@@ -257,13 +257,13 @@ const bare = new Bare({
   beta: true,
 })
 
-class Caladrius extends Card {
+class Vulture extends Card {
   onPlay(player: number, game: GameModel): void {
     this.starve(3, game, player)
   }
 }
-const caladrius = new Caladrius({
-  name: 'Caladrius',
+const vulture = new Vulture({
+  name: 'Vulture',
   id: 1031,
   cost: 3,
   points: 6,
@@ -310,7 +310,7 @@ export {
   truth,
   defiance,
   bare,
-  caladrius,
+  vulture,
   release,
   // TODO 1
 }

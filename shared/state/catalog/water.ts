@@ -185,7 +185,7 @@ const fish = new Fish({
   beta: true,
 })
 
-class Unnamed extends Card {
+class Cloud extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -202,8 +202,8 @@ class Unnamed extends Card {
     }
   }
 }
-const unnamed = new Unnamed({
-  name: 'Unnamed',
+const cloud = new Cloud({
+  name: 'Cloud',
   id: 7202,
   cost: 5,
   points: 5,
@@ -265,7 +265,7 @@ export {
   refresh,
   overflow,
   fish,
-  unnamed,
+  cloud,
   precious,
   // TODO 1
 }
