@@ -19,8 +19,7 @@ const dawn = new Dawn(4, {
   text: 'When played, gain Sight 4.\nMorning: Return this to hand.',
   keywords: [
     { name: Keywords.sight, x: 0, y: 74, value: 4 },
-    { name: Keywords.morning, x: -22, y: 104 },
-    // { name: Keywords.sight, x: 0, y: 130, value: 1 },
+    { name: Keywords.morning, x: 0, y: 104 },
   ],
 })
 
