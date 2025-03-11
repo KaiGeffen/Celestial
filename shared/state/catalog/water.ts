@@ -104,6 +104,7 @@ const dew = new Dew({
   story: 'I return\nOver and over again\nSwelling the future',
   keywords: [{ name: Keywords.morning, x: 0, y: 82 }],
 })
+dew.references = [{ card: dew, x: 6, y: 112 }]
 
 class GentleRain extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {

@@ -237,7 +237,7 @@ class Lantern extends Card {
           Object.getPrototypeOf(this),
           Object.getOwnPropertyDescriptors(this),
         )
-        copy.points += 2
+        copy.points += 1
 
         game.hand[player].unshift(copy)
       }
@@ -250,7 +250,7 @@ const lantern = new Lantern({
   cost: 5,
   points: 5,
   qualities: [Quality.FLEETING],
-  text: 'Fleeting.\nIf this is the last card in the story, transform a card in hand into a copy of this with +2 points.',
+  text: 'Fleeting.\nIf this is the last card in the story, transform a card in hand into a copy of this with +1 point.',
   beta: true,
 })
 
