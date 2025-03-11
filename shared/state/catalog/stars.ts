@@ -109,7 +109,7 @@ const moon = new Moon({
   name: 'Moon',
   id: 73,
   cost: 5,
-  points: 4,
+  points: 5,
   text: 'Morning: Trigger the morning abilities of the top 2 cards below this with morning.',
   keywords: [{ name: Keywords.morning, x: 0, y: 60 }],
 })
@@ -181,7 +181,7 @@ const possibility = new Possibility({
   beta: true,
 })
 
-class Neptune extends Card {
+class RadiantCore extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -197,8 +197,8 @@ class Neptune extends Card {
     return true
   }
 }
-const neptune = new Neptune({
-  name: 'Neptune',
+const radiantCore = new RadiantCore({
+  name: 'Radiant Core',
   id: 8056,
   cost: 3,
   text: 'Gain 4 breath.\nMorning: Gain 1 breath for each breath you ended the last round with.',
@@ -256,7 +256,7 @@ export {
   // BETA
   fates,
   possibility,
-  neptune,
+  radiantCore,
   dreamer,
   pride,
   // TODO 1
