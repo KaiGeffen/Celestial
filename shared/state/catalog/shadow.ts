@@ -194,7 +194,6 @@ const victim = new Victim({
   name: 'Victim',
   id: 4001,
   text: 'If you lose this round, Nourish -1 your opponent for each point you lost by.',
-  keywords: [{ name: Keywords.nourish, x: -31, y: 112, value: 1 }],
   beta: true,
 })
 
@@ -208,7 +207,7 @@ const rupture = new Rupture({
   name: 'Rupture',
   id: 4027,
   cost: 1,
-  text: "Create a Wound in your opponent's hand.",
+  text: "Create a Wound in your opponent's hand.\n(Wound is a 0:-3, Fleeting, When this is discarded, add it to the story.)",
   references: [{ card: wound, x: 5, y: 112 }],
   beta: true,
 })
