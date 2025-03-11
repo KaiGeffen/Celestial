@@ -151,7 +151,7 @@ export class CardImage {
     if (!this.scene.game.textures.exists(card.name)) {
       this.image.setTint(0x000)
 
-      const s = `${card.name}\n${card.cost}:${card.points}\n${card.text}`
+      const s = `${card.name}\n${card.text}`
       const txt = this.scene.add
         .text(0, 0, s, Style.cardText)
         .setWordWrapWidth(Space.cardWidth)
