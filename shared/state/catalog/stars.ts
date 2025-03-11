@@ -222,7 +222,7 @@ const dreamer = new Dreamer({
   id: 8832,
   cost: 1,
   points: 1,
-  text: 'Exhale 1: Worth +1.\nDraw a card if your hand is empty.',
+  text: 'Draw a card if your hand is empty.\nExhale 1: Worth +1.',
   beta: true,
 })
 

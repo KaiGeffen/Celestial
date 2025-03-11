@@ -232,24 +232,20 @@ const precious = new Precious({
 
 class Unfolding extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
+    if (super.exhale(4, game, player)) {
+      bonus += game.story.acts.length
+    }
+
     super.play(player, game, index, bonus)
 
-    if (super.exhale(2, game, player)) {
-      game.draw(3, player)
-    }
-  }
-
-  onPlay(player: number, game: GameModel): void {
-    if (game.hand[player].length > 0) {
-      const card = game.hand[player].shift()
-      game.deck[player].unshift(card)
-      game.draw(player, 1)
+    if (super.exhale(1, game, player)) {
+      game.draw(player)
     }
   }
 }
 const unfolding = new Unfolding({
   name: 'Unfolding',
-  id: 7210,
+  id: 7212,
   text: 'Exhale 4: Worth +1 for each card later in the story.\nExhale 1: Draw a card.',
   beta: true,
 })
@@ -268,5 +264,5 @@ export {
   fish,
   cloud,
   precious,
-  // TODO 1
+  unfolding,
 }
