@@ -82,7 +82,7 @@ export class CardImage {
       BBStyle.cardStats,
     )
       .setOrigin(0.5)
-      .setAlpha(0.001)
+      .setAlpha(card.beta ? 1 : 0.001)
       .on('pointerover', () =>
         hint.showText(`This card costs ${this.txtCost.text} breath to play.`),
       )
@@ -259,7 +259,7 @@ export class CardImage {
     if (cost !== null) {
       this.cost = cost
 
-      if (cost === this.card.cost) {
+      if (!this.card.beta && cost === this.card.cost) {
         this.txtCost.setAlpha(0.001)
       } else {
         this.txtCost.setAlpha(1)
@@ -274,7 +274,7 @@ export class CardImage {
   // Set the displayed point value of the card, or hide it if it's equal to the default value
   setPoints(amt: number): CardImage {
     // TODO Generalize once it's not just pet and child that have dynamic version
-    if (this.card.points !== this.card.basePoints) {
+    if (this.card.points !== this.card.basePoints || this.card.beta) {
       this.txtPoints.setAlpha(1)
       this.txtPoints.setText(`[stroke=${Color.cardStatChanged}]${amt}[/stroke]`)
     } else {
