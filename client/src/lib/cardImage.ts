@@ -1,21 +1,11 @@
 import 'phaser'
 import Catalog from '../../../shared/state/catalog'
-import {
-  Color,
-  Style,
-  BBStyle,
-  Time,
-  Space,
-  Flags,
-  UserSettings,
-} from '../settings/settings'
+import { Color, Style, BBStyle, Space, Flags } from '../settings/settings'
 import Card from '../../../shared/state/card'
-import { KeywordPosition, ReferencePosition } from '../../../shared/state/card'
-import { StatusBar } from '../lib/status'
+import { KeywordPosition } from '../../../shared/state/card'
 import { KeywordLabel, ReferenceLabel } from '../lib/keywordLabel'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import BaseScene from '../scene/baseScene'
-import Loader from '../loader/loader'
 import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 
 // The offset of cost / points

@@ -2,9 +2,7 @@ import 'phaser'
 
 import { Keyword, Keywords } from '../../../shared/state/keyword'
 import { Style } from '../settings/settings'
-import Catalog from '../../../shared/state/catalog'
 import Card from '../../../shared/state/card'
-import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
 export class KeywordLabel extends Phaser.GameObjects.Image {
   keyword: Keyword
