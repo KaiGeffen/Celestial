@@ -25,7 +25,7 @@ class PveMatch extends Match {
   protected async opponentActs() {
     const model = getClientGameModel(this.game.model, 1, false)
     const action = getAction(model)
-    if (this.game.onPlayerInput(1, action)) {
+    if (this.game.onPlayerInput(1, action, this.game.model.versionNo)) {
       await this.notifyState()
     } else {
       console.error('Computer opponent chose invalid action')

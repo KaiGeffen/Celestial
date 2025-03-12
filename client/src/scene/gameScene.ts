@@ -49,7 +49,7 @@ export class GameScene extends BaseScene {
     this.params = params
     // Reset variables
     this.queuedStates = {}
-    this.currentVersion = this.maxVersion = 0
+    this.currentVersion = this.maxVersion = -1
 
     // Connect with the server
     if (this.isTutorial) {
@@ -106,7 +106,7 @@ export class GameScene extends BaseScene {
 
   // Signal that a match has been found with given player names
   signalMatchFound(name1: string, name2: string): void {
-    console.log('Match found with', name1, name2)
+    console.log('Match found between', name1, 'and', name2)
 
     // TODO Smell, class these
     this.view.ourHand['showUsername'](name1)
@@ -120,7 +120,7 @@ export class GameScene extends BaseScene {
     // Commands region
     view.commands.recapCallback = () => {
       // Scan backwards through the queued states to find the start of the recap
-      for (let version = this.currentVersion; version >= 0; version--) {
+      for (let version = this.currentVersion - 1; version >= 0; version--) {
         if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
           // Continue backwards until we find where isRecap is false
           while (version >= 0 && this.queuedStates[version].isRecap) {
@@ -212,7 +212,7 @@ export class GameScene extends BaseScene {
     // Pass button
     view.pass.setCallback(() => {
       if (!this.paused) {
-        net.playCard(MechanicsSettings.PASS, this.currentVersion)
+        net.passTurn(this.currentVersion)
       }
     })
     view.pass.setShowResultsCallback(() => {
@@ -257,9 +257,9 @@ export class GameScene extends BaseScene {
     // Enable the searching region visual update
     this.view.searching.update(time, delta)
 
-    if (this.currentVersion in this.queuedStates) {
+    if (this.currentVersion + 1 in this.queuedStates) {
       let isDisplayed = this.displayState(
-        this.queuedStates[this.currentVersion],
+        this.queuedStates[this.currentVersion + 1],
       )
 
       // If the state was just shown, delete it
