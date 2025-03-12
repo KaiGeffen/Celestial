@@ -51,14 +51,14 @@ class ServerController {
     }
   }
 
-  onPlayerInput(player: number, choice: number, versionNum: number): boolean {
+  onPlayerInput(player: number, choice: number, versionNo: number): boolean {
     // Game is over
     if (this.model.winner !== null) {
       return false
     }
 
     // Version number is wrong
-    if (versionNum !== this.model.versionNo) {
+    if (versionNo !== this.model.versionNo) {
       return false
     }
 

@@ -114,13 +114,13 @@ class MatchQueue {
 // Register each of the events that the server receives during a match
 function registerEvents(ws: MatchServerWS, match: Match, playerNumber: number) {
   ws.on('playCard', (data) => {
-    match.doAction(playerNumber, data.cardNum, data.versionNum)
+    match.doAction(playerNumber, data.cardNum, data.versionNo)
   })
     .on('mulligan', (data) => {
       match.doMulligan(playerNumber, data.mulligan)
     })
     .on('passTurn', (data) => {
-      match.doAction(playerNumber, MechanicsSettings.PASS, data.versionNum)
+      match.doAction(playerNumber, MechanicsSettings.PASS, data.versionNo)
     })
     .on('exitMatch', (data) => {
       match.doExit(ws)

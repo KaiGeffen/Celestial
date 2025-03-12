@@ -51,11 +51,11 @@ export class MatchWS {
     }
   }
 
-  playCard(index: number, versionNum: number) {
+  playCard(index: number, versionNo: number) {
     this.socket.send({
       type: 'playCard',
       cardNum: index,
-      versionNum: versionNum,
+      versionNo: versionNo,
     })
   }
 
@@ -66,10 +66,10 @@ export class MatchWS {
     })
   }
 
-  passTurn(versionNum: number) {
+  passTurn(versionNo: number) {
     this.socket.send({
       type: 'passTurn',
-      versionNum: versionNum,
+      versionNo: versionNo,
     })
   }
 

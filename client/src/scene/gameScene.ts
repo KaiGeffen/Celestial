@@ -265,7 +265,6 @@ export class GameScene extends BaseScene {
       // If the state was just shown, delete it
       if (isDisplayed) {
         this.currentVersion++
-        // delete this.queuedStates[nextVersionNumber]
       }
     }
   }
