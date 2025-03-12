@@ -34,6 +34,13 @@ export default class GameModel {
   mulligansComplete: boolean[] = [false, false]
   roundCount: number = 0
 
+  // How many ms each player has left
+  timers: [number, number] = [
+    MechanicsSettings.TIMER_START,
+    MechanicsSettings.TIMER_START,
+  ]
+  lastTime: number = Date.now()
+
   // Effects
   sound: SoundEffect | null = null
   animations: Animation[][] = [[], []]
@@ -83,6 +90,12 @@ export default class GameModel {
     this.animations = [[], []]
   }
 
+  // Get how many ms the active player has left
+  getPlayerTimeLeft(player: number): number {
+    const elapsed = Date.now() - this.lastTime
+    return this.timers[player] - elapsed
+  }
+
   switchPriority() {
     this.priority = this.priority ^ 1
   }
@@ -130,7 +143,7 @@ export default class GameModel {
     copy.amtDrawn = [...this.amtDrawn]
     copy.avatars = [...this.avatars]
     copy.roundCount = this.roundCount
-
+    copy.timers = [...this.timers]
     return copy
   }
 

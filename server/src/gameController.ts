@@ -72,6 +72,9 @@ class ServerController {
       return false
     }
 
+    // Update the player's in-game timer
+    this.updatePlayerTimer(player, true)
+
     if (choice === MechanicsSettings.PASS) {
       if (!this.canPass(player)) {
         return false
@@ -103,7 +106,7 @@ class ServerController {
     }
   }
 
-  attemptPlay(player: number, cardNum: number): boolean {
+  private attemptPlay(player: number, cardNum: number): boolean {
     if (this.canPlay(player, cardNum)) {
       this.model.sound = null
       this.play(player, cardNum)
@@ -113,7 +116,7 @@ class ServerController {
     }
   }
 
-  play(player: number, cardNum: number): void {
+  private play(player: number, cardNum: number): void {
     // Get the cost first, since some cards change their cost when a card leaves hand
     const cost = this.model.getCost(this.model.hand[player][cardNum], player)
     this.model.breath[player] -= cost
@@ -129,6 +132,15 @@ class ServerController {
 
   doMulligan(player: number, mulligans: Mulligan): void {
     this.model.versionIncr()
+
+    // Update the time of last played card only if mulligans are now complete (And player with priority is now on the clock)
+    const updateLastPlayedTime = this.model.mulligansComplete[player ^ 1]
+    console.log(
+      'Updating last played time for player',
+      player,
+      this.model.lastTime.toString().slice(-10),
+    )
+    this.updatePlayerTimer(player, updateLastPlayedTime)
 
     // Determine which cards are being kept or thrown back
     const keptCards: [Card, number][] = []
@@ -266,7 +278,7 @@ class ServerController {
   }
 
   // The resolution phase, after both players have passed. Points and effects happen as cards resolve
-  doResolvePhase(): void {
+  private doResolvePhase(): void {
     this.model.score = [0, 0]
     const wins: [number, number] = [0, 0]
 
@@ -300,7 +312,7 @@ class ServerController {
     this.model.sound = null
   }
 
-  doUpkeepStatuses(player: number): void {
+  private doUpkeepStatuses(player: number): void {
     // Clear inspired from last round
     const createdStatuses = [Status.INSPIRED]
     this.model.status[player] = this.model.status[player].filter(
@@ -322,7 +334,7 @@ class ServerController {
     )
   }
 
-  canPlay(player: number, cardNum: number): boolean {
+  private canPlay(player: number, cardNum: number): boolean {
     if (cardNum >= this.model.hand[player].length) {
       return false
     }
@@ -335,7 +347,7 @@ class ServerController {
     return true
   }
 
-  canPass(player: number): boolean {
+  private canPass(player: number): boolean {
     return true
     // if (
     //   this.model.maxBreath[player] === BREATH_CAP &&
@@ -349,6 +361,21 @@ class ServerController {
     // }
 
     // return true
+  }
+
+  // Update the given player's in-game timer
+  private updatePlayerTimer(player: number, updateLastTime: boolean): void {
+    const timeElapsed = Date.now() - this.model.lastTime
+    if (updateLastTime) {
+      this.model.lastTime = Date.now()
+    }
+
+    // Lose the time they took to act
+    this.model.timers[player] -= timeElapsed
+
+    // Recoup time for having acted
+    console.log('Recouping time for player', this.model.lastTime)
+    this.model.timers[player] += MechanicsSettings.TIMER_RECOUP
   }
 }
 

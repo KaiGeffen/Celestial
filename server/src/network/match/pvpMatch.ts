@@ -75,6 +75,15 @@ class PvpMatch extends Match {
       console.error('Error updating match results:', error)
     })
   }
+
+  startTimerCheck() {
+    setInterval(async () => {
+      const currentPlayer = this.game.model.priority
+
+      const timeLeft = this.game.model.getPlayerTimeLeft(currentPlayer)
+      console.log(`Player ${currentPlayer + 1} has ${timeLeft}ms left`)
+    }, 1000) // Check every second
+  }
 }
 
 export default PvpMatch

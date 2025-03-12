@@ -11,6 +11,9 @@ export class MechanicsSettings {
   static readonly START_BREATH = 1
   static readonly BREATH_CAP = 10
 
+  static readonly TIMER_START = 4000 // 2 minutes
+  static readonly TIMER_RECOUP = 10000 // 10 seconds
+
   // The code to communicate passing, TODO is this a mechanic
   static readonly PASS = 10
 }
