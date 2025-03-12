@@ -57,10 +57,6 @@ function predictPointDifference(model: GameModel): number {
 }
 
 function wantDryRound(model: GameModel): boolean {
-  if (model.story.acts.length > 0 || model.passes === 0) {
-    return false
-  }
-
   let result = 0
   const weDraw = Math.min(
     2,
@@ -132,8 +128,8 @@ function getAIAction(model: GameModel): number {
     wantDryRound(model) &&
     // We have less than max breath
     model.maxBreath[0] < MechanicsSettings.BREATH_CAP &&
-    // No cards are in the story
-    model.story.acts.length > 0
+    // All the cards in the story are from us
+    model.story.acts.every((act) => act.owner === 0)
   ) {
     return MechanicsSettings.PASS
   }
