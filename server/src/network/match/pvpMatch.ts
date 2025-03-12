@@ -2,8 +2,11 @@ import Match from './match'
 import { MatchServerWS } from '../../../../shared/network/matchWS'
 import { updateMatchResult } from '../../db/updateMatchResult'
 import { Deck } from '../../../../shared/types/deck'
+import { MechanicsSettings } from '../../../../shared/settings'
 
 class PvpMatch extends Match {
+  timerCheckInterval: NodeJS.Timeout
+
   constructor(
     ws1: MatchServerWS,
     uuid1: string,
@@ -13,6 +16,8 @@ class PvpMatch extends Match {
     deck2: Deck,
   ) {
     super(ws1, uuid1, deck1, ws2, uuid2, deck2)
+
+    this.startTimerCheck()
   }
 
   // Given ws is disconnecting
@@ -76,13 +81,46 @@ class PvpMatch extends Match {
     })
   }
 
-  startTimerCheck() {
-    setInterval(async () => {
-      const currentPlayer = this.game.model.priority
+  // Start an interval to autopass if the user has no time left
+  private startTimerCheck() {
+    this.timerCheckInterval = setInterval(async () => {
+      // If game is over, stop checking
+      if (
+        this.game.model.winner !== null ||
+        this.ws1 === null ||
+        this.ws2 === null
+      ) {
+        if (this.timerCheckInterval) {
+          clearInterval(this.timerCheckInterval)
+          this.timerCheckInterval = null
+        }
+        return
+      }
 
-      const timeLeft = this.game.model.getPlayerTimeLeft(currentPlayer)
-      console.log(`Player ${currentPlayer + 1} has ${timeLeft}ms left`)
-    }, 1000) // Check every second
+      // During mulligan, check both players
+      for (let player = 0; player < 2; player++) {
+        const timeLeft = this.game.model.getPlayerTimeLeft(player)
+        if (timeLeft <= 0) {
+          let isValid = false
+
+          // Do default action for the current context
+          if (!this.game.model.mulligansComplete[player]) {
+            isValid = true
+            this.game.doMulligan(player, [false, false, false])
+          } else {
+            isValid = this.game.onPlayerInput(
+              player,
+              MechanicsSettings.PASS,
+              this.game.model.versionNo,
+            )
+          }
+
+          if (isValid) {
+            await this.notifyState()
+          }
+        }
+      }
+    }, 1000)
   }
 }
 

@@ -135,11 +135,6 @@ class ServerController {
 
     // Update the time of last played card only if mulligans are now complete (And player with priority is now on the clock)
     const updateLastPlayedTime = this.model.mulligansComplete[player ^ 1]
-    console.log(
-      'Updating last played time for player',
-      player,
-      this.model.lastTime.toString().slice(-10),
-    )
     this.updatePlayerTimer(player, updateLastPlayedTime)
 
     // Determine which cards are being kept or thrown back
@@ -374,7 +369,6 @@ class ServerController {
     this.model.timers[player] -= timeElapsed
 
     // Recoup time for having acted
-    console.log('Recouping time for player', this.model.lastTime)
     this.model.timers[player] += MechanicsSettings.TIMER_RECOUP
   }
 }

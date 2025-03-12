@@ -24,8 +24,6 @@ interface Match {
 }
 
 class Match implements Match {
-  timerCheckInterval: NodeJS.Timeout
-
   constructor(
     ws1: MatchServerWS,
     uuid1: string | null = null,
@@ -50,45 +48,6 @@ class Match implements Match {
       deck2.cosmetics.avatar,
     )
     this.game.start()
-
-    this.startTimerCheck()
-  }
-
-  // Start an interval to autopass if the user has no time left
-  startTimerCheck() {
-    this.timerCheckInterval = setInterval(async () => {
-      // If game is over, stop checking
-      if (
-        this.game.model.winner !== null ||
-        this.ws1 === null
-        // this.ws2 === null TODO For pvp check either
-      ) {
-        if (this.timerCheckInterval) {
-          clearInterval(this.timerCheckInterval)
-          this.timerCheckInterval = null
-        }
-        return
-      }
-
-      // Determine current player's time left
-      const currentPlayer = this.game.model.priority
-
-      const timeLeft = this.game.model.getPlayerTimeLeft(currentPlayer)
-      // console.log(`Player ${currentPlayer + 1} has ${timeLeft}ms left`)
-
-      // If time is up, do a default action
-      if (timeLeft <= 0) {
-        const isValid = this.game.onPlayerInput(
-          currentPlayer,
-          MechanicsSettings.PASS,
-          this.game.model.versionNo,
-        )
-
-        if (isValid) {
-          await this.notifyState()
-        }
-      }
-    }, 1000) // Check every .1 seconds
   }
 
   // Notify all connected players that the match has started
