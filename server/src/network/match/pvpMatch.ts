@@ -17,7 +17,7 @@ class PvpMatch extends Match {
   ) {
     super(ws1, uuid1, deck1, ws2, uuid2, deck2)
 
-    this.startTimerCheck()
+    // this.startTimerCheck() TODO Enable once in prod
   }
 
   // Given ws is disconnecting
