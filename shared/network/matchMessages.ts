@@ -18,11 +18,14 @@ export interface MatchClientMessages {
   }
   playCard: {
     cardNum: number
+    versionNum: number
   }
   mulligan: {
     mulligan: Mulligan
   }
-  passTurn: {}
+  passTurn: {
+    versionNum: number
+  }
   exitMatch: {}
   emote: {}
 }

@@ -51,14 +51,14 @@ export class MatchWS {
     }
   }
 
-  playCard(index: number) {
+  playCard(index: number, versionNum: number) {
     this.socket.send({
       type: 'playCard',
       cardNum: index,
+      versionNum: versionNum,
     })
   }
 
-  // TODO standardize mulligan type
   doMulligan(mulligans: Mulligan) {
     this.socket.send({
       type: 'mulligan',
@@ -66,9 +66,10 @@ export class MatchWS {
     })
   }
 
-  passTurn() {
+  passTurn(versionNum: number) {
     this.socket.send({
       type: 'passTurn',
+      versionNum: versionNum,
     })
   }
 

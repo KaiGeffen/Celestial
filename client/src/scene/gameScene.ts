@@ -144,7 +144,7 @@ export class GameScene extends BaseScene {
 
     // Hand region
     view.ourHand.setCardClickCallback((i: number) => {
-      net.playCard(i)
+      net.playCard(i, this.currentVersion)
     })
     view.ourHand.setDisplayCostCallback((cost: number) => {
       that.view.ourScore.displayCost(cost)
@@ -212,7 +212,7 @@ export class GameScene extends BaseScene {
     // Pass button
     view.pass.setCallback(() => {
       if (!this.paused) {
-        net.playCard(MechanicsSettings.PASS)
+        net.playCard(MechanicsSettings.PASS, this.currentVersion)
       }
     })
     view.pass.setShowResultsCallback(() => {
@@ -286,7 +286,7 @@ export class GameScene extends BaseScene {
 
     // Autopass
     if (this.shouldPass(state)) {
-      this.net.passTurn()
+      this.net.passTurn(state.versionNo)
     }
 
     // State was displayed

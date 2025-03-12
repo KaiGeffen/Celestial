@@ -51,15 +51,23 @@ class ServerController {
     }
   }
 
-  onPlayerInput(player: number, choice: number): boolean {
+  onPlayerInput(player: number, choice: number, versionNum: number): boolean {
+    // Game is over
     if (this.model.winner !== null) {
       return false
     }
 
+    // Version number is wrong
+    if (versionNum !== this.model.versionNo) {
+      return false
+    }
+
+    // Player doesn't have priority
     if (player !== this.model.priority) {
       return false
     }
 
+    // Still in mulligan phase
     if (this.model.mulligansComplete.includes(false)) {
       return false
     }
