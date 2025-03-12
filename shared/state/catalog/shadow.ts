@@ -181,7 +181,6 @@ const sickness = new Sickness({
   ],
   // references: [{ card: sickness, x: -48, y: 132 }],
 })
-sickness.references = [{ card: sickness, x: -48, y: 132 }]
 
 // BETA
 class Victim extends Card {
