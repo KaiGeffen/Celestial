@@ -361,6 +361,7 @@ export class View {
       .on('pointerover', () => {
         this.scene.hint.hide()
       })
+      .setScale(2)
 
     this.searching = new Regions.Searching().create(scene, avatarId)
 

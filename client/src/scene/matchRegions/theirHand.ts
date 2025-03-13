@@ -37,9 +37,9 @@ export default class TheirHandRegion extends Region {
     // Highlight visible when they have priority
     this.priority = this.scene.add
       .image(0, 0, 'chrome-TopPriority')
-      .setVisible(true)
+      .setVisible(false)
       .setOrigin(0)
-    // this.container.add(this.priority)
+    this.container.add(this.priority)
 
     // Create the status visuals
     this.createStatusDisplay()
@@ -86,7 +86,7 @@ export default class TheirHandRegion extends Region {
     this.deleteTemp()
 
     // Priority
-    // this.priority.setVisible(state.priority === 1)
+    this.priority.setVisible(!state.isRecap && state.priority === 1)
 
     // Avatar
     this.avatar.setQuality({ num: state.avatars[1] })

@@ -25,8 +25,7 @@ export default class OurHandRegion extends Region {
   callback: (i: number) => void
   displayCostCallback: (cost: number) => void
 
-  // Effect showing that we have priority
-  // priorityHighlight: Phaser.GameObjects.Video
+  priority: Phaser.GameObjects.Image
 
   btnDeck: Button
   btnDiscard: Button
@@ -48,21 +47,20 @@ export default class OurHandRegion extends Region {
   btnAvatar: Button
 
   create(scene: GameScene, avatarId: number): OurHandRegion {
-    let that = this
     this.scene = scene
-
-    // Avatar, status, hand, recap, pass buttons
 
     this.container = scene.add
       .container(0, Space.windowHeight - Space.handHeight)
       .setDepth(Depth.ourHand)
 
-    this.container.add(this.createBackground(scene))
-
     // Visual effect that highlights when we have priority
-    // this.priorityHighlight = this.createPriorityHighlight()
-    // .setVisible(false)
-    // this.container.add(this.priorityHighlight)
+    this.priority = scene.add
+      .image(0, Space.handHeight, 'chrome-BottomPriority')
+      .setVisible(false)
+      .setOrigin(0, 1)
+
+    this.priority.setDisplaySize(Space.windowWidth, this.priority.height)
+    this.container.add(this.priority)
 
     // Create the status visuals
     this.createStatusDisplay()
@@ -110,6 +108,9 @@ export default class OurHandRegion extends Region {
 
   displayState(state: GameModel): void {
     this.deleteTemp()
+
+    // Priority
+    this.priority.setVisible(!state.isRecap && state.priority === 0)
 
     // Pile sizes
     this.btnDeck.setText(`${state.deck[0].length}`)
@@ -263,17 +264,6 @@ export default class OurHandRegion extends Region {
   // Hide the cards in our hand, used when mulligan is visible
   hideHand(): void {
     this.deleteTemp()
-  }
-
-  private createBackground(scene: Phaser.Scene): Phaser.GameObjects.GameObject {
-    const s = `icon-${Flags.mobile ? 'Mobile' : ''}Bottom`
-    const y = Flags.mobile ? 0 : -50
-    let renderedBackground = scene.add
-      .image(Space.windowWidth, y, s)
-      .setOrigin(1, 0)
-      .setInteractive()
-
-    return renderedBackground
   }
 
   private createAvatar(avatarId: number): Button {
