@@ -1,15 +1,15 @@
 // The base colors used throughout this app
 const CoreColors: Record<string, number | string> = {
-  white: 0xF5F2EB,
+  white: 0xf5f2eb,
   whiteS: '#F5F2EB',
 
-  black: 0x353F4E,
+  black: 0x353f4e,
   blackS: '#353F4E',
 
-  gold: 0xFABD5D,
+  gold: 0xfabd5d,
   goldS: '#FABD5D',
-  
-  blue: 0x5F99DC,
+
+  blue: 0x5f99dc,
   blueS: '#5F99DC',
 
   brown: 0x664930,
@@ -19,14 +19,17 @@ const CoreColors: Record<string, number | string> = {
   greyA: 0x555555e0,
   lightGrey: 0x888888,
 
-  backgroundDark: 0xCBC1A8,
-  backgroundLight: 0xF5F2EB,
+  backgroundDark: 0xcbc1a8,
+  backgroundLight: 0xf5f2eb,
 
   darken: 0x333333,
 
-  buttonSelected: 0xBCB4B4,
-}
+  buttonSelected: 0xbcb4b4,
 
+  // NEW
+  c1: 0x111d2f,
+  c2: 0x1c3354,
+}
 
 // The colors for each component of the app (Ex: Slider)
 export const Color: Record<string, any> = {
@@ -91,7 +94,7 @@ export const Color: Record<string, any> = {
 
   // SCENES
   // Builder
-  cardCount: CoreColors.goldS,
+  cardCount: CoreColors.c2,
 
   // Preload
   progressBackground: CoreColors.backgroundDark,

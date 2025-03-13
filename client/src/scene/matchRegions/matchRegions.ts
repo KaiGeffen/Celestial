@@ -5,7 +5,6 @@ import OurHandRegion from './ourHand'
 import TheirHandRegion from './theirHand'
 import StoryRegion from './story'
 import OurScoreRegion from './ourScore'
-import TheirScoreRegion from './theirScore'
 import * as Overlay from './pileOverlays'
 import PassRegion from './pass'
 import RoundResultRegion from './roundResult'
@@ -20,7 +19,6 @@ export default class Regions {
   static TheirHand = TheirHandRegion
   static Story = StoryRegion
   static OurScore = OurScoreRegion
-  static TheirScore = TheirScoreRegion
 
   static OurDeck = Overlay.OurDeckOverlay
   static TheirDeck = Overlay.TheirDeckOverlay

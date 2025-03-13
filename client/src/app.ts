@@ -33,7 +33,7 @@ const config: Phaser.Types.Core.GameConfig = {
   height: Space.windowHeight,
   parent: 'game',
   disableContextMenu: true,
-  pixelArt: true,
+  // pixelArt: true,
   powerPreference: 'high-performance',
   transparent: true,
   dom: {

@@ -7,13 +7,11 @@ import {
   Depth,
   Space,
   Style,
-  Time,
   Flags,
   UserSettings,
 } from '../../settings/settings'
 import { GameScene } from '../gameScene'
 import Region from './baseRegion'
-import CardLocation from './cardLocation'
 
 export default class TheirHandRegion extends Region {
   priority: Phaser.GameObjects.Image
@@ -32,50 +30,25 @@ export default class TheirHandRegion extends Region {
 
     // Avatar, status, hand, recap, pass buttons
     this.container = scene.add.container(0, 0).setDepth(Depth.theirHand)
-    this.createBackground()
 
     // Highlight visible when they have priority
     this.priority = this.scene.add
       .image(0, 0, 'chrome-TopPriority')
       .setVisible(false)
       .setOrigin(0)
+      .setDepth(-1)
     this.container.add(this.priority)
 
     // Create the status visuals
     this.createStatusDisplay()
 
     // Create our avatar
-    this.avatar = this.createAvatar()
+    this.createAvatar()
 
-    // Create stack buttons
-    if (Flags.mobile) {
-      this.btnDeck = new Buttons.Stacks.Deck(
-        this.container,
-        Space.windowWidth - 169,
-        Space.handHeight / 2,
-        0,
-      )
-      this.btnDiscard = new Buttons.Stacks.Discard(
-        this.container,
-        Space.windowWidth - 111,
-        Space.handHeight / 2,
-        0,
-      )
-    } else {
-      const x = Space.windowWidth - 300
-      this.btnDeck = new Buttons.Stacks.Deck(
-        this.container,
-        x,
-        (Space.handHeight * 1) / 4,
-        1,
-      )
-      this.btnDiscard = new Buttons.Stacks.Discard(
-        this.container,
-        x,
-        (Space.handHeight * 3) / 4,
-        1,
-      )
-    }
+    // TODO Remove
+    this.showUsername('UsernameExtraLong (sfskfnskfs)')
+
+    this.createStackButtons()
 
     this.addHotkeyListeners()
 
@@ -93,17 +66,6 @@ export default class TheirHandRegion extends Region {
 
     // Statuses
     this.displayStatuses(state)
-
-    this.cards = []
-    for (let i = 0; i < state.hand[1].length; i++) {
-      let card = this.addCard(
-        state.hand[1][i],
-        CardLocation.theirHand(state, i, this.container),
-      ).moveToTopOnHover()
-
-      this.cards.push(card)
-      this.temp.push(card)
-    }
 
     // Pile sizes
     this.btnDeck.setText(`${state.deck[1].length}`)
@@ -133,46 +95,16 @@ export default class TheirHandRegion extends Region {
 
   showUsername(username: string): void {
     this.container.add(
-      this.scene.add
-        .text(
-          21 + Space.avatarSize / 2,
-          14 + Space.avatarSize,
-          username,
-          Style.username,
-        )
-        .setOrigin(0.5, 0),
+      this.scene.add.text(144, 19, username, Style.username).setOrigin(0),
     )
   }
 
-  private createBackground(): void {
-    const s = `icon-${Flags.mobile ? 'MobileBottom' : 'Top'}`
-    let background = this.scene.add
-      .image(Space.windowWidth, 0, s)
-      .setOrigin(1, 0)
-      .setInteractive()
+  private createAvatar(): void {
+    const x = 22
+    const y = 14
+    this.avatar = new Buttons.Avatar(this.container, x, y, 'Jules').setOrigin(0)
 
-    if (Flags.mobile) {
-      background.setFlipY(true)
-    }
-
-    this.container.add(background)
-  }
-
-  private createPriorityHighlight(): Phaser.GameObjects.Video {
-    return this.scene.add
-      .video(0, 0, 'priorityHighlight')
-      .setOrigin(0)
-      .play(true)
-      .setAlpha(0)
-  }
-
-  private createAvatar(): Button {
-    const x = Flags.mobile ? 10 : 21
-    const y = Flags.mobile ? 10 : 14
-    let btn = new Buttons.Avatar(this.container, x, y, 'Jules')
-    btn.setOrigin(0)
-
-    return btn
+    this.avatar.icon.setDisplaySize(95, 95)
   }
 
   private createStatusDisplay(): void {
@@ -180,23 +112,22 @@ export default class TheirHandRegion extends Region {
       let x = 21 + Space.avatarSize - 10
 
       // Inspire
-      let y = 14
-      this.btnInspire = new Buttons.Keywords.Inspire(this.container, x - 15, y)
+      this.btnInspire = new Buttons.Keywords.Inspire(this.container, 147, 58.85)
         .setOrigin(0)
-        .setVisible(false)
+        .setVisible(true)
       this.btnInspire.setOnHover(
-        ...this.onHoverStatus('Inspired', this.btnInspire),
+        ...this.onHoverStatus('Inspire', this.btnInspire),
       )
 
       // Nourish
-      y += Space.avatarSize / 2
-      this.btnNourish = new Buttons.Keywords.Nourish(this.container, x - 15, y)
+      this.btnNourish = new Buttons.Keywords.Nourish(this.container, 209, 58.85)
         .setOrigin(0)
-        .setVisible(false)
+        .setVisible(true)
       this.btnNourish.setOnHover(
         ...this.onHoverStatus('Nourish', this.btnNourish),
       )
     } else {
+      // TODO Remove
       // Bottom center of avatar
       let x = 10 + Space.avatarSize / 2
       const dx = Space.avatarSize / 4
@@ -213,6 +144,43 @@ export default class TheirHandRegion extends Region {
         y + 10,
       ).setVisible(false)
     }
+  }
+
+  private createStackButtons(): void {
+    const x = 37
+    let y = 150
+    this.scene.add.image(x, y, 'icon-Hand')
+    this.scene.add.text(x + 40, y, '4', Style.cardCount).setOrigin(0, 0.5)
+
+    y += 46
+    this.scene.add.image(x, y, 'icon-Deck')
+    this.scene.add.text(x + 40, y, '4', Style.cardCount).setOrigin(0, 0.5)
+
+    y += 46
+    this.scene.add.image(x, y, 'icon-Discard')
+    this.scene.add.text(x + 40, y, '4', Style.cardCount).setOrigin(0, 0.5)
+
+    y += 46
+    this.scene.add.image(x, y, 'icon-Removed')
+    this.scene.add.text(x + 40, y, '4', Style.cardCount).setOrigin(0, 0.5)
+
+    y += 46
+    this.scene.add.image(x, y, 'icon-Wins')
+    this.scene.add.text(x + 40, y, '4', Style.cardCount).setOrigin(0, 0.5)
+
+    // Existing buttons
+    this.btnDeck = new Buttons.Stacks.Deck(
+      this.container,
+      x,
+      (Space.handHeight * 1) / 4,
+      1,
+    )
+    this.btnDiscard = new Buttons.Stacks.Discard(
+      this.container,
+      x,
+      (Space.handHeight * 3) / 4,
+      1,
+    )
   }
 
   private onHoverStatus(status: string, btn: Button): [() => void, () => void] {
@@ -253,9 +221,9 @@ export default class TheirHandRegion extends Region {
     const amtInspire = amts[1]
     const amtNourish = amts[2] - amts[3]
 
-    this.btnInspire.setVisible(amtInspire !== 0).setText(`${amtInspire}`)
+    // this.btnInspire.setVisible(amtInspire !== 0).setText(`${amtInspire}`)
 
-    this.btnNourish.setVisible(amtNourish !== 0).setText(`${amtNourish}`)
+    // this.btnNourish.setVisible(amtNourish !== 0).setText(`${amtNourish}`)
   }
 
   // They have used the given emote

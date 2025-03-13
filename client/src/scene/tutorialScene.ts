@@ -207,7 +207,6 @@ export default class TutorialGameScene extends AdventureGameScene {
       case 0:
         this.view.pass.hide()
         this.view.theirHand.hide()
-        this.view.theirScore.hide()
         this.view.ourHand.hide()
         this.view.ourScore.hideAll().showWins()
         if (!Flags.mobile) {
@@ -237,7 +236,6 @@ export default class TutorialGameScene extends AdventureGameScene {
         break
 
       case 7:
-        this.view.theirScore.show()
         this.view.theirHand.show()['hideStacks']()
 
         this.view.pass.show()['disablePass']()

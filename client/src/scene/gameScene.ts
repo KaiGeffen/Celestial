@@ -329,7 +329,6 @@ export class View {
   theirHand: Region
   story: Region
   ourScore
-  theirScore: Region
   pass: PassRegion
   scores: Region
 
@@ -375,8 +374,6 @@ export class View {
 
     this.story = new Regions.Story().create(scene)
     this.ourScore = new Regions.OurScore().create(scene)
-    this.theirScore = new Regions.TheirScore().create(scene)
-    // this.ourButtons = new Regions.OurButtons().create(scene)
 
     this.pass = new Regions.Pass().create(scene)
     this.scores = new Regions.RoundResult().create(scene)
@@ -424,7 +421,6 @@ export class View {
     this.theirHand.displayState(state)
     this.story.displayState(state)
     this.ourScore.displayState(state)
-    this.theirScore.displayState(state)
     // this.ourButtons.displayState(state)
     this.pass.displayState(state)
     this.scores.displayState(state)

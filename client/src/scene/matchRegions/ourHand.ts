@@ -58,6 +58,7 @@ export default class OurHandRegion extends Region {
       .image(0, Space.handHeight, 'chrome-BottomPriority')
       .setVisible(false)
       .setOrigin(0, 1)
+      .setDepth(-1)
 
     this.priority.setDisplaySize(Space.windowWidth, this.priority.height)
     this.container.add(this.priority)

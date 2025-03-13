@@ -183,7 +183,7 @@ export default class Animator {
           // TODO Check length
           card = this.view.ourHand.cards[animation.index2]
         } else {
-          card = this.view.theirHand.cards[animation.index2]
+          card = undefined
         }
         break
 
