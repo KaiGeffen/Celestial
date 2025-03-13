@@ -206,7 +206,7 @@ export default class TutorialGameScene extends AdventureGameScene {
     switch (this.progress) {
       case 0:
         this.view.pass.hide()
-        this.view.theirHand.hide()
+        this.view.theirAvatar.hide()
         this.view.ourHand.hide()
         this.view.ourScore.hideAll().showWins()
         if (!Flags.mobile) {
@@ -236,7 +236,7 @@ export default class TutorialGameScene extends AdventureGameScene {
         break
 
       case 7:
-        this.view.theirHand.show()['hideStacks']()
+        this.view.theirAvatar.show()['hideStacks']()
 
         this.view.pass.show()['disablePass']()
         break
@@ -250,7 +250,7 @@ export default class TutorialGameScene extends AdventureGameScene {
     // Hide stacks
     this.view.commands.hide()
     this.view.ourHand['hideStacks']()
-    this.view.theirHand['hideStacks']()
+    this.view.theirAvatar['hideStacks']()
 
     // Hide pass until a point
     if (this.progress === 0) {
@@ -284,7 +284,6 @@ export default class TutorialGameScene extends AdventureGameScene {
     // this.view.discardPiles.hide()
     this.view.commands.hide()
     // this.view.ourHand['hideStacks']()
-    // this.view.theirHand['hideStacks']()
 
     // // Hide pass until a point
     // if (this.progress < 8) {

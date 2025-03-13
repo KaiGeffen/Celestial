@@ -21,7 +21,7 @@ function getSpace() {
     cardsPerPage: 8 * 4,
     stackOffset: 30,
     stackOverlap: 40,
-    // How far from the left announcement text should start (Passed!, Mulliganing, etc) 
+    // How far from the left announcement text should start (Passed!, Mulliganing, etc)
     announceOffset: width - 300 - 20,
     scoresOffset: width - 300 + 50,
     stackX: width - 300,
@@ -32,15 +32,15 @@ function getSpace() {
     textAreaHeight: 60,
 
     // These values are experimental and related to the 3/15 gui pass
-    cardWidth: Flags.mobile ? 196 * 0.7 : 336 * 7/10,
+    cardWidth: Flags.mobile ? 196 * 0.7 : (336 * 7) / 10,
     cardHeight: Flags.mobile ? 280 * 0.7 : 336,
-    fullCardWidth: 336 * 7/10,
+    fullCardWidth: (336 * 7) / 10,
     fullCardHeight: 336,
     storyXOverlap: 30,
     // If this is more than half of cardHeight, mistake
     storyYOverlap: Flags.mobile ? 80 : 120,
     // Dimensions of the hand regions
-    handHeight: Flags.mobile ? 80 : 160,
+    handHeight: Flags.mobile ? 80 : 255, // 160,
     // Standard corner width for rounded rectangles
     corner: 10,
     // For basic text

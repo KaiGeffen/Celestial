@@ -1,8 +1,10 @@
 import SearchingRegion from './searching'
 import CommandsRegion from './commands'
 
+import OurAvatarRegion from './ourAvatar'
+import TheirAvatarRegion from './theirAvatar'
+
 import OurHandRegion from './ourHand'
-import TheirHandRegion from './theirHand'
 import StoryRegion from './story'
 import OurScoreRegion from './ourScore'
 import * as Overlay from './pileOverlays'
@@ -15,8 +17,11 @@ import ResultsRegion from './results'
 export default class Regions {
   static Searching = SearchingRegion
   static Commands = CommandsRegion
+
+  static OurAvatar = OurAvatarRegion
+  static TheirAvatar = TheirAvatarRegion
+
   static OurHand = OurHandRegion
-  static TheirHand = TheirHandRegion
   static Story = StoryRegion
   static OurScore = OurScoreRegion
 

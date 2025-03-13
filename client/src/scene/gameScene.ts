@@ -110,7 +110,7 @@ export class GameScene extends BaseScene {
 
     // TODO Smell, class these
     this.view.ourHand['showUsername'](name1)
-    this.view.theirHand['showUsername'](name2)
+    this.view.theirAvatar['showUsername'](name2)
   }
 
   // Set all of the callback functions for the regions in the view
@@ -149,21 +149,21 @@ export class GameScene extends BaseScene {
     view.ourHand.setDisplayCostCallback((cost: number) => {
       that.view.ourScore.displayCost(cost)
     })
-    view.ourHand.setEmoteCallback(() => {
+    view.ourAvatar.setEmoteCallback(() => {
       this.net.signalEmote()
     })
 
     // Set the callbacks for overlays
-    view.ourHand.setOverlayCallbacks(
-      () => {
-        this.view.showOverlay(this.view.ourDeckOverlay)
-      },
-      () => {
-        this.view.showOverlay(this.view.ourDiscardOverlay)
-      },
-    )
+    // view.ourHand.setOverlayCallbacks(
+    //   () => {
+    //     this.view.showOverlay(this.view.ourDeckOverlay)
+    //   },
+    //   () => {
+    //     this.view.showOverlay(this.view.ourDiscardOverlay)
+    //   },
+    // )
 
-    view.theirHand.setOverlayCallbacks(
+    view.theirAvatar.setOverlayCallbacks(
       () => {
         this.view.showOverlay(this.view.theirDeckOverlay)
       },
@@ -311,7 +311,7 @@ export class GameScene extends BaseScene {
 
   // Opponent has used a given emote
   emote(emoteNumber: number): void {
-    this.view.theirHand['emote'](emoteNumber)
+    this.view.theirAvatar['emote'](emoteNumber)
   }
 }
 
@@ -324,9 +324,11 @@ export class View {
   // The buttons below Options button
   commands: Region
 
+  ourAvatar: Region
+  theirAvatar: Region
+
   ourHand: Region
   // ourButtons: Region
-  theirHand: Region
   story: Region
   ourScore
   pass: PassRegion
@@ -367,10 +369,7 @@ export class View {
     this.commands = new Regions.Commands().create(scene)
 
     // Create each of the regions
-    // this.createOurHand()
-    // new HandRegion()//.create(scene)
-    this.ourHand = new Regions.OurHand().create(scene, avatarId)
-    this.theirHand = new Regions.TheirHand().create(scene)
+    this.theirAvatar = new Regions.TheirAvatar().create(scene)
 
     this.story = new Regions.Story().create(scene)
     this.ourScore = new Regions.OurScore().create(scene)
@@ -378,6 +377,11 @@ export class View {
     this.pass = new Regions.Pass().create(scene)
     this.scores = new Regions.RoundResult().create(scene)
 
+    this.ourAvatar = new Regions.OurAvatar().create(scene, avatarId)
+    this.ourHand = new Regions.OurHand().create(scene, avatarId) // TODO Remove
+    // TODO Our stacks
+
+    // Overlays
     this.ourDeckOverlay = new Regions.OurDeck().create(scene)
     this.theirDeckOverlay = new Regions.TheirDeck().create(scene)
     this.ourDiscardOverlay = new Regions.OurDiscard()
@@ -417,11 +421,14 @@ export class View {
     this.mulligan.displayState(state)
     this.commands.displayState(state)
 
+    this.theirAvatar.displayState(state)
+
+    this.ourAvatar.displayState(state)
     this.ourHand.displayState(state)
-    this.theirHand.displayState(state)
-    this.story.displayState(state)
     this.ourScore.displayState(state)
-    // this.ourButtons.displayState(state)
+    // Our stacks
+
+    this.story.displayState(state)
     this.pass.displayState(state)
     this.scores.displayState(state)
 

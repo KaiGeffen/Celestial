@@ -361,7 +361,7 @@ export default class Animator {
         if (owner === 0) {
           obj = this.view.ourHand['btnInspire'] // TODO Smell, fix typing
         } else {
-          obj = this.view.theirHand['btnInspire']
+          obj = this.view.theirAvatar['btnInspire']
         }
         break
 
@@ -369,7 +369,7 @@ export default class Animator {
         if (owner === 0) {
           obj = this.view.ourHand['btnNourish']
         } else {
-          obj = this.view.theirHand['btnNourish']
+          obj = this.view.theirAvatar['btnNourish']
         }
         break
     }
