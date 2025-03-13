@@ -11,7 +11,6 @@ export default class ScoreRegion extends Region {
   currentBreath: number
 
   // Stack amount
-  txtHand: Phaser.GameObjects.Text
   txtDeck: Phaser.GameObjects.Text
   txtDiscard: Phaser.GameObjects.Text
   txtRemoved: Phaser.GameObjects.Text
@@ -38,12 +37,10 @@ export default class ScoreRegion extends Region {
 
     // Create all of the breath icons
     this.createBreathIcons()
+    this.createWins()
 
     const x = Space.windowWidth - (Flags.mobile ? 5 : 124)
     const y = Space.windowHeight - (Flags.mobile ? Space.handHeight + 15 : 114)
-    this.txtWins = scene.add
-      .text(x, y, '', Style.basic)
-      .setOrigin(Flags.mobile ? 1 : 0, Flags.mobile ? 0.5 : 0)
 
     this.txtBreath = scene.add
       .text(
@@ -55,7 +52,7 @@ export default class ScoreRegion extends Region {
       .setOrigin(Flags.mobile ? 0.5 : 0, 0.5)
 
     // Add each of these objects to container
-    this.container.add([this.txtBreath, this.txtWins])
+    this.container.add(this.txtBreath)
 
     return this
   }
@@ -97,9 +94,9 @@ export default class ScoreRegion extends Region {
     // Discard
     this.container.add([
       this.scene.add.image(x, y, 'icon-Discard'),
-      this.scene.add
+      (this.txtDiscard = this.scene.add
         .text(x1, y + textOffset, '10', Style.todoPileCount)
-        .setOrigin(0, 1),
+        .setOrigin(0, 1)),
       this.scene.add
         .text(x1, y + textOffset, 'Discard', Style.todoHint)
         .setOrigin(0),
@@ -108,9 +105,9 @@ export default class ScoreRegion extends Region {
     // Deck
     this.container.add([
       this.scene.add.image(x, y - dy, 'icon-Deck'),
-      this.scene.add
+      (this.txtDeck = this.scene.add
         .text(x1, y - dy + textOffset, '4', Style.todoPileCount)
-        .setOrigin(0, 1),
+        .setOrigin(0, 1)),
       this.scene.add
         .text(x1, y - dy + textOffset, 'Deck', Style.todoHint)
         .setOrigin(0),
@@ -119,11 +116,28 @@ export default class ScoreRegion extends Region {
     // Removed
     this.container.add([
       this.scene.add.image(x, y - dy * 2, 'icon-Removed'),
-      this.scene.add
+      (this.txtRemoved = this.scene.add
         .text(x1, y - dy * 2 + textOffset, '4', Style.todoPileCount)
-        .setOrigin(0, 1),
+        .setOrigin(0, 1)),
       this.scene.add
         .text(x1, y - dy * 2 + textOffset, 'Removed', Style.todoHint)
+        .setOrigin(0),
+    ])
+  }
+
+  private createWins(): void {
+    const x = Space.windowWidth - 250 + 136
+    const x1 = x + 50
+    const y = Space.windowHeight - 60 - 80
+    const textOffset = 4
+
+    this.container.add([
+      this.scene.add.image(x, y, 'icon-Wins'),
+      (this.txtWins = this.scene.add
+        .text(x1, y + textOffset, '', Style.todoPileCount)
+        .setOrigin(0, 1)),
+      this.scene.add
+        .text(x1, y + textOffset, 'Wins', Style.todoHint)
         .setOrigin(0),
     ])
   }
