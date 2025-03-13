@@ -94,7 +94,7 @@ export const Color: Record<string, any> = {
 
   // SCENES
   // Builder
-  cardCount: CoreColors.c2,
+  cardCount: CoreColors.goldS,
 
   // Preload
   progressBackground: CoreColors.backgroundDark,
@@ -112,4 +112,7 @@ export const Color: Record<string, any> = {
   tutorialBackground: '#aace',
   // A translucent background that draws attention to one element on the screen
   focusBackground: CoreColors.grey,
+
+  // TODO New after rewok
+  stackCount: CoreColors.c2,
 }

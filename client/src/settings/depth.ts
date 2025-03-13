@@ -2,16 +2,16 @@
 export const Depth: Record<string, number> = {
   discardPiles: -1,
 
-  storyAtDay: 0,
   ourHand: 1,
   theirHand: 1,
-  storyAtNight: 2,
-  ourScore: 3,
-  theirScore: 3,
-  mulligan: 4,
+  storyAtDay: 2,
+  storyAtNight: 3,
+  ourScore: 4,
+  theirScore: 4,
+  mulligan: 5,
 
   // Above all other layers with cards
-  aboveOtherCards: 5,
+  aboveOtherCards: 6,
 
   commands: 7,
   tutorial: 7,

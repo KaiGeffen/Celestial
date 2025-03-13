@@ -16,9 +16,18 @@ import Region from './baseRegion'
 export default class TheirHandRegion extends Region {
   priority: Phaser.GameObjects.Image
 
+  // Stack amount
+  txtHand: Phaser.GameObjects.Text
+  txtDeck: Phaser.GameObjects.Text
+  txtDiscard: Phaser.GameObjects.Text
+  txtRemoved: Phaser.GameObjects.Text
+  txtWins: Phaser.GameObjects.Text
+
+  // TODO Old
   btnDeck: Button
   btnDiscard: Button
 
+  //
   btnInspire: Button
   btnNourish: Button
 
@@ -61,15 +70,18 @@ export default class TheirHandRegion extends Region {
     // Priority
     this.priority.setVisible(!state.isRecap && state.priority === 1)
 
-    // Avatar
+    // Avatar TODO Only needs to happen once
     this.avatar.setQuality({ num: state.avatars[1] })
 
     // Statuses
     this.displayStatuses(state)
 
     // Pile sizes
-    this.btnDeck.setText(`${state.deck[1].length}`)
-    this.btnDiscard.setText(`${state.pile[1].length}`)
+    this.txtHand.setText(`${state.hand[1].length}`)
+    this.txtDeck.setText(`${state.deck[1].length}`)
+    this.txtDiscard.setText(`${state.pile[1].length}`)
+    this.txtRemoved.setText(`${state.expended[1].length}`)
+    this.txtWins.setText(`${state.wins[1]}`)
   }
 
   addHotkeyListeners() {
@@ -150,34 +162,44 @@ export default class TheirHandRegion extends Region {
     const x = 37
     let y = 150
     this.scene.add.image(x, y, 'icon-Hand')
-    this.scene.add.text(x + 40, y, '4', Style.cardCount).setOrigin(0, 0.5)
+    this.txtHand = this.scene.add
+      .text(x + 40, y, '', Style.todoPileCount)
+      .setOrigin(0, 0.5)
 
     y += 46
     this.scene.add.image(x, y, 'icon-Deck')
-    this.scene.add.text(x + 40, y, '4', Style.cardCount).setOrigin(0, 0.5)
+    this.txtDeck = this.scene.add
+      .text(x + 40, y, '', Style.todoPileCount)
+      .setOrigin(0, 0.5)
 
     y += 46
     this.scene.add.image(x, y, 'icon-Discard')
-    this.scene.add.text(x + 40, y, '4', Style.cardCount).setOrigin(0, 0.5)
+    this.txtDiscard = this.scene.add
+      .text(x + 40, y, '', Style.todoPileCount)
+      .setOrigin(0, 0.5)
 
     y += 46
     this.scene.add.image(x, y, 'icon-Removed')
-    this.scene.add.text(x + 40, y, '4', Style.cardCount).setOrigin(0, 0.5)
+    this.txtRemoved = this.scene.add
+      .text(x + 40, y, '', Style.todoPileCount)
+      .setOrigin(0, 0.5)
 
     y += 46
     this.scene.add.image(x, y, 'icon-Wins')
-    this.scene.add.text(x + 40, y, '4', Style.cardCount).setOrigin(0, 0.5)
+    this.txtWins = this.scene.add
+      .text(x + 40, y, '', Style.todoPileCount)
+      .setOrigin(0, 0.5)
 
     // Existing buttons
     this.btnDeck = new Buttons.Stacks.Deck(
       this.container,
-      x,
+      -100,
       (Space.handHeight * 1) / 4,
       1,
     )
     this.btnDiscard = new Buttons.Stacks.Discard(
       this.container,
-      x,
+      -100,
       (Space.handHeight * 3) / 4,
       1,
     )
@@ -221,9 +243,21 @@ export default class TheirHandRegion extends Region {
     const amtInspire = amts[1]
     const amtNourish = amts[2] - amts[3]
 
-    // this.btnInspire.setVisible(amtInspire !== 0).setText(`${amtInspire}`)
+    this.btnInspire.setVisible(amtInspire !== 0).setText(`${amtInspire}`)
+    this.btnNourish.setVisible(amtNourish !== 0).setText(`${amtNourish}`)
 
-    // this.btnNourish.setVisible(amtNourish !== 0).setText(`${amtNourish}`)
+    // If there is no inspire, move nourish to the inspire position
+    if (amtInspire === 0) {
+      this.btnNourish.setPosition(
+        this.btnInspire.icon.x,
+        this.btnInspire.icon.y,
+      )
+    } else {
+      this.btnNourish.setPosition(
+        this.btnInspire.icon.x + 63,
+        this.btnInspire.icon.y,
+      )
+    }
   }
 
   // They have used the given emote

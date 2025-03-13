@@ -31,8 +31,10 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   // Count of a card in the deck
   cardCount: {
     fontFamily: mainFont,
-    fontSize: '20px',
+    fontSize: '24px', //FontSettings.standard.size,
     color: Color.cardCount,
+    stroke: '#0009',
+    strokeThickness: 3,
   },
   // Text for the buttons that are just text
   textButton: {
@@ -139,6 +141,13 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     fontFamily: altFont,
     fontSize: '18px',
     color: Color.basicText,
+  },
+
+  // Count of a card in the deck
+  todoPileCount: {
+    fontFamily: mainFont,
+    fontSize: '20px',
+    color: Color.stackCount,
   },
 }
 
