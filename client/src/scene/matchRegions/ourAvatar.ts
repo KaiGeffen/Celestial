@@ -3,18 +3,9 @@ import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import { CardImage } from '../../lib/cardImage'
 import GameModel from '../../../../shared/state/gameModel'
-import {
-  Depth,
-  Space,
-  Style,
-  Time,
-  UserSettings,
-} from '../../settings/settings'
-import BaseScene from '../baseScene'
+import { Depth, Space, Style } from '../../settings/settings'
 import Region from './baseRegion'
-import CardLocation from './cardLocation'
 import { GameScene } from '../gameScene'
-import { MechanicsSettings } from '../../../../shared/settings'
 
 export default class OurHandRegion extends Region {
   // Function called when elements in this region are interacted with

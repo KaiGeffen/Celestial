@@ -153,7 +153,7 @@ export default class OurHandRegion extends Region {
   }
 
   // Hide the cards in our hand, used when mulligan is visible
-  hideHand(): void {
+  private hideHand(): void {
     this.deleteTemp()
   }
 

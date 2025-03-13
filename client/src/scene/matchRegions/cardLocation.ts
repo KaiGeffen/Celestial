@@ -18,7 +18,7 @@ export default class CardLocation {
     container?: Phaser.GameObjects.Container,
   ): [number, number] {
     // X of the first card in their hand
-    const x0 = (Flags.mobile ? 100 : 220) + Space.cardWidth / 2
+    const x0 = 400 + Space.cardWidth / 2
 
     let dx = Space.cardWidth + Space.pad
 
