@@ -14,11 +14,9 @@ import {
 import { GameScene } from '../gameScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
-import { MechanicsSettings } from '../../../../shared/settings'
 
 export default class TheirHandRegion extends Region {
-  // Effect showing that they have priority
-  priorityHighlight: Phaser.GameObjects.Video
+  priority: Phaser.GameObjects.Image
 
   btnDeck: Button
   btnDiscard: Button
@@ -37,8 +35,11 @@ export default class TheirHandRegion extends Region {
     this.createBackground()
 
     // Highlight visible when they have priority
-    this.priorityHighlight = this.createPriorityHighlight().setVisible(false)
-    this.container.add(this.priorityHighlight)
+    this.priority = this.scene.add
+      .image(0, 0, 'chrome-TopPriority')
+      .setVisible(true)
+      .setOrigin(0)
+    // this.container.add(this.priority)
 
     // Create the status visuals
     this.createStatusDisplay()
@@ -83,6 +84,9 @@ export default class TheirHandRegion extends Region {
 
   displayState(state: GameModel): void {
     this.deleteTemp()
+
+    // Priority
+    // this.priority.setVisible(state.priority === 1)
 
     // Avatar
     this.avatar.setQuality({ num: state.avatars[1] })
@@ -235,17 +239,6 @@ export default class TheirHandRegion extends Region {
     }
 
     return [onHover, onExit]
-  }
-
-  // Animate them getting or losing priority
-  private animatePriority(state: GameModel): void {
-    const targetAlpha = state.priority === 1 && !state.isRecap ? 1 : 0
-
-    this.scene.tweens.add({
-      targets: this.priorityHighlight,
-      alpha: targetAlpha,
-      duration: Time.recapTweenWithPause(),
-    })
   }
 
   private displayStatuses(state: GameModel): void {

@@ -137,8 +137,6 @@ export default class TutorialGameScene extends AdventureGameScene {
 
     switch (this.params.missionID) {
       case 0:
-        this.view.decks.hide()
-        this.view.discardPiles.hide()
         this.view.commands.hide()
         this.displayHints1()
         break
@@ -252,8 +250,6 @@ export default class TutorialGameScene extends AdventureGameScene {
     this.displayHint(1)
 
     // Hide stacks
-    this.view.decks.hide()
-    this.view.discardPiles.hide()
     this.view.commands.hide()
     this.view.ourHand['hideStacks']()
     this.view.theirHand['hideStacks']()

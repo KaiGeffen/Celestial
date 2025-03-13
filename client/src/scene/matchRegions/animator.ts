@@ -199,17 +199,17 @@ export default class Animator {
 
       case Zone.Deck:
         if (owner === 0) {
-          card = this.view.decks.cards[animation.index2]
+          card = undefined
         } else {
-          card = this.view.decks.cards2[animation.index2]
+          card = undefined
         }
         break
 
       case Zone.Discard:
         if (owner === 0) {
-          card = this.view.discardPiles.cards[animation.index2]
+          card = undefined
         } else {
-          card = this.view.discardPiles.cards2[animation.index2]
+          card = undefined
         }
         break
 

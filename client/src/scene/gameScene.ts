@@ -223,25 +223,6 @@ export class GameScene extends BaseScene {
       }
     })
 
-    // Piles (Show overlay when clicked)
-    view.decks.setCallback(
-      () => {
-        that.view.ourDeckOverlay.show()
-      },
-      () => {
-        that.view.theirDeckOverlay.show()
-      },
-    )
-
-    view.discardPiles.setCallback(
-      () => {
-        that.view.ourDiscardOverlay.show()
-      },
-      () => {
-        that.view.theirDiscardOverlay.show()
-      },
-    )
-
     // Mulligan
     view.mulligan.setCallback(() => {
       const choice: [boolean, boolean, boolean] = view.mulligan.mulliganChoices
@@ -349,8 +330,6 @@ export class View {
   story: Region
   ourScore
   theirScore: Region
-  decks: Region
-  discardPiles: Region
   pass: PassRegion
   scores: Region
 
@@ -398,8 +377,6 @@ export class View {
     this.theirScore = new Regions.TheirScore().create(scene)
     // this.ourButtons = new Regions.OurButtons().create(scene)
 
-    this.decks = new Regions.Decks().create(scene)
-    this.discardPiles = new Regions.DiscardPiles().create(scene)
     this.pass = new Regions.Pass().create(scene)
     this.scores = new Regions.RoundResult().create(scene)
 
@@ -448,8 +425,6 @@ export class View {
     this.ourScore.displayState(state)
     this.theirScore.displayState(state)
     // this.ourButtons.displayState(state)
-    this.decks.displayState(state)
-    this.discardPiles.displayState(state)
     this.pass.displayState(state)
     this.scores.displayState(state)
 

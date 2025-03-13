@@ -4,6 +4,7 @@ import Catalog from '../../../shared/state/catalog'
 // Json data
 import avatarData from './avatars.json'
 import iconData from './icons.json'
+import chromeData from './chrome.json'
 import backgroundData from './backgrounds.json'
 import keywordData from './keywords.json'
 import storyData from './stories.json'
@@ -48,6 +49,11 @@ const imagePrefixMap: PrefixEntry[] = [
     fp: 'icons/',
     prefix: 'icon-',
     list: iconData,
+  },
+  {
+    fp: 'chrome/',
+    prefix: 'chrome-',
+    list: chromeData,
   },
   {
     fp: 'keywords/',
