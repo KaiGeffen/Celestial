@@ -231,7 +231,7 @@ const precious = new Precious({
 
 class Unfolding extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    if (super.exhale(4, game, player)) {
+    if (super.exhale(5, game, player)) {
       bonus += game.story.acts.length
     }
 
@@ -245,7 +245,7 @@ class Unfolding extends Card {
 const unfolding = new Unfolding({
   name: 'Unfolding',
   id: 7212,
-  text: 'Exhale 4: Worth +1 for each card later in the story.\nExhale 1: Draw a card.',
+  text: 'Exhale 5: Worth +1 for each card later in the story.\nExhale 1: Draw a card.',
   beta: true,
 })
 
