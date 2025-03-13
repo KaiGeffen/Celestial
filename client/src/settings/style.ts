@@ -149,6 +149,11 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     fontSize: '20px',
     color: Color.stackCount,
   },
+  todoHint: {
+    fontFamily: mainFont,
+    fontSize: '12px',
+    color: Color.hint,
+  },
 }
 
 // The styling for BBCode objects, from the rexui module

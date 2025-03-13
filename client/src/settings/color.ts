@@ -27,8 +27,8 @@ const CoreColors: Record<string, number | string> = {
   buttonSelected: 0xbcb4b4,
 
   // NEW
-  c1: 0x111d2f,
-  c2: 0x1c3354,
+  c1: '#5f99dc',
+  c2: '#1c3354',
 }
 
 // The colors for each component of the app (Ex: Slider)
@@ -115,4 +115,5 @@ export const Color: Record<string, any> = {
 
   // TODO New after rewok
   stackCount: CoreColors.c2,
+  hint: CoreColors.c1,
 }

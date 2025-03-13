@@ -37,6 +37,9 @@ export default class OurHandRegion extends Region {
     // Create our avatar
     this.createAvatar(avatarId)
 
+    // TODO Temp
+    this.showUsername('Test Man (1200)')
+
     return this
   }
 
@@ -52,14 +55,7 @@ export default class OurHandRegion extends Region {
 
   showUsername(username: string): void {
     this.container.add(
-      this.scene.add
-        .text(
-          21 + Space.avatarSize / 2,
-          11 + Space.avatarSize,
-          username,
-          Style.username,
-        )
-        .setOrigin(0.5, 0),
+      this.scene.add.text(25, 180, username, Style.username).setOrigin(0),
     )
   }
 

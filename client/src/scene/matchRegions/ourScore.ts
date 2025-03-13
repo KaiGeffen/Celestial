@@ -10,8 +10,14 @@ export default class ScoreRegion extends Region {
   maxBreath: number
   currentBreath: number
 
-  txtBreath: Phaser.GameObjects.Text
+  // Stack amount
+  txtHand: Phaser.GameObjects.Text
+  txtDeck: Phaser.GameObjects.Text
+  txtDiscard: Phaser.GameObjects.Text
+  txtRemoved: Phaser.GameObjects.Text
+
   txtWins: Phaser.GameObjects.Text
+  txtBreath: Phaser.GameObjects.Text
 
   // Icons for each of the states of breath
   breathBasic: Phaser.GameObjects.Image[] = []
@@ -28,6 +34,8 @@ export default class ScoreRegion extends Region {
     this.scene = scene
     this.container = scene.add.container().setDepth(Depth.ourScore)
 
+    this.createStacks()
+
     // Create all of the breath icons
     this.createBreathIcons()
 
@@ -37,11 +45,10 @@ export default class ScoreRegion extends Region {
       .text(x, y, '', Style.basic)
       .setOrigin(Flags.mobile ? 1 : 0, Flags.mobile ? 0.5 : 0)
 
-    // On mobile, center the text, otherwise have it aligned with wins text
     this.txtBreath = scene.add
       .text(
         Flags.mobile ? this.BREATH_X : x,
-        this.BREATH_Y + (Flags.mobile ? 0 : 5),
+        this.BREATH_Y + 5,
         '',
         Style.basic,
       )
@@ -78,6 +85,47 @@ export default class ScoreRegion extends Region {
       this.breathOom[i].setVisible(i < cost)
       this.breathHover[i].setVisible(i < Math.min(cost, this.currentBreath))
     }
+  }
+
+  private createStacks(): void {
+    const x = Space.windowWidth - 250
+    const x1 = x + 50
+    const y = Space.windowHeight - 60
+    const dy = 80
+    const textOffset = 4
+
+    // Discard
+    this.container.add([
+      this.scene.add.image(x, y, 'icon-Discard'),
+      this.scene.add
+        .text(x1, y + textOffset, '10', Style.todoPileCount)
+        .setOrigin(0, 1),
+      this.scene.add
+        .text(x1, y + textOffset, 'Discard', Style.todoHint)
+        .setOrigin(0),
+    ])
+
+    // Deck
+    this.container.add([
+      this.scene.add.image(x, y - dy, 'icon-Deck'),
+      this.scene.add
+        .text(x1, y - dy + textOffset, '4', Style.todoPileCount)
+        .setOrigin(0, 1),
+      this.scene.add
+        .text(x1, y - dy + textOffset, 'Deck', Style.todoHint)
+        .setOrigin(0),
+    ])
+
+    // Removed
+    this.container.add([
+      this.scene.add.image(x, y - dy * 2, 'icon-Removed'),
+      this.scene.add
+        .text(x1, y - dy * 2 + textOffset, '4', Style.todoPileCount)
+        .setOrigin(0, 1),
+      this.scene.add
+        .text(x1, y - dy * 2 + textOffset, 'Removed', Style.todoHint)
+        .setOrigin(0),
+    ])
   }
 
   // Create all of the breath icons
