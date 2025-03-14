@@ -76,11 +76,11 @@ export default class TheirHandRegion extends Region {
     this.displayStatuses(state)
 
     // Pile sizes
+    this.txtWins.setText(`${state.wins[1]}/5`)
     this.txtHand.setText(`${state.hand[1].length}`)
     this.txtDeck.setText(`${state.deck[1].length}`)
     this.txtDiscard.setText(`${state.pile[1].length}`)
     this.txtRemoved.setText(`${state.expended[1].length}`)
-    this.txtWins.setText(`${state.wins[1]}`)
   }
 
   addHotkeyListeners() {
@@ -160,7 +160,7 @@ export default class TheirHandRegion extends Region {
   private createStackButtons(): void {
     const x = 37
     let y = 150
-    this.scene.add.image(x, y, 'icon-Wins').setScale(2 / 3)
+    this.scene.add.image(x, y, 'icon-Wins').setScale(24 / 35)
     this.txtWins = this.scene.add
       .text(x + 40, y, '', Style.todoPileCount)
       .setOrigin(0, 0.5)
@@ -172,19 +172,19 @@ export default class TheirHandRegion extends Region {
       .setOrigin(0, 0.5)
 
     y += 46
-    this.scene.add.image(x, y, 'icon-Deck').setScale(2 / 3)
+    this.scene.add.image(x, y, 'icon-Deck').setScale(24 / 35)
     this.txtDeck = this.scene.add
       .text(x + 40, y, '', Style.todoPileCount)
       .setOrigin(0, 0.5)
 
     y += 46
-    this.scene.add.image(x, y, 'icon-Discard').setScale(2 / 3)
+    this.scene.add.image(x, y, 'icon-Discard').setScale(24 / 35)
     this.txtDiscard = this.scene.add
       .text(x + 40, y, '', Style.todoPileCount)
       .setOrigin(0, 0.5)
 
     y += 46
-    this.scene.add.image(x, y, 'icon-Removed').setScale(2 / 3)
+    this.scene.add.image(x, y, 'icon-Removed').setScale(24 / 35)
     this.txtRemoved = this.scene.add
       .text(x + 40, y, '', Style.todoPileCount)
       .setOrigin(0, 0.5)
