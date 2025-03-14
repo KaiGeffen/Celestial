@@ -88,6 +88,8 @@ export default class TheirAvatarRegion extends Region {
 
     // If removed is empty, make it invisible
     this.removedContainer.setVisible(state.expended[1].length > 0)
+
+    super.displayState(state)
   }
 
   addHotkeyListeners() {

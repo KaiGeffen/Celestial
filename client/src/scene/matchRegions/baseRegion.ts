@@ -1,4 +1,5 @@
 import 'phaser'
+import Phaser from 'phaser'
 
 import { CardImage } from '../../lib/cardImage'
 import Card from '../../../../shared/state/card'
@@ -24,7 +25,25 @@ export default class Region {
   }
 
   // Display parts of the given state relevant to this region
-  displayState(state: GameModel): void {}
+  displayState(state: GameModel): void {
+    // Check if the state is a recap
+    const isRecap = state.isRecap // Adjust this based on your actual state structure
+
+    // Iterate through all children in this.container
+    this.container.list.forEach((child) => {
+      // Check if the child is a Phaser.GameObject.Text object
+      if (
+        child instanceof Phaser.GameObjects.Text
+        //  || child instanceof Phaser.GameObjects.Image
+      ) {
+        if (isRecap) {
+          child.setTintFill(0xffffff)
+        } else {
+          child.clearTint()
+        }
+      }
+    })
+  }
 
   show(): Region {
     this.container.setVisible(true)

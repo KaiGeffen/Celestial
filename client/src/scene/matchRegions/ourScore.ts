@@ -81,6 +81,8 @@ export default class ScoreRegion extends Region {
 
     const s = `${state.breath[0]}/${state.maxBreath[0]}`
     this.txtBreath.setText(s)
+
+    super.displayState(state)
   }
 
   // Display a given breath cost

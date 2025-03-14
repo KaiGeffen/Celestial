@@ -51,6 +51,8 @@ export default class OurAvatarRegion extends Region {
 
     // Statuses
     this.displayStatuses(state)
+
+    super.displayState(state)
   }
 
   showUsername(username: string): void {
