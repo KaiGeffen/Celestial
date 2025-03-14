@@ -22,6 +22,7 @@ import StoryRegion from './matchRegions/story'
 import ScoreRegion from './matchRegions/ourScore'
 import OurHandRegion from './matchRegions/ourHand'
 import MulliganRegion from './matchRegions/mulliganRegion'
+import TheirHandRegion from './matchRegions/theirHand'
 
 // TODO Rename to Match
 export class GameScene extends BaseScene {
@@ -337,6 +338,8 @@ export class View {
   theirAvatar: TheirAvatarRegion
 
   ourHand: OurHandRegion
+  theirHand: Region
+
   // ourButtons: Region
   story: StoryRegion
   ourScore: ScoreRegion
@@ -384,6 +387,7 @@ export class View {
 
     // Create each of the regions
     this.theirAvatar = new Regions.TheirAvatar().create(scene)
+    this.theirHand = new Regions.TheirHand().create(scene)
 
     this.story = new Regions.Story().create(scene)
     this.ourScore = new Regions.OurScore().create(scene)
@@ -426,6 +430,7 @@ export class View {
 
     this.ourAvatar.displayState(state)
     this.ourHand.displayState(state)
+    this.theirHand.displayState(state)
     this.ourScore.displayState(state)
     this.scoreboard.displayState(state)
 

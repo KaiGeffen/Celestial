@@ -13,6 +13,7 @@ import RoundResultRegion from './roundResult'
 import MulliganRegion from './mulliganRegion'
 import ResultsRegion from './results'
 import ScoreboardRegion from './scoreboard'
+import TheirHandRegion from './theirHand'
 
 export default class Regions {
   static Searching = SearchingRegion
@@ -21,6 +22,8 @@ export default class Regions {
   static TheirAvatar = TheirAvatarRegion
 
   static OurHand = OurHandRegion
+  static TheirHand = TheirHandRegion
+
   static Story = StoryRegion
   static OurScore = OurScoreRegion
 
