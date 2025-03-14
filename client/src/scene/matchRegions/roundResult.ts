@@ -1,7 +1,6 @@
 import 'phaser'
-import RoundRectangle from 'phaser3-rex-plugins/plugins/roundrectangle.js'
 import GameModel from '../../../../shared/state/gameModel'
-import { Color, Space, Style, Depth, Time } from '../../settings/settings'
+import { Space, Depth } from '../../settings/settings'
 import Region from './baseRegion'
 import { GameScene } from '../gameScene'
 

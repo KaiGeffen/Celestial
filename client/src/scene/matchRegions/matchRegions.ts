@@ -13,6 +13,7 @@ import RoundResultRegion from './roundResult'
 
 import MulliganRegion from './mulliganRegion'
 import ResultsRegion from './results'
+import ScoreboardRegion from './scoreboard'
 
 export default class Regions {
   static Searching = SearchingRegion
@@ -34,6 +35,7 @@ export default class Regions {
 
   static Pass = PassRegion
   static RoundResult = RoundResultRegion
+  static Scoreboard = ScoreboardRegion
 
   static Mulligan = MulliganRegion
   static Results = ResultsRegion

@@ -357,7 +357,9 @@ export class View {
   ourScore: ScoreRegion
   pass: PassRegion
   scores: Region
+  scoreboard: Region
 
+  // Overlays
   ourDeckOverlay: OverlayRegion
   theirDeckOverlay: OverlayRegion
   ourDiscardOverlay: OverlayRegion
@@ -405,6 +407,7 @@ export class View {
 
     this.pass = new Regions.Pass().create(scene)
     this.scores = new Regions.RoundResult().create(scene)
+    this.scoreboard = new Regions.Scoreboard().create(scene)
 
     this.ourAvatar = new Regions.OurAvatar().create(scene, avatarId)
     this.ourHand = new Regions.OurHand().create(scene, avatarId) // TODO Remove
@@ -458,7 +461,7 @@ export class View {
     this.ourAvatar.displayState(state)
     this.ourHand.displayState(state)
     this.ourScore.displayState(state)
-    // Our stacks
+    this.scoreboard.displayState(state)
 
     this.story.displayState(state)
     this.pass.displayState(state)

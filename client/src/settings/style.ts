@@ -146,13 +146,18 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   // Count of a card in the deck
   todoPileCount: {
     fontFamily: mainFont,
-    fontSize: '20px',
+    fontSize: '24px',
     color: Color.stackCount,
   },
   todoHint: {
     fontFamily: mainFont,
     fontSize: '12px',
     color: Color.hint,
+  },
+  scoreboard: {
+    fontFamily: mainFont,
+    fontSize: '35px',
+    color: Color.scoreboard,
   },
 }
 

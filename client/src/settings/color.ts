@@ -118,4 +118,5 @@ export const Color: Record<string, any> = {
   stackCount: CoreColors.c2,
   hint: CoreColors.c1,
   username: CoreColors.c3,
+  scoreboard: CoreColors.c2,
 }
