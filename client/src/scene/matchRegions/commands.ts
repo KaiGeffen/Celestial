@@ -60,7 +60,7 @@ export default class CommandsRegion extends Region {
   }
 
   private addHotkeyListeners() {
-    this.scene.input.keyboard.on('keydown-T', () => {
+    this.scene.input.keyboard.on('keydown-R', () => {
       if (UserSettings._get('hotkeys')) {
         if (this.btnRecap.enabled) {
           this.btnRecap.onClick()

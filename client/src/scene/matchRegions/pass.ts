@@ -153,7 +153,7 @@ export default class PassRegion extends Region {
     let that = this
 
     const x = Flags.mobile ? 100 : 156
-    this.btnPass = new Icons.Pass(this.container, -x, 0)
+    this.btnPass = new Icons.Pass(this.container, -x, 0).setAlpha(0)
     this.btnMoon = new Icons.Moon(this.container, x, 0, () => {
       if (this.scene['paused']) {
         this.scene['paused'] = false
@@ -166,7 +166,7 @@ export default class PassRegion extends Region {
           this.btnMoon.txt.text.replace('\n\n', '\nPaused\n'),
         )
       }
-    })
+    }).setAlpha(0)
   }
 
   private createText(): void {

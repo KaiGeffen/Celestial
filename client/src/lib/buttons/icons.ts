@@ -207,25 +207,18 @@ class Pass extends Button {
   ) {
     super(within, x, y, {
       text: {
-        text: 'PASS',
+        text: '',
         interactive: false,
         style: Style.pass,
-        offsetX: Flags.mobile ? -3 : 7,
-        offsetY: Flags.mobile ? 4 : 9,
       },
       icon: {
-        name: `${Flags.mobile ? 'Mobile' : ''}Sun`,
+        name: `Pass`,
         interactive: true,
-        circular: true,
       },
       callbacks: {
         click: f,
       },
     })
-
-    // Show a hint when hovered
-    // const s = 'Pass priority.\nOnce both players have passed in a row, the round ends.'
-    // super.makeHintable(s)
   }
 
   enable() {
@@ -235,17 +228,7 @@ class Pass extends Button {
       return this
     }
 
-    this.setText('PASS')
     super.enable()
-
-    return this
-  }
-
-  disable() {
-    // TODO Have this be on a cloud instead
-    // this.setText('THEIR\nTURN')
-    this.setText('')
-    super.disable()
 
     return this
   }

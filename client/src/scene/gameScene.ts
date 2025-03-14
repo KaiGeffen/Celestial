@@ -172,15 +172,12 @@ export class GameScene extends BaseScene {
 
     view.theirAvatar.setOverlayCallbacks(
       () => {
-        console.log('show their deck')
         this.view.showOverlay(this.view.theirDeckOverlay)
       },
       () => {
-        console.log('show their discard')
         this.view.showOverlay(this.view.theirDiscardOverlay)
       },
       () => {
-        console.log('show their expended')
         this.view.showOverlay(this.view.theirExpendedOverlay)
       },
     )
@@ -241,6 +238,18 @@ export class GameScene extends BaseScene {
       }
     })
     view.pass.setShowResultsCallback(() => {
+      if (!that.view.results.isVisible()) {
+        that.view.results.show()
+      } else {
+        that.view.results.hide()
+      }
+    })
+    view.pass2.setCallback(() => {
+      if (!this.paused) {
+        net.passTurn(this.currentVersion)
+      }
+    })
+    view.pass2.setShowResultsCallback(() => {
       if (!that.view.results.isVisible()) {
         that.view.results.show()
       } else {
@@ -359,6 +368,7 @@ export class View {
   story: StoryRegion
   ourScore: ScoreRegion
   pass: PassRegion
+  pass2: any
   scores: Region
 
   ourDeckOverlay: OverlayRegion
@@ -407,6 +417,7 @@ export class View {
     this.ourScore = new Regions.OurScore().create(scene)
 
     this.pass = new Regions.Pass().create(scene)
+    this.pass2 = new Regions.Pass2().create(scene)
     this.scores = new Regions.RoundResult().create(scene)
 
     this.ourAvatar = new Regions.OurAvatar().create(scene, avatarId)
@@ -465,6 +476,7 @@ export class View {
 
     this.story.displayState(state)
     this.pass.displayState(state)
+    this.pass2.displayState(state)
     this.scores.displayState(state)
 
     this.ourDeckOverlay.displayState(state)
