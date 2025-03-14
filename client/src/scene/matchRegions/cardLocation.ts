@@ -76,7 +76,7 @@ export default class CardLocation {
     // Offset from the first card
     const xOffset = dx * i
     const x = x0 + xOffset
-    let y = 80 - Space.cardHeight / 2
+    let y = 50 - Space.cardHeight / 2
 
     return [x - container.x, y - container.y]
   }

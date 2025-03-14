@@ -67,6 +67,7 @@ export default class OurHandRegion extends Region {
         .setCost(state.cardCosts[i])
         .setFocusOptions('Play')
         .moveToTopOnHover()
+        .showShadow()
 
       const cost = state.cardCosts[i]
       card.setOnHover(
