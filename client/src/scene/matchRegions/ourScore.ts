@@ -10,17 +10,20 @@ const BREATH_X = Space.windowWidth - 250 + 136
 const BREATH_Y = Space.windowHeight - 60
 
 export default class ScoreRegion extends Region {
-  // For the current state, the maximum and current amount of breath we have
-  maxBreath: number
-  currentBreath: number
-
-  // Stack amount
+  // Amount in each stack
   txtDeck: Phaser.GameObjects.Text
   txtDiscard: Phaser.GameObjects.Text
   txtRemoved: Phaser.GameObjects.Text
+  // All objects relating to removed (Invisible when empty)
+  removedContainer: Phaser.GameObjects.Container
 
   txtWins: Phaser.GameObjects.Text
+
   txtBreath: Phaser.GameObjects.Text
+
+  // For the current state, the maximum and current amount of breath we have
+  maxBreath: number
+  currentBreath: number
 
   // Icons for each of the states of breath
   breathBasic: Phaser.GameObjects.Image[] = []
@@ -43,6 +46,17 @@ export default class ScoreRegion extends Region {
   }
 
   displayState(state: GameModel): void {
+    // Stacks
+    this.txtDiscard.setText(`${state.pile[0].length}`)
+    this.txtDeck.setText(`${state.deck[0].length}`)
+    this.txtRemoved.setText(`${state.expended[0].length}`)
+
+    this.removedContainer.setVisible(state.expended[0].length > 0)
+
+    // Wins
+    this.txtWins.setText(`${state.wins[0]}/5`)
+
+    // Breath
     this.maxBreath = state.maxBreath[0]
     this.currentBreath = state.breath[0]
 
@@ -51,8 +65,6 @@ export default class ScoreRegion extends Region {
 
     const s = `${state.breath[0]}/${state.maxBreath[0]}`
     this.txtBreath.setText(s)
-
-    this.txtWins.setText(`${Flags.mobile ? 'Wins: ' : ''}${state.wins[0]}/5`)
   }
 
   // Display a given breath cost
@@ -99,15 +111,18 @@ export default class ScoreRegion extends Region {
     ])
 
     // Removed
-    this.container.add([
-      this.scene.add.image(x, y - dy * 2, 'icon-Removed'),
+    this.removedContainer = this.scene.add.container(0, y - dy * 2)
+
+    this.removedContainer.add([
+      this.scene.add.image(x, 0, 'icon-Removed'),
       (this.txtRemoved = this.scene.add
-        .text(x1, y - dy * 2 + textOffset, '4', Style.todoPileCount)
+        .text(x1, textOffset, '4', Style.todoPileCount)
         .setOrigin(0, 1)),
       this.scene.add
-        .text(x1, y - dy * 2 + textOffset, 'Removed', Style.todoHint)
+        .text(x1, textOffset, 'Removed', Style.todoHint)
         .setOrigin(0),
     ])
+    this.container.add(this.removedContainer)
   }
 
   private createWins(): void {

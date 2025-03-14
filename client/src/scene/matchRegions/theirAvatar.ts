@@ -17,11 +17,14 @@ export default class TheirHandRegion extends Region {
   priority: Phaser.GameObjects.Image
 
   // Stack amount
+  txtWins: Phaser.GameObjects.Text
   txtHand: Phaser.GameObjects.Text
   txtDeck: Phaser.GameObjects.Text
   txtDiscard: Phaser.GameObjects.Text
   txtRemoved: Phaser.GameObjects.Text
-  txtWins: Phaser.GameObjects.Text
+
+  // All objects relating to removed (Invisible when empty)
+  removedContainer: Phaser.GameObjects.Container
 
   // TODO Old
   btnDeck: Button
@@ -81,6 +84,9 @@ export default class TheirHandRegion extends Region {
     this.txtDeck.setText(`${state.deck[1].length}`)
     this.txtDiscard.setText(`${state.pile[1].length}`)
     this.txtRemoved.setText(`${state.expended[1].length}`)
+
+    // If removed is empty, make it invisible
+    this.removedContainer.setVisible(state.expended[1].length > 0)
   }
 
   addHotkeyListeners() {
@@ -160,44 +166,47 @@ export default class TheirHandRegion extends Region {
   private createStackButtons(): void {
     const x = 37
     let y = 150
-    this.scene.add.image(x, y, 'icon-Wins').setScale(24 / 35)
-    this.txtWins = this.scene.add
-      .text(x + 40, y, '', Style.todoPileCount)
-      .setOrigin(0, 0.5)
-
-    y += 46
-    this.scene.add.image(x, y, 'icon-Hand')
-    this.txtHand = this.scene.add
-      .text(x + 40, y, '', Style.todoPileCount)
-      .setOrigin(0, 0.5)
-
-    y += 46
-    this.scene.add.image(x, y, 'icon-Deck').setScale(24 / 35)
-    this.txtDeck = this.scene.add
-      .text(x + 40, y, '', Style.todoPileCount)
-      .setOrigin(0, 0.5)
-
-    y += 46
-    this.scene.add.image(x, y, 'icon-Discard').setScale(24 / 35)
-    this.txtDiscard = this.scene.add
-      .text(x + 40, y, '', Style.todoPileCount)
-      .setOrigin(0, 0.5)
-
-    y += 46
-    this.scene.add.image(x, y, 'icon-Removed').setScale(24 / 35)
-    this.txtRemoved = this.scene.add
-      .text(x + 40, y, '', Style.todoPileCount)
-      .setOrigin(0, 0.5)
-
     this.container.add([
-      this.txtWins,
-      this.txtHand,
-      this.txtDeck,
-      this.txtDiscard,
-      this.txtRemoved,
+      this.scene.add.image(x, y, 'icon-Wins').setScale(24 / 35),
+      (this.txtWins = this.scene.add
+        .text(x + 40, y, '', Style.todoPileCount)
+        .setOrigin(0, 0.5)),
     ])
 
-    // Existing buttons
+    y += 46
+    this.container.add([
+      this.scene.add.image(x, y, 'icon-Hand'),
+      (this.txtHand = this.scene.add
+        .text(x + 40, y, '', Style.todoPileCount)
+        .setOrigin(0, 0.5)),
+    ])
+
+    y += 46
+    this.container.add([
+      this.scene.add.image(x, y, 'icon-Deck').setScale(24 / 35),
+      (this.txtDeck = this.scene.add
+        .text(x + 40, y, '', Style.todoPileCount)
+        .setOrigin(0, 0.5)),
+    ])
+
+    y += 46
+    this.container.add([
+      this.scene.add.image(x, y, 'icon-Discard').setScale(24 / 35),
+      (this.txtDiscard = this.scene.add
+        .text(x + 40, y, '', Style.todoPileCount)
+        .setOrigin(0, 0.5)),
+    ])
+
+    y += 46
+    this.removedContainer = this.scene.add.container(0, 0)
+    this.removedContainer.add([
+      this.scene.add.image(x, y, 'icon-Removed').setScale(24 / 35),
+      (this.txtRemoved = this.scene.add
+        .text(x + 40, y, '', Style.todoPileCount)
+        .setOrigin(0, 0.5)),
+    ])
+
+    // Existing buttons TODO
     this.btnDeck = new Buttons.Stacks.Deck(
       this.container,
       -100,
