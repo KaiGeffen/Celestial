@@ -5,6 +5,10 @@ import Region from './baseRegion'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { GameScene } from '../gameScene'
 
+// Center at 163, 53 from right bottom corner
+const BREATH_X = Space.windowWidth - 250 + 136
+const BREATH_Y = Space.windowHeight - 60
+
 export default class ScoreRegion extends Region {
   // For the current state, the maximum and current amount of breath we have
   maxBreath: number
@@ -25,34 +29,15 @@ export default class ScoreRegion extends Region {
   breathHover: Phaser.GameObjects.Image[] = []
   breathOom: Phaser.GameObjects.Image[] = []
 
-  // Center at 163, 53 from right bottom corner
-  BREATH_X = Space.windowWidth - (Flags.mobile ? 40 : 163)
-  BREATH_Y = Space.windowHeight - (Flags.mobile ? Space.handHeight / 2 : 53)
-
   create(scene: GameScene): ScoreRegion {
     this.scene = scene
     this.container = scene.add.container().setDepth(Depth.ourScore)
 
     this.createStacks()
 
-    // Create all of the breath icons
-    this.createBreathIcons()
     this.createWins()
 
-    const x = Space.windowWidth - (Flags.mobile ? 5 : 124)
-    const y = Space.windowHeight - (Flags.mobile ? Space.handHeight + 15 : 114)
-
-    this.txtBreath = scene.add
-      .text(
-        Flags.mobile ? this.BREATH_X : x,
-        this.BREATH_Y + 5,
-        '',
-        Style.basic,
-      )
-      .setOrigin(Flags.mobile ? 0.5 : 0, 0.5)
-
-    // Add each of these objects to container
-    this.container.add(this.txtBreath)
+    this.createBreath()
 
     return this
   }
@@ -142,6 +127,18 @@ export default class ScoreRegion extends Region {
     ])
   }
 
+  private createBreath(): void {
+    this.createBreathIcons()
+
+    const x = Space.windowWidth - 250 + 136 + 50
+
+    this.txtBreath = this.scene.add
+      .text(x, BREATH_Y + 5, '', Style.basic)
+      .setOrigin(0)
+
+    this.container.add(this.txtBreath)
+  }
+
   // Create all of the breath icons
   private createBreathIcons(): void {
     // NOTE Order matters, earliest is on the bottom
@@ -162,7 +159,7 @@ export default class ScoreRegion extends Region {
     key: string,
     images: Phaser.GameObjects.Image[],
   ): void {
-    const center = [this.BREATH_X, this.BREATH_Y]
+    const center = [BREATH_X, BREATH_Y]
     const radius = 30
 
     // 10 is the max displayed breath, but player could have more
