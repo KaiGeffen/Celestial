@@ -2,9 +2,10 @@ import 'phaser'
 import Button from '../../lib/buttons/button'
 import Icons from '../../lib/buttons/icons'
 import GameModel from '../../../../shared/state/gameModel'
-import { Space, UserSettings } from '../../settings/settings'
+import { Space, Style, UserSettings } from '../../settings/settings'
 import { GameScene } from '../gameScene'
 import Region from './baseRegion'
+import Buttons from '../../lib/buttons/buttons'
 
 // During the round, shows Pass button, who has passed, and who has priority
 export default class PassRegion extends Region {
@@ -16,9 +17,8 @@ export default class PassRegion extends Region {
 
   hotkeysRegistered = false
 
+  btnRecap: Button
   btnPass: Button
-
-  btnMoon: Button
 
   txtYouPassed: Phaser.GameObjects.Text
   txtTheyPassed: Phaser.GameObjects.Text
@@ -31,14 +31,24 @@ export default class PassRegion extends Region {
     )
 
     // Create the pass button
+    this.btnRecap = new Buttons.Text(
+      this.container,
+      -60,
+      -70,
+      'RECAP',
+      () => {
+        this.recapCallback()
+      },
+      Style.todoRecap,
+      62,
+      23,
+    ).setOrigin(1, 0.5)
     this.btnPass = new Icons.Pass(this.container, 0, 0).setOrigin(1, 0.5)
 
     return this
   }
 
   displayState(state: GameModel): void {
-    this.deleteTemp()
-
     // Before mulligan is complete, hide this region
     if (state.mulligansComplete.includes(false)) {
       this.container.setVisible(false)
@@ -48,6 +58,9 @@ export default class PassRegion extends Region {
       this.hotkeysRegistered = true
     }
     this.container.setVisible(true)
+
+    // Hide the recap button unless there is a previous round to show
+    this.btnRecap.setVisible(!state.isRecap && state.roundCount > 0)
 
     // Enable/disable button based on who has priority
     if (state.winner !== null) {

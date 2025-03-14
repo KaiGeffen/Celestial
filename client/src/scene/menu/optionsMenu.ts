@@ -137,6 +137,7 @@ export default class OptionsMenu extends Menu {
         0,
         s,
         () => {},
+        Style.textButton,
         Space.buttonWidth,
         height,
       )

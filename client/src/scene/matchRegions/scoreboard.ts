@@ -30,16 +30,28 @@ export default class ScoreboardRegion extends Region {
   }
 
   displayState(state: GameModel): void {
+    // At night, show score
     if (state.isRecap) {
-      this.theirScoreboard.show()
-      this.ourScoreboard.show()
+      this.theirScoreboard.show(state.score[1].toString())
+      this.ourScoreboard.show(state.score[0].toString())
     } else {
-      this.theirScoreboard.hide()
-      this.ourScoreboard.hide()
+      // During the round, show which player has passed
+      if (state.passes === 2) {
+        this.theirScoreboard.show('Pass')
+        this.ourScoreboard.show('Pass')
+      } else if (state.passes === 0) {
+        this.theirScoreboard.hide()
+        this.ourScoreboard.hide()
+      } else {
+        if (state.priority === 0) {
+          this.theirScoreboard.show('Pass')
+          this.ourScoreboard.hide()
+        } else {
+          this.ourScoreboard.show('Pass')
+          this.theirScoreboard.hide()
+        }
+      }
     }
-
-    this.theirScoreboard.setText(state.score[1].toString())
-    this.ourScoreboard.setText(state.score[0].toString())
   }
 }
 
@@ -58,15 +70,12 @@ class Scoreboard {
     this.container.add(this.txt)
   }
 
-  setText(text: string) {
+  show(text: string) {
+    this.container.setX(-this.background.width)
     this.txt.setText(text)
   }
 
-  show() {
-    this.container.setX(-this.background.width)
-  }
-
   hide() {
-    this.container.setX(0)
+    this.container.setX(-Space.pad)
   }
 }

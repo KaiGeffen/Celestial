@@ -125,7 +125,7 @@ export class GameScene extends BaseScene {
     let that = this
 
     // Commands region
-    view.commands.recapCallback = () => {
+    view.pass.recapCallback = () => {
       // Scan backwards through the queued states to find the start of the recap
       for (let version = this.currentVersion - 1; version >= 0; version--) {
         if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
