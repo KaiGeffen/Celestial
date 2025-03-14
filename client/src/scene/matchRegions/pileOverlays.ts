@@ -47,19 +47,6 @@ export default class OverlayRegion extends Region {
 
   displayState(state: GameModel): void {}
 
-  // Set the callback for this overlay switching to another
-  setSwitch(callback: () => void): this {
-    new Buttons.Basic(
-      this.container,
-      Space.pad + Space.buttonWidth / 2,
-      Space.pad + Space.buttonHeight / 2,
-      'Other',
-      callback,
-    )
-
-    return this
-  }
-
   protected displayCards(cards: Card[]): void {
     this.deleteTemp()
 

@@ -60,7 +60,9 @@ export default class PassRegion extends Region {
     this.container.setVisible(true)
 
     // Hide the recap button unless there is a previous round to show
-    this.btnRecap.setVisible(!state.isRecap && state.roundCount > 0)
+    this.btnRecap
+      .setVisible(!state.isRecap && state.roundCount > 0)
+      .enable(!state.isRecap && state.roundCount > 0)
 
     // Enable/disable button based on who has priority
     if (state.winner !== null) {
@@ -95,6 +97,12 @@ export default class PassRegion extends Region {
     this.scene.input.keyboard.on('keydown-SPACE', () => {
       if (this.btnPass.enabled && UserSettings._get('hotkeys')) {
         this.btnPass.onClick()
+      }
+    })
+
+    this.scene.input.keyboard.on('keydown-R', () => {
+      if (this.btnRecap.enabled && UserSettings._get('hotkeys')) {
+        this.btnRecap.onClick()
       }
     })
   }

@@ -403,10 +403,11 @@ export default class Button {
     return this
   }
 
-  enable(invert = false) {
-    if (invert) {
+  enable(b = true) {
+    if (!b) {
       return this.disable()
     }
+
     if (this.icon !== undefined) {
       this.icon.setInteractive()
 
