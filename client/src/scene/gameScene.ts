@@ -366,8 +366,8 @@ export class View {
       })
     this.background.setScale(
       Math.max(
-        this.background.width / Space.windowWidth,
-        this.background.height / Space.windowHeight,
+        Space.windowWidth / this.background.width,
+        Space.windowHeight / this.background.height,
       ),
     )
 

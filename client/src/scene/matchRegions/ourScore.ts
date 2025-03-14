@@ -4,6 +4,8 @@ import { Depth, Space, Style, Flags } from '../../settings/settings'
 import Region from './baseRegion'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { GameScene } from '../gameScene'
+import Button from '../../lib/buttons/button'
+import Buttons from '../../lib/buttons/buttons'
 
 // Center at 163, 53 from right bottom corner
 const BREATH_X = Space.windowWidth - 250 + 136
@@ -12,8 +14,14 @@ const BREATH_Y = Space.windowHeight - 60
 export default class ScoreRegion extends Region {
   // Amount in each stack
   txtDeck: Phaser.GameObjects.Text
+  btnDeck: Button
+
   txtDiscard: Phaser.GameObjects.Text
+  btnDiscard: Button
+
   txtRemoved: Phaser.GameObjects.Text
+  btnRemoved: Button
+
   // All objects relating to removed (Invisible when empty)
   removedContainer: Phaser.GameObjects.Container
 
@@ -89,8 +97,8 @@ export default class ScoreRegion extends Region {
     const textOffset = 4
 
     // Discard
+    this.btnDiscard = new Buttons.Stacks.Discard(this.container, x, y, 0)
     this.container.add([
-      this.scene.add.image(x, y, 'icon-Discard'),
       (this.txtDiscard = this.scene.add
         .text(x1, y + textOffset, '10', Style.todoPileCount)
         .setOrigin(0, 1)),
@@ -100,8 +108,8 @@ export default class ScoreRegion extends Region {
     ])
 
     // Deck
+    this.btnDeck = new Buttons.Stacks.Deck(this.container, x, y - dy, 0)
     this.container.add([
-      this.scene.add.image(x, y - dy, 'icon-Deck'),
       (this.txtDeck = this.scene.add
         .text(x1, y - dy + textOffset, '4', Style.todoPileCount)
         .setOrigin(0, 1)),
@@ -113,8 +121,8 @@ export default class ScoreRegion extends Region {
     // Removed
     this.removedContainer = this.scene.add.container(0, y - dy * 2)
 
+    this.btnRemoved = new Buttons.Stacks.Removed(this.removedContainer, x, 0, 0)
     this.removedContainer.add([
-      this.scene.add.image(x, 0, 'icon-Removed'),
       (this.txtRemoved = this.scene.add
         .text(x1, textOffset, '4', Style.todoPileCount)
         .setOrigin(0, 1)),

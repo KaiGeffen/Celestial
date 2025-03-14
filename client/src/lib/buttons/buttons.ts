@@ -3,7 +3,7 @@ import AvatarButton from './avatar'
 import DecklistButton from './decklist'
 import TextButton from './text'
 import MissionButton from './mission'
-import { DeckButton, DiscardButton } from './stacks'
+import { DeckButton, DiscardButton, RemovedButton } from './stacks'
 import { InspireButton, NourishButton, SightButton } from './keywords'
 
 // Export all of the available buttons
@@ -15,6 +15,7 @@ export default class Buttons {
   static Stacks = {
     Deck: DeckButton,
     Discard: DiscardButton,
+    Removed: RemovedButton,
   }
   static Keywords = {
     Inspire: InspireButton,
