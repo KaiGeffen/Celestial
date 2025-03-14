@@ -214,6 +214,7 @@ export default class TheirAvatarRegion extends Region {
 
     y += 46
     this.removedContainer = this.scene.add.container(0, 0)
+    this.container.add(this.removedContainer)
     this.btnRemoved = new Buttons.Stacks.Removed(this.removedContainer, x, y, 1)
     this.removedContainer.add(
       (this.txtRemoved = this.scene.add

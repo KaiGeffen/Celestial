@@ -26,23 +26,8 @@ export default class Region {
 
   // Display parts of the given state relevant to this region
   displayState(state: GameModel): void {
-    // Check if the state is a recap
-    const isRecap = state.isRecap // Adjust this based on your actual state structure
-
-    // Iterate through all children in this.container
-    this.container.list.forEach((child) => {
-      // Check if the child is a Phaser.GameObject.Text object
-      if (
-        child instanceof Phaser.GameObjects.Text
-        //  || child instanceof Phaser.GameObjects.Image
-      ) {
-        if (isRecap) {
-          child.setTintFill(0xffffff)
-        } else {
-          child.clearTint()
-        }
-      }
-    })
+    const isRecap = state.isRecap // Check if the state is a recap
+    updateTextFill(this.container, isRecap) // Call the recursive function
   }
 
   show(): Region {
@@ -143,4 +128,23 @@ export default class Region {
       },
     })
   }
+}
+
+function updateTextFill(
+  container: Phaser.GameObjects.Container,
+  isRecap: boolean,
+): void {
+  container.list.forEach((child) => {
+    // If text, set to white at night or normal otherwise
+    if (child instanceof Phaser.GameObjects.Text) {
+      if (isRecap) {
+        child.setTintFill(0xffffff)
+      } else {
+        child.clearTint()
+      }
+    } else if (child instanceof Phaser.GameObjects.Container) {
+      // If the child is a container, call the function recursively
+      updateTextFill(child, isRecap)
+    }
+  })
 }
