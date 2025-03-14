@@ -190,7 +190,7 @@ class Cloud extends Card {
     super.play(player, game, index, bonus)
 
     if (super.exhale(2, game, player)) {
-      game.draw(3, player)
+      game.draw(player, 3)
     }
   }
 
