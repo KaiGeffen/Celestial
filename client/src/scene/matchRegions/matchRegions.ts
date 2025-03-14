@@ -9,7 +9,6 @@ import StoryRegion from './story'
 import OurScoreRegion from './ourScore'
 import * as Overlay from './pileOverlays'
 import PassRegion from './pass'
-import Pass2Region from './pass2'
 import RoundResultRegion from './roundResult'
 
 import MulliganRegion from './mulliganRegion'
@@ -34,7 +33,6 @@ export default class Regions {
   static TheirExpended = Overlay.TheirExpendedOverlay
 
   static Pass = PassRegion
-  static Pass2 = Pass2Region
   static RoundResult = RoundResultRegion
 
   static Mulligan = MulliganRegion

@@ -14,8 +14,8 @@ import Regions from './matchRegions/matchRegions'
 import OverlayRegion from './matchRegions/pileOverlays'
 import GameModel from '../../../shared/state/gameModel'
 import { MechanicsSettings } from '../../../shared/settings'
-import PassRegion from './matchRegions/pass'
 import { Deck } from '../../../shared/types/deck'
+import PassRegion from './matchRegions/pass'
 import CommandsRegion from './matchRegions/commands'
 import OurAvatarRegion from './matchRegions/ourAvatar'
 import TheirAvatarRegion from './matchRegions/theirAvatar'
@@ -244,18 +244,6 @@ export class GameScene extends BaseScene {
         that.view.results.hide()
       }
     })
-    view.pass2.setCallback(() => {
-      if (!this.paused) {
-        net.passTurn(this.currentVersion)
-      }
-    })
-    view.pass2.setShowResultsCallback(() => {
-      if (!that.view.results.isVisible()) {
-        that.view.results.show()
-      } else {
-        that.view.results.hide()
-      }
-    })
 
     // Mulligan
     view.mulligan.setCallback(() => {
@@ -368,7 +356,6 @@ export class View {
   story: StoryRegion
   ourScore: ScoreRegion
   pass: PassRegion
-  pass2: any
   scores: Region
 
   ourDeckOverlay: OverlayRegion
@@ -417,7 +404,6 @@ export class View {
     this.ourScore = new Regions.OurScore().create(scene)
 
     this.pass = new Regions.Pass().create(scene)
-    this.pass2 = new Regions.Pass2().create(scene)
     this.scores = new Regions.RoundResult().create(scene)
 
     this.ourAvatar = new Regions.OurAvatar().create(scene, avatarId)
@@ -476,7 +462,6 @@ export class View {
 
     this.story.displayState(state)
     this.pass.displayState(state)
-    this.pass2.displayState(state)
     this.scores.displayState(state)
 
     this.ourDeckOverlay.displayState(state)
