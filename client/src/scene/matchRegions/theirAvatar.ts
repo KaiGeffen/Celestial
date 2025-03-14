@@ -13,7 +13,7 @@ import {
 import { GameScene } from '../gameScene'
 import Region from './baseRegion'
 
-export default class TheirHandRegion extends Region {
+export default class TheirAvatarRegion extends Region {
   priority: Phaser.GameObjects.Image
 
   // Stack amount
@@ -26,18 +26,19 @@ export default class TheirHandRegion extends Region {
   // All objects relating to removed (Invisible when empty)
   removedContainer: Phaser.GameObjects.Container
 
-  // TODO Old
+  // Buttons for each stack
   btnDeck: Button
   btnDiscard: Button
+  btnRemoved: Button
 
-  //
+  // Status buttons
   btnInspire: Button
   btnNourish: Button
 
   // Avatar image
   avatar: Button
 
-  create(scene: GameScene): TheirHandRegion {
+  create(scene: GameScene): TheirAvatarRegion {
     this.scene = scene
 
     // Avatar, status, hand, recap, pass buttons
@@ -91,23 +92,35 @@ export default class TheirHandRegion extends Region {
 
   addHotkeyListeners() {
     // Deck
-    this.scene.input.keyboard.on('keydown-E', () => {
+    this.scene.input.keyboard.on('keydown-A', () => {
       if (UserSettings._get('hotkeys')) {
         this.btnDeck.onClick()
       }
     })
 
     // Discard
-    this.scene.input.keyboard.on('keydown-R', () => {
+    this.scene.input.keyboard.on('keydown-S', () => {
       if (UserSettings._get('hotkeys')) {
         this.btnDiscard.onClick()
       }
     })
+
+    // Removed
+    this.scene.input.keyboard.on('keydown-D', () => {
+      if (UserSettings._get('hotkeys')) {
+        this.btnRemoved.onClick()
+      }
+    })
   }
 
-  setOverlayCallbacks(fDeck: () => void, fDiscard: () => void): void {
-    this.btnDeck.setOnClick(fDeck)
-    this.btnDiscard.setOnClick(fDiscard)
+  setOverlayCallbacks(
+    deckCallback: () => void,
+    discardCallback: () => void,
+    removedCallback: () => void,
+  ): void {
+    this.btnDeck.setOnClick(deckCallback)
+    this.btnDiscard.setOnClick(discardCallback)
+    this.btnRemoved.setOnClick(removedCallback)
   }
 
   showUsername(username: string): void {
@@ -182,29 +195,29 @@ export default class TheirHandRegion extends Region {
     ])
 
     y += 46
-    this.container.add([
-      this.scene.add.image(x, y, 'icon-Deck').setScale(24 / 35),
+    this.btnDeck = new Buttons.Stacks.Deck(this.container, x, y, 1)
+    this.container.add(
       (this.txtDeck = this.scene.add
         .text(x + 40, y, '', Style.todoPileCount)
         .setOrigin(0, 0.5)),
-    ])
+    )
 
     y += 46
-    this.container.add([
-      this.scene.add.image(x, y, 'icon-Discard').setScale(24 / 35),
+    this.btnDiscard = new Buttons.Stacks.Discard(this.container, x, y, 1)
+    this.container.add(
       (this.txtDiscard = this.scene.add
         .text(x + 40, y, '', Style.todoPileCount)
         .setOrigin(0, 0.5)),
-    ])
+    )
 
     y += 46
     this.removedContainer = this.scene.add.container(0, 0)
-    this.removedContainer.add([
-      this.scene.add.image(x, y, 'icon-Removed').setScale(24 / 35),
+    this.btnRemoved = new Buttons.Stacks.Removed(this.removedContainer, x, y, 1)
+    this.removedContainer.add(
       (this.txtRemoved = this.scene.add
         .text(x + 40, y, '', Style.todoPileCount)
         .setOrigin(0, 0.5)),
-    ])
+    )
 
     // Existing buttons TODO
     this.btnDeck = new Buttons.Stacks.Deck(

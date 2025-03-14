@@ -1,6 +1,12 @@
 import 'phaser'
 import GameModel from '../../../../shared/state/gameModel'
-import { Depth, Space, Style, Flags } from '../../settings/settings'
+import {
+  Depth,
+  Space,
+  Style,
+  Flags,
+  UserSettings,
+} from '../../settings/settings'
 import Region from './baseRegion'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { GameScene } from '../gameScene'
@@ -49,6 +55,8 @@ export default class ScoreRegion extends Region {
     this.createWins()
 
     this.createBreath()
+
+    this.addHotkeyListeners()
 
     return this
   }
@@ -133,6 +141,16 @@ export default class ScoreRegion extends Region {
     this.container.add(this.removedContainer)
   }
 
+  setOverlayCallbacks(
+    deckCallback: () => void,
+    discardCallback: () => void,
+    removedCallback: () => void,
+  ): void {
+    this.btnDeck.setOnClick(deckCallback)
+    this.btnDiscard.setOnClick(discardCallback)
+    this.btnRemoved.setOnClick(removedCallback)
+  }
+
   private createWins(): void {
     const x = Space.windowWidth - 250 + 136
     const x1 = x + 50
@@ -203,6 +221,29 @@ export default class ScoreRegion extends Region {
       this.container.add(image)
       images.push(image)
     }
+  }
+
+  addHotkeyListeners() {
+    // Deck
+    this.scene.input.keyboard.on('keydown-Q', () => {
+      if (UserSettings._get('hotkeys')) {
+        this.btnDeck.onClick()
+      }
+    })
+
+    // Discard
+    this.scene.input.keyboard.on('keydown-W', () => {
+      if (UserSettings._get('hotkeys')) {
+        this.btnDiscard.onClick()
+      }
+    })
+
+    // Removed
+    this.scene.input.keyboard.on('keydown-E', () => {
+      if (UserSettings._get('hotkeys')) {
+        this.btnRemoved.onClick()
+      }
+    })
   }
 
   // TUTORIAL FUNCTIONALITY

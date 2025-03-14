@@ -7,7 +7,7 @@ import { Depth, Space, Style } from '../../settings/settings'
 import Region from './baseRegion'
 import { GameScene } from '../gameScene'
 
-export default class OurHandRegion extends Region {
+export default class OurAvatarRegion extends Region {
   // Function called when elements in this region are interacted with
   callback: (i: number) => void
   displayCostCallback: (cost: number) => void
@@ -21,7 +21,7 @@ export default class OurHandRegion extends Region {
   // Avatar image
   btnAvatar: Button
 
-  create(scene: GameScene, avatarId: number): OurHandRegion {
+  create(scene: GameScene, avatarId: number): OurAvatarRegion {
     this.scene = scene
 
     this.container = scene.add

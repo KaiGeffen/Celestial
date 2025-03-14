@@ -16,6 +16,13 @@ import GameModel from '../../../shared/state/gameModel'
 import { MechanicsSettings } from '../../../shared/settings'
 import PassRegion from './matchRegions/pass'
 import { Deck } from '../../../shared/types/deck'
+import CommandsRegion from './matchRegions/commands'
+import OurAvatarRegion from './matchRegions/ourAvatar'
+import TheirAvatarRegion from './matchRegions/theirAvatar'
+import StoryRegion from './matchRegions/story'
+import ScoreRegion from './matchRegions/ourScore'
+import OurHandRegion from './matchRegions/ourHand'
+import MulliganRegion from './matchRegions/mulliganRegion'
 
 // TODO Rename to Match
 export class GameScene extends BaseScene {
@@ -114,7 +121,7 @@ export class GameScene extends BaseScene {
   }
 
   // Set all of the callback functions for the regions in the view
-  private setCallbacks(view, net: MatchWS): void {
+  private setCallbacks(view: View, net: MatchWS): void {
     let that = this
 
     // Commands region
@@ -165,10 +172,28 @@ export class GameScene extends BaseScene {
 
     view.theirAvatar.setOverlayCallbacks(
       () => {
+        console.log('show their deck')
         this.view.showOverlay(this.view.theirDeckOverlay)
       },
       () => {
+        console.log('show their discard')
         this.view.showOverlay(this.view.theirDiscardOverlay)
+      },
+      () => {
+        console.log('show their expended')
+        this.view.showOverlay(this.view.theirExpendedOverlay)
+      },
+    )
+
+    view.ourScore.setOverlayCallbacks(
+      () => {
+        this.view.showOverlay(this.view.ourDeckOverlay)
+      },
+      () => {
+        this.view.showOverlay(this.view.ourDiscardOverlay)
+      },
+      () => {
+        this.view.showOverlay(this.view.ourExpendedOverlay)
       },
     )
 
@@ -324,15 +349,15 @@ export class View {
   searching: Region
 
   // The buttons below Options button
-  commands: Region
+  commands: CommandsRegion
 
-  ourAvatar: Region
-  theirAvatar: Region
+  ourAvatar: OurAvatarRegion
+  theirAvatar: TheirAvatarRegion
 
-  ourHand: Region
+  ourHand: OurHandRegion
   // ourButtons: Region
-  story: Region
-  ourScore
+  story: StoryRegion
+  ourScore: ScoreRegion
   pass: PassRegion
   scores: Region
 
@@ -344,7 +369,7 @@ export class View {
   theirExpendedOverlay: OverlayRegion
 
   // Region shown during mulligan phase
-  mulligan: Region
+  mulligan: MulliganRegion
 
   // Region shown when the game has been won / lost
   results: Region
