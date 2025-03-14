@@ -16,7 +16,6 @@ import GameModel from '../../../shared/state/gameModel'
 import { MechanicsSettings } from '../../../shared/settings'
 import { Deck } from '../../../shared/types/deck'
 import PassRegion from './matchRegions/pass'
-import CommandsRegion from './matchRegions/commands'
 import OurAvatarRegion from './matchRegions/ourAvatar'
 import TheirAvatarRegion from './matchRegions/theirAvatar'
 import StoryRegion from './matchRegions/story'
@@ -124,31 +123,6 @@ export class GameScene extends BaseScene {
   private setCallbacks(view: View, net: MatchWS): void {
     let that = this
 
-    // Commands region
-    view.pass.recapCallback = () => {
-      // Scan backwards through the queued states to find the start of the recap
-      for (let version = this.currentVersion - 1; version >= 0; version--) {
-        if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
-          // Continue backwards until we find where isRecap is false
-          while (version >= 0 && this.queuedStates[version].isRecap) {
-            version--
-          }
-          this.currentVersion = version + 1
-          break
-        }
-      }
-    }
-    view.commands.skipCallback = () => {
-      that.tweens.getTweens().forEach((tween) => {
-        tween.complete()
-      })
-
-      // End the pause
-      that.paused = false
-
-      that.currentVersion = that.maxVersion
-    }
-
     // Hand region
     view.ourHand.setCardClickCallback((i: number) => {
       net.playCard(i, this.currentVersion)
@@ -244,6 +218,20 @@ export class GameScene extends BaseScene {
         that.view.results.hide()
       }
     })
+    // TODO Consider moving this to a separate command region
+    view.pass.recapCallback = () => {
+      // Scan backwards through the queued states to find the start of the recap
+      for (let version = this.currentVersion - 1; version >= 0; version--) {
+        if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
+          // Continue backwards until we find where isRecap is false
+          while (version >= 0 && this.queuedStates[version].isRecap) {
+            version--
+          }
+          this.currentVersion = version + 1
+          break
+        }
+      }
+    }
 
     // Mulligan
     view.mulligan.setCallback(() => {
@@ -345,9 +333,6 @@ export class View {
 
   searching: Region
 
-  // The buttons below Options button
-  commands: CommandsRegion
-
   ourAvatar: OurAvatarRegion
   theirAvatar: TheirAvatarRegion
 
@@ -396,8 +381,6 @@ export class View {
     )
 
     this.searching = new Regions.Searching().create(scene, avatarId)
-
-    this.commands = new Regions.Commands().create(scene)
 
     // Create each of the regions
     this.theirAvatar = new Regions.TheirAvatar().create(scene)
@@ -454,7 +437,6 @@ export class View {
     this.background.setTint(state.isRecap ? 0x555555 : 0xffffff)
 
     this.mulligan.displayState(state)
-    this.commands.displayState(state)
 
     this.theirAvatar.displayState(state)
 

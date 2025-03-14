@@ -1,5 +1,4 @@
 import SearchingRegion from './searching'
-import CommandsRegion from './commands'
 
 import OurAvatarRegion from './ourAvatar'
 import TheirAvatarRegion from './theirAvatar'
@@ -17,7 +16,6 @@ import ScoreboardRegion from './scoreboard'
 
 export default class Regions {
   static Searching = SearchingRegion
-  static Commands = CommandsRegion
 
   static OurAvatar = OurAvatarRegion
   static TheirAvatar = TheirAvatarRegion
