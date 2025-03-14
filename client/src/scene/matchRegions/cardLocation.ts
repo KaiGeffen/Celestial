@@ -114,18 +114,15 @@ export default class CardLocation {
     const x = x0 + dx * i
 
     // Y
-    let y
+    let y = (Space.windowHeight * 3) / 8
     switch (owner) {
       case undefined:
-        y = Space.windowHeight / 2
         break
       case 0:
-        y =
-          Space.windowHeight / 2 + (Space.cardHeight / 2 - Space.storyYOverlap)
+        y = y + (Space.cardHeight / 2 - Space.storyYOverlap)
         break
       case 1:
-        y =
-          Space.windowHeight / 2 - (Space.cardHeight / 2 - Space.storyYOverlap)
+        y = y - (Space.cardHeight / 2 - Space.storyYOverlap)
         break
     }
 

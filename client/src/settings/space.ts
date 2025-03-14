@@ -38,7 +38,7 @@ function getSpace() {
     fullCardHeight: 336,
     storyXOverlap: 30,
     // If this is more than half of cardHeight, mistake
-    storyYOverlap: Flags.mobile ? 80 : 120,
+    storyYOverlap: 140,
     // Dimensions of the hand regions
     handHeight: Flags.mobile ? 80 : 255, // 160,
     // Standard corner width for rounded rectangles

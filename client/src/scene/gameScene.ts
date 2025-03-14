@@ -6,7 +6,7 @@ import {
   MatchTutorialWS,
 } from '../network/net'
 // Import Settings itself
-import { UserSettings } from '../settings/settings'
+import { Space, UserSettings } from '../settings/settings'
 import BaseScene from './baseScene'
 import Animator from './matchRegions/animator'
 import Region from './matchRegions/baseRegion'
@@ -319,6 +319,8 @@ export class GameScene extends BaseScene {
 export class View {
   scene: BaseScene
 
+  background: Phaser.GameObjects.Image
+
   searching: Region
 
   // The buttons below Options button
@@ -353,7 +355,7 @@ export class View {
   constructor(scene: GameScene, avatarId: number) {
     this.scene = scene
 
-    let background = scene.add
+    this.background = scene.add
       .image(0, 0, 'bg-Match')
       .setOrigin(0)
       .setDepth(-1)
@@ -362,7 +364,12 @@ export class View {
       .on('pointerover', () => {
         this.scene.hint.hide()
       })
-      .setScale(2)
+    this.background.setScale(
+      Math.max(
+        this.background.width / Space.windowWidth,
+        this.background.height / Space.windowHeight,
+      ),
+    )
 
     this.searching = new Regions.Searching().create(scene, avatarId)
 
@@ -417,6 +424,9 @@ export class View {
 
   displayState(state: GameModel) {
     this.searching.hide()
+
+    // Shadow the background during recapp
+    this.background.setTint(state.isRecap ? 0x555555 : 0xffffff)
 
     this.mulligan.displayState(state)
     this.commands.displayState(state)
