@@ -29,6 +29,7 @@ const CoreColors: Record<string, number | string> = {
   // NEW
   c1: '#5f99dc',
   c2: '#1c3354',
+  c3: '#111d2f',
 }
 
 // The colors for each component of the app (Ex: Slider)
@@ -116,4 +117,5 @@ export const Color: Record<string, any> = {
   // TODO New after rewok
   stackCount: CoreColors.c2,
   hint: CoreColors.c1,
+  username: CoreColors.c3,
 }

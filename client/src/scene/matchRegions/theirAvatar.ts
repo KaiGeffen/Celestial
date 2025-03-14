@@ -45,7 +45,6 @@ export default class TheirHandRegion extends Region {
       .image(0, 0, 'chrome-TopPriority')
       .setVisible(false)
       .setOrigin(0)
-      .setDepth(-1)
     this.container.add(this.priority)
 
     // Create the status visuals
@@ -161,34 +160,42 @@ export default class TheirHandRegion extends Region {
   private createStackButtons(): void {
     const x = 37
     let y = 150
+    this.scene.add.image(x, y, 'icon-Wins').setScale(2 / 3)
+    this.txtWins = this.scene.add
+      .text(x + 40, y, '', Style.todoPileCount)
+      .setOrigin(0, 0.5)
+
+    y += 46
     this.scene.add.image(x, y, 'icon-Hand')
     this.txtHand = this.scene.add
       .text(x + 40, y, '', Style.todoPileCount)
       .setOrigin(0, 0.5)
 
     y += 46
-    this.scene.add.image(x, y, 'icon-Deck')
+    this.scene.add.image(x, y, 'icon-Deck').setScale(2 / 3)
     this.txtDeck = this.scene.add
       .text(x + 40, y, '', Style.todoPileCount)
       .setOrigin(0, 0.5)
 
     y += 46
-    this.scene.add.image(x, y, 'icon-Discard')
+    this.scene.add.image(x, y, 'icon-Discard').setScale(2 / 3)
     this.txtDiscard = this.scene.add
       .text(x + 40, y, '', Style.todoPileCount)
       .setOrigin(0, 0.5)
 
     y += 46
-    this.scene.add.image(x, y, 'icon-Removed')
+    this.scene.add.image(x, y, 'icon-Removed').setScale(2 / 3)
     this.txtRemoved = this.scene.add
       .text(x + 40, y, '', Style.todoPileCount)
       .setOrigin(0, 0.5)
 
-    y += 46
-    this.scene.add.image(x, y, 'icon-Wins')
-    this.txtWins = this.scene.add
-      .text(x + 40, y, '', Style.todoPileCount)
-      .setOrigin(0, 0.5)
+    this.container.add([
+      this.txtWins,
+      this.txtHand,
+      this.txtDeck,
+      this.txtDiscard,
+      this.txtRemoved,
+    ])
 
     // Existing buttons
     this.btnDeck = new Buttons.Stacks.Deck(

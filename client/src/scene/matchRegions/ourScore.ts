@@ -131,12 +131,16 @@ export default class ScoreRegion extends Region {
     this.createBreathIcons()
 
     const x = Space.windowWidth - 250 + 136 + 50
+    const y = BREATH_Y + 4
 
     this.txtBreath = this.scene.add
-      .text(x, BREATH_Y + 5, '', Style.basic)
+      .text(x, y, '', Style.todoPileCount)
+      .setOrigin(0, 1)
+    const hint = this.scene.add
+      .text(x, y, 'Breath', Style.todoHint)
       .setOrigin(0)
 
-    this.container.add(this.txtBreath)
+    this.container.add([this.txtBreath, hint])
   }
 
   // Create all of the breath icons

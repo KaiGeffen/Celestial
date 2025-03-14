@@ -140,7 +140,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   username: {
     fontFamily: altFont,
     fontSize: '18px',
-    color: Color.basicText,
+    color: Color.username,
   },
 
   // Count of a card in the deck
