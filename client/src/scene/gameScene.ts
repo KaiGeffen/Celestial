@@ -37,7 +37,7 @@ export class GameScene extends BaseScene {
   isTutorial = false
 
   // Whether the opponent has disconnected
-  opponentDisconnected = false
+  opponentDisconnected: boolean
 
   init(params: {
     deck?: Deck
@@ -50,6 +50,7 @@ export class GameScene extends BaseScene {
     // Reset variables
     this.queuedStates = {}
     this.currentVersion = this.maxVersion = -1
+    this.opponentDisconnected = false
 
     // Connect with the server
     if (this.isTutorial) {
