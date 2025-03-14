@@ -218,20 +218,6 @@ export default class TheirAvatarRegion extends Region {
         .text(x + 40, y, '', Style.todoPileCount)
         .setOrigin(0, 0.5)),
     )
-
-    // Existing buttons TODO
-    this.btnDeck = new Buttons.Stacks.Deck(
-      this.container,
-      -100,
-      (Space.handHeight * 1) / 4,
-      1,
-    )
-    this.btnDiscard = new Buttons.Stacks.Discard(
-      this.container,
-      -100,
-      (Space.handHeight * 3) / 4,
-      1,
-    )
   }
 
   private onHoverStatus(status: string, btn: Button): [() => void, () => void] {
