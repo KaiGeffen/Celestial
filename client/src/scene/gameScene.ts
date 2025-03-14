@@ -140,7 +140,7 @@ export class GameScene extends BaseScene {
       // End the pause
       that.paused = false
 
-      that.currentVersion = that.maxVersion
+      that.currentVersion = that.maxVersion - 1
     }
 
     // Hand region
