@@ -92,6 +92,7 @@ class Boa extends Card {
     super.play(player, game, index, bonus)
     if (nourished) {
       game.discard(player ^ 1)
+      game.draw(player)
     }
   }
 }
