@@ -39,7 +39,7 @@ class PvpMatch extends Match {
     // Notify remaining player of the disconnect
     await Promise.all(
       this.getActiveWsList().map((ws: MatchServerWS) =>
-        ws.send({ type: 'dc' }),
+        ws.send({ type: 'opponentDisconnected' }),
       ),
     )
   }

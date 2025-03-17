@@ -39,6 +39,6 @@ export interface MatchServerMessages {
     state: GameModel
   }
   signalError: {}
-  dc: {}
+  opponentDisconnected: {}
   opponentEmote: {}
 }

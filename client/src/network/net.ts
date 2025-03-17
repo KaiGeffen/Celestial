@@ -35,7 +35,7 @@ export class MatchWS {
         // TODO Handle signalling or logging that error on the client
         console.log('Server says that an action was in error.')
       })
-      .on('dc', () => {
+      .on('opponentDisconnected', () => {
         scene.signalDC()
       })
       .on('opponentEmote', (data) => {
@@ -78,7 +78,6 @@ export class MatchWS {
     this.socket.send({
       type: 'exitMatch',
     })
-    this.socket.close(1000)
   }
 
   // Signal to the server that we have emoted
