@@ -3,18 +3,13 @@ import {
   Style,
   Color,
   Space,
-  Time,
   Ease,
   UserSettings,
   Url,
 } from '../settings/settings'
 import BaseScene from './baseScene'
-import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
-import Icons from '../lib/buttons/icons'
-import Loader from '../loader/loader'
 import UserDataServer from '../network/userDataServer'
-import { CardImage } from '../lib/cardImage'
 import Catalog from '../../../shared/state/catalog'
 import Cinematic from '../lib/cinematic'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'

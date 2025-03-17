@@ -8,6 +8,9 @@ const K_FACTOR = 32 // Standard K-factor used in chess
 const elo = new EloRank(K_FACTOR)
 const BASE_ELO = 1000
 
+const COIN_REWARD = 10
+const GEMS_REWARD = 1
+
 export async function updateMatchResult(
   winnerId: string | null,
   loserId: string | null,
@@ -81,6 +84,7 @@ export async function updateMatchResult(
       .set({
         elo: newWinnerRating,
         wins: sql`${players.wins} + 1`,
+        coins: sql`${players.coins} + ${COIN_REWARD}`,
       })
       .where(eq(players.id, winnerId))
   }
