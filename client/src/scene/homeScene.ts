@@ -22,6 +22,9 @@ const headerHeight = Space.iconSize + Space.pad * 2
 const discordHeight = 150
 
 export default class HomeScene extends BaseScene {
+  // Add this property to the class
+  private questTimer: Phaser.Time.TimerEvent = null
+
   constructor() {
     super({
       key: 'HomeScene',
@@ -95,7 +98,7 @@ export default class HomeScene extends BaseScene {
       .setOrigin(0.5)
 
     // Add user stats display
-    if (true || UserDataServer.isLoggedIn()) {
+    if (UserDataServer.isLoggedIn()) {
       this.createUserStatsDisplay()
       this.createQuestText()
     }
@@ -110,14 +113,14 @@ export default class HomeScene extends BaseScene {
     const bgColor = Color.backgroundLight
 
     // Define position
-    const xPos = Space.windowWidth / 2 + Space.pad / 2
-    const yPos = headerHeight + Space.pad
+    const x = Space.windowWidth / 2 + Space.pad / 2
+    const y = headerHeight + Space.pad
 
-    // Create text to measure its dimensions
+    // Create text with initial value
     const questText = this.add
       .text(
-        xPos,
-        yPos,
+        x,
+        y,
         isQuestAvailable
           ? 'Daily Quest Available!'
           : `Next Quest: ${getTimeUntilNextQuest()}`,
@@ -129,37 +132,51 @@ export default class HomeScene extends BaseScene {
     // Create background based on text dimensions
     const bg = this.add
       .rectangle(
-        xPos - padding,
-        yPos - padding,
+        x - padding,
+        y - padding,
         questText.width + padding * 2,
         questText.height + padding * 2,
         bgColor,
         0.85,
       )
+      .setStrokeStyle(2, isQuestAvailable ? Color.gold : Color.backgroundDark)
       .setOrigin(0)
       .setDepth(9)
 
-    // Add a border to the background
-    const border = this.add
-      .rectangle(
-        xPos - padding,
-        yPos - padding,
-        questText.width + padding * 2,
-        questText.height + padding * 2,
-        isQuestAvailable ? Color.gold : Color.backgroundDark,
-        0,
-      )
-      .setStrokeStyle(2, isQuestAvailable ? 0xffd700 : 0x888888)
-      .setOrigin(0)
-      .setDepth(9)
+    // If quest is not available, set up timer to update every second
+    if (!isQuestAvailable) {
+      // Function to update the text
+      const updateQuestTime = () => {
+        // Check if quest has become available
+        if (isDailyQuestAvailable()) {
+          // Update text and styling for available quest
+          questText.setText('Daily Quest Available!')
+          bg.setStrokeStyle(2, Color.gold)
 
-    // Add shadow to the background
-    this.plugins.get('rexDropShadowPipeline')['add'](bg, {
-      distance: 3,
-      angle: 135,
-      shadowColor: 0x000000,
-      alpha: 0.5,
-    })
+          // Clear the timer as quest is now available
+          if (this.questTimer) {
+            this.questTimer.remove()
+            this.questTimer = null
+          }
+        } else {
+          // Update countdown text
+          const newTimeText = `Next Quest: ${getTimeUntilNextQuest()}`
+          questText.setText(newTimeText)
+
+          // Adjust background width based on new text width
+          bg.width = questText.width + padding * 2
+          bg.setPosition(x - padding, y - padding)
+        }
+      }
+
+      // Create a timer that fires every second
+      this.questTimer = this.time.addEvent({
+        delay: 1000,
+        callback: updateQuestTime,
+        callbackScope: this,
+        loop: true,
+      })
+    }
   }
 
   private createUserStatsDisplay(): void {
@@ -612,5 +629,14 @@ export default class HomeScene extends BaseScene {
         return
       }
     }
+  }
+
+  beforeExit(): void {
+    if (this.questTimer) {
+      this.questTimer.remove()
+      this.questTimer = null
+    }
+
+    super.beforeExit()
   }
 }

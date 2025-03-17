@@ -27,9 +27,7 @@ export default class UserDataServer {
   static elo: number | null = null
   static gems: number | null = null
   static coins: number | null = null
-  static lastDailyReward: Date | null = new Date(
-    Date.now() - 1000 * 3 * 60 * 1000,
-  ) // Default to 3 minutes ago
+  static lastDailyReward: Date | null = null
 
   // Log in with the server for user with given OAuth token
   static login(
@@ -171,7 +169,6 @@ export default class UserDataServer {
 
   // Returns if the user is logged in
   static isLoggedIn(): boolean {
-    return true
     return wsServer !== undefined
   }
 
