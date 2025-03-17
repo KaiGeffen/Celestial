@@ -185,7 +185,7 @@ class RadiantCore extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    game.breath[player] += 4
+    game.breath[player] += 3
   }
 
   onMorning(player: number, game: GameModel, index: number) {
@@ -201,7 +201,7 @@ const radiantCore = new RadiantCore({
   name: 'Radiant Core',
   id: 8056,
   cost: 3,
-  text: 'Gain 4 breath.\nMorning: Gain 1 breath for each breath you ended the last round with.',
+  text: 'Gain 3 breath.\nMorning: Gain 1 breath for each breath you ended the last round with.',
   beta: true,
 })
 
