@@ -61,6 +61,18 @@
       }, 2000); // Delay by 2 seconds after page load
     });
   </script>
+
+  <script>
+    // Detect if user is on a mobile device
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    
+    // Redirect to Discord if on mobile
+    if (isMobile()) {
+      window.location.href = "https://discord.gg/UXWswspB8S";
+    }
+  </script>
 </head>
 <body>
   <!-- playsinline and muted enable mobile autoplay -->
