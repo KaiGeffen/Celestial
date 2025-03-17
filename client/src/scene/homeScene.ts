@@ -13,6 +13,10 @@ import UserDataServer from '../network/userDataServer'
 import Catalog from '../../../shared/state/catalog'
 import Cinematic from '../lib/cinematic'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
+import {
+  getTimeUntilNextQuest,
+  isDailyQuestAvailable,
+} from '../utils/dailyQuestUtils'
 
 const headerHeight = Space.iconSize + Space.pad * 2
 const discordHeight = 150
@@ -93,7 +97,69 @@ export default class HomeScene extends BaseScene {
     // Add user stats display
     if (true || UserDataServer.isLoggedIn()) {
       this.createUserStatsDisplay()
+      this.createQuestText()
     }
+  }
+
+  private createQuestText(): void {
+    // Check if daily quest is available
+    const isQuestAvailable = isDailyQuestAvailable()
+
+    // Create background rectangle for the quest text
+    const padding = Space.padSmall
+    const bgColor = Color.backgroundLight
+
+    // Define position
+    const xPos = Space.windowWidth / 2 + Space.pad / 2
+    const yPos = headerHeight + Space.pad
+
+    // Create text to measure its dimensions
+    const questText = this.add
+      .text(
+        xPos,
+        yPos,
+        isQuestAvailable
+          ? 'Daily Quest Available!'
+          : `Next Quest: ${getTimeUntilNextQuest()}`,
+        Style.basic,
+      )
+      .setOrigin(0)
+      .setDepth(10)
+
+    // Create background based on text dimensions
+    const bg = this.add
+      .rectangle(
+        xPos - padding,
+        yPos - padding,
+        questText.width + padding * 2,
+        questText.height + padding * 2,
+        bgColor,
+        0.85,
+      )
+      .setOrigin(0)
+      .setDepth(9)
+
+    // Add a border to the background
+    const border = this.add
+      .rectangle(
+        xPos - padding,
+        yPos - padding,
+        questText.width + padding * 2,
+        questText.height + padding * 2,
+        isQuestAvailable ? Color.gold : Color.backgroundDark,
+        0,
+      )
+      .setStrokeStyle(2, isQuestAvailable ? 0xffd700 : 0x888888)
+      .setOrigin(0)
+      .setDepth(9)
+
+    // Add shadow to the background
+    this.plugins.get('rexDropShadowPipeline')['add'](bg, {
+      distance: 3,
+      angle: 135,
+      shadowColor: 0x000000,
+      alpha: 0.5,
+    })
   }
 
   private createUserStatsDisplay(): void {
@@ -108,7 +174,7 @@ export default class HomeScene extends BaseScene {
       .text(
         Space.windowWidth - (Space.pad * 2 + Space.iconSize),
         headerHeight / 2,
-        `${username} (${elo}) ${gems}💎 ${coins}🪙`,
+        `${username} (${elo}) ${gems}💎 ${coins}💰`,
         Style.basic,
       )
       .setOrigin(1, 0.5)

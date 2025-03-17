@@ -85,6 +85,7 @@ export default function createUserDataServer() {
             elo: data.elo,
             gems: data.gems,
             coins: data.coins,
+            lastDailyReward: data.last_daily_reward,
           })
 
           // Update last active time

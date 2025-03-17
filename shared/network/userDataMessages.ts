@@ -35,5 +35,6 @@ export interface UserDataServerMessages {
     elo: number
     gems: number
     coins: number
+    lastDailyReward: Date
   }
 }

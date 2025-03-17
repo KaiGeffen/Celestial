@@ -27,6 +27,9 @@ export default class UserDataServer {
   static elo: number | null = null
   static gems: number | null = null
   static coins: number | null = null
+  static lastDailyReward: Date | null = new Date(
+    Date.now() - 1000 * 3 * 60 * 1000,
+  ) // Default to 3 minutes ago
 
   // Log in with the server for user with given OAuth token
   static login(
@@ -118,9 +121,16 @@ export default class UserDataServer {
           elo: number
           gems: number
           coins: number
+          lastDailyReward: Date
         }) => {
           // Store the UUID after successful login
           this.userUUID = uuid
+
+          this.username = data.username
+          this.elo = data.elo
+          this.gems = data.gems
+          this.coins = data.coins
+          this.lastDailyReward = data.lastDailyReward
 
           that.loadUserData(data)
           callback()
@@ -161,6 +171,7 @@ export default class UserDataServer {
 
   // Returns if the user is logged in
   static isLoggedIn(): boolean {
+    return true
     return wsServer !== undefined
   }
 
