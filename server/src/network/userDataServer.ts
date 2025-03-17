@@ -62,39 +62,25 @@ export default function createUserDataServer() {
           .select()
           .from(players)
           .where(eq(players.id, userId))
+          .limit(1)
 
         if (result.length === 0) {
           ws.send({ type: 'promptUserInit' })
         } else if (result.length === 1) {
           // Send user their data
-          const data = result[0]
-
-          let decks: Deck[] = []
-          try {
-            decks = data.decks.map((deck) => JSON.parse(deck))
-          } catch (e) {
-            console.error('Error parsing decks:', e)
-          }
-
-          ws.send({
-            type: 'sendUserData',
-            inventory: data.inventory,
-            completedMissions: data.completedmissions,
-            decks,
-            username: data.username,
-            elo: data.elo,
-            gems: data.gems,
-            coins: data.coins,
-            lastDailyReward: data.last_daily_reward,
-          })
-
-          // Update last active time
-          await db
-            .update(players)
-            .set({ lastactive: new Date().toISOString() })
-            .where(eq(players.id, id))
+          await sendUserData(ws, id, result[0])
         }
       })
+        .on('refreshUserData', async () => {
+          if (!id) return
+          const result = await db
+            .select()
+            .from(players)
+            .where(eq(players.id, id))
+            .limit(1)
+          if (result.length === 0) return
+          await sendUserData(ws, id, result[0])
+        })
         .on('sendDecks', async ({ decks }) => {
           if (!id) return
           await db
@@ -155,4 +141,45 @@ export default function createUserDataServer() {
   })
 
   console.log('User-data server is running on port: ', USER_DATA_PORT)
+}
+
+// Send the user their full data
+async function sendUserData(
+  ws: UserDataServerWS,
+  id: string,
+  data: {
+    inventory: string
+    completedmissions: string
+    decks: string[]
+    username: string
+    elo: number
+    gems: number
+    coins: number
+    last_daily_reward: Date
+  },
+) {
+  let decks: Deck[] = []
+  try {
+    decks = data.decks.map((deck) => JSON.parse(deck))
+  } catch (e) {
+    console.error('Error parsing decks:', e)
+  }
+
+  ws.send({
+    type: 'sendUserData',
+    inventory: data.inventory,
+    completedMissions: data.completedmissions,
+    decks,
+    username: data.username,
+    elo: data.elo,
+    gems: data.gems,
+    coins: data.coins,
+    lastDailyReward: data.last_daily_reward,
+  })
+
+  // Update last active time
+  await db
+    .update(players)
+    .set({ lastactive: new Date().toISOString() })
+    .where(eq(players.id, id))
 }

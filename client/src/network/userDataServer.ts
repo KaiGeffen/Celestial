@@ -172,6 +172,14 @@ export default class UserDataServer {
     return wsServer !== undefined
   }
 
+  static refreshUserData(): void {
+    if (UserDataServer.isLoggedIn()) {
+      wsServer.send({
+        type: 'refreshUserData',
+      })
+    }
+  }
+
   private static convertBoolArrayToBitString(array: boolean[]): string {
     return array.map((value) => (value ? '1' : '0')).join('')
   }

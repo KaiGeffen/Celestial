@@ -15,6 +15,7 @@ export interface UserDataClientMessages {
   sendCompletedMissions: {
     missions: string
   }
+  refreshUserData: {}
   sendInitialUserData: {
     username: string
     decks: Deck[]

@@ -16,6 +16,7 @@ import GameModel from '../../../shared/state/gameModel'
 import { MechanicsSettings } from '../../../shared/settings'
 import PassRegion from './matchRegions/pass'
 import { Deck } from '../../../shared/types/deck'
+import UserDataServer from '../network/userDataServer'
 
 // TODO Rename to Match
 export class GameScene extends BaseScene {
@@ -75,6 +76,7 @@ export class GameScene extends BaseScene {
 
   beforeExit() {
     this.net.exitMatch()
+    UserDataServer.refreshUserData()
   }
 
   // Listens for websocket updates
