@@ -94,6 +94,29 @@ export default class HomeScene extends BaseScene {
         Style.homeTitle,
       )
       .setOrigin(0.5)
+
+    // Add user stats display
+    if (true || UserDataServer.isLoggedIn()) {
+      this.createUserStatsDisplay()
+    }
+  }
+
+  private createUserStatsDisplay(): void {
+    // Get user data, use defaults if not logged in
+    const username = UserDataServer.username
+    const elo = UserDataServer.elo
+    const gems = UserDataServer.gems
+    const coins = UserDataServer.coins
+
+    // Create the text object displaying user stats
+    this.add
+      .text(
+        Space.windowWidth - (Space.pad * 2 + Space.iconSize),
+        headerHeight / 2,
+        `${username} (${elo}) ${gems}💎 ${coins}🪙`,
+        Style.basic,
+      )
+      .setOrigin(1, 0.5)
   }
 
   private createButtons(): void {

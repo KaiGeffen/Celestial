@@ -53,6 +53,10 @@ export const players = pgTable(
     decks: varchar('decks', { length: 1000 }).array().notNull(),
     inventory: varchar('inventory', { length: 1000 }).notNull(),
     completedmissions: varchar('completedmissions', { length: 1000 }).notNull(),
+
+    // Currency
+    gems: integer('gems').notNull(),
+    coins: integer('coins').notNull(),
   },
   (table) => ({
     emailIdx: uniqueIndex('email_idx').on(table.email),

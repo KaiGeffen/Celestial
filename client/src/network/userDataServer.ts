@@ -23,6 +23,10 @@ var wsServer: UserDataClientWS = undefined
 
 export default class UserDataServer {
   private static userUUID: string | null = null // Store UUID after successful login
+  static username: string | null = null
+  static elo: number | null = null
+  static gems: number | null = null
+  static coins: number | null = null
 
   // Log in with the server for user with given OAuth token
   static login(
@@ -110,6 +114,10 @@ export default class UserDataServer {
           inventory: string
           completedMissions: string
           decks: Deck[]
+          username: string
+          elo: number
+          gems: number
+          coins: number
         }) => {
           // Store the UUID after successful login
           this.userUUID = uuid
@@ -217,6 +225,9 @@ export default class UserDataServer {
     inventory: string
     completedMissions: string
     decks: Deck[]
+    username: string
+    elo: number
+    gems: number
   }): void {
     // Map from binary string to bool array
     sessionStorage.setItem(
@@ -239,6 +250,9 @@ export default class UserDataServer {
     )
 
     sessionStorage.setItem('decks', JSON.stringify(data.decks))
+    sessionStorage.setItem('username', data.username)
+    sessionStorage.setItem('elo', data.elo.toString())
+    sessionStorage.setItem('gems', data.gems.toString())
   }
 
   // TODO Clarify if we reuse a UserSessionWS or create a new ws even for signed in users

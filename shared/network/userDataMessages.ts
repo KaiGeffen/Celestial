@@ -31,5 +31,9 @@ export interface UserDataServerMessages {
     inventory: string
     completedMissions: string
     decks: Deck[]
+    username: string
+    elo: number
+    gems: number
+    coins: number
   }
 }

@@ -81,6 +81,10 @@ export default function createUserDataServer() {
             inventory: data.inventory,
             completedMissions: data.completedmissions,
             decks,
+            username: data.username,
+            elo: data.elo,
+            gems: data.gems,
+            coins: data.coins,
           })
 
           // Update last active time
@@ -139,6 +143,8 @@ export default function createUserDataServer() {
               inventory: inventory,
               completedmissions: missions,
               lastactive: new Date().toISOString(),
+              gems: 0,
+              coins: 0,
             })
           },
         )
