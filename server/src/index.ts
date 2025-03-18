@@ -3,6 +3,7 @@ import createUserDataServer from './network/userDataServer'
 import createLeaderboardServer from './network/leaderboardServer'
 import createMatchHistoryServer from './network/matchHistoryServer'
 import createUsernameAvailabilityServer from './network/usernameAvailabilityServer'
+import createPaymentServer from './network/paymentServer'
 
 console.log('Starting server')
 
@@ -19,3 +20,4 @@ createUserDataServer()
 createLeaderboardServer()
 createMatchHistoryServer()
 createUsernameAvailabilityServer()
+createPaymentServer()

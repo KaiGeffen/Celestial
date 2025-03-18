@@ -24,6 +24,7 @@ import OutlinePipelinePlugin from 'phaser3-rex-plugins/plugins/outlinepipeline-p
 import DropShadowPipelinePlugin from 'phaser3-rex-plugins/plugins/dropshadowpipeline-plugin.js'
 import ContainerLitePlugin from 'phaser3-rex-plugins/plugins/containerlite-plugin.js'
 import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
+import StoreScene from './scene/storeScene'
 // import UIComponent from 'phaser3-rex-plugins/templates/ui/ui-components.js'
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -52,6 +53,7 @@ const config: Phaser.Types.Core.GameConfig = {
     BuilderScene,
     AdventureScene,
     MatchHistoryScene,
+    StoreScene,
   ],
   plugins: {
     scene: [
