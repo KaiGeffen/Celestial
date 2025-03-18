@@ -5,6 +5,8 @@ import Buttons from '../lib/buttons/buttons'
 import UserDataServer from '../network/userDataServer'
 import { paymentService } from '../services/paymentService'
 
+const headerHeight = Space.buttonHeight + Space.pad * 2
+
 export default class StoreScene extends BaseScene {
   constructor() {
     super({ key: 'StoreScene' })
@@ -17,9 +19,49 @@ export default class StoreScene extends BaseScene {
   }
 
   private createHeader(): void {
-    // Similar to your other scenes
-    // Create a header with a back button
-    // ...
+    // Make the background header
+    let background = this.add
+      .rectangle(0, 0, Space.windowWidth, headerHeight, Color.backgroundLight)
+      .setOrigin(0)
+
+    this.plugins.get('rexDropShadowPipeline')['add'](background, {
+      distance: 3,
+      angle: -90,
+      shadowColor: 0x000000,
+    })
+
+    // Create back button
+    new Buttons.Basic(
+      this,
+      Space.pad + Space.buttonWidth / 2,
+      headerHeight / 2,
+      'Back',
+      () => {
+        this.sound.play('click')
+        this.scene.start('HomeScene')
+      },
+    )
+
+    // Create title back in center
+    this.add
+      .text(
+        Space.windowWidth / 2,
+        headerHeight / 2,
+        'Gem Store',
+        Style.homeTitle,
+      )
+      .setOrigin(0.5)
+
+    // Display current gem balance
+    const gems = UserDataServer.gems || 0
+    this.add
+      .text(
+        Space.windowWidth - (Space.pad * 2 + Space.iconSize),
+        headerHeight / 2,
+        `Balance: ${gems} 💎`,
+        Style.basic,
+      )
+      .setOrigin(1, 0.5)
   }
 
   private createGemPackages(): void {
@@ -30,7 +72,7 @@ export default class StoreScene extends BaseScene {
       { id: 'huge', gems: 750, price: '$39.99', color: 0xb8860b },
     ]
 
-    const startY = 300 + Space.pad * 2
+    const startY = headerHeight + Space.pad * 4 // Start below header
     const packageHeight = 100
     const packageWidth = Space.windowWidth - Space.pad * 4
 
@@ -92,8 +134,12 @@ export default class StoreScene extends BaseScene {
 
     try {
       // Create payment intent
-      const { clientSecret, amount, gems } =
-        await paymentService.purchaseGems(packageId)
+      const result = await paymentService.purchaseGems(packageId)
+      if (!result) {
+        throw new Error('Failed to create payment intent')
+      }
+
+      const { clientSecret, amount, gems } = result
 
       // Launch payment modal
       this.scene.pause()

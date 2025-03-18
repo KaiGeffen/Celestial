@@ -98,9 +98,9 @@ export default class HomeScene extends BaseScene {
       .setOrigin(0.5)
 
     // Add user stats display
-    if (UserDataServer.isLoggedIn()) {
+    if (true || UserDataServer.isLoggedIn()) {
       this.createUserStatsDisplay()
-      this.createQuestText()
+      // this.createQuestText()
     }
   }
 
@@ -187,14 +187,15 @@ export default class HomeScene extends BaseScene {
     const coins = UserDataServer.coins
 
     // Create the text object displaying user stats
-    this.add
-      .text(
-        Space.windowWidth - (Space.pad * 2 + Space.iconSize),
-        headerHeight / 2,
-        `${username} (${elo}) ${gems}💎 ${coins}💰`,
-        Style.basic,
-      )
-      .setOrigin(1, 0.5)
+    new Buttons.Text(
+      this,
+      Space.windowWidth - (Space.pad * 2 + Space.iconSize),
+      headerHeight / 2,
+      `${username} (${elo}) ${gems}💎 ${coins}💰`,
+      () => {
+        this.scene.start('StoreScene')
+      },
+    ).setOrigin(1, 0.5)
   }
 
   private createButtons(): void {
@@ -519,8 +520,7 @@ export default class HomeScene extends BaseScene {
       })
       .on('pointerdown', () => {
         this.sound.play('click')
-        this.scene.start('StoreScene')
-        // this.scene.start('MatchHistoryScene')
+        this.scene.start('MatchHistoryScene')
       })
 
     map.mask = new Phaser.Display.Masks.BitmapMask(this, rect)
