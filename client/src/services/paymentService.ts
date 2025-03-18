@@ -1,6 +1,8 @@
 import { loadStripe } from '@stripe/stripe-js'
 import { Url } from '../settings/url'
 import { PAYMENT_PORT } from '../../../shared/network/settings'
+import { Flags } from '../settings/flags'
+import UserDataServer from '../network/userDataServer'
 
 const stripePromise = loadStripe(Url.stripePublishableKey)
 
@@ -9,8 +11,16 @@ export const paymentService = {
   async purchaseGems(
     gemPackage: string,
   ): Promise<{ sessionId: string; amount: number; gems: number }> {
+    const uuid = UserDataServer.getUUID()
+    if (!uuid) throw new Error('No UUID found')
+
+    // Get the base URL
+    const baseUrl = Flags.local
+      ? `http://localhost:${PAYMENT_PORT}`
+      : window.location.origin
+
     const response = await fetch(
-      `http://localhost:${PAYMENT_PORT}/api/payments/create-checkout-session`,
+      `${baseUrl}/api/payments/create-checkout-session`,
       {
         method: 'POST',
         headers: {
@@ -18,7 +28,7 @@ export const paymentService = {
         },
         body: JSON.stringify({
           gemPackage,
-          googleId: localStorage.getItem('googleId') || 'test-user-id',
+          uuid,
         }),
       },
     )

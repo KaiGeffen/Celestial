@@ -45,14 +45,14 @@ export default function createPaymentServer() {
     console.log('Request body:', req.body)
 
     try {
-      const { googleId, gemPackage } = req.body
+      const { googleId: uuid, gemPackage } = req.body
 
-      if (!googleId || !gemPackage) {
+      if (!uuid || !gemPackage) {
         return res.status(400).json({ error: 'Missing required parameters' })
       }
 
       // Convert Google ID to your UUID format
-      const userId = uuidv5(googleId, UUID_NAMESPACE)
+      const userId = uuidv5(uuid, UUID_NAMESPACE)
 
       // Get package details
       const packageDetails = GEM_PACKAGES[gemPackage]
@@ -103,22 +103,20 @@ export default function createPaymentServer() {
     const signature = req.headers['stripe-signature']
 
     try {
+      // Verify the webhook came from Stripe
       const event = stripe.webhooks.constructEvent(
         req.body,
         signature,
         process.env.STRIPE_WEBHOOK_SECRET,
       )
 
-      // Handle both payment_intent.succeeded and checkout.session.completed
-      if (
-        event.type === 'payment_intent.succeeded' ||
-        event.type === 'checkout.session.completed'
-      ) {
+      // This is where payment success is handled
+      if (event.type === 'checkout.session.completed') {
         // Get the payment details
         const paymentData = event.data.object
         const { userId, gemAmount } = paymentData.metadata
 
-        // Update user's gem balance
+        // Update user's gem balance in your database
         await db
           .update(players)
           .set({
