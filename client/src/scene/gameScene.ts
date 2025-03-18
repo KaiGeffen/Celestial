@@ -76,6 +76,7 @@ export class GameScene extends BaseScene {
 
   beforeExit() {
     this.net.exitMatch()
+    console.log('About to exit')
     UserDataServer.refreshUserData()
   }
 

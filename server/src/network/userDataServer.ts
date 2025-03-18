@@ -72,12 +72,15 @@ export default function createUserDataServer() {
         }
       })
         .on('refreshUserData', async () => {
+          console.log('Refreshing user data')
+          console.log('id is', id)
           if (!id) return
           const result = await db
             .select()
             .from(players)
             .where(eq(players.id, id))
             .limit(1)
+          console.log('result is', result)
           if (result.length === 0) return
           await sendUserData(ws, id, result[0])
         })
