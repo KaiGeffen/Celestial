@@ -189,10 +189,8 @@ class RadiantCore extends Card {
   }
 
   onMorning(player: number, game: GameModel, index: number) {
-    const endOfLastRound =
-      game.recentModels[player][game.recentModels[player].length - 1]
-    const lastRoundsBreath = endOfLastRound.breath[player]
-    super.addBreath(lastRoundsBreath, game, player)
+    const amt = game.endingBreath[player]
+    super.addBreath(amt, game, player)
 
     return true
   }

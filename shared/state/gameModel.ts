@@ -19,6 +19,8 @@ export default class GameModel {
   // Player qualities
   breath: number[] = [1, 1]
   maxBreath: number[] = [1, 1]
+  // TODO This is a hack for Radiant Core, consider other approaches
+  endingBreath: number[] = [0, 0]
   status: Status[][] = [[], []]
   vision: number[] = [0, 0]
 

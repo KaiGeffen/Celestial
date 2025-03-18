@@ -301,6 +301,8 @@ class ServerController {
     this.model.roundResults[1].push(this.model.score[1])
 
     this.model.roundCount += 1
+    this.model.endingBreath[0] = this.model.breath[0]
+    this.model.endingBreath[1] = this.model.breath[1]
 
     this.model.story.saveFinalStateAndClear(this.model)
 
