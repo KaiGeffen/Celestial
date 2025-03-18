@@ -101,10 +101,11 @@ export class GameScene extends BaseScene {
     // Disable the pass button
     this.view.pass.disablePass()
 
-    // Launch a menu saying opponent disconnected
+    // Show a message that opponent disconnected
     this.scene.launch('MenuScene', {
-      menu: 'disconnect',
-      activeScene: this,
+      menu: 'message',
+      title: 'Opponent Disconnected',
+      s: 'Your opponent disconnected, you win!',
     })
   }
 

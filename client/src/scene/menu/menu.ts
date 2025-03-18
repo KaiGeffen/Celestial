@@ -153,7 +153,6 @@ import HelpMenu from './help'
 // TODO Rename since it includes both
 import { NewDeckMenu, EditDeckMenu } from './newDeck'
 import ModeMenu from './mode'
-import DCMenu from './disconnect'
 import ConfirmMenu from './confirm'
 import DistributionMenu from './distribution'
 import MessageMenu from './message'
@@ -170,7 +169,6 @@ const menus = {
   newDeck: NewDeckMenu,
   mode: ModeMenu,
   editDeck: EditDeckMenu,
-  disconnect: DCMenu,
   confirm: ConfirmMenu,
   distribution: DistributionMenu,
   message: MessageMenu,
