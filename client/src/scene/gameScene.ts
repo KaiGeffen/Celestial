@@ -98,9 +98,6 @@ export class GameScene extends BaseScene {
   signalDC(): void {
     this.opponentDisconnected = true
 
-    // Disable the pass button
-    this.view.pass.disablePass()
-
     // Show a message that opponent disconnected
     this.scene.launch('MenuScene', {
       menu: 'message',
