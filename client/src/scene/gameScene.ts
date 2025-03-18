@@ -37,9 +37,6 @@ export class GameScene extends BaseScene {
   // Whether this match is a tutorial
   isTutorial = false
 
-  // Whether the opponent has disconnected
-  opponentDisconnected: boolean
-
   init(params: {
     deck?: Deck
     missionID?: number
@@ -51,7 +48,6 @@ export class GameScene extends BaseScene {
     // Reset variables
     this.queuedStates = {}
     this.currentVersion = this.maxVersion = -1
-    this.opponentDisconnected = false
 
     // Connect with the server
     if (this.isTutorial) {
@@ -96,8 +92,6 @@ export class GameScene extends BaseScene {
   }
 
   signalDC(): void {
-    this.opponentDisconnected = true
-
     // Show a message that opponent disconnected
     this.scene.launch('MenuScene', {
       menu: 'message',

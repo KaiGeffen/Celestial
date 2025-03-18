@@ -238,8 +238,6 @@ export default class OurHandRegion extends Region {
       let msg
       if (state.winner !== null) {
         msg = 'The game is over.'
-      } else if (this.scene.opponentDisconnected) {
-        msg = 'Your opponent has disconnected.'
       } else if (!state.mulligansComplete[1]) {
         msg = 'Opponent still mulliganing.'
       } else if (state.isRecap) {
