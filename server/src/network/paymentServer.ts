@@ -34,20 +34,11 @@ export default function createPaymentServer() {
   // JSON parser for all other routes
   app.use(express.json())
 
-  // Debug middleware
-  app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`, req.body)
-    next()
-  })
-
   // Create a router instance
   const router = express.Router()
 
   // Configure routes on the router
   router.post('/create-checkout-session', async (req, res) => {
-    console.log('Create checkout session handler triggered')
-    console.log('Request body:', req.body)
-
     try {
       const { uuid, gemPackage } = req.body
 
