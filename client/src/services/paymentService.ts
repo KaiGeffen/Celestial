@@ -27,8 +27,8 @@ export const paymentService = {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          gemPackage,
           uuid,
+          gemPackage,
         }),
       },
     )

@@ -45,7 +45,7 @@ export default function createPaymentServer() {
     console.log('Request body:', req.body)
 
     try {
-      const { googleId: uuid, gemPackage } = req.body
+      const { uuid, gemPackage } = req.body
 
       if (!uuid || !gemPackage) {
         return res.status(400).json({ error: 'Missing required parameters' })
