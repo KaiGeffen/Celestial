@@ -1,9 +1,7 @@
 import { loadStripe } from '@stripe/stripe-js'
+import { Url } from '../settings/url'
 
-const stripePromise = loadStripe(
-  'pk_test_51N000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
-)
-// loadStripe(process.env.STRIPE_PUBLISHABLE_KEY || '')
+const stripePromise = loadStripe(Url.stripePublishableKey)
 
 export const paymentService = {
   // Initialize a purchase for gems
