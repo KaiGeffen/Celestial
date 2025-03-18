@@ -150,6 +150,7 @@ export default class BaseScene extends SharedBaseScene {
       throw 'Last scene is undefined'
     } else {
       this.beforeExit()
+      this.scene.stop('MenuScene')
       this.scene.start(this.lastScene)
     }
   }
