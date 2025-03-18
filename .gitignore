@@ -1,6 +1,9 @@
 # DS_Store #
 *.DS_Store
 
+# env files #
+*.env
+
 # Text editor backups #
 *~
 

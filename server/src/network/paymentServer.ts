@@ -27,14 +27,23 @@ export default function createPaymentServer() {
   // Enable CORS
   app.use(cors())
 
-  // Parse JSON for regular routes
+  // Parse JSON for all routes except webhook
   app.use(express.json())
 
-  // Special handling for Stripe webhook endpoint
-  app.use('/webhook', express.raw({ type: 'application/json' }))
+  // Debug middleware
+  app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`, req.body)
+    next()
+  })
 
-  // Create payment intent endpoint
-  app.post('/create-payment-intent', async (req, res) => {
+  // Create a router instance
+  const router = express.Router()
+
+  // Configure routes on the router
+  router.post('/create-checkout-session', async (req, res) => {
+    console.log('Create checkout session handler triggered')
+    console.log('Request body:', req.body)
+
     try {
       const { googleId, gemPackage } = req.body
 
@@ -51,10 +60,25 @@ export default function createPaymentServer() {
         return res.status(400).json({ error: 'Invalid gem package' })
       }
 
-      // Create payment intent
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: packageDetails.amount,
-        currency: 'usd',
+      // Create Checkout Session
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: `${packageDetails.gems} Celestial Gems`,
+                description: `Gem package for Celestial Game`,
+              },
+              unit_amount: packageDetails.amount,
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${req.headers.origin || 'http://localhost:4949'}`,
+        cancel_url: `${req.headers.origin || 'http://localhost:4949'}`,
         metadata: {
           userId,
           gemAmount: packageDetails.gems.toString(),
@@ -62,20 +86,20 @@ export default function createPaymentServer() {
         },
       })
 
-      // Return client secret and payment details
+      // Return session ID and payment details
       res.json({
-        clientSecret: paymentIntent.client_secret,
+        sessionId: session.id,
         amount: packageDetails.amount,
         gems: packageDetails.gems,
       })
     } catch (error) {
-      console.error('Error creating payment intent:', error)
-      res.status(500).json({ error: 'Failed to create payment intent' })
+      console.error('Error creating checkout session:', error)
+      res.status(500).json({ error: 'Failed to create checkout session' })
     }
   })
 
-  // Webhook endpoint to handle successful payments
-  app.post('/webhook', async (req, res) => {
+  // Update webhook handler to handle checkout.session.completed events
+  router.post('/webhook', async (req, res) => {
     const signature = req.headers['stripe-signature']
 
     try {
@@ -85,9 +109,14 @@ export default function createPaymentServer() {
         process.env.STRIPE_WEBHOOK_SECRET,
       )
 
-      if (event.type === 'payment_intent.succeeded') {
-        const paymentIntent = event.data.object
-        const { userId, gemAmount } = paymentIntent.metadata
+      // Handle both payment_intent.succeeded and checkout.session.completed
+      if (
+        event.type === 'payment_intent.succeeded' ||
+        event.type === 'checkout.session.completed'
+      ) {
+        // Get the payment details
+        const paymentData = event.data.object
+        const { userId, gemAmount } = paymentData.metadata
 
         // Update user's gem balance
         await db
@@ -106,6 +135,12 @@ export default function createPaymentServer() {
       res.status(400).send(`Webhook Error: ${error.message}`)
     }
   })
+
+  // Special handling for Stripe webhook endpoint
+  app.use('/api/payments/webhook', express.raw({ type: 'application/json' }))
+
+  // Mount the router at the prefix path
+  app.use('/api/payments', router)
 
   // Start the server
   app.listen(PAYMENT_PORT, () => {

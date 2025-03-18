@@ -5,7 +5,7 @@ import Buttons from '../lib/buttons/buttons'
 import UserDataServer from '../network/userDataServer'
 import { paymentService } from '../services/paymentService'
 
-const headerHeight = Space.buttonHeight + Space.pad * 2
+const headerHeight = Space.iconSize + Space.pad * 2
 
 export default class StoreScene extends BaseScene {
   constructor() {
@@ -133,46 +133,17 @@ export default class StoreScene extends BaseScene {
       .setOrigin(0.5)
 
     try {
-      // Create payment intent
+      // Create payment session and open checkout
       const result = await paymentService.purchaseGems(packageId)
       if (!result) {
-        throw new Error('Failed to create payment intent')
+        throw new Error('Failed to create payment session')
       }
 
-      const { clientSecret, amount, gems } = result
+      // Open Stripe Checkout
+      await paymentService.openCheckout(result.sessionId)
 
-      // Launch payment modal
-      this.scene.pause()
-
-      // Process payment (this would typically be in a modal or popup)
-      const success = await paymentService.confirmPayment(clientSecret)
-
-      this.scene.resume()
+      // Note: Success/failure handling will happen via URL redirects
       loadingText.destroy()
-
-      if (success) {
-        // Show success message
-        this.add
-          .text(
-            Space.windowWidth / 2,
-            Space.windowHeight / 2,
-            `Successfully purchased ${gems} gems!`,
-            Style.basic,
-          )
-          .setOrigin(0.5)
-
-        // The actual gem update will come through WebSocket
-      } else {
-        // Show error message
-        this.add
-          .text(
-            Space.windowWidth / 2,
-            Space.windowHeight / 2,
-            'Payment failed. Please try again.',
-            Style.basic,
-          )
-          .setOrigin(0.5)
-      }
     } catch (error) {
       this.signalError('Payment error: ' + error)
       loadingText.destroy()
