@@ -186,7 +186,13 @@ class ServerController {
     this.model.mulligansComplete[player] = true
   }
 
-  doUpkeep(): void {
+  setWinnerViaDisconnect(winner: number): void {
+    this.model.winner = winner
+    this.model.mulligansComplete = [true, true]
+    this.model.versionIncr()
+  }
+
+  protected doUpkeep(): void {
     // Reset vision
     const newVision0 = this.model.status[0].includes(Status.AWAKENED)
       ? this.model.vision[0]

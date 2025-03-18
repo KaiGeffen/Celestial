@@ -160,7 +160,7 @@ class TutorialController extends ServerController {
     this.model.mulligansComplete = [true, true]
   }
 
-  doUpkeep() {
+  protected doUpkeep() {
     super.doUpkeep()
     this.model.priority = 0
   }

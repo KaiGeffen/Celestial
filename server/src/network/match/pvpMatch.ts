@@ -25,12 +25,13 @@ class PvpMatch extends Match {
     // Don't send disconnect message if the game has already ended
     if (this.game === null || this.game.model.winner !== null) return
 
-    // This game is over now
-    this.game = null
-
     // Update match result, counting the disconnecting player as the loser
     const winner = this.ws1 === disconnectingWs ? 1 : 0
     await this.updateMatchResult(winner)
+
+    // Set the winner and notify connected players
+    this.game.setWinnerViaDisconnect(winner)
+    await this.notifyState()
 
     // Null the ws that has disconnected
     if (this.ws1 === disconnectingWs) this.ws1 = null
