@@ -27,7 +27,11 @@ export default function createPaymentServer() {
   // Enable CORS
   app.use(cors())
 
-  // Parse JSON for all routes except webhook
+  // IMPORTANT: Raw body parser for webhook must come BEFORE json parser
+  // and BEFORE the router mounting
+  app.use('/api/payments/webhook', express.raw({ type: 'application/json' }))
+
+  // JSON parser for all other routes
   app.use(express.json())
 
   // Debug middleware
@@ -134,10 +138,7 @@ export default function createPaymentServer() {
     }
   })
 
-  // Special handling for Stripe webhook endpoint
-  app.use('/api/payments/webhook', express.raw({ type: 'application/json' }))
-
-  // Mount the router at the prefix path
+  // Mount the router at the prefix path LAST
   app.use('/api/payments', router)
 
   // Start the server
