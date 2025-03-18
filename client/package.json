@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "webpack",
-    "start": "webpack --watch & live-server --port=8083",
+    "start": "webpack && live-server --port=8083",
     "dev": "webpack --watch & live-server --port=4949"
   },
   "repository": {
