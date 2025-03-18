@@ -30,10 +30,12 @@ class PvpMatch extends Match {
     this.game.setWinnerViaDisconnect(winner)
     await this.notifyState()
 
-    // Notify all players and close websockets
+    // Notify opponent and close websockets
     await Promise.all(
       this.getActiveWsList().map((ws: MatchServerWS) => {
-        ws.send({ type: 'opponentDisconnected' })
+        if (ws !== disconnectingWs) {
+          ws.send({ type: 'opponentDisconnected' })
+        }
         ws.close()
       }),
     )
