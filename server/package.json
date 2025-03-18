@@ -13,14 +13,17 @@
   },
   "dependencies": {
     "@types/pg": "^8.10.9",
+    "bufferutil": "^4.0.9",
     "dotenv": "^16.4.7",
     "drizzle-kit": "^0.20.6",
     "drizzle-orm": "^0.29.1",
     "elo-rank": "^1.0.4",
     "nodemon": "^3.1.9",
     "pg": "^8.11.3",
+    "pg-native": "^3.3.0",
     "stripe": "^17.7.0",
     "ts-loader": "^8.0.17",
+    "utf-8-validate": "^6.0.5",
     "webpack": "^5.23.0",
     "webpack-cli": "^4.5.0"
   }
