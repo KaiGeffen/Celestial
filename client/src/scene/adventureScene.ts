@@ -12,8 +12,6 @@ import Buttons from '../lib/buttons/buttons'
 import Button from '../lib/buttons/button'
 
 import Catalog from '../../../shared/state/catalog'
-// import adventureData from "../adventure.json"
-// adventureData.reverse()
 import { adventureNode, adventureData } from '../adventures/adventure'
 
 // TODO Remove the arrow images because drag is now default
