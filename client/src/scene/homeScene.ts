@@ -98,9 +98,9 @@ export default class HomeScene extends BaseScene {
       .setOrigin(0.5)
 
     // Add user stats display
-    if (true || UserDataServer.isLoggedIn()) {
+    if (UserDataServer.isLoggedIn()) {
       this.createUserStatsDisplay()
-      // this.createQuestText()
+      this.createQuestText()
     }
   }
 
