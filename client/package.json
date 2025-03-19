@@ -46,7 +46,7 @@
     "jwt-decode": "^3.1.2",
     "path-browserify": "^1.0.1",
     "phaser": "^3.55.2",
-    "phaser3-rex-plugins": "^1.1.72",
+    "phaser3-rex-plugins": "^1.80.14",
     "phaser3-rex-plugins-types": "^0.2.0",
     "process": "^0.11.10",
     "socket.io": "^3.1.2",

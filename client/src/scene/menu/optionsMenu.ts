@@ -544,7 +544,7 @@ export default class OptionsMenu extends Menu {
         Color.sliderIndicator,
       ),
       thumb: this.scene.add.image(0, 0, 'icon-Thumb'),
-      input: 'drag',
+      input: 'click',
 
       value: value,
       valuechangeCallback: callback,
