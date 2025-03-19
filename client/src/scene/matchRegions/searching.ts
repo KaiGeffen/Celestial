@@ -155,9 +155,6 @@ export default class SearchingRegion extends Region {
       Space.windowHeight / 2 + 100,
       'Cancel',
       () => {
-        // Do any necessary cleanup
-        scene.beforeExit()
-
         // Return to the last scene
         scene.doBack()
       },
