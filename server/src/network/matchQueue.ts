@@ -99,6 +99,13 @@ class MatchQueue {
             deck: data.deck,
           }
           searchingPlayers[data.password] = waitingPlayer
+
+          // Ensure that if they leave, they are removed from the queue
+          ws.on('exitMatch', () => {
+            console.log('Player disconnected before getting into a match:')
+            delete searchingPlayers[data.password]
+            ws.close()
+          })
         }
       })
       .on('initTutorial', async (data) => {
@@ -122,10 +129,10 @@ function registerEvents(ws: MatchServerWS, match: Match, playerNumber: number) {
     .on('passTurn', (data) => {
       match.doAction(playerNumber, MechanicsSettings.PASS, data.versionNo)
     })
-    .on('exitMatch', (data) => {
+    .on('exitMatch', () => {
       match.doExit(ws)
     })
-    .on('emote', (data) => {
+    .on('emote', () => {
       const emote = 0 // TODO
       match.signalEmote(playerNumber, emote)
     })
