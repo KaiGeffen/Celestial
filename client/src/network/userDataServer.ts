@@ -74,6 +74,10 @@ export default class UserDataServer {
           callback: () => {
             callback()
           },
+          // Ensure that user is logged out if they cancel
+          exitCallback: () => {
+            this.logout()
+          },
         })
       })
       .on('invalidToken', () => {
@@ -154,6 +158,10 @@ export default class UserDataServer {
 
   static logout(): void {
     console.log('Logging out')
+
+    // Clear the sign-in token
+    localStorage.removeItem('gsi_token')
+
     if (UserDataServer.isLoggedIn()) {
       console.log('server was logged in and now its logging out...')
 

@@ -75,11 +75,7 @@ export default class HomeScene extends BaseScene {
         this.scene.launch('MenuScene', {
           menu: 'confirm',
           callback: () => {
-            // Clear the stored token
-            localStorage.removeItem('gsi_token')
-
             UserDataServer.logout()
-
             this.scene.start('SigninScene')
           },
           hint: 'logout',
