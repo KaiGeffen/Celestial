@@ -340,7 +340,7 @@ export default class OurBoardRegion extends Region {
     index: number,
   ): () => void {
     return () => {
-      card.container.setY(0)
+      card.container.setY(43)
 
       // Stop showing a positive card cost
       this.displayCostCallback(0)

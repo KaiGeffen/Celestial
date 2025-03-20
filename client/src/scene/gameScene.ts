@@ -113,7 +113,7 @@ export class GameScene extends BaseScene {
 
     // TODO Smell, class these
     this.view.ourBoard['showUsername'](name1)
-    this.view.theirboard['showUsername'](name2)
+    this.view.theirBoard['showUsername'](name2)
   }
 
   // Set all of the callback functions for the regions in the view
@@ -339,7 +339,7 @@ export class View {
 
   // Board
   ourBoard: OurBoardRegion
-  theirboard: TheirBoardRegion
+  theirBoard: TheirBoardRegion
 
   ourDeckOverlay: OverlayRegion
   theirDeckOverlay: OverlayRegion
@@ -378,7 +378,7 @@ export class View {
     // this.createOurHand()
     // new HandRegion()//.create(scene)
     this.ourBoard = new Regions.OurBoard().create(scene, avatarId)
-    this.theirboard = new Regions.TheirBoard().create(scene)
+    this.theirBoard = new Regions.TheirBoard().create(scene)
 
     this.story = new Regions.Story().create(scene)
     this.ourScore = new Regions.OurScore().create(scene)
@@ -437,7 +437,7 @@ export class View {
     this.ourAvatar.displayState(state)
 
     this.ourBoard.displayState(state)
-    this.theirboard.displayState(state)
+    this.theirBoard.displayState(state)
     this.story.displayState(state)
     this.ourScore.displayState(state)
     this.theirScore.displayState(state)

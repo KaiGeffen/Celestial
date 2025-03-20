@@ -28,17 +28,17 @@ export default class CardLocation {
 
       // If total width exceeds max, scale down spacing
       const maxWidth =
-        Space.windowWidth - (200 + 200 + Space.cardWidth * 2 + Space.pad * 2)
+        Space.windowWidth -
+        (200 + Space.cardWidth + Space.pad) * 2 -
+        Space.cardWidth
       const totalWidth = dx * (totalCards - 1)
       if (totalWidth > maxWidth) {
         dx *= maxWidth / totalWidth
       }
 
-      // Calculate offset from center
-      // For odd numbers of cards: center card at 0, others at ±dx, ±2dx, etc.
-      // For even numbers: cards at ±dx/2, ±3dx/2, etc.
+      // Calculate offset from center, reversed so first card is leftmost
       const isEven = totalCards % 2 === 0
-      const indexFromCenter = i - Math.floor(totalCards / 2)
+      const indexFromCenter = Math.floor(totalCards / 2) - (totalCards - 1 - i)
       const xOffset = isEven
         ? (indexFromCenter + 0.5) * dx
         : indexFromCenter * dx
@@ -68,17 +68,17 @@ export default class CardLocation {
 
       // If total width exceeds max, scale down spacing
       const maxWidth =
-        Space.windowWidth - (200 + 200 + Space.cardWidth * 2 + Space.pad * 2)
+        Space.windowWidth -
+        (200 + Space.cardWidth + Space.pad) * 2 -
+        Space.cardWidth
       const totalWidth = dx * (totalCards - 1)
       if (totalWidth > maxWidth) {
         dx *= maxWidth / totalWidth
       }
 
-      // Calculate offset from center
-      // For odd numbers of cards: center card at 0, others at ±dx, ±2dx, etc.
-      // For even numbers: cards at ±dx/2, ±3dx/2, etc.
+      // Calculate offset from center, reversed so first card is leftmost
       const isEven = totalCards % 2 === 0
-      const indexFromCenter = i - Math.floor(totalCards / 2)
+      const indexFromCenter = Math.floor(totalCards / 2) - (totalCards - 1 - i)
       const xOffset = isEven
         ? (indexFromCenter + 0.5) * dx
         : indexFromCenter * dx
@@ -89,7 +89,7 @@ export default class CardLocation {
       return [x - container.x, y - container.y]
     }
 
-    return [0, 0] // Placeholder return, actual implementation needed
+    return [0, 0]
   }
 
   static story(

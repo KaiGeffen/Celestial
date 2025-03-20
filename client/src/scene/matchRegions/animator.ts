@@ -183,7 +183,7 @@ export default class Animator {
           // TODO Check length
           card = this.view.ourBoard.cards[animation.index2]
         } else {
-          card = this.view.theirboard.cards[animation.index2]
+          card = this.view.theirBoard.cards[animation.index2]
         }
         break
 
@@ -361,7 +361,7 @@ export default class Animator {
         if (owner === 0) {
           obj = this.view.ourBoard['btnInspire'] // TODO Smell, fix typing
         } else {
-          obj = this.view.theirboard['btnInspire']
+          obj = this.view.theirBoard['btnInspire']
         }
         break
 
@@ -369,7 +369,7 @@ export default class Animator {
         if (owner === 0) {
           obj = this.view.ourBoard['btnNourish']
         } else {
-          obj = this.view.theirboard['btnNourish']
+          obj = this.view.theirBoard['btnNourish']
         }
         break
     }
