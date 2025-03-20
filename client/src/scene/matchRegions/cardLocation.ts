@@ -8,6 +8,9 @@ import { Space, Flags } from '../../settings/settings'
 // Amount of room to leave to the right of the last card in either hand
 const minRoom = (Flags.mobile ? 210 : 342) + Space.cardWidth / 2
 
+// TODO Remove i from many of these arguments (height is CardHeight - 43)
+const todoTheirHandHeight = -43
+
 // This describes where on screen each card in each region should appear
 // so that regions can move their cards to the appropriate locations for
 // other regions
@@ -55,30 +58,36 @@ export default class CardLocation {
     i: number,
     container: Phaser.GameObjects.Container,
   ): [number, number] {
-    // X of the first card in their hand
-    const x0 = (Flags.mobile ? 100 : 220) + Space.cardWidth / 2
-
+    const centerX = Space.windowWidth / 2
     let dx = Space.cardWidth + Space.pad
 
-    // If their hand has too many cards for the screen size, scale down
-    const maxOffset = Space.windowWidth - x0 - minRoom
-
     if (state !== undefined) {
-      // Find the amount that we must scale down by
-      // offset of last card <= maxOffset
-      // This may be multiplied by a constant to fit within the max
-      const lastCardOffset = dx * 5 //(state.opponentHandSize - 1)
-      if (lastCardOffset > maxOffset) {
-        dx *= maxOffset / lastCardOffset
+      const totalCards = state.hand[1].length
+
+      // If total width exceeds max, scale down spacing
+      const maxWidth =
+        Space.windowWidth - (200 + 200 + Space.cardWidth * 2 + Space.pad * 2)
+      const totalWidth = dx * (totalCards - 1)
+      if (totalWidth > maxWidth) {
+        dx *= maxWidth / totalWidth
       }
+
+      // Calculate offset from center
+      // For odd numbers of cards: center card at 0, others at ±dx, ±2dx, etc.
+      // For even numbers: cards at ±dx/2, ±3dx/2, etc.
+      const isEven = totalCards % 2 === 0
+      const indexFromCenter = i - Math.floor(totalCards / 2)
+      const xOffset = isEven
+        ? (indexFromCenter + 0.5) * dx
+        : indexFromCenter * dx
+
+      const x = centerX + xOffset
+      let y = todoTheirHandHeight
+
+      return [x - container.x, y - container.y]
     }
 
-    // Offset from the first card
-    const xOffset = dx * i
-    const x = x0 + xOffset
-    let y = Space.handHeight - Space.cardHeight / 2
-
-    return [x - container.x, y - container.y]
+    return [0, 0] // Placeholder return, actual implementation needed
   }
 
   static story(
@@ -152,16 +161,9 @@ export default class CardLocation {
     container?: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const dx = 3 * i
-    let x = 30 - dx
-    let y = Space.windowHeight / 2 - Space.cardHeight / 2 - Space.pad
-
-    if (container !== undefined) {
-      x -= container.x
-      y -= container.y
-    }
-
-    return [x, y]
+    const x = 200 + Space.cardWidth / 2
+    const y = todoTheirHandHeight
+    return [x - container.x, y - container.y]
   }
 
   static ourDiscard(
@@ -179,10 +181,8 @@ export default class CardLocation {
     container: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const dx = 3 * i
-    const x0 = Space.windowWidth - Space.cardWidth / 2 - Space.pad
-    const x = x0 + dx
-    const y = 110
+    const x = Space.windowWidth - Space.cardWidth / 2 - 200
+    const y = todoTheirHandHeight
     return [x - container.x, y - container.y]
   }
 

@@ -10,6 +10,7 @@ import {
   Time,
   Flags,
   UserSettings,
+  Color,
 } from '../../settings/settings'
 import { GameScene } from '../gameScene'
 import Region from './baseRegion'
@@ -23,33 +24,13 @@ export default class TheirHandRegion extends Region {
   btnDeck: Button
   btnDiscard: Button
 
-  btnInspire: Button
-  btnNourish: Button
-
   create(scene: GameScene): TheirHandRegion {
     this.scene = scene
 
-    // Avatar, status, hand, recap, pass buttons
     this.container = scene.add.container(0, 0).setDepth(Depth.theirHand)
     this.createBackground()
 
-    // Highlight visible when they have priority
-    this.priorityHighlight = this.createPriorityHighlight().setVisible(false)
-    this.container.add(this.priorityHighlight)
-
-    const x = Space.windowWidth - 300
-    this.btnDeck = new Buttons.Stacks.Deck(
-      this.container,
-      x,
-      (Space.handHeight * 1) / 4,
-      1,
-    )
-    this.btnDiscard = new Buttons.Stacks.Discard(
-      this.container,
-      x,
-      (Space.handHeight * 3) / 4,
-      1,
-    )
+    this.createStacks()
 
     this.addHotkeyListeners()
 
@@ -110,62 +91,36 @@ export default class TheirHandRegion extends Region {
   }
 
   private createBackground(): void {
-    const s = `icon-${Flags.mobile ? 'MobileBottom' : 'Top'}`
-    let background = this.scene.add
-      .image(Space.windowWidth, 0, s)
-      .setOrigin(1, 0)
-      .setInteractive()
+    const x = 200
+    const width = Space.windowWidth - 400 // (200 from each side)
+    const height = Space.cardHeight / 2 - 43
 
-    if (Flags.mobile) {
-      background.setFlipY(true)
-    }
+    const background = this.scene.add
+      .rectangle(x, 0, width, height, Color.backgroundLight)
+      .setOrigin(0)
 
     this.container.add(background)
   }
 
-  private createPriorityHighlight(): Phaser.GameObjects.Video {
-    return this.scene.add
-      .video(0, 0, 'priorityHighlight')
-      .setOrigin(0)
-      .play(true)
-      .setAlpha(0)
-  }
+  private createStacks(): void {
+    let [x, y] = CardLocation.theirDeck(this.container)
+    this.container.add(this.scene.add.image(x, y, 'Cardback'))
+    this.btnDeck = new Buttons.Stacks.Deck(
+      this.container,
+      x,
+      y + Space.cardHeight / 2,
+      1,
+    )
 
-  private onHoverStatus(status: string, btn: Button): [() => void, () => void] {
-    let that = this
-    let keyword = Keywords.get(status)
-
-    //TODO Move this into hint
-    let onHover = () => {
-      let s = keyword.text
-
-      // Remove the first X (In image data)
-      s = s.replace(' X', '')
-
-      // Get the value from the given status button
-      s = s.split(/\bX\b/).join(btn.getText())
-      s = s.replace('you', 'they')
-
-      // Hint shows status text
-      that.scene.hint.showText(s)
-    }
-
-    let onExit = () => {
-      that.scene.hint.hide()
-    }
-
-    return [onHover, onExit]
-  }
-
-  // Animate them getting or losing priority
-  private animatePriority(state: GameModel): void {
-    const targetAlpha = state.priority === 1 && !state.isRecap ? 1 : 0
-
-    this.scene.tweens.add({
-      targets: this.priorityHighlight,
-      alpha: targetAlpha,
-      duration: Time.recapTweenWithPause(),
-    })
+    // Discard pile
+    ;[x, y] = CardLocation.theirDiscard(this.container)
+    this.container.add(this.scene.add.image(x, y, 'Cardback'))
+    this.btnDiscard = new Buttons.Stacks.Discard(
+      this.container,
+      x,
+      y + Space.cardHeight / 2,
+      1,
+    )
   }
 
   // TUTORIAL FUNCTIONALITY
