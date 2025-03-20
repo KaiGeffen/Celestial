@@ -18,8 +18,11 @@ export class RegisterUsernameMenu extends Menu {
   private confirmButton: Button
   private errorText: Phaser.GameObjects.Text
 
-  constructor(scene: MenuScene, params: { callback: () => void }) {
-    super(scene, width)
+  constructor(
+    scene: MenuScene,
+    params: { callback: () => void; exitCallback: () => void },
+  ) {
+    super(scene, width, params)
     this.callback = params.callback
     this.createContent()
     this.layout()
