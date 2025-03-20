@@ -17,7 +17,7 @@ import Region from './baseRegion'
 import CardLocation from './cardLocation'
 import { MechanicsSettings } from '../../../../shared/settings'
 
-export default class TheirBoard extends Region {
+export default class TheirBoardRegion extends Region {
   // Effect showing that they have priority
   priorityHighlight: Phaser.GameObjects.Video
 

@@ -28,7 +28,7 @@ export default class MulliganRegion extends Region {
   btnReady: Button
 
   // The player's keep/not keep choices for each card in their hand
-  mulliganChoices = [false, false, false]
+  mulliganChoices: [boolean, boolean, boolean] = [false, false, false]
 
   // The callback for when the button is clicked
   onButtonClick: () => void

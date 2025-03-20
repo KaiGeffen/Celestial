@@ -19,7 +19,7 @@ import { GameScene } from '../gameScene'
 import { MechanicsSettings } from '../../../../shared/settings'
 
 // The y distance card moves up when hovered
-const HOVER_OFFSET = Space.cardHeight / 2
+const HOVER_OFFSET = Space.cardHeight / 2 - 43
 
 export default class OurHandRegion extends Region {
   // Function called when elements in this region are interacted with
@@ -205,7 +205,7 @@ export default class OurHandRegion extends Region {
   }
 
   private createStacks(): void {
-    let [x, y] = CardLocation.theirDeck(this.container)
+    let [x, y] = CardLocation.ourDeck(this.container)
     this.container.add(this.scene.add.image(x, y, 'Cardback'))
     this.btnDeck = new Buttons.Stacks.Deck(
       this.container,
@@ -215,7 +215,7 @@ export default class OurHandRegion extends Region {
     )
 
     // Discard pile
-    ;[x, y] = CardLocation.theirDiscard(this.container)
+    ;[x, y] = CardLocation.ourDiscard(this.container)
     this.container.add(this.scene.add.image(x, y, 'Cardback'))
     this.btnDiscard = new Buttons.Stacks.Discard(
       this.container,
@@ -339,15 +339,14 @@ export default class OurHandRegion extends Region {
     cards: CardImage[],
     index: number,
   ): () => void {
-    let that = this
     return () => {
       card.container.setY(0)
 
       // Stop showing a positive card cost
-      that.displayCostCallback(0)
+      this.displayCostCallback(0)
 
       // Remember that no card is being hovered now
-      that.hoveredCard = undefined
+      this.hoveredCard = undefined
     }
   }
 

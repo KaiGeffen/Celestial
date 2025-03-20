@@ -1,12 +1,10 @@
 import SearchingRegion from './searching'
 import CommandsRegion from './commands'
 
-import OurHandRegion from './ourHand'
-import TheirBoard from './theirHand'
+import OurBoardRegion from './ourHand'
+import TheirBoardRegion from './theirHand'
 import StoryRegion from './story'
 import OurScoreRegion from './ourScore'
-import DecksRegion from './decks'
-import DiscardPilesRegion from './discardPiles'
 import TheirScoreRegion from './theirScore'
 import * as Overlay from './pileOverlays'
 import PassRegion from './pass'
@@ -14,22 +12,20 @@ import RoundResultRegion from './roundResult'
 
 import MulliganRegion from './mulliganRegion'
 import ResultsRegion from './results'
-import TheirAvatarRegion from './theirAvatar'
 import OurAvatarRegion from './ourAvatar'
+import TheirAvatarRegion from './theirAvatar'
 
 export default class Regions {
   static Searching = SearchingRegion
   static Commands = CommandsRegion
-  static OurHand = OurHandRegion
-  static TheirBoard = TheirBoard
+  static OurBoard = OurBoardRegion
+  static TheirBoard = TheirBoardRegion
   static Story = StoryRegion
   static OurScore = OurScoreRegion
   static TheirScore = TheirScoreRegion
-  static Decks = DecksRegion
-  static DiscardPiles = DiscardPilesRegion
 
-  static TheirAvatar = TheirAvatarRegion
   static OurAvatar = OurAvatarRegion
+  static TheirAvatar = TheirAvatarRegion
 
   static OurDeck = Overlay.OurDeckOverlay
   static TheirDeck = Overlay.TheirDeckOverlay

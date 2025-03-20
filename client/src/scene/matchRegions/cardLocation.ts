@@ -44,7 +44,7 @@ export default class CardLocation {
         : indexFromCenter * dx
 
       const x = centerX + xOffset
-      let y = Space.windowHeight - Space.handHeight + Space.cardHeight / 2
+      let y = Space.windowHeight - todoTheirHandHeight
 
       if (container !== undefined) {
         return [x - container.x, y - container.y]
@@ -147,16 +147,9 @@ export default class CardLocation {
     container?: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const dx = 3 * i
-    let x = 30 - dx
-    let y = Space.windowHeight / 2 + Space.cardHeight / 2 + Space.pad
-
-    if (container !== undefined) {
-      x -= container.x
-      y -= container.y
-    }
-
-    return [x, y]
+    const x = 200 + Space.cardWidth / 2
+    const y = Space.windowHeight - todoTheirHandHeight
+    return [x - (container?.x || 0), y - (container?.y || 0)]
   }
 
   static theirDeck(
@@ -172,10 +165,8 @@ export default class CardLocation {
     container: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const dx = 3 * i
-    const x0 = Space.windowWidth - Space.cardWidth / 2 - Space.pad
-    const x = x0 + dx
-    const y = Space.windowHeight - 110
+    const x = Space.windowWidth - Space.cardWidth / 2 - 200
+    const y = Space.windowHeight - todoTheirHandHeight
     return [x - container.x, y - container.y]
   }
 

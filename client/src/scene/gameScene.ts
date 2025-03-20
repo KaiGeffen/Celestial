@@ -18,6 +18,12 @@ import { Deck } from '../../../shared/types/deck'
 import UserDataServer from '../network/userDataServer'
 import TheirAvatarRegion from './matchRegions/theirAvatar'
 import OurAvatarRegion from './matchRegions/ourAvatar'
+import CommandsRegion from './matchRegions/commands'
+import OurHandRegion from './matchRegions/ourHand'
+import TheirBoardRegion from './matchRegions/theirHand'
+import StoryRegion from './matchRegions/story'
+import ScoreRegion from './matchRegions/ourScore'
+import MulliganRegion from './matchRegions/mulliganRegion'
 
 // TODO Rename to Match
 export class GameScene extends BaseScene {
@@ -144,7 +150,7 @@ export class GameScene extends BaseScene {
       net.playCard(i, this.currentVersion)
     })
     view.ourHand.setDisplayCostCallback((cost: number) => {
-      that.view.ourScore.displayCost(cost)
+      that.view.ourScore['displayCost'](cost)
     })
     view.ourAvatar.setEmoteCallback(() => {
       this.net.signalEmote()
@@ -219,25 +225,6 @@ export class GameScene extends BaseScene {
         that.view.results.hide()
       }
     })
-
-    // Piles (Show overlay when clicked)
-    view.decks.setCallback(
-      () => {
-        that.view.ourDeckOverlay.show()
-      },
-      () => {
-        that.view.theirDeckOverlay.show()
-      },
-    )
-
-    view.discardPiles.setCallback(
-      () => {
-        that.view.ourDiscardOverlay.show()
-      },
-      () => {
-        that.view.theirDiscardOverlay.show()
-      },
-    )
 
     // Mulligan
     view.mulligan.setCallback(() => {
@@ -338,16 +325,14 @@ export class View {
   searching: Region
 
   // The buttons below Options button
-  commands: Region
+  commands: CommandsRegion
 
-  ourHand: Region
+  ourHand: OurHandRegion
   // ourButtons: Region
-  theirHand: Region
-  story: Region
-  ourScore
+  theirHand: TheirBoardRegion
+  story: StoryRegion
+  ourScore: Region
   theirScore: Region
-  decks: Region
-  discardPiles: Region
   pass: PassRegion
   scores: Region
 
@@ -363,7 +348,7 @@ export class View {
   theirExpendedOverlay: OverlayRegion
 
   // Region shown during mulligan phase
-  mulligan: Region
+  mulligan: MulliganRegion
 
   // Region shown when the game has been won / lost
   results: Region
@@ -391,7 +376,7 @@ export class View {
     // Create each of the regions
     // this.createOurHand()
     // new HandRegion()//.create(scene)
-    this.ourHand = new Regions.OurHand().create(scene, avatarId)
+    this.ourHand = new Regions.OurBoard().create(scene, avatarId)
     this.theirHand = new Regions.TheirBoard().create(scene)
 
     this.story = new Regions.Story().create(scene)
@@ -399,15 +384,14 @@ export class View {
     this.theirScore = new Regions.TheirScore().create(scene)
     // this.ourButtons = new Regions.OurButtons().create(scene)
 
-    // TODO Sort these out
-    this.theirAvatar = new Regions.TheirAvatar().create(scene)
-    this.ourAvatar = new Regions.OurAvatar().create(scene)
-
-    this.decks = new Regions.Decks().create(scene)
-    this.discardPiles = new Regions.DiscardPiles().create(scene)
     this.pass = new Regions.Pass().create(scene)
     this.scores = new Regions.RoundResult().create(scene)
 
+    // Avatars
+    this.ourAvatar = new Regions.OurAvatar().create(scene)
+    this.theirAvatar = new Regions.TheirAvatar().create(scene)
+
+    // Overlays
     this.ourDeckOverlay = new Regions.OurDeck().create(scene)
     this.theirDeckOverlay = new Regions.TheirDeck().create(scene)
     this.ourDiscardOverlay = new Regions.OurDiscard()
@@ -456,9 +440,6 @@ export class View {
     this.story.displayState(state)
     this.ourScore.displayState(state)
     this.theirScore.displayState(state)
-    // this.ourButtons.displayState(state)
-    this.decks.displayState(state)
-    this.discardPiles.displayState(state)
     this.pass.displayState(state)
     this.scores.displayState(state)
 
