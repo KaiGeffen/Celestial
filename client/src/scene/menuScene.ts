@@ -2,13 +2,14 @@ import 'phaser'
 
 import { BaseMenuScene } from './baseScene'
 import { Style, Color, Space, Time } from '../settings/settings'
-import { createMenu } from './menu/menu'
+import Menu, { createMenu } from './menu/menu'
 
 // The scene showing whichever menu is open, if any
 // This scene is on top of any other active open scenes
 export default class MenuScene extends BaseMenuScene {
   // Whether the scene has started ending, to ensure it only does so once
   sceneEnding: boolean
+  menu: Menu
 
   constructor() {
     super({
@@ -25,12 +26,12 @@ export default class MenuScene extends BaseMenuScene {
 
     this.addBackground()
 
-    let menu = createMenu(this, params.menu, params)
+    this.menu = createMenu(this, params.menu, params)
 
     // When esc is pressed, close this scene
     let esc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC)
     esc.on('down', () => {
-      menu.close()
+      this.menu.close()
     })
 
     this.scene.bringToTop()
@@ -83,7 +84,9 @@ export default class MenuScene extends BaseMenuScene {
       0.7,
     )
     invisBackground.setInteractive()
-    invisBackground.on('pointerdown', this.endScene())
+    invisBackground.on('pointerdown', () => {
+      this.menu.close()
+    })
   }
 
   endScene(): () => void {
