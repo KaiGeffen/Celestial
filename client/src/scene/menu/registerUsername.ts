@@ -14,16 +14,11 @@ const inputTextWidth = 200
 export class RegisterUsernameMenu extends Menu {
   private username: string = ''
   private usernameInputText
-  private callback: () => void
   private confirmButton: Button
   private errorText: Phaser.GameObjects.Text
 
-  constructor(
-    scene: MenuScene,
-    params: { callback: () => void; exitCallback: () => void },
-  ) {
+  constructor(scene: MenuScene, params: { exitCallback: () => void }) {
     super(scene, width, params)
-    this.callback = params.callback
     this.createContent()
     this.layout()
 
@@ -149,14 +144,11 @@ export class RegisterUsernameMenu extends Menu {
       0,
       'Confirm',
       () => {
-        // Send username to server
-        UserDataServer.sendInitialUserData(this.username)
-
-        // Call the callback
-        this.callback()
-
         // Close this scene
         this.scene.scene.stop()
+
+        // Send username to server
+        UserDataServer.sendInitialUserData(this.username)
       },
       false,
       true,
