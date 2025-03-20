@@ -13,10 +13,11 @@ import Region from './matchRegions/baseRegion'
 import Regions from './matchRegions/matchRegions'
 import OverlayRegion from './matchRegions/pileOverlays'
 import GameModel from '../../../shared/state/gameModel'
-import { MechanicsSettings } from '../../../shared/settings'
 import PassRegion from './matchRegions/pass'
 import { Deck } from '../../../shared/types/deck'
 import UserDataServer from '../network/userDataServer'
+import TheirAvatarRegion from './matchRegions/theirAvatar'
+import OurAvatarRegion from './matchRegions/ourAvatar'
 
 // TODO Rename to Match
 export class GameScene extends BaseScene {
@@ -326,7 +327,7 @@ export class GameScene extends BaseScene {
 
   // Opponent has used a given emote
   emote(emoteNumber: number): void {
-    this.view.theirHand['emote'](emoteNumber)
+    this.view.theirAvatar.emote(emoteNumber)
   }
 }
 
@@ -349,6 +350,10 @@ export class View {
   discardPiles: Region
   pass: PassRegion
   scores: Region
+
+  // Add in here
+  theirAvatar: TheirAvatarRegion
+  ourAvatar: OurAvatarRegion
 
   ourDeckOverlay: OverlayRegion
   theirDeckOverlay: OverlayRegion
@@ -394,6 +399,10 @@ export class View {
     this.theirScore = new Regions.TheirScore().create(scene)
     // this.ourButtons = new Regions.OurButtons().create(scene)
 
+    // TODO Sort these out
+    this.theirAvatar = new Regions.TheirAvatar().create(scene)
+    this.ourAvatar = new Regions.OurAvatar().create(scene)
+
     this.decks = new Regions.Decks().create(scene)
     this.discardPiles = new Regions.DiscardPiles().create(scene)
     this.pass = new Regions.Pass().create(scene)
@@ -437,6 +446,10 @@ export class View {
 
     this.mulligan.displayState(state)
     this.commands.displayState(state)
+
+    // TODO Sort these out
+    this.theirAvatar.displayState(state)
+    this.ourAvatar.displayState(state)
 
     this.ourHand.displayState(state)
     this.theirHand.displayState(state)

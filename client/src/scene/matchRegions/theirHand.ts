@@ -26,9 +26,6 @@ export default class TheirHandRegion extends Region {
   btnInspire: Button
   btnNourish: Button
 
-  // Avatar image
-  avatar: Button
-
   create(scene: GameScene): TheirHandRegion {
     this.scene = scene
 
@@ -40,41 +37,19 @@ export default class TheirHandRegion extends Region {
     this.priorityHighlight = this.createPriorityHighlight().setVisible(false)
     this.container.add(this.priorityHighlight)
 
-    // Create the status visuals
-    this.createStatusDisplay()
-
-    // Create our avatar
-    this.avatar = this.createAvatar()
-
-    // Create stack buttons
-    if (Flags.mobile) {
-      this.btnDeck = new Buttons.Stacks.Deck(
-        this.container,
-        Space.windowWidth - 169,
-        Space.handHeight / 2,
-        0,
-      )
-      this.btnDiscard = new Buttons.Stacks.Discard(
-        this.container,
-        Space.windowWidth - 111,
-        Space.handHeight / 2,
-        0,
-      )
-    } else {
-      const x = Space.windowWidth - 300
-      this.btnDeck = new Buttons.Stacks.Deck(
-        this.container,
-        x,
-        (Space.handHeight * 1) / 4,
-        1,
-      )
-      this.btnDiscard = new Buttons.Stacks.Discard(
-        this.container,
-        x,
-        (Space.handHeight * 3) / 4,
-        1,
-      )
-    }
+    const x = Space.windowWidth - 300
+    this.btnDeck = new Buttons.Stacks.Deck(
+      this.container,
+      x,
+      (Space.handHeight * 1) / 4,
+      1,
+    )
+    this.btnDiscard = new Buttons.Stacks.Discard(
+      this.container,
+      x,
+      (Space.handHeight * 3) / 4,
+      1,
+    )
 
     this.addHotkeyListeners()
 
@@ -83,12 +58,6 @@ export default class TheirHandRegion extends Region {
 
   displayState(state: GameModel): void {
     this.deleteTemp()
-
-    // Avatar
-    this.avatar.setQuality({ num: state.avatars[1] })
-
-    // Statuses
-    this.displayStatuses(state)
 
     this.cards = []
     for (let i = 0; i < state.hand[1].length; i++) {
@@ -162,55 +131,6 @@ export default class TheirHandRegion extends Region {
       .setAlpha(0)
   }
 
-  private createAvatar(): Button {
-    const x = Flags.mobile ? 10 : 21
-    const y = Flags.mobile ? 10 : 14
-    let btn = new Buttons.Avatar(this.container, x, y, 'Jules')
-    btn.setOrigin(0)
-
-    return btn
-  }
-
-  private createStatusDisplay(): void {
-    if (!Flags.mobile) {
-      let x = 21 + Space.avatarSize - 10
-
-      // Inspire
-      let y = 14
-      this.btnInspire = new Buttons.Keywords.Inspire(this.container, x - 15, y)
-        .setOrigin(0)
-        .setVisible(false)
-      this.btnInspire.setOnHover(
-        ...this.onHoverStatus('Inspired', this.btnInspire),
-      )
-
-      // Nourish
-      y += Space.avatarSize / 2
-      this.btnNourish = new Buttons.Keywords.Nourish(this.container, x - 15, y)
-        .setOrigin(0)
-        .setVisible(false)
-      this.btnNourish.setOnHover(
-        ...this.onHoverStatus('Nourish', this.btnNourish),
-      )
-    } else {
-      // Bottom center of avatar
-      let x = 10 + Space.avatarSize / 2
-      const dx = Space.avatarSize / 4
-      let y = 10 + Space.avatarSize
-
-      this.btnInspire = new Buttons.Keywords.Inspire(
-        this.container,
-        x + dx,
-        y + 10,
-      ).setVisible(false)
-      this.btnNourish = new Buttons.Keywords.Nourish(
-        this.container,
-        x - dx,
-        y + 10,
-      ).setVisible(false)
-    }
-  }
-
   private onHoverStatus(status: string, btn: Button): [() => void, () => void] {
     let that = this
     let keyword = Keywords.get(status)
@@ -246,28 +166,6 @@ export default class TheirHandRegion extends Region {
       alpha: targetAlpha,
       duration: Time.recapTweenWithPause(),
     })
-  }
-
-  private displayStatuses(state: GameModel): void {
-    // Specific to 4 TODO
-    let amts = [0, 0, 0, 0]
-    const length = 4
-
-    state.status[1].forEach(function (status, index, array) {
-      amts[status]++
-    })
-
-    const amtInspire = amts[1]
-    const amtNourish = amts[2] - amts[3]
-
-    this.btnInspire.setVisible(amtInspire !== 0).setText(`${amtInspire}`)
-
-    this.btnNourish.setVisible(amtNourish !== 0).setText(`${amtNourish}`)
-  }
-
-  // They have used the given emote
-  emote(emoteNumber: number): void {
-    this.avatar.setQuality({ emoting: emoteNumber })
   }
 
   // TUTORIAL FUNCTIONALITY

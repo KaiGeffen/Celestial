@@ -50,20 +50,13 @@ export class InspireButton extends KeywordButton {
         style: Style.basic,
       },
       icon: {
-        name: Flags.mobile ? `MobileInspire` : `Inspire`,
+        name: `Inspire`,
         interactive: true,
       },
       callbacks: {
         click: f,
       },
     })
-
-    // TODO This is a hacky way to make their mobile status flip
-    const flipY = y > Space.avatarSize
-    const dx = Flags.mobile ? 0 : 52
-    const dy = Flags.mobile ? -24 * (flipY ? -1 : 1) : 17
-
-    this.txt.setPosition(x + dx, y + dy)
   }
 
   makeHintable(): Button {
@@ -88,20 +81,13 @@ export class NourishButton extends KeywordButton {
         style: Style.basic,
       },
       icon: {
-        name: Flags.mobile ? `MobileNourish` : `Nourish`,
+        name: `Nourish`,
         interactive: true,
       },
       callbacks: {
         click: f,
       },
     })
-
-    // TODO This is a hacky way to make their mobile status flip
-    const flipY = y > Space.avatarSize
-    const dx = Flags.mobile ? 0 : 52
-    const dy = Flags.mobile ? -24 * (flipY ? -1 : 1) : 17
-
-    this.txt.setPosition(x + dx, y + dy)
   }
 
   makeHintable(): Button {
@@ -133,8 +119,6 @@ export class SightButton extends KeywordButton {
         click: f,
       },
     })
-
-    this.txt.setPosition(x + 11, y - 15)
   }
 
   makeHintable(): Button {
