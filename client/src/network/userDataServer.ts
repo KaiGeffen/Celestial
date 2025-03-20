@@ -76,7 +76,7 @@ export default class UserDataServer {
           },
           // Ensure that user is logged out if they cancel
           exitCallback: () => {
-            this.logout()
+            UserDataServer.logout()
           },
         })
       })
