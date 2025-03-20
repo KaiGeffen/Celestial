@@ -59,9 +59,7 @@ export const players = pgTable(
     coins: integer('coins').notNull(),
 
     // Track last daily reward time
-    last_daily_reward: timestamp('last_daily_reward')
-      .notNull()
-      .default(sql`now() - interval '1 day'`),
+    last_daily_reward: timestamp('last_daily_reward').notNull(),
   },
   (table) => ({
     emailIdx: uniqueIndex('email_idx').on(table.email),
