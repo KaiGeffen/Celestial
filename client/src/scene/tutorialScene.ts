@@ -208,9 +208,9 @@ export default class TutorialGameScene extends AdventureGameScene {
     switch (this.progress) {
       case 0:
         this.view.pass.hide()
-        this.view.theirHand.hide()
+        this.view.theirboard.hide()
         this.view.theirScore.hide()
-        this.view.ourHand.hide()
+        this.view.ourBoard.hide()
         this.view.ourScore.hideAll().showWins()
         if (!Flags.mobile) {
           this.view.ourScore.showBackground()
@@ -235,12 +235,12 @@ export default class TutorialGameScene extends AdventureGameScene {
 
       case 6:
         this.card.destroy()
-        this.view.ourHand.show()['hideStacks']()
+        this.view.ourBoard.show()['hideStacks']()
         break
 
       case 7:
         this.view.theirScore.show()
-        this.view.theirHand.show()['hideStacks']()
+        this.view.theirboard.show()['hideStacks']()
 
         this.view.pass.show()['disablePass']()
         break
@@ -255,8 +255,8 @@ export default class TutorialGameScene extends AdventureGameScene {
     this.view.decks.hide()
     this.view.discardPiles.hide()
     this.view.commands.hide()
-    this.view.ourHand['hideStacks']()
-    this.view.theirHand['hideStacks']()
+    this.view.ourBoard['hideStacks']()
+    this.view.theirboard['hideStacks']()
 
     // Hide pass until a point
     if (this.progress === 0) {
@@ -268,14 +268,14 @@ export default class TutorialGameScene extends AdventureGameScene {
     // Hide different elements on the screen based on progress
     switch (this.progress) {
       case 5:
-        this.view.ourHand.cards[1].setOnClick(() => {
+        this.view.ourBoard.cards[1].setOnClick(() => {
           this.signalError('Try playing Mercy then passing...')
         })
         break
 
       case 7:
       case 9:
-        this.view.ourHand.cards[0].setOnClick(() => {
+        this.view.ourBoard.cards[0].setOnClick(() => {
           this.signalError('Try passing instead...')
         })
         break

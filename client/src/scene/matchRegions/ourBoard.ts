@@ -21,7 +21,7 @@ import { MechanicsSettings } from '../../../../shared/settings'
 // The y distance card moves up when hovered
 const HOVER_OFFSET = Space.cardHeight / 2 - 43
 
-export default class OurHandRegion extends Region {
+export default class OurBoardRegion extends Region {
   // Function called when elements in this region are interacted with
   callback: (i: number) => void
   displayCostCallback: (cost: number) => void
@@ -38,7 +38,7 @@ export default class OurHandRegion extends Region {
   // Index of the card from the last state that was being hovered, if any
   hoveredCard: number
 
-  create(scene: GameScene, avatarId: number): OurHandRegion {
+  create(scene: GameScene, avatarId: number): this {
     this.scene = scene
 
     this.container = scene.add

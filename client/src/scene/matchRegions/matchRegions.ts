@@ -1,8 +1,8 @@
 import SearchingRegion from './searching'
 import CommandsRegion from './commands'
 
-import OurBoardRegion from './ourHand'
-import TheirBoardRegion from './theirHand'
+import OurBoardRegion from './ourBoard'
+import TheirBoardRegion from './theirBoard'
 import StoryRegion from './story'
 import OurScoreRegion from './ourScore'
 import TheirScoreRegion from './theirScore'

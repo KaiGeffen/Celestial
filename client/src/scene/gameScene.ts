@@ -19,8 +19,8 @@ import UserDataServer from '../network/userDataServer'
 import TheirAvatarRegion from './matchRegions/theirAvatar'
 import OurAvatarRegion from './matchRegions/ourAvatar'
 import CommandsRegion from './matchRegions/commands'
-import OurHandRegion from './matchRegions/ourHand'
-import TheirBoardRegion from './matchRegions/theirHand'
+import OurBoardRegion from './matchRegions/ourBoard'
+import TheirBoardRegion from './matchRegions/theirBoard'
 import StoryRegion from './matchRegions/story'
 import ScoreRegion from './matchRegions/ourScore'
 import MulliganRegion from './matchRegions/mulliganRegion'
@@ -112,8 +112,8 @@ export class GameScene extends BaseScene {
     console.log('Match found between', name1, 'and', name2)
 
     // TODO Smell, class these
-    this.view.ourHand['showUsername'](name1)
-    this.view.theirHand['showUsername'](name2)
+    this.view.ourBoard['showUsername'](name1)
+    this.view.theirboard['showUsername'](name2)
   }
 
   // Set all of the callback functions for the regions in the view
@@ -146,10 +146,10 @@ export class GameScene extends BaseScene {
     }
 
     // Hand region
-    view.ourHand.setCardClickCallback((i: number) => {
+    view.ourBoard.setCardClickCallback((i: number) => {
       net.playCard(i, this.currentVersion)
     })
-    view.ourHand.setDisplayCostCallback((cost: number) => {
+    view.ourBoard.setDisplayCostCallback((cost: number) => {
       that.view.ourScore['displayCost'](cost)
     })
     view.ourAvatar.setEmoteCallback(() => {
@@ -157,7 +157,7 @@ export class GameScene extends BaseScene {
     })
 
     // Set the callbacks for overlays
-    view.ourHand.setOverlayCallbacks(
+    view.ourBoard.setOverlayCallbacks(
       () => {
         this.view.showOverlay(this.view.ourDeckOverlay)
       },
@@ -166,7 +166,7 @@ export class GameScene extends BaseScene {
       },
     )
 
-    view.theirHand.setOverlayCallbacks(
+    view.theirBoard.setOverlayCallbacks(
       () => {
         this.view.showOverlay(this.view.theirDeckOverlay)
       },
@@ -327,9 +327,6 @@ export class View {
   // The buttons below Options button
   commands: CommandsRegion
 
-  ourHand: OurHandRegion
-  // ourButtons: Region
-  theirHand: TheirBoardRegion
   story: StoryRegion
   ourScore: Region
   theirScore: Region
@@ -339,6 +336,10 @@ export class View {
   // Add in here
   theirAvatar: TheirAvatarRegion
   ourAvatar: OurAvatarRegion
+
+  // Board
+  ourBoard: OurBoardRegion
+  theirboard: TheirBoardRegion
 
   ourDeckOverlay: OverlayRegion
   theirDeckOverlay: OverlayRegion
@@ -376,8 +377,8 @@ export class View {
     // Create each of the regions
     // this.createOurHand()
     // new HandRegion()//.create(scene)
-    this.ourHand = new Regions.OurBoard().create(scene, avatarId)
-    this.theirHand = new Regions.TheirBoard().create(scene)
+    this.ourBoard = new Regions.OurBoard().create(scene, avatarId)
+    this.theirboard = new Regions.TheirBoard().create(scene)
 
     this.story = new Regions.Story().create(scene)
     this.ourScore = new Regions.OurScore().create(scene)
@@ -435,8 +436,8 @@ export class View {
     this.theirAvatar.displayState(state)
     this.ourAvatar.displayState(state)
 
-    this.ourHand.displayState(state)
-    this.theirHand.displayState(state)
+    this.ourBoard.displayState(state)
+    this.theirboard.displayState(state)
     this.story.displayState(state)
     this.ourScore.displayState(state)
     this.theirScore.displayState(state)

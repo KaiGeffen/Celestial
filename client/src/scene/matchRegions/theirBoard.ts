@@ -1,5 +1,4 @@
 import 'phaser'
-import { Keywords } from '../../../../shared/state/keyword'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import GameModel from '../../../../shared/state/gameModel'
@@ -15,7 +14,6 @@ import {
 import { GameScene } from '../gameScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
-import { MechanicsSettings } from '../../../../shared/settings'
 
 export default class TheirBoardRegion extends Region {
   // Effect showing that they have priority
