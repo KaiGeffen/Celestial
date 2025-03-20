@@ -146,7 +146,7 @@ export class GameScene extends BaseScene {
     view.ourHand.setDisplayCostCallback((cost: number) => {
       that.view.ourScore.displayCost(cost)
     })
-    view.ourHand.setEmoteCallback(() => {
+    view.ourAvatar.setEmoteCallback(() => {
       this.net.signalEmote()
     })
 
@@ -392,7 +392,7 @@ export class View {
     // this.createOurHand()
     // new HandRegion()//.create(scene)
     this.ourHand = new Regions.OurHand().create(scene, avatarId)
-    this.theirHand = new Regions.TheirHand().create(scene)
+    this.theirHand = new Regions.TheirBoard().create(scene)
 
     this.story = new Regions.Story().create(scene)
     this.ourScore = new Regions.OurScore().create(scene)

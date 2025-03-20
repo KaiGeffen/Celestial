@@ -10,6 +10,7 @@ import {
   Time,
   Flags,
   UserSettings,
+  Color,
 } from '../../settings/settings'
 import BaseScene from '../baseScene'
 import Region from './baseRegion'
@@ -25,15 +26,8 @@ export default class OurHandRegion extends Region {
   callback: (i: number) => void
   displayCostCallback: (cost: number) => void
 
-  // Effect showing that we have priority
-  // priorityHighlight: Phaser.GameObjects.Video
-
   btnDeck: Button
   btnDiscard: Button
-
-  btnInspire: Button
-  btnNourish: Button
-  btnSight: Button
 
   // Whether we have already clicked on a card to play it
   cardClicked: boolean
@@ -44,64 +38,16 @@ export default class OurHandRegion extends Region {
   // Index of the card from the last state that was being hovered, if any
   hoveredCard: number
 
-  // Avatar image
-  btnAvatar: Button
-
   create(scene: GameScene, avatarId: number): OurHandRegion {
-    let that = this
     this.scene = scene
 
-    // Avatar, status, hand, recap, pass buttons
-
     this.container = scene.add
-      .container(0, Space.windowHeight - Space.handHeight)
+      .container(0, Space.windowHeight)
       .setDepth(Depth.ourHand)
 
-    this.container.add(this.createBackground(scene))
+    this.createBackground(scene)
 
-    // Visual effect that highlights when we have priority
-    // this.priorityHighlight = this.createPriorityHighlight()
-    // .setVisible(false)
-    // this.container.add(this.priorityHighlight)
-
-    // Create the status visuals
-    this.createStatusDisplay()
-
-    // Create our avatar
-    this.btnAvatar = this.createAvatar(avatarId)
-
-    // Create a visual divider
-    // let divide = scene.add.image(Space.windowWidth - 300 - Space.cardWidth/2, Space.handHeight/2, 'icon-Divide')
-
-    // Deck and discard pile totals
-    if (Flags.mobile) {
-      this.btnDeck = new Buttons.Stacks.Deck(
-        this.container,
-        Space.windowWidth - 169,
-        Space.handHeight / 2,
-        0,
-      )
-      this.btnDiscard = new Buttons.Stacks.Discard(
-        this.container,
-        Space.windowWidth - 111,
-        Space.handHeight / 2,
-        0,
-      )
-    } else {
-      const x = Space.windowWidth - 294
-      this.btnDeck = new Buttons.Stacks.Deck(
-        this.container,
-        x,
-        (Space.handHeight * 1) / 4,
-        0,
-      )
-      this.btnDiscard = new Buttons.Stacks.Discard(
-        this.container,
-        x,
-        (Space.handHeight * 3) / 4,
-        0,
-      )
-    }
+    this.createStacks()
 
     this.addOverlayHotkeys()
 
@@ -110,10 +56,6 @@ export default class OurHandRegion extends Region {
 
   displayState(state: GameModel): void {
     this.deleteTemp()
-
-    // Pile sizes
-    this.btnDeck.setText(`${state.deck[0].length}`)
-    this.btnDiscard.setText(`${state.pile[0].length}`)
 
     // Until we have mulliganed, hide the cards in our hand
     if (!state.mulligansComplete[0]) {
@@ -126,10 +68,9 @@ export default class OurHandRegion extends Region {
 
     this.cardClicked = false
 
-    let that = this
-
-    // Statuses
-    this.displayStatuses(state)
+    // Pile sizes
+    this.btnDeck.setText(`${state.deck[0].length}`)
+    this.btnDiscard.setText(`${state.pile[0].length}`)
 
     // Add each of the cards in our hand
     this.cards = []
@@ -144,8 +85,8 @@ export default class OurHandRegion extends Region {
 
       const cost = state.cardCosts[i]
       card.setOnHover(
-        that.onCardHover(card, cost, i),
-        that.onCardExit(card, this.cards, i),
+        this.onCardHover(card, cost, i),
+        this.onCardExit(card, this.cards, i),
       )
 
       // Set whether the card shows as playable, and set its onclick
@@ -213,19 +154,6 @@ export default class OurHandRegion extends Region {
     this.btnDiscard.setOnClick(fDiscard)
   }
 
-  showUsername(username: string): void {
-    this.container.add(
-      this.scene.add
-        .text(
-          21 + Space.avatarSize / 2,
-          11 + Space.avatarSize,
-          username,
-          Style.username,
-        )
-        .setOrigin(0.5, 0),
-    )
-  }
-
   // Set the callback / error message for when card is clicked
   private setCardOnClick(card: CardImage, state: GameModel, i: number) {
     // Set whether card shows up as playable, and also whether we can click to play a card in this state
@@ -259,93 +187,42 @@ export default class OurHandRegion extends Region {
   }
 
   // Hide the cards in our hand, used when mulligan is visible
+  // TODO Is this private?
   hideHand(): void {
     this.deleteTemp()
   }
 
-  private createBackground(scene: Phaser.Scene): Phaser.GameObjects.GameObject {
-    const s = `icon-${Flags.mobile ? 'Mobile' : ''}Bottom`
-    const y = Flags.mobile ? 0 : -50
-    let renderedBackground = scene.add
-      .image(Space.windowWidth, y, s)
-      .setOrigin(1, 0)
-      .setInteractive()
+  private createBackground(scene: Phaser.Scene): void {
+    const x = 200
+    const width = Space.windowWidth - 400
+    const height = Space.cardHeight / 2 - 43
 
-    return renderedBackground
+    const background = this.scene.add
+      .rectangle(x, 0, width, height, Color.backgroundLight)
+      .setOrigin(0, 1)
+
+    this.container.add(background)
   }
 
-  private createAvatar(avatarId: number): Button {
-    console.log('createAvatar called with ID:', avatarId)
-
-    if (Flags.mobile) {
-      return this.createAvatarMobile(avatarId)
-    }
-
-    let btn = new Buttons.Avatar(this.container, 21, 11, avatarId)
-      .setOrigin(0)
-      .setQuality({ emotive: true })
-
-    // Sight
-    this.btnSight = new Buttons.Keywords.Sight(
+  private createStacks(): void {
+    let [x, y] = CardLocation.theirDeck(this.container)
+    this.container.add(this.scene.add.image(x, y, 'Cardback'))
+    this.btnDeck = new Buttons.Stacks.Deck(
       this.container,
-      btn.icon.x + Space.avatarSize / 2,
-      btn.icon.y + Space.avatarSize - Space.padSmall,
+      x,
+      y - Space.cardHeight / 2,
+      1,
     )
-      .setOrigin(0.5, 1)
-      .setVisible(false)
 
-    return btn
-  }
-
-  private createAvatarMobile(avatarId: number): Button {
-    let btn = new Buttons.Avatar(this.container, 10, -10, avatarId)
-      .setOrigin(0)
-      .setQuality({ emotive: true })
-
-    // Sight
-    this.btnSight = new Buttons.Keywords.Sight(
+    // Discard pile
+    ;[x, y] = CardLocation.theirDiscard(this.container)
+    this.container.add(this.scene.add.image(x, y, 'Cardback'))
+    this.btnDiscard = new Buttons.Stacks.Discard(
       this.container,
-      btn.icon.x + Space.avatarSize / 2,
-      btn.icon.y + Space.avatarSize - Space.padSmall,
+      x,
+      y - Space.cardHeight / 2,
+      1,
     )
-      .setOrigin(0.5, 1)
-      .setVisible(false)
-
-    return btn
-  }
-
-  private createStatusDisplay(): void {
-    if (!Flags.mobile) {
-      let x = 21 + Space.avatarSize - 10
-
-      // Inspire
-      let y = 11
-      this.btnInspire = new Buttons.Keywords.Inspire(this.container, x - 15, y)
-        .setOrigin(0)
-        .setVisible(false)
-
-      // Nourish
-      y += Space.avatarSize / 2
-      this.btnNourish = new Buttons.Keywords.Nourish(this.container, x - 15, y)
-        .setOrigin(0)
-        .setVisible(false)
-    } else {
-      // Top center of avatar
-      let x = 10 + Space.avatarSize / 2
-      const dx = Space.avatarSize / 4
-      let y = -10
-
-      this.btnInspire = new Buttons.Keywords.Inspire(
-        this.container,
-        x + dx,
-        y - 10,
-      ).setVisible(false)
-      this.btnNourish = new Buttons.Keywords.Nourish(
-        this.container,
-        x - dx,
-        y - 10,
-      ).setVisible(false)
-    }
   }
 
   // Return the function that runs when card with given index is clicked on
@@ -445,15 +322,14 @@ export default class OurHandRegion extends Region {
     cost: number,
     index: number,
   ): () => void {
-    let that = this
     return () => {
-      card.container.setY(Space.handHeight - HOVER_OFFSET)
+      card.container.setY(-HOVER_OFFSET)
 
       // Show the card's cost in the breath icon
-      that.displayCostCallback(cost)
+      this.displayCostCallback(cost)
 
       // Remember that this card is being hovered
-      that.hoveredCard = index
+      this.hoveredCard = index
     }
   }
 
@@ -465,7 +341,7 @@ export default class OurHandRegion extends Region {
   ): () => void {
     let that = this
     return () => {
-      card.container.setY(HOVER_OFFSET)
+      card.container.setY(0)
 
       // Stop showing a positive card cost
       that.displayCostCallback(0)
@@ -484,31 +360,6 @@ export default class OurHandRegion extends Region {
   // Set the callback for showing how much breath a card costs
   setDisplayCostCallback(f: (cost: number) => void): void {
     this.displayCostCallback = f
-  }
-
-  setEmoteCallback(fEmote: () => void): void {
-    this.btnAvatar.setOnClick(fEmote, false, false)
-  }
-
-  private displayStatuses(state: GameModel): void {
-    // Specific to 4 TODO
-    let amts = [0, 0, 0, 0]
-    const length = 4
-
-    state.status[0].forEach(function (status, index, array) {
-      amts[status]++
-    })
-
-    const amtInspire = amts[1]
-    const amtNourish = amts[2] - amts[3]
-
-    this.btnInspire.setVisible(amtInspire !== 0).setText(`${amtInspire}`)
-
-    this.btnNourish.setVisible(amtNourish !== 0).setText(`${amtNourish}`)
-
-    this.btnSight
-      .setVisible(state.vision[0] !== 0)
-      .setText(`${state.vision[0]}`)
   }
 
   // TUTORIAL FUNCTIONALITY

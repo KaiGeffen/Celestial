@@ -2,7 +2,7 @@ import SearchingRegion from './searching'
 import CommandsRegion from './commands'
 
 import OurHandRegion from './ourHand'
-import TheirHandRegion from './theirHand'
+import TheirBoard from './theirHand'
 import StoryRegion from './story'
 import OurScoreRegion from './ourScore'
 import DecksRegion from './decks'
@@ -21,7 +21,7 @@ export default class Regions {
   static Searching = SearchingRegion
   static Commands = CommandsRegion
   static OurHand = OurHandRegion
-  static TheirHand = TheirHandRegion
+  static TheirBoard = TheirBoard
   static Story = StoryRegion
   static OurScore = OurScoreRegion
   static TheirScore = TheirScoreRegion

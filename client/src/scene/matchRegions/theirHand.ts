@@ -17,14 +17,14 @@ import Region from './baseRegion'
 import CardLocation from './cardLocation'
 import { MechanicsSettings } from '../../../../shared/settings'
 
-export default class TheirHandRegion extends Region {
+export default class TheirBoard extends Region {
   // Effect showing that they have priority
   priorityHighlight: Phaser.GameObjects.Video
 
   btnDeck: Button
   btnDiscard: Button
 
-  create(scene: GameScene): TheirHandRegion {
+  create(scene: GameScene): this {
     this.scene = scene
 
     this.container = scene.add.container(0, 0).setDepth(Depth.theirHand)

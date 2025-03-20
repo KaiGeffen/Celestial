@@ -20,37 +20,39 @@ export default class CardLocation {
     i: number,
     container?: Phaser.GameObjects.Container,
   ): [number, number] {
-    // X of the first card in their hand
-    const x0 = (Flags.mobile ? 100 : 220) + Space.cardWidth / 2
-
+    const centerX = Space.windowWidth / 2
     let dx = Space.cardWidth + Space.pad
 
-    // If their hand has too many cards for the screen size, scale down
-    // Amount of room to leave to the right of the last card
-    const maxOffset = Space.windowWidth - x0 - minRoom
-
     if (state !== undefined) {
-      // Find the amount that we must scale down by
-      // offset of last card <= maxOffset
-      // This may be multiplied by a constant to fit within the max
-      const lastCardOffset = dx * (6 - 1)
-      if (lastCardOffset > maxOffset) {
-        dx *= maxOffset / lastCardOffset
+      const totalCards = state.hand[0].length
+
+      // If total width exceeds max, scale down spacing
+      const maxWidth =
+        Space.windowWidth - (200 + 200 + Space.cardWidth * 2 + Space.pad * 2)
+      const totalWidth = dx * (totalCards - 1)
+      if (totalWidth > maxWidth) {
+        dx *= maxWidth / totalWidth
       }
+
+      // Calculate offset from center
+      // For odd numbers of cards: center card at 0, others at ±dx, ±2dx, etc.
+      // For even numbers: cards at ±dx/2, ±3dx/2, etc.
+      const isEven = totalCards % 2 === 0
+      const indexFromCenter = i - Math.floor(totalCards / 2)
+      const xOffset = isEven
+        ? (indexFromCenter + 0.5) * dx
+        : indexFromCenter * dx
+
+      const x = centerX + xOffset
+      let y = Space.windowHeight - Space.handHeight + Space.cardHeight / 2
+
+      if (container !== undefined) {
+        return [x - container.x, y - container.y]
+      }
+      return [x, y]
     }
 
-    // Offset from the first card
-    const xOffset = dx * i
-    let x = x0 + xOffset
-
-    let y = Space.windowHeight - Space.handHeight + Space.cardHeight / 2
-
-    if (container !== undefined) {
-      x -= container.x
-      y -= container.y
-    }
-
-    return [x, y]
+    return [0, 0]
   }
 
   static theirHand(
