@@ -19,7 +19,7 @@ import { GameScene } from '../gameScene'
 import { MechanicsSettings } from '../../../../shared/settings'
 
 // The y distance card moves up when hovered
-const HOVER_OFFSET = Space.cardHeight / 2 - 43
+const HOVER_OFFSET = Space.cardHeight / 2
 
 export default class OurBoardRegion extends Region {
   // Function called when elements in this region are interacted with
@@ -195,7 +195,7 @@ export default class OurBoardRegion extends Region {
   private createBackground(scene: Phaser.Scene): void {
     const x = 200
     const width = Space.windowWidth - 400
-    const height = Space.cardHeight / 2 - 43
+    const height = Space.cardHeight / 2 - 65
 
     const background = this.scene.add
       .rectangle(x, 0, width, height, Color.backgroundLight)
@@ -206,7 +206,7 @@ export default class OurBoardRegion extends Region {
 
   private createStacks(): void {
     let [x, y] = CardLocation.ourDeck(this.container)
-    this.container.add(this.scene.add.image(x, y, 'Cardback'))
+    // this.container.add(this.scene.add.image(x, y, 'Cardback'))
     this.btnDeck = new Buttons.Stacks.Deck(
       this.container,
       x,
@@ -216,7 +216,7 @@ export default class OurBoardRegion extends Region {
 
     // Discard pile
     ;[x, y] = CardLocation.ourDiscard(this.container)
-    this.container.add(this.scene.add.image(x, y, 'Cardback'))
+    // this.container.add(this.scene.add.image(x, y, 'Cardback'))
     this.btnDiscard = new Buttons.Stacks.Discard(
       this.container,
       x,
@@ -340,7 +340,7 @@ export default class OurBoardRegion extends Region {
     index: number,
   ): () => void {
     return () => {
-      card.container.setY(43)
+      card.container.setY(65)
 
       // Stop showing a positive card cost
       this.displayCostCallback(0)

@@ -9,7 +9,7 @@ import { Space, Flags } from '../../settings/settings'
 const minRoom = (Flags.mobile ? 210 : 342) + Space.cardWidth / 2
 
 // TODO Remove i from many of these arguments (height is CardHeight - 43)
-const todoTheirHandHeight = -43
+const todoTheirHandHeight = -65
 
 // This describes where on screen each card in each region should appear
 // so that regions can move their cards to the appropriate locations for
@@ -20,30 +20,20 @@ export default class CardLocation {
     i: number,
     container?: Phaser.GameObjects.Container,
   ): [number, number] {
-    const centerX = Space.windowWidth / 2
+    const leftEdge = 200 + Space.cardWidth / 2
     let dx = Space.cardWidth + Space.pad
 
     if (state !== undefined) {
       const totalCards = state.hand[0].length
 
       // If total width exceeds max, scale down spacing
-      const maxWidth =
-        Space.windowWidth -
-        (200 + Space.cardWidth + Space.pad) * 2 -
-        Space.cardWidth
+      const maxWidth = Space.windowWidth - (200 + 200 + Space.cardWidth)
       const totalWidth = dx * (totalCards - 1)
       if (totalWidth > maxWidth) {
         dx *= maxWidth / totalWidth
       }
 
-      // Calculate offset from center, reversed so first card is leftmost
-      const isEven = totalCards % 2 === 0
-      const indexFromCenter = Math.floor(totalCards / 2) - (totalCards - 1 - i)
-      const xOffset = isEven
-        ? (indexFromCenter + 0.5) * dx
-        : indexFromCenter * dx
-
-      const x = centerX + xOffset
+      const x = leftEdge + i * dx
       let y = Space.windowHeight - todoTheirHandHeight
 
       if (container !== undefined) {
@@ -60,30 +50,20 @@ export default class CardLocation {
     i: number,
     container: Phaser.GameObjects.Container,
   ): [number, number] {
-    const centerX = Space.windowWidth / 2
+    const leftEdge = 200 + Space.cardWidth / 2
     let dx = Space.cardWidth + Space.pad
 
     if (state !== undefined) {
       const totalCards = state.hand[1].length
 
       // If total width exceeds max, scale down spacing
-      const maxWidth =
-        Space.windowWidth -
-        (200 + Space.cardWidth + Space.pad) * 2 -
-        Space.cardWidth
+      const maxWidth = Space.windowWidth - (200 + 200 + Space.cardWidth)
       const totalWidth = dx * (totalCards - 1)
       if (totalWidth > maxWidth) {
         dx *= maxWidth / totalWidth
       }
 
-      // Calculate offset from center, reversed so first card is leftmost
-      const isEven = totalCards % 2 === 0
-      const indexFromCenter = Math.floor(totalCards / 2) - (totalCards - 1 - i)
-      const xOffset = isEven
-        ? (indexFromCenter + 0.5) * dx
-        : indexFromCenter * dx
-
-      const x = centerX + xOffset
+      const x = leftEdge + i * dx
       let y = todoTheirHandHeight
 
       return [x - container.x, y - container.y]

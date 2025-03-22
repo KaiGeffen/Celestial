@@ -13,9 +13,8 @@ import {
 } from '../../settings/settings'
 import Region from './baseRegion'
 import { GameScene } from '../gameScene'
-import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
-const width = 200
+const width = Space.avatarSize + Space.pad * 2
 const height = 250
 
 export default class TheirAvatarRegion extends Region {
@@ -31,7 +30,7 @@ export default class TheirAvatarRegion extends Region {
 
     this.createBackground(scene)
     this.createStatusDisplay()
-    this.avatar = this.createAvatar()
+    this.createAvatar()
 
     return this
   }
@@ -85,8 +84,8 @@ export default class TheirAvatarRegion extends Region {
     this.container.add(background)
   }
 
-  private createAvatar(): Button {
-    return new Buttons.Avatar(this.container, width / 2, 80)
+  private createAvatar(): void {
+    this.avatar = new Buttons.Avatar(this.container, width / 2, 80)
   }
 
   private createStatusDisplay(): void {

@@ -7,7 +7,7 @@ import Region from './baseRegion'
 import { GameScene } from '../gameScene'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
-const width = 200
+const width = Space.avatarSize + Space.pad * 2
 const height = 250
 
 export default class OurAvatarRegion extends Region {

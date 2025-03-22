@@ -91,7 +91,7 @@ export default class TheirBoardRegion extends Region {
   private createBackground(): void {
     const x = 200
     const width = Space.windowWidth - 400 // (200 from each side)
-    const height = Space.cardHeight / 2 - 43
+    const height = Space.cardHeight / 2 - 65
 
     const background = this.scene.add
       .rectangle(x, 0, width, height, Color.backgroundLight)
@@ -102,7 +102,7 @@ export default class TheirBoardRegion extends Region {
 
   private createStacks(): void {
     let [x, y] = CardLocation.theirDeck(this.container)
-    this.container.add(this.scene.add.image(x, y, 'Cardback'))
+    // this.container.add(this.scene.add.image(x, y, 'Cardback'))
     this.btnDeck = new Buttons.Stacks.Deck(
       this.container,
       x,
@@ -112,7 +112,7 @@ export default class TheirBoardRegion extends Region {
 
     // Discard pile
     ;[x, y] = CardLocation.theirDiscard(this.container)
-    this.container.add(this.scene.add.image(x, y, 'Cardback'))
+    // this.container.add(this.scene.add.image(x, y, 'Cardback'))
     this.btnDiscard = new Buttons.Stacks.Discard(
       this.container,
       x,
