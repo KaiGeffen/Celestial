@@ -71,6 +71,7 @@ export class CardImage {
       `[b]${card.cost}[/b]`,
       BBStyle.cardStats,
     )
+      .setVisible(card.id !== Catalog.cardback.id)
       .setOrigin(0.5)
       .on('pointerover', () =>
         hint.showText(`This card costs ${this.txtCost.text} breath to play.`),
@@ -87,6 +88,7 @@ export class CardImage {
       `[b]${card.points}[/b]`,
       BBStyle.cardStats,
     )
+      .setVisible(card.id !== Catalog.cardback.id)
       .setOrigin(0.5)
       .on('pointerover', () =>
         hint.showText(
