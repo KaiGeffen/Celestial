@@ -1,6 +1,7 @@
 // Settings relating to styles of text or bbcode throughout the app
 import 'phaser'
 import { Space, Color, Flags } from './settings'
+import { Line } from 'phaser3-rex-plugins/plugins/gameobjects/shape/shapes/geoms'
 
 // All fonts used
 const mainFont = 'Mulish'
@@ -179,7 +180,9 @@ export const BBStyle: Record<string, any> = {
     fontFamily: mainFont,
     fontSize: '16px',
     color: 0xffffff,
-    backgroundColor: 0x222222e0,
+    backgroundColor: 0x111111a0, // Start fully transparent
+    backgroundColor2: 0x111111e0, // End with your desired opacity
+    backgroundHorizontalGradient: false, // false for vertical gradient
     wrap: {
       mode: 'word',
       width: 180,

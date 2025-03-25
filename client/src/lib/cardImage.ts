@@ -314,7 +314,7 @@ export class CardImage {
     // Replace each keyword with the appropriate image
     for (const keyword of Object.values(Keywords.getAll())) {
       // Create a regex that matches the keyword name followed by optional positive/negative number
-      const regex = new RegExp(`${keyword.name}\\s*(-?\\d+)?`, 'g')
+      const regex = new RegExp(`\\b${keyword.name}[ ]*(-?\\d+)?\\b`, 'g')
 
       s = s.replace(regex, (match, value) => {
         // If there's a value (like "Nourish 3"), include it in the image name
@@ -326,11 +326,35 @@ export class CardImage {
       })
     }
 
-    // Create the text
+    console.log(s)
+
+    // Create gradient background first
+    const gradientHeight = 10
+    const bg = this.scene.add.graphics()
+
+    // Draw the main background
+    bg.fillStyle(0x222222, 0.88) // e0 alpha = 0.88
+    bg.fillRect(-95, 0, 190, 148) // Using fixedWidth and full height
+
+    // Draw gradient overlay
+    for (let i = 0; i < gradientHeight; i++) {
+      const alpha = i / gradientHeight
+      bg.fillStyle(0x222222, alpha * 0.88)
+      bg.fillRect(-95, i, 190, 1)
+    }
+
+    // Create the text with transparent background
     this.txtText = this.scene.add
-      .rexBBCodeText(-1, 148, s, BBStyle.cardText)
+      .rexBBCodeText(-1, 148, s, {
+        ...BBStyle.cardText,
+        backgroundColor: null, // Remove background from BBCodeText
+      })
       .setOrigin(0.5, 1)
       .setWordWrapWidth(Space.cardWidth)
+
+    // Add both to the container
+    this.container.add(bg)
+    this.container.add(this.txtText)
 
     // Enable hovering to get hint
     let hint = this.scene.hint
