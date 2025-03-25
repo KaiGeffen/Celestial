@@ -171,10 +171,17 @@ export default class Hint {
   // return this
 
   // TODO Use in more places, instead of forming a string then passing to showText
-  showKeyword(name: string): void {
+  showKeyword(name: string, x: string = 'X'): void {
     const keyword = Keywords.get(name)
     if (keyword) {
-      this.showText(keyword.text.replace(' X', ''))
+      let s = keyword.text
+
+      s = s.replace(/X/g, x)
+
+      // NOTE Special case for occurences of +X, where X could be -N, so you want -N instead of +-N
+      s = s.split(/\+\-/).join('-')
+
+      this.showText(s)
     }
   }
 

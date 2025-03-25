@@ -182,13 +182,14 @@ export const BBStyle: Record<string, any> = {
     backgroundColor: 0x222222e0,
     wrap: {
       mode: 'word',
-      width: 190,
+      width: 180,
     },
     fixedWidth: 190,
-    // padding: {
-    //   left: 5,
-    //   right: 5,
-    // },
+    halign: 'center',
+    padding: {
+      left: 5,
+      right: 5,
+    },
   },
   // Hint text shown when something onscreen is hovered
   hint: {

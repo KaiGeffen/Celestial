@@ -319,17 +319,39 @@ export class CardImage {
       s = s.replace(regex, (match, value) => {
         // If there's a value (like "Nourish 3"), include it in the image name
         if (value) {
-          return `[img=kw-${keyword.name} ${value}]`
+          return `[area=${keyword.name}_${value}][img=kw-${keyword.name} ${value}][/area]`
         }
         // Otherwise just use the keyword name (like "Birth")
-        return `[img=kw-${keyword.name}]`
+        return `[area=${keyword.name}][img=kw-${keyword.name}][/area]`
       })
     }
 
+    // Create the text
     this.txtText = this.scene.add
       .rexBBCodeText(-1, 148, s, BBStyle.cardText)
       .setOrigin(0.5, 1)
       .setWordWrapWidth(Space.cardWidth)
+
+    // Enable hovering to get hint
+    let hint = this.scene.hint
+    this.txtText
+      .on('areaover', (key: string) => {
+        if (key[0] === '_') {
+          hint.showCard(key.slice(1))
+        } else {
+          // Keyword X values are stored after an underscore
+          if (key.includes('_')) {
+            const [name, x] = key.split('_')
+            hint.showKeyword(name, x)
+          } else {
+            hint.showKeyword(key)
+          }
+        }
+      })
+      .on('areaout', () => {
+        hint.hide()
+      })
+      .setInteractive()
   }
 
   private addKeywords(): void {
