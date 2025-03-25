@@ -21,6 +21,7 @@ export class CardImage {
   // Visual elements that appear on the cardImage
   txtCost: BBCodeText
   txtPoints: BBCodeText
+  txtText: BBCodeText
   keywords: KeywordLabel[] = []
   references: ReferenceLabel[] = []
 
@@ -53,64 +54,21 @@ export class CardImage {
   }
 
   private init(card: Card, outerContainer: any, interactive: Boolean) {
-    let that = this
     this.card = card
-
-    let scene: BaseScene = outerContainer.scene
-    this.scene = scene
+    this.scene = outerContainer.scene
 
     // Card image
     this.image = this.scene.add.image(0, 0, card.name)
     this.image.setDisplaySize(Space.cardWidth, Space.cardHeight)
 
     // Stat text
-    let hint = this.scene['hint']
-    this.txtCost = this.scene.add['rexBBCodeText'](
-      -Space.cardWidth / 2 + statOffset1,
-      -Space.cardHeight / 2 + statOffset1,
-      `[b]${card.cost}[/b]`,
-      BBStyle.cardStats,
-    )
-      .setVisible(card.id !== Catalog.cardback.id)
-      .setOrigin(0.5)
-      .on('pointerover', () =>
-        hint.showText(`This card costs ${this.txtCost.text} breath to play.`),
-      )
-      .on('pointerout', () => {
-        this.onHoverExit()()
-        hint.hide()
-      })
-      .on('pointerdown', () => this.clickCallback())
+    this.createStats()
 
-    this.txtPoints = this.scene.add['rexBBCodeText'](
-      -Space.cardWidth / 2 + statOffset1,
-      -Space.cardHeight / 2 + statOffset2,
-      `[b]${card.points}[/b]`,
-      BBStyle.cardStats,
-    )
-      .setVisible(card.id !== Catalog.cardback.id)
-      .setOrigin(0.5)
-      .on('pointerover', () =>
-        hint.showText(
-          `This card is worth ${this.txtPoints.text} point${card.points === 1 ? '' : 's'}.`,
-        ),
-      )
-      .on('pointerout', () => {
-        this.onHoverExit()()
-        hint.hide()
-      })
-      .on('pointerdown', () => this.clickCallback())
-    this.setPoints(card.points)
+    this.createText()
 
-    if (!Flags.mobile) {
-      // Make cost and points interactive
-      this.txtCost.setInteractive()
-      this.txtPoints.setInteractive()
-
-      // Add keywords and references
-      this.addKeywords()
-      this.addReferences()
-    }
+    // Add keywords and references
+    this.addKeywords()
+    this.addReferences()
 
     // This container
     this.container = this.createContainer(outerContainer)
@@ -136,18 +94,6 @@ export class CardImage {
 
     if (interactive) {
       this.image.setInteractive()
-    }
-
-    // FOR TESTING TODO Flag to include
-    if (!this.scene.game.textures.exists(card.name)) {
-      this.image.setTint(0x000)
-
-      const s = `${card.name}\n${card.text}`
-      const txt = this.scene.add
-        .text(0, 0, s, Style.cardText)
-        .setWordWrapWidth(Space.cardWidth)
-        .setOrigin(0.5, 0.5)
-      this.container.add(txt)
     }
   }
 
@@ -308,6 +254,7 @@ export class CardImage {
       this.image,
       this.txtCost,
       this.txtPoints,
+      this.txtText,
       ...this.keywords,
       ...this.references,
     ])
@@ -316,6 +263,73 @@ export class CardImage {
     outerContainer.add(container)
 
     return container
+  }
+
+  private createStats(): void {
+    let hint = this.scene.hint
+
+    // Cost
+    this.txtCost = this.scene.add['rexBBCodeText'](
+      -Space.cardWidth / 2 + statOffset1,
+      -Space.cardHeight / 2 + statOffset1,
+      `[b]${this.card.cost}[/b]`,
+      BBStyle.cardStats,
+    )
+      .setVisible(this.card.id !== Catalog.cardback.id)
+      .setOrigin(0.5)
+      .on('pointerover', () =>
+        hint.showText(`This card costs ${this.txtCost.text} breath to play.`),
+      )
+      .on('pointerout', () => {
+        this.onHoverExit()()
+        hint.hide()
+      })
+      .on('pointerdown', () => this.clickCallback())
+
+    // Points
+    this.txtPoints = this.scene.add['rexBBCodeText'](
+      -Space.cardWidth / 2 + statOffset1,
+      -Space.cardHeight / 2 + statOffset2,
+      `[b]${this.card.points}[/b]`,
+      BBStyle.cardStats,
+    )
+      .setVisible(this.card.id !== Catalog.cardback.id)
+      .setOrigin(0.5)
+      .on('pointerover', () =>
+        hint.showText(
+          `This card is worth ${this.txtPoints.text} point${this.card.points === 1 ? '' : 's'}.`,
+        ),
+      )
+      .on('pointerout', () => {
+        this.onHoverExit()()
+        hint.hide()
+      })
+      .on('pointerdown', () => this.clickCallback())
+    this.setPoints(this.card.points)
+
+    if (!Flags.mobile) {
+      // Make cost and points interactive
+      this.txtCost.setInteractive()
+      this.txtPoints.setInteractive()
+    }
+  }
+
+  private createText(): void {
+    const s = this.card.text
+    this.txtText = this.scene.add
+      .rexBBCodeText(-1, 148, s, BBStyle.cardText)
+      .setOrigin(0.5, 1)
+      .setWordWrapWidth(Space.cardWidth)
+    // if (!this.scene.game.textures.exists(card.name)) {
+    //   this.image.setTint(0x000)
+
+    //   const s = `${card.name}\n${card.text}`
+    //   const txt = this.scene.add
+    //     .text(0, 0, s, Style.cardText)
+    //     .setWordWrapWidth(Space.cardWidth)
+    //     .setOrigin(0.5, 0.5)
+    //   this.container.add(txt)
+    // }
   }
 
   private addKeywords(): void {

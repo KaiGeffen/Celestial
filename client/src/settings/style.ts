@@ -174,6 +174,22 @@ export const BBStyle: Record<string, any> = {
       bottom: -5,
     },
   },
+  // The textbox for the card
+  cardText: {
+    fontFamily: mainFont,
+    fontSize: '16px',
+    color: 0xffffff,
+    backgroundColor: 0x222222e0,
+    wrap: {
+      mode: 'word',
+      width: 190,
+    },
+    fixedWidth: 190,
+    // padding: {
+    //   left: 5,
+    //   right: 5,
+    // },
+  },
   // Hint text shown when something onscreen is hovered
   hint: {
     fontFamily: mainFont,
