@@ -7,6 +7,7 @@ import { KeywordLabel, ReferenceLabel } from '../lib/keywordLabel'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import BaseScene from '../scene/baseScene'
 import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
+import { Keywords } from '../../../shared/state/keyword'
 
 // The offset of cost / points
 const statOffset1 = 26
@@ -67,8 +68,8 @@ export class CardImage {
     this.createText()
 
     // Add keywords and references
-    this.addKeywords()
-    this.addReferences()
+    // this.addKeywords()
+    // this.addReferences()
 
     // This container
     this.container = this.createContainer(outerContainer)
@@ -250,14 +251,7 @@ export class CardImage {
     }
 
     // Add each of the objects
-    container.add([
-      this.image,
-      this.txtCost,
-      this.txtPoints,
-      this.txtText,
-      ...this.keywords,
-      ...this.references,
-    ])
+    container.add([this.image, this.txtCost, this.txtPoints, this.txtText])
 
     // Make outercontainer contain this container
     outerContainer.add(container)
@@ -315,21 +309,27 @@ export class CardImage {
   }
 
   private createText(): void {
-    const s = this.card.text
+    let s = this.card.text
+
+    // Replace each keyword with the appropriate image
+    for (const keyword of Object.values(Keywords.getAll())) {
+      // Create a regex that matches the keyword name followed by optional number
+      const regex = new RegExp(`${keyword.name}\\s*(\\d+)?`, 'g')
+
+      s = s.replace(regex, (match, value) => {
+        // If there's a value (like "Nourish 3"), include it in the image name
+        if (value) {
+          return `[img=kw-${keyword.name} ${value}]`
+        }
+        // Otherwise just use the keyword name (like "Birth")
+        return `[img=kw-${keyword.name}]`
+      })
+    }
+
     this.txtText = this.scene.add
       .rexBBCodeText(-1, 148, s, BBStyle.cardText)
       .setOrigin(0.5, 1)
       .setWordWrapWidth(Space.cardWidth)
-    // if (!this.scene.game.textures.exists(card.name)) {
-    //   this.image.setTint(0x000)
-
-    //   const s = `${card.name}\n${card.text}`
-    //   const txt = this.scene.add
-    //     .text(0, 0, s, Style.cardText)
-    //     .setWordWrapWidth(Space.cardWidth)
-    //     .setOrigin(0.5, 0.5)
-    //   this.container.add(txt)
-    // }
   }
 
   private addKeywords(): void {
