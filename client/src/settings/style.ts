@@ -189,6 +189,8 @@ export const BBStyle: Record<string, any> = {
     padding: {
       left: 5,
       right: 5,
+      top: 5,
+      bottom: 5,
     },
   },
   // Hint text shown when something onscreen is hovered

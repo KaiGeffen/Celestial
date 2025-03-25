@@ -313,8 +313,8 @@ export class CardImage {
 
     // Replace each keyword with the appropriate image
     for (const keyword of Object.values(Keywords.getAll())) {
-      // Create a regex that matches the keyword name followed by optional number
-      const regex = new RegExp(`${keyword.name}\\s*(\\d+)?`, 'g')
+      // Create a regex that matches the keyword name followed by optional positive/negative number
+      const regex = new RegExp(`${keyword.name}\\s*(-?\\d+)?`, 'g')
 
       s = s.replace(regex, (match, value) => {
         // If there's a value (like "Nourish 3"), include it in the image name
