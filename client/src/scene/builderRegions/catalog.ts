@@ -43,7 +43,7 @@ export default class CatalogRegion {
 
     // Add each card
     let pool = Flags.devCardsEnabled
-      ? [...Catalog.collectibleCards, ...Catalog.betaCards]
+      ? Catalog.collectibleCards.filter((c) => c.name === 'Dagger') //[...Catalog.collectibleCards, ...Catalog.betaCards]
       : Catalog.collectibleCards
     pool = pool.sort((a, b) => a.cost - b.cost)
 

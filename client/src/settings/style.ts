@@ -165,11 +165,8 @@ export const BBStyle: Record<string, any> = {
   // Cost / Points shown above each card
   cardStats: {
     fontFamily: mainFont,
-    fontSize: Flags.mobile ? '20px' : '36px',
+    fontSize: '30px',
     color: Color.cardText,
-    backgroundColor: Color.cardTextBackground,
-    backgroundHorizontalGradient: false,
-    strokeThickness: 3,
     padding: {
       // left: 5,
       // right: 5,

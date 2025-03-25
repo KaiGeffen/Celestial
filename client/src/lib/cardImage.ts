@@ -9,8 +9,8 @@ import BaseScene from '../scene/baseScene'
 import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 
 // The offset of cost / points
-const statOffset1 = Flags.mobile ? 15 : 25
-const statOffset2 = Flags.mobile ? 42 : 77
+const statOffset1 = 26
+const statOffset2 = 77
 
 export class CardImage {
   scene: BaseScene
@@ -68,11 +68,10 @@ export class CardImage {
     this.txtCost = this.scene.add['rexBBCodeText'](
       -Space.cardWidth / 2 + statOffset1,
       -Space.cardHeight / 2 + statOffset1,
-      `${card.cost}`,
+      `[b]${card.cost}[/b]`,
       BBStyle.cardStats,
     )
       .setOrigin(0.5)
-      .setAlpha(card.beta ? 1 : 0.001)
       .on('pointerover', () =>
         hint.showText(`This card costs ${this.txtCost.text} breath to play.`),
       )
@@ -85,7 +84,7 @@ export class CardImage {
     this.txtPoints = this.scene.add['rexBBCodeText'](
       -Space.cardWidth / 2 + statOffset1,
       -Space.cardHeight / 2 + statOffset2,
-      `${card.points}`,
+      `[b]${card.points}[/b]`,
       BBStyle.cardStats,
     )
       .setOrigin(0.5)
@@ -249,13 +248,9 @@ export class CardImage {
     if (cost !== null) {
       this.cost = cost
 
-      if (!this.card.beta && cost === this.card.cost) {
-        this.txtCost.setAlpha(0.001)
-      } else {
-        this.txtCost.setAlpha(1)
-      }
-
-      this.txtCost.setText(`[stroke=${Color.cardStatChanged}]${cost}[/stroke]`)
+      this.txtCost.setText(
+        `[b][stroke=${Color.cardStatChanged}]${cost}[/stroke][/b]`,
+      )
     }
 
     return this
@@ -265,10 +260,9 @@ export class CardImage {
   setPoints(amt: number): CardImage {
     // TODO Generalize once it's not just pet and child that have dynamic version
     if (this.card.points !== this.card.basePoints || this.card.beta) {
-      this.txtPoints.setAlpha(1)
-      this.txtPoints.setText(`[stroke=${Color.cardStatChanged}]${amt}[/stroke]`)
-    } else {
-      this.txtPoints.setAlpha(0.001)
+      this.txtPoints.setText(
+        `[b][stroke=${Color.cardStatChanged}]${amt}[/stroke][/b]`,
+      )
     }
 
     return this
@@ -545,8 +539,8 @@ export class TutorialCardImage extends CardImage {
   // Takes a callback for when each component has been hovered
   highlightComponents(callback: () => void) {
     // Make cost and points visible
-    this.txtCost.setAlpha(1).setText(`${this.card.cost}`)
-    this.txtPoints.setAlpha(1).setText(`${this.card.points}`)
+    this.txtCost.setText(`${this.card.cost}`)
+    this.txtPoints.setText(`${this.card.points}`)
 
     // Define components
     this.components = [this.txtCost, this.txtPoints, ...this.keywords]
@@ -562,11 +556,6 @@ export class TutorialCardImage extends CardImage {
 
       // When a component is hovered, stop highlighting and check if all highlights are gone
       component.setInteractive().on('pointerover', () => {
-        // Make text invisible (Normal)
-        if (component === this.txtCost || component === this.txtPoints) {
-          component.setAlpha(0.001)
-        }
-
         // Remove highlight
         postFxPlugin['remove'](component)
 
