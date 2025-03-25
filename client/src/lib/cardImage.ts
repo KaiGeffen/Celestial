@@ -326,35 +326,24 @@ export class CardImage {
       })
     }
 
-    console.log(s)
+    // Replace each reference to a card by changing its color, but ignore text inside specific BBCode tags
+    Catalog.allCards.forEach((card) => {
+      // Only avoid matching if between img= or area= and the next ]
+      const regex = new RegExp(
+        `(?<!(?:img|area)=[^\\]]*?)\\b${card.name}\\b`,
+        'g',
+      )
+      s = s.replace(
+        regex,
+        `[area=_${card.name}][color=#FABD5D]${card.name}[/color][/area]`,
+      )
+    })
 
-    // Create gradient background first
-    const gradientHeight = 10
-    const bg = this.scene.add.graphics()
-
-    // Draw the main background
-    bg.fillStyle(0x222222, 0.88) // e0 alpha = 0.88
-    bg.fillRect(-95, 0, 190, 148) // Using fixedWidth and full height
-
-    // Draw gradient overlay
-    for (let i = 0; i < gradientHeight; i++) {
-      const alpha = i / gradientHeight
-      bg.fillStyle(0x222222, alpha * 0.88)
-      bg.fillRect(-95, i, 190, 1)
-    }
-
-    // Create the text with transparent background
+    // Create the text
     this.txtText = this.scene.add
-      .rexBBCodeText(-1, 148, s, {
-        ...BBStyle.cardText,
-        backgroundColor: null, // Remove background from BBCodeText
-      })
+      .rexBBCodeText(-1, 148, s, BBStyle.cardText)
       .setOrigin(0.5, 1)
       .setWordWrapWidth(Space.cardWidth)
-
-    // Add both to the container
-    this.container.add(bg)
-    this.container.add(this.txtText)
 
     // Enable hovering to get hint
     let hint = this.scene.hint
