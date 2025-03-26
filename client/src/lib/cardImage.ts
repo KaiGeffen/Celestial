@@ -319,25 +319,30 @@ export class CardImage {
       s = s.replace(regex, (match, value) => {
         // If there's a value (like "Nourish 3"), include it in the image name
         if (value) {
-          return `[area=${keyword.name}_${value}][img=kw-${keyword.name} ${value}][/area]`
+          return `[area=${keyword.name}_${value}][color=#FABD5D]${keyword.name} ${value}[/color][/area]`
         }
         // Otherwise just use the keyword name (like "Birth")
-        return `[area=${keyword.name}][img=kw-${keyword.name}][/area]`
+        return `[area=${keyword.name}][color=#FABD5D]${keyword.name} [/color][/area]`
       })
     }
 
     // Replace each reference to a card by changing its color, but ignore text inside specific BBCode tags
-    Catalog.allCards.forEach((card) => {
-      // Only avoid matching if between img= or area= and the next ]
-      const regex = new RegExp(
-        `(?<!(?:img|area)=[^\\]]*?)\\b${card.name}\\b`,
-        'g',
+    Catalog.allCards
+      .map((card) => card.name)
+      .filter(
+        (cardName) =>
+          !Keywords.getAll()
+            .map((kw) => kw.name)
+            .includes(cardName),
       )
-      s = s.replace(
-        regex,
-        `[area=_${card.name}][color=#FABD5D]${card.name}[/color][/area]`,
-      )
-    })
+      .forEach((cardName) => {
+        // Only avoid matching if between img= or area= and the next ]
+        const regex = new RegExp(`\\b${cardName}\\b`, 'g')
+        s = s.replace(
+          regex,
+          `[area=_${cardName}][color=#FABD5D]${cardName}[/color][/area]`,
+        )
+      })
 
     // Create the text
     this.txtText = this.scene.add
