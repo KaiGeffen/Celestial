@@ -111,9 +111,8 @@ export class GameScene extends BaseScene {
   signalMatchFound(name1: string, name2: string): void {
     console.log('Match found between', name1, 'and', name2)
 
-    // TODO Smell, class these
-    this.view.ourBoard['showUsername'](name1)
-    this.view.theirBoard['showUsername'](name2)
+    this.view.ourAvatar['showUsername'](name1, 1020)
+    this.view.theirAvatar['showUsername'](name2, 1230)
   }
 
   // Set all of the callback functions for the regions in the view
@@ -157,7 +156,7 @@ export class GameScene extends BaseScene {
     })
 
     // Set the callbacks for overlays
-    view.ourBoard.setOverlayCallbacks(
+    view.ourAvatar.setOverlayCallbacks(
       () => {
         this.view.showOverlay(this.view.ourDeckOverlay)
       },
@@ -166,7 +165,7 @@ export class GameScene extends BaseScene {
       },
     )
 
-    view.theirBoard.setOverlayCallbacks(
+    view.theirAvatar.setOverlayCallbacks(
       () => {
         this.view.showOverlay(this.view.theirDeckOverlay)
       },

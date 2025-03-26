@@ -26,9 +26,6 @@ export default class OurBoardRegion extends Region {
   callback: (i: number) => void
   displayCostCallback: (cost: number) => void
 
-  btnDeck: Button
-  btnDiscard: Button
-
   // Whether we have already clicked on a card to play it
   cardClicked: boolean
 
@@ -47,10 +44,6 @@ export default class OurBoardRegion extends Region {
 
     this.createBackground(scene)
 
-    this.createStacks()
-
-    this.addOverlayHotkeys()
-
     return this
   }
 
@@ -67,10 +60,6 @@ export default class OurBoardRegion extends Region {
     }
 
     this.cardClicked = false
-
-    // Pile sizes
-    this.btnDeck.setText(`${state.deck[0].length}`)
-    this.btnDiscard.setText(`${state.pile[0].length}`)
 
     // Add each of the cards in our hand
     this.cards = []
@@ -115,22 +104,6 @@ export default class OurBoardRegion extends Region {
     }
   }
 
-  private addOverlayHotkeys() {
-    // Deck
-    this.scene.input.keyboard.on('keydown-Q', () => {
-      if (UserSettings._get('hotkeys')) {
-        this.btnDeck.onClick()
-      }
-    })
-
-    // Discard
-    this.scene.input.keyboard.on('keydown-W', () => {
-      if (UserSettings._get('hotkeys')) {
-        this.btnDiscard.onClick()
-      }
-    })
-  }
-
   private addCardHotkeys() {
     const numberWords = ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX']
 
@@ -147,11 +120,6 @@ export default class OurBoardRegion extends Region {
         }
       })
     }
-  }
-
-  setOverlayCallbacks(fDeck: () => void, fDiscard: () => void): void {
-    this.btnDeck.setOnClick(fDeck)
-    this.btnDiscard.setOnClick(fDiscard)
   }
 
   // Set the callback / error message for when card is clicked
@@ -202,27 +170,6 @@ export default class OurBoardRegion extends Region {
       .setOrigin(0, 1)
 
     this.container.add(background)
-  }
-
-  private createStacks(): void {
-    let [x, y] = CardLocation.ourDeck(this.container)
-    // this.container.add(this.scene.add.image(x, y, 'Cardback'))
-    this.btnDeck = new Buttons.Stacks.Deck(
-      this.container,
-      x,
-      y - Space.cardHeight / 2,
-      1,
-    )
-
-    // Discard pile
-    ;[x, y] = CardLocation.ourDiscard(this.container)
-    // this.container.add(this.scene.add.image(x, y, 'Cardback'))
-    this.btnDiscard = new Buttons.Stacks.Discard(
-      this.container,
-      x,
-      y - Space.cardHeight / 2,
-      1,
-    )
   }
 
   // Return the function that runs when card with given index is clicked on
@@ -359,13 +306,5 @@ export default class OurBoardRegion extends Region {
   // Set the callback for showing how much breath a card costs
   setDisplayCostCallback(f: (cost: number) => void): void {
     this.displayCostCallback = f
-  }
-
-  // TUTORIAL FUNCTIONALITY
-  hideStacks(): Region {
-    this.btnDeck.setVisible(false)
-    this.btnDiscard.setVisible(false)
-
-    return this
   }
 }

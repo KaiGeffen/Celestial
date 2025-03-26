@@ -28,10 +28,6 @@ export default class TheirBoardRegion extends Region {
     this.container = scene.add.container(0, 0).setDepth(Depth.theirHand)
     this.createBackground()
 
-    this.createStacks()
-
-    this.addHotkeyListeners()
-
     return this
   }
 
@@ -48,31 +44,6 @@ export default class TheirBoardRegion extends Region {
       this.cards.push(card)
       this.temp.push(card)
     }
-
-    // Pile sizes
-    this.btnDeck.setText(`${state.deck[1].length}`)
-    this.btnDiscard.setText(`${state.pile[1].length}`)
-  }
-
-  addHotkeyListeners() {
-    // Deck
-    this.scene.input.keyboard.on('keydown-E', () => {
-      if (UserSettings._get('hotkeys')) {
-        this.btnDeck.onClick()
-      }
-    })
-
-    // Discard
-    this.scene.input.keyboard.on('keydown-R', () => {
-      if (UserSettings._get('hotkeys')) {
-        this.btnDiscard.onClick()
-      }
-    })
-  }
-
-  setOverlayCallbacks(fDeck: () => void, fDiscard: () => void): void {
-    this.btnDeck.setOnClick(fDeck)
-    this.btnDiscard.setOnClick(fDiscard)
   }
 
   showUsername(username: string): void {
@@ -98,34 +69,5 @@ export default class TheirBoardRegion extends Region {
       .setOrigin(0)
 
     this.container.add(background)
-  }
-
-  private createStacks(): void {
-    let [x, y] = CardLocation.theirDeck(this.container)
-    // this.container.add(this.scene.add.image(x, y, 'Cardback'))
-    this.btnDeck = new Buttons.Stacks.Deck(
-      this.container,
-      x,
-      y + Space.cardHeight / 2,
-      1,
-    )
-
-    // Discard pile
-    ;[x, y] = CardLocation.theirDiscard(this.container)
-    // this.container.add(this.scene.add.image(x, y, 'Cardback'))
-    this.btnDiscard = new Buttons.Stacks.Discard(
-      this.container,
-      x,
-      y + Space.cardHeight / 2,
-      1,
-    )
-  }
-
-  // TUTORIAL FUNCTIONALITY
-  hideStacks(): Region {
-    this.btnDeck.setVisible(false)
-    this.btnDiscard.setVisible(false)
-
-    return this
   }
 }

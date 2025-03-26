@@ -139,9 +139,14 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     color: '#F5F2EB',
   },
   username: {
-    fontFamily: altFont,
-    fontSize: '18px',
-    color: Color.basicText,
+    fontFamily: mainFont,
+    fontSize: '16px',
+    color: Color.username,
+  },
+  usernameElo: {
+    fontFamily: mainFont,
+    fontSize: '10px',
+    color: Color.username,
   },
 }
 

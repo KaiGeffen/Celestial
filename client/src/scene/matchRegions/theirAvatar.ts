@@ -13,6 +13,7 @@ import {
 } from '../../settings/settings'
 import Region from './baseRegion'
 import { GameScene } from '../gameScene'
+import CardLocation from './cardLocation'
 
 const width = Space.avatarSize + Space.pad * 2
 const height = 250
@@ -21,6 +22,8 @@ export default class TheirAvatarRegion extends Region {
   btnInspire: Button
   btnNourish: Button
   btnSight: Button
+  btnDeck: Button
+  btnDiscard: Button
 
   avatar: Button
 
@@ -31,6 +34,12 @@ export default class TheirAvatarRegion extends Region {
     this.createBackground(scene)
     this.createStatusDisplay()
     this.createAvatar()
+    this.createStacks()
+
+    this.addHotkeyListeners()
+
+    // TODO Only for certain game
+    this.showUsername('Opponent', 1230)
 
     return this
   }
@@ -51,24 +60,63 @@ export default class TheirAvatarRegion extends Region {
     const amtInspire = amts[1]
     const amtNourish = amts[2] - amts[3]
 
-    this.btnInspire.setVisible(amtInspire !== 0).setText(`${amtInspire}`)
+    this.btnInspire.setVisible(true).setText(`${amtInspire}`)
     this.btnNourish.setVisible(amtNourish !== 0).setText(`${amtNourish}`)
     this.btnSight
       .setVisible(state.vision[1] !== 0)
       .setText(`${state.vision[1]}`)
+
+    // Pile sizes
+    this.btnDeck.setText(`${state.deck[1].length}`)
+    this.btnDiscard.setText(`${state.pile[1].length}`)
   }
 
-  showUsername(username: string): void {
-    this.container.add(
-      this.scene.add
-        .text(
-          21 + Space.avatarSize / 2,
-          11 + Space.avatarSize,
-          username,
-          Style.username,
-        )
-        .setOrigin(0.5, 0),
+  private createStacks(): void {
+    const y = 215
+    this.btnDeck = new Buttons.Stacks.Deck(this.container, width / 4, y, 1)
+
+    // Discard pile
+    this.btnDiscard = new Buttons.Stacks.Discard(
+      this.container,
+      (width * 3) / 4,
+      y,
+      1,
     )
+  }
+
+  private addHotkeyListeners() {
+    // Deck
+    this.scene.input.keyboard.on('keydown-E', () => {
+      if (UserSettings._get('hotkeys')) {
+        this.btnDeck.onClick()
+      }
+    })
+
+    // Discard
+    this.scene.input.keyboard.on('keydown-R', () => {
+      if (UserSettings._get('hotkeys')) {
+        this.btnDiscard.onClick()
+      }
+    })
+  }
+
+  setOverlayCallbacks(fDeck: () => void, fDiscard: () => void): void {
+    this.btnDeck.setOnClick(fDeck)
+    this.btnDiscard.setOnClick(fDiscard)
+  }
+
+  showUsername(username: string, elo: number): void {
+    const x = this.avatar.icon.x
+    const y0 = this.avatar.icon.y + this.avatar.icon.height / 2 + 5
+
+    const txtUsername = this.scene.add
+      .text(x, y0, username, Style.username)
+      .setOrigin(0.5, 0)
+    const txtUsernameElo = this.scene.add
+      .text(x, y0 + 16 + 5, elo.toString(), Style.usernameElo)
+      .setOrigin(0.5, 0)
+
+    this.container.add([txtUsername, txtUsernameElo])
   }
 
   // Show their avatar using the given emote
@@ -89,24 +137,29 @@ export default class TheirAvatarRegion extends Region {
   }
 
   private createStatusDisplay(): void {
+    const y = height + Space.pad + 50 / 2
     this.btnInspire = new Buttons.Keywords.Inspire(
       this.container,
       width / 2 - 55,
-      210,
+      y,
     )
-    this.btnNourish = new Buttons.Keywords.Nourish(
-      this.container,
-      width / 2,
-      210,
-    )
+    this.btnNourish = new Buttons.Keywords.Nourish(this.container, width / 2, y)
     this.btnSight = new Buttons.Keywords.Sight(
       this.container,
       width / 2 + 55,
-      210,
+      y,
     )
   }
 
   setEmoteCallback(fEmote: () => void): void {
     this.avatar.setOnClick(fEmote, false, false)
+  }
+
+  // TUTORIAL FUNCTIONALITY
+  hideStacks(): Region {
+    this.btnDeck.setVisible(false)
+    this.btnDiscard.setVisible(false)
+
+    return this
   }
 }

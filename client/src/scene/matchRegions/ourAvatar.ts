@@ -5,7 +5,7 @@ import GameModel from '../../../../shared/state/gameModel'
 import { Color, Depth, Space, Style } from '../../settings/settings'
 import Region from './baseRegion'
 import { GameScene } from '../gameScene'
-import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
+import { UserSettings } from '../../settings/userSettings'
 
 const width = Space.avatarSize + Space.pad * 2
 const height = 250
@@ -14,6 +14,8 @@ export default class OurAvatarRegion extends Region {
   btnInspire: Button
   btnNourish: Button
   btnSight: Button
+  btnDeck: Button
+  btnDiscard: Button
   avatar: Button
 
   create(scene: GameScene): this {
@@ -25,6 +27,12 @@ export default class OurAvatarRegion extends Region {
     this.createBackground(scene)
     this.createStatusDisplay()
     this.createAvatar()
+    this.createStacks()
+
+    this.addHotkeyListeners()
+
+    // TODO Only for certain game
+    this.showUsername('Player', 1020)
 
     return this
   }
@@ -47,19 +55,58 @@ export default class OurAvatarRegion extends Region {
     this.btnSight
       .setVisible(state.vision[0] !== 0)
       .setText(`${state.vision[0]}`)
+
+    // Pile sizes
+    this.btnDeck.setText(`${state.deck[0].length}`)
+    this.btnDiscard.setText(`${state.pile[0].length}`)
   }
 
-  showUsername(username: string): void {
-    this.container.add(
-      this.scene.add
-        .text(
-          21 + Space.avatarSize / 2,
-          11 + Space.avatarSize,
-          username,
-          Style.username,
-        )
-        .setOrigin(0.5, 0),
+  private createStacks(): void {
+    const y = 40
+    this.btnDeck = new Buttons.Stacks.Deck(this.container, width / 4, y, 0)
+
+    // Discard pile
+    this.btnDiscard = new Buttons.Stacks.Discard(
+      this.container,
+      (width * 3) / 4,
+      y,
+      0,
     )
+  }
+
+  private addHotkeyListeners() {
+    // Deck
+    this.scene.input.keyboard.on('keydown-Q', () => {
+      if (UserSettings._get('hotkeys')) {
+        this.btnDeck.onClick()
+      }
+    })
+
+    // Discard
+    this.scene.input.keyboard.on('keydown-W', () => {
+      if (UserSettings._get('hotkeys')) {
+        this.btnDiscard.onClick()
+      }
+    })
+  }
+
+  setOverlayCallbacks(fDeck: () => void, fDiscard: () => void): void {
+    this.btnDeck.setOnClick(fDeck)
+    this.btnDiscard.setOnClick(fDiscard)
+  }
+
+  showUsername(username: string, elo: number): void {
+    const x = this.avatar.icon.x
+    const y0 = this.avatar.icon.y + this.avatar.icon.height / 2 + 5
+
+    const txtUsername = this.scene.add
+      .text(x, y0, username, Style.username)
+      .setOrigin(0.5, 0)
+    const txtUsernameElo = this.scene.add
+      .text(x, y0 + 16 + 5, elo.toString(), Style.usernameElo)
+      .setOrigin(0.5, 0)
+
+    this.container.add([txtUsername, txtUsernameElo])
   }
 
   private createBackground(scene: Phaser.Scene): void {
@@ -78,20 +125,17 @@ export default class OurAvatarRegion extends Region {
   }
 
   private createStatusDisplay(): void {
+    const y = -(Space.pad + 50 / 2)
     this.btnInspire = new Buttons.Keywords.Inspire(
       this.container,
       width / 2 - 55,
-      40,
+      y,
     )
-    this.btnNourish = new Buttons.Keywords.Nourish(
-      this.container,
-      width / 2,
-      40,
-    )
+    this.btnNourish = new Buttons.Keywords.Nourish(this.container, width / 2, y)
     this.btnSight = new Buttons.Keywords.Sight(
       this.container,
       width / 2 + 55,
-      40,
+      y,
     )
   }
 
