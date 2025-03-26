@@ -180,9 +180,7 @@ export const BBStyle: Record<string, any> = {
     fontFamily: mainFont,
     fontSize: '16px',
     color: 0xffffff,
-    backgroundColor: 0x111111a0, // Start fully transparent
-    backgroundColor2: 0x111111e0, // End with your desired opacity
-    backgroundHorizontalGradient: false, // false for vertical gradient
+    backgroundColor: 0x111111a0,
     wrap: {
       mode: 'word',
       width: 180,
