@@ -278,7 +278,8 @@ class Release extends Card {
 
     const deck = game.deck[player]
     // Remove the top 4 cards from the deck
-    const top4 = deck.splice(deck.length - 4, 4)
+    const amt = Math.min(4, deck.length)
+    const top4 = deck.splice(deck.length - amt, amt)
 
     // Add back any without Fleeting and RFG the others
     for (let card of top4) {

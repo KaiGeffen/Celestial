@@ -9,12 +9,6 @@ import UserDataServer from '../network/userDataServer'
  * @returns boolean indicating if a quest is available
  */
 export function isDailyQuestAvailable(): boolean {
-  if (!UserDataServer.isLoggedIn() || !UserDataServer.lastDailyReward) {
-    throw new Error(
-      'Daily quest is not available: User is not logged in or last daily reward is not set.',
-    )
-  }
-
   const now = new Date()
   const lastReward = new Date(UserDataServer.lastDailyReward)
   const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)

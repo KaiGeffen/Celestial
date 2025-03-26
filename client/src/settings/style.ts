@@ -1,6 +1,7 @@
 // Settings relating to styles of text or bbcode throughout the app
 import 'phaser'
 import { Space, Color, Flags } from './settings'
+import { Line } from 'phaser3-rex-plugins/plugins/gameobjects/shape/shapes/geoms'
 
 // All fonts used
 const mainFont = 'Mulish'
@@ -165,16 +166,32 @@ export const BBStyle: Record<string, any> = {
   // Cost / Points shown above each card
   cardStats: {
     fontFamily: mainFont,
-    fontSize: Flags.mobile ? '20px' : '36px',
+    fontSize: '30px',
     color: Color.cardText,
-    backgroundColor: Color.cardTextBackground,
-    backgroundHorizontalGradient: false,
-    strokeThickness: 3,
     padding: {
       // left: 5,
       // right: 5,
       top: -5,
       bottom: -5,
+    },
+  },
+  // The textbox for the card
+  cardText: {
+    fontFamily: mainFont,
+    fontSize: '16px',
+    color: 0xffffff,
+    backgroundColor: 0x111111a0,
+    wrap: {
+      mode: 'word',
+      width: 180,
+    },
+    fixedWidth: 190,
+    halign: 'center',
+    padding: {
+      left: 5,
+      right: 5,
+      top: 5,
+      bottom: 5,
     },
   },
   // Hint text shown when something onscreen is hovered

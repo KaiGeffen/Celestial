@@ -122,7 +122,7 @@ export default function createUserDataServer() {
             }
 
             // Create new user entry in database
-            await db.insert(players).values({
+            const data = {
               id: id,
               email: potentialEmail,
               username: username,
@@ -135,7 +135,12 @@ export default function createUserDataServer() {
               lastactive: new Date().toISOString(),
               gems: 0,
               coins: 0,
-            })
+              last_daily_reward: new Date(),
+            }
+            await db.insert(players).values(data)
+
+            // Send user their data
+            await sendUserData(ws, id, data)
           },
         )
     } catch (e) {

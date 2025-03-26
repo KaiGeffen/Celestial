@@ -42,9 +42,10 @@ export default class CatalogRegion {
     this.cardCatalog = []
 
     // Add each card
-    let pool = Flags.devCardsEnabled
-      ? [...Catalog.collectibleCards, ...Catalog.betaCards]
-      : Catalog.collectibleCards
+    let pool = Catalog.collectibleCards
+    // let pool = Flags.devCardsEnabled
+    //   ? [...Catalog.collectibleCards, ...Catalog.betaCards]
+    //   : Catalog.collectibleCards
     pool = pool.sort((a, b) => a.cost - b.cost)
 
     for (let i = 0; i < pool.length; i++) {

@@ -71,12 +71,9 @@ export default class UserDataServer {
         // Open username registration menu
         game.scene.getAt(0).scene.launch('MenuScene', {
           menu: 'registerUsername',
-          callback: () => {
-            callback()
-          },
           // Ensure that user is logged out if they cancel
           exitCallback: () => {
-            this.logout()
+            UserDataServer.logout()
           },
         })
       })

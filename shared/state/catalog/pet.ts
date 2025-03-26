@@ -118,6 +118,7 @@ const holdTight = new HoldTight({
   id: 33,
   cost: 2,
   points: 2,
+  text: 'Put the top card of your discard pile on on top of your deck.',
 })
 
 // BETA TODO
