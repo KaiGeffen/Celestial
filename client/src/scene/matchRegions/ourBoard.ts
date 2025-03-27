@@ -71,10 +71,15 @@ export default class OurBoardRegion extends Region {
 
   // Set the callback / error message for when card is clicked
   private setCardOnClick(card: CardImage, state: GameModel, i: number) {
+    // Set whether card shows up as playable
+    if (state.cardCosts[i] > state.breath[0]) {
+      card.setPlayable(false)
+    }
+
     card.setOnClick(() => {
-      // If this card is already raised, try to play it
+      // Only try to play if the card is currently raised (hovered)
       if (this.raisedCardIndex === i) {
-        // Check if there are any errors that prevent playing
+        // Check if there are any errors
         let msg
         if (state.winner !== null) {
           msg = 'The game is over.'
@@ -95,27 +100,6 @@ export default class OurBoardRegion extends Region {
 
         // If no errors, play the card
         this.onCardPlay(i, card, this.cards, state)()
-      } else {
-        // Always allow raising the card
-        // Lower any currently raised card
-        if (this.raisedCardIndex !== null) {
-          const raisedCard = this.cards[this.raisedCardIndex]
-          this.scene.tweens.add({
-            targets: raisedCard.container,
-            y: 65,
-            duration: Time.playCard() / 2,
-            ease: 'Sine.easeOut',
-          })
-        }
-
-        // Raise this card
-        this.scene.tweens.add({
-          targets: card.container,
-          y: -HOVER_OFFSET,
-          duration: Time.playCard() / 2,
-          ease: 'Sine.easeOut',
-        })
-        this.raisedCardIndex = i
       }
     })
   }
@@ -221,7 +205,7 @@ export default class OurBoardRegion extends Region {
       const cost = state.cardCosts[i]
       card.setOnHover(
         this.onCardHover(card, cost, i),
-        this.onCardExit(card, cost, i),
+        this.onCardExit(card, this.cards, i),
       )
 
       // Set whether the card shows as playable, and set its onclick
@@ -257,15 +241,43 @@ export default class OurBoardRegion extends Region {
     index: number,
   ): () => void {
     return () => {
-      // Only show cost, don't move card
+      // Show the card's cost
       this.displayCostCallback(cost)
+
+      // Raise the card
+      this.scene.tweens.add({
+        targets: card.container,
+        y: -HOVER_OFFSET,
+        duration: Time.playCard() / 2,
+        ease: 'Sine.easeOut',
+      })
+
+      // Track which card is raised
+      this.raisedCardIndex = index
     }
   }
 
-  private onCardExit(card: CardImage, cost: number, index: number): () => void {
+  private onCardExit(
+    card: CardImage,
+    cards: CardImage[],
+    index: number,
+  ): () => void {
     return () => {
-      // Only hide cost, don't move card
+      // Hide the cost
       this.displayCostCallback(0)
+
+      // Lower the card
+      this.scene.tweens.add({
+        targets: card.container,
+        y: 65,
+        duration: Time.playCard() / 2,
+        ease: 'Sine.easeOut',
+      })
+
+      // Clear raised card tracking if this was the raised card
+      if (this.raisedCardIndex === index) {
+        this.raisedCardIndex = null
+      }
     }
   }
 
