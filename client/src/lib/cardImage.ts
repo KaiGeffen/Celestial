@@ -358,6 +358,7 @@ export class CardImage {
         hint.hide()
       })
       .setInteractive()
+      .on('pointerdown', () => this.clickCallback())
   }
 
   // Move this cardImage above everything else in its container when it's hovered
