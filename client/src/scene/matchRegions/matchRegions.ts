@@ -17,15 +17,21 @@ import TheirAvatarRegion from './theirAvatar'
 export default class Regions {
   static Searching = SearchingRegion
   static Commands = TheirScoreRegion
-  static OurBoard = OurBoardRegion
-  static TheirBoard = TheirBoardRegion
   static Story = StoryRegion
-  static OurScore = OurScoreRegion
-  static TheirScore = TheirScoreRegion
 
+  // Avatars and associated statuses
   static OurAvatar = OurAvatarRegion
   static TheirAvatar = TheirAvatarRegion
 
+  // The cards in our / their hands
+  static OurBoard = OurBoardRegion
+  static TheirBoard = TheirBoardRegion
+
+  // Regions for the scores (Right-side showing wins etc)
+  static OurScore = OurScoreRegion
+  static TheirScore = TheirScoreRegion
+
+  // Overlays of the stacks
   static OurDeck = Overlay.OurDeckOverlay
   static TheirDeck = Overlay.TheirDeckOverlay
   static OurDiscard = Overlay.OurDiscardOverlay
@@ -36,6 +42,7 @@ export default class Regions {
   static Pass = PassRegion
   static RoundResult = RoundResultRegion
 
+  // Regions for special periods of the game
   static Mulligan = MulliganRegion
   static Results = ResultsRegion
 }

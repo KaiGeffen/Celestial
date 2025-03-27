@@ -6,11 +6,12 @@ import { MechanicsSettings } from '../../../../shared/settings'
 import { GameScene } from '../gameScene'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
-const width = 126
+const width = 135
 const height = 120
+const BREATH_X = 40
+const BREATH_Y = 80
 
-// TODO Rename to OurScore
-export default class ScoreRegion extends Region {
+export default class OurScoreRegion extends Region {
   // For the current state, the maximum and current amount of breath we have
   maxBreath: number
   currentBreath: number
@@ -25,11 +26,7 @@ export default class ScoreRegion extends Region {
   breathHover: Phaser.GameObjects.Image[] = []
   breathOom: Phaser.GameObjects.Image[] = []
 
-  // TODO Move outside this class
-  BREATH_X = 31
-  BREATH_Y = 80
-
-  create(scene: GameScene): ScoreRegion {
+  create(scene: GameScene): this {
     this.scene = scene
     this.container = scene.add
       .container(Space.windowWidth - width, Space.windowHeight - height)
@@ -100,13 +97,13 @@ export default class ScoreRegion extends Region {
   }
 
   private createBreath(): void {
-    const x = width / 2 + 10
+    const x = width / 2 + 20
     this.txtBreath = this.scene.add
-      .text(x, this.BREATH_Y, '', Style.todoScore)
+      .text(x, BREATH_Y, '', Style.todoScore)
       .setOrigin(0, 1)
 
     const hintBreath = this.scene.add
-      .text(x, this.BREATH_Y, 'Breath', Style.todoSubtext)
+      .text(x, BREATH_Y, 'Breath', Style.todoSubtext)
       .setOrigin(0, 0)
 
     this.container.add([this.txtBreath, hintBreath])
@@ -135,7 +132,7 @@ export default class ScoreRegion extends Region {
     key: string,
     images: Phaser.GameObjects.Image[],
   ): void {
-    const center = [this.BREATH_X, this.BREATH_Y]
+    const center = [BREATH_X, BREATH_Y]
     const radius = 30
 
     // 10 is the max displayed breath, but player could have more

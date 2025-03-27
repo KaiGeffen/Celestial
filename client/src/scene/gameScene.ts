@@ -22,7 +22,7 @@ import TheirScoreRegion from './matchRegions/theirScore'
 import OurBoardRegion from './matchRegions/ourBoard'
 import TheirBoardRegion from './matchRegions/theirBoard'
 import StoryRegion from './matchRegions/story'
-import ScoreRegion from './matchRegions/ourScore'
+import OurScoreRegion from './matchRegions/ourScore'
 import MulliganRegion from './matchRegions/mulliganRegion'
 
 // TODO Rename to Match
