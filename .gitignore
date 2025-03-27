@@ -2,7 +2,7 @@
 *.DS_Store
 
 # env files #
-*.env
+# *.env
 
 # Text editor backups #
 *~

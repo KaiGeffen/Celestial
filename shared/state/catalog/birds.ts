@@ -2,6 +2,8 @@ import Card from '../card'
 import { Quality } from '../quality'
 import GameModel from '../gameModel'
 import { Keywords } from '../keyword'
+import { Zone } from '../zone'
+import { Animation } from '../../animation'
 
 class Dove extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -299,6 +301,38 @@ const release = new Release({
   beta: true,
 })
 
+class Rooster extends Card {
+  onMorning(player: number, game: GameModel, index: number) {
+    for (let i = index - 1; i >= 0; i--) {
+      const card = game.pile[player][i]
+      if (card.onMorning(player, game, i)) {
+        game.animations[player].push(
+          new Animation({
+            from: Zone.Discard,
+            to: Zone.Discard,
+            card: card,
+            index: i,
+            index2: i,
+          }),
+        )
+
+        // A morning effect was triggered, so we can stop
+        return true
+      }
+    }
+
+    return true
+  }
+}
+const rooster = new Rooster({
+  name: 'Rooster',
+  id: 1073,
+  cost: 1,
+  points: 1,
+  text: 'Morning: Trigger the morning ability of the top card below this with morning.',
+  beta: true,
+})
+
 export {
   dove,
   starling,
@@ -313,5 +347,5 @@ export {
   bare,
   vulture,
   release,
-  // TODO 1
+  rooster,
 }
