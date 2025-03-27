@@ -77,30 +77,27 @@ export default class OurBoardRegion extends Region {
     }
 
     card.setOnClick(() => {
-      // Only try to play if the card is currently raised (hovered)
-      if (this.raisedCardIndex === i) {
-        // Check if there are any errors
-        let msg
-        if (state.winner !== null) {
-          msg = 'The game is over.'
-        } else if (!state.mulligansComplete[1]) {
-          msg = 'Opponent still mulliganing.'
-        } else if (state.isRecap) {
-          msg = 'The story is resolving.'
-        } else if (state.priority === 1) {
-          msg = "It's not your turn."
-        } else if (state.cardCosts[i] > state.breath[0]) {
-          msg = 'Not enough breath.'
-        }
-
-        if (msg !== undefined) {
-          this.scene.signalError(msg)
-          return
-        }
-
-        // If no errors, play the card
-        this.onCardPlay(i, card, this.cards, state)()
+      // Check if there are any errors
+      let msg
+      if (state.winner !== null) {
+        msg = 'The game is over.'
+      } else if (!state.mulligansComplete[1]) {
+        msg = 'Opponent still mulliganing.'
+      } else if (state.isRecap) {
+        msg = 'The story is resolving.'
+      } else if (state.priority === 1) {
+        msg = "It's not your turn."
+      } else if (state.cardCosts[i] > state.breath[0]) {
+        msg = 'Not enough breath.'
       }
+
+      if (msg !== undefined) {
+        this.scene.signalError(msg)
+        return
+      }
+
+      // If no errors, play the card
+      this.onCardPlay(i, card, this.cards, state)()
     })
   }
 
