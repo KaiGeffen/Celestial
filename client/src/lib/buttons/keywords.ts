@@ -48,6 +48,7 @@ export class InspireButton extends KeywordButton {
         text: text,
         interactive: false,
         style: Style.basic,
+        offsetX: 12,
       },
       icon: {
         name: `Inspire`,
@@ -79,6 +80,7 @@ export class NourishButton extends KeywordButton {
         text: text,
         interactive: false,
         style: Style.basic,
+        offsetX: 12,
       },
       icon: {
         name: `Nourish`,
@@ -110,6 +112,7 @@ export class SightButton extends KeywordButton {
         text: text,
         interactive: false,
         style: Style.basic,
+        offsetX: 12,
       },
       icon: {
         name: `Sight`,
