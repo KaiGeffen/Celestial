@@ -23,8 +23,6 @@ export class CardImage {
   txtCost: BBCodeText
   txtPoints: BBCodeText
   txtText: BBCodeText
-  keywords: KeywordLabel[] = []
-  references: ReferenceLabel[] = []
 
   // A container just for this cardImage and elements within it
   container: ContainerLite | Phaser.GameObjects.Container
@@ -64,12 +62,7 @@ export class CardImage {
 
     // Stat text
     this.createStats()
-
     this.createText()
-
-    // Add keywords and references
-    // this.addKeywords()
-    // this.addReferences()
 
     // This container
     this.container = this.createContainer(outerContainer)
@@ -99,16 +92,11 @@ export class CardImage {
   }
 
   destroy(): void {
-    ;[
-      this.image,
-      this.txtCost,
-      this.txtPoints,
-      ...this.keywords,
-      ...this.references,
-      this.container,
-    ].forEach((obj) => {
-      obj.destroy()
-    })
+    ;[this.image, this.txtCost, this.txtPoints, this.container].forEach(
+      (obj) => {
+        obj.destroy()
+      },
+    )
   }
 
   show(): CardImage {
@@ -372,43 +360,6 @@ export class CardImage {
       .setInteractive()
   }
 
-  private addKeywords(): void {
-    let that = this
-
-    this.card.keywords.forEach((keywordTuple: KeywordPosition) => {
-      let keyword = new KeywordLabel(
-        this.scene,
-        keywordTuple.name,
-        keywordTuple.x,
-        keywordTuple.y,
-        keywordTuple.value,
-        () => {
-          that.clickCallback()
-        },
-      )
-
-      this.keywords.push(keyword)
-    })
-  }
-
-  private addReferences(): void {
-    let that = this
-
-    this.card.references.forEach((referencePosition) => {
-      let reference = new ReferenceLabel(
-        this.scene,
-        referencePosition.card,
-        referencePosition.x,
-        referencePosition.y,
-        () => {
-          that.clickCallback()
-        },
-      )
-
-      this.references.push(reference)
-    })
-  }
-
   // Move this cardImage above everything else in its container when it's hovered
   moveToTopOnHover(): CardImage {
     let that = this
@@ -544,16 +495,12 @@ export class CardImage {
     this.image.setTint(color)
     this.txtCost.setTint(color)
     this.txtPoints.setTint(color)
-
-    this.keywords.forEach((keyword) => keyword.setTint(color))
   }
 
   private clearTint(): void {
     this.image.clearTint()
     this.txtCost.clearTint()
     this.txtPoints.clearTint()
-
-    this.keywords.forEach((keyword) => keyword.clearTint())
   }
 
   /**
@@ -594,7 +541,7 @@ export class TutorialCardImage extends CardImage {
     this.txtPoints.setText(`${this.card.points}`)
 
     // Define components
-    this.components = [this.txtCost, this.txtPoints, ...this.keywords]
+    this.components = [this.txtCost, this.txtPoints]
 
     // Highlight each component
     var postFxPlugin = this.scene.plugins.get('rexOutlinePipeline')
