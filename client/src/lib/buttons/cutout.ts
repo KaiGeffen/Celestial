@@ -1,7 +1,14 @@
 import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
-import { Space, Style, Color, Time, Flags } from '../../settings/settings'
+import {
+  Space,
+  Style,
+  Color,
+  Time,
+  Flags,
+  BBStyle,
+} from '../../settings/settings'
 import Button from './button'
 import Card from '../../../../shared/state/card'
 import Hint from '../hint'
@@ -17,14 +24,8 @@ export default class Cutout extends Button {
   // Whether this card is required for the current mission
   required = false
 
-  constructor(
-    within: ContainerLite,
-    card: Card,
-    x: number = 0,
-    y: number = 0,
-    f: () => void = function () {},
-  ) {
-    super(within, x, y, {
+  constructor(within: ContainerLite, card: Card) {
+    super(within, 0, 0, {
       text: {
         text: '',
         interactive: false,
@@ -51,10 +52,10 @@ export default class Cutout extends Button {
                 closeOnClick: () => {
                   return this.count === 0
                 },
-                callback: f,
+                callback: () => {},
               })
             }
-          : f,
+          : () => {},
         // When hovered, show the given cards
         hover: () => {
           hint.leftPin = this.icon.getRightCenter().x
@@ -80,6 +81,22 @@ export default class Cutout extends Button {
         .setOrigin(0.5, 0.5)
       within.add(txt)
     }
+
+    // TODO
+    const txtCost = this.scene.add['rexBBCodeText'](
+      -164,
+      -22,
+      `[b]${card.cost}[/b]`,
+      BBStyle.cardStats,
+    )
+    within.add(txtCost)
+    const txtPoints = this.scene.add['rexBBCodeText'](
+      -130,
+      -12,
+      `[b]${card.points}[/b]`,
+      BBStyle.cardStats,
+    )
+    within.add(txtPoints)
 
     // The base scene's hint text object
     let hint: Hint = within.scene['hint']

@@ -183,12 +183,6 @@ export const BBStyle: Record<string, any> = {
     fontFamily: mainFont,
     fontSize: '30px',
     color: Color.cardText,
-    padding: {
-      // left: 5,
-      // right: 5,
-      top: -5,
-      bottom: -5,
-    },
   },
   // The textbox for the card
   cardText: {
