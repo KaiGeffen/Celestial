@@ -24,9 +24,9 @@ export class MatchWS {
 
     // Each registered event
     socket
-      .on('matchStart', ({ name1, name2 }) => {
+      .on('matchStart', ({ name1, name2, elo1, elo2 }) => {
         // Signal that a match has been found
-        scene.signalMatchFound(name1, name2)
+        scene.signalMatchFound(name1, name2, elo1, elo2)
       })
       .on('transmitState', (data) => {
         newScene.queueState(data.state)

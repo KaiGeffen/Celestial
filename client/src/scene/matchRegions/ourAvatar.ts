@@ -31,9 +31,6 @@ export default class OurAvatarRegion extends Region {
 
     this.addHotkeyListeners()
 
-    // TODO Only for certain game
-    this.showUsername('Player', 1020)
-
     return this
   }
 

@@ -108,11 +108,16 @@ export class GameScene extends BaseScene {
   }
 
   // Signal that a match has been found with given player names
-  signalMatchFound(name1: string, name2: string): void {
+  signalMatchFound(
+    name1: string,
+    name2: string,
+    elo1: number,
+    elo2: number,
+  ): void {
     console.log('Match found between', name1, 'and', name2)
 
-    this.view.ourAvatar['showUsername'](name1, 1020)
-    this.view.theirAvatar['showUsername'](name2, 1230)
+    this.view.ourAvatar.showUsername(name1, elo1)
+    this.view.theirAvatar.showUsername(name2, elo2)
   }
 
   // Set all of the callback functions for the regions in the view
@@ -486,10 +491,15 @@ export class StandardGameScene extends GameScene {
     super(args)
   }
 
-  signalMatchFound(name1: string, name2: string): void {
+  signalMatchFound(
+    name1: string,
+    name2: string,
+    elo1: number,
+    elo2: number,
+  ): void {
     this.view.searching.displayState(undefined)
 
-    super.signalMatchFound(name1, name2)
+    super.signalMatchFound(name1, name2, elo1, elo2)
   }
 }
 
@@ -518,7 +528,12 @@ export class AdventureGameScene extends GameScene {
     super.queueState(state)
   }
 
-  signalMatchFound(name1: string, name2: string): void {}
+  signalMatchFound(
+    name1: string,
+    name2: string,
+    elo1: number,
+    elo2: number,
+  ): void {}
 
   private unlockMissionRewards(): void {
     // Set that user has completed the missions with this id

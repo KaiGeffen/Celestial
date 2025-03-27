@@ -52,22 +52,26 @@ class Match implements Match {
 
   // Notify all connected players that the match has started
   async notifyMatchStart() {
-    const username1 = await this.getUsername(this.uuid1)
-    const username2 = await this.getUsername(this.uuid2)
+    const user1 = await this.getUsernameElo(this.uuid1)
+    const user2 = await this.getUsernameElo(this.uuid2)
 
     await Promise.all(
       this.getActiveWsList().map((ws) => {
         if (ws === this.ws1) {
           ws.send({
             type: 'matchStart',
-            name1: username1,
-            name2: username2,
+            name1: user1.username,
+            name2: user2.username,
+            elo1: user1.elo,
+            elo2: user2.elo,
           })
         } else {
           ws.send({
             type: 'matchStart',
-            name1: username2,
-            name2: username1,
+            name1: user2.username,
+            name2: user1.username,
+            elo1: user2.elo,
+            elo2: user1.elo,
           })
         }
       }),
@@ -141,8 +145,10 @@ class Match implements Match {
   }
 
   // Get the name of player with given uuid
-  private async getUsername(uuid: string | null): Promise<string> {
-    if (!uuid) return ''
+  private async getUsernameElo(
+    uuid: string | null,
+  ): Promise<{ username: string; elo: number }> {
+    if (!uuid) return { username: '', elo: 0 }
 
     try {
       const result = await db
@@ -154,12 +160,12 @@ class Match implements Match {
         .where(eq(players.id, uuid))
         .limit(1)
 
-      if (result.length === 0) return ''
+      if (result.length === 0) return { username: '', elo: 0 }
 
-      return `${result[0].username} (${result[0].elo})`
+      return { username: result[0].username, elo: result[0].elo }
     } catch (error) {
       console.error('Error fetching username:', error)
-      return ''
+      return { username: '', elo: 0 }
     }
   }
 }
