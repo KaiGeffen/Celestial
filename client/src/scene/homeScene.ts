@@ -38,8 +38,14 @@ export default class HomeScene extends BaseScene {
     // Ensure animation is hidden
     Cinematic.hide()
 
-    this.createHeader()
+    // If the last tutorial isn't complete, start the next tutorial
+    const missions = UserSettings._get('completedMissions')
+    if (!missions[TUTORIAL_LENGTH - 1]) {
+      this.doTutorial()
+      return
+    }
 
+    this.createHeader()
     this.createButtons()
 
     super.create()
@@ -201,14 +207,8 @@ export default class HomeScene extends BaseScene {
     const height =
       Space.windowHeight - headerHeight - Space.pad * 3 - discordHeight
 
-    // If tutorial complete, show normal buttons, otherwise show tutorial button
-    const missions = UserSettings._get('completedMissions')
-    if (missions[TUTORIAL_LENGTH - 1]) {
-      this.createAdventureButton(width, height)
-      this.createDeckbuilderButton(width, height)
-    } else {
-      this.createTutorialButton()
-    }
+    this.createAdventureButton(width, height)
+    this.createDeckbuilderButton(width, height)
 
     this.createDiscordButton()
     this.createLeaderboardButton()
@@ -280,69 +280,6 @@ export default class HomeScene extends BaseScene {
         'Adventure',
         Style.homeButtonText,
       )
-      .setOrigin(0.5)
-      .setShadow(0, 1, 'rgb(0, 0, 0, 1)', 6)
-  }
-
-  private createTutorialButton(): void {
-    const names = ['Jules', 'Mia', 'Kitz']
-
-    const x = Space.windowWidth / 2
-    const y =
-      headerHeight +
-      (Space.windowHeight - headerHeight - discordHeight - Space.pad) / 2
-    const width = Math.min(
-      Space.windowWidth - Space.pad * 2,
-      Space.avatarWidth * names.length + Space.pad * (names.length + 1),
-    )
-    const height = Math.min(
-      Space.avatarHeight,
-      Space.windowHeight - headerHeight - discordHeight - Space.pad * 3,
-    )
-
-    // Free Play button
-    let rectRight = this.add.rectangle(
-      x,
-      y,
-      width,
-      height,
-      Color.backgroundLight,
-      1,
-    )
-
-    // Container with visual elements of the button
-    let container = this.add.container(x, y)
-
-    for (let i = 0; i < names.length; i++) {
-      const offset = (i - 1) * (Space.avatarWidth + Space.pad)
-      const avatar = this.add.sprite(offset, 0, `avatar-${names[i]}Full`)
-
-      container.add(avatar)
-    }
-
-    // While not hovered, rectangle is greyed
-    rectRight
-      .setInteractive()
-      .on('pointerover', () => {
-        container.iterate((child) => {
-          child.setTint(0x444444)
-        })
-      })
-      .on('pointerout', () => {
-        container.iterate((child) => {
-          child.clearTint()
-        })
-      })
-      .on('pointerdown', () => {
-        this.sound.play('click')
-        this.doTutorial()
-      })
-
-    container.mask = new Phaser.Display.Masks.BitmapMask(this, rectRight)
-
-    // Text over the rectangle
-    this.add
-      .text(rectRight.x, rectRight.y, 'Tutorial', Style.homeButtonText)
       .setOrigin(0.5)
       .setShadow(0, 1, 'rgb(0, 0, 0, 1)', 6)
   }
