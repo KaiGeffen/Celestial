@@ -20,7 +20,7 @@ class TutorialMatch extends PveMatch {
   protected async opponentActs() {
     // TODO Use ai instead
     ;[0, 1, 2, 3, 4, 5, MechanicsSettings.PASS].forEach((action) => {
-      if (this.game.onPlayerInput(1, action)) {
+      if (this.game.onPlayerInput(1, action, this.game.model.versionNo)) {
         return
       }
     })
