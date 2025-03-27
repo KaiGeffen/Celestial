@@ -119,8 +119,8 @@ export class GameScene extends BaseScene {
   private setCallbacks(view, net: MatchWS): void {
     let that = this
 
-    // Commands region
-    view.commands.recapCallback = () => {
+    // Their score region
+    view.theirScore.recapCallback = () => {
       // Scan backwards through the queued states to find the start of the recap
       for (let version = this.currentVersion - 1; version >= 0; version--) {
         if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
@@ -133,7 +133,7 @@ export class GameScene extends BaseScene {
         }
       }
     }
-    view.commands.skipCallback = () => {
+    view.theirScore.skipCallback = () => {
       that.tweens.getTweens().forEach((tween) => {
         tween.complete()
       })
@@ -323,23 +323,20 @@ export class View {
 
   searching: Region
 
-  // The buttons below Options button
-  commands: TheirScoreRegion
-
   story: StoryRegion
-  ourScore: Region
-  theirScore: Region
   pass: PassRegion
   scores: Region
 
-  // Add in here
   theirAvatar: TheirAvatarRegion
   ourAvatar: OurAvatarRegion
 
-  // Board
   ourBoard: OurBoardRegion
   theirBoard: TheirBoardRegion
 
+  ourScore: Region
+  theirScore: Region
+
+  // Overlays
   ourDeckOverlay: OverlayRegion
   theirDeckOverlay: OverlayRegion
   ourDiscardOverlay: OverlayRegion
@@ -370,8 +367,6 @@ export class View {
       })
 
     this.searching = new Regions.Searching().create(scene, avatarId)
-
-    this.commands = new Regions.Commands().create(scene)
 
     // Create each of the regions
     // this.createOurHand()
@@ -429,20 +424,21 @@ export class View {
     this.searching.hide()
 
     this.mulligan.displayState(state)
-    this.commands.displayState(state)
 
-    // TODO Sort these out
     this.theirAvatar.displayState(state)
     this.ourAvatar.displayState(state)
 
     this.ourBoard.displayState(state)
     this.theirBoard.displayState(state)
-    this.story.displayState(state)
+
     this.ourScore.displayState(state)
     this.theirScore.displayState(state)
+
+    this.story.displayState(state)
     this.pass.displayState(state)
     this.scores.displayState(state)
 
+    // Overlays
     this.ourDeckOverlay.displayState(state)
     this.theirDeckOverlay.displayState(state)
     this.ourDiscardOverlay.displayState(state)
@@ -450,6 +446,7 @@ export class View {
     this.ourExpendedOverlay.displayState(state)
     this.theirExpendedOverlay.displayState(state)
 
+    // Result of the game ending
     this.results.displayState(state)
 
     // Animate the state

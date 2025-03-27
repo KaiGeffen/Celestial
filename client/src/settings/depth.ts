@@ -15,7 +15,6 @@ export const Depth: Record<string, number> = {
   // Above all other layers with cards
   aboveOtherCards: 5,
 
-  commands: 7,
   tutorial: 7,
   pileOverlays: 8,
   searching: 9,

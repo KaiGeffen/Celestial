@@ -5,15 +5,12 @@ import GameModel from '../../../../shared/state/gameModel'
 import {
   Space,
   Depth,
-  Flags,
   UserSettings,
   Style,
   Color,
 } from '../../settings/settings'
-import BaseScene from '../baseScene'
 import Region from './baseRegion'
 import { GameScene } from '../gameScene'
-import { MechanicsSettings } from '../../../../shared/settings'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 // Y of the buttons
@@ -34,7 +31,7 @@ export default class TheirScoreRegion extends Region {
     this.scene = scene
     this.container = scene.add
       .container(Space.windowWidth - width, 0)
-      .setDepth(Depth.commands) // TODO Rename
+      .setDepth(Depth.theirScore)
 
     this.createBackground()
     this.createRecap()
@@ -94,11 +91,8 @@ export default class TheirScoreRegion extends Region {
     const y = Space.pad + Space.iconSize / 2
 
     // Recap button
-    this.btnRecap = new Icons.Recap(
-      this.container,
-      x,
-      y,
-      this.recapCallback,
+    this.btnRecap = new Icons.Recap(this.container, x, y, () =>
+      this.recapCallback(),
     ).setVisible(false)
   }
 
@@ -107,11 +101,8 @@ export default class TheirScoreRegion extends Region {
     const y = Space.pad + Space.iconSize / 2
 
     // Skip button
-    this.btnSkip = new Icons.Skip(
-      this.container,
-      x,
-      y,
-      this.skipCallback,
+    this.btnSkip = new Icons.Skip(this.container, x, y, () =>
+      this.skipCallback(),
     ).setVisible(false)
   }
 

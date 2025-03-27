@@ -16,7 +16,6 @@ import TheirAvatarRegion from './theirAvatar'
 
 export default class Regions {
   static Searching = SearchingRegion
-  static Commands = TheirScoreRegion
   static Story = StoryRegion
 
   // Avatars and associated statuses
