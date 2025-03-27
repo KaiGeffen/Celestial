@@ -31,7 +31,7 @@ export default class TheirAvatarRegion extends Region {
     this.scene = scene
     this.container = scene.add.container().setDepth(Depth.theirAvatar)
 
-    this.createBackground(scene)
+    this.createBackground()
     this.createStatusDisplay()
     this.createAvatar()
     this.createStacks()
@@ -53,14 +53,14 @@ export default class TheirAvatarRegion extends Region {
     let amts = [0, 0, 0, 0]
     const length = 4
 
-    state.status[0].forEach(function (status, index, array) {
+    state.status[1].forEach(function (status, index, array) {
       amts[status]++
     })
 
     const amtInspire = amts[1]
     const amtNourish = amts[2] - amts[3]
 
-    this.btnInspire.setVisible(true).setText(`${amtInspire}`)
+    this.btnInspire.setVisible(amtInspire !== 0).setText(`${amtInspire}`)
     this.btnNourish.setVisible(amtNourish !== 0).setText(`${amtNourish}`)
     this.btnSight
       .setVisible(state.vision[1] !== 0)
@@ -124,8 +124,8 @@ export default class TheirAvatarRegion extends Region {
     this.avatar.setQuality({ emoting: emoteNumber })
   }
 
-  private createBackground(scene: Phaser.Scene): void {
-    const background = scene.add
+  private createBackground(): void {
+    const background = this.scene.add
       .rectangle(0, 0, width, height, Color.backgroundDark)
       .setOrigin(0)
 

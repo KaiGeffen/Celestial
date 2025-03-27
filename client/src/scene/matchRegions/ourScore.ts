@@ -1,10 +1,15 @@
 import 'phaser'
 import GameModel from '../../../../shared/state/gameModel'
-import { Depth, Space, Style, Flags } from '../../settings/settings'
+import { Depth, Space, Style, Flags, Color } from '../../settings/settings'
 import Region from './baseRegion'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { GameScene } from '../gameScene'
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
+const width = 126
+const height = 120
+
+// TODO Rename to OurScore
 export default class ScoreRegion extends Region {
   // For the current state, the maximum and current amount of breath we have
   maxBreath: number
@@ -20,35 +25,20 @@ export default class ScoreRegion extends Region {
   breathHover: Phaser.GameObjects.Image[] = []
   breathOom: Phaser.GameObjects.Image[] = []
 
-  // Center at 163, 53 from right bottom corner
-  BREATH_X = Space.windowWidth - (Flags.mobile ? 40 : 163)
-  BREATH_Y = Space.windowHeight - (Flags.mobile ? Space.handHeight / 2 : 53)
+  // TODO Move outside this class
+  BREATH_X = 31
+  BREATH_Y = 80
 
   create(scene: GameScene): ScoreRegion {
     this.scene = scene
-    this.container = scene.add.container().setDepth(Depth.ourScore)
+    this.container = scene.add
+      .container(Space.windowWidth - width, Space.windowHeight - height)
+      .setDepth(Depth.ourScore)
 
-    // Create all of the breath icons
-    this.createBreathIcons()
+    this.createBackground()
 
-    const x = Space.windowWidth - (Flags.mobile ? 5 : 124)
-    const y = Space.windowHeight - (Flags.mobile ? Space.handHeight + 15 : 114)
-    this.txtWins = scene.add
-      .text(x, y, '', Style.basic)
-      .setOrigin(Flags.mobile ? 1 : 0, Flags.mobile ? 0.5 : 0)
-
-    // On mobile, center the text, otherwise have it aligned with wins text
-    this.txtBreath = scene.add
-      .text(
-        Flags.mobile ? this.BREATH_X : x,
-        this.BREATH_Y + (Flags.mobile ? 0 : 5),
-        '',
-        Style.basic,
-      )
-      .setOrigin(Flags.mobile ? 0.5 : 0, 0.5)
-
-    // Add each of these objects to container
-    this.container.add([this.txtBreath, this.txtWins])
+    this.createWins()
+    this.createBreath()
 
     return this
   }
@@ -78,6 +68,51 @@ export default class ScoreRegion extends Region {
       this.breathOom[i].setVisible(i < cost)
       this.breathHover[i].setVisible(i < Math.min(cost, this.currentBreath))
     }
+  }
+
+  private createBackground(): void {
+    const background = this.scene.add
+      .rectangle(0, 0, width, height, Color.backgroundDark)
+      .setOrigin(0)
+
+    this.container.add(background)
+  }
+
+  private createWins(): void {
+    // Create a vertical sizer
+    const winsSizer = new Sizer(this.scene, {
+      x: width / 2,
+      y: 0,
+      orientation: 'vertical',
+      space: { top: 5, item: 4 },
+    }).setOrigin(0.5, 0)
+
+    this.txtWins = this.scene.add.text(0, 0, '0/5', Style.todoScore)
+    const hintWins = this.scene.add.text(0, 0, 'Wins', Style.todoSubtext)
+
+    // Add texts to sizer, centering them horizontally
+    winsSizer
+      .add(this.txtWins, { align: 'center' })
+      .add(hintWins, { align: 'center' })
+      .layout()
+
+    this.container.add(winsSizer)
+  }
+
+  private createBreath(): void {
+    const x = width / 2 + 10
+    this.txtBreath = this.scene.add
+      .text(x, this.BREATH_Y, '', Style.todoScore)
+      .setOrigin(0, 1)
+
+    const hintBreath = this.scene.add
+      .text(x, this.BREATH_Y, 'Breath', Style.todoSubtext)
+      .setOrigin(0, 0)
+
+    this.container.add([this.txtBreath, hintBreath])
+
+    // Create all of the breath icons
+    this.createBreathIcons()
   }
 
   // Create all of the breath icons
@@ -139,6 +174,7 @@ export default class ScoreRegion extends Region {
     return this
   }
 
+  // TODO remove
   showBackground(): Region {
     let bg = this.scene.add
       .image(

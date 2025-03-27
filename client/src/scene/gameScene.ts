@@ -18,7 +18,7 @@ import { Deck } from '../../../shared/types/deck'
 import UserDataServer from '../network/userDataServer'
 import TheirAvatarRegion from './matchRegions/theirAvatar'
 import OurAvatarRegion from './matchRegions/ourAvatar'
-import CommandsRegion from './matchRegions/commands'
+import TheirScoreRegion from './matchRegions/theirScore'
 import OurBoardRegion from './matchRegions/ourBoard'
 import TheirBoardRegion from './matchRegions/theirBoard'
 import StoryRegion from './matchRegions/story'
@@ -324,7 +324,7 @@ export class View {
   searching: Region
 
   // The buttons below Options button
-  commands: CommandsRegion
+  commands: TheirScoreRegion
 
   story: StoryRegion
   ourScore: Region

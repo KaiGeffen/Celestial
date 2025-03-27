@@ -1,11 +1,10 @@
 import SearchingRegion from './searching'
-import CommandsRegion from './commands'
+import TheirScoreRegion from './theirScore'
 
 import OurBoardRegion from './ourBoard'
 import TheirBoardRegion from './theirBoard'
 import StoryRegion from './story'
 import OurScoreRegion from './ourScore'
-import TheirScoreRegion from './theirScore'
 import * as Overlay from './pileOverlays'
 import PassRegion from './pass'
 import RoundResultRegion from './roundResult'
@@ -17,7 +16,7 @@ import TheirAvatarRegion from './theirAvatar'
 
 export default class Regions {
   static Searching = SearchingRegion
-  static Commands = CommandsRegion
+  static Commands = TheirScoreRegion
   static OurBoard = OurBoardRegion
   static TheirBoard = TheirBoardRegion
   static Story = StoryRegion
