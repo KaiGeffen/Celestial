@@ -1,138 +1,140 @@
-[[
-  {
-    "italic": "In this city we tell stories - each day we craft them, and each night they come to life before a crowd. When you’ve won 5 times, you may pass on. To ease your journey into the city, I’ve given you 2 wins for now.",
-    "bold": "Win the game by winning 5 rounds.\nFor the tutorial, you start with 2 wins.",
-    "align": "right"
-  },
+[
+  [
+    {
+      "italic": "In this city we tell stories - each day we craft them, and each night they come to life before a crowd. When you’ve won 5 times, you may pass on. To ease your journey into the city, I’ve given you 2 wins for now.",
+      "bold": "Win the game by winning 5 rounds.\nFor the tutorial, you start with 2 wins.",
+      "align": "right"
+    },
 
-  {
-    "italic": "With our sacred breath we create the stories that we tell here. Each card takes some breath to play as we add it to our shared story. And each morning we awake with more breath in our lungs.",
-    "bold": "Spend Breath to play cards from your hand. You start with 1 breath and gain 1 more each round.",
-    "align": "right"
-  },
-  {
-    "italic": "These cards are the elements of the stories we tell - wisps and imagery brought here to form something greater. With our breath we weave them into the story, and when night falls they come to life, to enchant and delight the audience.",
-    "bold": "Mouse over each number and keyword on the card to learn more.",
-    "mobile": "Click on any card to learn more.",
-    "align": "card"
-  },
-  {
-    "italic": "Dove is about freedom and letting go. To fly unfettered to any height.",
-    "bold": "Dove costs 1 breath to play, and earns 1 point. It also has the following effects:\nOnce Dove has been added to the story, it will be visible to both players.\nWhen Dove resolves it will be removed from the game instead of moving to your discard pile.",
-    "align": "card"
-  },
-  {
-    "italic": "Dash is about the singular need to move fast. Run away from it all, never stop running!",
-    "bold": "Dash costs 2 breath, and is worth 3 points, minus the number of cards (Yours and your opponents) that appear to the left of it in the story that round.",
-    "align": "card"
-  },
-  {
-    "italic": "Mercy is a tale of the whole world’s compassion, it is that perfect moment when tension washes away completely.",
-    "bold": "Mercy costs 3 breath to play, is worth 3 points when it resolves, and will cause both players to draw a card.",
-    "align": "card"
-  },
-  {
-    "italic": "",
-    "bold": "You start each match with 3 cards in hand.\n\nAt the start of each round, you draw 2 cards.\n\nYou can’t have more than 6 cards in hand.",
-    "align": "bottom"
-  },
-  {
-    "italic": "",
-    "bold": "When you’re ready, click a card in your hand to add it to the story.",
-    "align": "center",
-    "final": true
-  },
-  null,
-  {
-    "italic": "",
-    "bold": "I play a Dove, too.\n\nYou can see it in the story because it’s Visible.",
-    "align": "story"
-  },
-  {
-    "italic": "",
-    "bold": "You’re out of cards to play.\nThe round ends now, and the cards we’ve played resolve from left to right.",
-    "align": "story"
-  },
-  null,
-  null,
-  {
-    "italic": "",
-    "bold": "Last round, we both earned 1 point, so we tied and neither of us earned a win.",
-    "align": "center"
-  },
-  {
-    "italic": "",
-    "bold": "As this round starts, we each draw 2 cards, our max breath goes up by 1, and our breath refills completely.",
-    "align": "center"
-  },
-  {
-    "italic": "",
-    "bold": "Playing Dash here earns 3 points - surely beating whatever I play...",
-    "align": "center",
-    "final": true
-  }
-],
-[
-  {
-    "italic": "",
-    "bold": "If you play a card with Inspire, you will have extra breath on the next round.\n\nPlay Stars now so you can afford Mercy next round.",
-    "align": "bottom",
-    "final": true
-  },
-  null,
-  null,
-  null,
-  null,
-  {
-    "italic": "",
-    "bold": "With your 3 breath you can afford Mercy.\n\nBut if you gained extra breath from Stars, you might have nothing to spend it on next round...",
-    "align": "center",
-    "final": true
-  },
-  null,
-  {
-    "italic": "",
-    "bold": "Sometimes it's better to pass instead of playing a card. Click the sun to pass.",
-    "align": "right",
-    "final": true
-  },
-  null,
-  null,
-  null,
-  {
-    "italic": "",
-    "bold": "With just a Dove, you probably can't win this round. But if you play enough Stars you can play Uprising next round to win for sure!",
-    "align": "center",
-    "final": true
-  },
-  null
-],
-[
-  {
-    "italic": "",
-    "bold": "You draw cards from your deck. Your deck starts with 15 cards in it. Click to see everything in your deck.",
-    "align": "left"
-  },
-  {
-    "italic": "",
-    "bold": "When cards resolve or are discarded, they go to your discard pile.",
-    "align": "right"
-  },
-  {
-    "italic": "",
-    "bold": "If your deck is empty when you would draw a card, your discard pile is shuffled to form a new deck.",
-    "align": "center"
-  },
-  {
-    "italic": "",
-    "bold": "Nourish will make the next card you resolve worth extra points, even if that card is played on a future round. Use it carefully to get points when you need them.",
-    "align": "center"
-  },
-  {
-    "italic": "",
-    "bold": "From here on it's up to you, show me what you've learned!",
-    "align": "center",
-    "final": true
-  },
-  null
-]]
+    {
+      "italic": "With our sacred breath we create the stories that we tell here. Each card takes some breath to play as we add it to our shared story. And each morning we awake with more breath in our lungs.",
+      "bold": "Spend Breath to play cards from your hand. You start with 1 breath and gain 1 more each round.",
+      "align": "right"
+    },
+    {
+      "italic": "These cards are the elements of the stories we tell - wisps and imagery brought here to form something greater. With our breath we weave them into the story, and when night falls they come to life, to enchant and delight the audience.",
+      "bold": "Mouse over each number and keyword on the card to learn more.",
+      "mobile": "Click on any card to learn more.",
+      "align": "card"
+    },
+    {
+      "italic": "Dove is about freedom and letting go. To fly unfettered to any height.",
+      "bold": "Dove costs 1 breath to play, and earns 1 point. It also has the following effects:\nOnce Dove has been added to the story, it will be visible to both players.\nWhen Dove resolves it will be removed from the game instead of moving to your discard pile.",
+      "align": "card"
+    },
+    {
+      "italic": "Dash is about the singular need to move fast. Run away from it all, never stop running!",
+      "bold": "Dash costs 2 breath, and is worth 3 points, minus the number of cards (Yours and your opponents) that appear to the left of it in the story that round.",
+      "align": "card"
+    },
+    {
+      "italic": "Mercy is a tale of the whole world’s compassion, it is that perfect moment when tension washes away completely.",
+      "bold": "Mercy costs 3 breath to play, is worth 3 points when it resolves, and will cause both players to draw a card.",
+      "align": "card"
+    },
+    {
+      "italic": "",
+      "bold": "You start each match with 3 cards in hand.\n\nAt the start of each round, you draw 2 cards.\n\nYou can’t have more than 6 cards in hand.",
+      "align": "bottom"
+    },
+    {
+      "italic": "",
+      "bold": "When you’re ready, click a card in your hand to add it to the story.",
+      "align": "center",
+      "final": true
+    },
+    null,
+    {
+      "italic": "",
+      "bold": "I play a Dove, too.\n\nYou can see it in the story because it’s Visible.",
+      "align": "story"
+    },
+    {
+      "italic": "",
+      "bold": "You’re out of cards to play.\nThe round ends now, and the cards we’ve played resolve from left to right.",
+      "align": "story"
+    },
+    null,
+    null,
+    {
+      "italic": "",
+      "bold": "Last round, we both earned 1 point, so we tied and neither of us earned a win.",
+      "align": "center"
+    },
+    {
+      "italic": "",
+      "bold": "As this round starts, we each draw 2 cards, our max breath goes up by 1, and our breath refills completely.",
+      "align": "center"
+    },
+    {
+      "italic": "",
+      "bold": "Playing Dash here earns 3 points - surely beating whatever I play...",
+      "align": "center",
+      "final": true
+    }
+  ],
+  [
+    {
+      "italic": "",
+      "bold": "If you play a card with Inspire, you will have extra breath on the next round.\n\nPlay Stars now so you can afford Mercy next round.",
+      "align": "bottom",
+      "final": true
+    },
+    null,
+    null,
+    null,
+    null,
+    {
+      "italic": "",
+      "bold": "With your 3 breath you can afford Mercy.\n\nBut if you gained extra breath from Stars, you might have nothing to spend it on next round...",
+      "align": "center",
+      "final": true
+    },
+    null,
+    {
+      "italic": "",
+      "bold": "Sometimes it's better to pass instead of playing a card. Click the sun to pass.",
+      "align": "right",
+      "final": true
+    },
+    null,
+    null,
+    null,
+    {
+      "italic": "",
+      "bold": "With just a Dove, you probably can't win this round. But if you play enough Stars you can play Uprising next round to win for sure!",
+      "align": "center",
+      "final": true
+    },
+    null
+  ],
+  [
+    {
+      "italic": "",
+      "bold": "You draw cards from your deck. Your deck starts with 15 cards in it. Click to see everything in your deck.",
+      "align": "left"
+    },
+    {
+      "italic": "",
+      "bold": "When cards resolve or are discarded, they go to your discard pile.",
+      "align": "left"
+    },
+    {
+      "italic": "",
+      "bold": "If your deck is empty when you would draw a card, your discard pile is shuffled to form a new deck.",
+      "align": "center"
+    },
+    {
+      "italic": "",
+      "bold": "Nourish will make the next card you resolve worth extra points, even if that card is played on a future round. Use it carefully to get points when you need them.",
+      "align": "center"
+    },
+    {
+      "italic": "",
+      "bold": "From here on it's up to you, show me what you've learned!",
+      "align": "center",
+      "final": true
+    },
+    null
+  ]
+]

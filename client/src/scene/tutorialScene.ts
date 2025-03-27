@@ -6,7 +6,7 @@ import data from '../catalog/tutorial.json'
 import { Space, Color, BBStyle, Time, Depth, Flags } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
-import { TutorialCardImage } from '../lib/cardImage'
+import { CardImage } from '../lib/cardImage'
 import Catalog from '../../../shared/state/catalog'
 import { ResultsRegionTutorial } from './matchRegions/results'
 import { SearchingRegionTutorial } from './matchRegions/searching'
@@ -28,7 +28,7 @@ export default class TutorialGameScene extends AdventureGameScene {
   pointer: Phaser.GameObjects.Image
 
   // A card that is being shown
-  card: TutorialCardImage
+  card: CardImage
 
   isTutorial = true
 
@@ -211,16 +211,13 @@ export default class TutorialGameScene extends AdventureGameScene {
         this.view.theirBoard.hide()
         this.view.theirScore.hide()
         this.view.ourBoard.hide()
-
-        this.view.ourScore.tutorialHideBreath()
         break
 
       case 1:
-        this.view.ourScore.showBreath()
         break
 
       case 2:
-        this.addCardWithRequiredHover('Dove')
+        this.addCard('Dove')
         break
 
       case 4:
@@ -336,8 +333,8 @@ export default class TutorialGameScene extends AdventureGameScene {
       case 'left':
         this.pointer.setRotation(0).setFlipX(true)
 
-        x = Space.pad + this.pointer.width / 2 + 80
-        y = Space.windowHeight - Space.handHeight - this.pointer.height + 30
+        x = Space.pad + this.pointer.width / 2 + 50
+        y = Space.windowHeight - Space.handHeight - this.pointer.height
         this.pointer.setPosition(x, y)
 
         // Text to the right of pointer
@@ -432,7 +429,7 @@ export default class TutorialGameScene extends AdventureGameScene {
     }
   }
 
-  private addCard(name: string): TutorialCardImage {
+  private addCard(name: string): CardImage {
     if (this.card !== undefined) {
       this.card.destroy()
     }
@@ -441,26 +438,8 @@ export default class TutorialGameScene extends AdventureGameScene {
     const y = Flags.mobile
       ? Space.windowHeight - Space.cardHeight / 2
       : Space.windowHeight / 2
-    this.card = new TutorialCardImage(
-      Catalog.getCard(name),
-      this.add.container(x, y),
-    )
+    this.card = new CardImage(Catalog.getCard(name), this.add.container(x, y))
 
     return this.card
-  }
-
-  // Add a card that must have each hoverable component hovered before continuing
-  private addCardWithRequiredHover(name: string): void {
-    let card = this.addCard(name)
-
-    // TODO On mobile possibly force some other interaction
-    if (Flags.mobile) {
-      return
-    }
-
-    // Disable the next button until each component has been hovered
-    this.btnNext.disable()
-
-    card.highlightComponents(() => this.btnNext.enable())
   }
 }

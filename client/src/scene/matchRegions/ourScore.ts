@@ -150,24 +150,4 @@ export default class OurScoreRegion extends Region {
       images.push(image)
     }
   }
-
-  // TUTORIAL FUNCTIONALITY
-
-  tutorialHideBreath(): void {
-    this.txtBreath.setVisible(false)
-
-    // Make all breath invisible
-    ;[...this.breathBasic, ...this.breathSpent, ...this.breathExtra]
-  }
-
-  // Show our Breath
-  showBreath(): Region {
-    this.txtBreath.setVisible(true)
-
-    // Make the starting breath visible
-    this.breathBasic[0].setVisible(true)
-    this.breathSpent[0].setVisible(true)
-
-    return this
-  }
 }
