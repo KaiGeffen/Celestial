@@ -12,7 +12,6 @@ import {
   UserSettings,
   Color,
 } from '../../settings/settings'
-import BaseScene from '../baseScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
 import { GameScene } from '../gameScene'
@@ -20,7 +19,6 @@ import { MechanicsSettings } from '../../../../shared/settings'
 
 // The y distance card moves up when hovered
 const HOVER_OFFSET = Space.cardHeight / 2
-const height = Space.cardHeight / 2 - 65
 
 export default class OurBoardRegion extends Region {
   // Function called when elements in this region are interacted with
@@ -103,7 +101,13 @@ export default class OurBoardRegion extends Region {
 
   private createBackground(scene: Phaser.Scene): void {
     const background = this.scene.add
-      .rectangle(0, 0, Space.windowWidth, height, Color.backgroundLight)
+      .rectangle(
+        0,
+        0,
+        Space.windowWidth,
+        Space.todoHandOffset,
+        Color.backgroundLight,
+      )
       .setOrigin(0, 1)
 
     this.container.add(background)
@@ -196,7 +200,7 @@ export default class OurBoardRegion extends Region {
 
       // If this was the raised card, raise it again
       if (i === this.raisedCardIndex) {
-        card.container.setY(-HOVER_OFFSET)
+        card.container.setY(-Space.cardHeight / 2)
       }
 
       const cost = state.cardCosts[i]
@@ -222,7 +226,7 @@ export default class OurBoardRegion extends Region {
         const pointer = this.scene.input.activePointer
         const pointerOverCard = card.image
           .getBounds()
-          .contains(pointer.x, pointer.y + HOVER_OFFSET)
+          .contains(pointer.x, pointer.y - Space.cardHeight / 2)
 
         if (pointerOverCard) {
           card.image.emit('pointerover')
@@ -244,7 +248,7 @@ export default class OurBoardRegion extends Region {
       // Raise the card
       this.scene.tweens.add({
         targets: card.container,
-        y: -HOVER_OFFSET,
+        y: -Space.cardHeight / 2,
         duration: Time.playCard() / 2,
         ease: 'Sine.easeOut',
       })
@@ -266,7 +270,7 @@ export default class OurBoardRegion extends Region {
       // Lower the card
       this.scene.tweens.add({
         targets: card.container,
-        y: 65,
+        y: Space.cardHeight / 2 - Space.todoHandOffset,
         duration: Time.playCard() / 2,
         ease: 'Sine.easeOut',
       })

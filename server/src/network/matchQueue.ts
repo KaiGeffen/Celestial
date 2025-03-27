@@ -35,7 +35,7 @@ class MatchQueue {
     // Register the init events
     ws.on('initPve', async (data) => {
       console.log(
-        'New PvE match with deck:',
+        'PvE:',
         data.deck.cards
           .map((cardId) => Catalog.getCardById(cardId).name)
           .join(', '),
@@ -59,7 +59,7 @@ class MatchQueue {
         const otherPlayer: WaitingPlayer = searchingPlayers[data.password]
         if (otherPlayer) {
           console.log(
-            'Match starting between players with decks:',
+            'PVP:',
             data.deck.cards
               .map((cardId) => Catalog.getCardById(cardId).name)
               .join(', '),

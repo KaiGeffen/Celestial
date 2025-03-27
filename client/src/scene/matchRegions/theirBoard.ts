@@ -15,8 +15,6 @@ import { GameScene } from '../gameScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
 
-const height = Space.cardHeight / 2 - 65
-
 export default class TheirBoardRegion extends Region {
   // Effect showing that they have priority
   priorityHighlight: Phaser.GameObjects.Video
@@ -63,7 +61,13 @@ export default class TheirBoardRegion extends Region {
 
   private createBackground(): void {
     const background = this.scene.add
-      .rectangle(0, 0, Space.windowWidth, height, Color.backgroundLight)
+      .rectangle(
+        0,
+        0,
+        Space.windowWidth,
+        Space.todoHandOffset,
+        Color.backgroundLight,
+      )
       .setOrigin(0)
 
     this.container.add(background)

@@ -8,8 +8,8 @@ import { Space, Flags } from '../../settings/settings'
 // Amount of room to leave to the right of the last card in either hand
 const minRoom = (Flags.mobile ? 210 : 342) + Space.cardWidth / 2
 
-// TODO Remove i from many of these arguments (height is CardHeight - 43)
-const todoTheirHandHeight = -65
+// TODO Remove this, deck and discard are no longer used
+const todoTheirHandHeight = -Space.todoHandOffset
 
 // This describes where on screen each card in each region should appear
 // so that regions can move their cards to the appropriate locations for
@@ -34,7 +34,7 @@ export default class CardLocation {
       }
 
       const x = leftEdge + i * dx
-      let y = Space.windowHeight - todoTheirHandHeight
+      let y = Space.windowHeight + Space.cardHeight / 2 - Space.todoHandOffset
 
       if (container !== undefined) {
         return [x - container.x, y - container.y]
@@ -64,7 +64,7 @@ export default class CardLocation {
       }
 
       const x = leftEdge + i * dx
-      let y = todoTheirHandHeight
+      let y = -Space.cardHeight / 2 + Space.todoHandOffset
 
       return [x - container.x, y - container.y]
     }
