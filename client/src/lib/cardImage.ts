@@ -519,12 +519,7 @@ export class CardImage {
 
       // Check if any of the internal elements are highlighted (Keywords, references, etc)
       let overInternal = false
-      ;[
-        this.txtCost,
-        this.txtPoints,
-        ...this.keywords,
-        ...this.references,
-      ].forEach((obj) => {
+      ;[this.txtCost, this.txtPoints, this.txtText].forEach((obj) => {
         if (obj.getBounds().contains(pointer.x, pointer.y)) {
           overInternal = true
         }
