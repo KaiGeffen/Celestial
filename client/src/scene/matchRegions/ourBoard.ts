@@ -20,6 +20,7 @@ import { MechanicsSettings } from '../../../../shared/settings'
 
 // The y distance card moves up when hovered
 const HOVER_OFFSET = Space.cardHeight / 2
+const height = Space.cardHeight / 2 - 65
 
 export default class OurBoardRegion extends Region {
   // Function called when elements in this region are interacted with
@@ -50,9 +51,9 @@ export default class OurBoardRegion extends Region {
   displayState(state: GameModel): void {
     this.deleteTemp()
 
-    // Until we have mulliganed, hide the cards in our hand
+    // Until we have mulliganed, hide (Delete) all the cards in our hand
     if (!state.mulligansComplete[0]) {
-      this.hideHand()
+      this.deleteTemp()
       return
     } else if (!this.cardHotkeysRegistered) {
       this.addCardHotkeys()
@@ -154,19 +155,9 @@ export default class OurBoardRegion extends Region {
     })
   }
 
-  // Hide the cards in our hand, used when mulligan is visible
-  // TODO Is this private?
-  hideHand(): void {
-    this.deleteTemp()
-  }
-
   private createBackground(scene: Phaser.Scene): void {
-    const x = 200
-    const width = Space.windowWidth - 400
-    const height = Space.cardHeight / 2 - 65
-
     const background = this.scene.add
-      .rectangle(x, 0, width, height, Color.backgroundLight)
+      .rectangle(0, 0, Space.windowWidth, height, Color.backgroundLight)
       .setOrigin(0, 1)
 
     this.container.add(background)
