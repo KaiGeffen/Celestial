@@ -333,8 +333,8 @@ export class View {
   ourBoard: OurBoardRegion
   theirBoard: TheirBoardRegion
 
-  ourScore: Region
-  theirScore: Region
+  ourScore: OurScoreRegion
+  theirScore: TheirScoreRegion
 
   // Overlays
   ourDeckOverlay: OverlayRegion

@@ -152,44 +152,12 @@ export default class OurScoreRegion extends Region {
   }
 
   // TUTORIAL FUNCTIONALITY
-  // Hide all elements in this region
-  hideAll(): Region {
-    this.txtWins.setVisible(false)
+
+  tutorialHideBreath(): void {
     this.txtBreath.setVisible(false)
 
     // Make all breath invisible
-    ;[
-      ...this.breathBasic,
-      ...this.breathSpent,
-      ...this.breathExtra,
-      ...this.breathHover,
-      ...this.breathOom,
-    ].forEach((obj) => {
-      obj.setVisible(false)
-    })
-
-    return this
-  }
-
-  // TODO remove
-  showBackground(): Region {
-    let bg = this.scene.add
-      .image(
-        Space.windowWidth,
-        Space.windowHeight - 50 - Space.handHeight,
-        'icon-Bottom Score',
-      )
-      .setOrigin(1, 0)
-      .setInteractive()
-
-    return this
-  }
-
-  // Show just the wins
-  showWins(): Region {
-    this.txtWins.setVisible(true)
-
-    return this
+    ;[...this.breathBasic, ...this.breathSpent, ...this.breathExtra]
   }
 
   // Show our Breath

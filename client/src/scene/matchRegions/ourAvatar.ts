@@ -142,4 +142,9 @@ export default class OurAvatarRegion extends Region {
   setEmoteCallback(fEmote: () => void): void {
     this.avatar.setOnClick(fEmote, false, false)
   }
+
+  tutorialHide(): void {
+    this.btnDeck.setVisible(false)
+    this.btnDiscard.setVisible(false)
+  }
 }
