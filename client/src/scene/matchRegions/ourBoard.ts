@@ -51,63 +51,6 @@ export default class OurBoardRegion extends Region {
     return this
   }
 
-  displayState(state: GameModel): void {
-    this.deleteTemp()
-
-    // Until we have mulliganed, hide (Delete) all the cards in our hand
-    if (!state.mulligansComplete[0]) {
-      this.deleteTemp()
-      return
-    } else if (!this.cardHotkeysRegistered) {
-      this.addCardHotkeys()
-      this.cardHotkeysRegistered = true
-    }
-
-    this.cardClicked = false
-
-    // Add each of the cards in our hand
-    this.cards = []
-    for (let i = 0; i < state.hand[0].length; i++) {
-      let card = this.addCard(
-        state.hand[0][i],
-        CardLocation.ourHand(state, i, this.container),
-      )
-        .setCost(state.cardCosts[i])
-        .setFocusOptions('Play')
-        .moveToTopOnHover()
-
-      const cost = state.cardCosts[i]
-      card.setOnHover(
-        this.onCardHover(card, cost, i),
-        this.onCardExit(card, this.cards, i),
-      )
-
-      // Set whether the card shows as playable, and set its onclick
-      card.setPlayable(state.cardCosts[i] <= state.breath[0])
-      this.setCardOnClick(card, state, i)
-
-      this.cards.push(card)
-      this.temp.push(card)
-    }
-
-    // Hover whichever card was being hovered last
-    if (this.hoveredCard !== undefined) {
-      let card = this.cards[this.hoveredCard]
-
-      if (card !== undefined) {
-        // Check that the mouse is still over the card's x
-        const pointer = this.scene.input.activePointer
-        const pointerOverCard = card.image
-          .getBounds()
-          .contains(pointer.x, pointer.y + HOVER_OFFSET)
-
-        if (pointerOverCard) {
-          card.image.emit('pointerover')
-        }
-      }
-    }
-  }
-
   private addCardHotkeys() {
     const numberWords = ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX']
 
@@ -128,36 +71,32 @@ export default class OurBoardRegion extends Region {
 
   // Set the callback / error message for when card is clicked
   private setCardOnClick(card: CardImage, state: GameModel, i: number) {
-    // Set whether card shows up as playable
-    if (state.cardCosts[i] > state.breath[0]) {
-      card.setPlayable(false)
-    }
-
     card.setOnClick(() => {
-      // Check if there are any errors
-      let msg
-      if (state.winner !== null) {
-        msg = 'The game is over.'
-      } else if (!state.mulligansComplete[1]) {
-        msg = 'Opponent still mulliganing.'
-      } else if (state.isRecap) {
-        msg = 'The story is resolving.'
-      } else if (state.priority === 1) {
-        msg = "It's not your turn."
-      } else if (state.cardCosts[i] > state.breath[0]) {
-        msg = 'Not enough breath.'
-      }
-
-      if (msg !== undefined) {
-        this.scene.signalError(msg)
-        return
-      }
-
-      // If this card is already raised
+      // If this card is already raised, try to play it
       if (this.raisedCardIndex === i) {
-        // Play the card
+        // Check if there are any errors that prevent playing
+        let msg
+        if (state.winner !== null) {
+          msg = 'The game is over.'
+        } else if (!state.mulligansComplete[1]) {
+          msg = 'Opponent still mulliganing.'
+        } else if (state.isRecap) {
+          msg = 'The story is resolving.'
+        } else if (state.priority === 1) {
+          msg = "It's not your turn."
+        } else if (state.cardCosts[i] > state.breath[0]) {
+          msg = 'Not enough breath.'
+        }
+
+        if (msg !== undefined) {
+          this.scene.signalError(msg)
+          return
+        }
+
+        // If no errors, play the card
         this.onCardPlay(i, card, this.cards, state)()
       } else {
+        // Always allow raising the card
         // Lower any currently raised card
         if (this.raisedCardIndex !== null) {
           const raisedCard = this.cards[this.raisedCardIndex]
@@ -252,9 +191,6 @@ export default class OurBoardRegion extends Region {
 
   // Modify displayState to lower any raised card when state changes
   displayState(state: GameModel): void {
-    // Reset raised card tracking
-    this.raisedCardIndex = null
-
     this.deleteTemp()
 
     // Until we have mulliganed, hide (Delete) all the cards in our hand
@@ -265,8 +201,6 @@ export default class OurBoardRegion extends Region {
       this.addCardHotkeys()
       this.cardHotkeysRegistered = true
     }
-
-    this.cardClicked = false
 
     // Add each of the cards in our hand
     this.cards = []
@@ -279,10 +213,15 @@ export default class OurBoardRegion extends Region {
         .setFocusOptions('Play')
         .moveToTopOnHover()
 
+      // If this was the raised card, raise it again
+      if (i === this.raisedCardIndex) {
+        card.container.setY(-HOVER_OFFSET)
+      }
+
       const cost = state.cardCosts[i]
       card.setOnHover(
         this.onCardHover(card, cost, i),
-        this.onCardExit(card, this.cards, i),
+        this.onCardExit(card, cost, i),
       )
 
       // Set whether the card shows as playable, and set its onclick
@@ -323,11 +262,7 @@ export default class OurBoardRegion extends Region {
     }
   }
 
-  private onCardExit(
-    card: CardImage,
-    cards: CardImage[],
-    index: number,
-  ): () => void {
+  private onCardExit(card: CardImage, cost: number, index: number): () => void {
     return () => {
       // Only hide cost, don't move card
       this.displayCostCallback(0)

@@ -121,6 +121,7 @@ export default class Card {
       id: 1003,
       points: amt,
       basePoints: 0,
+      text: 'Fleeting',
       qualities: [Quality.FLEETING],
     })
     game.create(player, card)
