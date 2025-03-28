@@ -24,6 +24,7 @@ import TheirBoardRegion from './matchRegions/theirBoard'
 import StoryRegion from './matchRegions/story'
 import OurScoreRegion from './matchRegions/ourScore'
 import MulliganRegion from './matchRegions/mulliganRegion'
+import PetRegion from './matchRegions/pet'
 
 // TODO Rename to Match
 export class GameScene extends BaseScene {
@@ -245,6 +246,9 @@ export class GameScene extends BaseScene {
     // Enable the searching region visual update
     this.view.searching.update(time, delta)
 
+    // Update pet
+    this.view.pet.update(time, delta)
+
     if (this.currentVersion + 1 in this.queuedStates) {
       let isDisplayed = this.displayState(
         this.queuedStates[this.currentVersion + 1],
@@ -358,6 +362,8 @@ export class View {
   // Class that animates everything that is animated
   animator: Animator
 
+  pet: PetRegion
+
   constructor(scene: GameScene, avatarId: number) {
     this.scene = scene
 
@@ -423,6 +429,9 @@ export class View {
     this.results.hide()
 
     this.animator = new Animator(scene, this)
+
+    // Create pet region
+    this.pet = new Regions.Pet().create(scene)
   }
 
   displayState(state: GameModel) {
@@ -461,6 +470,9 @@ export class View {
     if (state.sound !== null) {
       this.scene.playSound(state.sound)
     }
+
+    // Update pet
+    this.pet.displayState(state)
   }
 
   // Show the given overlay and hide all others
