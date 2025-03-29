@@ -337,6 +337,7 @@ export class CardImage {
       .rexBBCodeText(-1, 148, s, BBStyle.cardText)
       .setOrigin(0.5, 1)
       .setWordWrapWidth(Space.cardWidth)
+      .setVisible(s !== '')
 
     // Enable hovering to get hint
     let hint = this.scene.hint
