@@ -200,7 +200,7 @@ const pregnant = new Pregnant({
 
 class PassOn extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus + index)
+    super.play(player, game, index, bonus)
 
     game.create(player, heirloom)
   }
