@@ -24,7 +24,7 @@ import TheirBoardRegion from './matchRegions/theirBoard'
 import StoryRegion from './matchRegions/story'
 import OurScoreRegion from './matchRegions/ourScore'
 import MulliganRegion from './matchRegions/mulliganRegion'
-import PetRegion from './matchRegions/pet'
+import CompanionRegion from './matchRegions/companion'
 
 // TODO Rename to Match
 export class GameScene extends BaseScene {
@@ -362,7 +362,7 @@ export class View {
   // Class that animates everything that is animated
   animator: Animator
 
-  pet: PetRegion
+  pet: CompanionRegion
 
   constructor(scene: GameScene, avatarId: number) {
     this.scene = scene
@@ -431,7 +431,7 @@ export class View {
     this.animator = new Animator(scene, this)
 
     // Create pet region
-    this.pet = new Regions.Pet().create(scene)
+    this.pet = new Regions.Companion().create(scene)
   }
 
   displayState(state: GameModel) {

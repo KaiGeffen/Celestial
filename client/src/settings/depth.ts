@@ -2,6 +2,8 @@
 export const Depth: Record<string, number> = {
   discardPiles: -1,
 
+  companion: 0,
+
   theirAvatar: 1,
   ourAvatar: 1,
   storyAtDay: 0,

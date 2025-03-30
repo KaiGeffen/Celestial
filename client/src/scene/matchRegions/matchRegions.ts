@@ -13,7 +13,7 @@ import MulliganRegion from './mulliganRegion'
 import ResultsRegion from './results'
 import OurAvatarRegion from './ourAvatar'
 import TheirAvatarRegion from './theirAvatar'
-import PetRegion from './pet'
+import CompanionRegion from './companion'
 
 export default class Regions {
   static Searching = SearchingRegion
@@ -46,5 +46,5 @@ export default class Regions {
   static Mulligan = MulliganRegion
   static Results = ResultsRegion
 
-  static Pet = PetRegion
+  static Companion = CompanionRegion
 }

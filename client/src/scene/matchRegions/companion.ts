@@ -17,7 +17,7 @@ interface Butterfly {
   restingRotation?: number // The random rotation when resting
 }
 
-export default class PetRegion extends Region {
+export default class CompanionRegion extends Region {
   private butterflies: Butterfly[] = []
   private bounds: Phaser.Geom.Rectangle
   private spawnTimer: number = 0
@@ -47,7 +47,7 @@ export default class PetRegion extends Region {
     const width = Space.avatarSize + Space.pad * 2
     const height = Space.windowHeight - 500
 
-    this.container = scene.add.container(0, 250).setDepth(Depth.background + 1)
+    this.container = scene.add.container(0, 250).setDepth(Depth.companion)
     this.bounds = new Phaser.Geom.Rectangle(0, 0, width, height)
 
     // Create initial butterfly
