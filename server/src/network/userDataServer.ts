@@ -72,8 +72,6 @@ export default function createUserDataServer() {
         }
       })
         .on('refreshUserData', async () => {
-          console.log('Refreshing user data')
-          console.log('id is', id)
           if (!id) return
           const result = await db
             .select()
