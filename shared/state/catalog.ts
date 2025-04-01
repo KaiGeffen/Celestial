@@ -11,6 +11,7 @@ import * as waterCatalog from './catalog/water'
 import { child, seen, ashes, predator } from './catalog/tokens'
 import { Animation } from '../animation'
 import { Zone } from './zone'
+import { Keywords } from './keyword'
 
 // TODO Break out, make settings, and make dry this behavior
 class Paramountcy extends Card {

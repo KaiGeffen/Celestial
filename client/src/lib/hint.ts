@@ -30,6 +30,7 @@ export default class Hint {
     this.scene = scene
     this.container = scene.add.container().setDepth(40).setVisible(false)
 
+    // Textual part of hint
     this.txt = scene['rexUI'].add
       .BBCodeText(
         Space.windowWidth / 2,
@@ -39,8 +40,11 @@ export default class Hint {
       )
       .setOrigin(0.5, 1)
       .setAlign('center')
-
     this.container.add(this.txt)
+
+    // Cards
+    this.mainCard = new CardImage(null, this.container, false).hide()
+    this.referencedCard = new CardImage(null, this.container, false).hide()
 
     // Copy mouse position and show a hint when over a hinted object
     scene.input.on('pointermove', () => {
@@ -90,6 +94,8 @@ export default class Hint {
     }
 
     this.txt.setText(s).setFixedSize(0, 0)
+    this.mainCard.hide()
+    this.referencedCard.hide()
   }
 
   showCard(card: Card | string): Hint {
@@ -100,32 +106,22 @@ export default class Hint {
       card = Catalog.getCard(card)
     }
 
-    // Create the main card image if it doesn't exist
-    if (!this.mainCard) {
-      this.mainCard = new CardImage(card, this.container, false)
-    } else {
-      // Update existing card image
-      this.mainCard.destroy()
-      this.mainCard = new CardImage(card, this.container, false)
-    }
+    // Set the main card
+    this.mainCard.setCard(card)
 
-    // Get cards referenced by this card
-    const refs: Card[] = card.references.map((ref) => ref.card)
+    // Get card referenced by this card, if any
+    const refs: Card[] = card
+      .getReferencedCardNames()
+      .map((name) => Catalog.getCard(name))
 
-    // If there's a referenced card, create/update its image
+    // Set the referenced card, or hide if none
     if (refs.length > 0) {
-      // Remove the existing referenced card image if it exists
-      if (this.referencedCard) {
-        this.referencedCard.destroy()
-      }
-
-      // Create the new referenced card image
-      this.referencedCard = new CardImage(refs[0], this.container, false)
-    } else if (this.referencedCard) {
-      // Remove the referenced card image if there are no references
-      this.referencedCard.destroy()
+      this.referencedCard.setCard(refs[0])
+    } else {
+      this.referencedCard.hide()
     }
 
+    // TODO Update, this is off
     // Get all keywords present in this or any referenced card
     const keywordPosition: KeywordPosition[] = []
     ;[card, ...refs].forEach((card) => {

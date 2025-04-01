@@ -4,7 +4,8 @@ import { Act } from './story'
 import GameModel from './gameModel'
 import { Animation } from '../animation'
 import { Zone } from './zone'
-import { Keyword } from './keyword'
+import { Keyword, Keywords } from './keyword'
+import Catalog from './catalog'
 
 interface CardData {
   name?: string
@@ -293,8 +294,23 @@ export default class Card {
     return ''
   }
 
-  getReferencedCards(): Card[] {
-    return []
+  getReferencedCardNames(excludeKeywords = false): string[] {
+    let possibleCards = Catalog.allCards.map((card) => card.name)
+
+    if (excludeKeywords) {
+      possibleCards = possibleCards.filter(
+        (cardName) =>
+          !Keywords.getAll()
+            .map((kw) => kw.name)
+            .includes(cardName),
+      )
+    }
+
+    // Only return cards that actually appear in the text
+    return possibleCards.filter((cardName) => {
+      const regex = new RegExp(`\\b${cardName}\\b`, 'g')
+      return this.text.match(regex) !== null
+    })
   }
 }
 

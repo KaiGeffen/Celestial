@@ -55,17 +55,16 @@ export class CardImage {
   private init(card: Card, outerContainer: any, interactive: Boolean) {
     this.card = card
     this.scene = outerContainer.scene
+    this.createContainer(outerContainer)
 
     // Card image
     this.image = this.scene.add.image(0, 0, card.name)
     this.image.setDisplaySize(Space.cardWidth, Space.cardHeight)
+    this.container.add(this.image)
 
     // Stat text
     this.createStats()
     this.createText()
-
-    // This container
-    this.container = this.createContainer(outerContainer)
 
     if (!Flags.mobile) {
       this.image
@@ -193,6 +192,23 @@ export class CardImage {
     return this
   }
 
+  // Set this to be the given card, if it isn't already
+  setCard(card: Card): CardImage {
+    if (this.card.id !== card.id) {
+      this.card = card
+
+      // Destroy each of the existing elements
+      ;[this.txtCost, this.txtPoints, this.txtText].forEach((obj) => {
+        obj.destroy()
+      })
+
+      this.image.setTexture(card.name)
+      this.createStats()
+      this.createText()
+    }
+
+    return this
+  }
   // Set the displayed point value of the card, or hide it if it's equal to the default value
   setPoints(amt: number): CardImage {
     // TODO Generalize once it's not just pet and child that have dynamic version
@@ -221,30 +237,23 @@ export class CardImage {
     return this
   }
 
-  private createContainer(outerContainer): ContainerLite {
+  private createContainer(outerContainer): void {
     // Depending on the type of the outer container, need to do different things
-    let container
     if (outerContainer instanceof Phaser.GameObjects.Container) {
-      container = this.scene.add.container()
+      this.container = this.scene.add.container()
+      outerContainer.add(this.container)
     } else if (outerContainer instanceof ContainerLite) {
-      container = new ContainerLite(
+      this.container = new ContainerLite(
         this.scene,
         0,
         0,
         Space.cardWidth,
         Space.cardHeight,
       )
+      outerContainer.add(this.container)
     } else {
       throw 'CardImage was given a container that isnt of a correct type'
     }
-
-    // Add each of the objects
-    container.add([this.image, this.txtCost, this.txtPoints, this.txtText])
-
-    // Make outercontainer contain this container
-    outerContainer.add(container)
-
-    return container
   }
 
   private createStats(): void {
@@ -294,6 +303,8 @@ export class CardImage {
       this.txtCost.setInteractive()
       this.txtPoints.setInteractive()
     }
+
+    this.container.add([this.txtCost, this.txtPoints])
   }
 
   private createText(): void {
@@ -315,22 +326,13 @@ export class CardImage {
     }
 
     // Replace each reference to a card by changing its color, but ignore text inside specific BBCode tags
-    Catalog.allCards
-      .map((card) => card.name)
-      .filter(
-        (cardName) =>
-          !Keywords.getAll()
-            .map((kw) => kw.name)
-            .includes(cardName),
+    this.card.getReferencedCardNames(true).forEach((card) => {
+      const regex = new RegExp(`\\b${card}\\b`, 'g')
+      s = s.replace(
+        regex,
+        `[area=_${card}][color=#FABD5D]${card}[/color][/area]`,
       )
-      .forEach((cardName) => {
-        // Only avoid matching if between img= or area= and the next ]
-        const regex = new RegExp(`\\b${cardName}\\b`, 'g')
-        s = s.replace(
-          regex,
-          `[area=_${cardName}][color=#FABD5D]${cardName}[/color][/area]`,
-        )
-      })
+    })
 
     // Create the text
     this.txtText = this.scene.add
@@ -360,6 +362,8 @@ export class CardImage {
       })
       .setInteractive()
       .on('pointerdown', () => this.clickCallback())
+
+    this.container.add(this.txtText)
   }
 
   // Move this cardImage above everything else in its container when it's hovered
