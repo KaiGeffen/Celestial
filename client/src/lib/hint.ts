@@ -5,7 +5,7 @@ import { BBStyle, Time, Space } from '../settings/settings'
 import Card from '../../../shared/state/card'
 import { KeywordPosition } from '../../../shared/state/card'
 import Catalog from '../../../shared/state/catalog'
-import { Keywords } from '../../../shared/state/keyword'
+import { Keyword, Keywords } from '../../../shared/state/keyword'
 import { CardImage } from './cardImage'
 
 export default class Hint {
@@ -121,38 +121,21 @@ export default class Hint {
       this.referencedCard.hide()
     }
 
-    // TODO Update, this is off
-    // Get all keywords present in this or any referenced card
-    const keywordPosition: KeywordPosition[] = []
-    ;[card, ...refs].forEach((card) => {
-      card.keywords.forEach((kt) => {
-        // If this keyword hasn't been seen before, add this tuple (Including X value)
-        if (!keywordPosition.some((k) => k.name === kt.name)) {
-          keywordPosition.push(kt)
-        }
-      })
-    })
+    // Get all keywords present in the card text
+    const keywords: [Keyword, number][] = card.getKeywords()
 
     // If there are no keywords, set the size
-    if (keywordPosition.length === 0) {
+    if (!keywords) {
       const width =
         refs.length > 0
           ? Space.maxTextWidth + Space.pad
           : Space.cardWidth + Space.pad
       this.txt
-        .setText(`\n\n\n\n\n\n\n\n\n\n`)
+        .setText(`\n\n\n\n\n\n\n\n\n\n\n`)
         .setFixedSize(width, Space.cardHeight + Space.pad)
     } else {
-      // The hint relating to keywords
-      const keywordsText = getKeywordsText(keywordPosition)
-
-      // NOTE This is a hack because of a bug where card image renders with a single line's height
       this.txt
-        .setText(
-          `
-          \n\n\n\n\n\n\n\n\n\n
-          ${keywordsText}`,
-        )
+        .setText(`\n\n\n\n\n\n\n\n\n\n\n\n${getKeywordsText(keywords)}`)
         .setFixedSize(0, 0)
     }
 
@@ -252,16 +235,15 @@ export default class Hint {
 
 // For a list of keyword tuples (Which expresses a keyword and its value)
 // Get the hint text that should display
-function getKeywordsText(keywordPositions: KeywordPosition[]) {
+function getKeywordsText(keywords: [Keyword, number][]) {
   let result = ''
 
-  for (const keywordPosition of keywordPositions) {
-    const keyword = keywordPosition.name
+  for (const [keyword, value] of keywords) {
     let txt = keyword.text
 
-    if (keyword.hasX) {
+    if (value !== undefined) {
       // NOTE This is replaceAll, but supported on all architectures
-      txt = txt.split(/\bX\b/).join(`${keywordPosition.value}`)
+      txt = txt.split(/\bX\b/).join(`${value}`)
 
       // NOTE Special case for occurences of +X, where X could be -N, so you want -N instead of +-N
       txt = txt.split(/\+\-/).join('-')

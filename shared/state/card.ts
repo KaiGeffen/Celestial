@@ -310,8 +310,30 @@ export default class Card {
       return this.text.match(regex) !== null
     })
   }
+
+  getKeywords(): [Keyword, number][] {
+    const result: [Keyword, number][] = []
+
+    // Check each keyword for matches in the text
+    for (const keyword of Object.values(Keywords.getAll())) {
+      // Create a regex that matches the keyword name followed by optional positive/negative number
+      const regex = new RegExp(`\\b${keyword.name}[ ]*(-?\\d+)?\\b`, 'g')
+
+      // Find first match in the text
+      const match = regex.exec(this.text)
+      if (match) {
+        // match[0] is the full match (e.g., "Inspire 1")
+        // match[1] is the captured number (e.g., "1")
+        const amount = match[1] ? parseInt(match[1]) : undefined
+        result.push([keyword, amount])
+      }
+    }
+
+    return result
+  }
 }
 
+// TODO Remove this
 export interface KeywordPosition {
   name: Keyword
   x: number
