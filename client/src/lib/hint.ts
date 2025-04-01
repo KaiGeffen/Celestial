@@ -6,18 +6,30 @@ import Card from '../../../shared/state/card'
 import { KeywordPosition } from '../../../shared/state/card'
 import Catalog from '../../../shared/state/catalog'
 import { Keywords } from '../../../shared/state/keyword'
+import { CardImage } from './cardImage'
 
 export default class Hint {
-  txt: RexUIPlugin.BBCodeText
+  private scene: Phaser.Scene
+  private container: Phaser.GameObjects.Container
+
+  // The textual part
+  private txt: RexUIPlugin.BBCodeText
 
   // The X position to position flush to, or undefined if no pin
-  leftPin: number
+  private leftPin: number
 
   // Time in milliseconds that user has waited without moving cursor
-  waitTime = 0
-  skipWait = false
+  private waitTime = 0
+  private skipWait = false
+
+  // The card images shown in the hint
+  private mainCard: CardImage
+  private referencedCard: CardImage
 
   constructor(scene: Phaser.Scene) {
+    this.scene = scene
+    this.container = scene.add.container().setDepth(40).setVisible(false)
+
     this.txt = scene['rexUI'].add
       .BBCodeText(
         Space.windowWidth / 2,
@@ -26,15 +38,15 @@ export default class Hint {
         BBStyle.hint,
       )
       .setOrigin(0.5, 1)
-      .setDepth(40)
-      .setVisible(false)
       .setAlign('center')
+
+    this.container.add(this.txt)
 
     // Copy mouse position and show a hint when over a hinted object
     scene.input.on('pointermove', () => {
       this.orientText()
       if (!this.skipWait) {
-        this.txt.setAlpha(0)
+        this.container.setVisible(false)
         this.waitTime = 0
       }
     })
@@ -42,13 +54,13 @@ export default class Hint {
       if (this.waitTime < Time.hint && !this.skipWait) {
         this.waitTime += delta
       } else {
-        this.txt.setAlpha(1)
+        this.container.setVisible(true)
       }
     })
   }
 
   hide(): Hint {
-    this.txt.setVisible(false)
+    this.container.setVisible(false)
 
     // Reset the pin, since the next hovered item might not pin
     this.leftPin = undefined
@@ -58,7 +70,7 @@ export default class Hint {
 
   show(): Hint {
     this.orientText()
-    this.txt.setVisible(true)
+    this.container.setVisible(true)
 
     return this
   }
@@ -86,11 +98,33 @@ export default class Hint {
     // Get the card
     if (typeof card === 'string') {
       card = Catalog.getCard(card)
-      // card = getCard(card)
+    }
+
+    // Create the main card image if it doesn't exist
+    if (!this.mainCard) {
+      this.mainCard = new CardImage(card, this.container, false)
+    } else {
+      // Update existing card image
+      this.mainCard.destroy()
+      this.mainCard = new CardImage(card, this.container, false)
     }
 
     // Get cards referenced by this card
     const refs: Card[] = card.references.map((ref) => ref.card)
+
+    // If there's a referenced card, create/update its image
+    if (refs.length > 0) {
+      // Remove the existing referenced card image if it exists
+      if (this.referencedCard) {
+        this.referencedCard.destroy()
+      }
+
+      // Create the new referenced card image
+      this.referencedCard = new CardImage(refs[0], this.container, false)
+    } else if (this.referencedCard) {
+      // Remove the referenced card image if there are no references
+      this.referencedCard.destroy()
+    }
 
     // Get all keywords present in this or any referenced card
     const keywordPosition: KeywordPosition[] = []
@@ -102,13 +136,6 @@ export default class Hint {
         }
       })
     })
-
-    // FOR TESTING TODO Flag to include
-    if (!this.txt.scene.textures.exists(card.name)) {
-      const s = `${card.name}\n${card.cost}:${card.points}\n${card.text}`
-      this.showText(s)
-      return this
-    }
 
     // String for all referenced cards
     const referencedImages = refs.map((card) => ` [img=${card.name}]`).join()
@@ -124,8 +151,6 @@ export default class Hint {
       // The hint relating to keywords
       const keywordsText = getKeywordsText(keywordPosition)
 
-      this.showText(keywordsText)
-
       // NOTE This is a hack because of a bug where card image renders with a single line's height
       this.txt
         .setText(
@@ -138,37 +163,6 @@ export default class Hint {
 
     return this
   }
-
-  // // Get the hint text for the card
-  // let hintText = getHintText(card)
-  // const referencedImages = card
-  //   .getReferencedCards()
-  //   .map((card) => {
-  //     return ` [img=${card.name}]`
-  //   })
-  //   .join()
-  // if (hintText !== '') {
-  //   this.showText(hintText)
-
-  //   // NOTE This is a hack because of a bug where card image renders with a single line's height
-  //   this.txt
-  //     .setText(`[img=${card.name}]`)
-  //     .appendText(`[color=grey]${referencedImages}[/color]`)
-  //     .appendText('\n\n\n\n\n\n\n\n\n\n\n\n')
-  //     .appendText(`\n${hintText}`)
-  //     .setFixedSize(0, 0)
-  // } else {
-  //   const width =
-  //     card.getReferencedCards().length > 0
-  //       ? Space.maxTextWidth + Space.pad
-  //       : Space.cardWidth + Space.pad
-  //   this.txt
-  //     .setText(`[img=${card.name}]`)
-  //     .appendText(`${referencedImages}`)
-  //     .setFixedSize(width, Space.cardHeight + Space.pad)
-  // }
-
-  // return this
 
   // TODO Use in more places, instead of forming a string then passing to showText
   showKeyword(name: string, x: string = 'X'): void {
@@ -190,18 +184,40 @@ export default class Hint {
     const pointer = this.txt.scene.game.input.activePointer
 
     // Unless there is a left pin, center and hover above the mouse position
+    let x: number
+    let y: number
     if (this.leftPin === undefined) {
-      this.txt
-        .setX(pointer.position.x)
-        .setOrigin(0.5, 1)
-        .setY(pointer.position.y - Space.pad)
+      x = pointer.position.x
+      y = pointer.position.y - Space.pad
+      this.txt.setX(x).setOrigin(0.5, 1).setY(y)
+
+      // Adjust y for cards
+      y = y - this.txt.height + Space.cardHeight / 2 + Space.padSmall
     }
     // If there is a pin, go just to the right of that
     else {
-      this.txt
-        .setX(this.leftPin + Space.pad)
-        .setOrigin(0, 0.5)
-        .setY(pointer.position.y)
+      x = this.leftPin + Space.pad
+      y = pointer.position.y
+      this.txt.setX(x).setOrigin(0, 0.5).setY(y)
+
+      // Adjust x,y for the cards
+      x += this.txt.width / 2
+      y = y - this.txt.height / 2 + Space.padSmall + Space.cardHeight / 2
+    }
+
+    // Position main and referenced card images above text
+    if (this.referencedCard) {
+      // Position referenced card to the right
+      this.referencedCard.setPosition([
+        x + Space.cardWidth / 2 + Space.padSmall / 2,
+        y,
+      ])
+
+      // Adjust x of main card to be to the left
+      x -= Space.cardWidth / 2 + Space.padSmall / 2
+    }
+    if (this.mainCard) {
+      this.mainCard.setPosition([x, y])
     }
 
     this.ensureOnScreen()
@@ -228,6 +244,14 @@ export default class Hint {
     }
 
     txt.setPosition(txt.x + dx, txt.y + dy)
+    this.mainCard?.setPosition([
+      this.mainCard.container.x + dx,
+      this.mainCard.container.y + dy,
+    ])
+    this.referencedCard?.setPosition([
+      this.referencedCard.container.x + dx,
+      this.referencedCard.container.y + dy,
+    ])
   }
 }
 
