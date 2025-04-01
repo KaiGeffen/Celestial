@@ -9,7 +9,6 @@ import { Keywords } from '../../../shared/state/keyword'
 import { CardImage } from './cardImage'
 
 export default class Hint {
-  private scene: Phaser.Scene
   private container: Phaser.GameObjects.Container
 
   // The textual part
@@ -27,7 +26,6 @@ export default class Hint {
   private referencedCard: CardImage
 
   constructor(scene: Phaser.Scene) {
-    this.scene = scene
     this.container = scene.add.container().setDepth(40).setVisible(false)
 
     // Textual part of hint
@@ -54,10 +52,11 @@ export default class Hint {
       }
     })
     scene.events.on('update', (time, delta) => {
-      if (this.waitTime < Time.hint && !this.skipWait) {
+      if (!this.txt.scene) return
+      else if (this.waitTime < Time.hint && !this.skipWait) {
         this.waitTime += delta
         // Could also check that moving has happened, so not orienting every frame after timer runs out
-      } else if (this.txt.text !== '') {
+      } else {
         this.orientText()
         this.container.setAlpha(1)
       }
@@ -134,15 +133,14 @@ export default class Hint {
       })
     })
 
-    // String for all referenced cards
-    const referencedImages = refs.map((card) => ` [img=${card.name}]`).join()
+    // If there are no keywords, set the size
     if (keywordPosition.length === 0) {
       const width =
-        referencedImages.length > 0
+        refs.length > 0
           ? Space.maxTextWidth + Space.pad
           : Space.cardWidth + Space.pad
       this.txt
-        .setText(`[img=${card.name}]${referencedImages}`)
+        .setText(`\n\n\n\n\n\n\n\n\n\n`)
         .setFixedSize(width, Space.cardHeight + Space.pad)
     } else {
       // The hint relating to keywords
@@ -151,7 +149,7 @@ export default class Hint {
       // NOTE This is a hack because of a bug where card image renders with a single line's height
       this.txt
         .setText(
-          `[img=${card.name}][color=grey]${referencedImages}[/color]
+          `
           \n\n\n\n\n\n\n\n\n\n
           ${keywordsText}`,
         )
