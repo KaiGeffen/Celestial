@@ -48,17 +48,18 @@ export default class Hint {
 
     // Copy mouse position and show a hint when over a hinted object
     scene.input.on('pointermove', () => {
-      this.orientText()
       if (!this.skipWait) {
-        this.container.setVisible(false)
+        this.container.setAlpha(0)
         this.waitTime = 0
       }
     })
     scene.events.on('update', (time, delta) => {
       if (this.waitTime < Time.hint && !this.skipWait) {
         this.waitTime += delta
-      } else {
-        this.container.setVisible(true)
+        // Could also check that moving has happened, so not orienting every frame after timer runs out
+      } else if (this.txt.text !== '') {
+        this.orientText()
+        this.container.setAlpha(1)
       }
     })
   }
