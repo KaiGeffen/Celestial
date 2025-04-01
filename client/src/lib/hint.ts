@@ -107,7 +107,7 @@ export default class Hint {
     }
 
     // Set the main card
-    this.mainCard.setCard(card)
+    this.mainCard.setCard(card).show()
 
     // Get card referenced by this card, if any
     const refs: Card[] = card
@@ -116,7 +116,7 @@ export default class Hint {
 
     // Set the referenced card, or hide if none
     if (refs.length > 0) {
-      this.referencedCard.setCard(refs[0])
+      this.referencedCard.setCard(refs[0]).show()
     } else {
       this.referencedCard.hide()
     }
@@ -202,7 +202,7 @@ export default class Hint {
     }
 
     // Position main and referenced card images above text
-    if (this.referencedCard) {
+    if (this.referencedCard.visible) {
       // Position referenced card to the right
       this.referencedCard.setPosition([
         x + Space.cardWidth / 2 + Space.padSmall / 2,

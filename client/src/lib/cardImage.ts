@@ -18,6 +18,7 @@ export class CardImage {
 
   card: Card
   image: Phaser.GameObjects.Image
+  visible = true
 
   // Visual elements that appear on the cardImage
   txtCost: BBCodeText
@@ -100,12 +101,14 @@ export class CardImage {
 
   show(): CardImage {
     this.container.setVisible(true)
+    this.visible = true
 
     return this
   }
 
   hide(): CardImage {
     this.container.setVisible(false)
+    this.visible = false
 
     return this
   }
@@ -326,7 +329,7 @@ export class CardImage {
     }
 
     // Replace each reference to a card by changing its color, but ignore text inside specific BBCode tags
-    this.card.getReferencedCardNames(true).forEach((card) => {
+    this.card.getReferencedCardNames().forEach((card) => {
       const regex = new RegExp(`\\b${card}\\b`, 'g')
       s = s.replace(
         regex,

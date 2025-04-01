@@ -294,17 +294,15 @@ export default class Card {
     return ''
   }
 
-  getReferencedCardNames(excludeKeywords = false): string[] {
-    let possibleCards = Catalog.allCards.map((card) => card.name)
-
-    if (excludeKeywords) {
-      possibleCards = possibleCards.filter(
+  getReferencedCardNames(): string[] {
+    let possibleCards = Catalog.allCards
+      .map((card) => card.name)
+      .filter(
         (cardName) =>
           !Keywords.getAll()
             .map((kw) => kw.name)
             .includes(cardName),
       )
-    }
 
     // Only return cards that actually appear in the text
     return possibleCards.filter((cardName) => {
