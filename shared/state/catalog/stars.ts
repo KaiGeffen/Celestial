@@ -211,7 +211,7 @@ class Dreamer extends Card {
     super.play(player, game, index, bonus)
 
     if (game.hand[player].length === 0) {
-      game.draw(1, player)
+      game.draw(player, 1)
     }
   }
 }
@@ -243,6 +243,33 @@ const pride = new Pride({
   beta: true,
 })
 
+class Hero extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    // Departure
+    if (super.exhale(5, game, player)) {
+      bonus += 5
+    }
+
+    super.play(player, game, index, bonus)
+
+    // Initiation
+    if (super.exhale(3, game, player)) {
+      game.removeAct(0)
+    }
+
+    // Return
+    if (super.exhale(1, game, player)) {
+      super.inspire(1, game, player)
+    }
+  }
+}
+const hero = new Hero({
+  name: 'Hero',
+  id: 7369,
+  text: 'Exhale 5: Worth +5.\nExhale 3: Discard the next card in the story.\nExhale 1: Inspire 1.',
+  beta: true,
+})
+
 export {
   stars,
   cosmos,
@@ -257,5 +284,5 @@ export {
   radiantCore,
   dreamer,
   pride,
-  // TODO 1
+  hero,
 }
