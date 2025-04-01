@@ -124,14 +124,15 @@ export default class Hint {
     // Get all keywords present in the card text
     const keywords: [Keyword, number][] = card.getKeywords()
 
+    console.log('keywords', keywords)
     // If there are no keywords, set the size
-    if (!keywords) {
+    if (keywords.length === 0) {
       const width =
         refs.length > 0
           ? Space.maxTextWidth + Space.pad
           : Space.cardWidth + Space.pad
       this.txt
-        .setText(`\n\n\n\n\n\n\n\n\n\n\n`)
+        .setText(`\n\n\n\n\n\n\n\n\n\n`)
         .setFixedSize(width, Space.cardHeight + Space.pad)
     } else {
       this.txt

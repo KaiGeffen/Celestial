@@ -322,8 +322,6 @@ export default class Card {
       // Find first match in the text
       const match = regex.exec(this.text)
       if (match) {
-        // match[0] is the full match (e.g., "Inspire 1")
-        // match[1] is the captured number (e.g., "1")
         const amount = match[1] ? parseInt(match[1]) : undefined
         result.push([keyword, amount])
       }
