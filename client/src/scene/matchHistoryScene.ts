@@ -816,7 +816,7 @@ export default class MatchHistoryScene extends BaseScene {
       } else {
         // If it isn't, create a new cutout
         const card = Catalog.getCardById(cardId)
-        // TODO Error here, shouldn't happen
+        // TODO This shouldn't happen, consider throwing an error
         if (!card) {
           continue
         }
@@ -829,7 +829,6 @@ export default class MatchHistoryScene extends BaseScene {
           Space.cutoutHeight,
         )
         const cutout = new Cutout(container, card)
-        cutout.setDepth(1)
         sizer.add(container)
         cutouts[cardId] = cutout
       }
