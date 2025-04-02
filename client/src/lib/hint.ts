@@ -110,9 +110,9 @@ export default class Hint {
     this.mainCard.setCard(card).show()
 
     // Get card referenced by this card, if any
-    const refs: Card[] = card
-      .getReferencedCardNames()
-      .map((name) => Catalog.getCard(name))
+    const refs: Card[] = Catalog.getReferencedCardNames(card).map((name) =>
+      Catalog.getCard(name),
+    )
 
     // Set the referenced card, or hide if none
     if (refs.length > 0) {
@@ -122,7 +122,7 @@ export default class Hint {
     }
 
     // Get all keywords present in the card text
-    const keywords: [Keyword, number][] = card.getKeywords()
+    const keywords: [Keyword, number][] = Catalog.getKeywords(card)
 
     console.log('keywords', keywords)
     // If there are no keywords, set the size

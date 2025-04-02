@@ -329,13 +329,13 @@ export class CardImage {
     }
 
     // Replace each reference to a card by changing its color, but ignore text inside specific BBCode tags
-    // this.card.getReferencedCardNames().forEach((card) => {
-    //   const regex = new RegExp(`\\b${card}\\b`, 'g')
-    //   s = s.replace(
-    //     regex,
-    //     `[area=_${card}][color=#FABD5D]${card}[/color][/area]`,
-    //   )
-    // })
+    Catalog.getReferencedCardNames(this.card).forEach((card) => {
+      const regex = new RegExp(`\\b${card}\\b`, 'g')
+      s = s.replace(
+        regex,
+        `[area=_${card}][color=#FABD5D]${card}[/color][/area]`,
+      )
+    })
 
     // Create the text
     this.txtText = this.scene.add

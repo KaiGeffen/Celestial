@@ -4,8 +4,7 @@ import { Act } from './story'
 import GameModel from './gameModel'
 import { Animation } from '../animation'
 import { Zone } from './zone'
-import { Keyword, Keywords } from './keyword'
-// import Catalog from './catalog'
+import { Keyword } from './keyword'
 
 interface CardData {
   name?: string
@@ -292,43 +291,6 @@ export default class Card {
   // TODO The below are just for client (Mobile focus menu)
   getHintText(): string {
     return ''
-  }
-
-  getReferencedCardNames(): string[] {
-    return []
-    // let possibleCards = Catalog.allCards
-    //   .map((card) => card.name)
-    //   .filter(
-    //     (cardName) =>
-    //       !Keywords.getAll()
-    //         .map((kw) => kw.name)
-    //         .includes(cardName),
-    //   )
-
-    // // Only return cards that actually appear in the text
-    // return possibleCards.filter((cardName) => {
-    //   const regex = new RegExp(`\\b${cardName}\\b`, 'g')
-    //   return this.text.match(regex) !== null
-    // })
-  }
-
-  getKeywords(): [Keyword, number][] {
-    const result: [Keyword, number][] = []
-
-    // Check each keyword for matches in the text
-    for (const keyword of Object.values(Keywords.getAll())) {
-      // Create a regex that matches the keyword name followed by optional positive/negative number
-      const regex = new RegExp(`\\b${keyword.name}[ ]*(-?\\d+)?\\b`, 'g')
-
-      // Find first match in the text
-      const match = regex.exec(this.text)
-      if (match) {
-        const amount = match[1] ? parseInt(match[1]) : undefined
-        result.push([keyword, amount])
-      }
-    }
-
-    return result
   }
 }
 
