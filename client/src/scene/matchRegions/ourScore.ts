@@ -26,6 +26,9 @@ export default class OurScoreRegion extends Region {
   breathHover: Phaser.GameObjects.Image[] = []
   breathOom: Phaser.GameObjects.Image[] = []
 
+  // Relic icon
+  relic: Phaser.GameObjects.Image
+
   create(scene: GameScene): this {
     this.scene = scene
     this.container = scene.add
@@ -35,6 +38,7 @@ export default class OurScoreRegion extends Region {
     this.createBackground()
 
     this.createWins()
+    this.createRelic()
     this.createBreath()
 
     return this
@@ -50,7 +54,11 @@ export default class OurScoreRegion extends Region {
     const s = `${state.breath[0]}/${state.maxBreath[0]}`
     this.txtBreath.setText(s)
 
-    this.txtWins.setText(`${Flags.mobile ? 'Wins: ' : ''}${state.wins[0]}/5`)
+    // Wins
+    this.txtWins.setText(`${state.wins[0]}/5`)
+
+    // Relic
+    this.relic.setFrame(state.wins[0])
   }
 
   // Display a given breath cost
@@ -94,6 +102,13 @@ export default class OurScoreRegion extends Region {
       .layout()
 
     this.container.add(winsSizer)
+  }
+
+  private createRelic(): void {
+    this.relic = this.scene.add
+      .image(width / 2, 0, 'icon-Relic')
+      .setOrigin(0.5, 1)
+    this.container.add(this.relic)
   }
 
   private createBreath(): void {

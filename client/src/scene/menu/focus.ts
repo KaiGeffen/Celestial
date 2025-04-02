@@ -35,14 +35,13 @@ export default class FocusMenu extends Menu {
     getCount: () => number,
   ): void {
     // TODO Generalize when cards have more than 1 reference max
-    let refs = card.getReferencedCards()
-    if (refs.length > 0) {
-      this.createReferenceContent(card, refs[0])
-    }
-
-    this.createKeywords(card)
-    this.createCard(card, cost)
-    this.createButtons(callback, btnString, closeOnClick, getCount)
+    // let refs = card.getReferencedCardNames()
+    // if (refs.length > 0) {
+    //   this.createReferenceContent(card, refs[0])
+    // }
+    // this.createKeywords(card)
+    // this.createCard(card, cost)
+    // this.createButtons(callback, btnString, closeOnClick, getCount)
   }
 
   private createKeywords(card: Card): void {

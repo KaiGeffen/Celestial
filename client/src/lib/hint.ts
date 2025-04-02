@@ -15,7 +15,7 @@ export default class Hint {
   private txt: RexUIPlugin.BBCodeText
 
   // The X position to position flush to, or undefined if no pin
-  private leftPin: number
+  leftPin: number
 
   // Time in milliseconds that user has waited without moving cursor
   private waitTime = 0

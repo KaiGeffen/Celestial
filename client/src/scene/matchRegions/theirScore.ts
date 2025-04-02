@@ -27,6 +27,9 @@ export default class TheirScoreRegion extends Region {
 
   txtWins: Phaser.GameObjects.Text
 
+  // Relic icon
+  relic: Phaser.GameObjects.Image
+
   create(scene: GameScene): this {
     this.scene = scene
     this.container = scene.add
@@ -37,7 +40,7 @@ export default class TheirScoreRegion extends Region {
     this.createRecap()
     this.createSkip()
     this.createWins()
-
+    this.createRelic()
     this.addHotkeyListeners()
 
     return this
@@ -63,7 +66,11 @@ export default class TheirScoreRegion extends Region {
       this.btnSkip.setVisible(false)
     }
 
+    // Wins
     this.txtWins.setText(`${state.wins[1]}/5`)
+
+    // Relic
+    this.relic.setFrame(state.wins[1])
   }
 
   private addHotkeyListeners() {
@@ -126,5 +133,13 @@ export default class TheirScoreRegion extends Region {
 
     // Add sizer to container
     this.container.add(winsSizer)
+  }
+
+  private createRelic(): void {
+    this.relic = this.scene.add
+      .image(width / 2, height, 'icon-Relic')
+      .setRotation(Math.PI)
+      .setOrigin(0.5, 1)
+    this.container.add(this.relic)
   }
 }
