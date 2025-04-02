@@ -20,9 +20,12 @@ export class Keywords {
       Keywords.inspired,
       Keywords.nourish,
       Keywords.birth,
+      Keywords.exhale,
+      Keywords.refresh,
     ]
   }
 
+  // Qualities
   static visible = new Keyword(
     'Visible',
     "[color=#FABD5D]Visible[/color]: Both players can see this card while it's in the story.",
@@ -33,11 +36,22 @@ export class Keywords {
     '[color=#FABD5D]Fleeting[/color]: After resolving, this card is removed from the game.',
     false,
   )
+
+  // On play
+  static refresh = new Keyword(
+    'Refresh',
+    '[color=#FABD5D]Refresh[/color]: When played, put the leftmost card in your hand on the bottom of your deck, then draw a card if you did. Your opponent doesn’t see you do this.',
+    false,
+  )
+
+  // Triggers
   static morning = new Keyword(
     'Morning',
     '[color=#FABD5D]Morning[/color]: At the start of each round, if this is the top card of your discard pile, trigger the following effect.',
     false,
   )
+
+  // Abilities with X
   static sight = new Keyword(
     'Sight',
     '[color=#FABD5D]Sight X[/color]: Increase your Sight by X. Sight N makes the first N cards in the story visible to you, and is removed at end of round.',
@@ -61,6 +75,11 @@ export class Keywords {
   static birth = new Keyword(
     'Birth',
     '[color=#FABD5D]Birth X[/color]: If you have a Child in hand, increase its points by X. Otherwise create a 0:X [color=#FABD5D]Fleeting[/color] Child in hand.',
+    true,
+  )
+  static exhale = new Keyword(
+    'Exhale',
+    '[color=#FABD5D]Exhale X[/color]: If you can, spend X breath to trigger the following effect.',
     true,
   )
 }

@@ -138,7 +138,7 @@ const refresh = new Refresh({
   id: 200,
   cost: 1,
   points: 1,
-  text: 'When played, put the leftmost card in your hand on the bottom of your deck, then draw a card if you did. Your opponent doesn’t see you do this.',
+  text: 'Refresh',
   beta: true,
 })
 
@@ -160,7 +160,7 @@ const overflow = new Overflow({
   id: 201,
   cost: 3,
   points: -1,
-  text: 'Refresh.\nWorth +1 for each card in your hand.',
+  text: 'Refresh\nWorth +1 for each card in your hand.',
   beta: true,
 })
 
@@ -207,7 +207,7 @@ const cloud = new Cloud({
   id: 7202,
   cost: 5,
   points: 5,
-  text: 'Refresh.\nExhale 2: Draw 3 cards.',
+  text: 'Refresh\nExhale 2: Draw 3 cards.',
   beta: true,
 })
 
