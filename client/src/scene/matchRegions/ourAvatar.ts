@@ -29,6 +29,8 @@ export default class OurAvatarRegion extends Region {
     this.createAvatar()
     this.createStacks()
 
+    this.showUsername('Me O its me', 1409)
+
     this.addHotkeyListeners()
 
     return this
@@ -114,11 +116,15 @@ export default class OurAvatarRegion extends Region {
   }
 
   private createAvatar(): void {
-    this.avatar = new Buttons.Avatar(this.container, width / 2, 140).setQuality(
-      {
-        emotive: true,
-      },
-    )
+    const x = width / 2
+    const y = 140
+    this.avatar = new Buttons.Avatar(this.container, x, y).setQuality({
+      emotive: true,
+    })
+
+    // TODO Make Avatar be separate from border and take a config including cosmetics
+    const border = this.scene.add.image(x, y, 'icon-Border')
+    this.container.add(border)
   }
 
   private createStatusDisplay(): void {

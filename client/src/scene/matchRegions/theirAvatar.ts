@@ -36,6 +36,8 @@ export default class TheirAvatarRegion extends Region {
     this.createAvatar()
     this.createStacks()
 
+    this.showUsername('JustinTest', 999)
+
     this.addHotkeyListeners()
 
     return this
@@ -130,7 +132,13 @@ export default class TheirAvatarRegion extends Region {
   }
 
   private createAvatar(): void {
-    this.avatar = new Buttons.Avatar(this.container, width / 2, 80)
+    const x = width / 2
+    const y = 80
+    this.avatar = new Buttons.Avatar(this.container, x, y)
+
+    // TODO Make Avatar be separate from border and take a config including cosmetics
+    const border = this.scene.add.image(x, y, 'icon-Border')
+    this.container.add(border)
   }
 
   private createStatusDisplay(): void {
