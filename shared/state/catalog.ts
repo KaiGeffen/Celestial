@@ -86,8 +86,14 @@ export default class Catalog {
   }
 
   // Get all keywords present in a given card's text
-  static getKeywords(card: Card): [Keyword, number][] {
+  static getReferencedKeywords(card: Card): [Keyword, number][] {
     const result: [Keyword, number][] = []
+
+    const text =
+      card.text +
+      Catalog.getReferencedCardNames(card)
+        .map((name) => Catalog.getCard(name).text)
+        .join(' ')
 
     // Check each keyword for matches in the text
     for (const keyword of Object.values(Keywords.getAll())) {
@@ -95,7 +101,7 @@ export default class Catalog {
       const regex = new RegExp(`\\b${keyword.name}[ ]*(-?\\d+)?\\b`, 'g')
 
       // Find first match in the text
-      const match = regex.exec(card.text)
+      const match = regex.exec(text)
       if (match) {
         const amount = match[1] ? parseInt(match[1]) : undefined
         result.push([keyword, amount])

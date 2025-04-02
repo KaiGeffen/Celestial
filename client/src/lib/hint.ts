@@ -122,7 +122,7 @@ export default class Hint {
     }
 
     // Get all keywords present in the card text
-    const keywords: [Keyword, number][] = Catalog.getKeywords(card)
+    const keywords: [Keyword, number][] = Catalog.getReferencedKeywords(card)
 
     console.log('keywords', keywords)
     // If there are no keywords, set the size
