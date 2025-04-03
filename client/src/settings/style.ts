@@ -1,7 +1,6 @@
 // Settings relating to styles of text or bbcode throughout the app
 import 'phaser'
 import { Space, Color, Flags } from './settings'
-import { Line } from 'phaser3-rex-plugins/plugins/gameobjects/shape/shapes/geoms'
 
 // All fonts used
 const mainFont = 'Mulish'
@@ -152,6 +151,13 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     fontFamily: mainFont,
     fontSize: '24px',
     color: Color.todoScore,
+  },
+  todoCloud: {
+    fontFamily: altFont,
+    fontSize: '30px',
+    color: Color.passText,
+    stroke: '#fff',
+    strokeThickness: 2,
   },
   todoSubtext: {
     fontFamily: mainFont,
