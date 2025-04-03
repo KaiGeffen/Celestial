@@ -86,6 +86,20 @@ export class CardImage {
       })
     }
 
+    // NOTE Just for beta cards
+    if (this.card.beta) {
+      const name = this.scene.add
+        .text(
+          0,
+          -Space.cardHeight / 2 + Space.pad,
+          this.card.name,
+          Style.todoBetaCardName,
+        )
+        .setOrigin(0.5, 0)
+
+      this.container.add(name)
+    }
+
     if (interactive) {
       this.image.setInteractive()
     }

@@ -164,6 +164,11 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     fontSize: '12px',
     color: Color.todoSubtext,
   },
+  todoBetaCardName: {
+    fontFamily: mainFont,
+    fontSize: '30px',
+    color: Color.cardText,
+  },
 }
 
 // The styling for BBCode objects, from the rexui module
@@ -184,6 +189,7 @@ export const BBStyle: Record<string, any> = {
       width: Space.maxTextWidth,
     },
   },
+  // TODO This could be moved above, a BB can be instantiated with a normal style dictionary
   // Cost / Points shown above each card
   cardStats: {
     fontFamily: mainFont,
