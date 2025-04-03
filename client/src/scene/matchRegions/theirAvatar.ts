@@ -36,8 +36,6 @@ export default class TheirAvatarRegion extends Region {
     this.createAvatar()
     this.createStacks()
 
-    this.showUsername('JustinTest', 999)
-
     this.addHotkeyListeners()
 
     return this
