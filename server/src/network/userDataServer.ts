@@ -78,7 +78,6 @@ export default function createUserDataServer() {
             .from(players)
             .where(eq(players.id, id))
             .limit(1)
-          console.log('result is', result)
           if (result.length === 0) return
           await sendUserData(ws, id, result[0])
         })
