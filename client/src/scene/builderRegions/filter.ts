@@ -208,17 +208,6 @@ export default class FilterRegion {
         ${card.name}
         ${card.cost}
         ${card.points}`
-      // Add each keyword
-      for (let keyword of card.keywords) {
-        s += ` ${keyword.name.text}`
-      }
-      // Add each referenced card's text and its keyword text
-      for (let ref of card.references) {
-        s += ` ${ref.card.text}`
-        for (let keyword of ref.card.keywords) {
-          s += ` ${keyword.name.text}`
-        }
-      }
 
       // Compare inclusion without case
       const query = that.searchText.toLowerCase()

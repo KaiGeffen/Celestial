@@ -1,7 +1,6 @@
 import Card from '../card'
 import { Status } from '../status'
 import { Quality } from '../quality'
-import { Keywords } from '../keyword'
 import GameModel from '../gameModel'
 import { wound } from './tokens'
 
