@@ -7,22 +7,23 @@ import { KeywordLabel, ReferenceLabel } from '../lib/keywordLabel'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import BaseScene from '../scene/baseScene'
 import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
+import { Keywords } from '../../../shared/state/keyword'
 
 // The offset of cost / points
-const statOffset1 = Flags.mobile ? 15 : 25
-const statOffset2 = Flags.mobile ? 42 : 77
+const statOffset1 = 26
+const statOffset2 = 77
 
 export class CardImage {
   scene: BaseScene
 
   card: Card
   image: Phaser.GameObjects.Image
+  visible = true
 
   // Visual elements that appear on the cardImage
   txtCost: BBCodeText
   txtPoints: BBCodeText
-  keywords: KeywordLabel[] = []
-  references: ReferenceLabel[] = []
+  txtText: BBCodeText
 
   // A container just for this cardImage and elements within it
   container: ContainerLite | Phaser.GameObjects.Container
@@ -53,66 +54,18 @@ export class CardImage {
   }
 
   private init(card: Card, outerContainer: any, interactive: Boolean) {
-    let that = this
     this.card = card
-
-    let scene: BaseScene = outerContainer.scene
-    this.scene = scene
+    this.scene = outerContainer.scene
+    this.createContainer(outerContainer)
 
     // Card image
     this.image = this.scene.add.image(0, 0, card.name)
     this.image.setDisplaySize(Space.cardWidth, Space.cardHeight)
+    this.container.add(this.image)
 
     // Stat text
-    let hint = this.scene['hint']
-    this.txtCost = this.scene.add['rexBBCodeText'](
-      -Space.cardWidth / 2 + statOffset1,
-      -Space.cardHeight / 2 + statOffset1,
-      `${card.cost}`,
-      BBStyle.cardStats,
-    )
-      .setOrigin(0.5)
-      .setAlpha(card.beta ? 1 : 0.001)
-      .on('pointerover', () =>
-        hint.showText(`This card costs ${this.txtCost.text} breath to play.`),
-      )
-      .on('pointerout', () => {
-        this.onHoverExit()()
-        hint.hide()
-      })
-      .on('pointerdown', () => this.clickCallback())
-
-    this.txtPoints = this.scene.add['rexBBCodeText'](
-      -Space.cardWidth / 2 + statOffset1,
-      -Space.cardHeight / 2 + statOffset2,
-      `${card.points}`,
-      BBStyle.cardStats,
-    )
-      .setOrigin(0.5)
-      .on('pointerover', () =>
-        hint.showText(
-          `This card is worth ${this.txtPoints.text} point${card.points === 1 ? '' : 's'}.`,
-        ),
-      )
-      .on('pointerout', () => {
-        this.onHoverExit()()
-        hint.hide()
-      })
-      .on('pointerdown', () => this.clickCallback())
-    this.setPoints(card.points)
-
-    if (!Flags.mobile) {
-      // Make cost and points interactive
-      this.txtCost.setInteractive()
-      this.txtPoints.setInteractive()
-
-      // Add keywords and references
-      this.addKeywords()
-      this.addReferences()
-    }
-
-    // This container
-    this.container = this.createContainer(outerContainer)
+    this.createStats()
+    this.createText()
 
     if (!Flags.mobile) {
       this.image
@@ -136,41 +89,26 @@ export class CardImage {
     if (interactive) {
       this.image.setInteractive()
     }
-
-    // FOR TESTING TODO Flag to include
-    if (!this.scene.game.textures.exists(card.name)) {
-      this.image.setTint(0x000)
-
-      const s = `${card.name}\n${card.text}`
-      const txt = this.scene.add
-        .text(0, 0, s, Style.cardText)
-        .setWordWrapWidth(Space.cardWidth)
-        .setOrigin(0.5, 0.5)
-      this.container.add(txt)
-    }
   }
 
   destroy(): void {
-    ;[
-      this.image,
-      this.txtCost,
-      this.txtPoints,
-      ...this.keywords,
-      ...this.references,
-      this.container,
-    ].forEach((obj) => {
-      obj.destroy()
-    })
+    ;[this.image, this.txtCost, this.txtPoints, this.container].forEach(
+      (obj) => {
+        obj.destroy()
+      },
+    )
   }
 
   show(): CardImage {
     this.container.setVisible(true)
+    this.visible = true
 
     return this
   }
 
   hide(): CardImage {
     this.container.setVisible(false)
+    this.visible = false
 
     return this
   }
@@ -249,26 +187,38 @@ export class CardImage {
     if (cost !== null) {
       this.cost = cost
 
-      if (!this.card.beta && cost === this.card.cost) {
-        this.txtCost.setAlpha(0.001)
-      } else {
-        this.txtCost.setAlpha(1)
-      }
-
-      this.txtCost.setText(`[stroke=${Color.cardStatChanged}]${cost}[/stroke]`)
+      this.txtCost.setText(
+        `[b][stroke=${Color.cardStatChanged}]${cost}[/stroke][/b]`,
+      )
     }
 
     return this
   }
 
+  // Set this to be the given card, if it isn't already
+  setCard(card: Card): CardImage {
+    if (this.card.id !== card.id) {
+      this.card = card
+
+      // Destroy each of the existing elements
+      ;[this.txtCost, this.txtPoints, this.txtText].forEach((obj) => {
+        obj.destroy()
+      })
+
+      this.image.setTexture(card.name)
+      this.createStats()
+      this.createText()
+    }
+
+    return this
+  }
   // Set the displayed point value of the card, or hide it if it's equal to the default value
   setPoints(amt: number): CardImage {
     // TODO Generalize once it's not just pet and child that have dynamic version
     if (this.card.points !== this.card.basePoints || this.card.beta) {
-      this.txtPoints.setAlpha(1)
-      this.txtPoints.setText(`[stroke=${Color.cardStatChanged}]${amt}[/stroke]`)
-    } else {
-      this.txtPoints.setAlpha(0.001)
+      this.txtPoints.setText(
+        `[b][stroke=${Color.cardStatChanged}]${amt}[/stroke][/b]`,
+      )
     }
 
     return this
@@ -290,73 +240,133 @@ export class CardImage {
     return this
   }
 
-  private createContainer(outerContainer): ContainerLite {
+  private createContainer(outerContainer): void {
     // Depending on the type of the outer container, need to do different things
-    let container
     if (outerContainer instanceof Phaser.GameObjects.Container) {
-      container = this.scene.add.container()
+      this.container = this.scene.add.container()
+      outerContainer.add(this.container)
     } else if (outerContainer instanceof ContainerLite) {
-      container = new ContainerLite(
+      this.container = new ContainerLite(
         this.scene,
         0,
         0,
         Space.cardWidth,
         Space.cardHeight,
       )
+      outerContainer.add(this.container)
     } else {
       throw 'CardImage was given a container that isnt of a correct type'
     }
-
-    // Add each of the objects
-    container.add([
-      this.image,
-      this.txtCost,
-      this.txtPoints,
-      ...this.keywords,
-      ...this.references,
-    ])
-
-    // Make outercontainer contain this container
-    outerContainer.add(container)
-
-    return container
   }
 
-  private addKeywords(): void {
-    let that = this
+  private createStats(): void {
+    let hint = this.scene.hint
 
-    this.card.keywords.forEach((keywordTuple: KeywordPosition) => {
-      let keyword = new KeywordLabel(
-        this.scene,
-        keywordTuple.name,
-        keywordTuple.x,
-        keywordTuple.y,
-        keywordTuple.value,
-        () => {
-          that.clickCallback()
-        },
+    // Cost
+    this.txtCost = this.scene.add['rexBBCodeText'](
+      -Space.cardWidth / 2 + statOffset1,
+      -Space.cardHeight / 2 + statOffset1,
+      `[b]${this.card.cost}[/b]`,
+      BBStyle.cardStats,
+    )
+      .setVisible(this.card.id !== Catalog.cardback.id)
+      .setOrigin(0.5)
+      .on('pointerover', () =>
+        hint.showText(`This card costs ${this.txtCost.text} breath to play.`),
       )
+      .on('pointerout', () => {
+        this.onHoverExit()()
+        hint.hide()
+      })
+      .on('pointerdown', () => this.clickCallback())
 
-      this.keywords.push(keyword)
-    })
+    // Points
+    this.txtPoints = this.scene.add['rexBBCodeText'](
+      -Space.cardWidth / 2 + statOffset1,
+      -Space.cardHeight / 2 + statOffset2,
+      `[b]${this.card.points}[/b]`,
+      BBStyle.cardStats,
+    )
+      .setVisible(this.card.id !== Catalog.cardback.id)
+      .setOrigin(0.5)
+      .on('pointerover', () =>
+        hint.showText(
+          `This card is worth ${this.txtPoints.text} point${this.card.points === 1 ? '' : 's'}.`,
+        ),
+      )
+      .on('pointerout', () => {
+        this.onHoverExit()()
+        hint.hide()
+      })
+      .on('pointerdown', () => this.clickCallback())
+    this.setPoints(this.card.points)
+
+    if (!Flags.mobile) {
+      // Make cost and points interactive
+      this.txtCost.setInteractive()
+      this.txtPoints.setInteractive()
+    }
+
+    this.container.add([this.txtCost, this.txtPoints])
   }
 
-  private addReferences(): void {
-    let that = this
+  private createText(): void {
+    let s = this.card.text
 
-    this.card.references.forEach((referencePosition) => {
-      let reference = new ReferenceLabel(
-        this.scene,
-        referencePosition.card,
-        referencePosition.x,
-        referencePosition.y,
-        () => {
-          that.clickCallback()
-        },
+    // Replace each keyword with the appropriate image
+    for (const keyword of Object.values(Keywords.getAll())) {
+      // Create a regex that matches the keyword name followed by optional positive/negative number
+      const regex = new RegExp(`\\b${keyword.name}[ ]*(-?\\d+)?\\b`, 'g')
+
+      s = s.replace(regex, (match, value) => {
+        // If there's a value (like "Nourish 3"), include it in the image name
+        if (value) {
+          return `[area=${keyword.name}_${value}][color=#FABD5D]${keyword.name} ${value}[/color][/area]`
+        }
+        // Otherwise just use the keyword name (like "Birth")
+        return `[area=${keyword.name}][color=#FABD5D]${keyword.name} [/color][/area]`
+      })
+    }
+
+    // Replace each reference to a card by changing its color, but ignore text inside specific BBCode tags
+    Catalog.getReferencedCardNames(this.card).forEach((card) => {
+      const regex = new RegExp(`\\b${card}\\b`, 'g')
+      s = s.replace(
+        regex,
+        `[area=_${card}][color=#FABD5D]${card}[/color][/area]`,
       )
-
-      this.references.push(reference)
     })
+
+    // Create the text
+    this.txtText = this.scene.add
+      .rexBBCodeText(-1, 148, s, BBStyle.cardText)
+      .setOrigin(0.5, 1)
+      .setWordWrapWidth(Space.cardWidth)
+      .setVisible(s !== '')
+
+    // Enable hovering to get hint
+    let hint = this.scene.hint
+    this.txtText
+      .on('areaover', (key: string) => {
+        if (key[0] === '_') {
+          hint.showCard(key.slice(1))
+        } else {
+          // Keyword X values are stored after an underscore
+          if (key.includes('_')) {
+            const [name, x] = key.split('_')
+            hint.showKeyword(name, x)
+          } else {
+            hint.showKeyword(key)
+          }
+        }
+      })
+      .on('areaout', () => {
+        hint.hide()
+      })
+      .setInteractive()
+      .on('pointerdown', () => this.clickCallback())
+
+    this.container.add(this.txtText)
   }
 
   // Move this cardImage above everything else in its container when it's hovered
@@ -469,12 +479,7 @@ export class CardImage {
 
       // Check if any of the internal elements are highlighted (Keywords, references, etc)
       let overInternal = false
-      ;[
-        this.txtCost,
-        this.txtPoints,
-        ...this.keywords,
-        ...this.references,
-      ].forEach((obj) => {
+      ;[this.txtCost, this.txtPoints, this.txtText].forEach((obj) => {
         if (obj.getBounds().contains(pointer.x, pointer.y)) {
           overInternal = true
         }
@@ -499,16 +504,12 @@ export class CardImage {
     this.image.setTint(color)
     this.txtCost.setTint(color)
     this.txtPoints.setTint(color)
-
-    this.keywords.forEach((keyword) => keyword.setTint(color))
   }
 
   private clearTint(): void {
     this.image.clearTint()
     this.txtCost.clearTint()
     this.txtPoints.clearTint()
-
-    this.keywords.forEach((keyword) => keyword.clearTint())
   }
 
   /**
@@ -534,53 +535,6 @@ export class CardImage {
     })
 
     return this
-  }
-}
-
-// A CardImage whose components are highlighted and send a callback once they have each been hovered
-export class TutorialCardImage extends CardImage {
-  // Highlighted components that must be hovered before moving on
-  components = []
-
-  // Takes a callback for when each component has been hovered
-  highlightComponents(callback: () => void) {
-    // Make cost and points visible
-    this.txtCost.setAlpha(1).setText(`${this.card.cost}`)
-    this.txtPoints.setAlpha(1).setText(`${this.card.points}`)
-
-    // Define components
-    this.components = [this.txtCost, this.txtPoints, ...this.keywords]
-
-    // Highlight each component
-    var postFxPlugin = this.scene.plugins.get('rexOutlinePipeline')
-    this.components.forEach((component) => {
-      postFxPlugin['add'](component, {
-        thickness: Space.highlightWidth,
-        outlineColor: Color.outline,
-        quality: 0.3,
-      })
-
-      // When a component is hovered, stop highlighting and check if all highlights are gone
-      component.setInteractive().on('pointerover', () => {
-        // Make text invisible (Normal)
-        if (component === this.txtCost || component === this.txtPoints) {
-          component.setAlpha(0.001)
-        }
-
-        // Remove highlight
-        postFxPlugin['remove'](component)
-
-        // Remove component from list of components
-        const index = this.components.indexOf(component)
-        if (index > -1) {
-          this.components.splice(index, 1)
-        }
-
-        if (this.components.length === 0) {
-          callback()
-        }
-      })
-    })
   }
 }
 

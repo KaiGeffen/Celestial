@@ -28,8 +28,8 @@ export default class PassRegion extends Region {
   btnPass: Button
   btnMoon: Button
 
-  txtYouPassed: Phaser.GameObjects.Text
-  txtTheyPassed: Phaser.GameObjects.Text
+  yourPass: Phaser.GameObjects.Container
+  theirPass: Phaser.GameObjects.Container
 
   create(scene: GameScene): PassRegion {
     this.scene = scene
@@ -69,22 +69,22 @@ export default class PassRegion extends Region {
 
     // Show who has passed
     if (state.passes === 2) {
-      this.animatePass(this.txtYouPassed, true)
-      this.animatePass(this.txtTheyPassed, true)
+      this.animatePass(this.yourPass, true)
+      this.animatePass(this.theirPass, true)
     } else if (state.passes === 1) {
       // My turn, so they passed
       if (state.priority === 0) {
-        this.animatePass(this.txtYouPassed, false)
-        this.animatePass(this.txtTheyPassed, true)
+        this.animatePass(this.yourPass, false)
+        this.animatePass(this.theirPass, true)
       }
       // Their turn, so I passed
       else {
-        this.animatePass(this.txtYouPassed, true)
-        this.animatePass(this.txtTheyPassed, false)
+        this.animatePass(this.yourPass, true)
+        this.animatePass(this.theirPass, false)
       }
     } else {
-      this.animatePass(this.txtYouPassed, false)
-      this.animatePass(this.txtTheyPassed, false)
+      this.animatePass(this.yourPass, false)
+      this.animatePass(this.theirPass, false)
     }
 
     // Enable/disable button based on who has priority
@@ -170,29 +170,59 @@ export default class PassRegion extends Region {
   }
 
   private createText(): void {
-    this.txtYouPassed = this.scene.add
-      .text(-150, 120, 'You Passed', Style.basic)
-      .setOrigin(0.5)
+    // Create containers for each pass indicator
+    this.theirPass = this.scene.add.container(-150, -100).setAlpha(0)
+    this.yourPass = this.scene.add.container(-150, 100).setAlpha(0)
 
-    this.txtTheyPassed = this.scene.add
-      .text(-150, -120, 'They Passed', Style.basic)
+    // Them
+    const cloud = this.scene.add.image(0, 0, 'icon-Cloud')
+    const text = this.scene.add
+      .text(0, 20, 'Passed', Style.todoCloud)
       .setOrigin(0.5)
+    this.theirPass.add([cloud, text])
 
-    this.container.add([this.txtYouPassed, this.txtTheyPassed])
+    // Me
+    const cloud2 = this.scene.add.image(0, -20, 'icon-Cloud2')
+    const text2 = this.scene.add
+      .text(0, 0, 'Passed', Style.todoCloud)
+      .setOrigin(0.5)
+    this.yourPass.add([cloud2, text2])
+
+    // Add containers to the main container
+    this.container.add([this.yourPass, this.theirPass])
   }
 
   // Animate the given object saying that the player has/not passed
   // NOTE This causes a pause on every state change even if alpha is 0 > 0
-  private animatePass(txt: Phaser.GameObjects.Text, hasPassed: boolean): void {
-    this.scene.tweens.add({
-      targets: txt,
-      alpha: hasPassed ? 1 : 0,
-      duration: Time.recapTween(),
+  private animatePass(
+    container: Phaser.GameObjects.Container,
+    hasPassed: boolean,
+  ): void {
+    if (hasPassed) {
+      // Start off screen to the left
+      container.x = -160
+      container.alpha = 0
 
-      onComplete: function (tween, targets, _) {
-        txt.setAlpha(hasPassed ? 1 : 0)
-      },
-    })
+      this.scene.tweens.add({
+        targets: container,
+        x: -150,
+        alpha: 1,
+        duration: Time.recapTween(),
+        ease: 'Cubic.out',
+        onComplete: () => {
+          container.setAlpha(1)
+        },
+      })
+    } else {
+      this.scene.tweens.add({
+        targets: container,
+        alpha: 0,
+        duration: Time.recapTween(),
+        onComplete: () => {
+          container.setAlpha(0)
+        },
+      })
+    }
   }
 
   // Animate the sun / moon being visible when it's day or night

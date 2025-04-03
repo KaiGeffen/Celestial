@@ -121,6 +121,7 @@ export default class Card {
       id: 1003,
       points: amt,
       basePoints: 0,
+      text: 'Fleeting',
       qualities: [Quality.FLEETING],
     })
     game.create(player, card)
@@ -291,12 +292,9 @@ export default class Card {
   getHintText(): string {
     return ''
   }
-
-  getReferencedCards(): Card[] {
-    return []
-  }
 }
 
+// TODO Remove this
 export interface KeywordPosition {
   name: Keyword
   x: number

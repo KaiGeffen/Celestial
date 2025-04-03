@@ -86,6 +86,15 @@ const spritesheetPrefixMap: PrefixEntry[] = [
       height: 80,
     },
   },
+  {
+    fp: 'spritesheet/',
+    prefix: 'icon-',
+    list: ['Relic'],
+    sheet: {
+      width: 80,
+      height: 160,
+    },
+  },
 ]
 
 const prefixMap: PrefixEntry[] = [...imagePrefixMap, ...spritesheetPrefixMap]

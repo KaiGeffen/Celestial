@@ -34,6 +34,8 @@ export interface MatchServerMessages {
   matchStart: {
     name1: string
     name2: string
+    elo1: number
+    elo2: number
   }
   transmitState: {
     state: GameModel

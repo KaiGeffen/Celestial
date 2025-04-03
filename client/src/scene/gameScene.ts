@@ -13,10 +13,18 @@ import Region from './matchRegions/baseRegion'
 import Regions from './matchRegions/matchRegions'
 import OverlayRegion from './matchRegions/pileOverlays'
 import GameModel from '../../../shared/state/gameModel'
-import { MechanicsSettings } from '../../../shared/settings'
 import PassRegion from './matchRegions/pass'
 import { Deck } from '../../../shared/types/deck'
 import UserDataServer from '../network/userDataServer'
+import TheirAvatarRegion from './matchRegions/theirAvatar'
+import OurAvatarRegion from './matchRegions/ourAvatar'
+import TheirScoreRegion from './matchRegions/theirScore'
+import OurBoardRegion from './matchRegions/ourBoard'
+import TheirBoardRegion from './matchRegions/theirBoard'
+import StoryRegion from './matchRegions/story'
+import OurScoreRegion from './matchRegions/ourScore'
+import MulliganRegion from './matchRegions/mulliganRegion'
+import CompanionRegion from './matchRegions/companion'
 
 // TODO Rename to Match
 export class GameScene extends BaseScene {
@@ -101,20 +109,24 @@ export class GameScene extends BaseScene {
   }
 
   // Signal that a match has been found with given player names
-  signalMatchFound(name1: string, name2: string): void {
+  signalMatchFound(
+    name1: string,
+    name2: string,
+    elo1: number,
+    elo2: number,
+  ): void {
     console.log('Match found between', name1, 'and', name2)
 
-    // TODO Smell, class these
-    this.view.ourHand['showUsername'](name1)
-    this.view.theirHand['showUsername'](name2)
+    this.view.ourAvatar.showUsername(name1, elo1)
+    this.view.theirAvatar.showUsername(name2, elo2)
   }
 
   // Set all of the callback functions for the regions in the view
   private setCallbacks(view, net: MatchWS): void {
     let that = this
 
-    // Commands region
-    view.commands.recapCallback = () => {
+    // Their score region
+    view.theirScore.recapCallback = () => {
       // Scan backwards through the queued states to find the start of the recap
       for (let version = this.currentVersion - 1; version >= 0; version--) {
         if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
@@ -127,7 +139,7 @@ export class GameScene extends BaseScene {
         }
       }
     }
-    view.commands.skipCallback = () => {
+    view.theirScore.skipCallback = () => {
       that.tweens.getTweens().forEach((tween) => {
         tween.complete()
       })
@@ -139,18 +151,18 @@ export class GameScene extends BaseScene {
     }
 
     // Hand region
-    view.ourHand.setCardClickCallback((i: number) => {
+    view.ourBoard.setCardClickCallback((i: number) => {
       net.playCard(i, this.currentVersion)
     })
-    view.ourHand.setDisplayCostCallback((cost: number) => {
-      that.view.ourScore.displayCost(cost)
+    view.ourBoard.setDisplayCostCallback((cost: number) => {
+      that.view.ourScore['displayCost'](cost)
     })
-    view.ourHand.setEmoteCallback(() => {
+    view.ourAvatar.setEmoteCallback(() => {
       this.net.signalEmote()
     })
 
     // Set the callbacks for overlays
-    view.ourHand.setOverlayCallbacks(
+    view.ourAvatar.setOverlayCallbacks(
       () => {
         this.view.showOverlay(this.view.ourDeckOverlay)
       },
@@ -159,7 +171,7 @@ export class GameScene extends BaseScene {
       },
     )
 
-    view.theirHand.setOverlayCallbacks(
+    view.theirAvatar.setOverlayCallbacks(
       () => {
         this.view.showOverlay(this.view.theirDeckOverlay)
       },
@@ -219,25 +231,6 @@ export class GameScene extends BaseScene {
       }
     })
 
-    // Piles (Show overlay when clicked)
-    view.decks.setCallback(
-      () => {
-        that.view.ourDeckOverlay.show()
-      },
-      () => {
-        that.view.theirDeckOverlay.show()
-      },
-    )
-
-    view.discardPiles.setCallback(
-      () => {
-        that.view.ourDiscardOverlay.show()
-      },
-      () => {
-        that.view.theirDiscardOverlay.show()
-      },
-    )
-
     // Mulligan
     view.mulligan.setCallback(() => {
       const choice: [boolean, boolean, boolean] = view.mulligan.mulliganChoices
@@ -252,6 +245,9 @@ export class GameScene extends BaseScene {
   update(time, delta): void {
     // Enable the searching region visual update
     this.view.searching.update(time, delta)
+
+    // Update pet
+    this.view.pet.update(time, delta)
 
     if (this.currentVersion + 1 in this.queuedStates) {
       let isDisplayed = this.displayState(
@@ -326,7 +322,7 @@ export class GameScene extends BaseScene {
 
   // Opponent has used a given emote
   emote(emoteNumber: number): void {
-    this.view.theirHand['emote'](emoteNumber)
+    this.view.theirAvatar.emote(emoteNumber)
   }
 }
 
@@ -336,20 +332,20 @@ export class View {
 
   searching: Region
 
-  // The buttons below Options button
-  commands: Region
-
-  ourHand: Region
-  // ourButtons: Region
-  theirHand: Region
-  story: Region
-  ourScore
-  theirScore: Region
-  decks: Region
-  discardPiles: Region
+  story: StoryRegion
   pass: PassRegion
   scores: Region
 
+  theirAvatar: TheirAvatarRegion
+  ourAvatar: OurAvatarRegion
+
+  ourBoard: OurBoardRegion
+  theirBoard: TheirBoardRegion
+
+  ourScore: OurScoreRegion
+  theirScore: TheirScoreRegion
+
+  // Overlays
   ourDeckOverlay: OverlayRegion
   theirDeckOverlay: OverlayRegion
   ourDiscardOverlay: OverlayRegion
@@ -358,13 +354,15 @@ export class View {
   theirExpendedOverlay: OverlayRegion
 
   // Region shown during mulligan phase
-  mulligan: Region
+  mulligan: MulliganRegion
 
   // Region shown when the game has been won / lost
   results: Region
 
   // Class that animates everything that is animated
   animator: Animator
+
+  pet: CompanionRegion
 
   constructor(scene: GameScene, avatarId: number) {
     this.scene = scene
@@ -381,24 +379,25 @@ export class View {
 
     this.searching = new Regions.Searching().create(scene, avatarId)
 
-    this.commands = new Regions.Commands().create(scene)
-
     // Create each of the regions
     // this.createOurHand()
     // new HandRegion()//.create(scene)
-    this.ourHand = new Regions.OurHand().create(scene, avatarId)
-    this.theirHand = new Regions.TheirHand().create(scene)
+    this.ourBoard = new Regions.OurBoard().create(scene, avatarId)
+    this.theirBoard = new Regions.TheirBoard().create(scene)
 
     this.story = new Regions.Story().create(scene)
     this.ourScore = new Regions.OurScore().create(scene)
     this.theirScore = new Regions.TheirScore().create(scene)
     // this.ourButtons = new Regions.OurButtons().create(scene)
 
-    this.decks = new Regions.Decks().create(scene)
-    this.discardPiles = new Regions.DiscardPiles().create(scene)
     this.pass = new Regions.Pass().create(scene)
     this.scores = new Regions.RoundResult().create(scene)
 
+    // Avatars
+    this.ourAvatar = new Regions.OurAvatar().create(scene)
+    this.theirAvatar = new Regions.TheirAvatar().create(scene)
+
+    // Overlays
     this.ourDeckOverlay = new Regions.OurDeck().create(scene)
     this.theirDeckOverlay = new Regions.TheirDeck().create(scene)
     this.ourDiscardOverlay = new Regions.OurDiscard()
@@ -430,25 +429,30 @@ export class View {
     this.results.hide()
 
     this.animator = new Animator(scene, this)
+
+    // Create pet region
+    this.pet = new Regions.Companion().create(scene)
   }
 
   displayState(state: GameModel) {
     this.searching.hide()
 
     this.mulligan.displayState(state)
-    this.commands.displayState(state)
 
-    this.ourHand.displayState(state)
-    this.theirHand.displayState(state)
-    this.story.displayState(state)
+    this.theirAvatar.displayState(state)
+    this.ourAvatar.displayState(state)
+
+    this.ourBoard.displayState(state)
+    this.theirBoard.displayState(state)
+
     this.ourScore.displayState(state)
     this.theirScore.displayState(state)
-    // this.ourButtons.displayState(state)
-    this.decks.displayState(state)
-    this.discardPiles.displayState(state)
+
+    this.story.displayState(state)
     this.pass.displayState(state)
     this.scores.displayState(state)
 
+    // Overlays
     this.ourDeckOverlay.displayState(state)
     this.theirDeckOverlay.displayState(state)
     this.ourDiscardOverlay.displayState(state)
@@ -456,6 +460,7 @@ export class View {
     this.ourExpendedOverlay.displayState(state)
     this.theirExpendedOverlay.displayState(state)
 
+    // Result of the game ending
     this.results.displayState(state)
 
     // Animate the state
@@ -465,6 +470,9 @@ export class View {
     if (state.sound !== null) {
       this.scene.playSound(state.sound)
     }
+
+    // Update pet
+    this.pet.displayState(state)
   }
 
   // Show the given overlay and hide all others
@@ -495,10 +503,15 @@ export class StandardGameScene extends GameScene {
     super(args)
   }
 
-  signalMatchFound(name1: string, name2: string): void {
+  signalMatchFound(
+    name1: string,
+    name2: string,
+    elo1: number,
+    elo2: number,
+  ): void {
     this.view.searching.displayState(undefined)
 
-    super.signalMatchFound(name1, name2)
+    super.signalMatchFound(name1, name2, elo1, elo2)
   }
 }
 
@@ -527,7 +540,12 @@ export class AdventureGameScene extends GameScene {
     super.queueState(state)
   }
 
-  signalMatchFound(name1: string, name2: string): void {}
+  signalMatchFound(
+    name1: string,
+    name2: string,
+    elo1: number,
+    elo2: number,
+  ): void {}
 
   private unlockMissionRewards(): void {
     // Set that user has completed the missions with this id

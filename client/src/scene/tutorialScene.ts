@@ -6,7 +6,7 @@ import data from '../catalog/tutorial.json'
 import { Space, Color, BBStyle, Time, Depth, Flags } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
-import { TutorialCardImage } from '../lib/cardImage'
+import { CardImage } from '../lib/cardImage'
 import Catalog from '../../../shared/state/catalog'
 import { ResultsRegionTutorial } from './matchRegions/results'
 import { SearchingRegionTutorial } from './matchRegions/searching'
@@ -28,7 +28,7 @@ export default class TutorialGameScene extends AdventureGameScene {
   pointer: Phaser.GameObjects.Image
 
   // A card that is being shown
-  card: TutorialCardImage
+  card: CardImage
 
   isTutorial = true
 
@@ -137,9 +137,9 @@ export default class TutorialGameScene extends AdventureGameScene {
 
     switch (this.params.missionID) {
       case 0:
-        this.view.decks.hide()
-        this.view.discardPiles.hide()
-        this.view.commands.hide()
+        // this.view.ourAvatar.tutorialHide()
+        // this.view.theirAvatar.tutorialHide()
+        // this.view.theirScore.hide()
         this.displayHints1()
         break
 
@@ -208,21 +208,16 @@ export default class TutorialGameScene extends AdventureGameScene {
     switch (this.progress) {
       case 0:
         this.view.pass.hide()
-        this.view.theirHand.hide()
+        this.view.theirBoard.hide()
         this.view.theirScore.hide()
-        this.view.ourHand.hide()
-        this.view.ourScore.hideAll().showWins()
-        if (!Flags.mobile) {
-          this.view.ourScore.showBackground()
-        }
+        this.view.ourBoard.hide()
         break
 
       case 1:
-        this.view.ourScore.showBreath()
         break
 
       case 2:
-        this.addCardWithRequiredHover('Dove')
+        this.addCard('Dove')
         break
 
       case 4:
@@ -235,12 +230,12 @@ export default class TutorialGameScene extends AdventureGameScene {
 
       case 6:
         this.card.destroy()
-        this.view.ourHand.show()['hideStacks']()
+        this.view.ourBoard.show()['hideStacks']()
         break
 
       case 7:
         this.view.theirScore.show()
-        this.view.theirHand.show()['hideStacks']()
+        this.view.theirBoard.show()['hideStacks']()
 
         this.view.pass.show()['disablePass']()
         break
@@ -252,11 +247,11 @@ export default class TutorialGameScene extends AdventureGameScene {
     this.displayHint(1)
 
     // Hide stacks
-    this.view.decks.hide()
-    this.view.discardPiles.hide()
-    this.view.commands.hide()
-    this.view.ourHand['hideStacks']()
-    this.view.theirHand['hideStacks']()
+    // this.view.decks.hide()
+    // this.view.discardPiles.hide()
+    // this.view.commands.hide()
+    // this.view.ourBoard['hideStacks']()
+    // this.view.theirBoard['hideStacks']()
 
     // Hide pass until a point
     if (this.progress === 0) {
@@ -268,14 +263,14 @@ export default class TutorialGameScene extends AdventureGameScene {
     // Hide different elements on the screen based on progress
     switch (this.progress) {
       case 5:
-        this.view.ourHand.cards[1].setOnClick(() => {
+        this.view.ourBoard.cards[1].setOnClick(() => {
           this.signalError('Try playing Mercy then passing...')
         })
         break
 
       case 7:
       case 9:
-        this.view.ourHand.cards[0].setOnClick(() => {
+        this.view.ourBoard.cards[0].setOnClick(() => {
           this.signalError('Try passing instead...')
         })
         break
@@ -288,7 +283,7 @@ export default class TutorialGameScene extends AdventureGameScene {
 
     // Hide stacks
     // this.view.discardPiles.hide()
-    this.view.commands.hide()
+    // this.view.commands.hide()
     // this.view.ourHand['hideStacks']()
     // this.view.theirHand['hideStacks']()
 
@@ -338,8 +333,8 @@ export default class TutorialGameScene extends AdventureGameScene {
       case 'left':
         this.pointer.setRotation(0).setFlipX(true)
 
-        x = Space.pad + this.pointer.width / 2 + 80
-        y = Space.windowHeight - Space.handHeight - this.pointer.height + 30
+        x = Space.pad + this.pointer.width / 2 + 50
+        y = Space.windowHeight - Space.handHeight - this.pointer.height
         this.pointer.setPosition(x, y)
 
         // Text to the right of pointer
@@ -434,7 +429,7 @@ export default class TutorialGameScene extends AdventureGameScene {
     }
   }
 
-  private addCard(name: string): TutorialCardImage {
+  private addCard(name: string): CardImage {
     if (this.card !== undefined) {
       this.card.destroy()
     }
@@ -443,26 +438,8 @@ export default class TutorialGameScene extends AdventureGameScene {
     const y = Flags.mobile
       ? Space.windowHeight - Space.cardHeight / 2
       : Space.windowHeight / 2
-    this.card = new TutorialCardImage(
-      Catalog.getCard(name),
-      this.add.container(x, y),
-    )
+    this.card = new CardImage(Catalog.getCard(name), this.add.container(x, y))
 
     return this.card
-  }
-
-  // Add a card that must have each hoverable component hovered before continuing
-  private addCardWithRequiredHover(name: string): void {
-    let card = this.addCard(name)
-
-    // TODO On mobile possibly force some other interaction
-    if (Flags.mobile) {
-      return
-    }
-
-    // Disable the next button until each component has been hovered
-    this.btnNext.disable()
-
-    card.highlightComponents(() => this.btnNext.enable())
   }
 }

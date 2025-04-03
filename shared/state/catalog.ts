@@ -11,6 +11,7 @@ import * as waterCatalog from './catalog/water'
 import { child, seen, ashes, predator } from './catalog/tokens'
 import { Animation } from '../animation'
 import { Zone } from './zone'
+import { Keyword, Keywords } from './keyword'
 
 // TODO Break out, make settings, and make dry this behavior
 class Paramountcy extends Card {
@@ -64,5 +65,49 @@ export default class Catalog {
   }
   static getCardById(id: number): Card {
     return allCards.find((c) => c.id === id)
+  }
+
+  // Get all card names that are referenced in a given card's text
+  static getReferencedCardNames(card: Card): string[] {
+    let possibleCards = Catalog.allCards
+      .map((card) => card.name)
+      .filter(
+        (cardName) =>
+          !Keywords.getAll()
+            .map((kw) => kw.name)
+            .includes(cardName),
+      )
+
+    // Only return cards that actually appear in the text
+    return possibleCards.filter((cardName) => {
+      const regex = new RegExp(`\\b${cardName}\\b`, 'g')
+      return card.text.match(regex) !== null
+    })
+  }
+
+  // Get all keywords present in a given card's text
+  static getReferencedKeywords(card: Card): [Keyword, number][] {
+    const result: [Keyword, number][] = []
+
+    const text =
+      card.text +
+      Catalog.getReferencedCardNames(card)
+        .map((name) => Catalog.getCard(name).text)
+        .join(' ')
+
+    // Check each keyword for matches in the text
+    for (const keyword of Object.values(Keywords.getAll())) {
+      // Create a regex that matches the keyword name followed by optional positive/negative number
+      const regex = new RegExp(`\\b${keyword.name}[ ]*(-?\\d+)?\\b`, 'g')
+
+      // Find first match in the text
+      const match = regex.exec(text)
+      if (match) {
+        const amount = match[1] ? parseInt(match[1]) : undefined
+        result.push([keyword, amount])
+      }
+    }
+
+    return result
   }
 }

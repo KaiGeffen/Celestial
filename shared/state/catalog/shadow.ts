@@ -175,7 +175,7 @@ const sickness = new Sickness({
   cost: 3,
   points: -1,
   qualities: [Quality.FLEETING],
-  text: 'Fleeting, give your opponent Nourish -4, create a Sickness in their hand.',
+  text: 'Fleeting\nGive your opponent Nourish -4, create a Sickness in their hand.',
   keywords: [
     { name: Keywords.fleeting, x: 0, y: 61 },
     { name: Keywords.nourish, x: -35, y: 111, value: -4 },

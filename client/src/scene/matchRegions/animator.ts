@@ -181,9 +181,9 @@ export default class Animator {
       case Zone.Hand:
         if (owner === 0) {
           // TODO Check length
-          card = this.view.ourHand.cards[animation.index2]
+          card = this.view.ourBoard.cards[animation.index2]
         } else {
-          card = this.view.theirHand.cards[animation.index2]
+          card = this.view.theirBoard.cards[animation.index2]
         }
         break
 
@@ -199,17 +199,17 @@ export default class Animator {
 
       case Zone.Deck:
         if (owner === 0) {
-          card = this.view.decks.cards[animation.index2]
+          card = null //// this.view.decks.cards[animation.index2]
         } else {
-          card = this.view.decks.cards2[animation.index2]
+          card = null //this.view.decks.cards2[animation.index2]
         }
         break
 
       case Zone.Discard:
         if (owner === 0) {
-          card = this.view.discardPiles.cards[animation.index2]
+          card = null //this.view.discardPiles.cards[animation.index2]
         } else {
-          card = this.view.discardPiles.cards2[animation.index2]
+          card = null //this.view.discardPiles.cards2[animation.index2]
         }
         break
 
@@ -359,17 +359,17 @@ export default class Animator {
     switch (animation.status) {
       case Status.Inspire:
         if (owner === 0) {
-          obj = this.view.ourHand['btnInspire'] // TODO Smell, fix typing
+          obj = this.view.ourBoard['btnInspire'] // TODO Smell, fix typing
         } else {
-          obj = this.view.theirHand['btnInspire']
+          obj = this.view.theirBoard['btnInspire']
         }
         break
 
       case Status.Nourish:
         if (owner === 0) {
-          obj = this.view.ourHand['btnNourish']
+          obj = this.view.ourBoard['btnNourish']
         } else {
-          obj = this.view.theirHand['btnNourish']
+          obj = this.view.theirBoard['btnNourish']
         }
         break
     }

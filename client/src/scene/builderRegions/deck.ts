@@ -304,9 +304,6 @@ export default class DeckRegion {
       )
       let cutout = new Cutout(container, card)
       cutout.setOnClick(this.onClickCutout(cutout))
-      if (Flags.mobile) {
-        cutout.setDepth(4)
-      }
 
       // Add the container in the right position in the panel
       let index = this.addToPanelSorted(container, card, panel)

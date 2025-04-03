@@ -59,7 +59,7 @@ class MatchQueue {
         const otherPlayer: WaitingPlayer = searchingPlayers[data.password]
         if (otherPlayer) {
           console.log(
-            'PvP:\n',
+            'PVP:',
             data.deck.cards
               .map((cardId) => Catalog.getCardById(cardId).name)
               .join(', '),

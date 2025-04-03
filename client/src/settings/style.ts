@@ -138,9 +138,31 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     color: '#F5F2EB',
   },
   username: {
+    fontFamily: mainFont,
+    fontSize: '16px',
+    color: Color.username,
+  },
+  usernameElo: {
+    fontFamily: mainFont,
+    fontSize: '10px',
+    color: Color.username,
+  },
+  todoScore: {
+    fontFamily: mainFont,
+    fontSize: '24px',
+    color: Color.todoScore,
+  },
+  todoCloud: {
     fontFamily: altFont,
-    fontSize: '18px',
-    color: Color.basicText,
+    fontSize: '30px',
+    color: Color.passText,
+    stroke: '#fff',
+    strokeThickness: 2,
+  },
+  todoSubtext: {
+    fontFamily: mainFont,
+    fontSize: '12px',
+    color: Color.todoSubtext,
   },
 }
 
@@ -165,16 +187,26 @@ export const BBStyle: Record<string, any> = {
   // Cost / Points shown above each card
   cardStats: {
     fontFamily: mainFont,
-    fontSize: Flags.mobile ? '20px' : '36px',
+    fontSize: '30px',
     color: Color.cardText,
-    backgroundColor: Color.cardTextBackground,
-    backgroundHorizontalGradient: false,
-    strokeThickness: 3,
+  },
+  // The textbox for the card
+  cardText: {
+    fontFamily: mainFont,
+    fontSize: '16px',
+    color: 0xffffff,
+    backgroundColor: 0x111111a0,
+    wrap: {
+      mode: 'word',
+      width: 180,
+    },
+    fixedWidth: 190,
+    halign: 'center',
     padding: {
-      // left: 5,
-      // right: 5,
-      top: -5,
-      bottom: -5,
+      left: 5,
+      right: 5,
+      top: 5,
+      bottom: 5,
     },
   },
   // Hint text shown when something onscreen is hovered

@@ -1,3 +1,5 @@
+import { USERNAME_AVAILABILITY_PORT } from '../../../shared/network/settings'
+
 // The base colors used throughout this app
 const CoreColors: Record<string, number | string> = {
   white: 0xf5f2eb,
@@ -109,4 +111,9 @@ export const Color: Record<string, any> = {
   tutorialBackground: '#aace',
   // A translucent background that draws attention to one element on the screen
   focusBackground: CoreColors.grey,
+
+  // TODO Organize
+  username: CoreColors.blackS,
+  todoScore: CoreColors.blackS,
+  todoSubtext: CoreColors.blackS,
 }
