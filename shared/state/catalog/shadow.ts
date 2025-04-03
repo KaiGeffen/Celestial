@@ -59,8 +59,7 @@ const imprison = new Imprison({
   points: 3,
   text: 'At the end of this round, if your opponent has two or fewer points, they Nourish -1.',
   story:
-    'All tied up\ncan’t even stand\nAm I lethal to you and yours\nMy tight bonds calm me.',
-  keywords: [{ name: Keywords.nourish, x: 0, y: 130, value: -1 }],
+    "All tied up\ncan't even stand\nAm I lethal to you and yours\nMy tight bonds calm me.",
 })
 
 class Nightmare extends Card {
@@ -80,8 +79,6 @@ const nightmare = new Nightmare({
   text: 'Morning: If you have more cards in hand than your opponent, create a Shadow in hand.',
   story:
     'I struggle to find myself\nBetween the claws and biting words\nShearing my mind away',
-  keywords: [{ name: Keywords.morning, x: 0, y: 60 }],
-  references: [{ card: shadow, x: 0, y: 134 }],
 })
 
 class Boa extends Card {
@@ -121,7 +118,6 @@ const hungryGhost = new HungryGhost({
   cost: 2,
   points: 4,
   text: 'Nourish -4',
-  keywords: [{ name: Keywords.nourish, x: 0, y: 130, value: -4 }],
 })
 
 class Hurricane extends Card {
@@ -176,11 +172,6 @@ const sickness = new Sickness({
   points: -1,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nGive your opponent Nourish -4, create a Sickness in their hand.',
-  keywords: [
-    { name: Keywords.fleeting, x: 0, y: 61 },
-    { name: Keywords.nourish, x: -35, y: 111, value: -4 },
-  ],
-  // references: [{ card: sickness, x: -48, y: 132 }],
 })
 
 // BETA
@@ -210,7 +201,6 @@ const rupture = new Rupture({
   id: 4027,
   cost: 1,
   text: "Create a Wound in your opponent's hand.\n(Wound is a 0:-2, Fleeting, When this is discarded, add it to the story.)",
-  references: [{ card: wound, x: 5, y: 112 }],
   beta: true,
 })
 

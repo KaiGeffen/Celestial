@@ -19,10 +19,6 @@ const dove = new Dove({
   qualities: [Quality.VISIBLE, Quality.FLEETING],
   text: 'Visible\nFleeting',
   story: 'Look at my eyes.\nSurrender\nTo the one thing you want',
-  keywords: [
-    { name: Keywords.visible, x: 0, y: 100 },
-    { name: Keywords.fleeting, x: 0, y: 130 },
-  ],
 })
 
 class Starling extends Card {
@@ -49,10 +45,6 @@ const starling = new Starling({
   qualities: [Quality.VISIBLE, Quality.FLEETING],
   text: 'Visible\nFleeting\nWorth +1 if the next card in the story has base cost 1.',
   story: 'Making headway\nDefying the headwind\nHeading out and through',
-  keywords: [
-    { name: Keywords.visible, x: 0, y: 30 },
-    { name: Keywords.fleeting, x: 0, y: 60 },
-  ],
 })
 
 class SecretaryBird extends Card {
@@ -85,7 +77,6 @@ const secretaryBird = new SecretaryBird({
   qualities: [Quality.VISIBLE],
   text: 'Visible\nWorth +1 for each card in your hand with base cost 0 or 1. Remove those cards from the game.',
   story: 'I will I will I will\nBecome me become me become me\nAt your peril',
-  keywords: [{ name: Keywords.visible, x: 0, y: 43 }],
 })
 
 class Phoenix extends Card {
@@ -123,10 +114,6 @@ const phoenix = new Phoenix({
   text: 'Visible\nFleeting\nGive each card with fleeting in your deck or discard pile +1 point.',
   story:
     'Cracks in the shell\nShell falls away\nI stretch into wide possibilities',
-  keywords: [
-    { name: Keywords.visible, x: 0, y: 30 },
-    { name: Keywords.fleeting, x: 0, y: 60 },
-  ],
 })
 
 class Heron extends Card {
@@ -152,7 +139,6 @@ const heron = new Heron({
   text: "Visible\nSet both players' points to 0.\nCosts 1 more for each card in your discard pile.",
   story:
     'How you see me\nIs of no importance to me\nI am playing with being here, there, every where',
-  keywords: [{ name: Keywords.visible, x: 0, y: 60 }],
 })
 
 // BETA CONTENT TODO

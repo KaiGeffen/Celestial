@@ -17,10 +17,6 @@ const dawn = new Dawn(4, {
   name: 'Dawn',
   id: 50,
   text: 'When played, gain Sight 4.\nMorning: Return this to hand.',
-  keywords: [
-    { name: Keywords.sight, x: 0, y: 74, value: 4 },
-    { name: Keywords.morning, x: 0, y: 104 },
-  ],
 })
 
 class Nectar extends SightCard {
@@ -34,10 +30,6 @@ const nectar = new Nectar(3, {
   id: 25,
   cost: 1,
   text: 'Nourish 1\nWhen played, gain Sight 3.',
-  keywords: [
-    { name: Keywords.nourish, x: 0, y: 73, value: 1 },
-    { name: Keywords.sight, x: 0, y: 130, value: 3 },
-  ],
 })
 
 class ClearView extends Card {
@@ -51,7 +43,6 @@ const clearView = new ClearView({
   id: 27,
   cost: 1,
   text: "Create a Seen in your opponent's hand.",
-  references: [{ card: seen, x: 5, y: 112 }],
 })
 
 class Awakening extends Card {
@@ -106,7 +97,6 @@ const prey = new Prey({
   cost: 1,
   points: 2,
   text: "Create a Predator in your opponent's hand.",
-  references: [{ card: predator, x: 6, y: 113 }],
 })
 
 class Conquer extends Card {

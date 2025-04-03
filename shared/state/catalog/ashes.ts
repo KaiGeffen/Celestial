@@ -43,9 +43,7 @@ const impulse = new Impulse({
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nCreate two Ashes in your discard pile.',
   story:
-    'Belly burns with knowing now\nBurning hand tells me how heroic I am\nA whiff of ‘what if?’ is not enough to stop me',
-  keywords: [{ name: Keywords.fleeting, x: 0, y: 82 }],
-  references: [{ card: ashes, x: 12, y: 112 }],
+    'Belly burns with knowing now\nBurning hand tells me how heroic I am\nA whiff of "what if?" is not enough to stop me',
 })
 
 class Mine extends Card {
@@ -81,8 +79,6 @@ const arsonist = new Arsonist({
   text: 'Fleeting\nCreate three Ashes in your discard pile.',
   story:
     "We build and tend and feed and joy\nFlames dance in the buildings\nCrackle in the streets\nWe still build and tend and feed and joy\nAnd suddenly it's all up in smoke",
-  keywords: [{ name: Keywords.fleeting, x: 0, y: 82 }],
-  references: [{ card: ashes, x: 20, y: 112 }],
 })
 
 class Parch extends Card {
@@ -249,10 +245,6 @@ const fromAshes = new FromAshes({
   text: 'Remove from the game the top three cards of your discard pile. Nourish 1 for each card with Fleeting removed.',
   story:
     'Ash carefully tends\nThe green shoot\nLiving on atonement\nTender so close to death and beginning',
-  keywords: [
-    { name: Keywords.nourish, x: -36, y: 89, value: 1 },
-    { name: Keywords.fleeting, x: 38, y: 113 },
-  ],
 })
 
 // BETA

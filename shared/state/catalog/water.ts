@@ -102,7 +102,6 @@ const dew = new Dew({
   points: 1,
   text: 'Morning: Create a Dew in your hand.',
   story: 'I return\nOver and over again\nSwelling the future',
-  keywords: [{ name: Keywords.morning, x: 0, y: 82 }],
 })
 
 class GentleRain extends Card {
@@ -120,7 +119,6 @@ const gentleRain = new GentleRain({
   cost: 4,
   points: 2,
   text: "Nourish 1 for each card you've drawn this round.",
-  keywords: [{ name: Keywords.nourish, x: -32, y: 88, value: 1 }],
 })
 
 // BETA

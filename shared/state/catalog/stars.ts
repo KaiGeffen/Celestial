@@ -17,7 +17,6 @@ const stars = new Stars({
   name: 'Stars',
   id: 0,
   text: 'Inspire 1',
-  keywords: [{ name: Keywords.inspire, x: 0, y: 131, value: 1 }],
 })
 
 class Cosmos extends Card {
@@ -37,7 +36,6 @@ const cosmos = new Cosmos({
   id: 9,
   cost: 2,
   text: 'Inspire 1 for this and each of your cards later in the story.',
-  keywords: [{ name: Keywords.inspire, x: -28, y: 90, value: 1 }],
 })
 
 class NightVision extends SightCard {
@@ -51,7 +49,6 @@ const nightVision = new NightVision(3, {
   id: 28,
   cost: 1,
   text: 'Put the top card with base cost 2 from your deck into your hand.\nWhen played, gain Sight 3.',
-  keywords: [{ name: Keywords.sight, x: 0, y: 130, value: 3 }],
 })
 
 class Ecology extends Card {
@@ -79,7 +76,6 @@ const sun = new Sun({
   points: 8,
   text: 'Morning: Gain 2 breath.',
   story: 'I raise my head over the horizon\nI begin\nJust like you',
-  keywords: [{ name: Keywords.morning, x: 0, y: 104 }],
 })
 
 class Moon extends Card {
@@ -111,7 +107,6 @@ const moon = new Moon({
   cost: 5,
   points: 5,
   text: 'Morning: Trigger the morning abilities of the top 2 cards below this with morning.',
-  keywords: [{ name: Keywords.morning, x: 0, y: 60 }],
 })
 
 class Sunflower extends Card {
@@ -134,7 +129,6 @@ const sunflower = new Sunflower({
   cost: 2,
   points: 1,
   text: 'Inspire 1 for each point this is worth.',
-  keywords: [{ name: Keywords.inspire, x: -36, y: 111, value: 1 }],
 })
 
 // Beta

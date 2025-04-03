@@ -18,10 +18,6 @@ const seen = new Seen({
   cost: 2,
   qualities: [Quality.FLEETING],
   text: 'Fleeting.\nAt the start of each round, if this is in your hand, give your opponent Sight 4.',
-  keywords: [
-    { name: Keywords.fleeting, x: 0, y: 30 },
-    { name: Keywords.sight, x: 0, y: 130, value: 4 },
-  ],
 })
 
 class Ashes extends Card {
@@ -36,7 +32,6 @@ const ashes = new Ashes({
   cost: 1,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nDraw a card.',
-  keywords: [{ name: Keywords.fleeting, x: 0, y: 102 }],
 })
 
 const child = new Card({
@@ -44,7 +39,6 @@ const child = new Card({
   id: 1003,
   qualities: [Quality.FLEETING],
   text: 'Fleeting',
-  keywords: [{ name: Keywords.fleeting, x: 0, y: 130 }],
 })
 
 class Predator extends Card {
@@ -63,9 +57,6 @@ const predator = new Predator({
   cost: 1,
   qualities: [Quality.FLEETING],
   text: "Fleeting\nWorth +2 for each Prey in your opponent's discard pile.",
-  keywords: [{ name: Keywords.fleeting, x: 0, y: 61 }],
-  // 176, 77
-  // references: [{ card: prey, x: 59, y: 77 }],
 })
 
 // BETA

@@ -3,7 +3,6 @@ import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
 import { BBStyle, Time, Space } from '../settings/settings'
 import Card from '../../../shared/state/card'
-import { KeywordPosition } from '../../../shared/state/card'
 import Catalog from '../../../shared/state/catalog'
 import { Keyword, Keywords } from '../../../shared/state/keyword'
 import { CardImage } from './cardImage'

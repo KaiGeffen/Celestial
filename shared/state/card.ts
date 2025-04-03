@@ -18,8 +18,6 @@ interface CardData {
   // Just used by client
   text?: string
   story?: string
-  keywords?: KeywordPosition[]
-  references?: ReferencePosition[]
   beta?: boolean
 }
 
@@ -34,8 +32,6 @@ export default class Card {
   // Only used client-side
   text: string
   story: string = ''
-  keywords: KeywordPosition[] = []
-  references: ReferencePosition[] = []
   beta: boolean = false
 
   constructor({
@@ -48,8 +44,6 @@ export default class Card {
 
     text = '',
     story = '',
-    keywords = [],
-    references = [],
     beta = false,
   }: CardData) {
     this.name = name
@@ -61,8 +55,6 @@ export default class Card {
 
     this.text = text
     this.story = story
-    this.keywords = keywords
-    this.references = references
     this.beta = beta
   }
 
@@ -292,20 +284,6 @@ export default class Card {
   getHintText(): string {
     return ''
   }
-}
-
-// TODO Remove this
-export interface KeywordPosition {
-  name: Keyword
-  x: number
-  y: number
-  value?: number
-}
-
-export interface ReferencePosition {
-  card: Card
-  x: number
-  y: number
 }
 
 export class SightCard extends Card {

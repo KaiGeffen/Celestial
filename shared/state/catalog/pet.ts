@@ -17,7 +17,6 @@ const fruit = new Fruit({
   id: 11,
   cost: 3,
   text: 'Nourish 3',
-  keywords: [{ name: Keywords.nourish, x: 0, y: 130, value: 3 }],
 })
 
 class Oak extends Card {
@@ -33,7 +32,6 @@ const oak = new Oak({
   cost: 8,
   points: 8,
   text: 'If you win this round, Nourish 1 for each point you won by.',
-  keywords: [{ name: Keywords.nourish, x: -31, y: 112, value: 1 }],
 })
 
 class Bounty extends Card {
@@ -48,7 +46,6 @@ const bounty = new Bounty({
   cost: 3,
   points: 3,
   text: 'Both players Nourish 2.',
-  keywords: [{ name: Keywords.nourish, x: 0, y: 130, value: 2 }],
 })
 
 class Pet extends Card {
@@ -94,7 +91,6 @@ const hollow = new Hollow({
   name: 'Hollow',
   id: 76,
   text: 'Set your points to 0. Nourish 1 for each point you lost this way.',
-  keywords: [{ name: Keywords.nourish, x: -31, y: 112, value: 1 }],
 })
 
 class HoldTight extends Card {
