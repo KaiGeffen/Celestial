@@ -8,7 +8,7 @@ import * as birthCatalog from './catalog/birth'
 import * as visionCatalog from './catalog/vision'
 import * as starsCatalog from './catalog/stars'
 import * as waterCatalog from './catalog/water'
-import { child, seen, ashes, predator } from './catalog/tokens'
+import * as tokensCatalog from './catalog/tokens'
 import { Animation } from '../animation'
 import { Zone } from './zone'
 import { Keyword, Keywords } from './keyword'
@@ -51,7 +51,7 @@ const fullCatalog = [
   ...Object.values(starsCatalog),
   paramountcy,
 ]
-const nonCollectibles = [seen, ashes, child, predator]
+const nonCollectibles = [...Object.values(tokensCatalog)]
 const allCards = [...fullCatalog, ...nonCollectibles]
 
 export default class Catalog {

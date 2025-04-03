@@ -199,7 +199,7 @@ const rupture = new Rupture({
   name: 'Rupture',
   id: 4027,
   cost: 1,
-  text: "Create a Wound in your opponent's hand.\n(Wound is a 0:-2, Fleeting, When this is discarded, add it to the story.)",
+  text: "Create a Wound in your opponent's hand.",
   beta: true,
 })
 

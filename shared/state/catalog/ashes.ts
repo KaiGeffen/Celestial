@@ -4,7 +4,6 @@ import { Status } from '../status'
 import { Quality } from '../quality'
 import { Animation } from '../../animation'
 import { Zone } from '../zone'
-import { Keywords } from '../keyword'
 import GameModel from '../gameModel'
 
 class Dash extends Card {
