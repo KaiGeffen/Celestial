@@ -453,7 +453,7 @@ export default class HomeScene extends BaseScene {
       })
       .on('pointerdown', () => {
         this.sound.play('click')
-        this.scene.start('MatchHistoryScene')
+        this.scene.start('StoreScene')
       })
 
     map.mask = new Phaser.Display.Masks.BitmapMask(this, rect)

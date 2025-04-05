@@ -2,11 +2,12 @@ import 'phaser'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
 
-import { BBStyle, Time, Space, Flags } from '../settings/settings'
+import { BBStyle, Time, Space, Flags, Color, Style } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Icons from '../lib/buttons/icons'
 import Hint from '../lib/hint'
 import ensureMusic from '../loader/audioManager'
+import Buttons from '../lib/buttons/buttons'
 
 // Functionality shared between BaseScene and MenuBaseScene
 class SharedBaseScene extends Phaser.Scene {
@@ -171,6 +172,57 @@ export default class BaseScene extends SharedBaseScene {
         activeScene: that,
       })
     }
+  }
+}
+
+export class BaseSceneWithHeader extends BaseScene {
+  protected headerHeight = Space.iconSize + Space.pad * 2
+
+  create(params): void {
+    super.create(params)
+
+    this.createHeader(params.title)
+  }
+
+  private createHeader(title: string): void {
+    // Make the background header
+    let background = this.add
+      .rectangle(
+        0,
+        0,
+        Space.windowWidth,
+        this.headerHeight,
+        Color.backgroundLight,
+      )
+      .setOrigin(0)
+
+    this.plugins.get('rexDropShadowPipeline')['add'](background, {
+      distance: 3,
+      angle: -90,
+      shadowColor: 0x000000,
+    })
+
+    // Create back button
+    new Buttons.Basic(
+      this,
+      Space.pad + Space.buttonWidth / 2,
+      this.headerHeight / 2,
+      'Back',
+      () => {
+        this.sound.play('click')
+        this.scene.start('HomeScene')
+      },
+    )
+
+    // Create title back in center
+    this.add
+      .text(
+        Space.windowWidth / 2,
+        this.headerHeight / 2,
+        title,
+        Style.homeTitle,
+      )
+      .setOrigin(0.5)
   }
 }
 
