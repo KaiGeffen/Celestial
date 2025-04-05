@@ -11,7 +11,7 @@ export const paymentService = {
   async purchaseGems(
     gemPackage: string,
   ): Promise<{ sessionId: string; amount: number; gems: number }> {
-    const uuid = UserDataServer.getUUID()
+    const uuid = UserDataServer.getUserData().uuid
     if (!uuid) throw new Error('No UUID found')
 
     // Get the base URL

@@ -183,10 +183,10 @@ export default class HomeScene extends BaseScene {
 
   private createUserStatsDisplay(): void {
     // Get user data, use defaults if not logged in
-    const username = UserDataServer.username
-    const elo = UserDataServer.elo
-    const gems = UserDataServer.gems
-    const coins = UserDataServer.coins
+    const username = UserDataServer.getUserData().username
+    const elo = UserDataServer.getUserData().elo
+    const gems = UserDataServer.getUserData().gems
+    const coins = UserDataServer.getUserData().coins
 
     // Create the text object displaying user stats
     new Buttons.Text(
