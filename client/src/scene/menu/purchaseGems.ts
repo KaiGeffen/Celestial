@@ -2,7 +2,7 @@ import 'phaser'
 import { Style, Color, Space } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
-import { paymentService } from '../../services/paymentService'
+import { paymentService } from '../../store/paymentService'
 import BasicButton from '../../lib/buttons/basic'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import {

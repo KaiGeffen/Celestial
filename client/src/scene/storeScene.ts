@@ -4,8 +4,9 @@ import BaseScene, { BaseSceneWithHeader } from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import BasicButton from '../lib/buttons/basic'
 import UserDataServer from '../network/userDataServer'
-import { paymentService } from '../services/paymentService'
+import { paymentService } from '../store/paymentService'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
+import { STORE_ITEMS, StoreItem } from '../store/items'
 
 export default class StoreScene extends BaseSceneWithHeader {
   constructor() {
@@ -14,9 +15,7 @@ export default class StoreScene extends BaseSceneWithHeader {
 
   create(): void {
     this.createBackground()
-
     super.create({ title: 'Store' })
-
     this.createCategoriesText()
     this.createStoreItems()
   }
@@ -36,7 +35,7 @@ export default class StoreScene extends BaseSceneWithHeader {
       'Pets',
       'Cards',
       'Cardbacks',
-    ]
+    ] as const
 
     // Create a sizer that takes up the available horizontal space
     const sizer = this.rexUI.add
@@ -84,107 +83,57 @@ export default class StoreScene extends BaseSceneWithHeader {
       })
       .setOrigin(0, 0)
 
-    const items = [
-      createStoreItem(this, 'Thorn Border', 100, 'ThornBorder'),
-      createStoreItem(this, 'Dandelion Relic', 500, 'DandelionRelic'),
-      createStoreItem(this, 'Butterfly', 40, 'Butterfly'),
-      createStoreItem(this, 'Imani', 2000, 'Imani'),
-      createStoreItem(this, 'Jade Cardback', 300, 'JadeCardback'),
-      createStoreItem(this, 'Jules', 0, 'Jules'),
-    ]
-
-    items.forEach((item) => {
-      sizer.add(item)
+    // Create store items from configuration
+    Object.values(STORE_ITEMS).forEach((item) => {
+      sizer.add(this.createStoreItem(item))
     })
 
     sizer.layout()
   }
-}
 
-// Store item descriptions
-const STORE_ITEMS: { [key: string]: { description: string } } = {
-  ThornBorder: {
-    description:
-      'A thorny border that frames your avatar with a dark and mysterious edge.',
-  },
-  DandelionRelic: {
-    description:
-      'A mystical relic infused with the essence of dandelions, bringing fortune to its bearer.',
-  },
-  Butterfly: {
-    description:
-      'A delicate butterfly companion that follows your cursor with graceful movements.',
-  },
-  Imani: {
-    description:
-      "Unlock the Doula to a New World: Imani!\n\nCore to Imani is the Birth mechanic, which creates a Child in hand that can grow to any size. However, since many of these cards earn no points the round they are played, you must carefully ration out the points that you do have and efficiently sacrifice rounds that you can't win.\n\nOnce you've stabilized, remove your weakest cards with Mine, grow a Child as large as you can, then chain together cheap copies of The Future to finally win.",
-  },
-  JadeCardback: {
-    description:
-      'An elegant cardback design featuring intricate jade patterns that shimmer as cards move.',
-  },
-  Jules: {
-    description:
-      'A friendly character that brings unique strategic options to your gameplay.',
-  },
-}
-
-// A single item to purchase
-function createStoreItem(
-  scene: BaseScene,
-  name: string,
-  price: number,
-  image: string,
-): Phaser.GameObjects.GameObject {
-  const container = scene.rexUI.add.sizer({
-    orientation: 'vertical',
-    space: { item: Space.pad },
-  })
-
-  // Add image
-  const itemImage = scene.add.image(0, 0, `store-${image}`)
-  container.add(itemImage, { align: 'center' })
-
-  // Add name
-  container.add(scene.add.text(0, 0, name, Style.basic), {
-    align: 'center',
-  })
-
-  // Add price
-  container.add(scene.add.text(0, 0, `${price} 💎`, Style.basic), {
-    align: 'center',
-  })
-
-  // Make the container interactive
-  container
-    .setInteractive()
-    .on('pointerover', () => {
-      itemImage.setTint(0xcccccc)
+  private createStoreItem(item: StoreItem): Phaser.GameObjects.GameObject {
+    const container = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: { item: Space.pad },
     })
-    .on('pointerout', () => {
-      itemImage.clearTint()
+
+    // Add image
+    const itemImage = this.add.image(0, 0, `store-${item.imageKey}`)
+    container.add(itemImage, { align: 'center' })
+
+    // Add name
+    container.add(this.add.text(0, 0, item.name, Style.basic), {
+      align: 'center',
     })
-    .on('pointerdown', () => {
-      scene.sound.play('click')
 
-      // Get user's current balance
-      const balance = scene.registry.get('gems') || 0
+    // Add price
+    container.add(this.add.text(0, 0, `${item.cost} 💎`, Style.basic), {
+      align: 'center',
+    })
 
-      // Create store item data
-      const item = {
-        name,
-        description: STORE_ITEMS[image].description,
-        cost: price,
-        image: `store-${image}`,
-      }
-
-      // Launch the purchase menu
-      scene.scene.launch('MenuScene', {
-        menu: 'purchaseItem',
-        item,
-        balance,
+    // Make the container interactive
+    container
+      .setInteractive()
+      .on('pointerover', () => {
+        itemImage.setTint(0xcccccc)
       })
-    })
+      .on('pointerout', () => {
+        itemImage.clearTint()
+      })
+      .on('pointerdown', () => {
+        this.sound.play('click')
 
-  return container
+        // Get user's current balance
+        const balance = this.registry.get('gems') || 0
+
+        // Launch the purchase menu
+        this.scene.launch('MenuScene', {
+          menu: 'purchaseItem',
+          item,
+          balance,
+        })
+      })
+
+    return container
+  }
 }

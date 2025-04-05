@@ -4,13 +4,7 @@ import Menu from './menu'
 import MenuScene from '../menuScene'
 import BasicButton from '../../lib/buttons/basic'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-
-interface StoreItem {
-  name: string
-  description: string
-  cost: number
-  image: string
-}
+import { StoreItem } from '../../store/items'
 
 export default class PurchaseItemMenu extends Menu {
   private item: StoreItem
@@ -39,8 +33,7 @@ export default class PurchaseItemMenu extends Menu {
 
     // Add item image on the left
     const imageContainer = new ContainerLite(this.scene, 0, 0, 400, 400)
-    const image = this.scene.add.image(0, 0, this.item.image)
-    image.setDisplaySize(400, 400)
+    const image = this.scene.add.image(0, 0, `store-${this.item.imageKey}-full`)
     imageContainer.add(image)
     contentSizer.add(imageContainer)
 
