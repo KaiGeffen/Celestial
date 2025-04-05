@@ -5,19 +5,11 @@ import MenuScene from '../menuScene'
 import { paymentService } from '../../services/paymentService'
 import BasicButton from '../../lib/buttons/basic'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-
-interface GemPackage {
-  gems: number
-  price: number
-  id: string
-}
-
-const packages: GemPackage[] = [
-  { gems: 50, price: 4.99, id: 'gems-50' },
-  { gems: 150, price: 9.99, id: 'gems-150' },
-  { gems: 350, price: 19.99, id: 'gems-350' },
-  { gems: 750, price: 39.99, id: 'gems-750' },
-]
+import {
+  GEM_PACKAGES,
+  formatPrice,
+  GemPackage,
+} from '../../../../shared/config/gemPackages'
 
 export default class PurchaseGemsMenu extends Menu {
   constructor(scene: MenuScene, params) {
@@ -37,7 +29,7 @@ export default class PurchaseGemsMenu extends Menu {
     })
 
     // Add each package option as a BasicButton
-    packages.forEach((pkg) => {
+    Object.values(GEM_PACKAGES).forEach((pkg: GemPackage) => {
       const container = new ContainerLite(
         this.scene,
         0,
@@ -50,7 +42,7 @@ export default class PurchaseGemsMenu extends Menu {
         container,
         0,
         0,
-        `${pkg.gems} 💎  $${pkg.price}`,
+        `${pkg.gems} 💎  ${formatPrice(pkg.amount)}`,
         async () => {
           await this.purchaseGems(pkg.id)
         },

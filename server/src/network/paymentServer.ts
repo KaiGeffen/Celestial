@@ -7,6 +7,7 @@ import { v5 as uuidv5 } from 'uuid'
 import { PAYMENT_PORT, UUID_NAMESPACE } from '../../../shared/network/settings'
 import { db } from '../db/db'
 import { players } from '../db/schema'
+import { GEM_PACKAGES } from '../../../shared/config/gemPackages'
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
@@ -15,14 +16,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY environment variable is required')
-}
-
-// Define gem packages
-const GEM_PACKAGES = {
-  small: { gems: 50, amount: 499 }, // $4.99
-  medium: { gems: 150, amount: 999 }, // $9.99
-  large: { gems: 350, amount: 1999 }, // $19.99
-  huge: { gems: 750, amount: 3999 }, // $39.99
 }
 
 export default function createPaymentServer() {
