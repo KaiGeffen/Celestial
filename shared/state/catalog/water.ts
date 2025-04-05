@@ -227,26 +227,6 @@ const precious = new Precious({
   beta: true,
 })
 
-class Unfolding extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    if (super.exhale(5, game, player)) {
-      bonus += game.story.acts.length
-    }
-
-    super.play(player, game, index, bonus)
-
-    if (super.exhale(1, game, player)) {
-      game.draw(player)
-    }
-  }
-}
-const unfolding = new Unfolding({
-  name: 'Unfolding',
-  id: 7212,
-  text: 'Exhale 5: Worth +1 for each card later in the story.\nExhale 1: Draw a card.',
-  beta: true,
-})
-
 class Jormungandr extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
@@ -261,27 +241,6 @@ const jormungandr = new Jormungandr({
   cost: 9,
   points: 9,
   text: 'Discard the next card in the story and the top 2 cards of your deck.',
-  beta: true,
-})
-
-class Crabs extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    if (game.score[player] < game.score[player ^ 1]) {
-      bonus += 2
-    }
-
-    super.play(player, game, index, bonus)
-
-    if (game.hand[player].length < game.hand[player ^ 1].length) {
-      game.draw(player, 2)
-    }
-  }
-}
-const crabs = new Crabs({
-  name: 'Crabs',
-  id: 7217,
-  cost: 2,
-  text: 'If you have fewer points than your opponent, worth +2. If you have fewer cards in hand, draw 2.',
   beta: true,
 })
 
@@ -332,9 +291,6 @@ export {
   fish,
   cloud,
   precious,
-  overflow,
-  unfolding,
-  // THIS MANY CARDS
-  crabs,
   leveeBreaks,
+  overflow,
 }

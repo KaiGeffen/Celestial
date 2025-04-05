@@ -45,19 +45,12 @@ const clearView = new ClearView({
   text: "Create a Seen in your opponent's hand.",
 })
 
-class Awakening extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    this.addStatus(1, game, player, Status.AWAKENED)
-    super.play(player, game, index, bonus)
-  }
-}
-const awakening = new Awakening({
+const awakening = new SightCard(5, {
   name: 'Awakening',
   id: 39,
   cost: 3,
   points: 3,
-  // TODO Keyword for sight
-  text: 'Retain your Sight at the end of this round.',
+  text: 'When played, gain Sight 5.',
 })
 
 class Enlightenment extends Card {

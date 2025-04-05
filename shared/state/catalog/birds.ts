@@ -247,16 +247,16 @@ const bare = new Bare({
 
 class Vulture extends Card {
   onPlay(player: number, game: GameModel): void {
-    this.starve(3, game, player)
+    this.starve(2, game, player)
   }
 }
 const vulture = new Vulture({
   name: 'Vulture',
   id: 1031,
   cost: 3,
-  points: 6,
+  points: 5,
   qualities: [Quality.VISIBLE, Quality.FLEETING],
-  text: 'Visible.\nFleeting.\nWhen played, gain Nourish -3.',
+  text: 'Visible\nFleeting\nWhen played, gain Nourish -2.',
   beta: true,
 })
 

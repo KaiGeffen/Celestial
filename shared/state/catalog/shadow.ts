@@ -236,7 +236,7 @@ const spite = new Spite({
   name: 'Spite',
   id: 413,
   cost: 6,
-  points: 6,
+  points: 7,
   text: "Worth -X where X is your opponent's points.\nCosts 1 less for each card in the story.",
   beta: true,
 })

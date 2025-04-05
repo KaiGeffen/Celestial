@@ -200,37 +200,27 @@ const passOn = new PassOn({
   id: 5213,
   cost: 4,
   qualities: [Quality.FLEETING],
-  text: 'Fleeting.\nCreate an Heirloom in hand.',
+  text: 'Fleeting\nCreate an Heirloom in hand.',
   beta: true,
 })
 
-class Village extends Card {
+class Progeny extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus + index)
-  }
-}
-const village = new Village({
-  name: 'Village',
-  id: 4018,
-  cost: 4,
-  beta: true,
-  text: 'Worth +1 for each card before this in the story.',
-})
-
-class Aspirant extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    if (super.exhale(3, game, player)) {
-      bonus += 3
-    }
     super.play(player, game, index, bonus)
+
+    if (super.exhale(2, game, player)) {
+      if (game.story.acts.length > 0) {
+        const card = game.story.acts[0].card
+        game.create(player, card)
+      }
+    }
   }
 }
-const aspirant = new Aspirant({
-  name: 'Aspirant',
-  id: 360,
-  cost: 2,
-  points: 2,
-  text: 'Exhale 3: Worth +3.',
+const progeny = new Progeny({
+  name: 'Progeny',
+  id: 5243,
+  cost: 1,
+  text: 'Exhale 2: Create a copy in hand of the next card in the story.',
   beta: true,
 })
 
@@ -247,6 +237,6 @@ export {
   lullaby,
   pregnant,
   passOn,
-  village,
-  aspirant,
+  // TODO 2
+  progeny,
 }

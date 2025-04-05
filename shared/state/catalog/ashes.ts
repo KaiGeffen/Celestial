@@ -305,21 +305,23 @@ const immolant = new Immolant({
   beta: true,
 })
 
-class WordOfRuin extends Card {
+class Wildfire extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    if (super.exhale(3, game, player)) {
-      game.removeAct(0)
+    if (super.exhale(2, game, player)) {
+      if (game.score[player] < game.score[player ^ 1]) {
+        game.story.addAct(this, player)
+      }
     }
   }
 }
-const wordOfRuin = new WordOfRuin({
-  name: 'Word of Ruin',
-  id: 1069,
+const wildfire = new Wildfire({
+  name: 'Wildfire',
+  id: 260,
   cost: 2,
   points: 2,
-  text: 'Exhale 3: Discard the next card in the story.',
+  text: 'Exhale 1: If you have fewer points than your opponent, add a Wildfire to the story.',
   beta: true,
 })
 
@@ -333,9 +335,9 @@ export {
   cling,
   death,
   fromAshes,
-  // NEW
+  // BETA
   goliath,
   firebug,
   immolant,
-  wordOfRuin,
+  wildfire,
 }

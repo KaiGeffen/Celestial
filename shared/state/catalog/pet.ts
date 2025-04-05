@@ -164,7 +164,7 @@ const pomegranate = new Pomegranate({
   name: 'Pomegranate',
   id: 411,
   cost: 5,
-  text: 'Nourish 6.',
+  text: 'Nourish 6',
   beta: true,
 })
 
@@ -200,7 +200,7 @@ const rose = new Rose({
   cost: 1,
   points: -1,
   qualities: [Quality.FLEETING],
-  text: 'Fleeting.\nNourish 2.',
+  text: 'Fleeting\nNourish 2',
   beta: true,
 })
 
