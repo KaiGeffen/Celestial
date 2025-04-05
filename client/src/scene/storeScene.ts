@@ -80,22 +80,20 @@ export default class StoreScene extends BaseSceneWithHeader {
       .fixWidthSizer({
         y: this.headerHeight + Space.buttonHeight + Space.pad * 2,
         width: Space.windowWidth,
-        space: { item: Space.pad },
+        space: { item: Space.pad, left: Space.pad, right: Space.pad },
       })
-      .setPosition(Space.windowWidth / 2, Space.windowHeight / 2)
-      .setOrigin(0.5, 0.5)
+      .setOrigin(0, 0)
 
     const items = [
       createStoreItem(this, 'Thorn Border', 100, 'ThornBorder'),
-      createStoreItem(this, 'Dandelion Relic', 100, 'DandelionRelic'),
-      createStoreItem(this, 'Butterfly', 100, 'Butterfly'),
-      createStoreItem(this, 'Imani', 100, 'Imani'),
-      createStoreItem(this, 'Jade Cardback', 100, 'JadeCardback'),
-      createStoreItem(this, 'Jules', 100, 'Jules'),
+      createStoreItem(this, 'Dandelion Relic', 500, 'DandelionRelic'),
+      createStoreItem(this, 'Butterfly', 40, 'Butterfly'),
+      createStoreItem(this, 'Imani', 2000, 'Imani'),
+      createStoreItem(this, 'Jade Cardback', 300, 'JadeCardback'),
+      createStoreItem(this, 'Jules', 0, 'Jules'),
     ]
 
     items.forEach((item) => {
-      console.log(item)
       sizer.add(item)
     })
 
