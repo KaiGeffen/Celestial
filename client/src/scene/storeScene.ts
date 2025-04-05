@@ -101,23 +101,90 @@ export default class StoreScene extends BaseSceneWithHeader {
   }
 }
 
+// Store item descriptions
+const STORE_ITEMS: { [key: string]: { description: string } } = {
+  ThornBorder: {
+    description:
+      'A thorny border that frames your avatar with a dark and mysterious edge.',
+  },
+  DandelionRelic: {
+    description:
+      'A mystical relic infused with the essence of dandelions, bringing fortune to its bearer.',
+  },
+  Butterfly: {
+    description:
+      'A delicate butterfly companion that follows your cursor with graceful movements.',
+  },
+  Imani: {
+    description:
+      "Unlock the Doula to a New World: Imani!\n\nCore to Imani is the Birth mechanic, which creates a Child in hand that can grow to any size. However, since many of these cards earn no points the round they are played, you must carefully ration out the points that you do have and efficiently sacrifice rounds that you can't win.\n\nOnce you've stabilized, remove your weakest cards with Mine, grow a Child as large as you can, then chain together cheap copies of The Future to finally win.",
+  },
+  JadeCardback: {
+    description:
+      'An elegant cardback design featuring intricate jade patterns that shimmer as cards move.',
+  },
+  Jules: {
+    description:
+      'A friendly character that brings unique strategic options to your gameplay.',
+  },
+}
+
 // A single item to purchase
 function createStoreItem(
   scene: BaseScene,
   name: string,
   price: number,
   image: string,
-) {
-  return scene.rexUI.add
-    .sizer({
-      orientation: 'vertical',
-      space: { item: Space.pad },
+): Phaser.GameObjects.GameObject {
+  const container = scene.rexUI.add.sizer({
+    orientation: 'vertical',
+    space: { item: Space.pad },
+  })
+
+  // Add image
+  const itemImage = scene.add.image(0, 0, `store-${image}`)
+  container.add(itemImage, { align: 'center' })
+
+  // Add name
+  container.add(scene.add.text(0, 0, name, Style.basic), {
+    align: 'center',
+  })
+
+  // Add price
+  container.add(scene.add.text(0, 0, `${price} 💎`, Style.basic), {
+    align: 'center',
+  })
+
+  // Make the container interactive
+  container
+    .setInteractive()
+    .on('pointerover', () => {
+      itemImage.setTint(0xcccccc)
     })
-    .add(scene.add.image(0, 0, `store-${image}`), { align: 'center' })
-    .add(scene.add.text(0, 0, name, Style.basic), {
-      align: 'center',
+    .on('pointerout', () => {
+      itemImage.clearTint()
     })
-    .add(scene.add.text(0, 0, `${price} 💎`, Style.basic), {
-      align: 'center',
+    .on('pointerdown', () => {
+      scene.sound.play('click')
+
+      // Get user's current balance
+      const balance = scene.registry.get('gems') || 0
+
+      // Create store item data
+      const item = {
+        name,
+        description: STORE_ITEMS[image].description,
+        cost: price,
+        image: `store-${image}`,
+      }
+
+      // Launch the purchase menu
+      scene.scene.launch('MenuScene', {
+        menu: 'purchaseItem',
+        item,
+        balance,
+      })
     })
+
+  return container
 }
