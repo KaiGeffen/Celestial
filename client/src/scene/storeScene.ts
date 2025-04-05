@@ -65,10 +65,10 @@ export default class StoreScene extends BaseSceneWithHeader {
       Space.buttonWidth,
       Space.buttonHeight,
     )
-    new Buttons.Basic(container, 0, 0, 'Purchase 💎', () =>
-      // TODO Open menu to select package
-      this.initiatePayment('gems'),
-    )
+    new Buttons.Basic(container, 0, 0, 'Purchase 💎', () => {
+      this.sound.play('click')
+      this.scene.launch('MenuScene', { menu: 'purchaseGems' })
+    })
     sizer.add(container)
 
     // Layout the sizer
@@ -99,35 +99,6 @@ export default class StoreScene extends BaseSceneWithHeader {
 
     sizer.layout()
   }
-
-  private async initiatePayment(packageId: string): Promise<void> {
-    // Show loading state
-    const loadingText = this.add
-      .text(
-        Space.windowWidth / 2,
-        Space.windowHeight / 2,
-        'Processing payment...',
-        Style.basic,
-      )
-      .setOrigin(0.5)
-
-    try {
-      // Create payment session and open checkout
-      const result = await paymentService.purchaseGems(packageId)
-      if (!result) {
-        throw new Error('Failed to create payment session')
-      }
-
-      // Open Stripe Checkout
-      await paymentService.openCheckout(result.sessionId)
-
-      // Note: Success/failure handling will happen via URL redirects
-      loadingText.destroy()
-    } catch (error) {
-      this.signalError('Payment error: ' + error)
-      loadingText.destroy()
-    }
-  }
 }
 
 // A single item to purchase
@@ -143,11 +114,10 @@ function createStoreItem(
       space: { item: Space.pad },
     })
     .add(scene.add.image(0, 0, `store-${image}`), { align: 'center' })
-    .add(scene.add.text(0, 0, name, Style.basic).setOrigin(0.5), {
+    .add(scene.add.text(0, 0, name, Style.basic), {
       align: 'center',
     })
-    .add(scene.add.text(0, 0, `${price} 💎`, Style.basic).setOrigin(0.5), {
+    .add(scene.add.text(0, 0, `${price} 💎`, Style.basic), {
       align: 'center',
     })
-    .layout()
 }

@@ -12,7 +12,7 @@ export const paymentService = {
     gemPackage: string,
   ): Promise<{ sessionId: string; amount: number; gems: number }> {
     const uuid = UserDataServer.getUserData().uuid
-    if (!uuid) throw new Error('No UUID found')
+    if (!uuid) throw new Error('Must be logged in to purchase gems')
 
     // Get the base URL
     const baseUrl = Flags.local

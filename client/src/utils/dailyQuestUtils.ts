@@ -10,7 +10,7 @@ import UserDataServer from '../network/userDataServer'
  */
 export function isDailyQuestAvailable(): boolean {
   const now = new Date()
-  const lastReward = new Date(UserDataServer.lastDailyReward)
+  const lastReward = new Date(UserDataServer.getUserData().lastDailyReward)
   const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
 
   return lastReward < oneDayAgo
@@ -21,14 +21,17 @@ export function isDailyQuestAvailable(): boolean {
  * @returns Formatted string showing time until next quest
  */
 export function getTimeUntilNextQuest(): string {
-  if (!UserDataServer.isLoggedIn() || !UserDataServer.lastDailyReward) {
+  if (
+    !UserDataServer.isLoggedIn() ||
+    !UserDataServer.getUserData().lastDailyReward
+  ) {
     throw new Error(
       'Daily quest is not available: User is not logged in or last daily reward is not set.',
     )
   }
 
   const now = new Date()
-  const lastReward = new Date(UserDataServer.lastDailyReward)
+  const lastReward = new Date(UserDataServer.getUserData().lastDailyReward)
   const nextRewardTime = new Date(lastReward.getTime() + 24 * 60 * 60 * 1000)
 
   // Calculate hours, minutes, and seconds until next quest
