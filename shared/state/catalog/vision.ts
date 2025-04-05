@@ -181,14 +181,18 @@ class Riddle extends Card {
     ) {
       const card = game.hand[player].splice(0, 1)[0]
       game.story.addAct(card, player, 0)
+    } else {
+      game.discard(player, 1)
     }
   }
 }
 const riddle = new Riddle({
   name: 'Riddle',
   id: 6852,
+  cost: 1,
+  points: 1,
   qualities: [Quality.VISIBLE],
-  text: 'Visible.\nAdd the first card in your hand to the story after this if it has the same cost as the card after this.',
+  text: 'Visible\nDiscard a card, or add it to the story instead if it has the same base cost as the card after this.',
   beta: true,
 })
 

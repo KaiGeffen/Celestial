@@ -200,7 +200,7 @@ const passOn = new PassOn({
   id: 5213,
   cost: 4,
   qualities: [Quality.FLEETING],
-  text: 'Fleeting.\nCreate a 0:4 Heirloom in hand.',
+  text: 'Fleeting.\nCreate an Heirloom in hand.',
   beta: true,
 })
 
