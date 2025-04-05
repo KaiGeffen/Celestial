@@ -26,6 +26,7 @@ const birth = new Birth({
   name: 'Birth',
   id: 8,
   cost: 2,
+  points: 1,
   text: 'Birth 2',
 })
 
@@ -144,7 +145,7 @@ const uprising = new Uprising({
 })
 
 // BETA
-class Lullaby extends Card {
+class Storytime extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -156,8 +157,8 @@ class Lullaby extends Card {
     }
   }
 }
-const lullaby = new Lullaby({
-  name: 'Lullaby',
+const storytime = new Storytime({
+  name: 'Storytime',
   id: 5218,
   cost: 6,
   points: 2,
@@ -224,6 +225,23 @@ const progeny = new Progeny({
   beta: true,
 })
 
+class Hug extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    if (game.story.acts.length > 0 && game.story.acts[0].owner === player) {
+      bonus += 2
+    }
+    super.play(player, game, index, bonus)
+  }
+}
+const hug = new Hug({
+  name: 'Hug',
+  id: 5244,
+  cost: 2,
+  points: 1,
+  text: 'Worth +2 if the next card in the story is yours.',
+  beta: true,
+})
+
 export {
   nascence,
   birth,
@@ -234,9 +252,10 @@ export {
   cradle,
   uprising,
   // BETA
-  lullaby,
+  storytime,
   pregnant,
   passOn,
   // TODO 2
   progeny,
+  hug,
 }

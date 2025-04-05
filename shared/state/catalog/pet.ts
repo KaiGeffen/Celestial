@@ -248,6 +248,7 @@ const celebration = new Celebration({
   beta: true,
 })
 
+// TODO Rename
 class Supernova extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)

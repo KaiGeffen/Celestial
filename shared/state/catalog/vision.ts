@@ -237,7 +237,7 @@ const lantern = new Lantern({
   cost: 5,
   points: 5,
   qualities: [Quality.FLEETING],
-  text: 'Fleeting.\nIf this is the last card in the story, transform a card in hand into a copy of this with +1 point.',
+  text: 'Fleeting\nIf this is the last card in the story, transform a card in hand into a copy of this with +1 point.',
   beta: true,
 })
 

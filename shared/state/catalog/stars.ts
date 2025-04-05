@@ -64,6 +64,11 @@ const ecology = new Ecology({
 })
 
 class Sun extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    this.inspire(1, game, player)
+  }
+
   onMorning(player: number, game: GameModel, index: number) {
     super.addBreath(2, game, player)
     return true
@@ -74,7 +79,7 @@ const sun = new Sun({
   id: 56,
   cost: 8,
   points: 8,
-  text: 'Morning: Gain 2 breath.',
+  text: 'Inspire 1\nMorning: Gain 2 breath.',
   story: 'I raise my head over the horizon\nI begin\nJust like you',
 })
 
@@ -171,7 +176,7 @@ const possibility = new Possibility({
   id: 8828,
   cost: 4,
   qualities: [Quality.FLEETING],
-  text: 'Fleeting.\nIncrease your max breath by 1 permanently.',
+  text: 'Fleeting\nIncrease your max breath by 1 permanently.',
   beta: true,
 })
 

@@ -182,7 +182,7 @@ const truth = new Card({
   name: 'Truth',
   id: 104,
   cost: 6,
-  points: 8,
+  points: 7,
   beta: true,
 })
 
@@ -214,7 +214,7 @@ const defiance = new Defiance({
   beta: true,
 })
 
-class Bare extends Card {
+class Silence extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -235,8 +235,8 @@ class Bare extends Card {
     }
   }
 }
-const bare = new Bare({
-  name: 'Bare',
+const silence = new Silence({
+  name: 'Silence',
   id: 197,
   cost: 2,
   points: 2,
@@ -257,33 +257,6 @@ const vulture = new Vulture({
   points: 5,
   qualities: [Quality.VISIBLE, Quality.FLEETING],
   text: 'Visible\nFleeting\nWhen played, gain Nourish -2.',
-  beta: true,
-})
-
-class Release extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number): void {
-    super.play(player, game, index, bonus)
-
-    const deck = game.deck[player]
-    // Remove the top 4 cards from the deck
-    const amt = Math.min(4, deck.length)
-    const top4 = deck.splice(deck.length - amt, amt)
-
-    // Add back any without Fleeting and RFG the others
-    for (let card of top4) {
-      if (card.qualities.includes(Quality.FLEETING)) {
-        game.expended[player].push(card)
-      } else {
-        deck.push(card)
-      }
-    }
-  }
-}
-const release = new Release({
-  name: 'Release',
-  id: 1032,
-  qualities: [Quality.VISIBLE, Quality.FLEETING],
-  text: 'Visible.\nFleeting.\nRemove from the game all cards in the top 4 of your deck with Fleeting.',
   beta: true,
 })
 
@@ -330,8 +303,8 @@ export {
   nest,
   truth,
   defiance,
-  bare,
+  silence,
   vulture,
-  release,
   rooster,
+  // TODO 1
 }
