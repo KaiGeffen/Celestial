@@ -32,8 +32,14 @@ export default class PurchaseItemMenu extends Menu {
     })
 
     // Add item image on the left
-    const imageContainer = new ContainerLite(this.scene, 0, 0, 400, 400)
     const image = this.scene.add.image(0, 0, `store-${this.item.imageKey}-full`)
+    const imageContainer = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      image.width,
+      image.height,
+    )
     imageContainer.add(image)
     contentSizer.add(imageContainer)
 
