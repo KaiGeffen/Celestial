@@ -1,6 +1,6 @@
 import 'phaser'
 import { Style, Color, Space } from '../settings/settings'
-import { BaseSceneWithHeader } from './baseScene'
+import BaseScene, { BaseSceneWithHeader } from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import BasicButton from '../lib/buttons/basic'
 import UserDataServer from '../network/userDataServer'
@@ -18,7 +18,7 @@ export default class StoreScene extends BaseSceneWithHeader {
     super.create({ title: 'Store' })
 
     this.createCategoriesText()
-    // this.createStoreItems()
+    this.createStoreItems()
   }
 
   private createBackground(): void {
@@ -75,6 +75,33 @@ export default class StoreScene extends BaseSceneWithHeader {
     sizer.layout()
   }
 
+  private createStoreItems() {
+    const sizer = this.rexUI.add
+      .fixWidthSizer({
+        y: this.headerHeight + Space.buttonHeight + Space.pad * 2,
+        width: Space.windowWidth,
+        space: { item: Space.pad },
+      })
+      .setPosition(Space.windowWidth / 2, Space.windowHeight / 2)
+      .setOrigin(0.5, 0.5)
+
+    const items = [
+      createStoreItem(this, 'Thorn Border', 100, 'ThornBorder'),
+      createStoreItem(this, 'Dandelion Relic', 100, 'DandelionRelic'),
+      createStoreItem(this, 'Butterfly', 100, 'Butterfly'),
+      createStoreItem(this, 'Imani', 100, 'Imani'),
+      createStoreItem(this, 'Jade Cardback', 100, 'JadeCardback'),
+      createStoreItem(this, 'Jules', 100, 'Jules'),
+    ]
+
+    items.forEach((item) => {
+      console.log(item)
+      sizer.add(item)
+    })
+
+    sizer.layout()
+  }
+
   private async initiatePayment(packageId: string): Promise<void> {
     // Show loading state
     const loadingText = this.add
@@ -103,4 +130,26 @@ export default class StoreScene extends BaseSceneWithHeader {
       loadingText.destroy()
     }
   }
+}
+
+// A single item to purchase
+function createStoreItem(
+  scene: BaseScene,
+  name: string,
+  price: number,
+  image: string,
+) {
+  return scene.rexUI.add
+    .sizer({
+      orientation: 'vertical',
+      space: { item: Space.pad },
+    })
+    .add(scene.add.image(0, 0, `store-${image}`), { align: 'center' })
+    .add(scene.add.text(0, 0, name, Style.basic).setOrigin(0.5), {
+      align: 'center',
+    })
+    .add(scene.add.text(0, 0, `${price} 💎`, Style.basic).setOrigin(0.5), {
+      align: 'center',
+    })
+    .layout()
 }
