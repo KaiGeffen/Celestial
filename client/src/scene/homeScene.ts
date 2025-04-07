@@ -359,7 +359,7 @@ export default class HomeScene extends BaseScene {
       )
       .setOrigin(0.5, 1)
 
-    let map = this.add.sprite(0, 0, 'bg-Match').setOrigin(0)
+    let map = this.add.sprite(0, 0, 'backgroundMatch').setOrigin(0)
 
     // While not hovered, rectangle is greyed
     rect
@@ -401,7 +401,7 @@ export default class HomeScene extends BaseScene {
       1,
     )
 
-    let map = this.add.sprite(0, 0, 'bg-Match').setOrigin(0)
+    let map = this.add.sprite(0, 0, 'backgroundMatch').setOrigin(0)
 
     // While not hovered, rectangle is greyed
     rect
@@ -441,7 +441,7 @@ export default class HomeScene extends BaseScene {
       1,
     )
 
-    let map = this.add.sprite(0, 0, 'bg-Match').setOrigin(0)
+    let map = this.add.sprite(0, 0, 'backgroundMatch').setOrigin(0)
 
     rect
       .setInteractive()

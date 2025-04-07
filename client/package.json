@@ -4,9 +4,10 @@
   "description": "The client-side of Celestial",
   "main": "dist/index.js",
   "scripts": {
-    "build": "webpack",
-    "start": "webpack && live-server --port=8083",
-    "dev": "webpack --watch & live-server --port=4949"
+    "generate-assets": "ts-node src/loader/generate-asset-lists.ts",
+    "build": "npm run generate-assets && webpack",
+    "start": "npm run generate-assets && webpack && live-server --port=8083",
+    "dev": "npm run generate-assets && webpack --watch & live-server --port=4949"
   },
   "repository": {
     "type": "git",

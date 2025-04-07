@@ -1,101 +1,36 @@
 import avatarNames from '../lib/avatarNames'
 import Catalog from '../../../shared/state/catalog'
-
-// Json data
-import avatarData from './avatars.json'
-import iconData from './icons.json'
-import storePreviewData from './store.json'
-import backgroundData from './backgrounds.json'
-import keywordData from './keywords.json'
-import storyData from './stories.json'
-import sfxData from './sfx.json'
-import dialogData from './dialog.json'
 import { Space, Flags } from '../settings/settings'
+import { assetLists } from './assetLists'
 
 const EXTENSION = 'webp'
 
-// Entry in the prefix map below
-interface PrefixEntry {
-  fp: string
-  prefix: string
-  list: string[]
-  // Spritesheet specification
-  sheet?: {
+// Special spritesheets that need specific dimensions
+interface SpritesheetConfig {
+  directory: string
+  sheet: {
     width: number
     height: number
   }
 }
 
-const imagePrefixMap: PrefixEntry[] = [
+const SPRITESHEETS: SpritesheetConfig[] = [
   {
-    fp: `avatars//${Flags.mobile ? 'mobile/' : ''}`,
-    prefix: 'avatar-',
-    list: avatarData,
-  },
-  {
-    fp: `cards/${Flags.mobile ? 'mobile/' : ''}`,
-    prefix: '',
-    list: [
-      ...Catalog.allCards.filter((card) => !card.beta),
-      Catalog.cardback,
-    ].map((card) => card.name),
-  },
-  {
-    fp: 'cutouts/',
-    prefix: 'cutout-',
-    list: Catalog.collectibleCards.map((card) => card.name),
-  },
-  {
-    fp: 'icons/',
-    prefix: 'icon-',
-    list: iconData,
-  },
-  {
-    fp: 'store/',
-    prefix: 'store-',
-    list: storePreviewData,
-  },
-  {
-    fp: 'keywords/',
-    prefix: 'kw-',
-    list: keywordData,
-  },
-  {
-    fp: 'backgrounds/',
-    prefix: 'bg-',
-    list: backgroundData,
-  },
-  {
-    fp: 'story/',
-    prefix: 'story-',
-    list: storyData,
-  },
-]
-
-// NOTE Button preloaded to use in scene
-const spritesheetPrefixMap: PrefixEntry[] = [
-  {
-    fp: `avatars/${Flags.mobile ? 'mobile/' : ''}`,
-    prefix: 'avatar-',
-    list: avatarNames,
+    directory: 'avatar',
     sheet: {
       width: Space.avatarSize,
       height: Space.avatarSize,
     },
   },
   {
-    fp: 'spritesheet/',
-    prefix: 'icon-',
-    list: ['Mission'],
+    directory: 'spritesheet',
     sheet: {
       width: 80,
       height: 80,
     },
   },
   {
-    fp: 'spritesheet/',
-    prefix: 'icon-',
-    list: ['Relic'],
+    directory: 'spritesheet',
     sheet: {
       width: 80,
       height: 160,
@@ -103,16 +38,17 @@ const spritesheetPrefixMap: PrefixEntry[] = [
   },
 ]
 
-const prefixMap: PrefixEntry[] = [...imagePrefixMap, ...spritesheetPrefixMap]
-
 export default class Loader {
   // Load any assets that are needed within the preload scene
   static preload(scene: Phaser.Scene) {
     // Set the load path
     scene.load.path = 'assets/'
 
-    // Load button as a spritesheet
-    Loader.loadButton(scene)
+    // Load button as a spritesheet, used in this scene
+    scene.load.spritesheet(`icon-Button`, `img/Button.${EXTENSION}`, {
+      frameWidth: Space.buttonWidth,
+      frameHeight: Space.buttonHeight,
+    })
   }
 
   static loadAll(scene: Phaser.Scene) {
@@ -125,21 +61,64 @@ export default class Loader {
     // Load the round results
     Loader.loadResults(scene)
 
-    // Load the rest of the assets
-    Loader.bulkLoad(scene)
+    // Load all assets from each directory
+    Object.entries(assetLists).forEach(([directory, files]) => {
+      if (directory !== 'sfx' && directory !== 'dialog') {
+        Loader.loadAssets(scene, directory, files)
+      }
+    })
+
+    // Load spritesheets
+    SPRITESHEETS.forEach((config) => {
+      const files = assetLists[config.directory] || []
+      Loader.loadSpritesheets(scene, config.directory, files, config.sheet)
+    })
 
     scene.load.start()
 
     // After loading is complete, do anything that relies on the loaded resources
     scene.load.on('complete', () => {
-      // Generate the animations for a match results
+      // Generate the animations for match results
       Loader.loadAnimations(scene)
+    })
+  }
+
+  private static loadAssets(
+    scene: Phaser.Scene,
+    directory: string,
+    files: readonly string[],
+  ): void {
+    files.forEach((name) => {
+      const key = `${directory}-${name}`
+      // Add img/ prefix for image directories
+      const filepath =
+        directory === 'sfx' || directory === 'dialog'
+          ? `${directory}/${name}.mp3`
+          : `img/${directory}/${name}.${EXTENSION}`
+      scene.load.image(key, filepath)
+    })
+  }
+
+  private static loadSpritesheets(
+    scene: Phaser.Scene,
+    directory: string,
+    files: readonly string[],
+    sheet: { width: number; height: number },
+  ): void {
+    files.forEach((name) => {
+      const key = `${directory}-${name}`
+      const filepath = `img/${directory}/${name}.${EXTENSION}`
+
+      scene.load.spritesheet(key, filepath, {
+        frameWidth: sheet.width,
+        frameHeight: sheet.height,
+      })
     })
   }
 
   private static loadAnimations(scene: Phaser.Scene): void {
     ;['Win', 'Lose', 'Tie'].forEach((s) => {
-      const name = `icon-Round${s}`
+      const name = `icons-Round${s}`
 
       scene.anims.create({
         key: name,
@@ -149,47 +128,18 @@ export default class Loader {
     })
   }
 
-  // Load all of the assets that load in a normal way
-  private static bulkLoad(
-    scene: Phaser.Scene,
-    map: PrefixEntry[] = prefixMap,
-  ): void {
-    // For each type of asset
-    map.forEach((assetType: PrefixEntry) => {
-      // For each asset of that type
-      assetType.list.forEach((name) => {
-        let key = `${assetType.prefix}${name}`
-        let filepath = `${assetType.fp}${name}.${EXTENSION}`
-
-        if (assetType.sheet === undefined) {
-          scene.load.image(key, filepath)
-        } else {
-          scene.load.spritesheet(key, filepath, {
-            frameWidth: assetType.sheet.width,
-            frameHeight: assetType.sheet.height,
-          })
-        }
-      })
-    })
-  }
-
-  // Loads the basic button as a spritesheet
-  private static loadButton(scene: Phaser.Scene): void {
-    scene.load.spritesheet(`icon-Button`, `spritesheet/Button.${EXTENSION}`, {
-      frameWidth: Space.buttonWidth,
-      frameHeight: Space.buttonHeight,
-    })
-  }
-
   // Loads all audio
   private static loadAudio(scene: Phaser.Scene): void {
-    // Load all sfx
-    sfxData.forEach((sound) => {
-      scene.load.audio(sound, `sfx/${sound}.mp3`)
+    const audioAssets = assetLists['sfx'] || []
+    const dialogAssets = assetLists['dialog'] || []
+
+    // Load SFX
+    audioAssets.forEach((name) => {
+      scene.load.audio(name, `sfx/${name}.mp3`)
     })
 
-    // Load each characters dialog clip
-    dialogData.forEach((name) => {
+    // Load dialog
+    dialogAssets.forEach((name) => {
       scene.load.audio(`dialog-${name}`, `dialog/${name}.mp3`)
     })
   }
@@ -202,9 +152,9 @@ export default class Loader {
   // Load the round result animations
   private static loadResults(scene: Phaser.Scene): void {
     ;['Win', 'Lose', 'Tie'].forEach((s) => {
-      const name = `icon-Round${s}`
+      const name = `icons-Round${s}`
 
-      scene.load.spritesheet(name, `icons/Round${s}.${EXTENSION}`, {
+      scene.load.spritesheet(name, `img/icons/Round${s}.${EXTENSION}`, {
         frameWidth: 563,
         frameHeight: 258,
       })
