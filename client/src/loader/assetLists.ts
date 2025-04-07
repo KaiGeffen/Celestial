@@ -17,28 +17,28 @@ export const assetLists = {
     ],
     "dimensions": {
       "Adonis": {
-        "width": 80,
-        "height": 80
+        "width": 130,
+        "height": 130
       },
       "Imani": {
-        "width": 80,
-        "height": 80
+        "width": 130,
+        "height": 130
       },
       "Jules": {
-        "width": 80,
-        "height": 80
+        "width": 130,
+        "height": 130
       },
       "Kitz": {
-        "width": 80,
-        "height": 80
+        "width": 130,
+        "height": 130
       },
       "Mia": {
-        "width": 80,
-        "height": 80
+        "width": 130,
+        "height": 130
       },
       "Mitra": {
-        "width": 80,
-        "height": 80
+        "width": 130,
+        "height": 130
       }
     }
   },
@@ -177,6 +177,7 @@ export const assetLists = {
   },
   "icon": {
     "files": [
+      "Mission",
       "Arrow",
       "Border",
       "Bottom Score",
@@ -213,9 +214,6 @@ export const assetLists = {
       "QuestionMark",
       "Recap",
       "ResultGlow",
-      "RoundLose",
-      "RoundTie",
-      "RoundWin",
       "Search",
       "SearchBar",
       "Share",
@@ -229,7 +227,13 @@ export const assetLists = {
       "Underline",
       "Wins",
       "XOut"
-    ]
+    ],
+    "dimensions": {
+      "Mission": {
+        "width": 80,
+        "height": 80
+      }
+    }
   },
   "store": {
     "files": [
@@ -254,7 +258,6 @@ export const assetLists = {
   },
   "story": {
     "files": [
-      "Mission",
       "Map",
       "Match",
       "Mission",
@@ -262,13 +265,7 @@ export const assetLists = {
       "Story 2",
       "Story 3",
       "Story 4"
-    ],
-    "dimensions": {
-      "Mission": {
-        "width": 80,
-        "height": 80
-      }
-    }
+    ]
   },
   "border": {
     "files": [
@@ -277,8 +274,35 @@ export const assetLists = {
   },
   "relic": {
     "files": [
-      "Relic"
-    ]
+      "Dandelion"
+    ],
+    "dimensions": {
+      "Dandelion": {
+        "width": 80,
+        "height": 160
+      }
+    }
+  },
+  "roundResult": {
+    "files": [
+      "Lose",
+      "Tie",
+      "Win"
+    ],
+    "dimensions": {
+      "Lose": {
+        "width": 563,
+        "height": 258
+      },
+      "Tie": {
+        "width": 563,
+        "height": 258
+      },
+      "Win": {
+        "width": 563,
+        "height": 258
+      }
+    }
   },
   "sfx": {
     "files": [

@@ -49,7 +49,7 @@ export default class RoundResultRegion extends Region {
     }
 
     // Set what image displays
-    const name = `icon-Round${s}`
+    const name = `roundResult-${s}`
     this.roundResult.setTexture(name, 0).play(name)
 
     // Tween it fading in and out
