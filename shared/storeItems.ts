@@ -1,4 +1,5 @@
 export interface StoreItem {
+  id: number
   name: string
   description: string
   cost: number
@@ -8,6 +9,7 @@ export interface StoreItem {
 
 export const STORE_ITEMS: { [key: string]: StoreItem } = {
   ThornBorder: {
+    id: 1,
     name: 'Thorn Border',
     description:
       'A thorny border that frames your avatar with a dark and mysterious edge.',
@@ -16,6 +18,7 @@ export const STORE_ITEMS: { [key: string]: StoreItem } = {
     category: 'Borders',
   },
   DandelionRelic: {
+    id: 2,
     name: 'Dandelion Relic',
     description:
       'A mystical relic infused with the essence of dandelions, bringing fortune to its bearer.',
@@ -24,6 +27,7 @@ export const STORE_ITEMS: { [key: string]: StoreItem } = {
     category: 'Featured',
   },
   Butterfly: {
+    id: 3,
     name: 'Butterfly',
     description:
       'A delicate butterfly companion that follows your cursor with graceful movements.',
@@ -32,6 +36,7 @@ export const STORE_ITEMS: { [key: string]: StoreItem } = {
     category: 'Pets',
   },
   Imani: {
+    id: 4,
     name: 'Imani',
     description:
       "Unlock the Doula to a New World: Imani!\n\nCore to Imani is the Birth mechanic, which creates a Child in hand that can grow to any size. However, since many of these cards earn no points the round they are played, you must carefully ration out the points that you do have and efficiently sacrifice rounds that you can't win.\n\nOnce you've stabilized, remove your weakest cards with Mine, grow a Child as large as you can, then chain together cheap copies of The Future to finally win.",
@@ -40,6 +45,7 @@ export const STORE_ITEMS: { [key: string]: StoreItem } = {
     category: 'Cards',
   },
   JadeCardback: {
+    id: 5,
     name: 'Jade Cardback',
     description:
       'An elegant cardback design featuring intricate jade patterns that shimmer as cards move.',
@@ -48,6 +54,7 @@ export const STORE_ITEMS: { [key: string]: StoreItem } = {
     category: 'Cardbacks',
   },
   Jules: {
+    id: 6,
     name: 'Jules',
     description:
       'A friendly character that brings unique strategic options to your gameplay.',

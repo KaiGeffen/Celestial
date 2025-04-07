@@ -12,6 +12,7 @@ import { players } from '../db/schema'
 import { eq } from 'drizzle-orm'
 import { UserDataServerWS } from '../../../shared/network/userDataWS'
 import { Deck } from '../../../shared/types/deck'
+import { STORE_ITEMS } from '../../../shared/storeItems'
 
 // Create the websocket server
 export default function createUserDataServer() {
@@ -140,6 +141,33 @@ export default function createUserDataServer() {
             await sendUserData(ws, id, data)
           },
         )
+        // TODO Separate this to another "Store" server eventually
+        .on('purchaseItem', async ({ id: itemId }) => {
+          if (!id) {
+            throw new Error('User attempted to purchase item before signing in')
+          }
+
+          const cost = STORE_ITEMS[itemId].cost
+
+          const currentBalance = await db
+            .select({ balance: players.gems })
+            .from(players)
+            .where(eq(players.id, id))
+            .limit(1)
+
+          if (currentBalance[0].balance < cost) {
+            // TODO Send error to client
+            return
+          }
+
+          // Update balance
+          await db
+            .update(players)
+            .set({ gems: currentBalance[0].balance - cost })
+            .where(eq(players.id, id))
+
+          // Update inventory
+        })
     } catch (e) {
       console.error('Error in user data server:', e)
     }

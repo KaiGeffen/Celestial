@@ -9,6 +9,7 @@
     "**/*",
     "node_modules/phaser3-rex-plugins-types",
     "../shared/animation.ts",
-    "../shared/state/keyword.ts"
+    "../shared/state/keyword.ts",
+    "../shared/storeItems.ts"
   ]
 }

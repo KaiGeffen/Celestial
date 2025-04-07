@@ -220,6 +220,17 @@ export default class UserDataServer {
     })
   }
 
+  // Send server user's list of completed missions
+  static purchaseItem(id: number): void {
+    if (wsServer === undefined) {
+      throw 'Purchasing item when server ws doesnt exist.'
+    }
+    wsServer.send({
+      type: 'purchaseItem',
+      id,
+    })
+  }
+
   // Send all data necessary to initialize a user
   static sendInitialUserData(username: string): void {
     if (wsServer === undefined) {

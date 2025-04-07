@@ -6,7 +6,7 @@ import BasicButton from '../lib/buttons/basic'
 import UserDataServer from '../network/userDataServer'
 import { paymentService } from '../store/paymentService'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import { STORE_ITEMS, StoreItem } from '../store/items'
+import { STORE_ITEMS, StoreItem } from '../../../shared/storeItems'
 
 export default class StoreScene extends BaseSceneWithHeader {
   constructor() {

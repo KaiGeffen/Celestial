@@ -22,6 +22,9 @@ export interface UserDataClientMessages {
     inventory: string
     missions: string
   }
+  purchaseItem: {
+    id: number
+  }
 }
 
 export interface UserDataServerMessages {

@@ -4,7 +4,8 @@ import Menu from './menu'
 import MenuScene from '../menuScene'
 import BasicButton from '../../lib/buttons/basic'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import { StoreItem } from '../../store/items'
+import { StoreItem } from '../../../../shared/storeItems'
+import UserDataServer from '../../network/userDataServer'
 
 export default class PurchaseItemMenu extends Menu {
   private item: StoreItem
@@ -20,6 +21,22 @@ export default class PurchaseItemMenu extends Menu {
     // Now create content with properties set
     this.createContent()
     this.layout()
+  }
+
+  private handlePurchase(): void {
+    if (!UserDataServer.isLoggedIn()) {
+      this.scene.signalError('You must be logged in to make purchases.')
+      return
+    }
+
+    if (this.balance < this.item.cost) {
+      this.scene.signalError('Insufficient gems to make this purchase.')
+      return
+    }
+
+    UserDataServer.purchaseItem(this.item.id)
+
+    // TODO Error handle server not allowing purchase
   }
 
   private createContent(): void {
@@ -102,8 +119,7 @@ export default class PurchaseItemMenu extends Menu {
       Space.buttonHeight,
     )
     new BasicButton(buyContainer, 0, 0, 'Buy', () => {
-      // TODO: Implement purchase logic
-      this.close()
+      this.handlePurchase()
     })
     buttonsSizer.add(buyContainer)
 
