@@ -225,6 +225,7 @@ export const assetLists = {
       "Thumb",
       "Top",
       "Underline",
+      "Wardrobe",
       "Wins",
       "XOut"
     ],

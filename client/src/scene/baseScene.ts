@@ -8,6 +8,7 @@ import Icons from '../lib/buttons/icons'
 import Hint from '../lib/hint'
 import ensureMusic from '../loader/audioManager'
 import Buttons from '../lib/buttons/buttons'
+import UserDataServer from '../network/userDataServer'
 
 // Functionality shared between BaseScene and MenuBaseScene
 class SharedBaseScene extends Phaser.Scene {
@@ -223,6 +224,27 @@ export class BaseSceneWithHeader extends BaseScene {
         Style.homeTitle,
       )
       .setOrigin(0.5)
+
+    // Add user info
+    this.createUserStatsDisplay()
+  }
+
+  private createUserStatsDisplay(): void {
+    // Get user data, use defaults if not logged in
+    const username = UserDataServer.getUserData().username || 'Guest'
+    const elo = UserDataServer.getUserData().elo || 1200
+    const gems = UserDataServer.getUserData().gems || 0
+    const coins = UserDataServer.getUserData().coins || 0
+
+    // Create the text object displaying user stats
+    this.add
+      .text(
+        Space.windowWidth - (Space.pad * 2 + Space.iconSize),
+        this.headerHeight / 2,
+        `${username} (${elo}) ${gems}💎 ${coins}💰`,
+        Style.basic,
+      )
+      .setOrigin(1, 0.5)
   }
 }
 

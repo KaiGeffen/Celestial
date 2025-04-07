@@ -7,7 +7,7 @@ import {
   UserSettings,
   Url,
 } from '../settings/settings'
-import BaseScene from './baseScene'
+import { BaseSceneWithHeader } from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import UserDataServer from '../network/userDataServer'
 import Catalog from '../../../shared/state/catalog'
@@ -18,10 +18,9 @@ import {
   isDailyQuestAvailable,
 } from '../utils/dailyQuestUtils'
 
-const headerHeight = Space.iconSize + Space.pad * 2
 const discordHeight = 150
 
-export default class HomeScene extends BaseScene {
+export default class HomeScene extends BaseSceneWithHeader {
   // Add this property to the class
   private questTimer: Phaser.Time.TimerEvent = null
 
@@ -45,30 +44,18 @@ export default class HomeScene extends BaseScene {
       return
     }
 
-    this.createHeader()
-    this.createButtons()
+    super.create({ title: 'Celestial' })
 
-    super.create()
+    this.createButtons()
   }
 
-  private createHeader(): void {
-    // Make the background
-    let background = this.add
-      .rectangle(0, 0, Space.windowWidth, headerHeight, Color.backgroundLight)
-      .setOrigin(0)
-
-    this.plugins.get('rexDropShadowPipeline')['add'](background, {
-      distance: 3,
-      angle: -90,
-      shadowColor: 0x000000,
-    })
-
+  private createLoginLogoutButton(): void {
     // Create logout button
     const s = UserDataServer.isLoggedIn() ? 'Logout' : 'Login'
     let btnLogout = new Buttons.Basic(
       this,
       Space.pad + Space.buttonWidth / 2,
-      headerHeight / 2,
+      this.headerHeight / 2,
       s,
       () => {
         // If we aren't logged in, go to login scene
@@ -88,22 +75,6 @@ export default class HomeScene extends BaseScene {
         })
       },
     )
-
-    // Create title
-    this.add
-      .text(
-        Space.windowWidth / 2,
-        headerHeight / 2,
-        'Celestial',
-        Style.homeTitle,
-      )
-      .setOrigin(0.5)
-
-    // Add user stats display
-    if (UserDataServer.isLoggedIn()) {
-      this.createUserStatsDisplay()
-      this.createQuestText()
-    }
   }
 
   private createQuestText(): void {
@@ -116,7 +87,7 @@ export default class HomeScene extends BaseScene {
 
     // Define position
     const x = Space.windowWidth / 2 + Space.pad / 2
-    const y = headerHeight + Space.pad
+    const y = this.headerHeight + Space.pad
 
     // Create text with initial value
     const questText = this.add
@@ -181,31 +152,12 @@ export default class HomeScene extends BaseScene {
     }
   }
 
-  private createUserStatsDisplay(): void {
-    // Get user data, use defaults if not logged in
-    const username = UserDataServer.getUserData().username
-    const elo = UserDataServer.getUserData().elo
-    const gems = UserDataServer.getUserData().gems
-    const coins = UserDataServer.getUserData().coins
-
-    // Create the text object displaying user stats
-    new Buttons.Text(
-      this,
-      Space.windowWidth - (Space.pad * 2 + Space.iconSize),
-      headerHeight / 2,
-      `${username} (${elo}) ${gems}💎 ${coins}💰`,
-      () => {
-        this.scene.start('StoreScene')
-      },
-    ).setOrigin(1, 0.5)
-  }
-
   private createButtons(): void {
-    // const y = headerHeight + (Space.windowHeight - headerHeight)/2
+    // const y = this.headerHeight + (Space.windowHeight - this.headerHeight)/2
 
     const width = (Space.windowWidth - Space.pad * 3) / 2
     const height =
-      Space.windowHeight - headerHeight - Space.pad * 3 - discordHeight
+      Space.windowHeight - this.headerHeight - Space.pad * 3 - discordHeight
 
     this.createAdventureButton(width, height)
     this.createDeckbuilderButton(width, height)
@@ -213,13 +165,15 @@ export default class HomeScene extends BaseScene {
     this.createDiscordButton()
     this.createLeaderboardButton()
     this.createMatchHistoryButton()
+
+    this.createLoginLogoutButton()
   }
 
   private createAdventureButton(width: number, height: number): void {
     let rectLeft = this.add
       .rectangle(
         Space.windowWidth / 2 - Space.pad / 2,
-        headerHeight + Space.pad,
+        this.headerHeight + Space.pad,
         width,
         height,
         0x303030,
@@ -247,7 +201,7 @@ export default class HomeScene extends BaseScene {
     tweens.push(
       this.tweens.add({
         targets: map,
-        y: -(map.displayHeight - height - Space.pad - headerHeight),
+        y: -(map.displayHeight - height - Space.pad - this.headerHeight),
         duration: time,
         delay: time / 2,
         ease: 'Sine.easeInOut',
@@ -286,7 +240,7 @@ export default class HomeScene extends BaseScene {
 
   private createDeckbuilderButton(width: number, height: number): void {
     const x = Space.windowWidth / 2 + Space.pad / 2
-    const y = headerHeight + Space.pad
+    const y = this.headerHeight + Space.pad
 
     // Free Play button
     let rectRight = this.add
@@ -345,6 +299,11 @@ export default class HomeScene extends BaseScene {
       )
       .setOrigin(0.5)
       .setShadow(0, 1, 'rgb(0, 0, 0, 1)', 6)
+
+    // Add quest text if user is logged in
+    if (UserDataServer.isLoggedIn()) {
+      this.createQuestText()
+    }
   }
 
   private createDiscordButton(): void {
