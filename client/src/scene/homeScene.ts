@@ -359,7 +359,7 @@ export default class HomeScene extends BaseScene {
       )
       .setOrigin(0.5, 1)
 
-    let map = this.add.sprite(0, 0, 'backgroundMatch').setOrigin(0)
+    let map = this.add.sprite(0, 0, 'background-Match').setOrigin(0)
 
     // While not hovered, rectangle is greyed
     rect
@@ -401,7 +401,7 @@ export default class HomeScene extends BaseScene {
       1,
     )
 
-    let map = this.add.sprite(0, 0, 'backgroundMatch').setOrigin(0)
+    let map = this.add.sprite(0, 0, 'background-Match').setOrigin(0)
 
     // While not hovered, rectangle is greyed
     rect
@@ -441,7 +441,7 @@ export default class HomeScene extends BaseScene {
       1,
     )
 
-    let map = this.add.sprite(0, 0, 'backgroundMatch').setOrigin(0)
+    let map = this.add.sprite(0, 0, 'background-Match').setOrigin(0)
 
     rect
       .setInteractive()
@@ -476,7 +476,9 @@ export default class HomeScene extends BaseScene {
     const top = y === 0
 
     const imgX = top ? x + 500 : x - 500
-    let img = this.add.image(imgX, y, card).setOrigin(top ? 1 : 0, top ? 0 : 1)
+    let img = this.add
+      .image(imgX, y, `card-${card}`)
+      .setOrigin(top ? 1 : 0, top ? 0 : 1)
     container.add(img)
 
     // Tween
@@ -511,7 +513,7 @@ export default class HomeScene extends BaseScene {
           Math.random() * (Catalog.collectibleCards.length - 1),
         )
         const card = Catalog.collectibleCards[cardNum].name
-        img.setTexture(card)
+        img.setTexture(`card-${card}`)
 
         // When holding completes, tween the card dropping offscreen
         this.tweens.add(fallConfig)
@@ -522,7 +524,7 @@ export default class HomeScene extends BaseScene {
           Math.random() * (Catalog.collectibleCards.length - 1),
         )
         const card = Catalog.collectibleCards[cardNum].name
-        img.setTexture(card)
+        img.setTexture(`card-${card}`)
 
         // When holding completes, tween the card dropping offscreen
         this.tweens.add(fallConfig)

@@ -22,7 +22,7 @@ export default class StoreScene extends BaseSceneWithHeader {
 
   private createBackground(): void {
     this.add
-      .image(0, 0, 'backgroundMatch')
+      .image(0, 0, 'background-Match')
       .setOrigin(0)
       .setSize(Space.windowWidth, Space.windowHeight)
   }

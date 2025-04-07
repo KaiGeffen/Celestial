@@ -5,38 +5,15 @@ import { assetLists } from './assetLists'
 
 const EXTENSION = 'webp'
 
-// Special spritesheets that need specific dimensions
-interface SpritesheetConfig {
-  directory: string
-  sheet: {
-    width: number
-    height: number
+interface AssetInfo {
+  files: string[]
+  dimensions?: {
+    [filename: string]: {
+      width: number
+      height: number
+    }
   }
 }
-
-const SPRITESHEETS: SpritesheetConfig[] = [
-  {
-    directory: 'avatar',
-    sheet: {
-      width: Space.avatarSize,
-      height: Space.avatarSize,
-    },
-  },
-  {
-    directory: 'spritesheet',
-    sheet: {
-      width: 80,
-      height: 80,
-    },
-  },
-  {
-    directory: 'spritesheet',
-    sheet: {
-      width: 80,
-      height: 160,
-    },
-  },
-]
 
 export default class Loader {
   // Load any assets that are needed within the preload scene
@@ -51,6 +28,7 @@ export default class Loader {
     })
   }
 
+  // Load all assets
   static loadAll(scene: Phaser.Scene) {
     // Load all audio
     Loader.loadAudio(scene)
@@ -58,21 +36,46 @@ export default class Loader {
     // Load the videos
     Loader.loadVideos(scene)
 
-    // Load the round results
-    Loader.loadResults(scene)
-
     // Load all assets from each directory
-    Object.entries(assetLists).forEach(([directory, files]) => {
-      if (directory !== 'sfx' && directory !== 'dialog') {
-        Loader.loadAssets(scene, directory, files)
-      }
-    })
+    Object.entries(assetLists as unknown as Record<string, AssetInfo>).forEach(
+      ([directory, info]) => {
+        if (directory === 'sfx' || directory === 'dialog') {
+          return // Audio handled separately
+        }
 
-    // Load spritesheets
-    SPRITESHEETS.forEach((config) => {
-      const files = assetLists[config.directory] || []
-      Loader.loadSpritesheets(scene, config.directory, files, config.sheet)
-    })
+        info.files.forEach((file: string) => {
+          const key = `${directory}-${file}`
+          const dims = info.dimensions?.[file]
+
+          if (dims) {
+            // If file has dimensions, it's in a dimension directory
+            const filepath = `img/${directory}/${dims.width}x${dims.height}/${file}.${EXTENSION}`
+            scene.load.spritesheet(key, filepath, {
+              frameWidth: dims.width,
+              frameHeight: dims.height,
+            })
+
+            // Set up animations for round sprites
+            if (directory === 'icon' && file.startsWith('Round')) {
+              scene.load.once('complete', () => {
+                scene.anims.create({
+                  key: key,
+                  frameRate: 2,
+                  frames: scene.anims.generateFrameNumbers(key, {
+                    start: 0,
+                    end: 3,
+                  }),
+                })
+              })
+            }
+          } else {
+            // Regular image file
+            const filepath = `img/${directory}/${file}.${EXTENSION}`
+            scene.load.image(key, filepath)
+          }
+        })
+      },
+    )
 
     scene.load.start()
 
@@ -83,42 +86,9 @@ export default class Loader {
     })
   }
 
-  private static loadAssets(
-    scene: Phaser.Scene,
-    directory: string,
-    files: readonly string[],
-  ): void {
-    files.forEach((name) => {
-      const key = `${directory}-${name}`
-      // Add img/ prefix for image directories
-      const filepath =
-        directory === 'sfx' || directory === 'dialog'
-          ? `${directory}/${name}.mp3`
-          : `img/${directory}/${name}.${EXTENSION}`
-      scene.load.image(key, filepath)
-    })
-  }
-
-  private static loadSpritesheets(
-    scene: Phaser.Scene,
-    directory: string,
-    files: readonly string[],
-    sheet: { width: number; height: number },
-  ): void {
-    files.forEach((name) => {
-      const key = `${directory}-${name}`
-      const filepath = `img/${directory}/${name}.${EXTENSION}`
-
-      scene.load.spritesheet(key, filepath, {
-        frameWidth: sheet.width,
-        frameHeight: sheet.height,
-      })
-    })
-  }
-
   private static loadAnimations(scene: Phaser.Scene): void {
     ;['Win', 'Lose', 'Tie'].forEach((s) => {
-      const name = `icons-Round${s}`
+      const name = `roundResult-${s}`
 
       scene.anims.create({
         key: name,
@@ -130,8 +100,10 @@ export default class Loader {
 
   // Loads all audio
   private static loadAudio(scene: Phaser.Scene): void {
-    const audioAssets = assetLists['sfx'] || []
-    const dialogAssets = assetLists['dialog'] || []
+    const audioInfo = assetLists['sfx'] as unknown as AssetInfo
+    const dialogInfo = assetLists['dialog'] as unknown as AssetInfo
+    const audioAssets = audioInfo?.files || []
+    const dialogAssets = dialogInfo?.files || []
 
     // Load SFX
     audioAssets.forEach((name) => {
@@ -147,17 +119,5 @@ export default class Loader {
   // Loads all video textures
   private static loadVideos(scene: Phaser.Scene): void {
     // scene.load.video('priorityHighlight', 'priority.mp4')
-  }
-
-  // Load the round result animations
-  private static loadResults(scene: Phaser.Scene): void {
-    ;['Win', 'Lose', 'Tie'].forEach((s) => {
-      const name = `icons-Round${s}`
-
-      scene.load.spritesheet(name, `img/icons/Round${s}.${EXTENSION}`, {
-        frameWidth: 563,
-        frameHeight: 258,
-      })
-    })
   }
 }

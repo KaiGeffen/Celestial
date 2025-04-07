@@ -368,7 +368,7 @@ export class View {
     this.scene = scene
 
     let background = scene.add
-      .image(0, 0, 'backgroundMatch')
+      .image(0, 0, 'background-Match')
       .setOrigin(0)
       .setDepth(-1)
       // Hovering this will hide the hint, in case it lingers from a state change
