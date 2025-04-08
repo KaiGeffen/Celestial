@@ -21,7 +21,7 @@ export const STORE_ITEMS: { [key: string]: StoreItem } = {
     id: 2,
     name: 'Dandelion Relic',
     description:
-      'A mystical relic infused with the essence of dandelions, bringing fortune to its bearer.',
+      'A mystical relic infused with the essence of dandelions, bringing fortune to its bearer. Like all things, it ends; blowing its seeds to the wind, and leaving behind a trail of memories.',
     cost: 500,
     imageKey: 'DandelionRelic',
     category: 'Featured',
@@ -30,7 +30,7 @@ export const STORE_ITEMS: { [key: string]: StoreItem } = {
     id: 3,
     name: 'Butterfly',
     description:
-      'A delicate butterfly companion that follows your cursor with graceful movements.',
+      'A delicate butterfly companion whose graceful movements will bring a touch of elegance to your gameplay.',
     cost: 40,
     imageKey: 'Butterfly',
     category: 'Pets',
@@ -48,7 +48,7 @@ export const STORE_ITEMS: { [key: string]: StoreItem } = {
     id: 5,
     name: 'Jade Cardback',
     description:
-      'An elegant cardback design featuring intricate jade patterns that shimmer as cards move.',
+      'An elegant cardback design featuring intricate jade patterns that shimmer as cards move. Wait that is not true, and also you cannot use this lol. I do not think it looks good but idk.',
     cost: 300,
     imageKey: 'JadeCardback',
     category: 'Cardbacks',
@@ -57,7 +57,7 @@ export const STORE_ITEMS: { [key: string]: StoreItem } = {
     id: 6,
     name: 'Jules',
     description:
-      'A friendly character that brings unique strategic options to your gameplay.',
+      'Unlock the Free Spirit: Jules!\n\nJules plays many low-cost birds with Fleeting, that fly away once played. This leaves your deck light as a feather in the late game, making it easy to consistently draw your higher cost cards round after round.\n\nTheir honest and unapologetic nature is reflected in the birds being clearly Visible to your opponent, making it difficult for you to deceive them.',
     cost: 0,
     imageKey: 'Jules',
     category: 'Avatars',
