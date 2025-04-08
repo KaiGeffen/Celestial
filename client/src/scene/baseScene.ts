@@ -178,11 +178,30 @@ export default class BaseScene extends SharedBaseScene {
 
 export class BaseSceneWithHeader extends BaseScene {
   protected headerHeight = Space.iconSize + Space.pad * 2
+  private userStatsDisplay: Phaser.GameObjects.Text
 
   create(params): void {
     super.create(params)
 
     this.createHeader(params.title)
+  }
+
+  update(time: number, delta: number): void {
+    super.update(time, delta)
+
+    this.updateUserStatsDisplay()
+  }
+
+  private updateUserStatsDisplay(): void {
+    // Update the user stats display
+    // Get user data, use defaults if not logged in
+    const username = UserDataServer.getUserData().username || 'Guest'
+    const elo = UserDataServer.getUserData().elo || 1200
+    const gems = UserDataServer.getUserData().gems || 0
+    const coins = UserDataServer.getUserData().coins || 0
+
+    // Set the text to the user's stats (Which might update)
+    this.userStatsDisplay.setText(`${username} (${elo}) ${gems}💎 ${coins}💰`)
   }
 
   private createHeader(title: string): void {
@@ -230,21 +249,18 @@ export class BaseSceneWithHeader extends BaseScene {
   }
 
   private createUserStatsDisplay(): void {
-    // Get user data, use defaults if not logged in
-    const username = UserDataServer.getUserData().username || 'Guest'
-    const elo = UserDataServer.getUserData().elo || 1200
-    const gems = UserDataServer.getUserData().gems || 0
-    const coins = UserDataServer.getUserData().coins || 0
-
     // Create the text object displaying user stats
-    this.add
+    this.userStatsDisplay = this.add
       .text(
         Space.windowWidth - (Space.pad * 2 + Space.iconSize),
         this.headerHeight / 2,
-        `${username} (${elo}) ${gems}💎 ${coins}💰`,
+        '',
         Style.basic,
       )
       .setOrigin(1, 0.5)
+
+    // Set the text's values
+    this.updateUserStatsDisplay()
   }
 }
 

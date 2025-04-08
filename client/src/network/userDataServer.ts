@@ -28,6 +28,7 @@ type UserData = null | {
   gems: number
   coins: number
   lastDailyReward: Date
+  ownedItems: number[]
 }
 
 export default class UserDataServer {
@@ -125,6 +126,7 @@ export default class UserDataServer {
           gems: number
           coins: number
           lastDailyReward: Date
+          ownedItems: number[]
         }) => {
           // Store the uuid and user data after successful login
           this.userData = {
@@ -221,7 +223,7 @@ export default class UserDataServer {
   }
 
   // Send server user's list of completed missions
-  static purchaseItem(id: number): void {
+  static purchaseItem(id: number, cost: number): void {
     if (wsServer === undefined) {
       throw 'Purchasing item when server ws doesnt exist.'
     }
@@ -229,6 +231,10 @@ export default class UserDataServer {
       type: 'purchaseItem',
       id,
     })
+
+    // Locally manage the purchase
+    UserDataServer.getUserData().gems -= cost
+    // TODO Cosmetic array update
   }
 
   // Send all data necessary to initialize a user
@@ -259,6 +265,7 @@ export default class UserDataServer {
         gems: null,
         coins: null,
         lastDailyReward: null,
+        ownedItems: [],
       }
     } else {
       return this.userData
@@ -277,6 +284,7 @@ export default class UserDataServer {
     username: string
     elo: number
     gems: number
+    ownedItems: number[]
   }): void {
     // Map from binary string to bool array
     sessionStorage.setItem(
@@ -299,9 +307,6 @@ export default class UserDataServer {
     )
 
     sessionStorage.setItem('decks', JSON.stringify(data.decks))
-    sessionStorage.setItem('username', data.username)
-    sessionStorage.setItem('elo', data.elo.toString())
-    sessionStorage.setItem('gems', data.gems.toString())
   }
 
   // TODO Clarify if we reuse a UserSessionWS or create a new ws even for signed in users

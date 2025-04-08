@@ -34,7 +34,11 @@ export default class PurchaseItemMenu extends Menu {
       return
     }
 
-    UserDataServer.purchaseItem(this.item.id)
+    // Purchase the item on the server (Updates local igc totals)
+    UserDataServer.purchaseItem(this.item.id, this.item.cost)
+
+    // Close the menu
+    this.close()
 
     // TODO Error handle server not allowing purchase
   }
