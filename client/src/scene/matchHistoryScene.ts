@@ -1,6 +1,6 @@
 import 'phaser'
 import { Style, Color, Space, Flags, Scroll } from '../settings/settings'
-import BaseScene from './baseScene'
+import { BaseSceneWithHeader } from './baseScene'
 import UserDataServer from '../network/userDataServer'
 import Buttons from '../lib/buttons/buttons'
 import { MatchHistoryEntry } from '../../../shared/types/matchHistory'
@@ -15,7 +15,7 @@ import { encodeShareableDeckCode } from '../../../shared/codec'
 const headerHeight = Space.iconSize + Space.pad * 2
 const width = Space.windowWidth - Space.sliderWidth
 
-export default class MatchHistoryScene extends BaseScene {
+export default class MatchHistoryScene extends BaseSceneWithHeader {
   private matchHistoryData: MatchHistoryEntry[]
   private filteredMatchHistoryData: MatchHistoryEntry[]
   private searchText: string = ''
@@ -30,50 +30,14 @@ export default class MatchHistoryScene extends BaseScene {
   }
 
   create(): void {
-    super.create()
+    super.create({ title: 'Match History' })
 
     // Reset scene state when creating
     this.matchHistoryData = []
     this.filteredMatchHistoryData = []
     this.searchText = ''
 
-    this.createHeader()
     this.fetchMatchHistoryData()
-  }
-
-  private createHeader(): void {
-    // Make the background header
-    let background = this.add
-      .rectangle(0, 0, Space.windowWidth, headerHeight, Color.backgroundLight)
-      .setOrigin(0)
-
-    this.plugins.get('rexDropShadowPipeline')['add'](background, {
-      distance: 3,
-      angle: -90,
-      shadowColor: 0x000000,
-    })
-
-    // Create back button
-    new Buttons.Basic(
-      this,
-      Space.pad + Space.buttonWidth / 2,
-      headerHeight / 2,
-      'Back',
-      () => {
-        this.sound.play('click')
-        this.scene.start('HomeScene')
-      },
-    )
-
-    // Create title back in center
-    this.add
-      .text(
-        Space.windowWidth / 2,
-        headerHeight / 2,
-        'Match History',
-        Style.homeTitle,
-      )
-      .setOrigin(0.5)
   }
 
   private async fetchMatchHistoryData() {
@@ -509,7 +473,7 @@ export default class MatchHistoryScene extends BaseScene {
     }
 
     try {
-      const uuid = UserDataServer.getUUID()
+      const uuid = UserDataServer.getUserData().uuid
       if (!uuid) {
         this.signalError('Log in to view your match history')
         return

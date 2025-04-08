@@ -10,6 +10,7 @@ import {
   Ease,
   Flags,
   UserSettings,
+  Depth,
 } from '../../settings/settings'
 import { GameScene } from '../gameScene'
 import Region from './baseRegion'
@@ -33,10 +34,9 @@ export default class PassRegion extends Region {
 
   create(scene: GameScene): PassRegion {
     this.scene = scene
-    this.container = scene.add.container(
-      Space.windowWidth,
-      Space.windowHeight / 2,
-    )
+    this.container = scene.add
+      .container(Space.windowWidth, Space.windowHeight / 2)
+      .setDepth(Depth.pass)
 
     // Pass and recap button
     this.createButtons()
@@ -172,17 +172,17 @@ export default class PassRegion extends Region {
   private createText(): void {
     // Create containers for each pass indicator
     this.theirPass = this.scene.add.container(-150, -100).setAlpha(0)
-    this.yourPass = this.scene.add.container(-150, 100).setAlpha(0)
+    this.yourPass = this.scene.add.container(-150, 80).setAlpha(0)
 
     // Them
-    const cloud = this.scene.add.image(0, 0, 'icon-Cloud')
+    const cloud = this.scene.add.image(0, 0, 'icon-CloudBottom')
     const text = this.scene.add
       .text(0, 20, 'Passed', Style.todoCloud)
       .setOrigin(0.5)
     this.theirPass.add([cloud, text])
 
     // Me
-    const cloud2 = this.scene.add.image(0, -20, 'icon-Cloud2')
+    const cloud2 = this.scene.add.image(0, -20, 'icon-CloudTop')
     const text2 = this.scene.add
       .text(0, 0, 'Passed', Style.todoCloud)
       .setOrigin(0.5)

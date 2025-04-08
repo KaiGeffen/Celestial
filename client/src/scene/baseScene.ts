@@ -2,11 +2,13 @@ import 'phaser'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
 
-import { BBStyle, Time, Space, Flags } from '../settings/settings'
+import { BBStyle, Time, Space, Flags, Color, Style } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Icons from '../lib/buttons/icons'
 import Hint from '../lib/hint'
 import ensureMusic from '../loader/audioManager'
+import Buttons from '../lib/buttons/buttons'
+import UserDataServer from '../network/userDataServer'
 
 // Functionality shared between BaseScene and MenuBaseScene
 class SharedBaseScene extends Phaser.Scene {
@@ -171,6 +173,94 @@ export default class BaseScene extends SharedBaseScene {
         activeScene: that,
       })
     }
+  }
+}
+
+export class BaseSceneWithHeader extends BaseScene {
+  protected headerHeight = Space.iconSize + Space.pad * 2
+  private userStatsDisplay: Phaser.GameObjects.Text
+
+  create(params): void {
+    super.create(params)
+
+    this.createHeader(params.title)
+  }
+
+  update(time: number, delta: number): void {
+    super.update(time, delta)
+
+    this.updateUserStatsDisplay()
+  }
+
+  private updateUserStatsDisplay(): void {
+    // Update the user stats display
+    // Get user data, use defaults if not logged in
+    const username = UserDataServer.getUserData().username || 'Guest'
+    const elo = UserDataServer.getUserData().elo || 1200
+    const gems = UserDataServer.getUserData().gems || 0
+    const coins = UserDataServer.getUserData().coins || 0
+
+    // Set the text to the user's stats (Which might update)
+    this.userStatsDisplay.setText(`${username} (${elo}) ${gems}💎 ${coins}💰`)
+  }
+
+  private createHeader(title: string): void {
+    // Make the background header
+    let background = this.add
+      .rectangle(
+        0,
+        0,
+        Space.windowWidth,
+        this.headerHeight,
+        Color.backgroundLight,
+      )
+      .setOrigin(0)
+
+    this.plugins.get('rexDropShadowPipeline')['add'](background, {
+      distance: 3,
+      angle: -90,
+      shadowColor: 0x000000,
+    })
+
+    // Create back button
+    new Buttons.Basic(
+      this,
+      Space.pad + Space.buttonWidth / 2,
+      this.headerHeight / 2,
+      'Back',
+      () => {
+        this.sound.play('click')
+        this.scene.start('HomeScene')
+      },
+    )
+
+    // Create title back in center
+    this.add
+      .text(
+        Space.windowWidth / 2,
+        this.headerHeight / 2,
+        title,
+        Style.homeTitle,
+      )
+      .setOrigin(0.5)
+
+    // Add user info
+    this.createUserStatsDisplay()
+  }
+
+  private createUserStatsDisplay(): void {
+    // Create the text object displaying user stats
+    this.userStatsDisplay = this.add
+      .text(
+        Space.windowWidth - (Space.pad * 2 + Space.iconSize),
+        this.headerHeight / 2,
+        '',
+        Style.basic,
+      )
+      .setOrigin(1, 0.5)
+
+    // Set the text's values
+    this.updateUserStatsDisplay()
   }
 }
 

@@ -137,10 +137,13 @@ export class MatchPvpWS extends MatchWS {
     super(newScene)
 
     this.socket.onOpen(() => {
-      console.log('Sending initPvp with uuid:', UserDataServer.getUUID())
+      console.log(
+        'Sending initPvp with uuid:',
+        UserDataServer.getUserData().uuid,
+      )
       this.socket.send({
         type: 'initPvp',
-        uuid: UserDataServer.getUUID() || '',
+        uuid: UserDataServer.getUserData().uuid || '',
         deck: deck,
         password: password,
       })

@@ -210,8 +210,6 @@ class Pass extends Button {
         text: 'PASS',
         interactive: false,
         style: Style.pass,
-        offsetX: Flags.mobile ? -3 : 7,
-        offsetY: Flags.mobile ? 4 : 9,
       },
       icon: {
         name: `${Flags.mobile ? 'Mobile' : ''}Sun`,

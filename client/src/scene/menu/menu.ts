@@ -160,6 +160,8 @@ import FocusMenu from './focus'
 import SearchMenu from './search'
 import LeaderboardMenu from './leaderboard'
 import { RegisterUsernameMenu } from './registerUsername'
+import PurchaseGemsMenu from './purchaseGems'
+import PurchaseItemMenu from './purchaseItem'
 
 const menus = {
   options: OptionsMenu,
@@ -177,6 +179,8 @@ const menus = {
   search: SearchMenu,
   leaderboard: LeaderboardMenu,
   registerUsername: RegisterUsernameMenu,
+  purchaseGems: PurchaseGemsMenu,
+  purchaseItem: PurchaseItemMenu,
 }
 
 // Function exposed for the creation of custom menus

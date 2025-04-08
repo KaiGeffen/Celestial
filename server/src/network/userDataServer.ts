@@ -12,6 +12,8 @@ import { players } from '../db/schema'
 import { eq } from 'drizzle-orm'
 import { UserDataServerWS } from '../../../shared/network/userDataWS'
 import { Deck } from '../../../shared/types/deck'
+import { STORE_ITEMS } from '../../../shared/storeItems'
+import { cosmeticsTransactions } from '../db/schema'
 
 // Create the websocket server
 export default function createUserDataServer() {
@@ -140,6 +142,59 @@ export default function createUserDataServer() {
             await sendUserData(ws, id, data)
           },
         )
+        // TODO Separate this to another "Store" server eventually
+        .on('purchaseItem', async ({ id: itemId }) => {
+          if (!id) {
+            throw new Error('User attempted to purchase item before signing in')
+          }
+
+          const item = Object.values(STORE_ITEMS).find(
+            (item) => item.id === itemId,
+          )
+          if (!item) {
+            throw new Error(
+              `User attempted to purchase invalid item: ${itemId}`,
+            )
+          }
+          const cost = item.cost
+
+          const currentBalance = await db
+            .select({ balance: players.gems })
+            .from(players)
+            .where(eq(players.id, id))
+            .limit(1)
+
+          // TODO Check that user doesnt already own this item
+          if (currentBalance[0].balance < cost) {
+            // TODO Send error to client
+            return
+          }
+
+          // Start a transaction
+          await db.transaction(async (tx) => {
+            // Update balance
+            await tx
+              .update(players)
+              .set({ gems: currentBalance[0].balance - cost })
+              .where(eq(players.id, id))
+
+            // Record the transaction
+            await tx.insert(cosmeticsTransactions).values({
+              player_id: id,
+              item_id: itemId,
+              transaction_type: 'purchase',
+            })
+          })
+
+          // Send updated user data
+          const result = await db
+            .select()
+            .from(players)
+            .where(eq(players.id, id))
+            .limit(1)
+          if (result.length === 0) return
+          await sendUserData(ws, id, result[0])
+        })
     } catch (e) {
       console.error('Error in user data server:', e)
     }
@@ -170,6 +225,16 @@ async function sendUserData(
     console.error('Error parsing decks:', e)
   }
 
+  // Get player's cosmetics transactions
+  const transactions = await db
+    .select()
+    .from(cosmeticsTransactions)
+    .where(eq(cosmeticsTransactions.player_id, id))
+    .orderBy(cosmeticsTransactions.transaction_time)
+
+  // Convert transactions to a list of owned item IDs
+  const ownedItems = transactions.map((t) => t.item_id)
+
   ws.send({
     type: 'sendUserData',
     inventory: data.inventory,
@@ -180,6 +245,7 @@ async function sendUserData(
     gems: data.gems,
     coins: data.coins,
     lastDailyReward: data.last_daily_reward,
+    ownedItems, // Add owned items to the response
   })
 
   // Update last active time

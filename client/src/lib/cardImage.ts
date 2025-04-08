@@ -57,7 +57,7 @@ export class CardImage {
     this.createContainer(outerContainer)
 
     // Card image
-    this.image = this.scene.add.image(0, 0, card.name)
+    this.image = this.scene.add.image(0, 0, `card-${card.name}`)
     this.image.setDisplaySize(Space.cardWidth, Space.cardHeight)
     this.container.add(this.image)
 
@@ -565,7 +565,7 @@ export class FullSizeCardImage extends CardImage {
         .setTexture(s)
         .setDisplaySize(Space.fullCardWidth, Space.fullCardHeight)
     } else {
-      this.scene.load.image(s, `assets/cards/${card.name}.webp`).start()
+      this.scene.load.image(s, `assets/cards/card-${card.name}.webp`).start()
 
       // When image loads, set image texture
       this.scene.load.once('complete', () => {

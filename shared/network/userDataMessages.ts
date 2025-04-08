@@ -22,6 +22,9 @@ export interface UserDataClientMessages {
     inventory: string
     missions: string
   }
+  purchaseItem: {
+    id: number
+  }
 }
 
 export interface UserDataServerMessages {
@@ -37,5 +40,10 @@ export interface UserDataServerMessages {
     gems: number
     coins: number
     lastDailyReward: Date
+    ownedItems: number[]
+  }
+  purchaseItemSuccess: {
+    itemId: number
+    balance: number
   }
 }

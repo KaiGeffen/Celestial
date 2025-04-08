@@ -102,3 +102,26 @@ export const matchHistory = pgTable(
     dateIdx: index('date_idx').on(table.match_date),
   }),
 )
+
+export const cosmeticsTransactions = pgTable(
+  'cosmetics_transactions',
+  {
+    id: serial('id').primaryKey(),
+    player_id: uuid('player_id')
+      .notNull()
+      .references(() => players.id, { onDelete: 'cascade' }),
+    item_id: integer('item_id').notNull(),
+    transaction_time: timestamp('transaction_time').notNull().defaultNow(),
+    transaction_type: varchar('transaction_type', { length: 20 })
+      .notNull()
+      .$type<'purchase' | 'reward' | 'refund'>(),
+  },
+  (table) => ({
+    // Index for querying a player's transactions
+    playerTransactionsIdx: index('player_transactions_idx').on(table.player_id),
+    // Index for querying by transaction time
+    transactionTimeIdx: index('transaction_time_idx').on(
+      table.transaction_time,
+    ),
+  }),
+)

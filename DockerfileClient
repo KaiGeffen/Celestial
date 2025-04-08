@@ -11,7 +11,8 @@ USER node
 
 WORKDIR /home/node/app/client
 
-RUN npm install && npm run build
+RUN npm install
+RUN npm run build
 
 EXPOSE 8083
 

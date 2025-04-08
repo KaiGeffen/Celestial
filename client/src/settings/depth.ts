@@ -13,9 +13,10 @@ export const Depth: Record<string, number> = {
   ourScore: 3,
   theirScore: 3,
   mulligan: 4,
+  pass: 5,
 
   // Above all other layers with cards
-  aboveOtherCards: 5,
+  aboveOtherCards: 6,
 
   tutorial: 7,
   pileOverlays: 8,

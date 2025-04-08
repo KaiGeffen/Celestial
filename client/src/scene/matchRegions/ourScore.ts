@@ -106,7 +106,7 @@ export default class OurScoreRegion extends Region {
 
   private createRelic(): void {
     this.relic = this.scene.add
-      .image(width / 2, 0, 'icon-Relic')
+      .image(width / 2, 0, 'relic-Dandelion')
       .setOrigin(0.5, 1)
     this.container.add(this.relic)
   }

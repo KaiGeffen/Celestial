@@ -21,13 +21,18 @@ const code = 1000
 // The websocket which is open with the main server (Authentication/pack opening)
 var wsServer: UserDataClientWS = undefined
 
+type UserData = null | {
+  uuid: string
+  username: string
+  elo: number
+  gems: number
+  coins: number
+  lastDailyReward: Date
+  ownedItems: number[]
+}
+
 export default class UserDataServer {
-  private static userUUID: string | null = null // Store UUID after successful login
-  static username: string | null = null
-  static elo: number | null = null
-  static gems: number | null = null
-  static coins: number | null = null
-  static lastDailyReward: Date | null = null
+  private static userData: UserData = null
 
   // Log in with the server for user with given OAuth token
   static login(
@@ -121,25 +126,27 @@ export default class UserDataServer {
           gems: number
           coins: number
           lastDailyReward: Date
+          ownedItems: number[]
         }) => {
-          // Store the UUID after successful login
-          this.userUUID = uuid
-
-          this.username = data.username
-          this.elo = data.elo
-          this.gems = data.gems
-          this.coins = data.coins
-          this.lastDailyReward = data.lastDailyReward
+          // Store the uuid and user data after successful login
+          this.userData = {
+            uuid: uuid,
+            ...data,
+          }
 
           that.loadUserData(data)
-          callback()
+          // TODO Bad smell, the callback should only happen once as it references a scene
+          if (callback) {
+            callback()
+            callback = null
+          }
         },
       )
 
     // If the connection closes, login again with same args
     wsServer.ws.onclose = (event) => {
-      // Clear the UUID after logging out
-      this.userUUID = null
+      // Clear user data after logging out
+      this.userData = null
 
       // Don't attempt to login again if the server explicitly logged us out
       if (event.code !== code) {
@@ -154,6 +161,9 @@ export default class UserDataServer {
   }
 
   static logout(): void {
+    // Clear user data after logging out
+    this.userData = null
+
     console.log('Logging out')
 
     // Clear the sign-in token
@@ -165,9 +175,6 @@ export default class UserDataServer {
       wsServer.close(code)
       wsServer = undefined
 
-      // Clear the UUID after logging out
-      this.userUUID = null
-
       UserSettings.clearSessionStorage()
     }
   }
@@ -177,16 +184,13 @@ export default class UserDataServer {
     return wsServer !== undefined
   }
 
+  // Call the server to refresh the user data
   static refreshUserData(): void {
     if (UserDataServer.isLoggedIn()) {
       wsServer.send({
         type: 'refreshUserData',
       })
     }
-  }
-
-  private static convertBoolArrayToBitString(array: boolean[]): string {
-    return array.map((value) => (value ? '1' : '0')).join('')
   }
 
   // Send server an updated list of decks
@@ -222,6 +226,21 @@ export default class UserDataServer {
     })
   }
 
+  // Send server user's list of completed missions
+  static purchaseItem(id: number, cost: number): void {
+    if (wsServer === undefined) {
+      throw 'Purchasing item when server ws doesnt exist.'
+    }
+    wsServer.send({
+      type: 'purchaseItem' as const,
+      id,
+    })
+
+    // Locally manage the purchase
+    UserDataServer.getUserData().gems -= cost
+    // TODO Cosmetic array update
+  }
+
   // Send all data necessary to initialize a user
   static sendInitialUserData(username: string): void {
     if (wsServer === undefined) {
@@ -241,6 +260,26 @@ export default class UserDataServer {
     })
   }
 
+  static getUserData(): UserData {
+    if (this.userData === null) {
+      return {
+        uuid: null,
+        username: null,
+        elo: null,
+        gems: null,
+        coins: null,
+        lastDailyReward: null,
+        ownedItems: [],
+      }
+    } else {
+      return this.userData
+    }
+  }
+
+  private static convertBoolArrayToBitString(array: boolean[]): string {
+    return array.map((value) => (value ? '1' : '0')).join('')
+  }
+
   // Load user data that was sent from server into session storage
   private static loadUserData(data: {
     inventory: string
@@ -249,6 +288,7 @@ export default class UserDataServer {
     username: string
     elo: number
     gems: number
+    ownedItems: number[]
   }): void {
     // Map from binary string to bool array
     sessionStorage.setItem(
@@ -271,9 +311,6 @@ export default class UserDataServer {
     )
 
     sessionStorage.setItem('decks', JSON.stringify(data.decks))
-    sessionStorage.setItem('username', data.username)
-    sessionStorage.setItem('elo', data.elo.toString())
-    sessionStorage.setItem('gems', data.gems.toString())
   }
 
   // TODO Clarify if we reuse a UserSessionWS or create a new ws even for signed in users
@@ -289,9 +326,5 @@ export default class UserDataServer {
       const fullPath = `wss://celestialtcg.com/user_data_ws`
       return new TypedWebSocket(fullPath)
     }
-  }
-
-  static getUUID(): string | null {
-    return this.userUUID
   }
 }
