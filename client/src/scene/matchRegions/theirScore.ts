@@ -37,9 +37,7 @@ export default class TheirScoreRegion extends Region {
       .setDepth(Depth.theirScore)
 
     // this.createBackground()
-
-    this.createRecap()
-    this.createSkip()
+    this.createIcons()
     this.createWins()
     this.createRelic()
     this.addHotkeyListeners()
@@ -92,6 +90,24 @@ export default class TheirScoreRegion extends Region {
       .setOrigin(0)
 
     this.container.add(background)
+  }
+
+  private createIcons(): void {
+    // Always visible
+    this.createSetSpeed()
+
+    // Only one of these visible at a time
+    this.createRecap()
+    this.createSkip()
+  }
+
+  private createSetSpeed(): void {
+    const x = Space.pad * 2 + Space.iconSize + Space.iconSize / 2
+    const y = Space.pad + Space.iconSize / 2
+
+    // Set speed button
+    // TODO Change icon
+    // new Icons.Recap(this.container, x, y, () => console.log('Set speed'))
   }
 
   private createRecap(): void {
