@@ -305,23 +305,23 @@ const immolant = new Immolant({
   beta: true,
 })
 
-class Wildfire extends Card {
+class Husk extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    if (super.exhale(2, game, player)) {
-      if (game.score[player] < game.score[player ^ 1]) {
-        game.story.addAct(this, player)
+    if (game.story.acts.length > 0) {
+      const act = game.story.acts[0]
+      if (act.card.cost < game.pile[player].length) {
+        game.removeAct(0)
       }
     }
   }
 }
-const wildfire = new Wildfire({
-  name: 'Wildfire',
-  id: 260,
-  cost: 2,
-  points: 2,
-  text: 'Exhale 1: If you have fewer points than your opponent, add a Wildfire to the story.',
+const husk = new Husk({
+  name: 'Husk',
+  id: 257,
+  cost: 1,
+  text: 'Discard the next card in the story if its base cost is less than the number of cards in your discard pile.',
   beta: true,
 })
 
@@ -339,5 +339,5 @@ export {
   goliath,
   firebug,
   immolant,
-  wildfire,
+  husk,
 }

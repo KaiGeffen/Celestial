@@ -221,6 +221,7 @@ const progeny = new Progeny({
   name: 'Progeny',
   id: 5243,
   cost: 1,
+  points: 1,
   text: 'Exhale 2: Create a copy in hand of the next card in the story.',
   beta: true,
 })
