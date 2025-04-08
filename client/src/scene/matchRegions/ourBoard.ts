@@ -105,7 +105,7 @@ export default class OurBoardRegion extends Region {
         0,
         0,
         Space.windowWidth,
-        Space.todoHandOffset,
+        Space.todoHandOffset + Space.pad,
         Color.backgroundLight,
       )
       .setOrigin(0, 1)

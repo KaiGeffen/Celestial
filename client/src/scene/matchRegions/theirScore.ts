@@ -14,8 +14,8 @@ import { GameScene } from '../gameScene'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 // Y of the buttons
-const width = Space.iconSize * 2 + Space.pad * 3
-const height = 120
+const width = Space.iconSize * 3 + Space.pad * 4
+const height = Space.todoHandOffset + Space.pad
 
 // During the round, shows Pass button, who has passed, and who has priority
 export default class TheirScoreRegion extends Region {
@@ -36,7 +36,8 @@ export default class TheirScoreRegion extends Region {
       .container(Space.windowWidth - width, 0)
       .setDepth(Depth.theirScore)
 
-    this.createBackground()
+    // this.createBackground()
+
     this.createRecap()
     this.createSkip()
     this.createWins()
@@ -117,10 +118,10 @@ export default class TheirScoreRegion extends Region {
     // Create a vertical sizer
     const winsSizer = new Sizer(this.scene, {
       x: width / 2,
-      y: Space.iconSize + Space.pad * 2 + 15,
+      y: height,
       orientation: 'vertical',
-      space: { item: 4 },
-    })
+      space: { bottom: Space.padSmall, item: 4 },
+    }).setOrigin(0.5, 1)
 
     this.txtWins = this.scene.add.text(0, 0, '0/5', Style.todoScore)
     const hintWins = this.scene.add.text(0, 0, 'Wins', Style.todoSubtext)

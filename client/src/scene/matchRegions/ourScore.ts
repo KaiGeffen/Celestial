@@ -6,10 +6,10 @@ import { MechanicsSettings } from '../../../../shared/settings'
 import { GameScene } from '../gameScene'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
-const width = 135
-const height = 120
-const BREATH_X = 40
-const BREATH_Y = 80
+const width = Space.iconSize * 3 + Space.pad * 4
+const height = Space.todoHandOffset + Space.pad
+const BREATH_X = 30 + Space.padSmall
+const BREATH_Y = height - 30 - Space.padSmall
 
 export default class OurScoreRegion extends Region {
   // For the current state, the maximum and current amount of breath we have
@@ -35,7 +35,7 @@ export default class OurScoreRegion extends Region {
       .container(Space.windowWidth - width, Space.windowHeight - height)
       .setDepth(Depth.ourScore)
 
-    this.createBackground()
+    // this.createBackground()
 
     this.createWins()
     this.createRelic()
@@ -89,7 +89,7 @@ export default class OurScoreRegion extends Region {
       x: width / 2,
       y: 0,
       orientation: 'vertical',
-      space: { top: 5, item: 4 },
+      space: { top: Space.padSmall, item: 4 },
     }).setOrigin(0.5, 0)
 
     this.txtWins = this.scene.add.text(0, 0, '0/5', Style.todoScore)
