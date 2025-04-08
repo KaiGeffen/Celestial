@@ -47,7 +47,9 @@ export default function createPaymentServer() {
       const userId = uuidv5(uuid, UUID_NAMESPACE)
 
       // Get package details
-      const packageDetails = GEM_PACKAGES[gemPackage]
+      const packageDetails = Object.values(GEM_PACKAGES).find(
+        (pkg) => pkg.id === gemPackage,
+      )
       if (!packageDetails) {
         return res.status(400).json({ error: 'Invalid gem package' })
       }
