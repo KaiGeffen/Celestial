@@ -50,10 +50,11 @@ export default class PurchaseItemMenu extends Menu {
     // Purchase the item on the server (Updates local igc totals)
     UserDataServer.purchaseItem(this.item.id, this.item.cost)
 
+    // TODO Its sizer in some cases needs layout because different text width
+    this.priceText.setText('Owned')
+
     // Close the menu
     this.close()
-
-    // TODO Error handle server not allowing purchase
   }
 
   private createContent(): void {
@@ -146,8 +147,6 @@ export default class PurchaseItemMenu extends Menu {
       // Create a normal buy button
       new BasicButton(buyContainer, 0, 0, 'Buy', () => {
         this.handlePurchase()
-        this.priceText.setText('Owned')
-        // TODO Its sizer in some cases needs layout because different text width
       })
     }
 
