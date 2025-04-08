@@ -10,6 +10,7 @@ import {
   Ease,
   Flags,
   UserSettings,
+  Depth,
 } from '../../settings/settings'
 import { GameScene } from '../gameScene'
 import Region from './baseRegion'
@@ -33,10 +34,9 @@ export default class PassRegion extends Region {
 
   create(scene: GameScene): PassRegion {
     this.scene = scene
-    this.container = scene.add.container(
-      Space.windowWidth,
-      Space.windowHeight / 2,
-    )
+    this.container = scene.add
+      .container(Space.windowWidth, Space.windowHeight / 2)
+      .setDepth(Depth.pass)
 
     // Pass and recap button
     this.createButtons()
