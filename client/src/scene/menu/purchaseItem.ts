@@ -10,13 +10,18 @@ import UserDataServer from '../../network/userDataServer'
 export default class PurchaseItemMenu extends Menu {
   private item: StoreItem
   private balance: number
+  private isOwned: boolean
 
-  constructor(scene: MenuScene, params: { item: StoreItem; balance: number }) {
+  constructor(
+    scene: MenuScene,
+    params: { item: StoreItem; balance: number; isOwned: boolean },
+  ) {
     super(scene, 800) // Wider menu to accommodate the image and description
 
     // Set properties before creating content
     this.item = params.item
     this.balance = params.balance
+    this.isOwned = params.isOwned
 
     // Now create content with properties set
     this.createContent()
@@ -77,27 +82,30 @@ export default class PurchaseItemMenu extends Menu {
     })
     rightSizer.add(description)
 
-    // Add cost text
-    const costText = this.scene.add.text(
-      0,
-      0,
-      `Cost: ${this.item.cost} 💎`,
-      Style.announcement,
-    )
-    rightSizer.add(costText)
+    // Add cost and balance if not owned
+    if (!this.isOwned) {
+      // Add cost text or "Owned" text
+      const costText = this.scene.add.text(
+        0,
+        0,
+        `Cost: ${this.item.cost} 💎`,
+        Style.announcement,
+      )
+      rightSizer.add(costText)
 
-    // Add balance after text in red if negative
-    const balanceAfter = this.balance - this.item.cost
-    const balanceText = this.scene.add.text(
-      0,
-      0,
-      `Balance after: ${balanceAfter} 💎`,
-      {
-        ...Style.basic,
-        color: balanceAfter < 0 ? '#ff0000' : '#ffffff',
-      },
-    )
-    rightSizer.add(balanceText)
+      // Balance after text, in red if negative
+      const balanceAfter = this.balance - this.item.cost
+      const balanceText = this.scene.add.text(
+        0,
+        0,
+        `Balance after: ${balanceAfter} 💎`,
+        {
+          ...Style.basic,
+          color: balanceAfter < 0 ? '#ff0000' : '#ffffff',
+        },
+      )
+      rightSizer.add(balanceText)
+    }
 
     // Add right side sizer to main content
     contentSizer.add(rightSizer)
@@ -114,7 +122,7 @@ export default class PurchaseItemMenu extends Menu {
     // Add cancel button
     buttonsSizer.add(this.createCancelButton())
 
-    // Add buy button
+    // Add buy button or "Owned" button
     const buyContainer = new ContainerLite(
       this.scene,
       0,
@@ -122,9 +130,17 @@ export default class PurchaseItemMenu extends Menu {
       Space.buttonWidth,
       Space.buttonHeight,
     )
-    new BasicButton(buyContainer, 0, 0, 'Buy', () => {
-      this.handlePurchase()
-    })
+
+    if (this.isOwned) {
+      // Create a disabled "Owned" button
+      new BasicButton(buyContainer, 0, 0, 'Owned', () => {}).disable()
+    } else {
+      // Create a normal buy button
+      new BasicButton(buyContainer, 0, 0, 'Buy', () => {
+        this.handlePurchase()
+      })
+    }
+
     buttonsSizer.add(buyContainer)
 
     // Add buttons to menu

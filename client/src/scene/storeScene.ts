@@ -106,8 +106,17 @@ export default class StoreScene extends BaseSceneWithHeader {
       align: 'center',
     })
 
-    // Add price
-    container.add(this.add.text(0, 0, `${item.cost} 💎`, Style.basic), {
+    // Check if the item is owned
+    const userData = UserDataServer.getUserData()
+    const isOwned =
+      userData && userData.ownedItems && userData.ownedItems.includes(item.id)
+
+    // Add price or "Owned" text
+    const priceText = isOwned
+      ? this.add.text(0, 0, 'Owned', Style.basic)
+      : this.add.text(0, 0, `${item.cost} 💎`, Style.basic)
+
+    container.add(priceText, {
       align: 'center',
     })
 
@@ -131,6 +140,7 @@ export default class StoreScene extends BaseSceneWithHeader {
           menu: 'purchaseItem',
           item,
           balance,
+          isOwned,
         })
       })
 
