@@ -165,6 +165,7 @@ export default class HomeScene extends BaseSceneWithHeader {
     this.createDiscordButton()
     this.createLeaderboardButton()
     this.createMatchHistoryButton()
+    this.createStoreButton()
 
     this.createLoginLogoutButton()
   }
@@ -412,7 +413,7 @@ export default class HomeScene extends BaseSceneWithHeader {
       })
       .on('pointerdown', () => {
         this.sound.play('click')
-        this.scene.start('StoreScene')
+        this.scene.start('MatchHistoryScene')
       })
 
     map.mask = new Phaser.Display.Masks.BitmapMask(this, rect)
@@ -420,6 +421,42 @@ export default class HomeScene extends BaseSceneWithHeader {
     // Text over the rectangle
     this.add
       .text(rect.x, rect.y, '📜', Style.homeButtonText)
+      .setOrigin(0.5)
+      .setShadow(0, 1, 'rgb(0, 0, 0, 1)', 6)
+  }
+
+  private createStoreButton(): void {
+    const l = discordHeight
+
+    let rect = this.add.rectangle(
+      Space.pad * 2 + l + l / 2,
+      Space.windowHeight - Space.pad - l / 2,
+      l,
+      l,
+      0xfabd5d,
+      1,
+    )
+
+    let map = this.add.sprite(0, 0, 'background-Match').setOrigin(0)
+
+    rect
+      .setInteractive()
+      .on('pointerover', () => {
+        map.setTint(0x444444)
+      })
+      .on('pointerout', () => {
+        map.clearTint()
+      })
+      .on('pointerdown', () => {
+        this.sound.play('click')
+        this.scene.start('StoreScene')
+      })
+
+    map.mask = new Phaser.Display.Masks.BitmapMask(this, rect)
+
+    // Text over the rectangle
+    this.add
+      .text(rect.x, rect.y, '🛍️', Style.homeButtonText)
       .setOrigin(0.5)
       .setShadow(0, 1, 'rgb(0, 0, 0, 1)', 6)
   }
