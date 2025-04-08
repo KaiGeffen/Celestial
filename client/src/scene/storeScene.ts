@@ -124,7 +124,7 @@ export default class StoreScene extends BaseSceneWithHeader {
         this.sound.play('click')
 
         // Get user's current balance
-        const balance = this.registry.get('gems') || 0
+        const balance = UserDataServer.getUserData().gems
 
         // Launch the purchase menu
         this.scene.launch('MenuScene', {

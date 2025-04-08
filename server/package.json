@@ -16,7 +16,7 @@
     "bufferutil": "^4.0.9",
     "dotenv": "^16.4.7",
     "drizzle-kit": "^0.20.6",
-    "drizzle-orm": "^0.29.1",
+    "drizzle-orm": "^0.41.0",
     "elo-rank": "^1.0.4",
     "nodemon": "^3.1.9",
     "pg": "^8.11.3",

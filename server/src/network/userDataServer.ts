@@ -147,7 +147,15 @@ export default function createUserDataServer() {
             throw new Error('User attempted to purchase item before signing in')
           }
 
-          const cost = STORE_ITEMS[itemId].cost
+          const item = Object.values(STORE_ITEMS).find(
+            (item) => item.id === itemId,
+          )
+          if (!item) {
+            throw new Error(
+              `User attempted to purchase invalid item: ${itemId}`,
+            )
+          }
+          const cost = item.cost
 
           const currentBalance = await db
             .select({ balance: players.gems })
@@ -166,7 +174,7 @@ export default function createUserDataServer() {
             .set({ gems: currentBalance[0].balance - cost })
             .where(eq(players.id, id))
 
-          // Update inventory
+          // Update inventory TODO
         })
     } catch (e) {
       console.error('Error in user data server:', e)
