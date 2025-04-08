@@ -217,7 +217,7 @@ export class CardImage {
         obj.destroy()
       })
 
-      this.image.setTexture(card.name)
+      this.image.setTexture(`card-${card.name}`)
       this.createStats()
       this.createText()
     }
