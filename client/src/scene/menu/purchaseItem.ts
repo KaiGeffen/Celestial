@@ -11,10 +11,17 @@ export default class PurchaseItemMenu extends Menu {
   private item: StoreItem
   private balance: number
   private isOwned: boolean
+  // Price text is broader store scene, set to `owned` if we buy it
 
+  private priceText: Phaser.GameObjects.Text
   constructor(
     scene: MenuScene,
-    params: { item: StoreItem; balance: number; isOwned: boolean },
+    params: {
+      item: StoreItem
+      balance: number
+      isOwned: boolean
+      priceText: Phaser.GameObjects.Text
+    },
   ) {
     super(scene, 800) // Wider menu to accommodate the image and description
 
@@ -22,6 +29,7 @@ export default class PurchaseItemMenu extends Menu {
     this.item = params.item
     this.balance = params.balance
     this.isOwned = params.isOwned
+    this.priceText = params.priceText
 
     // Now create content with properties set
     this.createContent()
@@ -138,6 +146,8 @@ export default class PurchaseItemMenu extends Menu {
       // Create a normal buy button
       new BasicButton(buyContainer, 0, 0, 'Buy', () => {
         this.handlePurchase()
+        this.priceText.setText('Owned')
+        // TODO Its sizer in some cases needs layout because different text width
       })
     }
 

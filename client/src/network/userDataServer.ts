@@ -135,7 +135,11 @@ export default class UserDataServer {
           }
 
           that.loadUserData(data)
-          callback()
+          // TODO Bad smell, the callback should only happen once as it references a scene
+          if (callback) {
+            callback()
+            callback = null
+          }
         },
       )
 
@@ -228,7 +232,7 @@ export default class UserDataServer {
       throw 'Purchasing item when server ws doesnt exist.'
     }
     wsServer.send({
-      type: 'purchaseItem',
+      type: 'purchaseItem' as const,
       id,
     })
 

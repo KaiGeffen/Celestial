@@ -225,7 +225,6 @@ export const assetLists = {
       "Thumb",
       "Top",
       "Underline",
-      "Wardrobe",
       "Wins",
       "XOut"
     ],
@@ -238,6 +237,7 @@ export const assetLists = {
   },
   "store": {
     "files": [
+      "Butterfly-full",
       "Butterfly",
       "DandelionRelic-full",
       "DandelionRelic",

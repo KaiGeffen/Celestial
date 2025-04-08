@@ -58,7 +58,6 @@ export default class Loader {
             // Set up animations for round sprites
             if (directory === 'roundResult') {
               scene.load.once('complete', () => {
-                console.log('setting up animations for', key)
                 scene.anims.create({
                   key: key,
                   frameRate: 2,

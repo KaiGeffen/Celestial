@@ -141,6 +141,7 @@ export default class StoreScene extends BaseSceneWithHeader {
           item,
           balance,
           isOwned,
+          priceText,
         })
       })
 
