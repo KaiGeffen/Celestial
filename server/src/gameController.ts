@@ -123,11 +123,11 @@ class ServerController {
 
     const card = this.model.hand[player].splice(cardNum, 1)[0]
 
-    // Trigger on-play effects
-    card.onPlay(player, this.model)
-
     // Add the card to the story
     this.model.story.addAct(card, player)
+
+    // Trigger on-play effects
+    card.onPlay(player, this.model)
   }
 
   doMulligan(player: number, mulligans: Mulligan): void {

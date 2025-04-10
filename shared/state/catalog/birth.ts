@@ -256,7 +256,6 @@ export {
   storytime,
   pregnant,
   passOn,
-  // TODO 2
   progeny,
   hug,
 }

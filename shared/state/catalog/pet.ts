@@ -5,6 +5,7 @@ import { Keywords } from '../keyword'
 import { Animation } from '../../animation'
 import { Zone } from '../zone'
 import GameModel from '../gameModel'
+import Act from '../act'
 
 class Fruit extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -174,7 +175,7 @@ class Abundance extends Card {
 
     if (super.exhale(1, game, player)) {
       if (game.score[player] >= 7) {
-        this.nourish(3, game, player)
+        this.nourish(4, game, player)
       }
     }
   }
@@ -184,7 +185,7 @@ const abundance = new Abundance({
   id: 435,
   cost: 2,
   points: 2,
-  text: 'Exhale 1: If you have 7 or more points, Nourish 3.',
+  text: 'Exhale 1: If you have 7 or more points, Nourish 4.',
   beta: true,
 })
 
@@ -267,6 +268,37 @@ const supernova = new Supernova({
   beta: true,
 })
 
+class Berry extends Card {
+  private timesPlayed: number
+  constructor(timesPlayed: number) {
+    let s = `Nourish ${1 + timesPlayed}\nWhen played, give this Nourish 1.`
+    super({
+      name: 'Berry',
+      id: 4044,
+      cost: 2,
+      text: s,
+      beta: true,
+    })
+
+    this.timesPlayed = timesPlayed
+  }
+
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    this.nourish(1 + this.timesPlayed, game, player)
+  }
+
+  onPlay(player: number, game: GameModel) {
+    const index = game.story.acts.length - 1
+
+    // Replace this card's act with a new one with +1 times played
+    const newCard = new Berry(this.timesPlayed + 1)
+    const newAct = new Act(newCard, player)
+    game.story.replaceAct(index, newAct)
+  }
+}
+const berry = new Berry(0)
+
 export {
   fruit,
   oak,
@@ -281,5 +313,5 @@ export {
   rose,
   celebration,
   supernova,
-  // TODO 1
+  berry,
 }
