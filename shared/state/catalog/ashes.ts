@@ -285,15 +285,14 @@ class Immolant extends Card {
         from: Zone.Discard,
         to: Zone.Story,
         index: index,
-        // TODO This index is wrong, doesn't count resolved cards, and off by 1
-        index2: game.story.acts.length - 1,
+        index2: game.story.resolvedActs.length + 1,
       }),
     )
 
     // Remove this from the discard pile
     game.pile[player].pop()
 
-    game.story.addAct(this, player)
+    game.story.addAct(this, player, 0)
   }
 }
 const immolant = new Immolant({
@@ -301,7 +300,7 @@ const immolant = new Immolant({
   id: 204,
   cost: 1,
   points: 1,
-  text: 'When this is discarded, add it to the story.',
+  text: 'When this is discarded, add it next in the story.',
   beta: true,
 })
 

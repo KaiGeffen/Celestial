@@ -252,14 +252,11 @@ class LeveeBreaks extends Card {
     if (super.exhale(1, game, player)) {
       game.discard(player, 3)
 
-      for (const card of game.hand[player]) {
-        game.story.addAct(card, player)
+      // Add the hand to the story
+      while (game.hand[player].length > 0) {
+        const card = game.hand[player].shift()
+        game.story.addAct(card, player, 0)
       }
-    }
-
-    // Return
-    if (super.exhale(1, game, player)) {
-      super.inspire(1, game, player)
     }
   }
 }
@@ -268,7 +265,7 @@ const leveeBreaks = new LeveeBreaks({
   id: 8369,
   cost: 4,
   points: 4,
-  text: 'Exhale 1: Discard 3 cards. Add your hand to the story.',
+  text: 'Exhale 1: Discard 3 cards. Add your hand to the story after this.',
   beta: true,
 })
 
