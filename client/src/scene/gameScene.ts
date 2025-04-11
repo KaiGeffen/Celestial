@@ -69,6 +69,9 @@ export class GameScene extends BaseScene {
     // Create the view
     this.view = new View(this, this.params.deck?.cosmetics?.avatar ?? 0)
 
+    // Register the shift hotkey to explain hotkeys in all regions
+    this.addHotkeyHint()
+
     this.paused = false
 
     this.setCallbacks(this.view, this.net)
@@ -323,6 +326,32 @@ export class GameScene extends BaseScene {
   // Opponent has used a given emote
   emote(emoteNumber: number): void {
     this.view.theirAvatar.emote(emoteNumber)
+  }
+
+  // Register the shift hotkey to explain hotkeys in all regions
+  private addHotkeyHint(): void {
+    const regions = [
+      this.view.mulligan,
+      this.view.ourAvatar,
+      this.view.theirAvatar,
+      this.view.ourBoard,
+      this.view.theirScore,
+      this.view.pass,
+    ]
+    this.input.keyboard.on('keydown-SHIFT', () => {
+      if (UserSettings._get('hotkeys')) {
+        regions.forEach((region) => {
+          region.setHotkeyHintVisible(true)
+        })
+      }
+    })
+    this.input.keyboard.on('keyup-SHIFT', () => {
+      if (UserSettings._get('hotkeys')) {
+        regions.forEach((region) => {
+          region.setHotkeyHintVisible(false)
+        })
+      }
+    })
   }
 }
 

@@ -70,10 +70,13 @@ export default class MulliganRegion extends Region {
       )
       .setOrigin(0.5, 1)
 
+    // Ready button
+    const x = Space.windowWidth / 2
+    const y = Space.windowHeight / 2 + Space.cardHeight / 2 + Space.pad * 4
     this.btnReady = new Buttons.Basic(
       this.container,
-      Space.windowWidth / 2,
-      Space.windowHeight / 2 + Space.cardHeight / 2 + Space.pad * 4,
+      x,
+      y,
       'Ready',
       () => {
         this.onButtonClick()
@@ -81,9 +84,11 @@ export default class MulliganRegion extends Region {
       false,
       true,
     )
+    this.addHotkeyHint([x, y], 'SPACE')
 
     this.addHotkeyListeners()
 
+    // Add each to the container
     this.container.add([txtTitle, txtHint, this.txtPriority])
 
     return this
@@ -106,15 +111,15 @@ export default class MulliganRegion extends Region {
 
     // Show the cards as toggleable objects
     for (let i = 0; i < state.hand[0].length; i++) {
-      let card = this.addCard(
-        state.hand[0][i],
-        CardLocation.mulligan(this.container, i),
-      )
+      const position = CardLocation.mulligan(this.container, i)
+      let card = this.addCard(state.hand[0][i], position)
         .setCost(state.hand[0][i].cost)
         .setOnClick(this.onCardClick(i))
         .setFocusOptions('Toggle')
 
       this.cards.push(card)
+
+      this.addHotkeyHint(position, `${i + 1}`)
     }
 
     // Update the text saying who starts with priority

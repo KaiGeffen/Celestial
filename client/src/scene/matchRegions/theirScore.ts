@@ -96,9 +96,8 @@ export default class TheirScoreRegion extends Region {
     // Always visible
     this.createSetSpeed()
 
-    // Only one of these visible at a time
-    this.createRecap()
-    this.createSkip()
+    // Only one button visible at a time
+    this.createButtons()
   }
 
   private createSetSpeed(): void {
@@ -110,7 +109,7 @@ export default class TheirScoreRegion extends Region {
     // new Icons.Recap(this.container, x, y, () => console.log('Set speed'))
   }
 
-  private createRecap(): void {
+  private createButtons(): void {
     const x = Space.pad + Space.iconSize / 2
     const y = Space.pad + Space.iconSize / 2
 
@@ -118,16 +117,13 @@ export default class TheirScoreRegion extends Region {
     this.btnRecap = new Icons.Recap(this.container, x, y, () =>
       this.recapCallback(),
     ).setVisible(false)
-  }
-
-  private createSkip(): void {
-    const x = Space.pad + Space.iconSize / 2
-    const y = Space.pad + Space.iconSize / 2
 
     // Skip button
     this.btnSkip = new Icons.Skip(this.container, x, y, () =>
       this.skipCallback(),
     ).setVisible(false)
+
+    this.addHotkeyHint([x, y], 'T')
   }
 
   private createWins(): void {

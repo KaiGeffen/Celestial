@@ -169,6 +169,13 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     fontSize: '30px',
     color: Color.cardText,
   },
+  hotkeyHint: {
+    fontFamily: mainFont,
+    fontSize: '50px',
+    color: Color.whiteS,
+    stroke: Color.blackS,
+    strokeThickness: 4,
+  },
 }
 
 // The styling for BBCode objects, from the rexui module

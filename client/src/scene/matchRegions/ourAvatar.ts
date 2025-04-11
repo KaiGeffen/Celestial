@@ -59,16 +59,15 @@ export default class OurAvatarRegion extends Region {
   }
 
   private createStacks(): void {
+    let x = width / 4
     const y = 40
-    this.btnDeck = new Buttons.Stacks.Deck(this.container, width / 4, y, 0)
+    this.btnDeck = new Buttons.Stacks.Deck(this.container, x, y, 0)
+    this.addHotkeyHint([x, y], 'Q')
 
     // Discard pile
-    this.btnDiscard = new Buttons.Stacks.Discard(
-      this.container,
-      (width * 3) / 4,
-      y,
-      0,
-    )
+    x = (width * 3) / 4
+    this.btnDiscard = new Buttons.Stacks.Discard(this.container, x, y, 0)
+    this.addHotkeyHint([x, y], 'W')
   }
 
   private addHotkeyListeners() {

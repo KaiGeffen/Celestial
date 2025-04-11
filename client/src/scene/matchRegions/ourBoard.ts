@@ -209,6 +209,12 @@ export default class OurBoardRegion extends Region {
 
       this.cards.push(card)
       this.temp.push(card)
+
+      // Add hotkey hint text above the card
+      let position = CardLocation.ourHand(state, i, this.container)
+      position[1] -= Space.cardHeight / 2
+      const hotkeyText = this.addHotkeyHint(position, `${i + 1}`)
+      this.temp.push(hotkeyText)
     }
 
     // Hover whichever card was being hovered last

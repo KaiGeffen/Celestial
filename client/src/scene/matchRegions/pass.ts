@@ -41,7 +41,7 @@ export default class PassRegion extends Region {
     // Pass and recap button
     this.createButtons()
 
-    // Text for who has passed
+    // Show who has passed
     this.createText()
 
     return this
@@ -150,11 +150,9 @@ export default class PassRegion extends Region {
   }
 
   private createButtons(): void {
-    let that = this
-
-    const x = Flags.mobile ? 100 : 156
-    this.btnPass = new Icons.Pass(this.container, -x, 0)
-    this.btnMoon = new Icons.Moon(this.container, x, 0, () => {
+    const x = -156
+    this.btnPass = new Icons.Pass(this.container, x, 0)
+    this.btnMoon = new Icons.Moon(this.container, -x, 0, () => {
       if (this.scene['paused']) {
         this.scene['paused'] = false
         this.btnMoon.setText(
@@ -167,6 +165,8 @@ export default class PassRegion extends Region {
         )
       }
     })
+
+    this.addHotkeyHint([x, 0], 'SPACE')
   }
 
   private createText(): void {

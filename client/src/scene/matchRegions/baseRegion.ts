@@ -19,6 +19,9 @@ export default class Region {
   cards: CardImage[]
   cards2: CardImage[]
 
+  // Text showing which hotkey is relevant for each element in the region
+  hotkeyHints: Phaser.GameObjects.Text[] = []
+
   addCard(card: Card, position: [number, number] = [0, 0]): CardImage {
     return new CardImage(card, this.container).setPosition(position)
   }
@@ -103,6 +106,7 @@ export default class Region {
 
     delete this.temp
     this.temp = []
+    // this.hotkeyHints = []
   }
 
   // Animate the given card being emphasized
@@ -123,5 +127,29 @@ export default class Region {
         card.destroy()
       },
     })
+  }
+
+  // Show / hide the hotkey hints
+  setHotkeyHintVisible(show: boolean): void {
+    this.hotkeyHints.forEach((hint) => {
+      hint.setVisible(show)
+    })
+  }
+
+  // Add a hotkey hint at position with text s
+  protected addHotkeyHint(
+    position: [number, number],
+    s: string,
+  ): Phaser.GameObjects.Text {
+    const hotkeyText = this.scene.add
+      .text(position[0], position[1], s, Style.hotkeyHint)
+      .setOrigin(0.5)
+      .setVisible(false)
+
+    // Add to container and temp collection for cleanup
+    this.container.add(hotkeyText)
+    this.hotkeyHints.push(hotkeyText)
+
+    return hotkeyText
   }
 }
