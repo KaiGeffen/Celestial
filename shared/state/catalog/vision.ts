@@ -255,5 +255,4 @@ export {
   riddle,
   bull,
   lantern,
-  // TODO 1
 }
