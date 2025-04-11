@@ -304,23 +304,27 @@ const immolant = new Immolant({
   beta: true,
 })
 
-class Husk extends Card {
+class Spark extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    if (game.story.acts.length > 0) {
-      const act = game.story.acts[0]
-      if (act.card.cost < game.pile[player].length) {
-        game.removeAct(0)
+    for (let i = 0; i < game.story.acts.length; i++) {
+      if (game.story.acts[i].owner === player) {
+        game.removeAct(i)
+        break
       }
     }
   }
+
+  onPlay(player: number, game: GameModel) {
+    game.breath[player] += 3
+  }
 }
-const husk = new Husk({
-  name: 'Husk',
+const spark = new Spark({
+  name: 'Spark',
   id: 257,
   cost: 1,
-  text: 'Discard the next card in the story if its base cost is less than the number of cards in your discard pile.',
+  text: 'When played, gain 3 breath.\nDiscard your next card in the story.',
   beta: true,
 })
 
@@ -338,5 +342,5 @@ export {
   goliath,
   firebug,
   immolant,
-  husk,
+  spark,
 }
