@@ -9,7 +9,7 @@ import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 
 import { db } from '../db/db'
 import { players } from '../db/schema'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { UserDataServerWS } from '../../../shared/network/userDataWS'
 import { Deck } from '../../../shared/types/deck'
 import { STORE_ITEMS } from '../../../shared/storeItems'
@@ -112,7 +112,7 @@ export default function createUserDataServer() {
             const result = await db
               .select()
               .from(players)
-              .where(eq(players.username, username))
+              .where(sql`LOWER(${players.username}) = LOWER(${username})`)
               .limit(1)
             if (result.length > 0) {
               throw new Error(

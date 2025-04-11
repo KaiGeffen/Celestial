@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 
 import { USERNAME_AVAILABILITY_PORT } from '../../../shared/network/settings'
 import { db } from '../db/db'
@@ -16,7 +16,7 @@ export default function createUsernameAvailabilityServer() {
       const existingUser = await db
         .select({ username: players.username })
         .from(players)
-        .where(eq(players.username, username))
+        .where(sql`LOWER(${players.username}) = LOWER(${username})`)
         .limit(1)
 
       res.json({ exists: existingUser.length > 0 })
