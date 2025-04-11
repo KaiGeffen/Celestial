@@ -1,4 +1,4 @@
-import Card from '../card'
+import Card, { RefreshCard } from '../card'
 import GameModel from '../gameModel'
 import { Keywords } from '../keyword'
 
@@ -122,16 +122,7 @@ const gentleRain = new GentleRain({
 })
 
 // BETA
-class Refresh extends Card {
-  onPlay(player: number, game: GameModel): void {
-    if (game.hand[player].length > 0) {
-      const card = game.hand[player].shift()
-      game.deck[player].unshift(card)
-      game.draw(player, 1)
-    }
-  }
-}
-const refresh = new Refresh({
+const refresh = new RefreshCard({
   name: 'Refresh',
   id: 200,
   cost: 1,
@@ -140,7 +131,7 @@ const refresh = new Refresh({
   beta: true,
 })
 
-class Overflow extends Card {
+class Overflow extends RefreshCard {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus + game.hand[player].length)
   }
@@ -183,7 +174,7 @@ const fish = new Fish({
   beta: true,
 })
 
-class Cloud extends Card {
+class Cloud extends RefreshCard {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 

@@ -271,6 +271,20 @@ export default class GameModel {
     this.pile[player].push(card)
   }
 
+  createOnDeck(player: number, card: Card) {
+    this.animations[player].push(
+      new Animation({
+        from: Zone.Gone,
+        to: Zone.Deck,
+        card: card,
+        index2: 0,
+      }),
+    )
+
+    // Add the card at the top of the deck
+    this.deck[player].push(card)
+  }
+
   createInDeck(player: number, card: Card) {
     this.animations[player].push(
       new Animation({

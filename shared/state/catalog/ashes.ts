@@ -49,15 +49,15 @@ class Mine extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    game.dig(player, 4)
+    game.createOnDeck(player, ashes)
   }
 }
 const mine = new Mine({
   name: 'Mine',
   id: 15,
-  cost: 4,
+  cost: 3,
   points: 4,
-  text: 'Remove from the game the top four cards of your discard pile.',
+  text: 'Create an Ashes on top of your deck.',
 })
 
 class Arsonist extends Card {

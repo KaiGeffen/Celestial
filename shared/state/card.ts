@@ -298,3 +298,13 @@ export class SightCard extends Card {
     game.vision[player] += this.amt
   }
 }
+
+export class RefreshCard extends Card {
+  onPlay(player: number, game: GameModel): void {
+    if (game.hand[player].length > 0) {
+      const card = game.hand[player].shift()
+      game.deck[player].unshift(card)
+      game.draw(player, 1)
+    }
+  }
+}

@@ -292,20 +292,21 @@ const rooster = new Rooster({
   beta: true,
 })
 
-// class LetGo extends Card {
-//   play(player: number, game: GameModel, index: number, bonus: number) {
-//     super.play(player, game, index, bonus)
+class LetGo extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
 
-//     game.dig(player, 4)
-//   }
-// }
-// const letGo = new LetGo({
-//   name: 'Let Go',
-//   id: 1015,
-//   cost: 4,
-//   points: 4,
-//   text: 'Remove from the game the top four cards of your discard pile.',
-// })
+    game.dig(player, 4)
+  }
+}
+const letGo = new LetGo({
+  name: 'Let Go',
+  id: 1015,
+  cost: 4,
+  points: 4,
+  text: 'Remove from the game the top four cards of your discard pile.',
+  beta: true,
+})
 
 export {
   dove,
@@ -321,5 +322,5 @@ export {
   silence,
   vulture,
   rooster,
-  // letGo,
+  letGo,
 }
