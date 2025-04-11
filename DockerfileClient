@@ -11,10 +11,7 @@ USER node
 
 WORKDIR /home/node/app/client
 
-
-
 RUN npm install
-RUN apt-get update && apt-get install -y webp
 RUN npm run build
 
 EXPOSE 8083

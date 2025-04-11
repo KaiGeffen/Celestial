@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { execSync } from 'child_process'
+import sharp from 'sharp'
 
 const ASSETS_ROOT = path.join(__dirname, '../../../client/assets')
 
@@ -28,14 +28,16 @@ const DIRECTORIES = [
   'dialog',
 ]
 
-// Function to convert PNG to WebP
-function convertPngToWebp(pngPath: string): string {
+// Function to convert PNG to WebP using Sharp
+async function convertPngToWebp(pngPath: string): Promise<string> {
   const webpPath = pngPath.replace('.png', '.webp')
 
   try {
-    // Use cwebp to convert PNG to WebP
-    // You may need to install cwebp: apt-get install webp or brew install webp
-    execSync(`cwebp -q 80 "${pngPath}" -o "${webpPath}"`)
+    // Use Sharp to convert PNG to WebP
+    await sharp(pngPath)
+      .webp({ quality: 80 }) // Adjust quality as needed (0-100)
+      .toFile(webpPath)
+
     console.log(`Converted ${pngPath} to ${webpPath}`)
 
     // Delete the original PNG file after successful conversion
@@ -61,10 +63,10 @@ function parseDimensions(
   return undefined
 }
 
-function getAssetFiles(dir: string): {
+async function getAssetFiles(dir: string): Promise<{
   files: string[]
   dimensions?: { [filename: string]: { width: number; height: number } }
-} {
+}> {
   const fullPath = path.join(ASSETS_ROOT, dir)
   if (!fs.existsSync(fullPath)) {
     console.warn(`Directory not found: ${fullPath}`)
@@ -87,7 +89,7 @@ function getAssetFiles(dir: string): {
 
   const entries = fs.readdirSync(fullPath, { withFileTypes: true })
 
-  entries.forEach((entry) => {
+  for (const entry of entries) {
     if (entry.isDirectory()) {
       const dims = parseDimensions(entry.name)
       if (dims) {
@@ -95,22 +97,20 @@ function getAssetFiles(dir: string): {
         const subFiles = fs
           .readdirSync(path.join(fullPath, entry.name))
           .filter((file) => file.endsWith('.webp') || file.endsWith('.png'))
-          .map((file) => {
-            // Convert PNG to WebP if needed
-            if (file.endsWith('.png')) {
-              const pngPath = path.join(fullPath, entry.name, file)
-              convertPngToWebp(pngPath)
-              return file.replace('.png', '.webp')
-            }
-            return file
-          })
-          .map((file) => file.replace('.webp', ''))
 
-        // Store dimensions for these files
-        subFiles.forEach((file) => {
-          result.files.push(file)
-          result.dimensions[file] = dims
-        })
+        for (const file of subFiles) {
+          let processedFile = file
+          // Convert PNG to WebP if needed
+          if (file.endsWith('.png')) {
+            const pngPath = path.join(fullPath, entry.name, file)
+            await convertPngToWebp(pngPath)
+            processedFile = file.replace('.png', '.webp')
+          }
+
+          const baseName = processedFile.replace('.webp', '')
+          result.files.push(baseName)
+          result.dimensions[baseName] = dims
+        }
       }
     } else if (
       entry.isFile() &&
@@ -120,13 +120,13 @@ function getAssetFiles(dir: string): {
       if (entry.name.endsWith('.png')) {
         // Convert PNG to WebP
         const pngPath = path.join(fullPath, entry.name)
-        convertPngToWebp(pngPath)
+        await convertPngToWebp(pngPath)
         result.files.push(entry.name.replace('.png', ''))
       } else {
         result.files.push(entry.name.replace('.webp', ''))
       }
     }
-  })
+  }
 
   if (Object.keys(result.dimensions).length === 0) {
     delete result.dimensions
@@ -135,15 +135,15 @@ function getAssetFiles(dir: string): {
   return result
 }
 
-function generateAssetLists(): void {
+async function generateAssetLists(): Promise<void> {
   const assetLists: AssetList = {}
 
   // Generate lists for each directory
-  DIRECTORIES.forEach((dir) => {
+  for (const dir of DIRECTORIES) {
     // Use the last part of the path as the key (e.g., 'img/avatar' -> 'avatar')
     const dirKey = dir.split('/').pop()!
-    assetLists[dirKey] = getAssetFiles(dir)
-  })
+    assetLists[dirKey] = await getAssetFiles(dir)
+  }
 
   // Generate the output file
   const output = `// This file is auto-generated. Do not edit manually.
@@ -155,4 +155,8 @@ export const assetLists = ${JSON.stringify(assetLists, null, 2)} as const;`
   console.log(`Asset lists generated at ${outputPath}`)
 }
 
-generateAssetLists()
+// Run the generator
+generateAssetLists().catch((error) => {
+  console.error('Error generating asset lists:', error)
+  process.exit(1)
+})
