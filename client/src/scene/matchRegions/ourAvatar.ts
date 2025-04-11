@@ -24,7 +24,7 @@ export default class OurAvatarRegion extends Region {
       .container(0, Space.windowHeight - height)
       .setDepth(Depth.ourAvatar)
 
-    this.createBackground(scene)
+    this.createBackground()
     this.createStatusDisplay()
     this.createAvatar()
     this.createStacks()
@@ -106,10 +106,8 @@ export default class OurAvatarRegion extends Region {
     this.container.add([txtUsername, txtUsernameElo])
   }
 
-  private createBackground(scene: Phaser.Scene): void {
-    const background = scene.add
-      .rectangle(0, 0, width, height, Color.backgroundDark)
-      .setOrigin(0)
+  private createBackground(): void {
+    const background = this.scene.add.image(0, -7, 'chrome-Avatar').setOrigin(0)
     this.container.add(background)
   }
 

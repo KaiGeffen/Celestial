@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import { execSync } from 'child_process'
 
 const ASSETS_ROOT = path.join(__dirname, '../../../client/assets')
 
@@ -22,9 +23,30 @@ const DIRECTORIES = [
   'img/border',
   'img/relic',
   'img/roundResult',
+  'img/chrome',
   'sfx',
   'dialog',
 ]
+
+// Function to convert PNG to WebP
+function convertPngToWebp(pngPath: string): string {
+  const webpPath = pngPath.replace('.png', '.webp')
+
+  try {
+    // Use cwebp to convert PNG to WebP
+    // You may need to install cwebp: apt-get install webp or brew install webp
+    execSync(`cwebp -q 80 "${pngPath}" -o "${webpPath}"`)
+    console.log(`Converted ${pngPath} to ${webpPath}`)
+
+    // Delete the original PNG file after successful conversion
+    fs.unlinkSync(pngPath)
+
+    return webpPath
+  } catch (error) {
+    console.error(`Failed to convert ${pngPath} to WebP:`, error)
+    return pngPath // Return original path if conversion fails
+  }
+}
 
 function parseDimensions(
   dirName: string,
@@ -72,7 +94,16 @@ function getAssetFiles(dir: string): {
         // Add files from dimension directory
         const subFiles = fs
           .readdirSync(path.join(fullPath, entry.name))
-          .filter((file) => file.endsWith('.webp'))
+          .filter((file) => file.endsWith('.webp') || file.endsWith('.png'))
+          .map((file) => {
+            // Convert PNG to WebP if needed
+            if (file.endsWith('.png')) {
+              const pngPath = path.join(fullPath, entry.name, file)
+              convertPngToWebp(pngPath)
+              return file.replace('.png', '.webp')
+            }
+            return file
+          })
           .map((file) => file.replace('.webp', ''))
 
         // Store dimensions for these files
@@ -81,9 +112,19 @@ function getAssetFiles(dir: string): {
           result.dimensions[file] = dims
         })
       }
-    } else if (entry.isFile() && entry.name.endsWith('.webp')) {
+    } else if (
+      entry.isFile() &&
+      (entry.name.endsWith('.webp') || entry.name.endsWith('.png'))
+    ) {
       // Regular image file
-      result.files.push(entry.name.replace('.webp', ''))
+      if (entry.name.endsWith('.png')) {
+        // Convert PNG to WebP
+        const pngPath = path.join(fullPath, entry.name)
+        convertPngToWebp(pngPath)
+        result.files.push(entry.name.replace('.png', ''))
+      } else {
+        result.files.push(entry.name.replace('.webp', ''))
+      }
     }
   })
 

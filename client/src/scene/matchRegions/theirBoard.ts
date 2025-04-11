@@ -61,14 +61,13 @@ export default class TheirBoardRegion extends Region {
 
   private createBackground(): void {
     const background = this.scene.add
-      .rectangle(
-        0,
-        0,
-        Space.windowWidth,
-        Space.todoHandOffset + Space.pad,
-        Color.backgroundLight,
-      )
+      .image(0, 0, 'chrome-Hand')
       .setOrigin(0)
+      .setRotation(Math.PI)
+
+    // 7 is the height of the shadow
+    const y = Space.todoHandOffset + Space.pad + 7
+    background.setPosition(Space.windowWidth + Space.pad, y)
 
     this.container.add(background)
   }

@@ -7,7 +7,7 @@
     "generate-assets": "npx ts-node src/loader/generate-asset-lists.ts",
     "build": "npm run generate-assets && webpack",
     "start": "npm run build && live-server --port=8083",
-    "dev": "npm run generate-assets && webpack --watch & live-server --port=4949"
+    "dev": "webpack --watch & live-server --port=4949"
   },
   "repository": {
     "type": "git",

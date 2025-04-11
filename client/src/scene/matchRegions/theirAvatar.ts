@@ -123,9 +123,9 @@ export default class TheirAvatarRegion extends Region {
 
   private createBackground(): void {
     const background = this.scene.add
-      .rectangle(0, 0, width, height, Color.backgroundDark)
-      .setOrigin(0)
-
+      .image(-1, -1, 'chrome-Avatar')
+      .setOrigin(0, 1)
+      .setScale(1, -1)
     this.container.add(background)
   }
 
