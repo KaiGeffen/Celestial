@@ -268,36 +268,33 @@ const supernova = new Supernova({
   beta: true,
 })
 
-class Berry extends Card {
-  private timesPlayed: number
-  constructor(timesPlayed: number) {
-    let s = `Nourish ${1 + timesPlayed}\nWhen played, give this Nourish 1.`
-    super({
-      name: 'Berry',
-      id: 4044,
-      cost: 2,
-      text: s,
-      beta: true,
-    })
-
-    this.timesPlayed = timesPlayed
-  }
-
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
-    this.nourish(1 + this.timesPlayed, game, player)
-  }
-
-  onPlay(player: number, game: GameModel) {
-    const index = game.story.acts.length - 1
-
-    // Replace this card's act with a new one with +1 times played
-    const newCard = new Berry(this.timesPlayed + 1)
-    const newAct = new Act(newCard, player)
-    game.story.replaceAct(index, newAct)
+class Sample extends Card {
+  getCost(player: number, game: GameModel) {
+    let cost = this.cost
+    if (
+      game.status[player].some(
+        (status) => status === Status.NOURISH || status === Status.STARVE,
+      )
+    ) {
+      cost -= 1
+    }
+    if (game.status[player].some((status) => status === Status.INSPIRED)) {
+      cost -= 1
+    }
+    if (game.vision[player] > 0) {
+      cost -= 1
+    }
+    return Math.max(0, cost)
   }
 }
-const berry = new Berry(0)
+const sample = new Sample({
+  name: 'Sample',
+  id: 4837,
+  cost: 4,
+  points: 3,
+  text: 'Costs 1 less for each of the following statuses you have: Nourish, Inspire, Sight.',
+  beta: true,
+})
 
 export {
   fruit,
@@ -313,5 +310,5 @@ export {
   rose,
   celebration,
   supernova,
-  berry,
+  sample,
 }
