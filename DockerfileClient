@@ -6,6 +6,8 @@ WORKDIR /home/node/app
 
 COPY --chown=node:node ./client ./client
 COPY --chown=node:node ./shared ./shared
+COPY --chown=node:node ./client/robots.txt ./client/dist/
+COPY --chown=node:node ./client/sitemap.xml ./client/dist/
 
 USER node
 

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /ws
+Disallow: /ws/
+Disallow: /assets/splash.webp
+
+# Sitemap
+Sitemap: https://celestialtcg.com/sitemap.xml 
