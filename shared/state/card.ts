@@ -100,9 +100,19 @@ export default class Card {
   }
 
   birth(amt: number, game: GameModel, player: number) {
-    for (const card of game.hand[player]) {
+    for (let i = 0; i < game.hand[player].length; i++) {
+      const card = game.hand[player][i]
       if (card.name === 'Child') {
-        card.points += amt
+        // NOTE This replacement is done so that the replay doesn't show the eventual point value before it's achieved
+        const newCard = new Card({
+          name: 'Child',
+          id: 1003,
+          points: amt + card.points,
+          basePoints: 0,
+          text: 'Fleeting',
+          qualities: [Quality.FLEETING],
+        })
+        game.hand[player][i] = newCard
         return
       }
     }

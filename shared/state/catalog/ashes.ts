@@ -50,6 +50,7 @@ class Mine extends Card {
     super.play(player, game, index, bonus)
 
     game.createOnDeck(player, ashes)
+    game.createOnDeck(player, ashes)
   }
 }
 const mine = new Mine({
@@ -57,7 +58,7 @@ const mine = new Mine({
   id: 15,
   cost: 3,
   points: 4,
-  text: 'Create an Ashes on top of your deck.',
+  text: 'Create 2 Ashes on top of your deck.',
 })
 
 class Arsonist extends Card {
