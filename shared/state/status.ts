@@ -4,5 +4,4 @@ export enum Status {
   NOURISH,
   STARVE,
   UNLOCKED,
-  AWAKENED,
 }

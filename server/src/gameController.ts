@@ -194,13 +194,7 @@ class ServerController {
 
   protected doUpkeep(): void {
     // Reset vision
-    const newVision0 = this.model.status[0].includes(Status.AWAKENED)
-      ? this.model.vision[0]
-      : 0
-    const newVision1 = this.model.status[1].includes(Status.AWAKENED)
-      ? this.model.vision[1]
-      : 0
-    this.model.vision = [newVision0, newVision1]
+    this.model.vision = [0, 0]
 
     // Reset round counters
     this.model.passes = 0
@@ -331,7 +325,7 @@ class ServerController {
     }
 
     // Clear all statuses besides those just added
-    const clearedStatuses = [Status.INSPIRE, Status.UNLOCKED, Status.AWAKENED]
+    const clearedStatuses = [Status.INSPIRE, Status.UNLOCKED]
     this.model.status[player] = this.model.status[player].filter(
       (stat) => !clearedStatuses.includes(stat),
     )
