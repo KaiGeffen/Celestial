@@ -336,7 +336,7 @@ export class CardImage {
           return `[area=${keyword.name}_${value}][color=#FABD5D]${keyword.name} ${value}[/color][/area]`
         }
         // Otherwise just use the keyword name (like "Birth")
-        return `[area=${keyword.name}][color=#FABD5D]${keyword.name} [/color][/area]`
+        return `[area=${keyword.name}][color=#FABD5D]${keyword.name}[/color][/area]`
       })
     }
 
