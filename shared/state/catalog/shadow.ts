@@ -222,7 +222,7 @@ const craving = new Craving({
   beta: true,
 })
 
-class Spite extends Card {
+class Vampire extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     bonus -= game.score[player ^ 1]
     super.play(player, game, index, bonus)
@@ -232,8 +232,8 @@ class Spite extends Card {
     return Math.max(0, this.cost - game.story.acts.length)
   }
 }
-const spite = new Spite({
-  name: 'Spite',
+const vampire = new Vampire({
+  name: 'Vampire',
   id: 413,
   cost: 6,
   points: 7,
@@ -255,5 +255,5 @@ export {
   victim,
   rupture,
   craving,
-  spite,
+  vampire,
 }
