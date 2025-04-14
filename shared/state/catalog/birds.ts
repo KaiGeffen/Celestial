@@ -159,7 +159,7 @@ const fledgling = new Fledgling({
   name: 'Fledgling',
   id: 111,
   cost: 1,
-  text: 'Morning: Worth +1 point permanently.',
+  text: 'Morning: Worth +1 permanently.',
   beta: true,
 })
 

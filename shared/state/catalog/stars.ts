@@ -160,7 +160,7 @@ class Fates extends Card {
 const fates = new Fates({
   name: 'Fates',
   id: 369,
-  text: 'Exhale 6: Reset.\nExhale 3: Nourish 2.\nExhale 1: Birth 1.',
+  text: "Exhale 6: Set both players' points to 0.\nExhale 3: Nourish 2.\nExhale 1: Birth 1.",
   beta: true,
 })
 
