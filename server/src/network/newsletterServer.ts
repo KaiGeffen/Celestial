@@ -9,7 +9,15 @@ export default function createNewsletterServer() {
   const app = express()
 
   // Enable CORS
-  app.use(cors())
+  app.use(
+    cors({
+      // Specifically allow the about subdomain
+      origin: 'https://about.celestialtcg.com',
+      methods: ['POST', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Accept'],
+      credentials: true,
+    }),
+  )
 
   // JSON parser for all routes
   app.use(express.json())
