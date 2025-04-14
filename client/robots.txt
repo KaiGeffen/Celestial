@@ -1,8 +1,14 @@
+# about.celestialtcg.com
+User-agent: *
+Allow: /
+
+# celestialtcg.com
 User-agent: *
 Allow: /
 Disallow: /ws
 Disallow: /ws/
 Disallow: /assets/splash.webp
 
-# Sitemap
+# Sitemaps
+Sitemap: https://about.celestialtcg.com/sitemap.xml
 Sitemap: https://celestialtcg.com/sitemap.xml 
