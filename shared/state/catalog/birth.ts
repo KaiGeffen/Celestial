@@ -205,7 +205,7 @@ const passOn = new PassOn({
   beta: true,
 })
 
-class Progeny extends Card {
+class JustLikeDad extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -217,8 +217,8 @@ class Progeny extends Card {
     }
   }
 }
-const progeny = new Progeny({
-  name: 'Progeny',
+const justLikeDad = new JustLikeDad({
+  name: 'Just Like Dad',
   id: 5243,
   cost: 1,
   points: 1,
@@ -256,6 +256,6 @@ export {
   storytime,
   pregnant,
   passOn,
-  progeny,
+  justLikeDad,
   hug,
 }

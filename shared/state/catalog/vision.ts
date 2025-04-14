@@ -241,6 +241,30 @@ const lantern = new Lantern({
   beta: true,
 })
 
+class BeggingBowl extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    for (let i = game.status[player ^ 1].length - 1; i >= 0; i--) {
+      const status = game.status[player ^ 1][i]
+      if (status === Status.NOURISH) {
+        game.status[player ^ 1].splice(i, 1)
+        bonus += 1
+      } else if (status === Status.STARVE) {
+        game.status[player ^ 1].splice(i, 1)
+        bonus -= 1
+      }
+    }
+
+    super.play(player, game, index, bonus)
+  }
+}
+const beggingBowl = new BeggingBowl({
+  name: 'Begging Bowl',
+  id: 6085,
+  cost: 2,
+  text: "This consumes your opponent's Nourish.",
+  beta: true,
+})
+
 export {
   dawn,
   nectar,
@@ -255,4 +279,5 @@ export {
   riddle,
   bull,
   lantern,
+  beggingBowl,
 }

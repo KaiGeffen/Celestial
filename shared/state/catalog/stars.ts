@@ -180,7 +180,7 @@ const possibility = new Possibility({
   beta: true,
 })
 
-class RadiantCore extends Card {
+class CloakOfStars extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -194,8 +194,8 @@ class RadiantCore extends Card {
     return true
   }
 }
-const radiantCore = new RadiantCore({
-  name: 'Radiant Core',
+const cloakOfStars = new CloakOfStars({
+  name: 'Cloak Of Stars',
   id: 8056,
   cost: 3,
   text: 'Gain 3 breath.\nMorning: Gain 1 breath for each breath you ended the last round with.',
@@ -280,7 +280,7 @@ export {
   // BETA
   fates,
   possibility,
-  radiantCore,
+  cloakOfStars,
   dreamer,
   pride,
   hero,
