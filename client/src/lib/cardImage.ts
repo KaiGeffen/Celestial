@@ -376,6 +376,7 @@ export class CardImage {
         }
       })
       .on('areaout', () => {
+        this.onHoverExit()()
         hint.hide()
       })
       .setInteractive()
