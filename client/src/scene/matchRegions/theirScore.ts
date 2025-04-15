@@ -25,6 +25,7 @@ export default class TheirScoreRegion extends Region {
 
   private btnRecap: Button
   private btnSkip: Button
+  private btnSpeed: Button
 
   txtWins: Phaser.GameObjects.Text
 
@@ -38,7 +39,7 @@ export default class TheirScoreRegion extends Region {
       .setDepth(Depth.theirScore)
 
     // this.createBackground()
-    this.createIcons()
+    this.creatButtons()
     this.createWins()
     this.createRelic()
     this.addHotkeyListeners()
@@ -79,6 +80,12 @@ export default class TheirScoreRegion extends Region {
         }
       }
     })
+
+    this.scene.input.keyboard.on('keydown-Y', () => {
+      if (UserSettings._get('hotkeys')) {
+        this.btnSpeed.onClick()
+      }
+    })
   }
 
   private createBackground(): void {
@@ -89,20 +96,27 @@ export default class TheirScoreRegion extends Region {
     this.container.add(background)
   }
 
-  private createIcons(): void {
-    // Always visible
-    this.createSetSpeed()
-
-    // Only one button visible at a time
-    this.createButtons()
-  }
-
-  private createSetSpeed(): void {
-    const x = Space.pad * 2 + Space.iconSize + Space.iconSize / 2
+  private creatButtons(): void {
+    let x = Space.pad + Space.iconSize / 2
     const y = Space.pad + Space.iconSize / 2
 
+    // Recap button
+    this.btnRecap = new Icons.Recap(this.container, x, y, () =>
+      this.recapCallback(),
+    )
+
+    // Skip button
+    this.btnSkip = new Icons.Skip(this.container, x, y, () =>
+      this.skipCallback(),
+    ).setVisible(false)
+
+    this.addHotkeyHint([x, y], 'T')
+
+    // Speed button
+    x = Space.pad * 2 + Space.iconSize + Space.iconSize / 2
+
     // Create the speed button
-    const speedButton = new Icons.Speed(this.container, x, y, () => {
+    this.btnSpeed = new Icons.Speed(this.container, x, y, () => {
       // Get current speed
       const currentSpeed = UserSettings._get('animationSpeed')
 
@@ -117,16 +131,18 @@ export default class TheirScoreRegion extends Region {
       UserSettings._set('animationSpeed', newSpeed)
 
       // Update the icon frame based on speed
-      speedButton.icon.setFrame(this.getSpeedFrame(newSpeed))
+      // speedButton.icon.setFrame(this.getSpeedFrame(newSpeed))
 
       // Show a message about the speed change
       this.scene.signalError(`YOUR SPEED: ${newSpeed}x`)
     })
 
+    this.addHotkeyHint([x, y], 'Y')
+
     // Set initial frame based on current speed
-    const currentSpeed = UserSettings._get('animationSpeed')
-    const baseSpeed = currentSpeed / (Flags.local ? 10000 : 1)
-    speedButton.icon.setFrame(this.getSpeedFrame(baseSpeed))
+    // const currentSpeed = UserSettings._get('animationSpeed')
+    // const baseSpeed = currentSpeed / (Flags.local ? 10000 : 1)
+    // this.btnSpeed.icon.setFrame(this.getSpeedFrame(baseSpeed))
   }
 
   // Helper method to determine which frame to use based on speed
@@ -138,23 +154,6 @@ export default class TheirScoreRegion extends Region {
     else if (speed < 1.5)
       return 2 // Normal
     else return 3 // Fast
-  }
-
-  private createButtons(): void {
-    const x = Space.pad + Space.iconSize / 2
-    const y = Space.pad + Space.iconSize / 2
-
-    // Recap button
-    this.btnRecap = new Icons.Recap(this.container, x, y, () =>
-      this.recapCallback(),
-    )
-
-    // Skip button
-    this.btnSkip = new Icons.Skip(this.container, x, y, () =>
-      this.skipCallback(),
-    ).setVisible(false)
-
-    this.addHotkeyHint([x, y], 'T')
   }
 
   private createWins(): void {
