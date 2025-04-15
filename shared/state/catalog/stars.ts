@@ -1,6 +1,5 @@
 import Card from '../card'
 import { SightCard } from '../card'
-import { Status } from '../status'
 import { Quality } from '../quality'
 import { Keywords } from '../keyword'
 import { Animation } from '../../animation'
@@ -117,12 +116,7 @@ const moon = new Moon({
 class Sunflower extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     let points = this.points + bonus
-    points += game.status[player].filter(
-      (status) => status === Status.NOURISH,
-    ).length
-    points -= game.status[player].filter(
-      (status) => status === Status.STARVE,
-    ).length
+    points += game.status[player].nourish
 
     super.play(player, game, index, bonus)
     this.inspire(points, game, player)

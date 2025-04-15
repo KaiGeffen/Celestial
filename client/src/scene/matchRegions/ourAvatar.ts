@@ -39,19 +39,15 @@ export default class OurAvatarRegion extends Region {
     this.avatar.setQuality({ num: state.avatars[0] })
 
     // Statuses
-    let amts = [0, 0, 0, 0]
-    state.status[0].forEach((status) => {
-      amts[status]++
-    })
-
-    const amtInspire = amts[1]
-    const amtNourish = amts[2] - amts[3]
-
-    this.btnInspire.setVisible(amtInspire !== 0).setText(`${amtInspire}`)
-    this.btnNourish.setVisible(amtNourish !== 0).setText(`${amtNourish}`)
+    this.btnInspire
+      .setVisible(state.status[0].inspired !== 0)
+      .setText(`${state.status[0].inspired}`)
+    this.btnNourish
+      .setVisible(state.status[0].nourish !== 0)
+      .setText(`${state.status[0].nourish}`)
     this.btnSight
-      .setVisible(state.vision[0] !== 0)
-      .setText(`${state.vision[0]}`)
+      .setVisible(state.status[0].vision !== 0)
+      .setText(`${state.status[0].vision}`)
 
     // Pile sizes
     this.btnDeck.setText(`${state.deck[0].length}`)

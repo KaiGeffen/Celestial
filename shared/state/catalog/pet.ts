@@ -1,5 +1,4 @@
 import Card from '../card'
-import { Status } from '../status'
 import { Quality } from '../quality'
 import { Keywords } from '../keyword'
 import { Animation } from '../../animation'
@@ -24,7 +23,7 @@ class Oak extends Card {
   onRoundEndIfThisResolved(player: number, game: GameModel) {
     const scoreAboveWinning = game.score[player] - game.score[player ^ 1]
     const amt = Math.max(0, scoreAboveWinning)
-    game.status[player].push(...Array(amt).fill(Status.NOURISH))
+    game.status[player].nourish += amt
   }
 }
 const oak = new Oak({
@@ -64,13 +63,7 @@ class Pet extends Card {
 
   play(player: number, game: GameModel, index: number, bonus: number) {
     let points = this.points + bonus
-    points += game.status[player].filter(
-      (status) => status === Status.NOURISH,
-    ).length
-    points -= game.status[player].filter(
-      (status) => status === Status.STARVE,
-    ).length
-
+    points += game.status[player].nourish
     const pet = new Pet(points)
     game.pile[player].push(pet)
 
@@ -271,17 +264,13 @@ const supernova = new Supernova({
 class Sample extends Card {
   getCost(player: number, game: GameModel) {
     let cost = this.cost
-    if (
-      game.status[player].some(
-        (status) => status === Status.NOURISH || status === Status.STARVE,
-      )
-    ) {
+    if (game.status[player].nourish !== 0) {
       cost -= 1
     }
-    if (game.status[player].some((status) => status === Status.INSPIRED)) {
+    if (game.status[player].inspired !== 0) {
       cost -= 1
     }
-    if (game.vision[player] > 0) {
+    if (game.status[player].vision > 0) {
       cost -= 1
     }
     return Math.max(0, cost)

@@ -1,5 +1,4 @@
 import Card from '../card'
-import { Status } from '../status'
 import { Quality } from '../quality'
 import GameModel from '../gameModel'
 import { wound } from './tokens'
@@ -47,7 +46,7 @@ class Imprison extends Card {
     // If opponent had 2 or fewer points
     if (game.score[player ^ 1] <= 2) {
       // Give them Nourish -1
-      game.status[player ^ 1].push(Status.STARVE)
+      game.status[player ^ 1].nourish -= 1
     }
   }
 }
@@ -82,9 +81,7 @@ const nightmare = new Nightmare({
 
 class Boa extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    const nourished =
-      game.status[player].includes(Status.NOURISH) ||
-      game.status[player].includes(Status.STARVE)
+    const nourished = game.status[player].nourish !== 0
     super.play(player, game, index, bonus)
     if (nourished) {
       game.discard(player ^ 1)
@@ -178,7 +175,7 @@ class Victim extends Card {
   onRoundEndIfThisResolved(player: number, game: GameModel) {
     const scoreAboveWinning = game.score[player ^ 1] - game.score[player]
     const amt = Math.max(0, scoreAboveWinning)
-    game.status[player ^ 1].push(...Array(amt).fill(Status.STARVE))
+    game.status[player ^ 1].nourish -= amt
   }
 }
 const victim = new Victim({

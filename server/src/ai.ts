@@ -1,5 +1,4 @@
 import { MechanicsSettings } from '../../shared/settings'
-import { Status } from '../../shared/state/status'
 import { Quality } from '../../shared/state/quality'
 import GameModel from '../../shared/state/gameModel'
 
@@ -20,16 +19,10 @@ function predictPointDifference(model: GameModel): number {
   let ourPoints = 0
   let theirPoints = 0
 
-  let ourNourish =
-    model.status[0].filter((s: Status) => s === Status.NOURISH).length -
-    model.status[0].filter((s: Status) => s === Status.STARVE).length
-  let theirNourish =
-    model.status[1].filter((s: Status) => s === Status.NOURISH).length -
-    model.status[1].filter((s: Status) => s === Status.STARVE).length
+  let ourNourish = model.status[0].nourish
+  let theirNourish = model.status[1].nourish
 
-  let theirBreath =
-    model.maxBreath[0] +
-    model.status[1].filter((s: Status) => s === Status.INSPIRED).length
+  let theirBreath = model.maxBreath[0] + model.status[1].inspired
   let theyPlayedHiddenCards = false
 
   for (const act of model.story.acts) {
@@ -71,8 +64,8 @@ function wantDryRound(model: GameModel): boolean {
   )
   result -= 2 * theyDraw
 
-  result -= model.status[0].filter((s: Status) => s === Status.INSPIRED).length
-  result += model.status[1].filter((s: Status) => s === Status.INSPIRED).length
+  result -= model.status[0].inspired
+  result += model.status[1].inspired
 
   return result > 0
 }

@@ -1,6 +1,5 @@
 import Card from '../card'
 import { ashes } from './tokens'
-import { Status } from '../status'
 import { Quality } from '../quality'
 import { Animation } from '../../animation'
 import { Zone } from '../zone'
@@ -105,7 +104,7 @@ class Parch extends Card {
   }
 
   onPlay(player: number, game: GameModel) {
-    game.status[player].push(Status.UNLOCKED)
+    game.status[player].unlocked = true
   }
 }
 const parch = new Parch({

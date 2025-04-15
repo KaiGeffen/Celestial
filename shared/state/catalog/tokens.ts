@@ -1,14 +1,13 @@
 import Card from '../card'
 import { Quality } from '../quality'
 import GameModel from '../gameModel'
-import { Keywords } from '../keyword'
 import { Zone } from '../zone'
 import { Animation } from '../../animation'
-// import { prey } from './vision'
 
 class Seen extends Card {
   onUpkeepInHand(player: number, game: GameModel, index: number): boolean {
-    game.vision[player ^ 1] += 4
+    game.status[player ^ 1].vision += 4
+    console.log('Seen', game.status[player ^ 1].vision)
     return true
   }
 }

@@ -1,7 +1,6 @@
 import Card from '../card'
 import { SightCard } from '../card'
 import { seen, predator } from './tokens'
-import { Status } from '../status'
 import { Quality } from '../quality'
 import { Keywords } from '../keyword'
 import GameModel from '../gameModel'
@@ -60,7 +59,7 @@ class Enlightenment extends Card {
       const act = game.story.acts[i]
       if (act.owner === (player ^ 1)) {
         if (
-          i + 1 <= game.vision[player] ||
+          i + 1 <= game.status[player].vision ||
           act.card.qualities.includes(Quality.VISIBLE)
         ) {
           numSeenCards += 1
@@ -101,7 +100,7 @@ class Conquer extends Card {
         numSeenCards += 1
       } else {
         if (
-          i + 1 <= game.vision[player] ||
+          i + 1 <= game.status[player].vision ||
           act.card.qualities.includes(Quality.VISIBLE)
         ) {
           numSeenCards += 1
@@ -243,17 +242,8 @@ const lantern = new Lantern({
 
 class BeggingBowl extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    for (let i = game.status[player ^ 1].length - 1; i >= 0; i--) {
-      const status = game.status[player ^ 1][i]
-      if (status === Status.NOURISH) {
-        game.status[player ^ 1].splice(i, 1)
-        bonus += 1
-      } else if (status === Status.STARVE) {
-        game.status[player ^ 1].splice(i, 1)
-        bonus -= 1
-      }
-    }
-
+    bonus += game.status[player ^ 1].nourish
+    game.status[player ^ 1].nourish = 0
     super.play(player, game, index, bonus)
   }
 }

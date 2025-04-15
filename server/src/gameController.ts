@@ -1,7 +1,6 @@
 import GameModel from '../../shared/state/gameModel'
 import Card from '../../shared/state/card'
 
-import { Status } from '../../shared/state/status'
 import { SoundEffect } from '../../shared/state/soundEffect'
 import { Animation } from '../../shared/animation'
 import { Zone } from '../../shared/state/zone'
@@ -193,9 +192,6 @@ class ServerController {
   }
 
   protected doUpkeep(): void {
-    // Reset vision
-    this.model.vision = [0, 0]
-
     // Reset round counters
     this.model.passes = 0
     this.model.amtPasses = [0, 0]
@@ -204,8 +200,10 @@ class ServerController {
     // Set priority
     this.model.priority = this.model.lastPlayerWhoPlayed
 
-    // Increase max breath by 1, up to a cap
+    // Determine order of player triggers
     const players = this.model.priority === 1 ? [1, 0] : [0, 1]
+
+    // Increase max breath by 1, up to a cap
     for (const player of players) {
       if (this.model.maxBreath[player] < MechanicsSettings.BREATH_CAP) {
         this.model.maxBreath[player] = Math.min(
@@ -214,10 +212,16 @@ class ServerController {
         )
       }
       this.model.breath[player] = this.model.maxBreath[player]
+    }
 
+    // Status upkeeps
+    for (const player of players) {
       // Do any upkeep status effect
       this.doUpkeepStatuses(player)
+    }
 
+    // Hand triggers
+    for (const player of players) {
       // Do any effects that activate in hand
       let index = 0
       while (index < this.model.hand[player].length) {
@@ -242,7 +246,10 @@ class ServerController {
 
         index += 1
       }
+    }
 
+    // Morning triggers
+    for (const player of players) {
       // Do any activated in discard pile effects
       if (this.model.pile[player].length > 0) {
         const card = this.model.pile[player][this.model.pile[player].length - 1]
@@ -257,16 +264,16 @@ class ServerController {
               from: Zone.Discard,
               to: Zone.Discard,
               card: card,
-              index: index,
-              index2: index,
+              index: 0, // TODO Use this or remove
+              index2: 0,
             }),
           )
         }
       }
     }
 
-    // Draw cards for the turn, set breath to max
-    for (const player of [0, 1]) {
+    // Draw cards for the turn, ensure breath is at least 0
+    for (const player of players) {
       this.model.draw(player, MechanicsSettings.DRAW_PER_TURN)
       this.model.breath[player] = Math.max(this.model.breath[player], 0)
     }
@@ -310,25 +317,15 @@ class ServerController {
   }
 
   private doUpkeepStatuses(player: number): void {
-    // Clear inspired from last round
-    const createdStatuses = [Status.INSPIRED]
-    this.model.status[player] = this.model.status[player].filter(
-      (stat) => !createdStatuses.includes(stat),
-    )
+    // Clear statuses that are removed at start of round
+    this.model.status[player].inspired = 0
+    this.model.status[player].vision = 0
+    this.model.status[player].unlocked = false
 
-    // Add inspired equal to the amount of inspire
-    for (const stat of this.model.status[player]) {
-      if (stat === Status.INSPIRE) {
-        this.model.breath[player] += 1
-        this.model.status[player].push(Status.INSPIRED)
-      }
-    }
-
-    // Clear all statuses besides those just added
-    const clearedStatuses = [Status.INSPIRE, Status.UNLOCKED]
-    this.model.status[player] = this.model.status[player].filter(
-      (stat) => !clearedStatuses.includes(stat),
-    )
+    // Add inspired and breath equal to the amount of inspire
+    this.model.status[player].inspired = this.model.status[player].inspire
+    this.model.breath[player] += this.model.status[player].inspire
+    this.model.status[player].inspire = 0
   }
 
   private canPlay(player: number, cardNum: number): boolean {

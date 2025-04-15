@@ -1,4 +1,3 @@
-import { Status } from './status'
 import { Quality } from './quality'
 import { Act } from './story'
 import GameModel from './gameModel'
@@ -62,18 +61,8 @@ export default class Card {
   play(player: number, game: GameModel, index: number, bonus: number): void {
     let result = this.points + bonus
 
-    result += game.status[player].filter(
-      (status: Status) => status === Status.NOURISH,
-    ).length
-    game.status[player] = game.status[player].filter(
-      (status: Status) => status !== Status.NOURISH,
-    )
-    result -= game.status[player].filter(
-      (status: Status) => status === Status.STARVE,
-    ).length
-    game.status[player] = game.status[player].filter(
-      (status: Status) => status !== Status.STARVE,
-    )
+    result += game.status[player].nourish
+    game.status[player].nourish = 0
 
     game.score[player] += result
 
@@ -171,33 +160,8 @@ export default class Card {
 
   addBreath(amt: number, game: GameModel, player: number) {
     game.breath[player] += amt
-    for (let i = 0; i < amt; i++) {
-      game.status[player].push(Status.INSPIRED)
-    }
-  }
-
-  addStatus(amt: number, game: GameModel, player: number, stat: Status) {
-    for (let i = 0; i < amt; i++) {
-      if (stat === Status.NOURISH) {
-        const starveIndex = game.status[player].indexOf(Status.STARVE)
-        if (starveIndex !== -1) {
-          // Remove just one STARVE status
-          game.status[player].splice(starveIndex, 1)
-        } else {
-          game.status[player].push(stat)
-        }
-      } else if (stat === Status.STARVE) {
-        const nourishIndex = game.status[player].indexOf(Status.NOURISH)
-        if (nourishIndex !== -1) {
-          // Remove just one NOURISH status
-          game.status[player].splice(nourishIndex, 1)
-        } else {
-          game.status[player].push(stat)
-        }
-      } else {
-        game.status[player].push(stat)
-      }
-    }
+    // TODO Is this correct? Opponent shouldnt know about Ecology for example
+    game.status[player].inspired += amt
   }
 
   inspire(amt: number, game: GameModel, player: number) {
@@ -207,7 +171,7 @@ export default class Card {
         status: 0,
       }),
     )
-    this.addStatus(amt, game, player, Status.INSPIRE)
+    game.status[player].inspire += amt
   }
 
   nourish(amt: number, game: GameModel, player: number) {
@@ -217,7 +181,7 @@ export default class Card {
         status: 2,
       }),
     )
-    this.addStatus(amt, game, player, Status.NOURISH)
+    game.status[player].nourish += amt
   }
 
   starve(amt: number, game: GameModel, player: number) {
@@ -228,7 +192,7 @@ export default class Card {
         status: 3,
       }),
     )
-    this.addStatus(amt, game, player, Status.STARVE)
+    game.status[player].nourish -= amt
   }
 
   /* AI heuristics */
@@ -243,10 +207,7 @@ export default class Card {
   rateReset(world: any): number {
     let knownValue = 0
     let theirUnknownCards = 0
-    let theirBreath =
-      world.maxBreath[1] +
-      world.status[1].filter((status: Status) => status === Status.INSPIRED)
-        .length
+    let theirBreath = world.maxBreath[1] + world.status[1].inspired
 
     for (const act of world.story.acts) {
       const card = act.card
@@ -305,7 +266,7 @@ export class SightCard extends Card {
   }
 
   onPlay(player: number, game: GameModel): void {
-    game.vision[player] += this.amt
+    game.status[player].vision += this.amt
   }
 }
 

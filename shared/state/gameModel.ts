@@ -4,7 +4,7 @@ import { Avatar } from './avatar'
 
 import { Animation } from '../animation'
 import { Zone } from './zone'
-import { Status } from './status'
+import { Statuses } from './status'
 import { MechanicsSettings } from '../settings'
 import { SoundEffect } from './soundEffect'
 
@@ -21,7 +21,7 @@ export default class GameModel {
   maxBreath: number[] = [1, 1]
   // TODO This is a hack for Radiant Core, consider other approaches
   endingBreath: number[] = [0, 0]
-  status: Status[][] = [[], []]
+  status: [Statuses, Statuses]
   vision: number[] = [0, 0]
 
   // Resolving specific
@@ -85,6 +85,7 @@ export default class GameModel {
 
     // Starting priority is random
     this.priority = Math.floor(Math.random() * 2)
+    this.status = [new Statuses(), new Statuses()]
   }
 
   versionIncr() {
@@ -104,7 +105,7 @@ export default class GameModel {
 
   // Get the cost of given player playing the given card
   getCost(card: Card, player: number): number {
-    if (this.status[player].includes(Status.UNLOCKED)) {
+    if (this.status[player].unlocked) {
       return 0
     } else {
       return card.getCost(player, this)
@@ -122,7 +123,7 @@ export default class GameModel {
     copy.story = this.story.getDeepCopy()
     copy.breath = [...this.breath]
     copy.maxBreath = [...this.maxBreath]
-    copy.status = this.status.map((status) => [...status])
+    copy.status = [this.status[0].getDeepCopy(), this.status[1].getDeepCopy()]
     copy.vision = [...this.vision]
     copy.score = [...this.score]
     copy.recentModels = this.recentModels.map((models) =>
