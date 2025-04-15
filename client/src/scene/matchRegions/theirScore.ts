@@ -12,6 +12,7 @@ import {
 import Region from './baseRegion'
 import { GameScene } from '../gameScene'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
+import { Flags } from '../../settings/flags'
 
 // Y of the buttons
 const width = Space.iconSize * 3 + Space.pad * 4
@@ -104,9 +105,43 @@ export default class TheirScoreRegion extends Region {
     const x = Space.pad * 2 + Space.iconSize + Space.iconSize / 2
     const y = Space.pad + Space.iconSize / 2
 
-    // Set speed button
-    // TODO Change icon
-    // new Icons.Recap(this.container, x, y, () => console.log('Set speed'))
+    // Create the speed button
+    const speedButton = new Icons.Speed(this.container, x, y, () => {
+      // Get current speed
+      const currentSpeed = UserSettings._get('animationSpeed')
+
+      // Cycle through speeds: 0.25 -> 0.5 -> 1 -> 2 -> 0.25
+      let newSpeed
+      if (currentSpeed < 0.3) newSpeed = 0.5
+      else if (currentSpeed < 0.7) newSpeed = 1
+      else if (currentSpeed < 1.5) newSpeed = 2
+      else newSpeed = 0.25
+
+      // Update the setting
+      UserSettings._set('animationSpeed', newSpeed)
+
+      // Update the icon frame based on speed
+      speedButton.icon.setFrame(this.getSpeedFrame(newSpeed))
+
+      // Show a message about the speed change
+      this.scene.signalError(`YOUR SPEED: ${newSpeed}x`)
+    })
+
+    // Set initial frame based on current speed
+    const currentSpeed = UserSettings._get('animationSpeed')
+    const baseSpeed = currentSpeed / (Flags.local ? 10000 : 1)
+    speedButton.icon.setFrame(this.getSpeedFrame(baseSpeed))
+  }
+
+  // Helper method to determine which frame to use based on speed
+  private getSpeedFrame(speed: number): number {
+    if (speed < 0.3)
+      return 0 // Slowest
+    else if (speed < 0.7)
+      return 1 // Slow
+    else if (speed < 1.5)
+      return 2 // Normal
+    else return 3 // Fast
   }
 
   private createButtons(): void {

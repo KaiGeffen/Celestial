@@ -172,6 +172,25 @@ class Skip extends Button {
   }
 }
 
+class Speed extends Button {
+  constructor(
+    within: Phaser.Scene | Phaser.GameObjects.Container | ContainerLite,
+    x: number,
+    y: number,
+    f: () => void = () => {},
+  ) {
+    super(within, x, y, {
+      icon: {
+        name: 'Speed',
+        interactive: true,
+      },
+      callbacks: {
+        click: f,
+      },
+    })
+  }
+}
+
 class Arrow extends Button {
   constructor(
     within: Phaser.Scene | Phaser.GameObjects.Container | ContainerLite,
@@ -330,6 +349,7 @@ export default class Icons {
   static Distribution = Distribution
   static New = New
   static Recap = Recap
+  static Speed = Speed
   static Skip = Skip
   static Arrow = Arrow
   static Pass = Pass

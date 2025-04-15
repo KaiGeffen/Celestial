@@ -209,8 +209,6 @@ export default class OptionsMenu extends Menu {
       .addSpace()
       .add(this.createHotkeys(), { expand: true })
       .addSpace()
-      .add(this.createSpeed(), { expand: true })
-      .addSpace()
       .add(this.createQuit(activeScene), { expand: true })
 
     return sizer
@@ -402,27 +400,6 @@ export default class OptionsMenu extends Menu {
       }
     })
     sizer.add(container)
-
-    return sizer
-  }
-
-  private createSpeed() {
-    let sizer = this.scene['rexUI'].add.sizer({
-      width: this.subwidth,
-      orientation: 'vertical',
-      space: { item: Space.pad },
-    })
-
-    let txtHint = this.scene.add.text(0, 0, 'Animation Speed:', Style.basic)
-    sizer.add(txtHint, { align: 'left' })
-
-    let slider = this.getSlider(
-      UserSettings._get('animationSpeed'),
-      (value) => {
-        UserSettings._set('animationSpeed', value * (Flags.local ? 10000 : 1))
-      },
-    )
-    sizer.add(slider)
 
     return sizer
   }

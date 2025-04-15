@@ -220,6 +220,7 @@ export const assetLists = {
       "Sight",
       "Skip",
       "SmallX",
+      "Speed",
       "Status",
       "Sun",
       "Thumb",
