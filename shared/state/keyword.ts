@@ -54,7 +54,7 @@ export class Keywords {
   // Abilities with X
   static sight = new Keyword(
     'Sight',
-    '[color=#FABD5D]Sight X[/color]: Increase your Sight by X. Sight N makes the first N cards in the story visible to you, and is removed at end of round.',
+    '[color=#FABD5D]Sight X[/color]: The first X cards in the story are visible to you this round. Additional Sight adds to this number.',
     true,
   )
   static inspire = new Keyword(

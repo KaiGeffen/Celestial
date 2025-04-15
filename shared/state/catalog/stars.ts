@@ -240,7 +240,7 @@ class Hero extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     // Departure
     if (super.exhale(5, game, player)) {
-      bonus += 5
+      bonus += 4
     }
 
     super.play(player, game, index, bonus)
@@ -259,7 +259,7 @@ class Hero extends Card {
 const hero = new Hero({
   name: 'Hero',
   id: 7369,
-  text: 'Exhale 5: Worth +5.\nExhale 3: Discard the next card in the story.\nExhale 1: Inspire 1.',
+  text: 'Exhale 5: Worth +4.\nExhale 3: Discard the next card in the story.\nExhale 1: Inspire 1.',
   beta: true,
 })
 

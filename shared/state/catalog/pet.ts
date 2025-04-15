@@ -168,7 +168,7 @@ class Abundance extends Card {
 
     if (super.exhale(1, game, player)) {
       if (game.score[player] >= 7) {
-        this.nourish(4, game, player)
+        this.nourish(3, game, player)
       }
     }
   }
@@ -178,7 +178,7 @@ const abundance = new Abundance({
   id: 435,
   cost: 2,
   points: 2,
-  text: 'Exhale 1: If you have 7 or more points, Nourish 4.',
+  text: 'Exhale 1: If you have 7 or more points, Nourish 3.',
   beta: true,
 })
 
