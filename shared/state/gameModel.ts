@@ -22,7 +22,6 @@ export default class GameModel {
   // TODO This is a hack for Radiant Core, consider other approaches
   endingBreath: number[] = [0, 0]
   status: [Statuses, Statuses]
-  vision: number[] = [0, 0]
 
   // Resolving specific
   // Each player's score
@@ -124,7 +123,6 @@ export default class GameModel {
     copy.breath = [...this.breath]
     copy.maxBreath = [...this.maxBreath]
     copy.status = [this.status[0].getDeepCopy(), this.status[1].getDeepCopy()]
-    copy.vision = [...this.vision]
     copy.score = [...this.score]
     copy.recentModels = this.recentModels.map((models) =>
       models.map((model) => model.getDeepCopy()),
