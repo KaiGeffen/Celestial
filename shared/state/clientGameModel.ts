@@ -38,7 +38,6 @@ function reverseAttributes(model: GameModel): void {
     'breath',
     'maxBreath',
     'status',
-    'vision',
     'score',
     'roundResults',
     'mulligansComplete',

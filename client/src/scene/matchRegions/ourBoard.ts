@@ -195,8 +195,8 @@ export default class OurBoardRegion extends Region {
         .setFocusOptions('Play')
         .moveToTopOnHover()
 
-      // If this was the raised card, raise it again
-      if (i === this.raisedCardIndex) {
+      // If shift is held or card was hovered, raise the card immediately
+      if (i === this.raisedCardIndex || this.isShiftHeld) {
         card.container.setY(-Space.cardHeight / 2)
       }
 
@@ -215,9 +215,12 @@ export default class OurBoardRegion extends Region {
 
       // Add hotkey hint text above the card
       let position = CardLocation.ourHand(state, i, this.container)
-      position[1] -= Space.cardHeight / 2 + HOVER_OFFSET + Space.pad
+      position[1] -= Space.cardHeight / 2 + HOVER_OFFSET + 25
       const hotkeyText = this.addHotkeyHint(position, `${i + 1}`)
       this.temp.push(hotkeyText)
+
+      // If shift is held, show the hotkey hint
+      hotkeyText.setVisible(this.isShiftHeld)
     }
 
     // Hover whichever card was being hovered last
