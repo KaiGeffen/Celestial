@@ -343,6 +343,8 @@ export class GameScene extends BaseScene {
         regions.forEach((region) => {
           region.setHotkeyHintVisible(true)
         })
+        // Raise all cards when shift is pressed
+        this.view.ourBoard.raiseAllCards()
       }
     })
     this.input.keyboard.on('keyup-SHIFT', () => {
@@ -350,6 +352,8 @@ export class GameScene extends BaseScene {
         regions.forEach((region) => {
           region.setHotkeyHintVisible(false)
         })
+        // Lower all cards when shift is released
+        this.view.ourBoard.lowerAllCards()
       }
     })
   }

@@ -37,6 +37,9 @@ export default class OurBoardRegion extends Region {
   // Track which card is currently raised
   raisedCardIndex: number | null = null
 
+  // Track whether shift is held
+  isShiftHeld = false
+
   create(scene: GameScene, avatarId: number): this {
     this.scene = scene
 
@@ -212,7 +215,7 @@ export default class OurBoardRegion extends Region {
 
       // Add hotkey hint text above the card
       let position = CardLocation.ourHand(state, i, this.container)
-      position[1] -= Space.cardHeight / 2
+      position[1] -= Space.cardHeight / 2 + HOVER_OFFSET + Space.pad
       const hotkeyText = this.addHotkeyHint(position, `${i + 1}`)
       this.temp.push(hotkeyText)
     }
@@ -235,7 +238,7 @@ export default class OurBoardRegion extends Region {
     }
   }
 
-  // Remove the hover movement since we're using click to raise now
+  // Modify onCardHover to not raise if shift is held
   private onCardHover(
     card: CardImage,
     cost: number,
@@ -245,19 +248,23 @@ export default class OurBoardRegion extends Region {
       // Show the card's cost
       this.displayCostCallback(cost)
 
-      // Raise the card
-      this.scene.tweens.add({
-        targets: card.container,
-        y: -Space.cardHeight / 2,
-        duration: Time.playCard() / 2,
-        ease: 'Sine.easeOut',
-      })
+      // Only raise if shift is not held
+      if (!this.isShiftHeld) {
+        // Raise the card
+        this.scene.tweens.add({
+          targets: card.container,
+          y: -Space.cardHeight / 2,
+          duration: Time.playCard() / 2,
+          ease: 'Sine.easeOut',
+        })
 
-      // Track which card is raised
-      this.raisedCardIndex = index
+        // Track which card is raised
+        this.raisedCardIndex = index
+      }
     }
   }
 
+  // Modify onCardExit to not lower if shift is held
   private onCardExit(
     card: CardImage,
     cards: CardImage[],
@@ -267,17 +274,20 @@ export default class OurBoardRegion extends Region {
       // Hide the cost
       this.displayCostCallback(0)
 
-      // Lower the card
-      this.scene.tweens.add({
-        targets: card.container,
-        y: Space.cardHeight / 2 - Space.todoHandOffset,
-        duration: Time.playCard() / 2,
-        ease: 'Sine.easeOut',
-      })
+      // Only lower if shift is not held
+      if (!this.isShiftHeld) {
+        // Lower the card
+        this.scene.tweens.add({
+          targets: card.container,
+          y: Space.cardHeight / 2 - Space.todoHandOffset,
+          duration: Time.playCard() / 2,
+          ease: 'Sine.easeOut',
+        })
 
-      // Clear raised card tracking if this was the raised card
-      if (this.raisedCardIndex === index) {
-        this.raisedCardIndex = null
+        // Clear raised card tracking if this was the raised card
+        if (this.raisedCardIndex === index) {
+          this.raisedCardIndex = null
+        }
       }
     }
   }
@@ -291,5 +301,35 @@ export default class OurBoardRegion extends Region {
   // Set the callback for showing how much breath a card costs
   setDisplayCostCallback(f: (cost: number) => void): void {
     this.displayCostCallback = f
+  }
+
+  // Add method to raise all cards
+  raiseAllCards(): void {
+    if (this.isShiftHeld) return // Don't raise if already raised
+    this.isShiftHeld = true
+
+    this.cards.forEach((card, index) => {
+      this.scene.tweens.add({
+        targets: card.container,
+        y: -Space.cardHeight / 2,
+        duration: Time.playCard() / 2,
+        ease: 'Sine.easeOut',
+      })
+    })
+  }
+
+  // Add method to lower all cards
+  lowerAllCards(): void {
+    if (!this.isShiftHeld) return // Don't lower if already lowered
+    this.isShiftHeld = false
+
+    this.cards.forEach((card, index) => {
+      this.scene.tweens.add({
+        targets: card.container,
+        y: Space.cardHeight / 2 - Space.todoHandOffset,
+        duration: Time.playCard() / 2,
+        ease: 'Sine.easeOut',
+      })
+    })
   }
 }
