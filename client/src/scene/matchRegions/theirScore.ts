@@ -47,23 +47,19 @@ export default class TheirScoreRegion extends Region {
   }
 
   displayState(state: GameModel): void {
-    // Recap button
-    // TODO Conditional should care about whether a recap exists not the max breath
-    if (!state.isRecap && state.maxBreath[0] > 1) {
+    // Recap and skip buttons
+    if (!state.isRecap) {
       this.btnRecap.enable()
       this.btnRecap.setVisible(true)
+
+      this.btnSkip.disable()
+      this.btnSkip.setVisible(false)
     } else {
       this.btnRecap.disable()
       this.btnRecap.setVisible(false)
-    }
 
-    // Skip button
-    if (state.isRecap) {
       this.btnSkip.enable()
       this.btnSkip.setVisible(true)
-    } else {
-      this.btnSkip.disable()
-      this.btnSkip.setVisible(false)
     }
 
     // Wins
@@ -151,7 +147,7 @@ export default class TheirScoreRegion extends Region {
     // Recap button
     this.btnRecap = new Icons.Recap(this.container, x, y, () =>
       this.recapCallback(),
-    ).setVisible(false)
+    )
 
     // Skip button
     this.btnSkip = new Icons.Skip(this.container, x, y, () =>
