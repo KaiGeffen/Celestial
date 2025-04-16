@@ -7,7 +7,6 @@ import { Animation } from '../../animation'
 class Seen extends Card {
   onUpkeepInHand(player: number, game: GameModel, index: number): boolean {
     game.status[player ^ 1].vision += 4
-    console.log('Seen', game.status[player ^ 1].vision)
     return true
   }
 }
