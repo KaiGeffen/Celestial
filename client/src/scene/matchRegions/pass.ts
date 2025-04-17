@@ -143,8 +143,12 @@ export default class PassRegion extends Region {
   private addHotkeys() {
     this.scene.input.keyboard.removeListener('keydown-SPACE')
     this.scene.input.keyboard.on('keydown-SPACE', () => {
-      if (this.btnPass.enabled && UserSettings._get('hotkeys')) {
-        this.btnPass.onClick()
+      if (UserSettings._get('hotkeys')) {
+        if (this.btnPass.enabled) {
+          this.btnPass.onClick()
+        } else if (this.btnMoon.enabled) {
+          this.btnMoon.onClick()
+        }
       }
     })
   }
@@ -167,6 +171,7 @@ export default class PassRegion extends Region {
     })
 
     this.addHotkeyHint([x, 0], 'SPACE')
+    this.addHotkeyHint([-x, 0], 'SPACE').setRotation(Math.PI)
   }
 
   private createText(): void {
