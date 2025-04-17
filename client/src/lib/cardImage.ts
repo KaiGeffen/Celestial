@@ -520,6 +520,7 @@ export class CardImage {
     this.image.setTint(color)
     this.txtCost.setTint(color)
     this.txtPoints.setTint(color)
+    this.txtText.setTint(color)
   }
 
   private clearTint(): void {
