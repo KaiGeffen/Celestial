@@ -201,7 +201,6 @@ export const assetLists = {
       "Help",
       "InputText",
       "Inspire",
-      "Inspire",
       "MobileBottom",
       "MobileInspire",
       "MobileMoon",
@@ -209,7 +208,6 @@ export const assetLists = {
       "MobileSun",
       "Moon",
       "New",
-      "Nourish",
       "Nourish",
       "Options",
       "Pointer",
@@ -219,7 +217,6 @@ export const assetLists = {
       "Search",
       "SearchBar",
       "Share",
-      "Sight",
       "Sight",
       "Skip",
       "SmallX",
@@ -311,6 +308,7 @@ export const assetLists = {
   },
   "chrome": {
     "files": [
+      "Avatar",
       "Avatar",
       "Hand"
     ]

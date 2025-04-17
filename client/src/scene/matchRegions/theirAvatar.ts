@@ -16,7 +16,7 @@ import { GameScene } from '../gameScene'
 import CardLocation from './cardLocation'
 
 const width = Space.avatarSize + Space.pad * 2
-const height = 250
+const height = 270
 
 export default class TheirAvatarRegion extends Region {
   btnInspire: Button
@@ -63,7 +63,7 @@ export default class TheirAvatarRegion extends Region {
 
   private createStacks(): void {
     let x = width / 4
-    const y = 215
+    const y = height - Space.pad - Space.stackIconHeight / 2
     this.btnDeck = new Buttons.Stacks.Deck(this.container, x, y, 1)
     this.addHotkeyHint([x, y], 'E')
 
@@ -123,7 +123,7 @@ export default class TheirAvatarRegion extends Region {
 
   private createAvatar(): void {
     const x = width / 2
-    const y = 80
+    const y = Space.avatarSize / 2 + Space.pad
     this.avatar = new Buttons.Avatar(this.container, x, y)
 
     // TODO Make Avatar be separate from border and take a config including cosmetics

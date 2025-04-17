@@ -8,7 +8,7 @@ import { GameScene } from '../gameScene'
 import { UserSettings } from '../../settings/userSettings'
 
 const width = Space.avatarSize + Space.pad * 2
-const height = 250
+const height = 270
 
 export default class OurAvatarRegion extends Region {
   btnInspire: Button
@@ -56,7 +56,8 @@ export default class OurAvatarRegion extends Region {
 
   private createStacks(): void {
     let x = width / 4
-    const y = 40
+    const y = Space.pad + Space.stackIconHeight / 2
+    // Deck
     this.btnDeck = new Buttons.Stacks.Deck(this.container, x, y, 0)
     this.addHotkeyHint([x, y], 'Q')
 
@@ -108,7 +109,7 @@ export default class OurAvatarRegion extends Region {
 
   private createAvatar(): void {
     const x = width / 2
-    const y = 140
+    const y = Space.stackIconHeight + Space.pad * 2 + Space.avatarSize / 2
     this.avatar = new Buttons.Avatar(this.container, x, y).setQuality({
       emotive: true,
     })
