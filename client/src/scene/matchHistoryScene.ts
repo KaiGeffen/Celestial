@@ -511,9 +511,9 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         bottom: Space.pad,
       },
     })
-    let timeText = this.add.text(0, 0, 'Time', Style.basic)
+    let timeText = this.add.text(0, 0, '  Time', Style.basic)
     let opponentText = this.add.text(0, 0, 'Opponent', Style.basic)
-    let resultsText = this.add.text(0, 0, 'Results', Style.basic)
+    let resultsText = this.add.text(0, 0, 'W-L-T', Style.basic)
     let deckText = this.add.text(0, 0, 'Deck Name', Style.basic)
 
     // Create search container to hold both text and background
@@ -634,7 +634,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
 
     // Time text
     const time = new Date(entry.time)
-    const timeS = `${time.getMonth() + 1}/${time.getDate()}\n${time.getHours()}:${String(
+    const timeS = `  ${time.getMonth() + 1}/${time.getDate()}\n  ${time.getHours()}:${String(
       time.getMinutes(),
     ).padStart(2, '0')}`
     const timeText = this.add.text(0, 0, `\t${timeS}`, Style.basic)
@@ -658,7 +658,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     oppContainer.add(oppText)
 
     // Results text
-    const resultS = `   ${entry.roundsWon}-${entry.roundsTied}-${entry.roundsLost}`
+    const resultS = `     ${entry.wasWin ? 'Win' : 'Loss'}\n    ${entry.roundsWon}-${entry.roundsLost}-${entry.roundsTied}`
     let resultsText = this.add.text(0, 0, resultS, Style.basic)
 
     // User Info
