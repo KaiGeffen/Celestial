@@ -147,7 +147,7 @@ export default class Card {
 
   onPlay(player: number, game: GameModel): void {}
 
-  onDiscard(player: number, game: GameModel, index: number): void {}
+  onDiscard(player: number, game: GameModel): void {}
 
   onRoundEndIfThisResolved(player: number, game: GameModel): void {}
 

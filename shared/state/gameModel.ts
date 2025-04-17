@@ -204,7 +204,7 @@ export default class GameModel {
         )
 
         // Trigger its on discard effects
-        card.onDiscard(player, this, discardPileIndex)
+        card.onDiscard(player, this)
       }
     }
   }
@@ -336,7 +336,7 @@ export default class GameModel {
         )
 
         // Trigger its on discard effects
-        card.onDiscard(player, this, this.pile[player].length - 1)
+        card.onDiscard(player, this)
       }
     }
   }
@@ -364,20 +364,20 @@ export default class GameModel {
       return
     }
 
-    const act = this.story.acts[index]
+    const act = this.story.removeAct(index)
     this.animations[act.owner].push(
       new Animation({
         from: Zone.Story,
         to: Zone.Discard,
         card: act.card,
         index: index,
+        index2: this.pile[act.owner].length,
       }),
     )
 
-    this.story.removeAct(index)
-
-    // Trigger its on discard effects
-    act.card.onDiscard(act.owner, this, index)
+    // Add it to the discard and trigger its on discard effects
+    this.pile[act.owner].push(act.card)
+    act.card.onDiscard(act.owner, this)
   }
 
   returnActToHand(i: number) {

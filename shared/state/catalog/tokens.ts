@@ -59,12 +59,12 @@ const predator = new Predator({
 
 // BETA
 class Wound extends Card {
-  onDiscard(player: number, game: GameModel, index: number) {
+  onDiscard(player: number, game: GameModel) {
     game.animations[player].push(
       new Animation({
         from: Zone.Discard,
         to: Zone.Story,
-        index: index,
+        index: game.pile[player].length - 1,
         index2: game.story.resolvedActs.length + 1,
       }),
     )
