@@ -216,7 +216,7 @@ export default class AdventureScene extends BaseScene {
       .setWordWrapWidth(Space.stillframeTextWidth)
 
     const s =
-      'Impressive, all that life, all that wonder. You are welcomed in of course.' //" But if I might share one thing that I've learned in my time here... It's that someday, everything blows away."
+      "Impressive, all that life, all that wonder. You are welcomed in of course. But if I might share one thing that I've learned in my time here... It's that someday, everything blows away."
 
     let textbox = this.rexUI.add
       .textBox({
@@ -228,6 +228,9 @@ export default class AdventureScene extends BaseScene {
           right: Space.pad,
           top: Space.pad,
           bottom: Space.pad,
+        },
+        page: {
+          maxLines: 0, // 0 = unlimited lines
         },
       })
       .start(s, 50)
