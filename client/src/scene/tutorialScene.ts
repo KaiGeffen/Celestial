@@ -74,20 +74,28 @@ export default class TutorialGameScene extends AdventureGameScene {
       .setPadding(Space.padSmall, Space.padSmall)
 
     // Next button for tutorial text
-    this.btnNext = new Buttons.Basic(this, 0, 0, 'Next', () => {
-      this.progress += 1
-      switch (this.params.missionID) {
-        case 0:
-          this.displayHints1()
-          break
-        case 1:
-          this.displayHints2()
-          break
-        case 2:
-          this.displayHints3()
-          break
-      }
-    })
+    this.btnNext = new Buttons.Basic(
+      this,
+      0,
+      0,
+      'Next',
+      () => {
+        this.progress += 1
+        switch (this.params.missionID) {
+          case 0:
+            this.displayHints1()
+            break
+          case 1:
+            this.displayHints2()
+            break
+          case 2:
+            this.displayHints3()
+            break
+        }
+      },
+      false,
+      true,
+    )
 
     // Pointer for showing area of interest to user
     this.pointer = this.add
