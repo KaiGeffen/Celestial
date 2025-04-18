@@ -6,6 +6,7 @@ import Menu from './menu'
 import MenuScene from '../menuScene'
 import { LEADERBOARD_PORT, URL } from '../../../../shared/network/settings'
 
+const height = (Space.windowHeight * 2) / 3
 const width = 1000
 const RESULTS_PER_PAGE = 10
 
@@ -34,24 +35,19 @@ export default class LeaderboardMenu extends Menu {
 
   private async fetchLeaderboardData() {
     try {
-      const baseUrl = Flags.local
-        ? `http://${URL}:${LEADERBOARD_PORT}`
-        : 'https://celestialtcg.com'
-      const response = await fetch(`${baseUrl}/leaderboard`)
+      const response = await fetch(`https://celestialtcg.com/leaderboard`)
       if (!response.ok) {
         throw new Error('Failed to fetch leaderboard data')
       }
       this.leaderboardData = await response.json()
       this.createContent()
-
-      // Add panel to a scrollable panel
-      let scrollable = this.createScrollablePanel(this.scene, this.sizer)
-      scrollable.layout()
     } catch (error) {
       console.error('Error fetching leaderboard data:', error)
       // Optionally show error message to user
       this.scene.signalError('Failed to load leaderboard data')
     }
+
+    this.sizer.layout()
   }
 
   private createContent() {
@@ -79,7 +75,7 @@ export default class LeaderboardMenu extends Menu {
     // Create scrollable panel for all player rows
     let scrollablePanel = this.scene.rexUI.add.scrollablePanel({
       width: width,
-      height: (Space.windowHeight * 2) / 3,
+      height: height,
       scrollMode: 0,
       panel: {
         child: this.createPlayerRows(),
@@ -97,6 +93,7 @@ export default class LeaderboardMenu extends Menu {
     let entriesSizer = this.scene.rexUI.add.sizer({
       orientation: 'vertical',
       width: width,
+      height: height,
     })
 
     // Create individual rows for all entries
@@ -134,25 +131,5 @@ export default class LeaderboardMenu extends Menu {
       .add(eloText, { proportion: 1 })
 
     return rowSizer
-  }
-
-  private createScrollablePanel(scene: Phaser.Scene, panel) {
-    let scrollable = scene['rexUI'].add.scrollablePanel({
-      x: Space.windowWidth / 2,
-      y: Space.windowHeight / 2,
-      width: width,
-      height: Space.windowHeight - Space.pad * 4,
-
-      panel: {
-        child: panel.setDepth(1),
-      },
-
-      mouseWheelScroller: {
-        speed: 1,
-      },
-    })
-
-    scrollable.name = 'top'
-    return scrollable
   }
 }
