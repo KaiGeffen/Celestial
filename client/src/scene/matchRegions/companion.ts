@@ -189,7 +189,7 @@ export default class CompanionRegion extends Region {
   private pickNewTarget(butterfly: Butterfly): void {
     butterfly.targetX = Phaser.Math.Between(20, this.bounds.width - 20)
 
-    const upwardBias = Math.random() < 0.7
+    const upwardBias = Math.random() < 0.5
     const minY = upwardBias ? 20 : butterfly.sprite.y - 100
     const maxY = upwardBias
       ? Math.min(butterfly.sprite.y, this.bounds.height - 20)
