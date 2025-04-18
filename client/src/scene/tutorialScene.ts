@@ -242,8 +242,8 @@ export default class TutorialGameScene extends AdventureGameScene {
         this.view.theirBoard.show()
 
         // User can't pass during first tutorial
-        this.view.pass.tutorialSimplifyPass(true)
         this.view.pass.show()
+        this.view.pass.tutorialSimplifyPass(true)
 
         break
     }
@@ -253,16 +253,9 @@ export default class TutorialGameScene extends AdventureGameScene {
   private displayHints2(): void {
     this.displayHint(1)
 
-    // Hide stacks
-    // this.view.decks.hide()
-    // this.view.discardPiles.hide()
-    // this.view.commands.hide()
-    // this.view.ourBoard['hideStacks']()
-    // this.view.theirBoard['hideStacks']()
-
     // Hide pass until a point
     if (this.progress === 0) {
-      this.view.pass['tutorialDisablePass']()
+      this.view.pass.tutorialSimplifyPass(true)
     } else if (this.progress === 7) {
       this.view.pass.tutorialSimplifyPass(false)
     }
@@ -323,8 +316,8 @@ export default class TutorialGameScene extends AdventureGameScene {
       case 'right':
         this.pointer.setRotation(0)
 
-        x = Space.windowWidth - Space.pad - this.pointer.width / 2 - 80
-        y = Space.windowHeight - Space.handHeight - this.pointer.height + 30
+        x = Space.windowWidth - this.pointer.width / 2 - 72
+        y = Space.windowHeight - 168 - this.pointer.height
         this.pointer.setPosition(x, y)
 
         // Text to the left of pointer
@@ -341,7 +334,7 @@ export default class TutorialGameScene extends AdventureGameScene {
         this.pointer.setRotation(0).setFlipX(true)
 
         x = Space.pad + this.pointer.width / 2 + 50
-        y = Space.windowHeight - Space.handHeight - this.pointer.height
+        y = Space.windowHeight - 200 - this.pointer.height
         this.pointer.setPosition(x, y)
 
         // Text to the right of pointer

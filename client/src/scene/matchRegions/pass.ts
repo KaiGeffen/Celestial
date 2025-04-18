@@ -262,10 +262,11 @@ export default class PassRegion extends Region {
     if (simplified) {
       this.btnPass.setText('')
       this.btnPass['tutorialSimplifiedPass'] = true
+      this.btnPass.disable()
     } else {
       this.btnPass.setText('Pass')
-      this.btnPass.enable()
       this.btnPass['tutorialSimplifiedPass'] = false
+      this.btnPass.enable()
     }
   }
 }
