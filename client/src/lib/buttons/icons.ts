@@ -239,15 +239,12 @@ class Pass extends Button {
         click: f,
       },
     })
-
-    // Show a hint when hovered
-    // const s = 'Pass priority.\nOnce both players have passed in a row, the round ends.'
-    // super.makeHintable(s)
   }
 
   enable() {
     // For the tutorial, disable pass button
     if (this.tutorialSimplifiedPass) {
+      console.log('enable pass')
       this.icon.setAlpha(1)
       return this
     }

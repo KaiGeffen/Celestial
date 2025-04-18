@@ -335,4 +335,11 @@ export default class OurBoardRegion extends Region {
       })
     })
   }
+
+  // TUTORIAL
+  tutorialSetHandVisibility(visible: boolean): void {
+    this.cards.forEach((card) => {
+      card.container.setVisible(visible)
+    })
+  }
 }

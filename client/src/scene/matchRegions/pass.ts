@@ -258,16 +258,14 @@ export default class PassRegion extends Region {
 
   // For tutorial, disable the option to pass, but still show the sun
   // private oldCallback: () => void
-  disablePass(): void {
-    // this.btnPass.setAlpha(0)
-    this.btnPass.setText('').disable()['tutorialSimplifiedPass'] = true
-
-    // Enable it, with simplified uses
-    this.btnPass.enable()
-  }
-
-  enablePass(): void {
-    this.btnPass['tutorialSimplifiedPass'] = false
-    this.btnPass.enable()
+  tutorialSimplifyPass(simplified: boolean): void {
+    if (simplified) {
+      this.btnPass.setText('')
+      this.btnPass['tutorialSimplifiedPass'] = true
+    } else {
+      this.btnPass.setText('Pass')
+      this.btnPass.enable()
+      this.btnPass['tutorialSimplifiedPass'] = false
+    }
   }
 }

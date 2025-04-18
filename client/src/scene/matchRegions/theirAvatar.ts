@@ -149,12 +149,4 @@ export default class TheirAvatarRegion extends Region {
   setEmoteCallback(fEmote: () => void): void {
     this.avatar.setOnClick(fEmote, false, false)
   }
-
-  // TUTORIAL FUNCTIONALITY
-  hideStacks(): Region {
-    this.btnDeck.setVisible(false)
-    this.btnDiscard.setVisible(false)
-
-    return this
-  }
 }

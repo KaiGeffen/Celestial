@@ -121,7 +121,7 @@ export default class TutorialGameScene extends AdventureGameScene {
 
     // If player has won/lost, ensure pass button is enabled
     if (state.winner !== null) {
-      this.view.pass['enablePass']()
+      this.view.pass.tutorialSimplifyPass(false)
     }
 
     let result = super.displayState(state)
@@ -208,9 +208,14 @@ export default class TutorialGameScene extends AdventureGameScene {
     switch (this.progress) {
       case 0:
         this.view.pass.hide()
+        this.view.pet.hide()
+        this.view.ourAvatar.hide()
+        this.view.theirAvatar.hide()
         this.view.theirBoard.hide()
         this.view.theirScore.hide()
-        this.view.ourBoard.hide()
+
+        // Hide cards in hand until later
+        this.view.ourBoard.tutorialSetHandVisibility(false)
         break
 
       case 1:
@@ -230,14 +235,16 @@ export default class TutorialGameScene extends AdventureGameScene {
 
       case 6:
         this.card.destroy()
-        this.view.ourBoard.show()['hideStacks']()
+        this.view.ourBoard.tutorialSetHandVisibility(true)
         break
 
       case 7:
-        this.view.theirScore.show()
-        this.view.theirBoard.show()['hideStacks']()
+        this.view.theirBoard.show()
 
-        this.view.pass.show()['disablePass']()
+        // User can't pass during first tutorial
+        this.view.pass.tutorialSimplifyPass(true)
+        this.view.pass.show()
+
         break
     }
   }
@@ -255,9 +262,9 @@ export default class TutorialGameScene extends AdventureGameScene {
 
     // Hide pass until a point
     if (this.progress === 0) {
-      this.view.pass['disablePass']()
+      this.view.pass['tutorialDisablePass']()
     } else if (this.progress === 7) {
-      this.view.pass['enablePass']()
+      this.view.pass.tutorialSimplifyPass(false)
     }
 
     // Hide different elements on the screen based on progress
