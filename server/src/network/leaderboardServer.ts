@@ -23,6 +23,8 @@ export default function createLeaderboardServer() {
           elo: players.elo,
         })
         .from(players)
+        // TODO Remove once those old accounts have been deleted
+        .where(sql`${players.username} != 'Player'`)
         .orderBy(desc(players.elo))
         .limit(100)
 

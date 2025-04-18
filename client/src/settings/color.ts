@@ -116,4 +116,6 @@ export const Color: Record<string, any> = {
   username: CoreColors.blackS,
   todoScore: CoreColors.blackS,
   todoSubtext: CoreColors.blackS,
+
+  rowHighlight: CoreColors.gold,
 }

@@ -5,6 +5,7 @@ import { Color, Space, Style, BBStyle, Flags } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import { LEADERBOARD_PORT, URL } from '../../../../shared/network/settings'
+import UserDataServer from '../../network/userDataServer'
 
 const height = (Space.windowHeight * 2) / 3
 const width = 1000
@@ -109,6 +110,13 @@ export default class LeaderboardMenu extends Menu {
     let rowSizer = this.scene.rexUI.add.sizer({
       width: width,
     })
+
+    // If the row is our account, highlight it
+    if (entry.username === UserDataServer.getUserData().username) {
+      rowSizer.addBackground(
+        this.scene.add.rectangle(0, 0, 1, 1, Color.rowHighlight),
+      )
+    }
 
     // Add each text object
     let rankText = this.scene.add.text(0, 0, `\t${entry.rank}`, Style.basic)
