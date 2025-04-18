@@ -13,9 +13,9 @@ export class UserSettings {
       // Device specific settings (Not tied to user account)
       vsAi: true,
       mmCode: '',
-      volume: 0.3,
-      musicVolume: 0.0,
-      dialogVolume: 0.3,
+      volume: 0.5,
+      musicVolume: 0.5,
+      dialogVolume: 0.5,
       animationSpeed: Flags.local ? 1 : 0.25, // Max speed if playing locally
       // Whether the player should pass automatically if there's nothing they can play
       autopass: true,
