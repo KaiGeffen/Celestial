@@ -2,37 +2,37 @@
   {
     "name": "Jules",
     "surname": "Flurry of bright wings",
-    "description": "Jules plays many low-cost birds with [area=Fleeting][img=kw-Fleeting][/area], that fly away once played. This leaves your deck light as a feather in the late game, making it easy to consistently draw your higher cost cards round after round.\n\nTheir honest and unapologetic nature is reflected in the birds being clearly [area=Visible][img=kw-Visible][/area] to your opponent, making it difficult for you to deceive them.",
-    "chart": [1,4,3,2,1]
+    "description": "Jules plays many low-cost birds with [area=Fleeting][color=#FABD5D]Fleeting[/color][/area], that fly away once played. This leaves your deck light as a feather in the late game, making it easy to consistently draw your higher cost cards round after round.\n\nTheir honest and unapologetic nature is reflected in the birds being clearly [area=Visible][color=#FABD5D]Visible[/color][/area] to your opponent, making it difficult for you to deceive them.",
+    "chart": [1, 4, 3, 2, 1]
   },
   {
     "name": "Adonis",
     "surname": "Nova amongst ash",
     "description": "Adonis plays fiery cards that leave behind [color=#FABD5D][area=_Ashes]Ashes[/area][/color] in your discard pile, fueling explosive plays like [color=#FABD5D][area=_Veteran]Veteran[/area][/color] in the mid-game. Once you hit 12 cards in your discard pile, you can play [color=#FABD5D][area=_Death]Death[/area][/color] for free, followed in the same round by [color=#FABD5D][area=_Cling]Cling[/area][/color] to keep the combo going for many rounds in a row.\n\nTry to win as fast as possible, since once your deck runs out you'll be left with a discard pile full of [color=#FABD5D][area=_Ashes]Ashes[/area][/color] that will be shuffled to form a pretty bad deck.",
-    "chart": [2,5,1,4,4]
+    "chart": [2, 5, 1, 4, 4]
   },
   {
     "name": "Mia",
     "surname": "Bound in shadows",
-    "description": "Mia spends the early game playing [color=#FABD5D][area=_Dagger]Daggers[/area][/color] instead of points, disrupting and controlling the opponent to enable powerful [color=#FABD5D][area=_Shadow]Shadows[/area][/color] to come out later. The more the opponent struggles, the fewer cards they will have left, and all their points can be wiped away with a well timed [color=#FABD5D][area=_Hurricane]Hurricane[/area][/color].\n\nOnce the opponent's hand is in shambles, play [color=#FABD5D][area=_Oak]Oak[/area][/color] to gain tons of [area=Nourish][img=kw-Nourish][/area]. Making it impossible for the opponent to wrest back control.",
-    "chart": [3,3,5,2,2]
+    "description": "Mia spends the early game playing [color=#FABD5D][area=_Dagger]Daggers[/area][/color] instead of points, disrupting and controlling the opponent to enable powerful [color=#FABD5D][area=_Shadow]Shadows[/area][/color] to come out later. The more the opponent struggles, the fewer cards they will have left, and all their points can be wiped away with a well timed [color=#FABD5D][area=_Hurricane]Hurricane[/area][/color].\n\nOnce the opponent's hand is in shambles, play [color=#FABD5D][area=_Oak]Oak[/area][/color] to gain tons of [area=Nourish][color=#FABD5D]Nourish[/color][/area]. Making it impossible for the opponent to wrest back control.",
+    "chart": [3, 3, 5, 2, 2]
   },
   {
     "name": "Kitz",
     "surname": "Hopeless lover",
-    "description": "Kitz just wants to be together with his beloved [color=#FABD5D][area=_Pet]Pet[/area][/color]! His whole world revolves around finding her with [color=#FABD5D][area=_Night Vision]Night Vision[/area][/color], then seeing her grow strong with [area=Nourish][img=kw-Nourish][/area].\n\nOnce she's been played, he can't stand to be without her. Ensure that nothing gets on top of her in your discard pile, then play [color=#FABD5D][area=_Hold Tight]Hold Tight[/area][/color] to get her back time and time again!",
-    "chart": [4,2,1,5,5]
+    "description": "Kitz just wants to be together with his beloved [color=#FABD5D][area=_Pet]Pet[/area][/color]! His whole world revolves around finding her with [color=#FABD5D][area=_Night Vision]Night Vision[/area][/color], then seeing her grow strong with [area=Nourish][color=#FABD5D]Nourish[/color][/area].\n\nOnce she's been played, he can't stand to be without her. Ensure that nothing gets on top of her in your discard pile, then play [color=#FABD5D][area=_Hold Tight]Hold Tight[/area][/color] to get her back time and time again!",
+    "chart": [4, 2, 1, 5, 5]
   },
   {
     "name": "Imani",
     "surname": "Doula to a new world",
-    "description": "Core to Imani is the [area=Birth][img=kw-Birth][/area] mechanic, which creates a [color=#FABD5D][area=_Child]Child[/area][/color] in hand that can grow to any size. However, since many of these cards earn no points the round they are played, you must carefully ration out the points that you do have and efficiently sacrifice rounds that you can't win.\n\nOnce you've stabilized, remove your weakest cards with [color=#FABD5D][area=_Mine]Mine[/area][/color], grow a [color=#FABD5D][area=_Child]Child[/area][/color] as large as you can, then chain together cheap copies of [color=#FABD5D][area=_The Future]The Future[/area][/color] to finally win.",
-    "chart": [4,2,1,4,3]
+    "description": "Core to Imani is the [area=Birth][color=#FABD5D]Birth[/color][/area] mechanic, which creates a [color=#FABD5D][area=_Child]Child[/area][/color] in hand that can grow to any size. However, since many of these cards earn no points the round they are played, you must carefully ration out the points that you do have and efficiently sacrifice rounds that you can't win.\n\nOnce you've stabilized, remove your weakest cards with [color=#FABD5D][area=_Mine]Mine[/area][/color], grow a [color=#FABD5D][area=_Child]Child[/area][/color] as large as you can, then chain together cheap copies of [color=#FABD5D][area=_The Future]The Future[/area][/color] to finally win.",
+    "chart": [4, 2, 1, 4, 3]
   },
   {
     "name": "Mitra",
     "surname": "With eyes wide open",
-    "description": "Mitra is compelled by curiosity, endeavoring to see things as they truly are, his cards gain [area=Sight][img=kw-Sight][/area], revealing what the opponent has played so far. With this information, he can either stop them with [color=#FABD5D][area=_Hurricane]Hurricane[/area][/color], overtake them with [color=#FABD5D][area=_Hungry Ghost]Hungry Ghost[/area][/color], or play carryover in the form of [color=#FABD5D][area=_Fruit]Fruit[/area][/color].\n\n[color=#FABD5D][area=_Clear View]Clear View[/area][/color] fills the opponent's hand, forcing them to slow down and play the [color=#FABD5D][area=_Seen]Seen[/area][/color] it creates. [color=#FABD5D][area=_Enlightenment]Enlightenment[/area][/color] rounds out the late game, giving you that extra bit of reach.",
-    "chart": [5,1,5,4,2]
+    "description": "Mitra is compelled by curiosity, endeavoring to see things as they truly are, his cards gain [area=Sight][color=#FABD5D]Sight[/color][/area], revealing what the opponent has played so far. With this information, he can either stop them with [color=#FABD5D][area=_Hurricane]Hurricane[/area][/color], overtake them with [color=#FABD5D][area=_Hungry Ghost]Hungry Ghost[/area][/color], or play carryover in the form of [color=#FABD5D][area=_Fruit]Fruit[/area][/color].\n\n[color=#FABD5D][area=_Clear View]Clear View[/area][/color] fills the opponent's hand, forcing them to slow down and play the [color=#FABD5D][area=_Seen]Seen[/area][/color] it creates. [color=#FABD5D][area=_Enlightenment]Enlightenment[/area][/color] rounds out the late game, giving you that extra bit of reach.",
+    "chart": [5, 1, 5, 4, 2]
   }
 ]
