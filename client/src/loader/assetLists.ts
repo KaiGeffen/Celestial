@@ -309,7 +309,6 @@ export const assetLists = {
   "chrome": {
     "files": [
       "Avatar",
-      "Avatar",
       "Hand"
     ]
   },

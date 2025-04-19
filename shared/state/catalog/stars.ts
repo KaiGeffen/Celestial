@@ -59,6 +59,7 @@ const ecology = new Ecology({
   name: 'Ecology',
   id: 44,
   cost: 7,
+  points: 2,
   text: 'When played, gain 10 breath.',
 })
 
