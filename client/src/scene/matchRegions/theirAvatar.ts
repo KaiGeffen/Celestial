@@ -65,24 +65,24 @@ export default class TheirAvatarRegion extends Region {
     let x = width / 4
     const y = height - Space.pad - Space.stackIconHeight / 2
     this.btnDeck = new Buttons.Stacks.Deck(this.container, x, y, 1)
-    this.addHotkeyHint([x, y], 'E')
+    this.addHotkeyHint([x, y], 'A')
 
     // Discard pile
     x = (width * 3) / 4
     this.btnDiscard = new Buttons.Stacks.Discard(this.container, x, y, 1)
-    this.addHotkeyHint([x, y], 'R')
+    this.addHotkeyHint([x, y], 'S')
   }
 
   private addHotkeyListeners() {
     // Deck
-    this.scene.input.keyboard.on('keydown-E', () => {
+    this.scene.input.keyboard.on('keydown-A', () => {
       if (UserSettings._get('hotkeys')) {
         this.btnDeck.onClick()
       }
     })
 
     // Discard
-    this.scene.input.keyboard.on('keydown-R', () => {
+    this.scene.input.keyboard.on('keydown-S', () => {
       if (UserSettings._get('hotkeys')) {
         this.btnDiscard.onClick()
       }

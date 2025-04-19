@@ -42,6 +42,7 @@ export default class OurBoardRegion extends Region {
 
   create(scene: GameScene, avatarId: number): this {
     this.scene = scene
+    this.cards = []
 
     this.container = scene.add
       .container(0, Space.windowHeight)

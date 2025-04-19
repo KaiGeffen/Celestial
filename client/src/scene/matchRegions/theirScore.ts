@@ -71,7 +71,7 @@ export default class TheirScoreRegion extends Region {
   }
 
   private addHotkeyListeners() {
-    this.scene.input.keyboard.on('keydown-T', () => {
+    this.scene.input.keyboard.on('keydown-R', () => {
       if (UserSettings._get('hotkeys')) {
         if (this.btnRecap.enabled) {
           this.btnRecap.onClick()
@@ -81,7 +81,7 @@ export default class TheirScoreRegion extends Region {
       }
     })
 
-    this.scene.input.keyboard.on('keydown-Y', () => {
+    this.scene.input.keyboard.on('keydown-E', () => {
       if (UserSettings._get('hotkeys')) {
         this.btnSpeed.onClick()
       }
@@ -110,7 +110,7 @@ export default class TheirScoreRegion extends Region {
       this.skipCallback(),
     ).setVisible(false)
 
-    this.addHotkeyHint([x, y], 'T')
+    this.addHotkeyHint([x, y], 'R')
 
     // Speed button
     x = Space.pad * 2 + Space.iconSize + Space.iconSize / 2
@@ -137,7 +137,7 @@ export default class TheirScoreRegion extends Region {
       this.scene.signalError(`YOUR SPEED: ${newSpeed}x`)
     })
 
-    this.addHotkeyHint([x, y], 'Y')
+    this.addHotkeyHint([x, y], 'E')
 
     // Set initial frame based on current speed
     // const currentSpeed = UserSettings._get('animationSpeed')
