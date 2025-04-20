@@ -136,6 +136,11 @@ function registerEvents(ws: MatchServerWS, match: Match, playerNumber: number) {
       const emote = 0 // TODO
       match.signalEmote(playerNumber, emote)
     })
+
+  // Websocketing closing for any reason
+  ws.onClose(() => {
+    match.doExit(ws)
+  })
 }
 
 export default MatchQueue
