@@ -14,6 +14,13 @@ import Buttons from '../../lib/buttons/buttons'
 import GameModel from '../../../../shared/state/gameModel'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import avatarNames from '../../lib/avatarNames'
+import { TUTORIAL_LENGTH } from '../../../../shared/settings'
+
+const width = 300
+const height = Math.min(
+  Space.avatarHeight,
+  Space.windowHeight - (Space.buttonHeight + Space.pad * 2) * 2,
+)
 
 export default class ResultsRegion extends Region {
   // Whether the results have been seen already
@@ -31,14 +38,6 @@ export default class ResultsRegion extends Region {
 
   // The panel that shows results of the match
   panel: ScrollablePanel
-
-  WIDTH = 300
-  HEIGHT = Flags.mobile
-    ? Space.windowHeight - (Space.buttonHeight + Space.pad * 2) * 2
-    : Math.min(
-        Space.avatarHeight,
-        Space.windowHeight - (Space.buttonHeight + Space.pad * 2) * 2,
-      )
 
   create(scene: GameScene): ResultsRegion {
     this.scene = scene
@@ -66,22 +65,27 @@ export default class ResultsRegion extends Region {
     this.deleteTemp()
 
     // If the game isn't over, hide this
-    if (state.winner === null) {
-      this.hide()
-      return
-    }
+    // if (state.winner === null) {
+    //   this.hide()
+    //   return
+    // }
 
-    // If we are in a recap, hide this
-    if (state.isRecap) {
-      this.hide()
-      return
-    }
+    // // If we are in a recap, hide this
+    // if (state.isRecap) {
+    //   this.hide()
+    //   return
+    // }
 
-    // If the results have been shown before, hide this
-    if (this.seen) {
-      this.hide()
-      return
-    }
+    // // If the results have been shown before, hide this
+    // if (this.seen) {
+    //   this.hide()
+    //   return
+    // }
+
+    state.roundResults = [
+      [1, 2, 3, 9, 3, 2, 1, 4, 2],
+      [4, 5, 6, 1, 2, 3, 4, 1, 2],
+    ]
 
     // Avatars
     const av1 = avatarNames[state.avatars[0]]
@@ -149,9 +153,7 @@ export default class ResultsRegion extends Region {
     // Your avatar
     this.ourAvatar = this.scene.add
       .image(
-        Flags.mobile
-          ? Space.avatarWidth / 2
-          : Space.windowWidth / 2 - this.WIDTH,
+        Flags.mobile ? Space.avatarWidth / 2 : Space.windowWidth / 2 - width,
         Space.windowHeight / 2,
         'avatar-JulesFull',
       )
@@ -160,7 +162,7 @@ export default class ResultsRegion extends Region {
       .image(
         Flags.mobile
           ? Space.windowWidth - Space.avatarWidth / 2
-          : Space.windowWidth / 2 + this.WIDTH,
+          : Space.windowWidth / 2 + width,
         Space.windowHeight / 2,
         'avatar-MiaFull',
       )
@@ -177,24 +179,28 @@ export default class ResultsRegion extends Region {
   private createResultsPanel() {
     let background = this.createBackground()
 
-    const panel = this.scene.rexUI.add
-      .scrollablePanel({
-        x: Space.windowWidth / 2,
-        y: Space.windowHeight / 2,
-        width: this.WIDTH,
-        height: this.HEIGHT,
+    this.scrollablePanel = this.scene.rexUI.add.fixWidthSizer({
+      width: width,
+    })
+    const panel = this.scene.rexUI.add.scrollablePanel({
+      x: Space.windowWidth / 2,
+      y: Space.windowHeight / 2,
+      width: width,
+      height: height,
 
-        background: background,
+      background: background,
 
-        header: this.createHeader(),
+      header: this.createHeader(),
 
-        panel: {
-          child: this.createScrollablePanel(),
-        },
-      })
-      .setDepth(Depth.results)
-
-    this.updateOnScroll(this.scrollablePanel, panel)
+      scrollMode: 0,
+      panel: {
+        child: this.scrollablePanel,
+      },
+      slider: false,
+      mouseWheelScroller: {
+        speed: 0.5,
+      },
+    })
 
     return panel
   }
@@ -231,7 +237,7 @@ export default class ResultsRegion extends Region {
 
     let sizer = this.scene.rexUI.add
       .fixWidthSizer({
-        width: this.WIDTH,
+        width: width,
         align: 'center',
         space: {
           top: Space.pad,
@@ -250,17 +256,6 @@ export default class ResultsRegion extends Region {
     sizer.add(txt)
 
     return sizer
-  }
-
-  private createScrollablePanel() {
-    this.scrollablePanel = this.scene.rexUI.add.fixWidthSizer({
-      align: 'center',
-      space: {
-        top: Space.pad,
-      },
-    })
-
-    return this.scrollablePanel
   }
 
   private exitCallback(): () => void {
@@ -295,7 +290,7 @@ export default class ResultsRegion extends Region {
       // Container containing elements for this round
       let sizer = this.scene.rexUI.add
         .fixWidthSizer({
-          width: this.WIDTH,
+          width: width,
           align: 'center',
           space: {
             top: Space.pad,
@@ -332,34 +327,10 @@ export default class ResultsRegion extends Region {
       this.scrollablePanel.add(sizer)
     }
   }
-
-  // TODO Make dry with other scenes
-  // Update the panel when user scrolls with their mouse wheel
-  private updateOnScroll(panel, scrollablePanel) {
-    let that = this
-
-    this.scene.input.on(
-      'wheel',
-      function (pointer: Phaser.Input.Pointer, gameObject, dx, dy, dz, event) {
-        // Return if the pointer is outside of the panel
-        if (!panel.getBounds().contains(pointer.x, pointer.y)) {
-          return
-        }
-
-        // Scroll panel down by amount wheel moved
-        scrollablePanel.childOY -= dy
-
-        // Ensure that panel isn't out bounds (Below 0% or above 100% scroll)
-        scrollablePanel.t = Math.max(0, scrollablePanel.t)
-        scrollablePanel.t = Math.min(0.999999, scrollablePanel.t)
-      },
-    )
-  }
 }
 
 import { GameScene } from '../gameScene'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
-import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 
 export class ResultsRegionTutorial extends ResultsRegion {
   missionID: number
