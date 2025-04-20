@@ -327,34 +327,31 @@ export default class AdventureScene extends BaseScene {
 
   // Return the function for what happens when the given mission node is clicked on
   private missionOnClick(mission: adventureNode): () => void {
-    if ('deck' in mission) {
-      return () => {
+    return () => {
+      if ('deck' in mission) {
         this.scene.start('AdventureBuilderScene', mission)
-      }
-    } else if ('card' in mission) {
-      return () => {
-        UserSettings._setIndex('inventory', mission.card, true)
-
-        // Complete this mission
+      } else {
+        // Complete the mission
         UserSettings._setIndex('completedMissions', mission.id, true)
 
-        // TODO Clean this impl
-        let params = {
-          txt: '',
-          card: undefined,
+        // Show tip
+        if ('tip' in mission) {
+          this.scene.start('AdventureScene', { txt: mission.tip })
         }
+        // Unlock the card
+        else if ('card' in mission) {
+          UserSettings._setIndex('inventory', mission.card, true)
 
-        const card = Catalog.getCardById(mission.card)
-        if (card !== undefined) {
-          params.txt = card.story
-          params.card = card
+          const card = Catalog.getCardById(mission.card)
+          if (card === undefined) {
+            this.scene.start('AdventureScene', { txt: 'Error, card undefined' })
+          } else {
+            this.scene.start('AdventureScene', {
+              txt: card.story,
+              card: card,
+            })
+          }
         }
-
-        this.scene.start('AdventureScene', params)
-      }
-    } else if ('tip' in mission) {
-      return () => {
-        this.scene.start('AdventureScene', { txt: mission.tip })
       }
     }
   }

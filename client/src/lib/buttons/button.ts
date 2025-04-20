@@ -470,13 +470,10 @@ export default class Button {
   }
 
   setFrame(frame: number): this {
-    if (this.icon === undefined) {
-      throw new Error(
-        'Tried to set frame for a button that doesnt have frames.',
-      )
+    // Only set frame if the icon has multiple frames
+    if (this.icon && this.icon.texture.frameTotal > 1) {
+      this.icon.setFrame(frame)
     }
-
-    this.icon.setFrame(frame)
 
     return this
   }

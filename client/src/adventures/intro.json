@@ -1,7 +1,7 @@
 [
   {
     "name": "Tip 1",
-    "id": 180,
+    "id": 120,
     "x": 4920,
     "y": 764,
     "prereq": [[]],
@@ -13,6 +13,6 @@
     "x": 5062,
     "y": 760,
     "prereq": [[]],
-    "tip": "Make this a way to replay the tutorial"
+    "tip": "You can replay the tutorial through the help button at the top of the screen."
   }
 ]
