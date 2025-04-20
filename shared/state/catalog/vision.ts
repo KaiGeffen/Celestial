@@ -255,6 +255,29 @@ const beggingBowl = new BeggingBowl({
   beta: true,
 })
 
+// Not used
+class MorningBell extends Card {
+  onMorning(player: number, game: GameModel, index: number): boolean {
+    const amt = game.hand[player].length
+    for (let i = 0; i < amt; i++) {
+      game.deck[player].unshift(game.hand[player].pop())
+    }
+    game.shuffle(player, false, false)
+    game.draw(player, amt)
+
+    return true
+  }
+  morning(player: number, game: GameModel) {}
+}
+const morningBell = new MorningBell({
+  name: 'Morning Bell',
+  id: 6086,
+  cost: 4,
+  points: 4,
+  text: 'Morning: Shuffle your hand into your deck, then draw that many cards.',
+  beta: true,
+})
+
 export {
   dawn,
   nectar,
