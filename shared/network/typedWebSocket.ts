@@ -59,6 +59,11 @@ export class TypedWebSocket<
   close(code?: number, reason?: string): void {
     this.ws.close(code, reason)
   }
+
+  isOpen(): boolean {
+    // TODO Websocket.OPEN is 1, but remote vs local views Websocket differently
+    return this.ws.readyState === 1
+  }
 }
 
 export function createEvent<Messages, T extends keyof Messages>(

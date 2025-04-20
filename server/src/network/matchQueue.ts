@@ -47,8 +47,11 @@ class MatchQueue {
     ws.on('initPvp', async (data) => {
       // Clean up stale entries first
       Object.keys(searchingPlayers).forEach((password) => {
-        // TODO Websocket.OPEN is 1, but remote vs local views Websocket differently
-        if (searchingPlayers[password].ws.ws.readyState !== 1) {
+        if (!searchingPlayers[password].ws.isOpen()) {
+          console.log(
+            'Searching player went stale on password:',
+            searchingPlayers[password],
+          )
           delete searchingPlayers[password]
         }
       })
@@ -99,11 +102,13 @@ class MatchQueue {
         searchingPlayers[data.password] = waitingPlayer
 
         // Ensure that if they leave, they are removed from the queue
-        ws.on('exitMatch', () => {
+        const f = () => {
           console.log('Player disconnected before getting into a match:')
           delete searchingPlayers[data.password]
           ws.close()
-        })
+        }
+        ws.on('exitMatch', f)
+        ws.onClose(f)
       }
     })
 
