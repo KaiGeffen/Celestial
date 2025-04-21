@@ -67,7 +67,7 @@ const theFuture = new TheFuture({
   id: 22,
   cost: 8,
   points: 4,
-  text: 'Draw a card.\nCosts X less, where X is the total point value of all Children in your hand.',
+  text: 'Draw a card.\nCosts X less, where X is the total point value of each Child in your hand.',
 })
 
 class Posterity extends Card {
@@ -109,7 +109,7 @@ const rebirth = new Rebirth({
   name: 'Rebirth',
   id: 55,
   qualities: [Quality.FLEETING],
-  text: 'Fleeting\nTransform each of your cards later in the story into a 0:X Fleeting Child, where X is its cost.',
+  text: 'Fleeting\nTransform each of your cards later in the story into a 0:X Child, where X is its cost.',
 })
 
 class Cradle extends Card {
@@ -185,7 +185,7 @@ const pregnant = new Pregnant({
   name: 'Pregnant',
   id: 5212,
   cost: 1,
-  text: 'Create a 0:2 Fleeting Child in your deck.',
+  text: 'Create a 0:2 Child in your deck.',
   beta: true,
 })
 
