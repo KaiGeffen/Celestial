@@ -18,7 +18,6 @@ export class MatchWS {
 
   constructor(newScene: GameScene) {
     scene = newScene
-    // TODO
 
     const socket = (this.socket = this.getSocket())
 
@@ -32,7 +31,7 @@ export class MatchWS {
         newScene.queueState(data.state)
       })
       .on('signalError', () => {
-        // TODO Handle signalling or logging that error on the client
+        scene.signalError('Server says that an action was in error.')
         console.log('Server says that an action was in error.')
       })
       .on('opponentDisconnected', () => {
@@ -43,10 +42,12 @@ export class MatchWS {
       })
 
     socket.ws.onclose = () => {
-      console.log('Disconnected from the server')
+      scene.signalError('Disconnected from the server')
+      console.error('Disconnected from the server')
     }
 
     socket.ws.onerror = (error) => {
+      scene.signalError(`WebSocket error: ${error}`)
       console.error('WebSocket error:', error)
     }
   }
@@ -88,16 +89,11 @@ export class MatchWS {
     })
   }
 
-  // TODO Clarify if we reuse a UserSessionWS or create a new ws even for signed in users
   // Get the appropriate websocket for this environment
-  // If user is logged in, use the existing ws instead of opening a new one
   private getSocket(): MatchClientWS {
-    // Establish a websocket based on the environment
     if (Flags.local) {
       return new TypedWebSocket(`ws://${URL}:${MATCH_PORT}`)
     } else {
-      // The WS location on DO
-      // let loc = window.location
       const fullPath = `wss://celestialtcg.com/match_ws`
       return new TypedWebSocket(fullPath)
     }
