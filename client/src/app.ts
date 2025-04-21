@@ -12,7 +12,7 @@ import AdventureScene from './scene/adventureScene'
 import PlaceholderScene from './scene/placeholderScene'
 
 import { Color, Space, Flags } from './settings/settings'
-import addResizeHandler from './loader/windowResizeManager'
+import { refreshSpace } from './settings/space'
 
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import RoundRectanglePlugin from 'phaser3-rex-plugins/plugins/roundrectangle-plugin.js'
@@ -39,6 +39,9 @@ const config: Phaser.Types.Core.GameConfig = {
   transparent: true,
   dom: {
     createContainer: true,
+  },
+  scale: {
+    mode: Phaser.Scale.RESIZE,
   },
   scene: [
     PreloadScene,
@@ -117,7 +120,20 @@ export class CelestialGame extends Phaser.Game {
   constructor(config: Phaser.Types.Core.GameConfig) {
     super(config)
 
-    addResizeHandler(this)
+    // Set up resize event listener
+    this.scale.on('resize', this.handleResize, this)
+  }
+
+  private handleResize(gameSize: Phaser.Structs.Size): void {
+    // Call refreshSpace to update space calculations
+    refreshSpace()
+
+    // Notify all active scenes about the resize
+    this.scene.scenes.forEach((scene) => {
+      if (scene.scene.isActive()) {
+        // I need to like recreate the scene :/
+      }
+    })
   }
 }
 
