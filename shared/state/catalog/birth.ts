@@ -108,6 +108,7 @@ class Rebirth extends Card {
 const rebirth = new Rebirth({
   name: 'Rebirth',
   id: 55,
+  cost: 1,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nTransform each of your cards later in the story into a 0:X Child, where X is its cost.',
 })

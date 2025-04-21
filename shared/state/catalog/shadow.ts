@@ -206,7 +206,7 @@ class Craving extends Card {
     if (
       !game.story.acts.some((act) => act.owner === player && act.card.cost >= 6)
     ) {
-      game.discard(10, player)
+      game.discard(player, 10)
     }
   }
 }
