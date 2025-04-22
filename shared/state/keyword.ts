@@ -64,7 +64,7 @@ export class Keywords {
   )
   static inspired = new Keyword(
     'Inspired',
-    '[color=#FABD5D]Inspire X[/color]: This round you have X extra breath.',
+    '[color=#FABD5D]Inspired X[/color]: This round you have X extra breath.',
     true,
   )
   static nourish = new Keyword(

@@ -281,7 +281,7 @@ const sample = new Sample({
   id: 4837,
   cost: 4,
   points: 3,
-  text: 'Costs 1 less for each of the following statuses you have: Nourish, Inspire, Sight.',
+  text: 'Costs 1 less for each of the following statuses you have: Nourish, Inspired, Sight.',
   beta: true,
 })
 
