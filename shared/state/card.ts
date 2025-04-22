@@ -77,6 +77,13 @@ export default class Card {
     return this.qualities.includes(Quality.VISIBLE)
   }
 
+  copy(): Card {
+    return Object.create(
+      Object.getPrototypeOf(this),
+      Object.getOwnPropertyDescriptors(this),
+    )
+  }
+
   /* Keywords */
   // Spend the given amount of breath, return whether successful
   exhale(amt: number, game: GameModel, player: number): boolean {

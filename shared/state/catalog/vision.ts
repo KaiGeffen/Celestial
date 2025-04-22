@@ -4,6 +4,7 @@ import { seen, predator } from './tokens'
 import { Quality } from '../quality'
 import { Keywords } from '../keyword'
 import GameModel from '../gameModel'
+import Act from '../act'
 
 class Dawn extends SightCard {
   onMorning(player: number, game: GameModel, index: number): boolean {
@@ -163,28 +164,25 @@ const balance = new Balance({
 })
 
 class Riddle extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
+  onPlay(player: number, game: GameModel) {
+    const index = game.story.acts.length - 1
 
-    if (
-      game.story.acts.length >= 1 &&
-      game.hand[player].length >= 1 &&
-      game.story.acts[0].card.cost === game.hand[player][0].cost
-    ) {
-      const card = game.hand[player].splice(0, 1)[0]
-      game.story.addAct(card, player, 0)
-    } else {
-      game.discard(player, 1)
-    }
+    // Make a new act
+    const newCard = this.copy()
+    newCard.points *= 2
+    const act = new Act(newCard, player)
+
+    // Replace this card's act with the new one
+    game.story.replaceAct(index, act)
   }
 }
 const riddle = new Riddle({
   name: 'Riddle',
   id: 6852,
-  cost: 1,
+  cost: 2,
   points: 1,
-  qualities: [Quality.VISIBLE],
-  text: 'Visible\nDiscard a card, or add it to the story instead if it has the same base cost as the card after this.',
+  qualities: [Quality.FLEETING],
+  text: "Fleeting\nWhen played, double this card's points.",
   beta: true,
 })
 
