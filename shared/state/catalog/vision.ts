@@ -217,10 +217,7 @@ class Lantern extends Card {
       const card = game.hand[player].splice(0, 1)[0]
       if (card !== undefined) {
         // Create a new copy of the card, but with 1 more point
-        const copy = Object.create(
-          Object.getPrototypeOf(this),
-          Object.getOwnPropertyDescriptors(this),
-        )
+        const copy = this.copy()
         copy.points += 1
 
         game.hand[player].unshift(copy)

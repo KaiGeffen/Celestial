@@ -139,11 +139,7 @@ const heron = new Heron({
 // BETA CONTENT TODO
 class Fledgling extends Card {
   onMorning(player: number, game: GameModel, index: number) {
-    // Create a new copy of the card, but with 1 more point
-    const copy = Object.create(
-      Object.getPrototypeOf(this),
-      Object.getOwnPropertyDescriptors(this),
-    )
+    const copy = this.copy()
     copy.points += 1
 
     game.pile[player][index] = copy

@@ -155,11 +155,7 @@ const overflow = new Overflow({
 
 class Fish extends Card {
   onDraw(player: number, game: GameModel): void {
-    // Create a new copy of the card, but with 1 more point
-    const copy = Object.create(
-      Object.getPrototypeOf(this),
-      Object.getOwnPropertyDescriptors(this),
-    )
+    const copy = this.copy()
     copy.points += 1
 
     game.hand[player][game.hand[player].length - 1] = copy

@@ -91,11 +91,7 @@ class Rebirth extends Card {
     let idx = 0
     for (const act of game.story.acts) {
       if (act.owner === player) {
-        // Create a copy of child with points equal to original card's cost
-        const card = Object.create(
-          Object.getPrototypeOf(child),
-          Object.getOwnPropertyDescriptors(child),
-        )
+        const card = child.copy()
         card.points = act.card.cost
 
         // Transform original card into child
