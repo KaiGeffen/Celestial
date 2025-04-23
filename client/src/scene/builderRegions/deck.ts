@@ -8,7 +8,6 @@ import avatarNames from '../../lib/avatarNames'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import Cutout from '../../lib/buttons/cutout'
-import Icons from '../../lib/buttons/icons'
 import Card from '../../../../shared/state/card'
 import { decodeCard, encodeShareableDeckCode } from '../../../../shared/codec'
 import {
@@ -195,7 +194,13 @@ export default class DeckRegion {
       Space.buttonWidth / 3,
       Space.avatarSize / 2,
     )
-    new Icons.Recap(containerBack, 0, 0, this.backCallback())
+    new Buttons.Icon({
+      name: 'Recap',
+      within: containerBack,
+      x: 0,
+      y: 0,
+      f: this.backCallback(),
+    })
 
     // Add an edit button that allows user to change details about their deck
     let containerEdit = new ContainerLite(
@@ -205,7 +210,13 @@ export default class DeckRegion {
       Space.buttonWidth / 3,
       Space.avatarSize / 2,
     )
-    this.btnEdit = new Icons.Edit(containerEdit, 0, 0, this.openEditMenu())
+    this.btnEdit = new Buttons.Icon({
+      name: 'Edit',
+      within: containerEdit,
+      x: 0,
+      y: 0,
+      f: this.openEditMenu(),
+    })
 
     // Add a copy button that allows user to copy their deck code
     let containerShare = new ContainerLite(
@@ -215,7 +226,13 @@ export default class DeckRegion {
       Space.buttonWidth / 3,
       Space.avatarSize / 2,
     )
-    this.btnShare = new Icons.Share(containerShare, 0, 0, this.shareCallback())
+    this.btnShare = new Buttons.Icon({
+      name: 'Share',
+      within: containerShare,
+      x: 0,
+      y: 0,
+      f: this.shareCallback(),
+    })
 
     // Add a graph button for showing the distribution of costs in the deck
     let containerDistribution = new ContainerLite(
@@ -225,12 +242,13 @@ export default class DeckRegion {
       Space.buttonWidth / 3,
       Space.avatarSize / 2,
     )
-    new Icons.Distribution(
-      containerDistribution,
-      0,
-      0,
-      this.distributionCallback(),
-    )
+    new Buttons.Icon({
+      name: 'Distribution',
+      within: containerDistribution,
+      x: 0,
+      y: 0,
+      f: this.distributionCallback(),
+    })
 
     // Start button - Show how many cards are in deck, and enable user to start if deck is full
     let containerStart = new ContainerLite(

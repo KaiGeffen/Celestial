@@ -8,7 +8,6 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Cutout from '../lib/buttons/cutout'
 import Catalog from '../../../shared/state/catalog'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
-import Icons from '../lib/buttons/icons'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { encodeShareableDeckCode } from '../../../shared/codec'
 
@@ -810,7 +809,13 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       Space.iconSize,
       Space.iconSize,
     )
-    new Icons.Share(container, 0, 0, this.shareCallback(cards)).setDepth(1)
+    new Buttons.Icon({
+      name: 'Share',
+      within: container,
+      x: 0,
+      y: 0,
+      f: this.shareCallback(cards),
+    })
     return container
   }
 

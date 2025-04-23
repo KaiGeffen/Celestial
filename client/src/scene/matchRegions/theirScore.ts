@@ -1,6 +1,5 @@
 import 'phaser'
 import Button from '../../lib/buttons/button'
-import Icons from '../../lib/buttons/icons'
 import GameModel from '../../../../shared/state/gameModel'
 import {
   Space,
@@ -13,6 +12,7 @@ import Region from './baseRegion'
 import { GameScene } from '../gameScene'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { Flags } from '../../settings/flags'
+import Buttons from '../../lib/buttons/buttons'
 
 // Y of the buttons
 const width = Space.iconSize * 3 + Space.pad * 4
@@ -101,14 +101,22 @@ export default class TheirScoreRegion extends Region {
     const y = Space.pad + Space.iconSize / 2
 
     // Recap button
-    this.btnRecap = new Icons.Recap(this.container, x, y, () =>
-      this.recapCallback(),
-    )
+    this.btnRecap = new Buttons.Icon({
+      name: 'Recap',
+      within: this.container,
+      x: x,
+      y: y,
+      f: () => this.recapCallback(),
+    })
 
     // Skip button
-    this.btnSkip = new Icons.Skip(this.container, x, y, () =>
-      this.skipCallback(),
-    ).setVisible(false)
+    this.btnSkip = new Buttons.Icon({
+      name: 'Skip',
+      within: this.container,
+      x: x,
+      y: y,
+      f: () => this.skipCallback(),
+    }).setVisible(false)
 
     this.addHotkeyHint([x, y], 'R')
 
@@ -116,25 +124,31 @@ export default class TheirScoreRegion extends Region {
     x = Space.pad * 2 + Space.iconSize + Space.iconSize / 2
 
     // Create the speed button
-    this.btnSpeed = new Icons.Speed(this.container, x, y, () => {
-      // Get current speed
-      const currentSpeed = UserSettings._get('animationSpeed')
+    this.btnSpeed = new Buttons.Icon({
+      name: 'Speed',
+      within: this.container,
+      x: x,
+      y: y,
+      f: () => {
+        // Get current speed
+        const currentSpeed = UserSettings._get('animationSpeed')
 
-      // Cycle through speeds: 0.25 -> 0.5 -> 1 -> 2 -> 0.25
-      let newSpeed
-      if (currentSpeed < 0.3) newSpeed = 0.5
-      else if (currentSpeed < 0.7) newSpeed = 1
-      else if (currentSpeed < 1.5) newSpeed = 2
-      else newSpeed = 0.25
+        // Cycle through speeds: 0.25 -> 0.5 -> 1 -> 2 -> 0.25
+        let newSpeed
+        if (currentSpeed < 0.3) newSpeed = 0.5
+        else if (currentSpeed < 0.7) newSpeed = 1
+        else if (currentSpeed < 1.5) newSpeed = 2
+        else newSpeed = 0.25
 
-      // Update the setting
-      UserSettings._set('animationSpeed', newSpeed)
+        // Update the setting
+        UserSettings._set('animationSpeed', newSpeed)
 
-      // Update the icon frame based on speed
-      // speedButton.icon.setFrame(this.getSpeedFrame(newSpeed))
+        // Update the icon frame based on speed
+        // speedButton.icon.setFrame(this.getSpeedFrame(newSpeed))
 
-      // Show a message about the speed change
-      this.scene.signalError(`YOUR SPEED: ${newSpeed}x`)
+        // Show a message about the speed change
+        this.scene.signalError(`YOUR SPEED: ${newSpeed}x`)
+      },
     })
 
     this.addHotkeyHint([x, y], 'E')

@@ -5,7 +5,6 @@ import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWid
 
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
-import Icons from '../../lib/buttons/icons'
 import {
   Color,
   Space,
@@ -274,7 +273,13 @@ export default class DecklistsRegion {
         Space.iconSize,
         Space.buttonHeight,
       )
-      new Icons.New(containerNew, 0, 0, this.newDeckCallback())
+      new Buttons.Icon({
+        name: 'New',
+        within: containerNew,
+        x: 0,
+        y: 0,
+        f: this.newDeckCallback(),
+      })
       sizer.add(containerNew)
     } else {
       let line = this.scene.add.line(
@@ -296,7 +301,13 @@ export default class DecklistsRegion {
       let txtHint = this.scene.add.text(0, 0, 'My Decks:', Style.basic)
       hintSizer.add(txtHint).addSpace()
 
-      let btnNew = new Icons.New(hintSizer, 0, 0, this.newDeckCallback())
+      const btnNew = new Buttons.Icon({
+        name: 'New',
+        within: hintSizer,
+        x: 0,
+        y: 0,
+        f: this.newDeckCallback(),
+      })
     }
 
     return sizer

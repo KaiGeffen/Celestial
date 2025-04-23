@@ -1,6 +1,6 @@
 import 'phaser'
 import Button from '../../lib/buttons/button'
-import Icons from '../../lib/buttons/icons'
+
 import GameModel from '../../../../shared/state/gameModel'
 import {
   Style,
@@ -15,6 +15,7 @@ import {
 import { GameScene } from '../gameScene'
 import Region from './baseRegion'
 import { MechanicsSettings } from '../../../../shared/settings'
+import Buttons from '../../lib/buttons/buttons'
 
 // During the round, shows Pass button, who has passed, and who has priority
 export default class PassRegion extends Region {
@@ -155,8 +156,8 @@ export default class PassRegion extends Region {
 
   private createButtons(): void {
     const x = -156
-    this.btnPass = new Icons.Pass(this.container, x, 0)
-    this.btnMoon = new Icons.Moon(this.container, -x, 0, () => {
+    this.btnPass = new Buttons.Pass(this.container, x, 0)
+    this.btnMoon = new Buttons.Moon(this.container, -x, 0, () => {
       if (this.scene['paused']) {
         this.scene['paused'] = false
         this.btnMoon.setText(

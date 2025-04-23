@@ -20,7 +20,6 @@ import Buttons from '../../lib/buttons/buttons'
 import MenuScene from '../menuScene'
 import { rulebookString } from '../../catalog/rulebook'
 import { creditsString } from '../../catalog/credits'
-import Icons from '../../lib/buttons/icons'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 
 // TODO Use a non-mock color for the menu background
@@ -174,7 +173,10 @@ export default class OptionsMenu extends Menu {
       Space.buttonWidth,
       Space.buttonHeight,
     )
-    new Icons.Discord(container, 0, 0)
+    new Buttons.Icon({
+      name: 'Discord',
+      within: container,
+    })
     tabsSizer.add(container)
 
     return tabsSizer

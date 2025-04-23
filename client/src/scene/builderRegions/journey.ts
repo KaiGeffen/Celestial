@@ -6,7 +6,6 @@ import avatarNames from '../../lib/avatarNames'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import Cutout from '../../lib/buttons/cutout'
-import Icons from '../../lib/buttons/icons'
 import Card from '../../../../shared/state/card'
 import { decodeCard } from '../../../../shared/codec'
 import { Color, Space, Style, Flags } from '../../settings/settings'
@@ -127,8 +126,14 @@ export default class DeckRegion {
         Space.iconSize,
         Space.avatarSize,
       )
-      new Icons.Recap(container, 0, 0, () => {
-        this.scene.doBack()
+      new Buttons.Icon({
+        name: 'Recap',
+        within: container,
+        x: 0,
+        y: 0,
+        f: () => {
+          this.scene.doBack()
+        },
       })
       sizer.add(container).addSpace()
     }

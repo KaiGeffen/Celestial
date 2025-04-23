@@ -6,6 +6,9 @@ import MissionButton from './mission'
 import { DeckButton, DiscardButton } from './stacks'
 import { InspireButton, NourishButton, SightButton } from './keywords'
 import HomeSceneButton from './homeSceneButton'
+import Icon from './icon'
+import PassButton from './passButton'
+import MoonButton from './moonButton'
 
 // Export all of the available buttons
 export default class Buttons {
@@ -24,4 +27,8 @@ export default class Buttons {
   }
   static Mission = MissionButton
   static HomeScene = HomeSceneButton
+
+  static Pass = PassButton
+  static Moon = MoonButton
+  static Icon = Icon
 }

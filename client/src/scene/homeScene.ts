@@ -7,18 +7,15 @@ import {
   UserSettings,
   Url,
 } from '../settings/settings'
-import BaseScene, { BaseSceneWithHeader } from './baseScene'
+import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import UserDataServer from '../network/userDataServer'
-import Catalog from '../../../shared/state/catalog'
 import Cinematic from '../lib/cinematic'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
 import {
   getTimeUntilNextQuest,
   isDailyQuestAvailable,
 } from '../utils/dailyQuestUtils'
-import Icons from '../lib/buttons/icons'
-import RoundRectangle from 'phaser3-rex-plugins/plugins/roundrectangle'
 
 const discordHeight = 150
 
@@ -151,7 +148,7 @@ export default class HomeScene extends BaseScene {
     iconContainer.add(background)
 
     // First row
-    new Icons.Icon({
+    new Buttons.Icon({
       within: iconContainer,
       name: 'Quest',
       x: Space.pad + Space.iconSize * 0.5,
@@ -159,7 +156,7 @@ export default class HomeScene extends BaseScene {
       f: () => this.signalError('Quests coming soon!'),
     })
 
-    new Icons.Icon({
+    new Buttons.Icon({
       within: iconContainer,
       name: 'Friends',
       x: Space.pad * 2 + Space.iconSize * 1.5,
@@ -168,7 +165,7 @@ export default class HomeScene extends BaseScene {
     })
 
     // Second row
-    new Icons.Icon({
+    new Buttons.Icon({
       within: iconContainer,
       name: 'Store',
       x: Space.pad + Space.iconSize * 0.5,
@@ -176,7 +173,7 @@ export default class HomeScene extends BaseScene {
       f: () => this.scene.start('StoreScene'),
     })
 
-    new Icons.Icon({
+    new Buttons.Icon({
       within: iconContainer,
       name: 'History',
       x: Space.pad * 2 + Space.iconSize * 1.5,
@@ -186,7 +183,7 @@ export default class HomeScene extends BaseScene {
       },
     })
 
-    new Icons.Icon({
+    new Buttons.Icon({
       within: iconContainer,
       name: 'Leaderboard',
       x: Space.pad * 3 + Space.iconSize * 2.5,

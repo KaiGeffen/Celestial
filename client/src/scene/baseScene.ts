@@ -4,7 +4,6 @@ import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
 
 import { BBStyle, Time, Space, Flags, Color, Style } from '../settings/settings'
 import Button from '../lib/buttons/button'
-import Icons from '../lib/buttons/icons'
 import Hint from '../lib/hint'
 import ensureMusic from '../loader/audioManager'
 import Buttons from '../lib/buttons/buttons'
@@ -121,12 +120,15 @@ export default class BaseScene extends SharedBaseScene {
     }
 
     // Menu button
-    this.btnOptions = new Icons.Options(
-      this,
-      Space.windowWidth - Space.pad,
-      Space.pad,
-      this.openMenu(),
-    )
+    this.btnOptions = new Buttons.Icon({
+      name: 'Options',
+      within: this,
+      x: Space.windowWidth - Space.pad,
+      y: Space.pad,
+      f: () => {
+        this.scene.launch('OptionsMenu')
+      },
+    })
       .setOrigin(1, 0)
       .setDepth(10)
       .setNoScroll()

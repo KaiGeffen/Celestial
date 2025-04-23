@@ -5,7 +5,6 @@ import Card from '../../../../shared/state/card'
 import { CardImage } from '../../lib/cardImage'
 import { Style, UserSettings, Space, Flags } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
-import Icons from '../../lib/buttons/icons'
 import UButton from '../../lib/buttons/underlined'
 
 import { BuilderBase } from '../builderScene'
@@ -34,16 +33,22 @@ export default class FilterRegion {
       const x = Space.windowWidth - Space.pad * 2 - (Space.iconSize * 3) / 2
       const y = Space.pad + Space.iconSize / 2
       let container = scene.add.container(x, y)
-      let btnSearch = new Icons.Search(container, 0, 0, () => {
-        this.scene.scene.launch('MenuScene', {
-          menu: 'search',
-          callback: (s: string) => {
-            // Filter the visible cards based on the text
-            this.searchText = s
-            this.scene.filter()
-          },
-          start: this.searchText,
-        })
+      let btnSearch = new Buttons.Icon({
+        name: 'Search',
+        within: container,
+        x: 0,
+        y: 0,
+        f: () => {
+          this.scene.scene.launch('MenuScene', {
+            menu: 'search',
+            callback: (s: string) => {
+              // Filter the visible cards based on the text
+              this.searchText = s
+              this.scene.filter()
+            },
+            start: this.searchText,
+          })
+        },
       })
     } else {
       let container = scene.add.container().setDepth(2)
@@ -104,12 +109,13 @@ export default class FilterRegion {
 
       btns.push(btn)
     }
-    let btnX = new Icons.SmallX(
-      container,
-      x0 + 44 + 8 * 41,
-      y + 3,
-      this.onClearFilters(btns),
-    )
+    let btnX = new Buttons.Icon({
+      name: 'SmallX',
+      within: container,
+      x: x0 + 44 + 8 * 41,
+      y: y + 3,
+      f: this.onClearFilters(btns),
+    })
   }
 
   private createTextSearch(container: Phaser.GameObjects.Container) {
