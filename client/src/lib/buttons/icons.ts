@@ -337,8 +337,33 @@ class Discord extends Button {
   }
 }
 
+interface IconArgs {
+  within: Phaser.Scene | Phaser.GameObjects.Container
+  name: string
+  x?: number
+  y?: number
+  f?: () => void
+}
+
+// TODO Change most icons to this, they don't each need a class
+class Icon extends Button {
+  constructor({ within, name, x = 0, y = 0, f = () => {} }: IconArgs) {
+    super(within, x, y, {
+      icon: {
+        name,
+        interactive: true,
+      },
+      callbacks: {
+        click: f,
+      },
+    })
+  }
+}
+
 // Export all of the available icons, which are subtype of buttons
 export default class Icons {
+  static Icon = Icon
+
   static Options = Options
   static SmallX = SmallX
   static Share = Share

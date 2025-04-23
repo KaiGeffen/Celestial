@@ -7,7 +7,7 @@ import {
   UserSettings,
   Url,
 } from '../settings/settings'
-import { BaseSceneWithHeader } from './baseScene'
+import BaseScene, { BaseSceneWithHeader } from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import UserDataServer from '../network/userDataServer'
 import Catalog from '../../../shared/state/catalog'
@@ -17,10 +17,15 @@ import {
   getTimeUntilNextQuest,
   isDailyQuestAvailable,
 } from '../utils/dailyQuestUtils'
+import Icons from '../lib/buttons/icons'
+import RoundRectangle from 'phaser3-rex-plugins/plugins/roundrectangle'
 
 const discordHeight = 150
 
-export default class HomeScene extends BaseSceneWithHeader {
+const width = Space.iconSize * 3 + Space.pad * 4
+const height = Space.iconSize * 2 + Space.pad * 3
+
+export default class HomeScene extends BaseScene {
   // Add this property to the class
   private questTimer: Phaser.Time.TimerEvent = null
 
@@ -31,12 +36,15 @@ export default class HomeScene extends BaseSceneWithHeader {
   }
 
   create(): void {
+    super.create()
+
     // Ensure signin button is hidden
     document.getElementById('signin').hidden = true
 
     // Ensure animation is hidden
-    Cinematic.hide()
+    // Cinematic.hide()
 
+    // TODO Move this to the scene that calls this instead of briefly jumping here
     // If the last tutorial isn't complete, start the next tutorial
     const missions = UserSettings._get('completedMissions')
     if (!missions[TUTORIAL_LENGTH - 1]) {
@@ -44,9 +52,68 @@ export default class HomeScene extends BaseSceneWithHeader {
       return
     }
 
-    super.create({ title: 'Celestial' })
+    //
+    this.createIcons()
 
-    this.createButtons()
+    // this.createButtons()
+  }
+
+  private createIcons(): void {
+    const iconContainer = this.add.container(Space.windowWidth - width, 0)
+    const background = this.rexUI.add
+      .roundRectangle(0, 0, width, height, 5, 0xffffff)
+      .setAlpha(0.3)
+      .setOrigin(0, 0)
+    iconContainer.add(background)
+
+    // First row
+    new Icons.Icon({
+      within: iconContainer,
+      name: 'Quest',
+      x: Space.pad + Space.iconSize * 0.5,
+      y: Space.pad + Space.iconSize * 0.5,
+      f: () => this.signalError('Coming soon!'),
+    })
+
+    new Icons.Icon({
+      within: iconContainer,
+      name: 'Friends',
+      x: Space.pad * 2 + Space.iconSize * 1.5,
+      y: Space.pad + Space.iconSize * 0.5,
+      f: () => this.signalError('Coming soon!'),
+    })
+
+    // Second row
+    new Icons.Icon({
+      within: iconContainer,
+      name: 'History',
+      x: Space.pad + Space.iconSize * 0.5,
+      y: Space.pad * 2 + Space.iconSize * 1.5,
+      f: () => this.signalError('Coming soon!'),
+    })
+
+    new Icons.Icon({
+      within: iconContainer,
+      name: 'History',
+      x: Space.pad * 2 + Space.iconSize * 1.5,
+      y: Space.pad * 2 + Space.iconSize * 1.5,
+      f: () => {
+        this.scene.start('MatchHistoryScene')
+      },
+    })
+
+    new Icons.Icon({
+      within: iconContainer,
+      name: 'Leaderboard',
+      x: Space.pad * 3 + Space.iconSize * 2.5,
+      y: Space.pad * 2 + Space.iconSize * 1.5,
+      f: () => {
+        this.scene.launch('MenuScene', {
+          menu: 'leaderboard',
+          hint: 'leaderboard',
+        })
+      },
+    })
   }
 
   private createLoginLogoutButton(): void {
@@ -345,82 +412,6 @@ export default class HomeScene extends BaseSceneWithHeader {
         'Join the Discord Community',
         Style.homeButtonText,
       )
-      .setOrigin(0.5)
-      .setShadow(0, 1, 'rgb(0, 0, 0, 1)', 6)
-  }
-
-  private createLeaderboardButton(): void {
-    const l = discordHeight
-
-    let rect = this.add.rectangle(
-      Space.windowWidth - Space.pad - l / 2,
-      Space.windowHeight - Space.pad - l / 2,
-      l,
-      l,
-      0xfabd5d,
-      1,
-    )
-
-    let map = this.add.sprite(0, 0, 'background-Match').setOrigin(0)
-
-    // While not hovered, rectangle is greyed
-    rect
-      .setInteractive()
-      .on('pointerover', () => {
-        map.setTint(0x444444)
-      })
-      .on('pointerout', () => {
-        map.clearTint()
-      })
-      .on('pointerdown', () => {
-        this.sound.play('click')
-        this.scene.launch('MenuScene', {
-          menu: 'leaderboard',
-          hint: 'leaderboard',
-        })
-      })
-
-    map.mask = new Phaser.Display.Masks.BitmapMask(this, rect)
-
-    // Text over the rectangle
-    this.add
-      .text(rect.x, rect.y, '🏆', Style.homeButtonText)
-      .setOrigin(0.5)
-      .setShadow(0, 1, 'rgb(0, 0, 0, 1)', 6)
-  }
-
-  private createMatchHistoryButton(): void {
-    const l = discordHeight
-
-    let rect = this.add.rectangle(
-      Space.pad + l / 2, // Changed to position on far left
-      Space.windowHeight - Space.pad - l / 2,
-      l,
-      l,
-      0xfabd5d,
-      1,
-    )
-
-    let map = this.add.sprite(0, 0, 'background-Match').setOrigin(0)
-
-    rect
-      .setInteractive()
-      .on('pointerover', () => {
-        map.setTint(0x444444)
-      })
-      .on('pointerout', () => {
-        map.clearTint()
-      })
-      .on('pointerdown', () => {
-        this.sound.play('click')
-        this.scene.start('MatchHistoryScene')
-      })
-
-    map.mask = new Phaser.Display.Masks.BitmapMask(this, rect)
-
-    // Text over the rectangle
-    this.add
-      .text(rect.x, rect.y, '📜', Style.homeButtonText)
       .setOrigin(0.5)
       .setShadow(0, 1, 'rgb(0, 0, 0, 1)', 6)
   }
