@@ -154,7 +154,7 @@ export default class HomeScene extends BaseScene {
       name: 'Quest',
       x: Space.pad + Space.iconSize * 0.5,
       y: Space.pad + Space.iconSize * 0.5,
-      f: () => this.signalError('Coming soon!'),
+      f: () => this.signalError('Quests coming soon!'),
     })
 
     new Icons.Icon({
@@ -162,7 +162,7 @@ export default class HomeScene extends BaseScene {
       name: 'Friends',
       x: Space.pad * 2 + Space.iconSize * 1.5,
       y: Space.pad + Space.iconSize * 0.5,
-      f: () => this.signalError('Coming soon!'),
+      f: () => this.signalError('Friends coming soon!'),
     })
 
     // Second row
@@ -258,8 +258,8 @@ export default class HomeScene extends BaseScene {
     const bgColor = Color.backgroundLight
 
     // Define position
-    const x = Space.windowWidth / 2 + Space.pad / 2
-    const y = this.headerHeight + Space.pad
+    const x = Space.windowWidth - Space.pad
+    const y = Space.windowHeight - Space.pad * 2 - 120
 
     // Create text with initial value
     const questText = this.add
@@ -271,21 +271,21 @@ export default class HomeScene extends BaseScene {
           : `Next Quest: ${getTimeUntilNextQuest()}`,
         Style.basic,
       )
-      .setOrigin(0)
+      .setOrigin(1, 1)
       .setDepth(10)
 
     // Create background based on text dimensions
     const bg = this.add
       .rectangle(
-        x - padding,
-        y - padding,
+        x + padding,
+        y + padding,
         questText.width + padding * 2,
         questText.height + padding * 2,
         bgColor,
         0.85,
       )
       .setStrokeStyle(2, isQuestAvailable ? Color.gold : Color.backgroundDark)
-      .setOrigin(0)
+      .setOrigin(1, 1)
       .setDepth(9)
 
     // If quest is not available, set up timer to update every second
@@ -310,7 +310,7 @@ export default class HomeScene extends BaseScene {
 
           // Adjust background width based on new text width
           bg.width = questText.width + padding * 2
-          bg.setPosition(x - padding, y - padding)
+          bg.setPosition(x + padding, y + padding)
         }
       }
 
