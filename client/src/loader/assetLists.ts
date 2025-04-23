@@ -227,6 +227,7 @@ export const assetLists = {
       "SmallX",
       "Speed",
       "Status",
+      "Store",
       "Sun",
       "Thumb",
       "Top",

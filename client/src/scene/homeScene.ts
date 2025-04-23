@@ -66,10 +66,14 @@ export default class HomeScene extends BaseScene {
     // Create the icons in the top right
     this.createIcons()
 
-    // Create primary buttons (Journey, Free Play, Store)
+    // Create primary buttons (Journey, Free Play)
     this.createPrimaryButtons()
 
-    // this.createButtons()
+    // Login / Logout
+    this.createLoginLogoutButton()
+
+    // Quest text
+    this.createQuestText()
   }
 
   private createUserDetails(): void {
@@ -164,10 +168,10 @@ export default class HomeScene extends BaseScene {
     // Second row
     new Icons.Icon({
       within: iconContainer,
-      name: 'History',
+      name: 'Store',
       x: Space.pad + Space.iconSize * 0.5,
       y: Space.pad * 2 + Space.iconSize * 1.5,
-      f: () => this.signalError('Coming soon!'),
+      f: () => this.scene.start('StoreScene'),
     })
 
     new Icons.Icon({
@@ -197,34 +201,34 @@ export default class HomeScene extends BaseScene {
   createPrimaryButtons() {
     const buttonWidth = 220
     const buttonHeight = 120
+    const y = Space.windowHeight - (buttonHeight / 2 + Space.pad)
 
     // Journey
-    new Buttons.HomeScene(
-      this,
-      buttonWidth / 2 + Space.pad,
-      Space.windowHeight - (buttonHeight / 2 + Space.pad),
-      'Journey',
-      () => this.doAdventure(),
+    new Buttons.HomeScene(this, buttonWidth / 2 + Space.pad, y, 'Journey', () =>
+      this.doAdventure(),
     )
 
     // Play
     new Buttons.HomeScene(
       this,
       Space.windowWidth - (buttonWidth / 2 + Space.pad),
-      Space.windowHeight - (buttonHeight / 2 + Space.pad),
+      y,
       'Play',
       () => this.doDeckbuilder(),
+    )
+
+    // Discord
+    new Buttons.HomeScene(this, Space.windowWidth / 2, y, 'Discord', () =>
+      window.open(Url.discord, '_blank'),
     )
   }
 
   private createLoginLogoutButton(): void {
-    // Create logout button
-    const s = UserDataServer.isLoggedIn() ? 'Logout' : 'Login'
-    let btnLogout = new Buttons.Basic(
+    new Buttons.Basic(
       this,
-      Space.pad + Space.buttonWidth / 2,
-      this.headerHeight / 2,
-      s,
+      Space.windowWidth - Space.padSmall - Space.buttonWidth / 2,
+      Space.pad * 4 + Space.iconSize * 2 + Space.buttonHeight / 2,
+      UserDataServer.isLoggedIn() ? 'Logout' : 'Login',
       () => {
         // If we aren't logged in, go to login scene
         if (!UserDataServer.isLoggedIn()) {
@@ -320,21 +324,6 @@ export default class HomeScene extends BaseScene {
     }
   }
 
-  private createButtons(): void {
-    // const y = this.headerHeight + (Space.windowHeight - this.headerHeight)/2
-
-    const width = (Space.windowWidth - Space.pad * 3) / 2
-    const height = Space.windowHeight - 4 - Space.pad * 3 - discordHeight
-
-    this.createAdventureButton(width, height)
-    this.createDeckbuilderButton(width, height)
-
-    this.createDiscordButton()
-    this.createStoreButton()
-
-    this.createLoginLogoutButton()
-  }
-
   private createDiscordButton(): void {
     let rect = this.add
       .rectangle(
@@ -373,42 +362,6 @@ export default class HomeScene extends BaseScene {
         'Join the Discord Community',
         Style.homeButtonText,
       )
-      .setOrigin(0.5)
-      .setShadow(0, 1, 'rgb(0, 0, 0, 1)', 6)
-  }
-
-  private createStoreButton(): void {
-    const l = discordHeight
-
-    let rect = this.add.rectangle(
-      Space.pad * 2 + l + l / 2,
-      Space.windowHeight - Space.pad - l / 2,
-      l,
-      l,
-      0xfabd5d,
-      1,
-    )
-
-    let map = this.add.sprite(0, 0, 'background-Match').setOrigin(0)
-
-    rect
-      .setInteractive()
-      .on('pointerover', () => {
-        map.setTint(0x444444)
-      })
-      .on('pointerout', () => {
-        map.clearTint()
-      })
-      .on('pointerdown', () => {
-        this.sound.play('click')
-        this.scene.start('StoreScene')
-      })
-
-    map.mask = new Phaser.Display.Masks.BitmapMask(this, rect)
-
-    // Text over the rectangle
-    this.add
-      .text(rect.x, rect.y, '🛍️', Style.homeButtonText)
       .setOrigin(0.5)
       .setShadow(0, 1, 'rgb(0, 0, 0, 1)', 6)
   }
