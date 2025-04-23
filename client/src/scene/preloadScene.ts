@@ -18,6 +18,7 @@ import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 import ensureMusic from '../loader/audioManager'
 import Cinematic from '../lib/cinematic'
+import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
 // Scene for user to select a sign in option, without loading assets
 export class SigninScene extends Phaser.Scene {
@@ -32,7 +33,11 @@ export class SigninScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Sign in button is visible while on this scene and hidden otherwise
     document.getElementById('signin').hidden = false
+    this.events.on('shutdown', () => {
+      document.getElementById('signin').hidden = true
+    })
 
     // Ensure user is signed out
     UserSettings.clearSessionStorage()
@@ -111,7 +116,7 @@ export class SigninScene extends Phaser.Scene {
     ensureMusic(this)
 
     if (!this.load.isLoading()) {
-      this.scene.start('HomeScene')
+      this.startFirstScene()
     }
   }
 
@@ -146,6 +151,28 @@ export class SigninScene extends Phaser.Scene {
     if (storedToken) {
       const payload = jwt_decode<GoogleJwtPayload>(storedToken)
       UserDataServer.login(payload, this.game, () => this.onOptionClick())
+    }
+  }
+
+  // Navigate to the first scene user should see (Home or Tutorial)
+  protected startFirstScene(): void {
+    // If the last tutorial isn't complete, start the next tutorial
+    const missions = UserSettings._get('completedMissions')
+    if (!missions[TUTORIAL_LENGTH - 1]) {
+      for (let i = 0; i < TUTORIAL_LENGTH; i++) {
+        // If this tutorial mission hasn't been completed, jump to that mission
+        if (!missions[i]) {
+          this.scene.start('TutorialGameScene', {
+            isTutorial: false, // TODO This is old, remove
+            deck: undefined,
+            mmCode: `ai:t${i}`,
+            missionID: i,
+          })
+          return
+        }
+      }
+    } else {
+      this.scene.start('HomeScene')
     }
   }
 }
@@ -183,7 +210,7 @@ export class PreloadScene extends SigninScene {
     // When loading is complete, if user selected an option, start home screen
     this.load.on('complete', () => {
       if (this.signedInOrGuest) {
-        this.scene.start('HomeScene')
+        this.startFirstScene()
       }
     })
 

@@ -40,19 +40,8 @@ export default class HomeScene extends BaseScene {
     // Some events must fire when this scene exits
     this.events.on('shutdown', () => this.beforeExit())
 
-    // Ensure signin button is hidden
-    document.getElementById('signin').hidden = true
-
     // Cinematic plays while this is active
     Cinematic.ensure()
-
-    // TODO Move this to the scene that calls this instead of briefly jumping here
-    // If the last tutorial isn't complete, start the next tutorial
-    const missions = UserSettings._get('completedMissions')
-    if (!missions[TUTORIAL_LENGTH - 1]) {
-      this.doTutorial()
-      return
-    }
 
     // Create Logo
     this.add
@@ -320,22 +309,6 @@ export default class HomeScene extends BaseScene {
         callbackScope: this,
         loop: true,
       })
-    }
-  }
-
-  private doTutorial(): void {
-    const missions = UserSettings._get('completedMissions')
-    for (let i = 0; i < TUTORIAL_LENGTH; i++) {
-      // If this tutorial mission hasn't been completed, jump to that mission
-      if (!missions[i]) {
-        this.scene.start('TutorialGameScene', {
-          isTutorial: false,
-          deck: undefined,
-          mmCode: `ai:t${i}`,
-          missionID: i,
-        })
-        return
-      }
     }
   }
 

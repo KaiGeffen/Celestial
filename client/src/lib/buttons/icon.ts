@@ -1,6 +1,7 @@
 import 'phaser'
 import Button from './button'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
+
 // TODO Use this in more places for buttons
 export interface IconArgs {
   within: Phaser.Scene | Phaser.GameObjects.Container | ContainerLite
