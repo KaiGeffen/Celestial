@@ -41,7 +41,7 @@ export default class HomeScene extends BaseScene {
     super.create()
 
     // Some events must fire when this scene exits
-    this.events.on('shutdown', () => this.doExit())
+    this.events.on('shutdown', () => this.beforeExit())
 
     // Ensure signin button is hidden
     document.getElementById('signin').hidden = true
@@ -207,7 +207,7 @@ export default class HomeScene extends BaseScene {
 
     // Journey
     new Buttons.HomeScene(this, buttonWidth / 2 + Space.pad, y, 'Journey', () =>
-      this.scene.start('BuilderScene', { isTutorial: false }),
+      this.scene.start('AdventureScene'),
     )
 
     // Play
@@ -216,7 +216,7 @@ export default class HomeScene extends BaseScene {
       Space.windowWidth - (buttonWidth / 2 + Space.pad),
       y,
       'Play',
-      () => this.scene.start('AdventureScene'),
+      () => this.scene.start('BuilderScene', { isTutorial: false }),
     )
 
     // Discord
