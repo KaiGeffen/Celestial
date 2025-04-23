@@ -125,9 +125,7 @@ export default class BaseScene extends SharedBaseScene {
       within: this,
       x: Space.windowWidth - Space.pad,
       y: Space.pad,
-      f: () => {
-        this.scene.launch('OptionsMenu')
-      },
+      f: this.openMenu(),
     })
       .setOrigin(1, 0)
       .setDepth(10)
@@ -160,19 +158,17 @@ export default class BaseScene extends SharedBaseScene {
   }
 
   private openMenu(): () => void {
-    let that = this
-
-    return function () {
+    return () => {
       // TODO This check for multiple open menus should be handled in menuScene.ts
 
       // Don't open the menu if it's open already
-      if (that.scene.isActive('MenuScene')) {
+      if (this.scene.isActive('MenuScene')) {
         return
       }
 
-      that.scene.launch('MenuScene', {
+      this.scene.launch('MenuScene', {
         menu: 'options',
-        activeScene: that,
+        activeScene: this,
       })
     }
   }
