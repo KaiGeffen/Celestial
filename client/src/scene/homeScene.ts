@@ -28,6 +28,8 @@ const height = Space.iconSize * 2 + Space.pad * 3
 export default class HomeScene extends BaseScene {
   // Add this property to the class
   private questTimer: Phaser.Time.TimerEvent = null
+  private headerIcons: Phaser.GameObjects.Container
+  private statsContainer: Phaser.GameObjects.Container
 
   constructor() {
     super({
@@ -59,7 +61,7 @@ export default class HomeScene extends BaseScene {
       .setOrigin(0.5, 0)
 
     // Create the avatar and details about user
-    // this.createUserDetails()
+    this.createUserDetails()
 
     // Create the icons in the top right
     this.createIcons()
@@ -68,6 +70,70 @@ export default class HomeScene extends BaseScene {
     this.createPrimaryButtons()
 
     // this.createButtons()
+  }
+
+  private createUserDetails(): void {
+    const regionWidth = Space.avatarSize + Space.pad * 2
+    const regionHeight = 200
+    const userDetails = this.add.container(
+      Space.pad + regionWidth / 2,
+      Space.pad,
+    )
+
+    // Add background
+    const background = this.rexUI.add
+      .roundRectangle(0, 0, regionWidth, regionHeight, 5, 0xffffff)
+      .setAlpha(0.3)
+      .setOrigin(0.5, 0)
+    userDetails.add(background)
+
+    // Add avatar
+    const avatar = new Buttons.Avatar(
+      userDetails,
+      0,
+      Space.pad + Space.avatarSize / 2,
+    ).setQuality({
+      emotive: false,
+    })
+
+    // TODO Border / cosmetics
+
+    // Add username and ELO
+    let y = Space.pad + Space.avatarSize + Space.padSmall
+    const username = UserSettings._get('username') || 'Guest'
+    const elo = UserSettings._get('elo') || 1000
+
+    const txtUsername = this.add
+      .text(0, y, username, Style.username)
+      .setOrigin(0.5, 0)
+    const txtElo = this.add
+      .text(0, y + 16 + 5, elo.toString(), Style.usernameElo)
+      .setOrigin(0.5, 0)
+
+    userDetails.add([txtUsername, txtElo])
+
+    // Add gems
+    const subHeight = 30
+    y = regionHeight + Space.padSmall + subHeight / 2
+    const smallBg1 = this.rexUI.add
+      .roundRectangle(0, y, regionWidth, subHeight, 5, 0xffffff)
+      .setAlpha(0.3)
+    const amtGems = UserDataServer.getUserData().gems || 0
+    const txtGem = this.add
+      .text(0, y, `${amtGems} 💎`, Style.username)
+      .setOrigin(0.5)
+
+    // Add coins
+    y += Space.padSmall + subHeight
+    const smallBg2 = this.rexUI.add
+      .roundRectangle(0, y, regionWidth, subHeight, 5, 0xffffff)
+      .setAlpha(0.3)
+    const amtCoins = UserDataServer.getUserData().coins || 0
+    const txtCoins = this.add
+      .text(0, y, `${amtCoins}💰`, Style.username)
+      .setOrigin(0.5)
+
+    userDetails.add([smallBg1, txtGem, smallBg2, txtCoins])
   }
 
   private createIcons(): void {
@@ -135,8 +201,8 @@ export default class HomeScene extends BaseScene {
     // Journey
     new Buttons.HomeScene(
       this,
-      220 / 2 + Space.pad,
-      Space.windowHeight - (120 / 2 + Space.pad),
+      buttonWidth / 2 + Space.pad,
+      Space.windowHeight - (buttonHeight / 2 + Space.pad),
       'Journey',
       () => this.doAdventure(),
     )
@@ -144,8 +210,8 @@ export default class HomeScene extends BaseScene {
     // Play
     new Buttons.HomeScene(
       this,
-      Space.windowWidth - (220 / 2 + Space.pad),
-      Space.windowHeight - (120 / 2 + Space.pad),
+      Space.windowWidth - (buttonWidth / 2 + Space.pad),
+      Space.windowHeight - (buttonHeight / 2 + Space.pad),
       'Play',
       () => this.doDeckbuilder(),
     )
