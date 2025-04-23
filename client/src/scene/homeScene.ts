@@ -40,12 +40,14 @@ export default class HomeScene extends BaseScene {
   create(): void {
     super.create()
 
+    // Some events must fire when this scene exits
+    this.events.on('shutdown', () => this.doExit())
+
     // Ensure signin button is hidden
     document.getElementById('signin').hidden = true
 
     // Cinematic plays while this is active
     Cinematic.ensure()
-    this.events.on('shutdown', () => Cinematic.hide())
 
     // TODO Move this to the scene that calls this instead of briefly jumping here
     // If the last tutorial isn't complete, start the next tutorial
@@ -205,7 +207,7 @@ export default class HomeScene extends BaseScene {
 
     // Journey
     new Buttons.HomeScene(this, buttonWidth / 2 + Space.pad, y, 'Journey', () =>
-      this.doAdventure(),
+      this.scene.start('BuilderScene', { isTutorial: false }),
     )
 
     // Play
@@ -214,7 +216,7 @@ export default class HomeScene extends BaseScene {
       Space.windowWidth - (buttonWidth / 2 + Space.pad),
       y,
       'Play',
-      () => this.doDeckbuilder(),
+      () => this.scene.start('AdventureScene'),
     )
 
     // Discord
@@ -324,135 +326,7 @@ export default class HomeScene extends BaseScene {
     }
   }
 
-  private createDiscordButton(): void {
-    let rect = this.add
-      .rectangle(
-        Space.windowWidth / 2,
-        Space.windowHeight - Space.pad,
-        Space.windowWidth - Space.pad * 4 - discordHeight * 2,
-        discordHeight,
-        0xfabd5d,
-        1,
-      )
-      .setOrigin(0.5, 1)
-
-    let map = this.add.sprite(0, 0, 'background-Match').setOrigin(0)
-
-    // While not hovered, rectangle is greyed
-    rect
-      .setInteractive()
-      .on('pointerover', () => {
-        map.setTint(0x444444)
-      })
-      .on('pointerout', () => {
-        map.clearTint()
-      })
-      .on('pointerdown', () => {
-        this.sound.play('click')
-        window.open(Url.discord, '_blank')
-      })
-
-    map.mask = new Phaser.Display.Masks.BitmapMask(this, rect)
-
-    // Text over the rectangle
-    this.add
-      .text(
-        rect.x,
-        rect.y - rect.displayHeight / 2,
-        'Join the Discord Community',
-        Style.homeButtonText,
-      )
-      .setOrigin(0.5)
-      .setShadow(0, 1, 'rgb(0, 0, 0, 1)', 6)
-  }
-
-  private addCard(
-    container: Phaser.GameObjects.Container,
-    x: number,
-    y: number,
-    delay: number,
-  ): void {
-    // Becomes a random card when the tween starts
-    const card = Catalog.collectibleCards[0].name
-    const top = y === 0
-
-    const imgX = top ? x + 500 : x - 500
-    let img = this.add
-      .image(imgX, y, `card-${card}`)
-      .setOrigin(top ? 1 : 0, top ? 0 : 1)
-    container.add(img)
-
-    // Tween
-    const duration = 300
-    const durationFall = 300 * 2
-    const hold = 6000
-    const repeatDelay = 350 * 3
-
-    const fallConfig = {
-      targets: img,
-      y: top ? y - Space.cardHeight : y + Space.cardHeight,
-      delay: duration + hold - durationFall,
-      duration: durationFall,
-      ease: Ease.cardFall,
-      onComplete: () => {
-        // Reset the y
-        img.setY(y)
-      },
-    }
-
-    this.tweens.add({
-      targets: img,
-      x: x,
-      delay: 350 * delay,
-      repeat: -1,
-      duration: duration,
-      hold: hold,
-      repeatDelay: repeatDelay,
-      ease: Ease.basic,
-      onStart: () => {
-        const cardNum = Math.floor(
-          Math.random() * (Catalog.collectibleCards.length - 1),
-        )
-        const card = Catalog.collectibleCards[cardNum].name
-        img.setTexture(`card-${card}`)
-
-        // When holding completes, tween the card dropping offscreen
-        this.tweens.add(fallConfig)
-      },
-
-      onRepeat: () => {
-        const cardNum = Math.floor(
-          Math.random() * (Catalog.collectibleCards.length - 1),
-        )
-        const card = Catalog.collectibleCards[cardNum].name
-        img.setTexture(`card-${card}`)
-
-        // When holding completes, tween the card dropping offscreen
-        this.tweens.add(fallConfig)
-      },
-    })
-  }
-
-  // Do everything that occurs when the start button is pressed - either start, or prompt tutorial
-  private doStart(): void {
-    this.doDeckbuilder()
-  }
-
-  private doDeckbuilder(): void {
-    this.beforeExit()
-    this.scene.start('BuilderScene', { isTutorial: false })
-  }
-
-  private doAdventure(): void {
-    this.beforeExit()
-
-    // Otherwise, go to the adventure scene map
-    this.scene.start('AdventureScene')
-  }
-
   private doTutorial(): void {
-    this.beforeExit()
-
     const missions = UserSettings._get('completedMissions')
     for (let i = 0; i < TUTORIAL_LENGTH; i++) {
       // If this tutorial mission hasn't been completed, jump to that mission
@@ -469,6 +343,8 @@ export default class HomeScene extends BaseScene {
   }
 
   beforeExit(): void {
+    Cinematic.hide()
+
     if (this.questTimer) {
       this.questTimer.remove()
       this.questTimer = null
