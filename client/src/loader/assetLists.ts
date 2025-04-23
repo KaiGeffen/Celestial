@@ -201,6 +201,7 @@ export const assetLists = {
       "Friends",
       "Help",
       "History",
+      "HomeButton",
       "InputText",
       "Inspire",
       "Leaderboard",
@@ -313,7 +314,8 @@ export const assetLists = {
   "chrome": {
     "files": [
       "Avatar",
-      "Hand"
+      "Hand",
+      "Logo"
     ]
   },
   "sfx": {

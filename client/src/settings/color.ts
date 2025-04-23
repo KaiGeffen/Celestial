@@ -23,7 +23,7 @@ const CoreColors: Record<string, number | string> = {
 
   backgroundDark: 0xcbc1a8,
   backgroundLight: 0xf5f2eb,
-
+  backgroundLightS: '#F5F2EB',
   darken: 0x333333,
 
   buttonSelected: 0xbcb4b4,
@@ -50,7 +50,7 @@ export const Color: Record<string, any> = {
   // Backgrounds
   backgroundDark: CoreColors.backgroundDark,
   backgroundLight: CoreColors.backgroundLight,
-
+  backgroundLightS: CoreColors.backgroundLightS,
   // Error messages
   error: CoreColors.whiteS,
   errorBackground: CoreColors.blackS,

@@ -41,8 +41,9 @@ export default class HomeScene extends BaseScene {
     // Ensure signin button is hidden
     document.getElementById('signin').hidden = true
 
-    // Ensure animation is hidden
-    // Cinematic.hide()
+    // Cinematic plays while this is active
+    Cinematic.ensure()
+    this.events.on('shutdown', () => Cinematic.hide())
 
     // TODO Move this to the scene that calls this instead of briefly jumping here
     // If the last tutorial isn't complete, start the next tutorial
@@ -52,8 +53,19 @@ export default class HomeScene extends BaseScene {
       return
     }
 
-    //
+    // Create Logo
+    this.add
+      .image(Space.windowWidth / 2, Space.pad, 'chrome-Logo')
+      .setOrigin(0.5, 0)
+
+    // Create the avatar and details about user
+    // this.createUserDetails()
+
+    // Create the icons in the top right
     this.createIcons()
+
+    // Create primary buttons (Journey, Free Play, Store)
+    this.createPrimaryButtons()
 
     // this.createButtons()
   }
@@ -114,6 +126,29 @@ export default class HomeScene extends BaseScene {
         })
       },
     })
+  }
+
+  createPrimaryButtons() {
+    const buttonWidth = 220
+    const buttonHeight = 120
+
+    // Journey
+    new Buttons.HomeScene(
+      this,
+      220 / 2 + Space.pad,
+      Space.windowHeight - (120 / 2 + Space.pad),
+      'Journey',
+      () => this.doAdventure(),
+    )
+
+    // Play
+    new Buttons.HomeScene(
+      this,
+      Space.windowWidth - (220 / 2 + Space.pad),
+      Space.windowHeight - (120 / 2 + Space.pad),
+      'Play',
+      () => this.doDeckbuilder(),
+    )
   }
 
   private createLoginLogoutButton(): void {
@@ -223,155 +258,15 @@ export default class HomeScene extends BaseScene {
     // const y = this.headerHeight + (Space.windowHeight - this.headerHeight)/2
 
     const width = (Space.windowWidth - Space.pad * 3) / 2
-    const height =
-      Space.windowHeight - this.headerHeight - Space.pad * 3 - discordHeight
+    const height = Space.windowHeight - 4 - Space.pad * 3 - discordHeight
 
     this.createAdventureButton(width, height)
     this.createDeckbuilderButton(width, height)
 
     this.createDiscordButton()
-    this.createLeaderboardButton()
-    this.createMatchHistoryButton()
     this.createStoreButton()
 
     this.createLoginLogoutButton()
-  }
-
-  private createAdventureButton(width: number, height: number): void {
-    let rectLeft = this.add
-      .rectangle(
-        Space.windowWidth / 2 - Space.pad / 2,
-        this.headerHeight + Space.pad,
-        width,
-        height,
-        0x303030,
-        1,
-      )
-      .setOrigin(1, 0)
-
-    // Add tweens that make the map circle
-    const time = 30000
-
-    let map = this.add.sprite(0, 0, 'story-Map').setScale(0.5).setOrigin(0)
-
-    let tweens: Phaser.Tweens.Tween[] = []
-    tweens.push(
-      this.tweens.add({
-        targets: map,
-        x: -(map.displayWidth - width - Space.pad),
-        duration: time,
-        ease: 'Sine.easeInOut',
-        yoyo: true,
-        repeat: -1,
-      }),
-    )
-
-    tweens.push(
-      this.tweens.add({
-        targets: map,
-        y: -(map.displayHeight - height - Space.pad - this.headerHeight),
-        duration: time,
-        delay: time / 2,
-        ease: 'Sine.easeInOut',
-        yoyo: true,
-        repeat: -1,
-      }),
-    )
-
-    // While not hovered, rectangle is greyed
-    rectLeft
-      .setInteractive()
-      .on('pointerover', () => {
-        map.setTint(0x444444)
-      })
-      .on('pointerout', () => {
-        map.clearTint()
-      })
-      .on('pointerdown', () => {
-        this.sound.play('click')
-        this.doAdventure()
-      })
-
-    map.mask = new Phaser.Display.Masks.BitmapMask(this, rectLeft)
-
-    // Text over the rectangle
-    this.add
-      .text(
-        rectLeft.x - rectLeft.displayWidth / 2,
-        rectLeft.y + rectLeft.displayHeight / 2,
-        'Adventure',
-        Style.homeButtonText,
-      )
-      .setOrigin(0.5)
-      .setShadow(0, 1, 'rgb(0, 0, 0, 1)', 6)
-  }
-
-  private createDeckbuilderButton(width: number, height: number): void {
-    const x = Space.windowWidth / 2 + Space.pad / 2
-    const y = this.headerHeight + Space.pad
-
-    // Free Play button
-    let rectRight = this.add
-      .rectangle(x, y, width, height, Color.backgroundLight, 1)
-      .setOrigin(0)
-
-    // Container with visual elements of the button
-    let container = this.add.container(x, y)
-
-    // Character avatars
-    let avatar1 = this.add
-      .sprite(width / 2, 0, 'avatar-JulesFull')
-      .setOrigin(1, 0)
-    let avatar2 = this.add
-      .sprite(width / 2, Space.cardHeight, 'avatar-MiaFull')
-      .setOrigin(0)
-    container.add([avatar2, avatar1])
-
-    for (let i = 0; i < 3; i++) {
-      // Card in their hand
-      const x1 = width - (2 - i) * Space.stackOverlap * 2
-      this.addCard(container, x1, 0, i)
-
-      // Card in our hand
-      const x2 = i * Space.stackOverlap * 2
-      this.addCard(container, x2, height, i)
-    }
-
-    // While not hovered, rectangle is greyed
-    rectRight
-      .setInteractive()
-      .on('pointerover', () => {
-        container.iterate((child) => {
-          child.setTint(0x444444)
-        })
-      })
-      .on('pointerout', () => {
-        container.iterate((child) => {
-          child.clearTint()
-        })
-      })
-      .on('pointerdown', () => {
-        this.sound.play('click')
-        this.doStart()
-      })
-
-    container.mask = new Phaser.Display.Masks.BitmapMask(this, rectRight)
-
-    // Text over the rectangle
-    this.add
-      .text(
-        rectRight.x + rectRight.displayWidth / 2,
-        rectRight.y + rectRight.displayHeight / 2,
-        'Free Play',
-        Style.homeButtonText,
-      )
-      .setOrigin(0.5)
-      .setShadow(0, 1, 'rgb(0, 0, 0, 1)', 6)
-
-    // Add quest text if user is logged in
-    if (UserDataServer.isLoggedIn()) {
-      this.createQuestText()
-    }
   }
 
   private createDiscordButton(): void {

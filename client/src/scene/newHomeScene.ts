@@ -4,7 +4,6 @@ import { BaseSceneWithHeader } from './baseScene'
 import UserDataServer from '../network/userDataServer'
 import Cinematic from '../lib/cinematic'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
-import Buttons from '../lib/buttons/buttons'
 
 export default class NewHomeScene extends BaseSceneWithHeader {
   private headerIcons: Phaser.GameObjects.Container
@@ -13,15 +12,6 @@ export default class NewHomeScene extends BaseSceneWithHeader {
   constructor() {
     super({
       key: 'NewHomeScene',
-      name: 'New Home Scene',
-      x: 0,
-      y: 0,
-      callbacks: {
-        click: () => {},
-      },
-      sound: {
-        mute: true,
-      },
     })
   }
 
