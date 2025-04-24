@@ -156,7 +156,7 @@ export default class PassRegion extends Region {
 
   private createButtons(): void {
     const x = -156
-    this.btnPass = new Buttons.Pass(this.container, x, 0)
+    this.btnPass = new Buttons.Sun(this.container, x, 0)
     this.btnMoon = new Buttons.Moon(this.container, -x, 0, () => {
       if (this.scene['paused']) {
         this.scene['paused'] = false

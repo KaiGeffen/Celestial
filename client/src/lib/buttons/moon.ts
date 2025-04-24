@@ -1,8 +1,8 @@
 import 'phaser'
 import Button from './button'
-import { Style, Flags } from '../../settings/settings'
+import { Style } from '../../settings/settings'
 
-export default class MoonButton extends Button {
+export default class Moon extends Button {
   constructor(
     within: Phaser.Scene | Phaser.GameObjects.Container,
     x: number,

@@ -2,9 +2,7 @@ import 'phaser'
 import Button from './button'
 import { Style, Flags } from '../../settings/settings'
 
-// TODO Rename to Sun
-
-export default class PassButton extends Button {
+export default class Sun extends Button {
   // Used in the tutorial to reduce the functionality while player is learning
   tutorialSimplifiedPass = false
 
