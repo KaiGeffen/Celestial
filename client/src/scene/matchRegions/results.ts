@@ -316,12 +316,12 @@ export default class ResultsRegion extends Region {
       let background
       if (ours > theirs) {
         background = this.scene.add
-          .image(0, 0, 'icon-ResultGlow')
+          .image(0, 0, 'chrome-ResultGlow')
           .setDepth(Depth.results)
           .setRotation(Math.PI)
       } else if (theirs > ours) {
         background = this.scene.add
-          .image(0, 0, 'icon-ResultGlow')
+          .image(0, 0, 'chrome-ResultGlow')
           .setDepth(Depth.results)
       }
       if (background) {

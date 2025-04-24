@@ -163,7 +163,7 @@ export default class CompanionRegion extends Region {
 
   private spawnButterfly(): void {
     const sprite = this.scene.add
-      .image(this.bounds.centerX, this.bounds.centerY, 'icon-Butterfly')
+      .image(this.bounds.centerX, this.bounds.centerY, 'pet-Butterfly')
       .setOrigin(0.5)
       .setAlpha(0)
       .setTint(this.COLORS[Math.floor(Math.random() * this.COLORS.length)])

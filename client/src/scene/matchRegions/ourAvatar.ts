@@ -118,7 +118,7 @@ export default class OurAvatarRegion extends Region {
     })
 
     // TODO Make Avatar be separate from border and take a config including cosmetics
-    const border = this.scene.add.image(x, y, 'icon-Border')
+    const border = this.scene.add.image(x, y, 'border-Thorns')
     this.container.add(border)
   }
 

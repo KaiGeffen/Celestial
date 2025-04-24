@@ -181,14 +181,14 @@ export default class PassRegion extends Region {
     this.yourPass = this.scene.add.container(-150, 80).setAlpha(0)
 
     // Them
-    const cloud = this.scene.add.image(0, 0, 'icon-CloudBottom')
+    const cloud = this.scene.add.image(0, 0, 'chrome-CloudBottom')
     const text = this.scene.add
       .text(0, 20, 'Passed', Style.todoCloud)
       .setOrigin(0.5)
     this.theirPass.add([cloud, text])
 
     // Me
-    const cloud2 = this.scene.add.image(0, -20, 'icon-CloudTop')
+    const cloud2 = this.scene.add.image(0, -20, 'chrome-CloudTop')
     const text2 = this.scene.add
       .text(0, 0, 'Passed', Style.todoCloud)
       .setOrigin(0.5)

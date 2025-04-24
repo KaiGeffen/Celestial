@@ -76,7 +76,7 @@ export default class FilterRegion {
   private createBackground(container: Phaser.GameObjects.Container) {
     let background
     background = this.scene.add
-      .image(0, 0, 'icon-SearchBar')
+      .image(0, 0, 'chrome-SearchBar')
       .setOrigin(0)
       .setInteractive(
         new Phaser.Geom.Rectangle(

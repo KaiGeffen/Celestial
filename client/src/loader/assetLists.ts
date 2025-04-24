@@ -180,36 +180,23 @@ export const assetLists = {
       "Mission",
       "Arrow",
       "Border",
-      "Bottom Score",
-      "Bottom",
       "BreathBasic",
       "BreathExtra",
       "BreathHover",
       "BreathOom",
       "BreathSpent",
-      "Butterfly",
-      "CloudBottom",
-      "CloudTop",
       "CustomDeck",
       "Deck",
       "Discard",
       "Discord",
       "Distribution",
-      "Divide",
       "Edit",
-      "Exit",
       "Friends",
-      "Help",
       "History",
       "HomeButton",
       "InputText",
       "Inspire",
       "Leaderboard",
-      "MobileBottom",
-      "MobileInspire",
-      "MobileMoon",
-      "MobileNourish",
-      "MobileSun",
       "Moon",
       "New",
       "Nourish",
@@ -218,9 +205,7 @@ export const assetLists = {
       "Quest",
       "QuestionMark",
       "Recap",
-      "ResultGlow",
       "Search",
-      "SearchBar",
       "Share",
       "Sight",
       "Skip",
@@ -230,7 +215,6 @@ export const assetLists = {
       "Store",
       "Sun",
       "Thumb",
-      "Top",
       "Underline",
       "Wins",
       "XOut"
@@ -277,7 +261,7 @@ export const assetLists = {
   },
   "border": {
     "files": [
-      "Border"
+      "Thorns"
     ]
   },
   "relic": {
@@ -290,6 +274,11 @@ export const assetLists = {
         "height": 160
       }
     }
+  },
+  "pet": {
+    "files": [
+      "Butterfly"
+    ]
   },
   "roundResult": {
     "files": [
@@ -315,8 +304,12 @@ export const assetLists = {
   "chrome": {
     "files": [
       "Avatar",
+      "CloudBottom",
+      "CloudTop",
       "Hand",
-      "Logo"
+      "Logo",
+      "ResultGlow",
+      "SearchBar"
     ]
   },
   "sfx": {

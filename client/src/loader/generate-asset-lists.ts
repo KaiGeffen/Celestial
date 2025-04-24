@@ -22,6 +22,7 @@ const DIRECTORIES = [
   'img/story',
   'img/border',
   'img/relic',
+  'img/pet',
   'img/roundResult',
   'img/chrome',
   'sfx',
