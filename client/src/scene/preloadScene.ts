@@ -6,7 +6,6 @@ import Loader from '../loader/loader'
 import UserDataServer from '../network/userDataServer'
 import {
   Color,
-  Mobile,
   Space,
   Style,
   BBStyle,

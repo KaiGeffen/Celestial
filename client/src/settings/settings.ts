@@ -9,7 +9,6 @@ import { Time } from './time'
 import { Url } from './url'
 import { UserSettings } from './userSettings'
 import { Depth } from './depth'
-import { Mobile } from './mobile'
 import { Scroll } from './scroll'
 import { Ease } from './ease'
 
@@ -22,7 +21,6 @@ export {
   Url,
   UserSettings,
   Depth,
-  Mobile,
   Scroll,
   Ease,
   Flags,
