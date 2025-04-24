@@ -145,13 +145,12 @@ export default class Menu {
   }
 }
 
-import OptionsMenu from './optionsMenu'
+import OptionsMenu from './options'
 import ChoosePremade from './choosePremade'
 import CreditsMenu from './credits'
 import RulebookMenu from './rulebook'
 import HelpMenu from './help'
-// TODO Rename since it includes both
-import { NewDeckMenu, EditDeckMenu } from './newDeck'
+import { NewDeckMenu, EditDeckMenu } from './alterDeck'
 import ModeMenu from './mode'
 import ConfirmMenu from './confirm'
 import DistributionMenu from './distribution'

@@ -5,7 +5,7 @@ import RoundRectangle from 'phaser3-rex-plugins/plugins/roundrectangle.js'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 import Menu from './menu'
-import BaseScene from '../../scene/baseScene'
+import BaseScene from '../baseScene'
 import {
   Space,
   Color,
