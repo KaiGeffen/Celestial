@@ -124,7 +124,11 @@ export default class TheirAvatarRegion extends Region {
   private createAvatar(): void {
     const x = width / 2
     const y = Space.avatarSize / 2 + Space.pad
-    this.avatar = new Buttons.Avatar(this.container, x, y)
+    this.avatar = new Buttons.Avatar({
+      within: this.container,
+      x,
+      y,
+    })
 
     // TODO Make Avatar be separate from border and take a config including cosmetics
     const border = this.scene.add.image(x, y, 'icon-Border')

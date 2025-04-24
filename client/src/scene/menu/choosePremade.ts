@@ -116,18 +116,22 @@ export default class ChoosePremade extends Menu {
         Space.avatarSize,
         Space.avatarSize,
       )
-      this.avatarsSmall[i] = new Buttons.Avatar(container, 0, 0, i, () => {
-        // Set which avatar is selected
-        this.selectedAvatar = i
-        this.avatarsSmall.forEach((a) => a.deselect())
-        this.avatarsSmall[i].select()
+      this.avatarsSmall[i] = new Buttons.Avatar({
+        within: container,
+        avatarId: i,
+        f: () => {
+          // Set which avatar is selected
+          this.selectedAvatar = i
+          this.avatarsSmall.forEach((a) => a.deselect())
+          this.avatarsSmall[i].select()
 
-        // Adjust displayed content
-        this.setContent(avatarDetails[i])
+          // Adjust displayed content
+          this.setContent(avatarDetails[i])
 
-        // Scroll up the content
-        this.scrollablePanel.scrollToTop()
-        this.sizer.layout()
+          // Scroll up the content
+          this.scrollablePanel.scrollToTop()
+          this.sizer.layout()
+        },
       })
 
       // Select this avatar if appropriate

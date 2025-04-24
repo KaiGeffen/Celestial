@@ -110,7 +110,10 @@ export default class OurAvatarRegion extends Region {
   private createAvatar(): void {
     const x = width / 2
     const y = Space.stackIconHeight + Space.pad * 2 + Space.avatarSize / 2
-    this.avatar = new Buttons.Avatar(this.container, x, y).setQuality({
+    this.avatar = new Buttons.Avatar({
+      within: this.container,
+      x,
+      y,
       emotive: true,
     })
 

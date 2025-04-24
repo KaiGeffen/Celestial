@@ -164,12 +164,11 @@ export default class DeckRegion {
       Space.avatarSize,
       Space.avatarSize,
     )
-    this.btnAvatar = new Buttons.Avatar(
-      containerAvatar,
-      0,
-      0,
-      avatarNames[avatarID],
-    ).setQuality({ emotive: true })
+    this.btnAvatar = new Buttons.Avatar({
+      within: containerAvatar,
+      avatarId: avatarID,
+      emotive: true,
+    })
 
     // If this mission has text, show that when avatar is clicked
     if (storyText !== undefined) {

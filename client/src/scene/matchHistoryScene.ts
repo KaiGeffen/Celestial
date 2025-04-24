@@ -640,12 +640,11 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
 
     // Opponent Info
     const oppContainer = new ContainerLite(this).setOrigin(0)
-    new Buttons.Avatar(
-      oppContainer,
-      0,
-      0,
-      entry.opponentDeck.cosmetics.avatar,
-    ).icon.setOrigin(1, 0.5)
+    new Buttons.Avatar({
+      within: oppContainer,
+      avatarId: entry.opponentDeck.cosmetics.avatar,
+      origin: [1, 0.5],
+    })
     const oppText = this.add
       .text(
         0,
@@ -662,12 +661,11 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
 
     // User Info
     const userContainer = new ContainerLite(this).setOrigin(0)
-    new Buttons.Avatar(
-      userContainer,
-      0,
-      0,
-      entry.deck.cosmetics.avatar,
-    ).icon.setOrigin(1, 0.5)
+    new Buttons.Avatar({
+      within: userContainer,
+      avatarId: entry.deck.cosmetics.avatar,
+      origin: [1, 0.5],
+    })
     const userText = this.add
       .text(0, 0, ` ${entry.deck.name}(${entry.elo})`, Style.basic)
       .setOrigin(0, 0.5)

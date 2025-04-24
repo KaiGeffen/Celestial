@@ -138,7 +138,9 @@ export default class DeckRegion {
       Space.avatarSize + Space.pad,
       Space.avatarSize,
     )
-    this.avatar = new Buttons.Avatar(containerAvatar, 0, 0, 'Jules')
+    this.avatar = new Buttons.Avatar({
+      within: containerAvatar,
+    })
     if (Flags.mobile) {
       containerAvatar.setVisible(false)
     } else {

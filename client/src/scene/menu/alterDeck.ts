@@ -155,12 +155,16 @@ class AlterDeckMenu extends Menu {
       }
 
       let name = avatarNames[i]
-      let avatar = new Buttons.Avatar(sizer, 0, 0, name, () => {
-        // Deselect all avatars, then select this one, remember which is selected
-        avatars.forEach((a) => a.deselect())
-        avatar.select()
+      let avatar = new Buttons.Avatar({
+        within: sizer,
+        name,
+        f: () => {
+          // Deselect all avatars, then select this one, remember which is selected
+          avatars.forEach((a) => a.deselect())
+          avatar.select()
 
-        that.selectedAvatar = i
+          this.selectedAvatar = i
+        },
       })
       avatars.push(avatar)
 

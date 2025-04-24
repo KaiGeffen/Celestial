@@ -82,11 +82,9 @@ export default class HomeScene extends BaseScene {
     userDetails.add(background)
 
     // Add avatar
-    const avatar = new Buttons.Avatar(
-      userDetails,
-      0,
-      Space.pad + Space.avatarSize / 2,
-    ).setQuality({
+    const avatar = new Buttons.Avatar({
+      within: userDetails,
+      y: Space.pad + Space.avatarSize / 2,
       emotive: false,
     })
 

@@ -8,16 +8,18 @@ import { Color, Time } from '../../settings/settings'
 export default class AvatarButton extends Button {
   name: string
 
-  constructor(
-    within: Phaser.Scene | Phaser.GameObjects.Container | ContainerLite,
-    x: number,
-    y: number,
-    name: string | number = 0,
-    f: () => void = function () {},
-  ) {
-    // If an id was given instead of a string, get the string
-    if (typeof name === 'number') {
-      name = avatarNames[name]
+  constructor({
+    within,
+    name = 'Jules',
+    avatarId = undefined,
+    x = 0,
+    y = 0,
+    f = () => {},
+    emotive = false,
+    origin = [0.5, 0.5],
+  }) {
+    if (avatarId !== undefined) {
+      name = avatarNames[avatarId]
     }
 
     super(within, x, y, {
@@ -26,9 +28,7 @@ export default class AvatarButton extends Button {
         interactive: true,
       },
       callbacks: {
-        click: () => {
-          f()
-        },
+        click: f,
       },
       sound: {
         mute: true,
@@ -36,6 +36,12 @@ export default class AvatarButton extends Button {
     })
 
     this.name = name
+
+    this.icon.setOrigin(...origin)
+
+    if (emotive) {
+      this.setEmotive()
+    }
   }
 
   setOnClick(f, once = false, overwrite = true): Button {
