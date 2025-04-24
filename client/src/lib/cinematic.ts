@@ -16,7 +16,9 @@ export default class Cinematic {
 
     const animation: HTMLVideoElement = <HTMLVideoElement>animations.item(0)
     animation.style.display = ''
-    animation.src = 'assets/animation/Jules.mp4'
+    if (animation.src === '') {
+      animation.src = 'assets/animation/Jules.mp4'
+    }
   }
 
   /**
