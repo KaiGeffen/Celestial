@@ -15,7 +15,11 @@ export default class Cinematic {
     }
 
     const animation: HTMLVideoElement = <HTMLVideoElement>animations.item(0)
+
+    // Remove hiding from it
     animation.style.display = ''
+
+    // Make sure the right file is playing
     if (animation.src === '') {
       animation.src = 'assets/animation/Jules.mp4'
     }
