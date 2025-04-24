@@ -61,7 +61,9 @@ export default class HomeScene extends BaseScene {
     this.createLoginLogoutButton()
 
     // Quest text
-    this.createQuestText()
+    if (UserDataServer.isLoggedIn()) {
+      this.createQuestText()
+    }
   }
 
   private createUserDetails(): void {
