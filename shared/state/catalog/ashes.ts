@@ -268,7 +268,7 @@ class Goliath extends Card {
 }
 const goliath = new Goliath({
   name: 'Goliath',
-  id: 67,
+  id: 38,
   cost: 8,
   points: 8,
   text: 'Discard the next card in the story and the top 2 cards of your deck.',
@@ -283,7 +283,7 @@ class Firebug extends Card {
 }
 const firebug = new Firebug({
   name: 'Firebug',
-  id: 68,
+  id: 41,
   points: 1,
   text: 'Discard a card.',
   beta: true,
@@ -308,7 +308,7 @@ class Immolant extends Card {
 }
 const immolant = new Immolant({
   name: 'Immolant',
-  id: 69,
+  id: 42,
   cost: 1,
   points: 1,
   text: 'When this is discarded, add it next in the story.',

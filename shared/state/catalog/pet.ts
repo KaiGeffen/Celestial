@@ -156,7 +156,7 @@ class Pomegranate extends Card {
 }
 const pomegranate = new Pomegranate({
   name: 'Pomegranate',
-  id: 76,
+  id: 52,
   cost: 5,
   text: 'Nourish 6',
   beta: true,

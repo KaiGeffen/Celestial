@@ -162,7 +162,7 @@ class Nest extends Card {
 }
 const nest = new Nest({
   name: 'Nest',
-  id: 60,
+  id: 24,
   cost: 2,
   points: 0,
   text: 'Morning: Create a Dove in the story.',
@@ -199,7 +199,7 @@ class Defiance extends Card {
 }
 const defiance = new Defiance({
   name: 'Defiance',
-  id: 62,
+  id: 29,
   cost: 5,
   points: 3,
   text: 'Costs 1 less for each card your opponent can see in the story.',
@@ -229,7 +229,7 @@ class Silence extends Card {
 }
 const silence = new Silence({
   name: 'Silence',
-  id: 63,
+  id: 30,
   cost: 2,
   points: 2,
   qualities: [Quality.VISIBLE],
@@ -244,7 +244,7 @@ class Vulture extends Card {
 }
 const vulture = new Vulture({
   name: 'Vulture',
-  id: 64,
+  id: 36,
   cost: 3,
   points: 5,
   qualities: [Quality.VISIBLE, Quality.FLEETING],
@@ -277,7 +277,7 @@ class Rooster extends Card {
 }
 const rooster = new Rooster({
   name: 'Rooster',
-  id: 65,
+  id: 37,
   cost: 1,
   points: 1,
   text: 'Morning: Trigger the morning ability of the top card below this with morning.',
