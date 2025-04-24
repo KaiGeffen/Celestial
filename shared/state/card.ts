@@ -172,10 +172,10 @@ export default class Card {
   }
 
   inspire(amt: number, game: GameModel, player: number) {
+    // TODO Handle status animations
     game.animations[player].push(
       new Animation({
         from: Zone.Status,
-        status: 0,
       }),
     )
     game.status[player].inspire += amt
@@ -185,7 +185,6 @@ export default class Card {
     game.animations[player].push(
       new Animation({
         from: Zone.Status,
-        status: 2,
       }),
     )
     game.status[player].nourish += amt
@@ -195,8 +194,6 @@ export default class Card {
     game.animations[player].push(
       new Animation({
         from: Zone.Status,
-        // TODO Don't hardcode this number here
-        status: 3,
       }),
     )
     game.status[player].nourish -= amt
