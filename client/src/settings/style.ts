@@ -179,9 +179,9 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   homeSceneButton: {
     fontFamily: altFont,
     fontSize: '40px',
-    color: Color.blackS,
-    stroke: Color.whiteS,
-    strokeThickness: 1,
+    color: Color.goldS,
+    stroke: Color.blackS,
+    strokeThickness: 3,
   },
 }
 
