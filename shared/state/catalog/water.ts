@@ -231,7 +231,7 @@ class LeveeBreaks extends Card {
   }
 }
 const leveeBreaks = new LeveeBreaks({
-  name: 'Levee Breaks',
+  name: 'LeveeBreaks',
   id: 104,
   cost: 4,
   points: 4,

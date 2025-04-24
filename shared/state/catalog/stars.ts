@@ -217,7 +217,7 @@ class CloakOfStars extends Card {
   }
 }
 const cloakOfStars = new CloakOfStars({
-  name: 'Cloak Of Stars',
+  name: 'CloakOfStars',
   id: 96,
   cost: 3,
   text: 'Gain 3 breath.\nMorning: Gain 1 breath for each breath you ended the last round with.',
