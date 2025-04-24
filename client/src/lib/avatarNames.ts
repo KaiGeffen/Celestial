@@ -1,4 +1,1 @@
-// TODO Move to shared
-const avatarNames = ['Jules', 'Adonis', 'Mia', 'Kitz', 'Imani', 'Mitra']
-
-export default avatarNames
+export default ['Jules', 'Adonis', 'Mia', 'Kitz', 'Imani', 'Mitra']
