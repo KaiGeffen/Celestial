@@ -8,7 +8,6 @@ import { CardImage } from '../../lib/cardImage'
 import { Space, Time, Depth, Ease } from '../../settings/settings'
 import Catalog from '../../../../shared/state/catalog'
 import { View } from '../gameScene'
-import { Status } from '../../lib/status'
 
 export default class Animator {
   scene: GameScene
@@ -37,10 +36,6 @@ export default class Animator {
 
         if (animation.from === Zone.Mulligan) {
           this.animateMulligan(animation, owner, i, state)
-        }
-        // Gain a status
-        else if (animation.from === Zone.Status) {
-          this.animateStatus(animation, owner, i)
         }
         // Shuffle a player's deck
         else if (animation.from === Zone.Shuffle) {
@@ -343,43 +338,6 @@ export default class Animator {
       onComplete: function (tween, targets, _) {
         bottomCard.destroy()
       },
-    })
-  }
-
-  private animateStatus(animation: Animation, owner: number, i: number): void {
-    // TODO
-
-    // scene.add.image(Space.windowWidth/2, Space.windowHeight/2, `icon-${animation.status}1`)
-    // TODO
-    return
-
-    // TODO Some visual sparks or fruit thrown in the air?
-
-    let obj
-    switch (animation.status) {
-      case Status.Inspire:
-        if (owner === 0) {
-          obj = this.view.ourBoard['btnInspire'] // TODO Smell, fix typing
-        } else {
-          obj = this.view.theirBoard['btnInspire']
-        }
-        break
-
-      case Status.Nourish:
-        if (owner === 0) {
-          obj = this.view.ourBoard['btnNourish']
-        } else {
-          obj = this.view.theirBoard['btnNourish']
-        }
-        break
-    }
-
-    this.scene.tweens.add({
-      targets: obj.icon,
-      scale: 2,
-      delay: i * Time.recapTweenWithPause(),
-      duration: Time.recapTween() / 2,
-      yoyo: true,
     })
   }
 
