@@ -2,7 +2,7 @@ import 'phaser'
 import { Style, Color, Space } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
-import BasicButton from '../../lib/buttons/basic'
+import Buttons from '../../lib/buttons/buttons'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import { StoreItem } from '../../../../shared/storeItems'
 import UserDataServer from '../../network/userDataServer'
@@ -142,11 +142,18 @@ export default class PurchaseItemMenu extends Menu {
 
     if (this.isOwned) {
       // Create a disabled "Owned" button
-      new BasicButton(buyContainer, 0, 0, 'Owned', () => {}).disable()
+      new Buttons.Basic({
+        within: buyContainer,
+        text: 'Owned',
+      }).disable()
     } else {
       // Create a normal buy button
-      new BasicButton(buyContainer, 0, 0, 'Buy', () => {
-        this.handlePurchase()
+      new Buttons.Basic({
+        within: buyContainer,
+        text: 'Buy',
+        f: () => {
+          this.handlePurchase()
+        },
       })
     }
 

@@ -3,7 +3,7 @@ import { Style, Color, Space } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import { paymentService } from '../../store/paymentService'
-import BasicButton from '../../lib/buttons/basic'
+import Buttons from '../../lib/buttons/buttons'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import {
   GEM_PACKAGES,
@@ -28,7 +28,7 @@ export default class PurchaseGemsMenu extends Menu {
       space: { item: Space.pad },
     })
 
-    // Add each package option as a BasicButton
+    // Add each package option as a button
     Object.values(GEM_PACKAGES).forEach((pkg: GemPackage) => {
       const container = new ContainerLite(
         this.scene,
@@ -38,15 +38,13 @@ export default class PurchaseGemsMenu extends Menu {
         Space.buttonHeight,
       )
 
-      new BasicButton(
-        container,
-        0,
-        0,
-        `${pkg.gems} 💎  ${formatPrice(pkg.amount)}`,
-        async () => {
+      new Buttons.Basic({
+        within: container,
+        text: `${pkg.gems} 💎  ${formatPrice(pkg.amount)}`,
+        f: async () => {
           await this.purchaseGems(pkg.id)
         },
-      )
+      })
 
       sizer.add(container)
     })
