@@ -124,7 +124,7 @@ const gentleRain = new GentleRain({
 // BETA
 const refresh = new RefreshCard({
   name: 'Refresh',
-  id: 200,
+  id: 99,
   cost: 1,
   points: 1,
   text: 'Refresh',
@@ -146,7 +146,7 @@ class Overflow extends RefreshCard {
 }
 const overflow = new Overflow({
   name: 'Overflow',
-  id: 201,
+  id: 100,
   cost: 3,
   points: -1,
   text: 'Refresh\nWorth +1 for each card in your hand.',
@@ -163,7 +163,7 @@ class Fish extends Card {
 }
 const fish = new Fish({
   name: 'Fish',
-  id: 202,
+  id: 101,
   cost: 3,
   points: 2,
   text: 'When you draw this, increase its points by 1 permanently.',
@@ -189,7 +189,7 @@ class Cloud extends RefreshCard {
 }
 const cloud = new Cloud({
   name: 'Cloud',
-  id: 7202,
+  id: 102,
   cost: 5,
   points: 5,
   text: 'Refresh\nExhale 2: Draw 3 cards.',
@@ -207,27 +207,10 @@ class Precious extends Card {
 }
 const precious = new Precious({
   name: 'Precious',
-  id: 7210,
+  id: 103,
   cost: 2,
   points: 2,
   text: 'Discard your hand, draw that many cards.',
-  beta: true,
-})
-
-class Jormungandr extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
-
-    game.removeAct(0)
-    game.mill(player, 2)
-  }
-}
-const jormungandr = new Jormungandr({
-  name: 'Jörmungandr',
-  id: 7216,
-  cost: 9,
-  points: 9,
-  text: 'Discard the next card in the story and the top 2 cards of your deck.',
   beta: true,
 })
 
@@ -249,18 +232,12 @@ class LeveeBreaks extends Card {
 }
 const leveeBreaks = new LeveeBreaks({
   name: 'Levee Breaks',
-  id: 8369,
+  id: 104,
   cost: 4,
   points: 4,
   text: 'Exhale 1: Discard 3 cards. Add your hand to the story after this.',
   beta: true,
 })
-
-/*
-Burst damn
-Invisible hand
-jormungandr
-*/
 
 export {
   mercy,

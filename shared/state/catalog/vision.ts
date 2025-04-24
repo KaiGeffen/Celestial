@@ -139,7 +139,7 @@ class Timid extends SightCard {
 }
 const timid = new Timid(3, {
   name: 'Timid',
-  id: 850,
+  id: 87,
   cost: 1,
   points: 1,
   text: 'When played, gain Sight 3.\nExhale 1: Return your cards later in the story to your hand.',
@@ -156,7 +156,7 @@ class Balance extends Card {
 }
 const balance = new Balance({
   name: 'Balance',
-  id: 6850,
+  id: 88,
   cost: 2,
   points: 1,
   text: 'Worth +3 if the number of cards before this in the story is equal to the number of cards after this.',
@@ -178,7 +178,7 @@ class Riddle extends Card {
 }
 const riddle = new Riddle({
   name: 'Riddle',
-  id: 6852,
+  id: 89,
   cost: 2,
   points: 1,
   qualities: [Quality.FLEETING],
@@ -202,7 +202,7 @@ class Bull extends Card {
 }
 const bull = new Bull({
   name: 'Bull',
-  id: 6063,
+  id: 90,
   cost: 3,
   points: 3,
   text: 'Costs 1 less if the last card in the story has the same base-cost as the top card of your deck.',
@@ -227,7 +227,7 @@ class Lantern extends Card {
 }
 const lantern = new Lantern({
   name: 'Lantern',
-  id: 6083,
+  id: 91,
   cost: 5,
   points: 5,
   qualities: [Quality.FLEETING],
@@ -244,32 +244,9 @@ class BeggingBowl extends Card {
 }
 const beggingBowl = new BeggingBowl({
   name: 'Begging Bowl',
-  id: 6085,
+  id: 92,
   cost: 2,
   text: "This consumes your opponent's Nourish.",
-  beta: true,
-})
-
-// Not used
-class MorningBell extends Card {
-  onMorning(player: number, game: GameModel, index: number): boolean {
-    const amt = game.hand[player].length
-    for (let i = 0; i < amt; i++) {
-      game.deck[player].unshift(game.hand[player].pop())
-    }
-    game.shuffle(player, false, false)
-    game.draw(player, amt)
-
-    return true
-  }
-  morning(player: number, game: GameModel) {}
-}
-const morningBell = new MorningBell({
-  name: 'Morning Bell',
-  id: 6086,
-  cost: 4,
-  points: 4,
-  text: 'Morning: Shuffle your hand into your deck, then draw that many cards.',
   beta: true,
 })
 

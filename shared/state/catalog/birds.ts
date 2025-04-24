@@ -148,7 +148,7 @@ class Fledgling extends Card {
 }
 const fledgling = new Fledgling({
   name: 'Fledgling',
-  id: 111,
+  id: 59,
   cost: 1,
   text: 'Morning: Worth +1 permanently.',
   beta: true,
@@ -163,7 +163,7 @@ class Nest extends Card {
 const nest = new Nest({
   name: 'Nest',
   id: 207,
-  cost: 2,
+  cost: 60,
   points: 0,
   text: 'Morning: Create a Dove in the story.',
   beta: true,
@@ -171,7 +171,7 @@ const nest = new Nest({
 
 const truth = new Card({
   name: 'Truth',
-  id: 104,
+  id: 61,
   cost: 6,
   points: 7,
   beta: true,
@@ -199,7 +199,7 @@ class Defiance extends Card {
 }
 const defiance = new Defiance({
   name: 'Defiance',
-  id: 167,
+  id: 62,
   cost: 5,
   points: 3,
   text: 'Costs 1 less for each card your opponent can see in the story.',
@@ -229,7 +229,7 @@ class Silence extends Card {
 }
 const silence = new Silence({
   name: 'Silence',
-  id: 197,
+  id: 63,
   cost: 2,
   points: 2,
   qualities: [Quality.VISIBLE],
@@ -244,7 +244,7 @@ class Vulture extends Card {
 }
 const vulture = new Vulture({
   name: 'Vulture',
-  id: 1031,
+  id: 64,
   cost: 3,
   points: 5,
   qualities: [Quality.VISIBLE, Quality.FLEETING],
@@ -277,7 +277,7 @@ class Rooster extends Card {
 }
 const rooster = new Rooster({
   name: 'Rooster',
-  id: 1073,
+  id: 65,
   cost: 1,
   points: 1,
   text: 'Morning: Trigger the morning ability of the top card below this with morning.',
@@ -293,7 +293,7 @@ class LetGo extends Card {
 }
 const letGo = new LetGo({
   name: 'Let Go',
-  id: 1015,
+  id: 66,
   cost: 4,
   points: 4,
   text: 'Remove from the game the top four cards of your discard pile.',

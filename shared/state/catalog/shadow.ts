@@ -180,7 +180,7 @@ class Victim extends Card {
 }
 const victim = new Victim({
   name: 'Victim',
-  id: 4001,
+  id: 71,
   cost: 1,
   text: 'If you lose this round, Nourish -1 your opponent for each point you lost by.',
   beta: true,
@@ -194,7 +194,7 @@ class Rupture extends Card {
 }
 const rupture = new Rupture({
   name: 'Rupture',
-  id: 4027,
+  id: 72,
   cost: 1,
   text: "Create a Wound in your opponent's hand.",
   beta: true,
@@ -212,7 +212,7 @@ class Craving extends Card {
 }
 const craving = new Craving({
   name: 'Craving',
-  id: 4028,
+  id: 73,
   cost: 2,
   points: 4,
   text: 'Discard your hand unless you have a card with base-cost 6 or more later in the story.',
@@ -231,7 +231,7 @@ class Vampire extends Card {
 }
 const vampire = new Vampire({
   name: 'Vampire',
-  id: 413,
+  id: 74,
   cost: 6,
   points: 7,
   text: "Worth -X where X is your opponent's points.\nCosts 1 less for each card in the story.",

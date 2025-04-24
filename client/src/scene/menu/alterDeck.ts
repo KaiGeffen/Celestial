@@ -134,8 +134,6 @@ class AlterDeckMenu extends Menu {
   }
 
   private createAvatar() {
-    let that = this
-
     let fixSizer = this.scene.rexUI.add.fixWidthSizer({
       space: { line: Space.pad },
     })

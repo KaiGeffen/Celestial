@@ -154,86 +154,8 @@ class Fates extends Card {
 }
 const fates = new Fates({
   name: 'Fates',
-  id: 369,
+  id: 93,
   text: "Exhale 6: Set both players' points to 0.\nExhale 3: Nourish 2.\nExhale 1: Birth 1.",
-  beta: true,
-})
-
-class Possibility extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
-
-    game.maxBreath[player] += 1
-  }
-}
-const possibility = new Possibility({
-  name: 'Possibility',
-  id: 8828,
-  cost: 4,
-  qualities: [Quality.FLEETING],
-  text: 'Fleeting\nIncrease your max breath by 1 permanently.',
-  beta: true,
-})
-
-class CloakOfStars extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
-
-    game.breath[player] += 3
-  }
-
-  onMorning(player: number, game: GameModel, index: number) {
-    const amt = game.endingBreath[player]
-    super.addBreath(amt, game, player)
-
-    return true
-  }
-}
-const cloakOfStars = new CloakOfStars({
-  name: 'Cloak Of Stars',
-  id: 8056,
-  cost: 3,
-  text: 'Gain 3 breath.\nMorning: Gain 1 breath for each breath you ended the last round with.',
-  beta: true,
-})
-
-class Dreamer extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    if (super.exhale(1, game, player)) {
-      bonus += 1
-    }
-    super.play(player, game, index, bonus)
-
-    if (game.hand[player].length === 0) {
-      game.draw(player, 1)
-    }
-  }
-}
-const dreamer = new Dreamer({
-  name: 'Dreamer',
-  id: 8832,
-  cost: 1,
-  points: 1,
-  text: 'Draw a card if your hand is empty.\nExhale 1: Worth +1.',
-  beta: true,
-})
-
-class Pride extends Card {
-  onMorning(player: number, game: GameModel, index: number) {
-    if (super.exhale(2, game, player)) {
-      game.pile[player].splice(index, 1)
-      game.createInStory(player, this)
-      game.discard(player)
-    }
-    return true
-  }
-}
-const pride = new Pride({
-  name: 'Pride',
-  id: 8666,
-  cost: 3,
-  points: 3,
-  text: 'Morning: Exhale 2: Add this to the story. Discard a card.',
   beta: true,
 })
 
@@ -259,8 +181,86 @@ class Hero extends Card {
 }
 const hero = new Hero({
   name: 'Hero',
-  id: 7369,
+  id: 94,
   text: 'Exhale 5: Worth +4.\nExhale 3: Discard the next card in the story.\nExhale 1: Inspire 1.',
+  beta: true,
+})
+
+class Possibility extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    game.maxBreath[player] += 1
+  }
+}
+const possibility = new Possibility({
+  name: 'Possibility',
+  id: 95,
+  cost: 4,
+  qualities: [Quality.FLEETING],
+  text: 'Fleeting\nIncrease your max breath by 1 permanently.',
+  beta: true,
+})
+
+class CloakOfStars extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    game.breath[player] += 3
+  }
+
+  onMorning(player: number, game: GameModel, index: number) {
+    const amt = game.endingBreath[player]
+    super.addBreath(amt, game, player)
+
+    return true
+  }
+}
+const cloakOfStars = new CloakOfStars({
+  name: 'Cloak Of Stars',
+  id: 96,
+  cost: 3,
+  text: 'Gain 3 breath.\nMorning: Gain 1 breath for each breath you ended the last round with.',
+  beta: true,
+})
+
+class Dreamer extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    if (super.exhale(1, game, player)) {
+      bonus += 1
+    }
+    super.play(player, game, index, bonus)
+
+    if (game.hand[player].length === 0) {
+      game.draw(player, 1)
+    }
+  }
+}
+const dreamer = new Dreamer({
+  name: 'Dreamer',
+  id: 97,
+  cost: 1,
+  points: 1,
+  text: 'Draw a card if your hand is empty.\nExhale 1: Worth +1.',
+  beta: true,
+})
+
+class Pride extends Card {
+  onMorning(player: number, game: GameModel, index: number) {
+    if (super.exhale(2, game, player)) {
+      game.pile[player].splice(index, 1)
+      game.createInStory(player, this)
+      game.discard(player)
+    }
+    return true
+  }
+}
+const pride = new Pride({
+  name: 'Pride',
+  id: 98,
+  cost: 3,
+  points: 3,
+  text: 'Morning: Exhale 2: Add this to the story. Discard a card.',
   beta: true,
 })
 
@@ -274,9 +274,9 @@ export {
   sunflower,
   // BETA
   fates,
+  hero,
   possibility,
   cloakOfStars,
   dreamer,
   pride,
-  hero,
 }

@@ -141,7 +141,7 @@ class Yearn extends Card {
 }
 const yearn = new Yearn({
   name: 'Yearn',
-  id: 233,
+  id: 75,
   cost: 1,
   points: 1,
   text: 'Exhale 3: Add the top card of your discard pile to the story after this if it has base cost 3 or less.',
@@ -156,7 +156,7 @@ class Pomegranate extends Card {
 }
 const pomegranate = new Pomegranate({
   name: 'Pomegranate',
-  id: 411,
+  id: 76,
   cost: 5,
   text: 'Nourish 6',
   beta: true,
@@ -175,7 +175,7 @@ class Abundance extends Card {
 }
 const abundance = new Abundance({
   name: 'Abundance',
-  id: 435,
+  id: 77,
   cost: 2,
   points: 2,
   text: 'Exhale 1: If you have 7 or more points, Nourish 3.',
@@ -190,7 +190,7 @@ class Rose extends Card {
 }
 const rose = new Rose({
   name: 'Rose',
-  id: 437,
+  id: 78,
   cost: 1,
   points: -1,
   qualities: [Quality.FLEETING],
@@ -235,7 +235,7 @@ class Celebration extends Card {
 }
 const celebration = new Celebration({
   name: 'Celebration',
-  id: 4437,
+  id: 79,
   cost: 3,
   points: 3,
   text: 'Exhale 5: Add each card with base-cost 3 or less from your hand to the story after this.',
@@ -254,7 +254,7 @@ class Supernova extends Card {
 }
 const supernova = new Supernova({
   name: 'Supernova',
-  id: 4835,
+  id: 80,
   cost: 4,
   points: 4,
   text: 'Exhale 4: Double your points.',
@@ -278,7 +278,7 @@ class Sample extends Card {
 }
 const sample = new Sample({
   name: 'Sample',
-  id: 4837,
+  id: 81,
   cost: 4,
   points: 3,
   text: 'Costs 1 less for each of the following statuses you have: Nourish, Inspired, Sight.',

@@ -156,7 +156,7 @@ class Storytime extends Card {
 }
 const storytime = new Storytime({
   name: 'Storytime',
-  id: 5218,
+  id: 82,
   cost: 6,
   points: 2,
   text: 'Create a copy in hand of each card later in the 	story with base-cost 0.',
@@ -180,7 +180,7 @@ class Pregnant extends Card {
 }
 const pregnant = new Pregnant({
   name: 'Pregnant',
-  id: 5212,
+  id: 83,
   cost: 1,
   text: 'Create a 0:2 Child in your deck.',
   beta: true,
@@ -195,7 +195,7 @@ class PassOn extends Card {
 }
 const passOn = new PassOn({
   name: 'Pass On',
-  id: 5213,
+  id: 84,
   cost: 4,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nCreate an Heirloom in hand.',
@@ -216,7 +216,7 @@ class JustLikeDad extends Card {
 }
 const justLikeDad = new JustLikeDad({
   name: 'Just Like Dad',
-  id: 5243,
+  id: 85,
   cost: 1,
   points: 1,
   text: 'Exhale 2: Create a copy in hand of the next card in the story.',
@@ -233,7 +233,7 @@ class Hug extends Card {
 }
 const hug = new Hug({
   name: 'Hug',
-  id: 5244,
+  id: 86,
   cost: 2,
   points: 1,
   text: 'Worth +2 if the next card in the story is yours.',
