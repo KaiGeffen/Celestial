@@ -91,9 +91,10 @@ export default class HomeScene extends BaseScene {
     // TODO Border / cosmetics
 
     // Add username and ELO
+    const userData = UserDataServer.getUserData()
     let y = Space.pad + Space.avatarSize + Space.padSmall
-    const username = UserSettings._get('username') || 'Guest'
-    const elo = UserSettings._get('elo') || 1000
+    const username = userData.username || 'Guest'
+    const elo = userData.elo || 1000
 
     const txtUsername = this.add
       .text(0, y, username, Style.username)
@@ -110,7 +111,7 @@ export default class HomeScene extends BaseScene {
     const smallBg1 = this.rexUI.add
       .roundRectangle(0, y, regionWidth, subHeight, 5, 0xffffff)
       .setAlpha(0.3)
-    const amtGems = UserDataServer.getUserData().gems || 0
+    const amtGems = userData.gems || 0
     const txtGem = this.add
       .text(0, y, `${amtGems} 💎`, Style.username)
       .setOrigin(0.5)
@@ -120,7 +121,7 @@ export default class HomeScene extends BaseScene {
     const smallBg2 = this.rexUI.add
       .roundRectangle(0, y, regionWidth, subHeight, 5, 0xffffff)
       .setAlpha(0.3)
-    const amtCoins = UserDataServer.getUserData().coins || 0
+    const amtCoins = userData.coins || 0
     const txtCoins = this.add
       .text(0, y, `${amtCoins}💰`, Style.username)
       .setOrigin(0.5)
