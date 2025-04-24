@@ -140,7 +140,7 @@ export default class FilterRegion {
     )
       .on(
         'textchange',
-        function (inputText) {
+        (inputText) => {
           // Filter the visible cards based on the text
           this.searchText = inputText.text
           this.scene.filter()
@@ -191,7 +191,7 @@ export default class FilterRegion {
   // Returns a function which filters cards to see which are selectable
   getFilterFunction(): (card: Card) => boolean {
     // Filter cards based on their cost
-    let costFilter = function (card: Card): boolean {
+    let costFilter = (card: Card) => {
       // If no number are selected, all cards are fine
       if (!this.filterCostAry.includes(true)) {
         return true
@@ -202,7 +202,7 @@ export default class FilterRegion {
     }
 
     // Filter cards based on if they contain the string being searched
-    let searchTextFilter = function (card: Card): boolean {
+    let searchTextFilter = (card: Card) => {
       // Search over text, name, cost, points
       let s = `${card.text}
         ${card.name}
@@ -217,12 +217,12 @@ export default class FilterRegion {
     }
 
     // Filter cards based on whether you have unlocked them
-    let ownershipFilter = function (card: Card): boolean {
+    let ownershipFilter = (card: Card) => {
       return !this.filterUnowned || UserSettings._get('inventory')[card.id]
     }
 
     // Filter based on the overlap of all above filters
-    let andFilter = function (card: Card): boolean {
+    let andFilter = (card: Card) => {
       return costFilter(card) && searchTextFilter(card) && ownershipFilter(card)
     }
 

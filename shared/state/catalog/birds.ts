@@ -162,8 +162,8 @@ class Nest extends Card {
 }
 const nest = new Nest({
   name: 'Nest',
-  id: 207,
-  cost: 60,
+  id: 60,
+  cost: 2,
   points: 0,
   text: 'Morning: Create a Dove in the story.',
   beta: true,
