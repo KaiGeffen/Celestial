@@ -77,7 +77,7 @@ class Wound extends Card {
 }
 const wound = new Wound({
   name: 'Wound',
-  id: 1006,
+  id: 1005,
   points: -3,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nWhen this is discarded, add it next in the story.',
@@ -86,7 +86,7 @@ const wound = new Wound({
 
 const heirloom = new Card({
   name: 'Heirloom',
-  id: 1007,
+  id: 1006,
   points: 4,
   beta: true,
 })
