@@ -126,8 +126,6 @@ export class GameScene extends BaseScene {
 
   // Set all of the callback functions for the regions in the view
   private setCallbacks(view, net: MatchWS): void {
-    let that = this
-
     // Their score region
     view.theirScore.recapCallback = () => {
       // Scan backwards through the queued states to find the start of the recap
@@ -143,14 +141,14 @@ export class GameScene extends BaseScene {
       }
     }
     view.theirScore.skipCallback = () => {
-      that.tweens.getTweens().forEach((tween) => {
+      this.tweens.getTweens().forEach((tween) => {
         tween.complete()
       })
 
       // End the pause
-      that.paused = false
+      this.paused = false
 
-      that.currentVersion = that.maxVersion - 1
+      this.currentVersion = this.maxVersion - 1
     }
 
     // Hand region
@@ -158,7 +156,7 @@ export class GameScene extends BaseScene {
       net.playCard(i, this.currentVersion)
     })
     view.ourBoard.setDisplayCostCallback((cost: number) => {
-      that.view.ourScore['displayCost'](cost)
+      this.view.ourScore['displayCost'](cost)
     })
     view.ourAvatar.setEmoteCallback(() => {
       this.net.signalEmote()
@@ -211,12 +209,12 @@ export class GameScene extends BaseScene {
 
         // Skip all tweens playing currently
         // TODO Some text stays enlarged if it doesn't finish
-        that.tweens.getTweens().forEach((tween) => {
+        this.tweens.getTweens().forEach((tween) => {
           tween.complete()
         })
 
         // TODO Execution of story jumps to the act then stays paused
-        that.paused = false
+        this.paused = false
       }
     })
 
@@ -227,10 +225,10 @@ export class GameScene extends BaseScene {
       }
     })
     view.pass.setShowResultsCallback(() => {
-      if (!that.view.results.isVisible()) {
-        that.view.results.show()
+      if (!this.view.results.isVisible()) {
+        this.view.results.show()
       } else {
-        that.view.results.hide()
+        this.view.results.hide()
       }
     })
 

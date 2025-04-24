@@ -347,15 +347,14 @@ export default class DeckRegion {
 
   // Remove the card from deck which has given index
   private removeCardFromDeck(cutout: Cutout): () => void {
-    let that = this
-    return function () {
+    return () => {
       // Decrement, if fully gone, remove from deck list
       if (cutout.decrement().count === 0) {
         // Find the index of it within the deck list, remove that after
         let index
 
-        for (let i = 0; i < that.deck.length && index === undefined; i++) {
-          const cutoutI = that.deck[i]
+        for (let i = 0; i < this.deck.length && index === undefined; i++) {
+          const cutoutI = this.deck[i]
           if (cutoutI.id === cutout.id && !cutoutI.required) {
             index = i
           }
@@ -366,18 +365,18 @@ export default class DeckRegion {
         }
 
         // Remove from the deck list
-        that.deck.splice(index, 1)
+        this.deck.splice(index, 1)
 
         // Destroy the cutout and its container
         cutout.destroy()
 
         // Reformat the panel
-        that.scrollablePanel.t = Math.min(0.999999, that.scrollablePanel.t)
-        that.panel.layout()
+        this.scrollablePanel.t = Math.min(0.999999, this.scrollablePanel.t)
+        this.panel.layout()
       }
 
-      that.updateText()
-      that.scrollablePanel.layout()
+      this.updateText()
+      this.scrollablePanel.layout()
     }
   }
 

@@ -90,8 +90,6 @@ export default class MenuScene extends BaseMenuScene {
   }
 
   endScene(): () => void {
-    let that = this
-
     return () => {
       // Ensures that scene will only end (Sounds etc) once
       if (this.sceneEnding) {

@@ -387,7 +387,6 @@ export class CardImage {
 
   // Move this cardImage above everything else in its container when it's hovered
   moveToTopOnHover(): CardImage {
-    let that = this
     let container = this.container
     let parentContainer = container.parentContainer
 
@@ -456,13 +455,11 @@ export class CardImage {
   }
 
   private onHover(): () => void {
-    let that = this
+    const doHighlight = () => {
+      var postFxPlugin = this.scene.plugins.get('rexOutlinePipeline')
 
-    function doHighlight() {
-      var postFxPlugin = that.scene.plugins.get('rexOutlinePipeline')
-
-      postFxPlugin['remove'](that.image)
-      postFxPlugin['add'](that.image, {
+      postFxPlugin['remove'](this.image)
+      postFxPlugin['add'](this.image, {
         thickness: Space.highlightWidth,
         outlineColor: Color.outline,
         quality: 0.3,

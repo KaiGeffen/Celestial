@@ -156,14 +156,12 @@ export default class MulliganRegion extends Region {
 
   // The callback for when a card is clicked on
   private onCardClick(i: number): () => void {
-    let that = this
+    return () => {
+      this.scene.playSound('click')
 
-    return function () {
-      that.scene.playSound('click')
+      this.mulliganChoices[i] = !this.mulliganChoices[i]
 
-      that.mulliganChoices[i] = !that.mulliganChoices[i]
-
-      that.cards[i].toggleSelectedForMulligan()
+      this.cards[i].toggleSelectedForMulligan()
     }
   }
 

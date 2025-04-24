@@ -264,24 +264,21 @@ export default class ResultsRegion extends Region {
   }
 
   private exitCallback(): () => void {
-    let that = this
-    return function () {
-      that.scene.doBack()
+    return () => {
+      this.scene.doBack()
     }
   }
 
   private newMatchCallback(): () => void {
-    let that = this
-    return function () {
+    return () => {
       // Restarts the game scene with same arguments (Deck, matchmaking, etc)
-      that.scene.scene.restart()
+      this.scene.scene.restart()
     }
   }
 
   private reviewCallback(): () => void {
-    let that = this
-    return function () {
-      that.hide()
+    return () => {
+      this.hide()
     }
   }
 
@@ -336,11 +333,9 @@ export default class ResultsRegion extends Region {
   // TODO Make dry with other scenes
   // Update the panel when user scrolls with their mouse wheel
   private updateOnScroll(panel, scrollablePanel) {
-    let that = this
-
     this.scene.input.on(
       'wheel',
-      function (pointer: Phaser.Input.Pointer, gameObject, dx, dy, dz, event) {
+      (pointer: Phaser.Input.Pointer, gameObject, dx, dy, dz, event) => {
         // Return if the pointer is outside of the panel
         if (!panel.getBounds().contains(pointer.x, pointer.y)) {
           return

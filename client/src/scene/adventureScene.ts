@@ -295,7 +295,6 @@ export default class AdventureScene extends BaseScene {
 
   // Add all of the missions to the panel
   private addAdventureData(): void {
-    let that = this
     let completed: boolean[] = UserSettings._get('completedMissions')
 
     let unlockedMissions = adventureData.filter(function (mission) {
@@ -314,10 +313,10 @@ export default class AdventureScene extends BaseScene {
       // For now, it's all either the waving figure or ? icon
       const nodeType = 'deck' in mission ? 'Mission' : 'QuestionMark'
       let btn = new Buttons.Mission(
-        that,
+        this,
         mission.x,
         mission.y,
-        that.missionOnClick(mission),
+        this.missionOnClick(mission),
         nodeType,
       )
 

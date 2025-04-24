@@ -234,7 +234,6 @@ export default class Animator {
     permanentCard?: CardImage,
     sound?,
   ) {
-    let that = this
     if (permanentCard) {
       permanentCard.hide()
     }
@@ -247,13 +246,13 @@ export default class Animator {
       delay: i * Time.recapTweenWithPause(),
       duration: Time.recapTween(),
       ease: Ease.card,
-      onStart: function (tween: Phaser.Tweens.Tween, targets, _) {
+      onStart: (tween: Phaser.Tweens.Tween, targets, _) => {
         card.show()
         if (sound) {
-          that.scene.playSound(sound)
+          this.scene.playSound(sound)
         }
       },
-      onComplete: function (tween, targets, _) {
+      onComplete: (tween, targets, _) => {
         if (permanentCard) {
           permanentCard.show()
         }
@@ -297,8 +296,6 @@ export default class Animator {
 
   // Animate the given player's deck shuffling
   private animateShuffle(owner: number, i: number): void {
-    let that = this
-
     let start
     if (owner === 0) {
       start = CardLocation.ourDeck()
@@ -316,9 +313,9 @@ export default class Animator {
       duration: Time.recapTween() / 4,
       yoyo: true,
       repeat: 1,
-      onStart: function (tween: Phaser.Tweens.Tween, targets, _) {
+      onStart: (tween: Phaser.Tweens.Tween, targets, _) => {
         topCard.show()
-        that.scene.playSound('shuffle')
+        this.scene.playSound('shuffle')
       },
       onComplete: function (tween, targets, _) {
         topCard.destroy()

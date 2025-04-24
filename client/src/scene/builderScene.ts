@@ -121,23 +121,21 @@ export class AdventureBuilderScene extends BuilderBase {
   updateSavedDeck(deck: string): void {}
 
   private startCallback(): () => void {
-    let that = this
-
-    return function () {
+    return () => {
       // Create a proper deck object using the new type
       const aiDeck: Deck = {
         name: 'AI Deck',
-        cards: that.params.opponent,
+        cards: this.params.opponent,
         cosmetics: {
           avatar: 0,
         },
       }
 
       // Start a match against an ai opponent with the specified deck
-      that.scene.start('AdventureGameScene', {
-        deck: that.journeyRegion.getDeck(),
+      this.scene.start('AdventureGameScene', {
+        deck: this.journeyRegion.getDeck(),
         aiDeck: aiDeck,
-        missionID: that.params.id,
+        missionID: this.params.id,
       })
     }
   }
@@ -238,18 +236,16 @@ export class BuilderScene extends BuilderBase {
   }
 
   private startCallback(): () => void {
-    let that = this
-
-    return function () {
+    return () => {
       // Remember the deck for when the builder is returned to
-      that.rememberSettings()
+      this.rememberSettings()
 
       // Open the mode menu to select what mode to play in with the given deck
-      that.scene.launch('MenuScene', {
+      this.scene.launch('MenuScene', {
         menu: 'mode',
-        activeScene: that,
-        deck: that.deckRegion.getDeck(),
-        avatar: that.deckRegion.avatarNumber,
+        activeScene: this,
+        deck: this.deckRegion.getDeck(),
+        avatar: this.deckRegion.avatarNumber,
       })
     }
   }
@@ -260,26 +256,24 @@ export class BuilderScene extends BuilderBase {
     avatar: number,
     deckCode: number[],
   ) => void {
-    let that = this
-
-    return function (name: string, avatar: number, deckCode: number[]) {
+    return (name: string, avatar: number, deckCode: number[]) => {
       // Use a default deck name if it's not specified
       if (name === undefined || name === '') {
-        const number = that.decklistsRegion.savedDeckIndex + 1
+        const number = this.decklistsRegion.savedDeckIndex + 1
         name = `Deck ${number}`
       }
 
-      that.updateSavedDeck(undefined, name, avatar)
+      this.updateSavedDeck(undefined, name, avatar)
 
       // Update the avatar
-      that.setAvatar(avatar)
+      this.setAvatar(avatar)
 
       // Update the name
-      that.setName(name)
+      this.setName(name)
 
       if (deckCode.length > 0) {
         // Update the cards in the deck
-        that.setDeck(deckCode.map((id) => Catalog.getCardById(id)))
+        this.setDeck(deckCode.map((id) => Catalog.getCardById(id)))
       }
     }
   }

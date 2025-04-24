@@ -188,8 +188,6 @@ export default class CatalogRegion {
 
   // Shift the catalog to the right to make room for the deck panel
   shiftRight(): void {
-    let that = this
-
     const x = Flags.mobile
       ? Space.deckPanelWidth
       : Space.decklistPanelWidth + Space.deckPanelWidth
@@ -206,8 +204,8 @@ export default class CatalogRegion {
         duration: Time.builderSlide(),
         ease: Ease.slide,
         onUpdate: () => {
-          that.scrollablePanel.layout()
-          that.scrollablePanel.t = ratio
+          this.scrollablePanel.layout()
+          this.scrollablePanel.t = ratio
         },
       })
     }
@@ -215,8 +213,6 @@ export default class CatalogRegion {
 
   // Shift the catalog to the left to fill the absence of deck panel
   shiftLeft(): void {
-    let that = this
-
     const x = Space.decklistPanelWidth // + (Flags.mobile ? Space.sliderWidth : 0)
     const width = Space.windowWidth - x
 
@@ -231,8 +227,8 @@ export default class CatalogRegion {
         duration: Time.builderSlide(),
         ease: Ease.slide,
         onUpdate: () => {
-          that.scrollablePanel.layout()
-          that.scrollablePanel.t = ratio
+          this.scrollablePanel.layout()
+          this.scrollablePanel.t = ratio
         },
       })
     }

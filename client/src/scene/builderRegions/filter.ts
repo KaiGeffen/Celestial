@@ -160,50 +160,44 @@ export default class FilterRegion {
   }
 
   private onClickFilterButton(thisI: number, btns: UButton[]): () => void {
-    let that = this
-
-    return function () {
+    return () => {
       // Clear out all buttons
       for (let i = 0; i < btns.length; i++) {
         // Toggle this one, clear all others
         if (i === thisI) {
           btns[i].toggle()
-          that.filterCostAry[i] = !that.filterCostAry[i]
+          this.filterCostAry[i] = !this.filterCostAry[i]
         } else {
           btns[i].toggleOff()
-          that.filterCostAry[i] = false
+          this.filterCostAry[i] = false
         }
       }
 
-      that.scene.filter()
+      this.scene.filter()
     }
   }
 
   private onClearFilters(btns: UButton[]): () => void {
-    let that = this
-
-    return function () {
+    return () => {
       for (let i = 0; i < btns.length; i++) {
         btns[i].toggleOff()
-        that.filterCostAry[i] = false
+        this.filterCostAry[i] = false
       }
 
-      that.scene.filter()
+      this.scene.filter()
     }
   }
 
   // Returns a function which filters cards to see which are selectable
   getFilterFunction(): (card: Card) => boolean {
-    let that = this
-
     // Filter cards based on their cost
     let costFilter = function (card: Card): boolean {
       // If no number are selected, all cards are fine
-      if (!that.filterCostAry.includes(true)) {
+      if (!this.filterCostAry.includes(true)) {
         return true
       } else {
         // The last filtered cost includes everything more than it
-        return that.filterCostAry[Math.min(card.cost, maxCostFilter)]
+        return this.filterCostAry[Math.min(card.cost, maxCostFilter)]
       }
     }
 
@@ -216,7 +210,7 @@ export default class FilterRegion {
         ${card.points}`
 
       // Compare inclusion without case
-      const query = that.searchText.toLowerCase()
+      const query = this.searchText.toLowerCase()
       s = s.toLowerCase()
 
       return s.includes(query)
@@ -224,7 +218,7 @@ export default class FilterRegion {
 
     // Filter cards based on whether you have unlocked them
     let ownershipFilter = function (card: Card): boolean {
-      return !that.filterUnowned || UserSettings._get('inventory')[card.id]
+      return !this.filterUnowned || UserSettings._get('inventory')[card.id]
     }
 
     // Filter based on the overlap of all above filters

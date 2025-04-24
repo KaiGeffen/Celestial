@@ -137,11 +137,9 @@ export default class BaseScene extends SharedBaseScene {
   }
 
   doExit(): () => void {
-    let that = this
-
-    return function () {
-      that.beforeExit()
-      that.scene.start('HomeScene')
+    return () => {
+      this.beforeExit()
+      this.scene.start('HomeScene')
     }
   }
 

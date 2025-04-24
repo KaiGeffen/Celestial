@@ -70,7 +70,6 @@ export default class UserDataServer {
     })
 
     // Register a listener for the response of the user-data
-    const that = this
     wsServer
       .on('promptUserInit', () => {
         // Open username registration menu
@@ -134,7 +133,7 @@ export default class UserDataServer {
             ...data,
           }
 
-          that.loadUserData(data)
+          this.loadUserData(data)
           // TODO Bad smell, the callback should only happen once as it references a scene
           if (callback) {
             callback()

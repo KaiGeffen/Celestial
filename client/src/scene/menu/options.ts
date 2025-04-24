@@ -452,7 +452,6 @@ export default class OptionsMenu extends Menu {
   }
 
   private createMasterVolume() {
-    let that = this
     let sizer = this.scene['rexUI'].add.sizer({
       width: this.subwidth,
       orientation: 'vertical',
@@ -464,7 +463,7 @@ export default class OptionsMenu extends Menu {
 
     let slider = this.getSlider(UserSettings._get('volume'), (value) => {
       UserSettings._set('volume', value)
-      that.scene.sound.volume = value * 5
+      this.scene.sound.volume = value * 5
     })
     sizer.add(slider)
 

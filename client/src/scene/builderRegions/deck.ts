@@ -504,14 +504,12 @@ export default class DeckRegion {
   }
 
   private openEditMenu(): () => void {
-    let that = this
-
-    return function () {
-      that.scene.scene.launch('MenuScene', {
+    return () => {
+      this.scene.scene.launch('MenuScene', {
         menu: 'editDeck',
-        callback: that.editCallback,
-        deckName: that.txtDeckName.text,
-        selectedAvatar: that.avatarNumber,
+        callback: this.editCallback,
+        deckName: this.txtDeckName.text,
+        selectedAvatar: this.avatarNumber,
       })
     }
   }
@@ -528,13 +526,11 @@ export default class DeckRegion {
   }
 
   private distributionCallback(): () => void {
-    let that = this
-
-    return function () {
-      that.scene.scene.launch('MenuScene', {
+    return () => {
+      this.scene.scene.launch('MenuScene', {
         menu: 'distribution',
         // Used to form the graph
-        currentDeck: that.deck,
+        currentDeck: this.deck,
       })
     }
   }

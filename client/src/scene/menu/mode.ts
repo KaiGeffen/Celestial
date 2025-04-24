@@ -44,8 +44,6 @@ export default class ModeMenu extends Menu {
   }
 
   private createPasswordEntry() {
-    let that = this
-
     this.inputText = this.scene.add['rexInputText'](
       0,
       0,
@@ -64,13 +62,13 @@ export default class ModeMenu extends Menu {
         selectAll: true,
         id: 'search-field',
       },
-    ).on('textchange', function (inputText) {
-      that.password = inputText.text
+    ).on('textchange', (inputText) => {
+      this.password = inputText.text
 
       if (inputText.text === '') {
-        that.btnPwd.disable()
+        this.btnPwd.disable()
       } else {
-        that.btnPwd.enable()
+        this.btnPwd.enable()
       }
     })
 

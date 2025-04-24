@@ -105,9 +105,8 @@ export default class StoryRegion extends Region {
     const loc = CardLocation.story(state, index, this.container, undefined)
 
     // Form the string for the gain of the given player
-    let that = this
-    function getGain(i: number): string {
-      let amt = scores[i] - that.lastScores[i]
+    const getGain = (i: number) => {
+      let amt = scores[i] - this.lastScores[i]
       if (amt < 0) {
         return amt.toString()
       } else if (amt === 0) {
@@ -135,8 +134,6 @@ export default class StoryRegion extends Region {
   }
 
   private animate(state: GameModel, cards: CardImage[]): void {
-    let that = this
-
     // If the last card was just played by the opponent,
     // animate it from their hand
     if (state.story.acts.length === 0) {
@@ -164,9 +161,9 @@ export default class StoryRegion extends Region {
         x: x,
         y: y,
         duration: Time.playCard(),
-        onStart: function (tween, targets, _) {
+        onStart: (tween, targets, _) => {
           card.show()
-          that.scene.playSound('play them')
+          this.scene.playSound('play them')
         },
       })
     }

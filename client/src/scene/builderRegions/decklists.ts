@@ -313,24 +313,22 @@ export default class DecklistsRegion {
 
   // Update the panel when user scrolls with their mouse wheel
   private updateOnScroll(panel) {
-    let that = this
-
     this.scene.input.on(
       'wheel',
-      function (pointer: Phaser.Input.Pointer, gameObject, dx, dy, dz, event) {
+      (pointer: Phaser.Input.Pointer, gameObject, dx, dy, dz, event) => {
         // Return if the pointer is outside of the panel
         if (!panel.getBounds().contains(pointer.x, pointer.y)) {
           return
         }
 
         // Scroll panel down by amount wheel moved
-        that.scrollablePanel.childOY -= dy
+        this.scrollablePanel.childOY -= dy
 
         // Ensure that panel isn't out bounds (Below 0% or above 100% scroll)
-        that.scrollablePanel.t = Math.max(0, that.scrollablePanel.t)
-        that.scrollablePanel.t = Math.min(0.999999, that.scrollablePanel.t)
+        this.scrollablePanel.t = Math.max(0, this.scrollablePanel.t)
+        this.scrollablePanel.t = Math.min(0.999999, this.scrollablePanel.t)
 
-        that.refreshBtns()
+        this.refreshBtns()
       },
     )
   }
