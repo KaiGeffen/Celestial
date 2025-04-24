@@ -241,12 +241,10 @@ export default class DecklistsRegion {
       Space.buttonWidth,
       Space.buttonHeight,
     )
-    this.btnPremade = new Buttons.Basic(
-      containerPremade,
-      0,
-      0,
-      'Premade',
-      () => {
+    this.btnPremade = new Buttons.Basic({
+      within: containerPremade,
+      text: 'Premade',
+      f: () => {
         // Check if at max decks
         if (UserSettings._get('decks').length >= DecklistSettings.MAX_DECKS) {
           this.scene.signalError(
@@ -261,8 +259,8 @@ export default class DecklistsRegion {
           })
         }
       },
-      true,
-    )
+      muteClick: true,
+    })
     sizer.add(containerPremade)
 
     if (Flags.mobile) {

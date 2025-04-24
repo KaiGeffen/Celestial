@@ -45,18 +45,16 @@ export default class HelpMenu extends Menu {
   ): ContainerLite {
     let container = new ContainerLite(scene, 0, 0, Space.buttonWidth, 50)
 
-    new Buttons.Basic(
-      container,
-      0,
-      0,
-      'Tutorial',
-      () => {
+    new Buttons.Basic({
+      within: container,
+      text: 'Tutorial',
+      f: () => {
         callback()
         this.close()
       },
-      true,
-      true,
-    )
+      muteClick: true,
+      returnHotkey: true,
+    })
 
     return container
   }

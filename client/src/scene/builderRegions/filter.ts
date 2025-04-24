@@ -55,15 +55,15 @@ export default class FilterRegion {
 
       this.createBackground(container)
 
-      new Buttons.Basic(
-        container,
-        Space.pad + Space.buttonWidth / 2,
-        40,
-        'Back',
-        () => {
+      new Buttons.Basic({
+        within: container,
+        text: 'Back',
+        x: Space.pad + Space.buttonWidth / 2,
+        y: 40,
+        f: () => {
           scene.doBack()
         },
-      )
+      })
 
       this.createFilterButtons(container)
 

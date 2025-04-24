@@ -73,17 +73,16 @@ export default class MulliganRegion extends Region {
     // Ready button
     const x = Space.windowWidth / 2
     const y = Space.windowHeight / 2 + Space.cardHeight / 2 + Space.pad * 4
-    this.btnReady = new Buttons.Basic(
-      this.container,
+    this.btnReady = new Buttons.Basic({
+      within: this.container,
+      text: 'Ready',
       x,
       y,
-      'Ready',
-      () => {
+      f: () => {
         this.onButtonClick()
       },
-      false,
-      true,
-    )
+      returnHotkey: true,
+    })
     this.addHotkeyHint([x, y], 'SPACE')
 
     this.addHotkeyListeners()

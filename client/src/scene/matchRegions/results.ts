@@ -105,31 +105,31 @@ export default class ResultsRegion extends Region {
   protected createButtons() {
     // Exit
     let y = Space.windowHeight - (Space.pad + Space.buttonHeight / 2)
-    new Buttons.Basic(
-      this.container,
-      Space.windowWidth / 2 + Space.pad + Space.buttonWidth,
+    new Buttons.Basic({
+      within: this.container,
+      text: 'Exit Match',
+      x: Space.windowWidth / 2 + Space.pad + Space.buttonWidth,
       y,
-      'Exit Match',
-      this.exitCallback(),
-    )
+      f: this.exitCallback(),
+    })
 
     // Replay
-    new Buttons.Basic(
-      this.container,
-      Space.windowWidth / 2,
-      y,
-      'Play Again',
-      this.newMatchCallback(),
-    )
+    new Buttons.Basic({
+      within: this.container,
+      text: 'Play Again',
+      x: Space.windowWidth / 2,
+      y: y,
+      f: this.newMatchCallback(),
+    })
 
     // Review
-    new Buttons.Basic(
-      this.container,
-      Space.windowWidth / 2 - Space.pad - Space.buttonWidth,
+    new Buttons.Basic({
+      within: this.container,
+      text: 'Hide',
+      x: Space.windowWidth / 2 - Space.pad - Space.buttonWidth,
       y,
-      'Hide',
-      this.reviewCallback(),
-    )
+      f: this.reviewCallback(),
+    })
   }
 
   private createContent() {
@@ -367,13 +367,13 @@ export class ResultsRegionTutorial extends ResultsRegion {
   protected createButtons() {
     // Continue
     let y = Space.windowHeight - (Space.pad + Space.buttonHeight / 2)
-    new Buttons.Basic(
-      this.container,
-      Space.windowWidth / 2,
+    new Buttons.Basic({
+      within: this.container,
+      text: 'Continue',
+      x: Space.windowWidth / 2,
       y,
-      'Continue',
-      this.continueCallback(),
-    )
+      f: this.continueCallback(),
+    })
   }
 
   private continueCallback(): () => void {

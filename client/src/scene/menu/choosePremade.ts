@@ -261,16 +261,14 @@ export default class ChoosePremade extends Menu {
       Space.buttonWidth,
       Space.buttonHeight,
     )
-    let btnCancel = new Buttons.Basic(
-      c1,
-      0,
-      0,
-      'Cancel',
-      () => {
+    let btnCancel = new Buttons.Basic({
+      within: c1,
+      text: 'Cancel',
+      f: () => {
         this.close()
       },
-      true,
-    )
+      muteClick: true,
+    })
     panel.add(c1).addSpace()
 
     let c2 = new ContainerLite(
@@ -280,18 +278,16 @@ export default class ChoosePremade extends Menu {
       Space.buttonWidth,
       Space.buttonHeight,
     )
-    let btnSelect = new Buttons.Basic(
-      c2,
-      0,
-      0,
-      'Select',
-      () => {
+    let btnSelect = new Buttons.Basic({
+      within: c2,
+      text: 'Select',
+      f: () => {
         callback(this.selectedAvatar)
         this.close()
       },
-      true,
-      true,
-    )
+      muteClick: true,
+      returnHotkey: true,
+    })
     panel.add(c2)
     // .addSpace()
 

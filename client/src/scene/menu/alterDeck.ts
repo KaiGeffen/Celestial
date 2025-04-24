@@ -248,20 +248,18 @@ class AlterDeckMenu extends Menu {
       Space.buttonHeight,
     )
 
-    this.btnConfirm = new Buttons.Basic(
-      container,
-      0,
-      0,
-      this.confirmString,
-      () => {
+    this.btnConfirm = new Buttons.Basic({
+      within: container,
+      text: this.confirmString,
+      f: () => {
         createCallback(this.name, this.selectedAvatar, this.deckCode)
 
         // Close this scene
         this.scene.scene.stop()
       },
-      true,
-      true,
-    )
+      muteClick: true,
+      returnHotkey: true,
+    })
 
     return container
   }

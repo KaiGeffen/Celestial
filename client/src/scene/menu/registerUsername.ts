@@ -138,21 +138,18 @@ export class RegisterUsernameMenu extends Menu {
       Space.buttonHeight,
     )
 
-    this.confirmButton = new Buttons.Basic(
-      container,
-      0,
-      0,
-      'Confirm',
-      () => {
+    this.confirmButton = new Buttons.Basic({
+      within: container,
+      text: 'Confirm',
+      f: () => {
         // Close this scene
         this.scene.scene.stop()
 
         // Send username to server
         UserDataServer.sendInitialUserData(this.username)
       },
-      false,
-      true,
-    ).disable()
+      returnHotkey: true,
+    }).disable()
 
     return container
   }

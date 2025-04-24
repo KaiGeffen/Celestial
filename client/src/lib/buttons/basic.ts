@@ -4,16 +4,17 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import { UserSettings } from '../../settings/userSettings'
 
 export default class BasicButton extends Button {
-  constructor(
-    within: Phaser.Scene | Phaser.GameObjects.Container | ContainerLite,
-    x: number,
-    y: number,
-    text: string,
-    f: () => void = () => {},
-    muteClick: boolean = false,
-    // Whether this button activates when return is pressed
-    returnHotkey: boolean = false,
-  ) {
+  constructor({
+    within,
+    text = '',
+    x = 0,
+    y = 0,
+    f = () => {},
+    muteClick = false,
+    returnHotkey = false,
+    origin = [0.5, 0.5],
+    depth = undefined,
+  }) {
     super(within, x, y, {
       text: {
         text: text.toUpperCase(),
@@ -30,6 +31,12 @@ export default class BasicButton extends Button {
         mute: muteClick,
       },
     })
+
+    this.icon.setOrigin(...origin)
+    if (depth !== undefined) {
+      // TODO Maybe remove setDepth and just put impl here
+      this.setDepth(depth)
+    }
 
     // If return hotkey is enabled, add a listener for the return key
     if (returnHotkey) {

@@ -108,16 +108,14 @@ export default class Menu {
   protected createCancelButton(): ContainerLite {
     let container = new ContainerLite(this.scene, 0, 0, Space.buttonWidth, 50)
 
-    new Buttons.Basic(
-      container,
-      0,
-      0,
-      'Cancel',
-      () => {
+    new Buttons.Basic({
+      within: container,
+      text: 'Cancel',
+      f: () => {
         this.close()
       },
-      true,
-    )
+      muteClick: true,
+    })
 
     return container
   }

@@ -149,16 +149,16 @@ export default class SearchingRegion extends Region {
   }
 
   private addButtons(scene: GameScene): void {
-    let btn = new Buttons.Basic(
-      this.container,
-      Space.windowWidth / 2,
-      Space.windowHeight / 2 + 100,
-      'Cancel',
-      () => {
+    let btn = new Buttons.Basic({
+      within: this.container,
+      text: 'Cancel',
+      x: Space.windowWidth / 2,
+      y: Space.windowHeight / 2 + 100,
+      f: () => {
         // Return to the last scene
         scene.doBack()
       },
-    )
+    })
   }
 }
 
@@ -260,12 +260,12 @@ export class SearchingRegionTutorial extends Region {
   }
 
   private createButton(scene, tutorialNum): void {
-    this.btn = new Buttons.Basic(
-      this.container,
-      Space.windowWidth - Space.pad - Space.buttonWidth / 2,
-      Space.windowHeight - Space.pad - Space.buttonHeight / 2,
-      'Continue',
-      () => {
+    this.btn = new Buttons.Basic({
+      within: this.container,
+      text: 'Continue',
+      x: Space.windowWidth - Space.pad - Space.buttonWidth / 2,
+      y: Space.windowHeight - Space.pad - Space.buttonHeight / 2,
+      f: () => {
         // If typing isn't complete, complete it
         if (this.textbox.isTyping) {
           this.textbox.stop(true)
@@ -302,7 +302,7 @@ export class SearchingRegionTutorial extends Region {
           })
         }
       },
-    )
+    })
   }
 
   private tweenImage(): void {

@@ -213,12 +213,12 @@ export default class HomeScene extends BaseScene {
   }
 
   private createLoginLogoutButton(): void {
-    new Buttons.Basic(
-      this,
-      Space.windowWidth - Space.padSmall - Space.buttonWidth / 2,
-      Space.pad * 4 + Space.iconSize * 2 + Space.buttonHeight / 2,
-      UserDataServer.isLoggedIn() ? 'Logout' : 'Login',
-      () => {
+    new Buttons.Basic({
+      within: this,
+      text: UserDataServer.isLoggedIn() ? 'Logout' : 'Login',
+      x: Space.windowWidth - Space.padSmall - Space.buttonWidth / 2,
+      y: Space.pad * 4 + Space.iconSize * 2 + Space.buttonHeight / 2,
+      f: () => {
         // If we aren't logged in, go to login scene
         if (!UserDataServer.isLoggedIn()) {
           this.scene.start('SigninScene')
@@ -235,7 +235,7 @@ export default class HomeScene extends BaseScene {
           hint: 'logout',
         })
       },
-    )
+    })
   }
 
   private createQuestText(): void {

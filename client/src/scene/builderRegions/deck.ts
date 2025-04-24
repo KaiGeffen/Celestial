@@ -260,14 +260,12 @@ export default class DeckRegion {
       Space.buttonWidth,
       Space.avatarSize / 2,
     )
-    this.btnStart = new Buttons.Basic(
-      containerStart,
-      0,
-      0,
-      `0/${MechanicsSettings.DECK_SIZE}`,
-      startCallback,
-      true,
-    )
+    this.btnStart = new Buttons.Basic({
+      within: containerStart,
+      text: `0/${MechanicsSettings.DECK_SIZE}`,
+      f: startCallback,
+      muteClick: true,
+    })
 
     // Make a container for all of the buttons
     let sizerButtons = this.scene['rexUI'].add.fixWidthSizer({

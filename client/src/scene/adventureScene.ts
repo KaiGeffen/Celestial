@@ -116,16 +116,21 @@ export default class AdventureScene extends BaseScene {
       Space.buttonWidth / 2 -
       (Space.iconSize + Space.pad * 2)
     const y = Space.buttonHeight / 2 + Space.pad
-    new Buttons.Basic(this, x, y, 'Help', () => {
-      this.scene.launch('MenuScene', {
-        menu: 'help',
-        callback: () => {
-          this.scene.start('TutorialGameScene', { missionID: 0 })
-        },
-      })
-    })
-      .setDepth(10)
-      .setNoScroll()
+    new Buttons.Basic({
+      within: this,
+      text: 'Help',
+      x,
+      y,
+      f: () => {
+        this.scene.launch('MenuScene', {
+          menu: 'help',
+          callback: () => {
+            this.scene.start('TutorialGameScene', { missionID: 0 })
+          },
+        })
+      },
+      depth: 10,
+    }).setNoScroll()
   }
 
   // Create a popup for the card specified in params
@@ -239,12 +244,12 @@ export default class AdventureScene extends BaseScene {
     container.add([img, background, txt, textbox])
 
     // Add an okay button
-    let btn = new Buttons.Basic(
-      container,
-      Space.windowWidth - Space.pad - Space.buttonWidth / 2,
-      Space.windowHeight - Space.pad - Space.buttonHeight / 2,
-      'Continue',
-      () => {
+    let btn = new Buttons.Basic({
+      within: container,
+      text: 'Continue',
+      x: Space.windowWidth - Space.pad - Space.buttonWidth / 2,
+      y: Space.windowHeight - Space.pad - Space.buttonHeight / 2,
+      f: () => {
         // If typing isn't complete, complete it
         if (textbox.isTyping) {
           textbox.stop(true)
@@ -267,7 +272,7 @@ export default class AdventureScene extends BaseScene {
           this.scene.start('PlaceholderScene')
         }
       },
-    )
+    })
 
     // Scroll the image going down
     this.add.tween({

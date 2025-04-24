@@ -88,14 +88,18 @@ export default class ModeMenu extends Menu {
     )
 
     let container = new ContainerLite(this.scene, 0, 0, Space.buttonWidth, 50)
-    new Buttons.Basic(container, 0, 0, 'AI', () => {
-      activeScene.scene.stop()
+    new Buttons.Basic({
+      within: container,
+      text: 'AI',
+      f: () => {
+        activeScene.scene.stop()
 
-      this.scene.scene.start('StandardGameScene', {
-        isPvp: false,
-        deck: deck,
-        aiDeck: getRandomAiDeck(),
-      })
+        this.scene.scene.start('StandardGameScene', {
+          isPvp: false,
+          deck: deck,
+          aiDeck: getRandomAiDeck(),
+        })
+      },
     })
 
     sizer.add(txt).addSpace().add(container)
@@ -108,14 +112,18 @@ export default class ModeMenu extends Menu {
     const txt = this.scene.add.text(0, 0, 'Versus human opponent', Style.basic)
 
     let container = new ContainerLite(this.scene, 0, 0, Space.buttonWidth, 50)
-    new Buttons.Basic(container, 0, 0, 'PVP', () => {
-      activeScene.scene.stop()
+    new Buttons.Basic({
+      within: container,
+      text: 'PVP',
+      f: () => {
+        activeScene.scene.stop()
 
-      this.scene.scene.start('StandardGameScene', {
-        isPvp: true,
-        deck: deck,
-        password: '',
-      })
+        this.scene.scene.start('StandardGameScene', {
+          isPvp: true,
+          deck: deck,
+          password: '',
+        })
+      },
     })
 
     sizer.add(txt).addSpace().add(container)
@@ -128,14 +136,18 @@ export default class ModeMenu extends Menu {
     const txt = this.scene.add.text(0, 0, 'Versus same password', Style.basic)
 
     let container = new ContainerLite(this.scene, 0, 0, Space.buttonWidth, 50)
-    this.btnPwd = new Buttons.Basic(container, 0, 0, 'PWD', () => {
-      activeScene.scene.stop()
+    this.btnPwd = new Buttons.Basic({
+      within: container,
+      text: 'PWD',
+      f: () => {
+        activeScene.scene.stop()
 
-      this.scene.scene.start('StandardGameScene', {
-        isPvp: true,
-        deck: deck,
-        password: this.password,
-      })
+        this.scene.scene.start('StandardGameScene', {
+          isPvp: true,
+          deck: deck,
+          password: this.password,
+        })
+      },
     }).disable()
 
     sizer.add(txt).addSpace().add(container)

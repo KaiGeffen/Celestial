@@ -49,18 +49,15 @@ export default class ConfirmMenu extends Menu {
   private createOkay(scene: Phaser.Scene, callback: () => void): ContainerLite {
     let container = new ContainerLite(scene, 0, 0, Space.buttonWidth, 50)
 
-    new Buttons.Basic(
-      container,
-      0,
-      0,
-      'Okay',
-      () => {
+    new Buttons.Basic({
+      within: container,
+      text: 'Okay',
+      f: () => {
         callback()
         this.close()
       },
-      false,
-      true,
-    )
+      returnHotkey: true,
+    })
 
     return container
   }

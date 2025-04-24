@@ -1,34 +1,32 @@
-import "phaser"
-import { Style, Space, } from "../settings/settings"
-import BaseScene from "./baseScene"
-import Button from "../lib/buttons/button"
-import Buttons from "../lib/buttons/buttons"
+import 'phaser'
+import { Style, Space } from '../settings/settings'
+import BaseScene from './baseScene'
+import Button from '../lib/buttons/button'
+import Buttons from '../lib/buttons/buttons'
 
 export default class PlaceholderScene extends BaseScene {
-
   constructor() {
     super({
-      key: "PlaceholderScene"
+      key: 'PlaceholderScene',
     })
   }
 
   create(): void {
-  	this.add.text(Space.windowWidth/2,
-  		Space.windowHeight/2,
-  		s,
-  		{
-  			...Style.basic,
-  			wordWrap: { width: Space.windowWidth - Space.pad * 2 },
-  		},
-  		).setOrigin(0.5)
+    this.add
+      .text(Space.windowWidth / 2, Space.windowHeight / 2, s, {
+        ...Style.basic,
+        wordWrap: { width: Space.windowWidth - Space.pad * 2 },
+      })
+      .setOrigin(0.5)
 
-  	new Buttons.Basic(this,
-  		Space.windowWidth/2,
-  		Space.windowHeight - Space.pad - Space.buttonHeight/2,
-  		'Home',
-  		() => this.scene.start('HomeScene')
-  		)
-    
+    new Buttons.Basic({
+      within: this,
+      text: 'Home',
+      x: Space.windowWidth / 2,
+      y: Space.windowHeight - Space.pad - Space.buttonHeight / 2,
+      f: () => this.scene.start('HomeScene'),
+    })
+
     super.create()
   }
 }

@@ -221,16 +221,16 @@ export class BaseSceneWithHeader extends BaseScene {
     })
 
     // Create back button
-    new Buttons.Basic(
-      this,
-      Space.pad + Space.buttonWidth / 2,
-      this.headerHeight / 2,
-      'Back',
-      () => {
+    new Buttons.Basic({
+      within: this,
+      text: 'Back',
+      x: Space.pad + Space.buttonWidth / 2,
+      y: this.headerHeight / 2,
+      f: () => {
         this.sound.play('click')
         this.scene.start('HomeScene')
       },
-    )
+    })
 
     // Create title back in center
     this.add

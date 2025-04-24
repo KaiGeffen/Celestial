@@ -59,9 +59,16 @@ export class SigninScene extends Phaser.Scene {
     const x = Space.windowWidth / 2
     const y = Space.windowHeight - Space.buttonHeight / 2 - Space.pad
 
-    this.guestButton = new Buttons.Basic(this, x, y, 'Guest', () => {
-      this.onOptionClick()
-    }).setDepth(-1)
+    this.guestButton = new Buttons.Basic({
+      within: this,
+      text: 'Guest',
+      x,
+      y,
+      f: () => {
+        this.onOptionClick()
+      },
+      depth: -1,
+    })
 
     // TODO Use y value
     this.createGoogleGSIButton()

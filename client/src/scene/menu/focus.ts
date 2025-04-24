@@ -99,12 +99,12 @@ export default class FocusMenu extends Menu {
     }
 
     if (btnString !== '') {
-      new Buttons.Basic(
-        this.scene,
+      new Buttons.Basic({
+        within: this.scene,
+        text: btnString,
         x,
-        Space.windowHeight / 3,
-        btnString,
-        () => {
+        y: Space.windowHeight / 3,
+        f: () => {
           callback()
 
           if (closeOnClick()) {
@@ -116,19 +116,19 @@ export default class FocusMenu extends Menu {
             this.scene.playSound('click')
           }
         },
-        true,
-      )
+        muteClick: true,
+      })
     }
-    new Buttons.Basic(
-      this.scene,
+    new Buttons.Basic({
+      within: this.scene,
+      text: 'Cancel',
       x,
-      (2 * Space.windowHeight) / 3,
-      'Cancel',
-      () => {
+      y: (2 * Space.windowHeight) / 3,
+      f: () => {
         this.endScene()
       },
-      true,
-    )
+      muteClick: true,
+    })
   }
 
   private createReferenceContent(card: Card, ref: Card): void {
@@ -137,12 +137,12 @@ export default class FocusMenu extends Menu {
 
     // Button to switch between card and reference
     const x = Space.windowWidth - Space.pad - Space.buttonWidth / 2
-    let btn = new Buttons.Basic(
-      this.scene,
+    let btn = new Buttons.Basic({
+      within: this.scene,
+      text: `${ref.name}`,
       x,
-      Space.windowHeight / 2,
-      `${ref.name}`,
-    )
+      y: Space.windowHeight / 2,
+    })
     btn.setOnClick(() => {
       // Flip referenced card above/below focused card
       container.setDepth(container.depth * -1)

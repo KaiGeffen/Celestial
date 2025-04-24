@@ -324,24 +324,28 @@ export default class OptionsMenu extends Menu {
       Space.buttonWidth,
       Space.buttonHeight,
     )
-    let btn = new Buttons.Basic(container, 0, 0, 'Skip', () => {
-      this.scene.scene.start('MenuScene', {
-        menu: 'confirm',
-        callback: () => {
-          // Complete each mission in the intro
-          for (let i = 0; i < TUTORIAL_LENGTH; i++) {
-            UserSettings._setIndex('completedMissions', i, true)
-          }
+    let btn = new Buttons.Basic({
+      within: container,
+      text: 'Skip',
+      f: () => {
+        this.scene.scene.start('MenuScene', {
+          menu: 'confirm',
+          callback: () => {
+            // Complete each mission in the intro
+            for (let i = 0; i < TUTORIAL_LENGTH; i++) {
+              UserSettings._setIndex('completedMissions', i, true)
+            }
 
-          // Stop the other active scene
-          activeScene.beforeExit()
-          activeScene.scene.stop()
+            // Stop the other active scene
+            activeScene.beforeExit()
+            activeScene.scene.stop()
 
-          // Stop this scene and start the home scene
-          this.scene.scene.start('HomeScene')
-        },
-        hint: 'skip the tutorial',
-      })
+            // Stop this scene and start the home scene
+            this.scene.scene.start('HomeScene')
+          },
+          hint: 'skip the tutorial',
+        })
+      },
     })
     sizer.add(container)
 
@@ -363,14 +367,18 @@ export default class OptionsMenu extends Menu {
       Space.buttonWidth,
       Space.buttonHeight,
     )
-    let btn = new Buttons.Basic(container, 0, 0, s, () => {
-      if (UserSettings._get('autopass')) {
-        btn.setText('Disabled')
-        UserSettings._set('autopass', false)
-      } else {
-        btn.setText('Enabled')
-        UserSettings._set('autopass', true)
-      }
+    let btn = new Buttons.Basic({
+      within: container,
+      text: s,
+      f: () => {
+        if (UserSettings._get('autopass')) {
+          btn.setText('Disabled')
+          UserSettings._set('autopass', false)
+        } else {
+          btn.setText('Enabled')
+          UserSettings._set('autopass', true)
+        }
+      },
     })
     sizer.add(container)
 
@@ -392,14 +400,18 @@ export default class OptionsMenu extends Menu {
       Space.buttonWidth,
       Space.buttonHeight,
     )
-    let btn = new Buttons.Basic(container, 0, 0, s, () => {
-      if (UserSettings._get('hotkeys')) {
-        btn.setText('Disabled')
-        UserSettings._set('hotkeys', false)
-      } else {
-        btn.setText('Enabled')
-        UserSettings._set('hotkeys', true)
-      }
+    let btn = new Buttons.Basic({
+      within: container,
+      text: s,
+      f: () => {
+        if (UserSettings._get('hotkeys')) {
+          btn.setText('Disabled')
+          UserSettings._set('hotkeys', false)
+        } else {
+          btn.setText('Enabled')
+          UserSettings._set('hotkeys', true)
+        }
+      },
     })
     sizer.add(container)
 
@@ -423,13 +435,17 @@ export default class OptionsMenu extends Menu {
       .add(containerQuit)
       .addSpace()
 
-    new Buttons.Basic(containerQuit, 0, 0, 'Quit', () => {
-      // Stop the other active scene
-      activeScene.beforeExit()
-      activeScene.scene.stop()
+    new Buttons.Basic({
+      within: containerQuit,
+      text: 'Quit',
+      f: () => {
+        // Stop the other active scene
+        activeScene.beforeExit()
+        activeScene.scene.stop()
 
-      // Stop this scene and start the home scene
-      this.scene.scene.start('HomeScene')
+        // Stop this scene and start the home scene
+        this.scene.scene.start('HomeScene')
+      },
     })
 
     return sizer
