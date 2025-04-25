@@ -70,7 +70,7 @@ class Sun extends Card {
   }
 
   onMorning(player: number, game: GameModel, index: number) {
-    super.addBreath(2, game, player)
+    super.inspired(2, game, player)
     return true
   }
 }
@@ -79,7 +79,7 @@ const sun = new Sun({
   id: 56,
   cost: 8,
   points: 8,
-  text: 'Inspire 1\nMorning: Gain 2 breath.',
+  text: 'Inspire 1\nMorning: Inspired 2',
   story: 'I raise my head over the horizon\nI begin\nJust like you',
 })
 
@@ -211,7 +211,7 @@ class CloakOfStars extends Card {
 
   onMorning(player: number, game: GameModel, index: number) {
     const amt = game.endingBreath[player]
-    super.addBreath(amt, game, player)
+    super.inspired(amt, game, player)
 
     return true
   }
@@ -220,7 +220,7 @@ const cloakOfStars = new CloakOfStars({
   name: 'CloakOfStars',
   id: 96,
   cost: 3,
-  text: 'Gain 3 breath.\nMorning: Gain 1 breath for each breath you ended the last round with.',
+  text: 'Gain 3 breath.\nMorning: Inspired 1 for each breath you ended the last round with.',
   beta: true,
 })
 

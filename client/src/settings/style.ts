@@ -166,7 +166,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   },
   todoBetaCardName: {
     fontFamily: mainFont,
-    fontSize: '30px',
+    fontSize: '24px',
     color: Color.cardText,
   },
   hotkeyHint: {

@@ -165,9 +165,8 @@ export default class Card {
     game.score = [0, 0]
   }
 
-  addBreath(amt: number, game: GameModel, player: number) {
+  inspired(amt: number, game: GameModel, player: number) {
     game.breath[player] += amt
-    // TODO Is this correct? Opponent shouldnt know about Ecology for example
     game.status[player].inspired += amt
   }
 
