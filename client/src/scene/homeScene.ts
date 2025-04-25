@@ -1,23 +1,13 @@
 import 'phaser'
-import {
-  Style,
-  Color,
-  Space,
-  Ease,
-  UserSettings,
-  Url,
-} from '../settings/settings'
+import { Style, Color, Space, Url } from '../settings/settings'
 import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import UserDataServer from '../network/userDataServer'
 import Cinematic from '../lib/cinematic'
-import { TUTORIAL_LENGTH } from '../../../shared/settings'
 import {
   getTimeUntilNextQuest,
   isDailyQuestAvailable,
 } from '../utils/dailyQuestUtils'
-
-const discordHeight = 150
 
 const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
@@ -57,8 +47,9 @@ export default class HomeScene extends BaseScene {
     // Create primary buttons (Journey, Free Play)
     this.createPrimaryButtons()
 
-    // Login / Logout
+    // Normal buttons
     this.createLoginLogoutButton()
+    this.createFeedbackButton()
 
     // Quest text
     if (UserDataServer.isLoggedIn()) {
@@ -85,7 +76,7 @@ export default class HomeScene extends BaseScene {
     const avatar = new Buttons.Avatar({
       within: userDetails,
       y: Space.pad + Space.avatarSize / 2,
-      emotive: false,
+      f: () => this.signalError('User profile coming soon!'),
     })
 
     // TODO Border / cosmetics
@@ -235,6 +226,16 @@ export default class HomeScene extends BaseScene {
           hint: 'logout',
         })
       },
+    })
+  }
+
+  private createFeedbackButton(): void {
+    new Buttons.Basic({
+      within: this,
+      text: 'Feedback',
+      x: Space.windowWidth - Space.padSmall - Space.buttonWidth / 2,
+      y: Space.pad * 5 + Space.iconSize * 2 + Space.buttonHeight * 1.5,
+      f: () => window.open(Url.feedback, '_blank'),
     })
   }
 
