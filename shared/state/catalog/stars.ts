@@ -155,7 +155,7 @@ class Fates extends Card {
 const fates = new Fates({
   name: 'Fates',
   id: 93,
-  text: "Exhale 6: Set both players' points to 0.\nExhale 3: Nourish 2.\nExhale 1: Birth 1.",
+  text: "Exhale 6: Set both players' points to 0.\nExhale 3: Nourish 2\nExhale 1: Birth 1",
   beta: true,
 })
 
@@ -182,7 +182,7 @@ class Hero extends Card {
 const hero = new Hero({
   name: 'Hero',
   id: 94,
-  text: 'Exhale 5: Worth +4.\nExhale 3: Discard the next card in the story.\nExhale 1: Inspire 1.',
+  text: 'Exhale 5: Worth +4.\nExhale 3: Discard the next card in the story.\nExhale 1: Inspire 1',
   beta: true,
 })
 
