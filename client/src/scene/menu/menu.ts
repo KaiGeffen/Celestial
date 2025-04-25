@@ -159,6 +159,7 @@ import LeaderboardMenu from './leaderboard'
 import { RegisterUsernameMenu } from './registerUsername'
 import PurchaseGemsMenu from './purchaseGems'
 import PurchaseItemMenu from './purchaseItem'
+import UserProfileMenu from './userProfile'
 
 const menus = {
   options: OptionsMenu,
@@ -178,6 +179,7 @@ const menus = {
   registerUsername: RegisterUsernameMenu,
   purchaseGems: PurchaseGemsMenu,
   purchaseItem: PurchaseItemMenu,
+  userProfile: UserProfileMenu,
 }
 
 // Function exposed for the creation of custom menus

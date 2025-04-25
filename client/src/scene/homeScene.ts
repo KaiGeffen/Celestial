@@ -8,6 +8,7 @@ import {
   getTimeUntilNextQuest,
   isDailyQuestAvailable,
 } from '../utils/dailyQuestUtils'
+import MenuScene from './menuScene'
 
 const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
@@ -76,7 +77,16 @@ export default class HomeScene extends BaseScene {
     const avatar = new Buttons.Avatar({
       within: userDetails,
       y: Space.pad + Space.avatarSize / 2,
-      f: () => this.signalError('User profile coming soon!'),
+      f: () => {
+        this.scene.launch('MenuScene', {
+          menu: 'userProfile',
+          params: {
+            callback: () => {
+              // Handle profile updates here
+            },
+          },
+        })
+      },
     })
 
     // TODO Border / cosmetics
