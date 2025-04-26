@@ -209,7 +209,7 @@ const precious = new Precious({
   name: 'Precious',
   id: 103,
   cost: 2,
-  points: 2,
+  points: 1,
   text: 'Discard your hand, draw that many cards.',
   beta: true,
 })
