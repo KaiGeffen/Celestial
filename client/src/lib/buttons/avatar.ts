@@ -61,6 +61,7 @@ export default class AvatarButton extends Button {
     return super.setOnClick(fWithSound, once, overwrite)
   }
 
+  // TODO Remove setQuality method
   setQuality({
     num = undefined,
     emotive = false,
@@ -100,8 +101,17 @@ export default class AvatarButton extends Button {
     return this
   }
 
-  setBorder(border: number): void {
+  setAvatar(i: number): this {
+    this.name = avatarNames[i]
+    this.setTexture(`avatar-${this.name}`)
+
+    return this
+  }
+
+  setBorder(border: number): this {
     this.border.setTexture(`border-${borderNames[border]}`)
+
+    return this
   }
 
   timeout: NodeJS.Timeout

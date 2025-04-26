@@ -15,7 +15,7 @@ import {
   MechanicsSettings,
 } from '../../../../shared/settings'
 
-const width = Flags.mobile ? Space.avatarSize * 6 + Space.pad * 7 : 500
+const width = 500
 const inputTextWidth = 200
 
 class AlterDeckMenu extends Menu {

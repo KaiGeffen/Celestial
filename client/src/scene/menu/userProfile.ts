@@ -264,13 +264,10 @@ export default class UserProfileMenu extends Menu {
   }
 
   private updateCosmeticSet(newSet: CosmeticSet) {
-    // TODO Remove setQuality method (Make setAvatar)
-    this.currentAvatar.setQuality({ num: newSet.avatar })
+    this.currentAvatar.setAvatar(newSet.avatar)
     this.currentAvatar.setBorder(newSet.border)
 
-    this.outerAvatar.setQuality({
-      num: newSet.avatar,
-    })
+    this.outerAvatar.setAvatar(newSet.avatar)
     this.outerAvatar.setBorder(newSet.border)
 
     UserDataServer.setCosmeticSet(newSet)

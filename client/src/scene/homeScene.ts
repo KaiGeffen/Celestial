@@ -58,6 +58,11 @@ export default class HomeScene extends BaseScene {
   }
 
   private createUserDetails(): void {
+    if (!UserDataServer.isLoggedIn()) {
+      this.createLoginButton()
+      return
+    }
+
     const regionWidth = Space.avatarSize + Space.pad * 2
     const regionHeight = 200
     const userDetails = this.add.container(
@@ -126,6 +131,16 @@ export default class HomeScene extends BaseScene {
       .setOrigin(0.5)
 
     userDetails.add([smallBg1, txtGem, smallBg2, txtCoins])
+  }
+
+  private createLoginButton(): void {
+    new Buttons.Basic({
+      within: this,
+      text: 'Login',
+      x: Space.pad + Space.buttonWidth / 2,
+      y: Space.pad + Space.buttonHeight / 2,
+      f: () => this.scene.start('SigninScene'),
+    })
   }
 
   private createIcons(): void {

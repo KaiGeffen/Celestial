@@ -23,6 +23,7 @@ import newScrollablePanel from '../../lib/scrollablePanel'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
+import AvatarButton from '../../lib/buttons/avatar'
 
 const width = Space.deckPanelWidth // + Space.pad * 2
 
@@ -49,7 +50,7 @@ export default class DeckRegion {
 
   // The avatar button
   avatarNumber: number
-  private avatar: Button
+  private avatar: AvatarButton
   private txtDeckName: RexUIPlugin.BBCodeText
 
   // Buttons
@@ -384,7 +385,7 @@ export default class DeckRegion {
 
     this.avatarNumber = id
 
-    this.avatar.setQuality({ num: id, emotive: true }).enable()
+    this.avatar.setAvatar(id).enable()
 
     return this
   }

@@ -244,12 +244,13 @@ export default class UserDataServer {
   }
 
   static setCosmeticSet(cosmeticSet: CosmeticSet): void {
-    // Change it locally
-    this.userData.cosmeticSet = cosmeticSet
-
     if (wsServer === undefined) {
       throw 'Setting cosmetic set when server ws doesnt exist.'
     }
+
+    // Change it locally
+    this.userData.cosmeticSet = cosmeticSet
+
     wsServer.send({
       type: 'setCosmeticSet',
       value: cosmeticSet,
