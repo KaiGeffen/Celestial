@@ -49,7 +49,6 @@ export default class HomeScene extends BaseScene {
     this.createPrimaryButtons()
 
     // Normal buttons
-    this.createLoginLogoutButton()
     this.createFeedbackButton()
 
     // Quest text
@@ -80,11 +79,7 @@ export default class HomeScene extends BaseScene {
       f: () => {
         this.scene.launch('MenuScene', {
           menu: 'userProfile',
-          params: {
-            callback: () => {
-              // Handle profile updates here
-            },
-          },
+          activeScene: this,
         })
       },
     })
@@ -213,38 +208,12 @@ export default class HomeScene extends BaseScene {
     )
   }
 
-  private createLoginLogoutButton(): void {
-    new Buttons.Basic({
-      within: this,
-      text: UserDataServer.isLoggedIn() ? 'Logout' : 'Login',
-      x: Space.windowWidth - Space.padSmall - Space.buttonWidth / 2,
-      y: Space.pad * 4 + Space.iconSize * 2 + Space.buttonHeight / 2,
-      f: () => {
-        // If we aren't logged in, go to login scene
-        if (!UserDataServer.isLoggedIn()) {
-          this.scene.start('SigninScene')
-          return
-        }
-
-        // Otherwise ask to confirm user wants to log out
-        this.scene.launch('MenuScene', {
-          menu: 'confirm',
-          callback: () => {
-            UserDataServer.logout()
-            this.scene.start('SigninScene')
-          },
-          hint: 'logout',
-        })
-      },
-    })
-  }
-
   private createFeedbackButton(): void {
     new Buttons.Basic({
       within: this,
       text: 'Feedback',
       x: Space.windowWidth - Space.padSmall - Space.buttonWidth / 2,
-      y: Space.pad * 5 + Space.iconSize * 2 + Space.buttonHeight * 1.5,
+      y: Space.pad * 4 + Space.iconSize * 2 + Space.buttonHeight * 0.5,
       f: () => window.open(Url.feedback, '_blank'),
     })
   }

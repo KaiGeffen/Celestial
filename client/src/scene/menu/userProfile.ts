@@ -7,6 +7,7 @@ import Button from '../../lib/buttons/button'
 import UserDataServer from '../../network/userDataServer'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import AvatarButton from '../../lib/buttons/avatar'
+import BaseScene from '../baseScene'
 
 export default class UserProfileMenu extends Menu {
   private currentTab: string = 'Icon'
@@ -14,8 +15,13 @@ export default class UserProfileMenu extends Menu {
   private currentAvatarContainer: ContainerLite
   private currentAvatar: AvatarButton
 
-  constructor(scene: MenuScene, params) {
-    super(scene, 800)
+  // The home scene, which is closed when loggiing out
+  private activeScene: BaseScene
+
+  constructor(scene: MenuScene, params: { activeScene: BaseScene }) {
+    super(scene, 700)
+    this.activeScene = params.activeScene
+
     this.createContent()
     this.layout()
   }
@@ -43,7 +49,14 @@ export default class UserProfileMenu extends Menu {
 
     // Add background
     sizer.addBackground(
-      this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
+      this.scene.rexUI.add.roundRectangle(
+        0,
+        0,
+        1,
+        1,
+        10,
+        Color.backgroundLight,
+      ),
     )
 
     // Current avatar display
@@ -66,17 +79,28 @@ export default class UserProfileMenu extends Menu {
     const txtUsername = this.scene.add.text(
       0,
       0,
-      userData.username,
+      userData.username || 'Guest',
       Style.announcement,
     )
     const txtElo = this.scene.add.text(
       0,
       0,
-      userData.elo.toString(),
+      (userData.elo || 1000).toString(),
       Style.basic,
     )
     sizer.add(txtUsername)
     sizer.add(txtElo)
+
+    // Divider
+    sizer.add(
+      this.scene.add.rectangle(
+        0,
+        0,
+        Space.buttonWidth,
+        3,
+        Color.backgroundDark,
+      ),
+    )
 
     // Tab buttons
     ;['Icon', 'Border', 'Relic'].forEach((tab) => {
@@ -90,8 +114,8 @@ export default class UserProfileMenu extends Menu {
       const button = new Buttons.Basic({
         within: container,
         text: tab,
-        f: () => this.switchTab(tab),
-        muteClick: true,
+        f: () => this.scene.signalError('Coming soon!'),
+        // f: () => this.switchTab(tab),
       })
 
       this.tabButtons[tab] = button
@@ -102,32 +126,44 @@ export default class UserProfileMenu extends Menu {
       sizer.add(container)
     })
 
-    // Logout button
-    const logoutContainer = new ContainerLite(
+    // Divider
+    sizer.add(
+      this.scene.add.rectangle(
+        0,
+        0,
+        Space.buttonWidth,
+        3,
+        Color.backgroundDark,
+      ),
+    )
+
+    // Login/Logout button
+    sizer.add(this.createLoginLogoutButtons())
+
+    this.sizer.add(sizer)
+  }
+
+  private createLoginLogoutButtons(): ContainerLite {
+    const container = new ContainerLite(
       this.scene,
       0,
       0,
       Space.buttonWidth,
       Space.buttonHeight,
     )
-    const logoutBtn = new Buttons.Basic({
-      within: logoutContainer,
-      text: 'Logout',
-      f: () => {
-        this.scene.scene.launch('MenuScene', {
-          menu: 'confirm',
-          callback: () => {
-            UserDataServer.logout()
-            this.scene.scene.start('SigninScene')
-          },
-          hint: 'logout',
-        })
-      },
-      muteClick: true,
-    })
-    sizer.add(logoutContainer)
 
-    this.sizer.add(sizer)
+    new Buttons.Basic({
+      within: container,
+      text: UserDataServer.isLoggedIn() ? 'Logout' : 'Login',
+      f: () => {
+        UserDataServer.logout()
+
+        this.activeScene.scene.start('SigninScene')
+        this.close()
+      },
+    })
+
+    return container
   }
 
   // Right column - grid of choices
