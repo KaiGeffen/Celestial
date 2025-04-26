@@ -53,12 +53,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: true,
         deck: {
           name: 'Fire Dragons',
-          cosmetics: { avatar: 3 },
+          cosmeticSet: { avatar: 3, border: 1 },
           cards: [12, 15, 22, 33, 45, 12, 15, 22, 33, 45, 2, 8, 19, 27, 2],
         },
         opponentDeck: {
           name: 'Dragon Fury',
-          cosmetics: { avatar: 1 },
+          cosmeticSet: { avatar: 1, border: 0 },
           cards: [5, 18, 29, 41, 47, 5, 18, 29, 41, 47, 1, 9, 16, 25, 35],
         },
       },
@@ -73,12 +73,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: false,
         deck: {
           name: 'Control Mage',
-          cosmetics: { avatar: 4 },
+          cosmeticSet: { avatar: 4, border: 0 },
           cards: [3, 7, 14, 28, 39, 3, 7, 14, 28, 39, 11, 20, 31, 42, 48],
         },
         opponentDeck: {
           name: 'Arcane Masters',
-          cosmetics: { avatar: 2 },
+          cosmeticSet: { avatar: 2, border: 0 },
           cards: [6, 13, 24, 36, 49, 6, 13, 24, 36, 49, 4, 10, 17, 30, 44],
         },
       },
@@ -93,12 +93,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: false,
         deck: {
           name: 'Forest Spirits',
-          cosmetics: { avatar: 0 },
+          cosmeticSet: { avatar: 0, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: "Nature's Wrath",
-          cosmetics: { avatar: 5 },
+          cosmeticSet: { avatar: 5, border: 1 },
           cards: [7, 15, 23, 34, 45, 7, 15, 23, 34, 45, 2, 9, 19, 28, 40],
         },
       },
@@ -113,12 +113,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: true,
         deck: {
           name: 'Dark Arts',
-          cosmetics: { avatar: 2 },
+          cosmeticSet: { avatar: 2, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Shadow Legion',
-          cosmetics: { avatar: 3 },
+          cosmeticSet: { avatar: 3, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -133,12 +133,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: false,
         deck: {
           name: 'Holy Knights',
-          cosmetics: { avatar: 5 },
+          cosmeticSet: { avatar: 5, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Divine Order',
-          cosmetics: { avatar: 4 },
+          cosmeticSet: { avatar: 4, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -153,12 +153,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: true,
         deck: {
           name: 'Thunder Lords',
-          cosmetics: { avatar: 1 },
+          cosmeticSet: { avatar: 1, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Lightning Strike',
-          cosmetics: { avatar: 0 },
+          cosmeticSet: { avatar: 0, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -173,12 +173,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: false,
         deck: {
           name: 'Ice Kingdom',
-          cosmetics: { avatar: 2 },
+          cosmeticSet: { avatar: 2, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Frozen Throne',
-          cosmetics: { avatar: 4 },
+          cosmeticSet: { avatar: 4, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -193,12 +193,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: true,
         deck: {
           name: 'Inferno',
-          cosmetics: { avatar: 3 },
+          cosmeticSet: { avatar: 3, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Flame Legion',
-          cosmetics: { avatar: 1 },
+          cosmeticSet: { avatar: 1, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -213,12 +213,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: false,
         deck: {
           name: 'Stone Guard',
-          cosmetics: { avatar: 5 },
+          cosmeticSet: { avatar: 5, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Mountain Kings',
-          cosmetics: { avatar: 2 },
+          cosmeticSet: { avatar: 2, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -233,12 +233,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: true,
         deck: {
           name: 'Storm Riders',
-          cosmetics: { avatar: 0 },
+          cosmeticSet: { avatar: 0, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Aerial Force',
-          cosmetics: { avatar: 3 },
+          cosmeticSet: { avatar: 3, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -253,12 +253,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: false,
         deck: {
           name: 'Dark Matter',
-          cosmetics: { avatar: 4 },
+          cosmeticSet: { avatar: 4, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Void Walkers',
-          cosmetics: { avatar: 1 },
+          cosmeticSet: { avatar: 1, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -273,12 +273,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: true,
         deck: {
           name: 'Chronos',
-          cosmetics: { avatar: 2 },
+          cosmeticSet: { avatar: 2, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Time Weavers',
-          cosmetics: { avatar: 5 },
+          cosmeticSet: { avatar: 5, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -293,12 +293,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: true,
         deck: {
           name: 'Psychic Force',
-          cosmetics: { avatar: 1 },
+          cosmeticSet: { avatar: 1, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Mind Flayers',
-          cosmetics: { avatar: 3 },
+          cosmeticSet: { avatar: 3, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -313,12 +313,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: false,
         deck: {
           name: 'Wild Pack',
-          cosmetics: { avatar: 4 },
+          cosmeticSet: { avatar: 4, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Feral Kings',
-          cosmetics: { avatar: 2 },
+          cosmeticSet: { avatar: 2, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -333,12 +333,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: true,
         deck: {
           name: 'Spirit Guard',
-          cosmetics: { avatar: 3 },
+          cosmeticSet: { avatar: 3, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Soul Collectors',
-          cosmetics: { avatar: 0 },
+          cosmeticSet: { avatar: 0, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -353,12 +353,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: false,
         deck: {
           name: 'Crimson Order',
-          cosmetics: { avatar: 5 },
+          cosmeticSet: { avatar: 5, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Blood Legion',
-          cosmetics: { avatar: 4 },
+          cosmeticSet: { avatar: 4, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -373,12 +373,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: true,
         deck: {
           name: 'Celestial Guard',
-          cosmetics: { avatar: 2 },
+          cosmeticSet: { avatar: 2, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Star Walkers',
-          cosmetics: { avatar: 1 },
+          cosmeticSet: { avatar: 1, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -393,12 +393,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: false,
         deck: {
           name: 'Dream Warriors',
-          cosmetics: { avatar: 0 },
+          cosmeticSet: { avatar: 0, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Nightmare Legion',
-          cosmetics: { avatar: 3 },
+          cosmeticSet: { avatar: 3, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -413,12 +413,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: true,
         deck: {
           name: 'Thunder Guard',
-          cosmetics: { avatar: 4 },
+          cosmeticSet: { avatar: 4, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Lightning Lords',
-          cosmetics: { avatar: 2 },
+          cosmeticSet: { avatar: 2, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -433,12 +433,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: false,
         deck: {
           name: 'Ice Maidens',
-          cosmetics: { avatar: 1 },
+          cosmeticSet: { avatar: 1, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
         opponentDeck: {
           name: 'Frozen Guard',
-          cosmetics: { avatar: 5 },
+          cosmeticSet: { avatar: 5, border: 0 },
           cards: [8, 16, 25, 37, 46, 8, 16, 25, 37, 46, 3, 11, 21, 32, 43],
         },
       },
@@ -453,12 +453,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         wasWin: true,
         deck: {
           name: 'Dark Empire',
-          cosmetics: { avatar: 3 },
+          cosmeticSet: { avatar: 3, border: 0 },
           cards: [4, 12, 22, 31, 44, 4, 12, 22, 31, 44, 6, 13, 24, 35, 47],
         },
         opponentDeck: {
           name: 'Shadow Warriors',
-          cosmetics: { avatar: 0 },
+          cosmeticSet: { avatar: 0, border: 0 },
           cards: [5, 14, 26, 2, 48, 5, 14, 26, 2, 48, 1, 10, 20, 33, 49],
         },
       },
@@ -612,6 +612,10 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     let sizer = this.rexUI.add.sizer({
       orientation: 'vertical',
       width: width,
+      space: {
+        top: Space.pad / 2,
+        bottom: Space.pad / 2,
+      },
     })
 
     // The sizer when row is collapsed
@@ -643,6 +647,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     new Buttons.Avatar({
       within: oppContainer,
       avatarId: entry.opponentDeck.cosmeticSet.avatar,
+      border: entry.opponentDeck.cosmeticSet.border,
       origin: [1, 0.5],
     })
     const oppText = this.add
@@ -664,6 +669,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     new Buttons.Avatar({
       within: userContainer,
       avatarId: entry.deck.cosmeticSet.avatar,
+      border: entry.deck.cosmeticSet.border,
       origin: [1, 0.5],
     })
     const userText = this.add

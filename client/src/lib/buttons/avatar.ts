@@ -42,11 +42,10 @@ export default class AvatarButton extends Button {
     this.name = name
 
     // Make the border
-    // TODO More has to be done such as setting origin to support professed options
     this.border = this.scene.add.image(x, y, `border-${borderNames[border]}`)
     within.add(this.border)
 
-    this.icon.setOrigin(...origin)
+    this.setOrigin(...origin)
 
     if (emotive) {
       this.setEmotive()
@@ -80,6 +79,13 @@ export default class AvatarButton extends Button {
       // TODO Use emoting number
       this.doEmote()()
     }
+
+    return this
+  }
+
+  setOrigin(...args): Button {
+    super.setOrigin(...args)
+    this.border.setOrigin(...args)
 
     return this
   }
