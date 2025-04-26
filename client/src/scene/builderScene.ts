@@ -11,6 +11,7 @@ import JourneyRegion from './builderRegions/journey'
 import { Space } from '../settings/settings'
 import { DecklistSettings } from '../../../shared/settings'
 import Catalog from '../../../shared/state/catalog'
+import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 
 // Features common between all builders
 export class BuilderBase extends BaseScene {
@@ -47,8 +48,8 @@ export class BuilderBase extends BaseScene {
   }
 
   // Change the displayed avatar to the given avatar
-  setAvatar(id: number) {
-    this.deckRegion.setAvatar(id)
+  setCosmeticSet(set: CosmeticSet) {
+    this.deckRegion.setCosmeticSet(set)
 
     return this
   }
@@ -203,8 +204,12 @@ export class BuilderScene extends BuilderBase {
     return result
   }
 
-  updateSavedDeck(deck?: number[], name?: string, avatar?: number): void {
-    this.decklistsRegion.updateSavedDeck(deck, name, avatar)
+  updateSavedDeck(
+    deck?: number[],
+    name?: string,
+    cosmeticSet?: CosmeticSet,
+  ): void {
+    this.decklistsRegion.updateSavedDeck(deck, name, cosmeticSet)
   }
 
   beforeExit(): void {
@@ -254,20 +259,20 @@ export class BuilderScene extends BuilderBase {
   // Update the avatar or name for the current deck
   private updateDeckCallback(): (
     name: string,
-    avatar: number,
+    cosmeticSet: CosmeticSet,
     deckCode: number[],
   ) => void {
-    return (name: string, avatar: number, deckCode: number[]) => {
+    return (name: string, cosmeticSet: CosmeticSet, deckCode: number[]) => {
       // Use a default deck name if it's not specified
       if (name === undefined || name === '') {
         const number = this.decklistsRegion.savedDeckIndex + 1
         name = `Deck ${number}`
       }
 
-      this.updateSavedDeck(undefined, name, avatar)
+      this.updateSavedDeck(undefined, name, cosmeticSet)
 
       // Update the avatar
-      this.setAvatar(avatar)
+      this.setCosmeticSet(cosmeticSet)
 
       // Update the name
       this.setName(name)

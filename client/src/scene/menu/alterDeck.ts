@@ -14,6 +14,7 @@ import {
   DecklistSettings,
   MechanicsSettings,
 } from '../../../../shared/settings'
+import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 
 const width = 500
 const inputTextWidth = 200
@@ -66,7 +67,11 @@ class AlterDeckMenu extends Menu {
   }
 
   private createContent(
-    createCallback: (name: string, avatar: number, deckCode: number[]) => void,
+    createCallback: (
+      name: string,
+      cosmeticSet: CosmeticSet,
+      deckCode: number[],
+    ) => void,
   ) {
     this.createHeader(this.titleString, width)
 
@@ -152,10 +157,16 @@ class AlterDeckMenu extends Menu {
         fixSizer.add(sizer)
       }
 
-      let name = avatarNames[i]
+      const container = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        Space.avatarSize,
+        Space.avatarSize,
+      )
       let avatar = new Buttons.Avatar({
-        within: sizer,
-        name,
+        within: container,
+        avatarId: i,
         f: () => {
           // Deselect all avatars, then select this one, remember which is selected
           avatars.forEach((a) => a.deselect())
@@ -164,6 +175,7 @@ class AlterDeckMenu extends Menu {
           this.selectedAvatar = i
         },
       })
+      sizer.add(container)
       avatars.push(avatar)
 
       // Select the right avatar
@@ -221,7 +233,11 @@ class AlterDeckMenu extends Menu {
 
   // Create the buttons at the bottom which navigate to other scenes/menus
   private createButtons(
-    createCallback: (name: string, avatar: number, deckCode: number[]) => void,
+    createCallback: (
+      name: string,
+      cosmeticSet: CosmeticSet,
+      deckCode: number[],
+    ) => void,
   ) {
     let sizer = this.scene.rexUI.add.sizer({
       width: width - Space.pad * 2,
@@ -236,7 +252,11 @@ class AlterDeckMenu extends Menu {
   }
 
   private createConfirm(
-    createCallback: (name: string, avatar: number, deckCode: number[]) => void,
+    createCallback: (
+      name: string,
+      cosmeticSet: CosmeticSet,
+      deckCode: number[],
+    ) => void,
   ) {
     let container = new ContainerLite(
       this.scene,
@@ -250,7 +270,12 @@ class AlterDeckMenu extends Menu {
       within: container,
       text: this.confirmString,
       f: () => {
-        createCallback(this.name, this.selectedAvatar, this.deckCode)
+        // TODO border
+        const cosmeticSet: CosmeticSet = {
+          avatar: this.selectedAvatar,
+          border: 0,
+        }
+        createCallback(this.name, cosmeticSet, this.deckCode)
 
         // Close this scene
         this.scene.scene.stop()

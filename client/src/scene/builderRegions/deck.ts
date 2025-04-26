@@ -24,6 +24,7 @@ import { MechanicsSettings } from '../../../../shared/settings'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
 import AvatarButton from '../../lib/buttons/avatar'
+import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 
 const width = Space.deckPanelWidth // + Space.pad * 2
 
@@ -36,7 +37,11 @@ export default class DeckRegion {
   private scene: BuilderScene
 
   // Callback for when the deck's avatar or name is edited
-  editCallback: (name: string, avatar: number, deckCode: number[]) => void
+  editCallback: (
+    name: string,
+    cosmeticSet: CosmeticSet,
+    deckCode: number[],
+  ) => void
 
   // The panel within which all of the cards are
   private scrollablePanel: ScrollablePanel
@@ -60,7 +65,11 @@ export default class DeckRegion {
   create(
     scene: BuilderScene,
     startCallback: () => void,
-    editCallback?: (name: string, avatar: number, deckCode: number[]) => void,
+    editCallback?: (
+      name: string,
+      cosmeticSet: CosmeticSet,
+      deckCode: number[],
+    ) => void,
   ) {
     this.scene = scene
 
@@ -379,13 +388,12 @@ export default class DeckRegion {
     return true
   }
 
-  setAvatar(id: number): DeckRegion {
-    // TODO Require all decks to have an avatar
-    id = id === undefined ? 0 : id
+  setCosmeticSet(set: CosmeticSet): DeckRegion {
+    set = set === undefined ? { avatar: 0, border: 0 } : set
 
-    this.avatarNumber = id
+    this.avatarNumber = set.avatar
 
-    this.avatar.setAvatar(id).enable()
+    this.avatar.setAvatar(set.avatar).setBorder(set.border).enable()
 
     return this
   }
@@ -399,7 +407,7 @@ export default class DeckRegion {
   // Set the deck's to be the given premade deck
   setPremade(id: number): DeckRegion {
     this.txtDeckName.setText(`${avatarNames[id]} Premade`)
-    this.setAvatar(id)
+    this.setCosmeticSet({ avatar: id, border: 0 })
     this.setDeck(premadeDecklists[id].map((id) => Catalog.getCardById(id)))
 
     // Disable cards from being removed from the deck

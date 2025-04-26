@@ -18,13 +18,13 @@ import avatarNames from '../../lib/avatarNames'
 import premadeDecklists from '../../catalog/premadeDecklists'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
-import { BuilderBase } from '../builderScene'
-
+import { BuilderBase, BuilderScene } from '../builderScene'
+import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 const width = Space.decklistPanelWidth
 
 // Region of the deck builder which contains all the decklists
 export default class DecklistsRegion {
-  scene
+  scene: BuilderScene
   container: ContainerLite
 
   scrollablePanel: ScrollablePanel
@@ -43,7 +43,7 @@ export default class DecklistsRegion {
   avatar: Phaser.GameObjects.Image
 
   // Create the are where player can manipulate their decks
-  create(scene) {
+  create(scene: BuilderScene) {
     this.scene = scene
     this.container = new ContainerLite(scene)
 
@@ -55,22 +55,24 @@ export default class DecklistsRegion {
   }
 
   // Update the currently selected deck
-  updateSavedDeck(cards?: number[], name?: string, avatar?: number): void {
+  updateSavedDeck(
+    cards?: number[],
+    name?: string,
+    cosmeticSet?: CosmeticSet,
+  ): void {
     let index = this.savedDeckIndex
     if (index !== undefined) {
       let deck: Deck = UserSettings._get('decks')[index]
 
       cards = cards === undefined ? deck.cards : cards
       name = name === undefined ? deck.name : name
-      avatar = avatar === undefined ? deck.cosmeticSet.avatar : avatar
+      cosmeticSet =
+        cosmeticSet === undefined ? { avatar: 0, border: 0 } : cosmeticSet
 
       let newDeck: Deck = {
         name: name,
         cards: cards,
-        cosmeticSet: {
-          avatar: avatar,
-          border: 0,
-        },
+        cosmeticSet,
       }
 
       UserSettings._setIndex('decks', index, newDeck)
@@ -91,7 +93,11 @@ export default class DecklistsRegion {
   }
 
   // Create a deck and select it
-  private createDeck(name: string, avatar: number, deckCode: number[]): void {
+  private createDeck(
+    name: string,
+    cosmeticSet: CosmeticSet,
+    deckCode: number[],
+  ): void {
     // Use a default deck name if it's not specified
     if (name === undefined || name === '') {
       const number = this.decklistBtns.length + 1
@@ -102,9 +108,7 @@ export default class DecklistsRegion {
     UserSettings._push('decks', {
       name: name,
       cards: deckCode,
-      cosmetics: {
-        avatar: avatar === undefined ? Math.floor(Math.random() * 6) : avatar,
-      },
+      cosmeticSet,
     })
 
     // Create a new button
@@ -129,9 +133,13 @@ export default class DecklistsRegion {
   }
 
   // Return a callback for when a deck is created
-  createCallback(): (name: string, avatar: number, deck: number[]) => void {
-    return (name: string, avatar: number, deck: number[]) => {
-      this.createDeck(name, avatar, deck)
+  createCallback(): (
+    name: string,
+    cosmeticSet: CosmeticSet,
+    deck: number[],
+  ) => void {
+    return (name: string, cosmeticSet: CosmeticSet, deck: number[]) => {
+      this.createDeck(name, cosmeticSet, deck)
     }
   }
 
@@ -141,8 +149,12 @@ export default class DecklistsRegion {
       // Get premade deck details from scene
       const name = `${avatarNames[id]} Premade`
       const deck = premadeDecklists[id]
+      const cosmeticSet: CosmeticSet = {
+        avatar: id,
+        border: 0,
+      }
 
-      this.createDeck(name, id, deck)
+      this.createDeck(name, cosmeticSet, deck)
     }
   }
 
@@ -391,7 +403,7 @@ export default class DecklistsRegion {
         this.scene.setDeck(deck.cards.map((id) => Catalog.getCardById(id)))
 
         // Set the displayed avatar to this deck's avatar
-        this.scene.setAvatar(deck.cosmeticSet.avatar).setName(deck.name)
+        this.scene.setCosmeticSet(deck.cosmeticSet).setName(deck.name)
       }
     }
   }
