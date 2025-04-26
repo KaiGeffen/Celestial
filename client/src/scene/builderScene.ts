@@ -127,10 +127,7 @@ export class AdventureBuilderScene extends BuilderBase {
       const aiDeck: Deck = {
         name: 'AI Deck',
         cards: this.params.opponent,
-        cosmeticSet: {
-          avatar: 0,
-          border: 0,
-        },
+        cosmeticSet: this.deckRegion.cosmeticSet,
       }
 
       // Start a match against an ai opponent with the specified deck
@@ -251,7 +248,7 @@ export class BuilderScene extends BuilderBase {
         menu: 'mode',
         activeScene: this,
         deck: this.deckRegion.getDeck(),
-        avatar: this.deckRegion.avatarNumber,
+        cosmeticSet: this.deckRegion.cosmeticSet,
       })
     }
   }

@@ -54,7 +54,7 @@ export default class DeckRegion {
   private deck: Cutout[] = []
 
   // The avatar button
-  avatarNumber: number
+  cosmeticSet: CosmeticSet
   private avatar: AvatarButton
   private txtDeckName: RexUIPlugin.BBCodeText
 
@@ -354,10 +354,7 @@ export default class DeckRegion {
       cards: this.deck.reduce((acc, cutout) => {
         return [...acc, ...Array(cutout.count).fill(cutout.card.id)]
       }, [] as number[]),
-      cosmeticSet: {
-        avatar: this.avatarNumber,
-        border: 0,
-      },
+      cosmeticSet: this.cosmeticSet,
     }
   }
 
@@ -391,7 +388,7 @@ export default class DeckRegion {
   setCosmeticSet(set: CosmeticSet): DeckRegion {
     set = set === undefined ? { avatar: 0, border: 0 } : set
 
-    this.avatarNumber = set.avatar
+    this.cosmeticSet = set
 
     this.avatar.setAvatar(set.avatar).setBorder(set.border).enable()
 
@@ -519,7 +516,7 @@ export default class DeckRegion {
         menu: 'editDeck',
         callback: this.editCallback,
         deckName: this.txtDeckName.text,
-        selectedAvatar: this.avatarNumber,
+        cosmeticSet: this.cosmeticSet,
       })
     }
   }
