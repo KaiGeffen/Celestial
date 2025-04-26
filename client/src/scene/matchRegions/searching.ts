@@ -73,7 +73,6 @@ export default class SearchingRegion extends Region {
     // Change the text and have it flash, then hide this region
     this.txtTitle.setText('Opponent found')
     this.scene.playSound('match found')
-    // this.mysteryAvatar.setTexture(`avatar-${avatarNames[state.avatars[1]]}Full`)
 
     this.scene.tweens.add({
       targets: this.txtTitle,

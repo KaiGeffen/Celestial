@@ -6,6 +6,7 @@ import { Color, Depth, Space, Style } from '../../settings/settings'
 import Region from './baseRegion'
 import { GameScene } from '../gameScene'
 import { UserSettings } from '../../settings/userSettings'
+import AvatarButton from '../../lib/buttons/avatar'
 
 const width = Space.avatarSize + Space.pad * 2
 const height = 270
@@ -16,7 +17,7 @@ export default class OurAvatarRegion extends Region {
   btnSight: Button
   btnDeck: Button
   btnDiscard: Button
-  avatar: Button
+  avatar: AvatarButton
 
   create(scene: GameScene): this {
     this.scene = scene
@@ -36,7 +37,8 @@ export default class OurAvatarRegion extends Region {
 
   displayState(state: GameModel): void {
     // Avatar
-    this.avatar.setQuality({ num: state.avatars[0] })
+    this.avatar.setAvatar(state.cosmeticSets[0].avatar)
+    this.avatar.setBorder(state.cosmeticSets[0].border)
 
     // Statuses
     this.btnInspire
@@ -116,10 +118,6 @@ export default class OurAvatarRegion extends Region {
       y,
       emotive: true,
     })
-
-    // TODO Make Avatar be separate from border and take a config including cosmetics
-    const border = this.scene.add.image(x, y, 'border-Thorns')
-    this.container.add(border)
   }
 
   private createStatusDisplay(): void {

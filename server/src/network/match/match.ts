@@ -44,8 +44,8 @@ class Match implements Match {
     this.game = new ServerController(
       deck1.cards.map((cardId) => Catalog.getCardById(cardId)),
       deck2.cards.map((cardId) => Catalog.getCardById(cardId)),
-      deck1.cosmeticSet.avatar,
-      deck2.cosmeticSet.avatar,
+      deck1.cosmeticSet,
+      deck2.cosmeticSet,
     )
     this.game.start()
   }

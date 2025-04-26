@@ -7,6 +7,7 @@ import { Zone } from './zone'
 import { Statuses } from './status'
 import { MechanicsSettings } from '../settings'
 import { SoundEffect } from './soundEffect'
+import { CosmeticSet } from '../types/cosmeticSet'
 
 export default class GameModel {
   // Zones
@@ -64,13 +65,13 @@ export default class GameModel {
   // Other (For weird cards)
   amtPasses: number[] = [0, 0]
   amtDrawn: number[] = [0, 0]
-  avatars: Avatar[]
+  cosmeticSets: CosmeticSet[]
 
   constructor(
     deck1: Card[],
     deck2: Card[],
-    avatar1: Avatar,
-    avatar2: Avatar,
+    cosmeticSet1: CosmeticSet,
+    cosmeticSet2: CosmeticSet,
     // Shuffle the deck
     shuffle = true,
   ) {
@@ -80,7 +81,7 @@ export default class GameModel {
         this.shuffle(p, false)
       }
     }
-    this.avatars = [avatar1, avatar2]
+    this.cosmeticSets = [cosmeticSet1, cosmeticSet2]
 
     // Starting priority is random
     this.priority = Math.floor(Math.random() * 2)
@@ -113,7 +114,19 @@ export default class GameModel {
 
   // Return a full deepcopy of this object
   getDeepCopy(): GameModel {
-    const copy = new GameModel([], [], this.avatars[0], this.avatars[1], false)
+    const copy = new GameModel(
+      [],
+      [],
+      {
+        avatar: this.cosmeticSets[0].avatar,
+        border: this.cosmeticSets[0].border,
+      },
+      {
+        avatar: this.cosmeticSets[1].avatar,
+        border: this.cosmeticSets[1].border,
+      },
+      false,
+    )
 
     copy.hand = this.hand.map((hand) => [...hand])
     copy.deck = this.deck.map((deck) => [...deck])
@@ -142,7 +155,8 @@ export default class GameModel {
     copy.cardCosts = [...this.cardCosts]
     copy.amtPasses = [...this.amtPasses]
     copy.amtDrawn = [...this.amtDrawn]
-    copy.avatars = [...this.avatars]
+    // Unnecessary since a new own gets init above, but left in for clarity
+    // copy.avatars = [...this.avatars]
     copy.roundCount = this.roundCount
     copy.timers = [...this.timers]
     return copy

@@ -153,7 +153,13 @@ class TutorialController extends ServerController {
       ai_deck = o_decks[num]
     }
 
-    super(player_deck, ai_deck, 0, 0, false)
+    super(
+      player_deck,
+      ai_deck,
+      { avatar: 0, border: 0 },
+      { avatar: 0, border: 0 },
+      false,
+    )
 
     this.model.priority = 0
     this.model.wins[0] = 2

@@ -14,6 +14,7 @@ import {
 import Region from './baseRegion'
 import { GameScene } from '../gameScene'
 import CardLocation from './cardLocation'
+import AvatarButton from '../../lib/buttons/avatar'
 
 const width = Space.avatarSize + Space.pad * 2
 const height = 270
@@ -25,7 +26,7 @@ export default class TheirAvatarRegion extends Region {
   btnDeck: Button
   btnDiscard: Button
 
-  avatar: Button
+  avatar: AvatarButton
 
   create(scene: GameScene): this {
     this.scene = scene
@@ -43,7 +44,8 @@ export default class TheirAvatarRegion extends Region {
 
   displayState(state: GameModel): void {
     // Avatar
-    this.avatar.setQuality({ num: state.avatars[1] })
+    this.avatar.setAvatar(state.cosmeticSets[1].avatar)
+    this.avatar.setBorder(state.cosmeticSets[1].border)
 
     // Statuses
     this.btnInspire
@@ -129,10 +131,6 @@ export default class TheirAvatarRegion extends Region {
       x,
       y,
     })
-
-    // TODO Make Avatar be separate from border and take a config including cosmetics
-    const border = this.scene.add.image(x, y, 'border-Thorns')
-    this.container.add(border)
   }
 
   private createStatusDisplay(): void {

@@ -5,6 +5,7 @@ import { SoundEffect } from '../../shared/state/soundEffect'
 import { Animation } from '../../shared/animation'
 import { Zone } from '../../shared/state/zone'
 import { MechanicsSettings, Mulligan } from '../../shared/settings'
+import { CosmeticSet } from '../../shared/types/cosmeticSet'
 
 class ServerController {
   model: GameModel
@@ -12,11 +13,17 @@ class ServerController {
   constructor(
     deck1: Card[],
     deck2: Card[],
-    avatar1: number,
-    avatar2: number,
+    cosmeticSet1: CosmeticSet,
+    cosmeticSet2: CosmeticSet,
     shuffle: boolean = true,
   ) {
-    this.model = new GameModel(deck1, deck2, avatar1, avatar2, shuffle)
+    this.model = new GameModel(
+      deck1,
+      deck2,
+      cosmeticSet1,
+      cosmeticSet2,
+      shuffle,
+    )
   }
 
   start(): void {

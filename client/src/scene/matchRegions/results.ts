@@ -84,8 +84,8 @@ export default class ResultsRegion extends Region {
     }
 
     // Avatars
-    const av1 = avatarNames[state.avatars[0]]
-    const av2 = avatarNames[state.avatars[1]]
+    const av1 = avatarNames[state.cosmeticSets[0].avatar]
+    const av2 = avatarNames[state.cosmeticSets[1].avatar]
     this.ourAvatar.setTexture(`avatar-${av1}Full`)
     this.theirAvatar.setTexture(`avatar-${av2}Full`)
 
