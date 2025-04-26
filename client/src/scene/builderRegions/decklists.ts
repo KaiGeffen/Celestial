@@ -66,8 +66,17 @@ export default class DecklistsRegion {
 
       cards = cards === undefined ? deck.cards : cards
       name = name === undefined ? deck.name : name
-      cosmeticSet =
-        cosmeticSet === undefined ? { avatar: 0, border: 0 } : cosmeticSet
+      if (cosmeticSet === undefined) {
+        // NOTE This just deals with backwards compatability
+        if (deck.cosmeticSet !== undefined) {
+          cosmeticSet = deck.cosmeticSet
+        } else {
+          cosmeticSet = {
+            avatar: 0,
+            border: 0,
+          }
+        }
+      }
 
       let newDeck: Deck = {
         name: name,
