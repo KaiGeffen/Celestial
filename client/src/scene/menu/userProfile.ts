@@ -15,56 +15,68 @@ export default class UserProfileMenu extends Menu {
   private currentAvatar: AvatarButton
 
   constructor(scene: MenuScene, params) {
-    super(scene, Space.windowWidth / 2)
+    super(scene, 800)
     this.createContent()
     this.layout()
   }
 
   private createContent() {
     // Create header
-    this.createHeader('Profile', this.width)
+    this.createHeader('Profile')
 
-    // Create main container for two columns
-    const mainSizer = this.scene.rexUI.add.sizer({
-      orientation: 'horizontal',
-      space: { item: Space.pad * 2 },
-    })
+    this.createLeftColumn()
+    this.createRightColumn()
+  }
 
-    // Left column - current selections and controls
-    const leftSizer = this.scene.rexUI.add.sizer({
+  // Left column - current selections and controls
+  private createLeftColumn() {
+    const sizer = this.scene.rexUI.add.sizer({
       orientation: 'vertical',
-      space: { item: Space.pad },
-      x: 0, // Remove left padding
+      space: {
+        item: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+      },
     })
+
+    // Add background
+    sizer.addBackground(
+      this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
+    )
 
     // Current avatar display
-    this.currentAvatarContainer = new ContainerLite(this.scene, 0, 0)
+    this.currentAvatarContainer = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.avatarSize,
+      Space.avatarSize,
+    )
     this.currentAvatar = new Buttons.Avatar({
       within: this.currentAvatarContainer,
+      // TODO Get current account avatar
       name: 'Jules',
-      f: () => {},
     })
-
-    // Create a container for avatar and text to ensure proper spacing
-    const avatarAndTextSizer = this.scene.rexUI.add.sizer({
-      orientation: 'vertical',
-      space: { item: Space.pad },
-    })
-
-    avatarAndTextSizer.add(this.currentAvatarContainer)
+    sizer.add(this.currentAvatarContainer)
 
     // Profile info
     const userData = UserDataServer.getUserData()
-    const username = userData.username || 'Guest'
-    const elo = userData.elo || 1000
-
-    const txtUsername = this.scene.add.text(0, 0, username, Style.announcement)
-    const txtElo = this.scene.add.text(0, 0, elo.toString(), Style.basic)
-
-    avatarAndTextSizer.add(txtUsername)
-    avatarAndTextSizer.add(txtElo)
-
-    leftSizer.add(avatarAndTextSizer)
+    const txtUsername = this.scene.add.text(
+      0,
+      0,
+      userData.username,
+      Style.announcement,
+    )
+    const txtElo = this.scene.add.text(
+      0,
+      0,
+      userData.elo.toString(),
+      Style.basic,
+    )
+    sizer.add(txtUsername)
+    sizer.add(txtElo)
 
     // Tab buttons
     ;['Icon', 'Border', 'Relic'].forEach((tab) => {
@@ -87,7 +99,7 @@ export default class UserProfileMenu extends Menu {
         button.select()
       }
 
-      leftSizer.add(container)
+      sizer.add(container)
     })
 
     // Logout button
@@ -113,18 +125,24 @@ export default class UserProfileMenu extends Menu {
       },
       muteClick: true,
     })
-    leftSizer.add(logoutContainer)
+    sizer.add(logoutContainer)
 
-    // Right column - grid of choices
-    const rightSizer = this.scene.rexUI.add.sizer({
-      orientation: 'vertical',
-      space: { item: Space.pad },
-    })
+    this.sizer.add(sizer)
+  }
 
-    const gridSizer = this.scene.rexUI.add.gridSizer({
+  // Right column - grid of choices
+  private createRightColumn() {
+    const sizer = this.scene.rexUI.add.gridSizer({
       column: 3,
       row: 2,
-      space: { column: Space.pad, row: Space.pad },
+      space: {
+        column: Space.pad,
+        row: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+      },
     })
 
     // Add placeholder cosmetic items
@@ -136,22 +154,15 @@ export default class UserProfileMenu extends Menu {
         Space.avatarSize,
         Space.avatarSize,
       )
-      const button = new Buttons.Avatar({
+      new Buttons.Avatar({
         within: container,
         avatarId: i,
         f: () => this.currentAvatar.setQuality({ num: i }),
       })
-      gridSizer.add(container, i % 3, Math.floor(i / 3))
+      sizer.add(container, i % 3, Math.floor(i / 3))
     }
 
-    rightSizer.add(gridSizer)
-
-    // Add columns to main sizer
-    mainSizer.add(leftSizer)
-    mainSizer.add(rightSizer)
-
-    // Add main sizer to menu
-    this.sizer.add(mainSizer)
+    this.sizer.add(sizer)
   }
 
   private switchTab(tab: string) {
