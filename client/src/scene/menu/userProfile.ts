@@ -8,14 +8,13 @@ import UserDataServer from '../../network/userDataServer'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import AvatarButton from '../../lib/buttons/avatar'
 import BaseScene from '../baseScene'
+import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
 
 export default class UserProfileMenu extends Menu {
+  // TODO Refactor to remove this
   private currentTab: string = 'Icon'
-  private tabButtons: { [key: string]: Button } = {}
-  private currentAvatarContainer: ContainerLite
   private currentAvatar: AvatarButton
-  private currentBorder: Phaser.GameObjects.Image
-  private gridSizer: any // Store reference to grid sizer
+  private gridSizer: GridSizer // Store reference to grid sizer
 
   // The home scene, which is closed when logging out
   private activeScene: BaseScene
@@ -62,7 +61,7 @@ export default class UserProfileMenu extends Menu {
     )
 
     // Current avatar display
-    this.currentAvatarContainer = new ContainerLite(
+    const container = new ContainerLite(
       this.scene,
       0,
       0,
@@ -70,21 +69,11 @@ export default class UserProfileMenu extends Menu {
       Space.avatarSize,
     )
     this.currentAvatar = new Buttons.Avatar({
-      within: this.currentAvatarContainer,
+      within: container,
       // TODO Get current account avatar
       name: 'Jules',
     })
-
-    // Add border
-    this.currentBorder = this.scene.add.image(
-      Space.avatarSize / 2,
-      Space.avatarSize / 2,
-      'border-Thorns',
-    )
-    this.currentAvatarContainer.add(this.currentBorder)
-    this.currentBorder.setVisible(false) // Start with no border
-
-    sizer.add(this.currentAvatarContainer)
+    sizer.add(container)
 
     // Profile info
     const userData = UserDataServer.getUserData()
@@ -126,13 +115,11 @@ export default class UserProfileMenu extends Menu {
       const button = new Buttons.Basic({
         within: container,
         text: tab,
-        f: () => this.switchTab(tab),
+        f: () => {
+          this.currentTab = tab
+          this.updateGridContent()
+        },
       })
-
-      this.tabButtons[tab] = button
-      if (tab === this.currentTab) {
-        button.select()
-      }
 
       sizer.add(container)
     })
@@ -254,12 +241,5 @@ export default class UserProfileMenu extends Menu {
 
       this.gridSizer.add(container, i % 3, Math.floor(i / 3))
     }
-  }
-
-  private switchTab(tab: string) {
-    this.tabButtons[this.currentTab]?.deselect()
-    this.currentTab = tab
-    this.tabButtons[tab]?.select()
-    this.updateGridContent()
   }
 }
