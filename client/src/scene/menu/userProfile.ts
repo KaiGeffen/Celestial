@@ -182,6 +182,8 @@ export default class UserProfileMenu extends Menu {
     this.gridSizer = this.scene.rexUI.add.gridSizer({
       column: 3,
       row: 2,
+      width: Space.avatarSize * 3 + Space.pad * 4,
+      height: 600,
       space: {
         column: Space.pad,
         row: Space.pad,
@@ -242,7 +244,7 @@ export default class UserProfileMenu extends Menu {
         Space.avatarSize,
       )
 
-      // Create avatar with current icon
+      // Create avatar with current border
       const avatar = new Buttons.Avatar({
         within: container,
         name: this.currentAvatar.name,
