@@ -84,7 +84,9 @@ export class CardImage {
       })
     }
 
-    // NOTE Just for beta cards
+    // TODO After the new round of cards is released, remove the beta check and use the texture check
+    // If the card image doesn't exist, use a default image
+    // if (!this.scene.textures.exists(`card-${this.card.name}`)) {
     if (this.card.beta) {
       const name = this.scene.add
         .text(0, -Space.cardHeight / 2, this.card.name, Style.todoBetaCardName)
