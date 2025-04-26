@@ -4,14 +4,19 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import avatarNames from '../../lib/avatarNames'
 import { Color, Time } from '../../settings/settings'
 
+// TODO As this grows move it to another file
+const borderNames = ['None', 'Thorns']
+
 // Used when selected an avatar, when editing an avatar, and in a match
 export default class AvatarButton extends Button {
   name: string
+  border: Phaser.GameObjects.Image
 
   constructor({
     within,
     name = 'Jules',
     avatarId = undefined,
+    border = 0,
     x = 0,
     y = 0,
     f = () => {},
@@ -36,6 +41,11 @@ export default class AvatarButton extends Button {
     })
 
     this.name = name
+
+    // Make the border
+    // TODO More has to be done such as setting origin to support professed options
+    this.border = this.scene.add.image(x, y, `border-${borderNames[border]}`)
+    within.add(this.border)
 
     this.icon.setOrigin(...origin)
 
@@ -89,6 +99,10 @@ export default class AvatarButton extends Button {
     this.selected = false
 
     return this
+  }
+
+  setBorder(border: number): void {
+    this.border.setTexture(`border-${borderNames[border]}`)
   }
 
   timeout: NodeJS.Timeout

@@ -14,8 +14,10 @@ export default class UserProfileMenu extends Menu {
   private tabButtons: { [key: string]: Button } = {}
   private currentAvatarContainer: ContainerLite
   private currentAvatar: AvatarButton
+  private currentBorder: Phaser.GameObjects.Image
+  private gridSizer: any // Store reference to grid sizer
 
-  // The home scene, which is closed when loggiing out
+  // The home scene, which is closed when logging out
   private activeScene: BaseScene
 
   constructor(scene: MenuScene, params: { activeScene: BaseScene }) {
@@ -72,6 +74,16 @@ export default class UserProfileMenu extends Menu {
       // TODO Get current account avatar
       name: 'Jules',
     })
+
+    // Add border
+    this.currentBorder = this.scene.add.image(
+      Space.avatarSize / 2,
+      Space.avatarSize / 2,
+      'border-Thorns',
+    )
+    this.currentAvatarContainer.add(this.currentBorder)
+    this.currentBorder.setVisible(false) // Start with no border
+
     sizer.add(this.currentAvatarContainer)
 
     // Profile info
@@ -114,8 +126,7 @@ export default class UserProfileMenu extends Menu {
       const button = new Buttons.Basic({
         within: container,
         text: tab,
-        f: () => this.scene.signalError('Coming soon!'),
-        // f: () => this.switchTab(tab),
+        f: () => this.switchTab(tab),
       })
 
       this.tabButtons[tab] = button
@@ -168,7 +179,7 @@ export default class UserProfileMenu extends Menu {
 
   // Right column - grid of choices
   private createRightColumn() {
-    const sizer = this.scene.rexUI.add.gridSizer({
+    this.gridSizer = this.scene.rexUI.add.gridSizer({
       column: 3,
       row: 2,
       space: {
@@ -181,6 +192,25 @@ export default class UserProfileMenu extends Menu {
       },
     })
 
+    this.updateGridContent()
+    this.sizer.add(this.gridSizer)
+  }
+
+  private updateGridContent() {
+    // Clear existing content
+    this.gridSizer.removeAll(true)
+
+    if (this.currentTab === 'Icon') {
+      this.createIconGrid()
+    } else if (this.currentTab === 'Border') {
+      this.createBorderGrid()
+    }
+
+    // Force layout update
+    this.gridSizer.layout()
+  }
+
+  private createIconGrid() {
     // Add placeholder cosmetic items
     for (let i = 0; i < 6; i++) {
       const container = new ContainerLite(
@@ -195,16 +225,39 @@ export default class UserProfileMenu extends Menu {
         avatarId: i,
         f: () => this.currentAvatar.setQuality({ num: i }),
       })
-      sizer.add(container, i % 3, Math.floor(i / 3))
+      this.gridSizer.add(container, i % 3, Math.floor(i / 3))
     }
+  }
 
-    this.sizer.add(sizer)
+  private createBorderGrid() {
+    // Add border options (no border and thorn border for now)
+    const borderOptions = ['this is just a length', 'todo']
+
+    for (let i = 0; i < borderOptions.length; i++) {
+      const container = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        Space.avatarSize,
+        Space.avatarSize,
+      )
+
+      // Create avatar with current icon
+      const avatar = new Buttons.Avatar({
+        within: container,
+        name: this.currentAvatar.name,
+        border: i,
+        f: () => this.currentAvatar.setBorder(i),
+      })
+
+      this.gridSizer.add(container, i % 3, Math.floor(i / 3))
+    }
   }
 
   private switchTab(tab: string) {
     this.tabButtons[this.currentTab]?.deselect()
     this.currentTab = tab
     this.tabButtons[tab]?.select()
-    // TODO: Switch grid content based on selected tab
+    this.updateGridContent()
   }
 }
