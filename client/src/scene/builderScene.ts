@@ -126,7 +126,7 @@ export class AdventureBuilderScene extends BuilderBase {
       const aiDeck: Deck = {
         name: 'AI Deck',
         cards: this.params.opponent,
-        cosmetics: {
+        cosmeticSet: {
           avatar: 0,
         },
       }

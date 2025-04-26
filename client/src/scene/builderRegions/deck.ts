@@ -344,8 +344,9 @@ export default class DeckRegion {
       cards: this.deck.reduce((acc, cutout) => {
         return [...acc, ...Array(cutout.count).fill(cutout.card.id)]
       }, [] as number[]),
-      cosmetics: {
+      cosmeticSet: {
         avatar: this.avatarNumber,
+        border: 0,
       },
     }
   }

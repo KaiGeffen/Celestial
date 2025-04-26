@@ -1,5 +1,5 @@
 import { Deck } from '../types/deck'
-
+import { CosmeticSet } from '../types/cosmeticSet'
 export interface UserDataClientMessages {
   sendToken: {
     email: string
@@ -25,6 +25,9 @@ export interface UserDataClientMessages {
   purchaseItem: {
     id: number
   }
+  setCosmetics: {
+    value: CosmeticSet
+  }
 }
 
 export interface UserDataServerMessages {
@@ -41,6 +44,7 @@ export interface UserDataServerMessages {
     coins: number
     lastDailyReward: Date
     ownedItems: number[]
+    cosmeticSet: CosmeticSet
   }
   purchaseItemSuccess: {
     itemId: number

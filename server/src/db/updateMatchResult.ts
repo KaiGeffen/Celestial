@@ -45,8 +45,8 @@ export async function updateMatchResult(
   const username2 = loserData?.username || 'Guest'
 
   // Convert avatar to number before stringifying
-  winnerDeck.cosmetics.avatar = Number(winnerDeck.cosmetics.avatar)
-  loserDeck.cosmetics.avatar = Number(loserDeck.cosmetics.avatar)
+  winnerDeck.cosmeticSet.avatar = Number(winnerDeck.cosmeticSet.avatar)
+  loserDeck.cosmeticSet.avatar = Number(loserDeck.cosmeticSet.avatar)
 
   await db.insert(matchHistory).values({
     player1_id: winnerId,

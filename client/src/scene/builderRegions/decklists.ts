@@ -62,13 +62,14 @@ export default class DecklistsRegion {
 
       cards = cards === undefined ? deck.cards : cards
       name = name === undefined ? deck.name : name
-      avatar = avatar === undefined ? deck.cosmetics.avatar : avatar
+      avatar = avatar === undefined ? deck.cosmeticSet.avatar : avatar
 
       let newDeck: Deck = {
         name: name,
         cards: cards,
-        cosmetics: {
+        cosmeticSet: {
           avatar: avatar,
+          border: 0,
         },
       }
 
@@ -390,7 +391,7 @@ export default class DecklistsRegion {
         this.scene.setDeck(deck.cards.map((id) => Catalog.getCardById(id)))
 
         // Set the displayed avatar to this deck's avatar
-        this.scene.setAvatar(deck.cosmetics.avatar).setName(deck.name)
+        this.scene.setAvatar(deck.cosmeticSet.avatar).setName(deck.name)
       }
     }
   }

@@ -12,6 +12,7 @@ import {
 import type { GoogleJwtPayload } from '../types/google'
 import { UserDataClientWS } from '../../../shared/network/userDataWS'
 import { Deck } from '../../../shared/types/deck'
+import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 
 const ip = '127.0.0.1'
 const port = 5555
@@ -29,6 +30,7 @@ type UserData = null | {
   coins: number
   lastDailyReward: Date
   ownedItems: number[]
+  cosmeticSet: CosmeticSet
 }
 
 export default class UserDataServer {
@@ -126,6 +128,7 @@ export default class UserDataServer {
           coins: number
           lastDailyReward: Date
           ownedItems: number[]
+          cosmeticSet: CosmeticSet
         }) => {
           // Store the uuid and user data after successful login
           this.userData = {
@@ -269,6 +272,10 @@ export default class UserDataServer {
         coins: null,
         lastDailyReward: null,
         ownedItems: [],
+        cosmeticSet: {
+          avatar: 0,
+          border: 0,
+        },
       }
     } else {
       return this.userData

@@ -1,13 +1,9 @@
-// Cosmetic settings for a deck
-export interface DeckCosmetics {
-  avatar: number
-  // TODO More cosmetics
-}
+import { CosmeticSet } from './cosmeticSet'
 
 // Complete deck type
 export interface Deck {
   name: string
   // Array of card IDs
   cards: number[]
-  cosmetics: DeckCosmetics
+  cosmeticSet: CosmeticSet
 }

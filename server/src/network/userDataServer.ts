@@ -12,6 +12,7 @@ import { players } from '../db/schema'
 import { eq, sql } from 'drizzle-orm'
 import { UserDataServerWS } from '../../../shared/network/userDataWS'
 import { Deck } from '../../../shared/types/deck'
+import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import { STORE_ITEMS } from '../../../shared/storeItems'
 import { cosmeticsTransactions } from '../db/schema'
 
@@ -135,6 +136,9 @@ export default function createUserDataServer() {
               gems: 0,
               coins: 0,
               last_daily_reward: new Date(),
+              // Cosmetic set defaults
+              avatar_id: 0,
+              border_id: 0,
             }
             await db.insert(players).values(data)
 
@@ -216,6 +220,9 @@ async function sendUserData(
     gems: number
     coins: number
     last_daily_reward: Date
+    // Cosmetic set formed from this
+    avatar_id: number
+    border_id: number
   },
 ) {
   let decks: Deck[] = []
@@ -246,6 +253,10 @@ async function sendUserData(
     coins: data.coins,
     lastDailyReward: data.last_daily_reward,
     ownedItems, // Add owned items to the response
+    cosmeticSet: {
+      avatar: data.avatar_id,
+      border: data.border_id,
+    },
   })
 
   // Update last active time

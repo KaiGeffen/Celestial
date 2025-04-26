@@ -9,8 +9,8 @@ class TutorialMatch extends PveMatch {
     super(
       ws,
       '',
-      { name: '', cards: [], cosmetics: { avatar: 0 } },
-      { name: '', cards: [], cosmetics: { avatar: 0 } },
+      { name: '', cards: [], cosmeticSet: { avatar: 0, border: 0 } },
+      { name: '', cards: [], cosmeticSet: { avatar: 0, border: 0 } },
     )
 
     this.game = new TutorialController(num)
