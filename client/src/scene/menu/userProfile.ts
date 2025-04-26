@@ -9,8 +9,12 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import AvatarButton from '../../lib/buttons/avatar'
 import BaseScene from '../baseScene'
 import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
+import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 
 export default class UserProfileMenu extends Menu {
+  // The avatar on the homeScene
+  private outerAvatar: AvatarButton
+
   // TODO Refactor to remove this
   private currentTab: string = 'Icon'
   private currentAvatar: AvatarButton
@@ -19,9 +23,13 @@ export default class UserProfileMenu extends Menu {
   // The home scene, which is closed when logging out
   private activeScene: BaseScene
 
-  constructor(scene: MenuScene, params: { activeScene: BaseScene }) {
+  constructor(
+    scene: MenuScene,
+    params: { activeScene: BaseScene; outerAvatar: AvatarButton },
+  ) {
     super(scene, 700)
     this.activeScene = params.activeScene
+    this.outerAvatar = params.outerAvatar
 
     this.createContent()
     this.layout()
@@ -70,8 +78,8 @@ export default class UserProfileMenu extends Menu {
     )
     this.currentAvatar = new Buttons.Avatar({
       within: container,
-      // TODO Get current account avatar
-      name: 'Jules',
+      avatarId: UserDataServer.getUserData().cosmeticSet.avatar,
+      border: UserDataServer.getUserData().cosmeticSet.border,
     })
     sizer.add(container)
 
@@ -212,7 +220,13 @@ export default class UserProfileMenu extends Menu {
       new Buttons.Avatar({
         within: container,
         avatarId: i,
-        f: () => this.currentAvatar.setQuality({ num: i }),
+        f: () => {
+          const newSet = {
+            avatar: i,
+            border: UserDataServer.getUserData().cosmeticSet.border,
+          }
+          this.updateCosmeticSet(newSet)
+        },
       })
       this.gridSizer.add(container, i % 3, Math.floor(i / 3))
     }
@@ -236,10 +250,29 @@ export default class UserProfileMenu extends Menu {
         within: container,
         name: this.currentAvatar.name,
         border: i,
-        f: () => this.currentAvatar.setBorder(i),
+        f: () => {
+          const newSet = {
+            avatar: UserDataServer.getUserData().cosmeticSet.avatar,
+            border: i,
+          }
+          this.updateCosmeticSet(newSet)
+        },
       })
 
       this.gridSizer.add(container, i % 3, Math.floor(i / 3))
     }
+  }
+
+  private updateCosmeticSet(newSet: CosmeticSet) {
+    // TODO Remove setQuality method (Make setAvatar)
+    this.currentAvatar.setQuality({ num: newSet.avatar })
+    this.currentAvatar.setBorder(newSet.border)
+
+    this.outerAvatar.setQuality({
+      num: newSet.avatar,
+    })
+    this.outerAvatar.setBorder(newSet.border)
+
+    UserDataServer.setCosmeticSet(newSet)
   }
 }

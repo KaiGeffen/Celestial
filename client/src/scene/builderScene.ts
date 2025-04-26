@@ -128,6 +128,7 @@ export class AdventureBuilderScene extends BuilderBase {
         cards: this.params.opponent,
         cosmeticSet: {
           avatar: 0,
+          border: 0,
         },
       }
 

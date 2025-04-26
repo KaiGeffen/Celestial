@@ -1,6 +1,5 @@
 import 'phaser'
 import Button from './button'
-import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import avatarNames from '../../lib/avatarNames'
 import { Color, Time } from '../../settings/settings'
 
@@ -10,7 +9,7 @@ const borderNames = ['None', 'Thorns']
 // Used when selected an avatar, when editing an avatar, and in a match
 export default class AvatarButton extends Button {
   name: string
-  border: Phaser.GameObjects.Image
+  private border: Phaser.GameObjects.Image
 
   constructor({
     within,

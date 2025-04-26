@@ -75,11 +75,14 @@ export default class HomeScene extends BaseScene {
     // Add avatar
     const avatar = new Buttons.Avatar({
       within: userDetails,
+      avatarId: UserDataServer.getUserData().cosmeticSet.avatar,
+      border: UserDataServer.getUserData().cosmeticSet.border,
       y: Space.pad + Space.avatarSize / 2,
       f: () => {
         this.scene.launch('MenuScene', {
           menu: 'userProfile',
           activeScene: this,
+          outerAvatar: avatar,
         })
       },
     })

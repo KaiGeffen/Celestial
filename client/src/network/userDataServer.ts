@@ -243,6 +243,19 @@ export default class UserDataServer {
     // TODO Cosmetic array update
   }
 
+  static setCosmeticSet(cosmeticSet: CosmeticSet): void {
+    // Change it locally
+    this.userData.cosmeticSet = cosmeticSet
+
+    if (wsServer === undefined) {
+      throw 'Setting cosmetic set when server ws doesnt exist.'
+    }
+    wsServer.send({
+      type: 'setCosmeticSet',
+      value: cosmeticSet,
+    })
+  }
+
   // Send all data necessary to initialize a user
   static sendInitialUserData(username: string): void {
     if (wsServer === undefined) {

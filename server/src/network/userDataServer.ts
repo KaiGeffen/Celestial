@@ -12,7 +12,6 @@ import { players } from '../db/schema'
 import { eq, sql } from 'drizzle-orm'
 import { UserDataServerWS } from '../../../shared/network/userDataWS'
 import { Deck } from '../../../shared/types/deck'
-import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import { STORE_ITEMS } from '../../../shared/storeItems'
 import { cosmeticsTransactions } from '../db/schema'
 
@@ -198,6 +197,13 @@ export default function createUserDataServer() {
             .limit(1)
           if (result.length === 0) return
           await sendUserData(ws, id, result[0])
+        })
+        .on('setCosmeticSet', async ({ value }) => {
+          if (!id) return
+          await db
+            .update(players)
+            .set({ avatar_id: value.avatar, border_id: value.border })
+            .where(eq(players.id, id))
         })
     } catch (e) {
       console.error('Error in user data server:', e)

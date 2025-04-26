@@ -25,7 +25,7 @@ export interface UserDataClientMessages {
   purchaseItem: {
     id: number
   }
-  setCosmetics: {
+  setCosmeticSet: {
     value: CosmeticSet
   }
 }
