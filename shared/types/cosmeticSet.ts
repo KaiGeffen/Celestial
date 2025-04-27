@@ -2,5 +2,6 @@
 export interface CosmeticSet {
   avatar: number
   border: number
-  // TODO More cosmetics (Relic etc)
+  relic?: number
+  // TODO More cosmetics (Cardback, title, etc)
 }

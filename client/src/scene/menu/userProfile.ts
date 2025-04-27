@@ -201,6 +201,8 @@ export default class UserProfileMenu extends Menu {
       this.createIconGrid()
     } else if (this.currentTab === 'Border') {
       this.createBorderGrid()
+    } else if (this.currentTab === 'Relic') {
+      this.createRelicGrid()
     }
 
     // Force layout update
@@ -261,6 +263,37 @@ export default class UserProfileMenu extends Menu {
 
       this.gridSizer.add(container, i % 3, Math.floor(i / 3))
     }
+  }
+
+  private createRelicGrid() {
+    // Create a sizer to hold all frames horizontally
+    const frameSizer = this.scene.rexUI.add.sizer({
+      orientation: 'horizontal',
+      space: { left: 40 },
+    })
+
+    // Add each frame of the Dandelion animation
+    for (let i = 0; i < 6; i++) {
+      // Create relic image with specific frame
+      const relicImage = this.scene.add.image(0, 0, 'relic-Dandelion', i)
+
+      // TODO When multiple relics are added, this matters
+      // Add click handler
+      relicImage.setInteractive()
+      relicImage.on('pointerdown', () => {
+        const newSet = {
+          avatar: UserDataServer.getUserData().cosmeticSet.avatar,
+          border: UserDataServer.getUserData().cosmeticSet.border,
+          relic: 0,
+        }
+        this.updateCosmeticSet(newSet)
+      })
+
+      frameSizer.add(relicImage)
+    }
+
+    // Add the frame sizer to the grid
+    this.gridSizer.add(frameSizer, 0, 0)
   }
 
   private updateCosmeticSet(newSet: CosmeticSet) {
