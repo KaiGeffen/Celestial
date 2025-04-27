@@ -40,7 +40,7 @@ export default class OurBoardRegion extends Region {
   // Track whether shift is held
   isShiftHeld = false
 
-  create(scene: GameScene, avatarId: number): this {
+  create(scene: GameScene): this {
     this.scene = scene
     this.cards = []
 

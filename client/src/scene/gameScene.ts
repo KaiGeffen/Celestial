@@ -67,7 +67,7 @@ export class GameScene extends BaseScene {
     }
 
     // Create the view
-    this.view = new View(this, this.params.deck?.cosmetics?.avatar ?? 0)
+    this.view = new View(this, this.params.deck?.cosmeticSet?.avatar ?? 0)
 
     // Register the shift hotkey to explain hotkeys in all regions
     this.addHotkeyHint()
@@ -78,7 +78,7 @@ export class GameScene extends BaseScene {
   }
 
   restart(): void {
-    this.view = new View(this, this.params.deck?.cosmetics?.avatar ?? 0)
+    this.view = new View(this, this.params.deck?.cosmeticSet?.avatar ?? 0)
   }
 
   beforeExit() {
@@ -413,7 +413,7 @@ export class View {
     // Create each of the regions
     // this.createOurHand()
     // new HandRegion()//.create(scene)
-    this.ourBoard = new Regions.OurBoard().create(scene, avatarId)
+    this.ourBoard = new Regions.OurBoard().create(scene)
     this.theirBoard = new Regions.TheirBoard().create(scene)
 
     this.story = new Regions.Story().create(scene)

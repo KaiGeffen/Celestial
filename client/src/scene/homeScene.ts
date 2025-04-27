@@ -92,8 +92,6 @@ export default class HomeScene extends BaseScene {
       },
     })
 
-    // TODO Border / cosmetics
-
     // Add username and ELO
     const userData = UserDataServer.getUserData()
     let y = Space.pad + Space.avatarSize + Space.padSmall
