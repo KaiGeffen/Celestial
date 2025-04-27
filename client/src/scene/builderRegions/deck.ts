@@ -150,6 +150,7 @@ export default class DeckRegion {
     )
     this.avatar = new Buttons.Avatar({
       within: containerAvatar,
+      emotive: true,
     })
     if (Flags.mobile) {
       containerAvatar.setVisible(false)
@@ -228,6 +229,7 @@ export default class DeckRegion {
       x: 0,
       y: 0,
       f: this.openEditMenu(),
+      muteClick: true,
     })
 
     // Add a copy button that allows user to copy their deck code

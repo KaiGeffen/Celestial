@@ -327,6 +327,7 @@ export default class DecklistsRegion {
         x: 0,
         y: 0,
         f: this.newDeckCallback(),
+        muteClick: true,
       })
     }
 

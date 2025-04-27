@@ -433,13 +433,6 @@ export default class Button {
     return this
   }
 
-  highlight() {}
-
-  // Set the subtype's individual characteristic, implemented by some buttons
-  setQuality(args): Button {
-    throw `Button type ${typeof this} doesn't have a quality to set.`
-  }
-
   // Set the object to not scroll with the camera
   setNoScroll(): Button {
     if (this.txt) {

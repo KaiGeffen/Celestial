@@ -47,8 +47,9 @@ export default class AvatarButton extends Button {
 
     this.setOrigin(...origin)
 
+    // Set it so the avatar emotes briefly when clicked
     if (emotive) {
-      this.setEmotive()
+      this.onClick = this.doEmote
     }
   }
 
@@ -58,29 +59,6 @@ export default class AvatarButton extends Button {
     }
 
     return super.setOnClick(fWithSound, once, overwrite)
-  }
-
-  // TODO Remove setQuality method
-  setQuality({
-    num = undefined,
-    emotive = false,
-    emoting = undefined,
-  }): Button {
-    if (num !== undefined) {
-      this.name = avatarNames[num]
-      this.setTexture(`avatar-${this.name}`)
-    }
-
-    if (emotive) {
-      this.setEmotive()
-    }
-
-    if (emoting !== undefined) {
-      // TODO Use emoting number
-      this.doEmote()()
-    }
-
-    return this
   }
 
   setOrigin(...args): Button {
@@ -121,32 +99,23 @@ export default class AvatarButton extends Button {
   }
 
   timeout: NodeJS.Timeout
-  // Set it so the avatar emotes briefly when clicked
-  private setEmotive(): Button {
-    this.onClick = this.doEmote()
+  doEmote(number = 1): void {
+    // Get dialog audio element
+    const dialogAudio = document.getElementById('dialog') as HTMLAudioElement
 
-    return this
-  }
+    // Set the source and play
+    dialogAudio.src = `assets/dialog/${this.name}.mp3`
+    dialogAudio.currentTime = 0
+    dialogAudio.play()
 
-  private doEmote(number = 1): () => void {
-    return () => {
-      // Get dialog audio element
-      const dialogAudio = document.getElementById('dialog') as HTMLAudioElement
+    // Stop the timeout if it exists
+    clearTimeout(this.timeout)
 
-      // Set the source and play
-      dialogAudio.src = `assets/dialog/${this.name}.mp3`
-      dialogAudio.currentTime = 0
-      dialogAudio.play()
+    this.icon.setFrame(number)
 
-      // Stop the timeout if it exists
-      clearTimeout(this.timeout)
-
-      this.icon.setFrame(number)
-
-      // Keep track of this timeout
-      this.timeout = setTimeout(() => {
-        this.icon.setFrame(0)
-      }, Time.emote)
-    }
+    // Keep track of this timeout
+    this.timeout = setTimeout(() => {
+      this.icon.setFrame(0)
+    }, Time.emote)
   }
 }

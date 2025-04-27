@@ -112,7 +112,7 @@ export default class TheirAvatarRegion extends Region {
 
   // Show their avatar using the given emote
   emote(emoteNumber: number): void {
-    this.avatar.setQuality({ emoting: emoteNumber })
+    this.avatar.doEmote(emoteNumber)
   }
 
   private createBackground(): void {
