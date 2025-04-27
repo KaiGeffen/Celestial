@@ -15,17 +15,26 @@ import {
   MechanicsSettings,
 } from '../../../../shared/settings'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
+import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 
 const width = 500
 const inputTextWidth = 200
 
+enum tab {
+  ICON,
+  BORDER,
+}
+
 class AlterDeckMenu extends Menu {
+  // TODO Make some private
+
   // The user inputted name for the deck
   name: string
   nameInputText
 
-  // The user selected avatar number
+  // The user selected avatar number and border
   selectedAvatar: number
+  selectedBorder: number
 
   // The deck code for this deck, if any
   deckCode: number[] = []
@@ -35,6 +44,13 @@ class AlterDeckMenu extends Menu {
   // The names for different elements, which differ in different menus
   titleString: string
   confirmString: string
+
+  // Current tab for cosmetic selection
+  currentTab: tab = tab.ICON
+
+  // Container for the cosmetic options
+  private cosmeticOptionsContainer: ContainerLite
+  private cosmeticGrid: FixWidthSizer
 
   btnConfirm: Button
 
@@ -49,9 +65,8 @@ class AlterDeckMenu extends Menu {
 
     this.name = params.deckName
     this.selectedAvatar =
-      params.selectedAvatar === undefined
-        ? Math.floor(Math.random() * 6)
-        : params.selectedAvatar
+      params.cosmeticSet?.avatar ?? Math.floor(Math.random() * 6)
+    this.selectedBorder = params.cosmeticSet?.border ?? 0
     this.titleString = titleString
     this.confirmString = confirmString
 
@@ -75,33 +90,157 @@ class AlterDeckMenu extends Menu {
   ) {
     this.createHeader(this.titleString, width)
 
-    if (!Flags.mobile) {
-      this.sizer
-        .add(this.createName())
-        .addNewLine()
-        .addNewLine()
-        .add(this.createAvatar())
-        .addNewLine()
-        .addNewLine()
-        .add(this.createImport())
-        .addNewLine()
-        .addNewLine()
-        .add(this.createButtons(createCallback))
-    } else {
-      let namePlusImport = this.scene.rexUI.add
-        .sizer({ space: { item: Space.pad } })
-        .add(this.createName())
-        .add(this.createImport())
+    this.sizer
+      .add(this.createName())
+      .addNewLine()
+      .addNewLine()
+      .add(this.createCosmeticTabs())
+      .addNewLine()
+      .add(this.createCosmeticOptions())
+      .addNewLine()
+      .addNewLine()
+      .add(this.createImport())
+      .addNewLine()
+      .addNewLine()
+      .add(this.createButtons(createCallback))
+  }
 
-      this.sizer
-        .add(namePlusImport)
-        .addNewLine()
-        .addNewLine()
-        .add(this.createAvatar())
-        .addNewLine()
-        .addNewLine()
-        .add(this.createButtons(createCallback))
+  private createCosmeticTabs() {
+    let sizer = this.scene.rexUI.add.sizer({
+      space: { item: Space.pad },
+    })
+
+    const tabs = ['Icon', 'Border']
+    tabs.forEach((tabText) => {
+      const container = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        Space.buttonWidth,
+        Space.buttonHeight,
+      )
+      new Buttons.Basic({
+        within: container,
+        text: tabText,
+        f: () => {
+          this.currentTab = tabText === 'Icon' ? tab.ICON : tab.BORDER
+          this.updateCosmeticGrid()
+        },
+      })
+      sizer.add(container)
+    })
+
+    return sizer
+  }
+
+  private createCosmeticOptions() {
+    // Create the container for the cosmetic options
+    this.cosmeticOptionsContainer = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      width,
+      Space.avatarSize * 2 + Space.pad * 3,
+    )
+
+    // Create the grid sizer
+    this.cosmeticGrid = this.scene.rexUI.add.fixWidthSizer({
+      space: { line: Space.pad },
+    })
+
+    // Add the grid to the container
+    this.cosmeticOptionsContainer.add(this.cosmeticGrid)
+
+    // Create initial content
+    this.updateCosmeticGrid()
+
+    return this.cosmeticOptionsContainer
+  }
+
+  private updateCosmeticGrid() {
+    // Clear the grid
+    this.cosmeticGrid.removeAll(true)
+
+    let sizer
+    let items = []
+
+    if (this.currentTab === tab.ICON) {
+      // Create avatar grid
+      for (let i = 0; i < 6; i++) {
+        if (i % 3 === 0) {
+          sizer = this.scene.rexUI.add.sizer({
+            space: { item: Space.pad },
+          })
+          this.cosmeticGrid.add(sizer)
+        }
+
+        const container = new ContainerLite(
+          this.scene,
+          0,
+          0,
+          Space.avatarSize,
+          Space.avatarSize,
+        )
+        let avatar = new Buttons.Avatar({
+          within: container,
+          avatarId: i,
+          border: this.selectedBorder,
+          f: () => {
+            items.forEach((a) => a.deselect())
+            avatar.select()
+            this.selectedAvatar = i
+          },
+        })
+        sizer.add(container)
+        items.push(avatar)
+
+        if (i === this.selectedAvatar) {
+          avatar.select()
+        } else {
+          avatar.deselect()
+        }
+      }
+    } else {
+      // Create border grid
+      const borderOptions = ['this is just a length', 'todo']
+      for (let i = 0; i < borderOptions.length; i++) {
+        if (i % 3 === 0) {
+          sizer = this.scene.rexUI.add.sizer({
+            space: { item: Space.pad },
+          })
+          this.cosmeticGrid.add(sizer)
+        }
+
+        const container = new ContainerLite(
+          this.scene,
+          0,
+          0,
+          Space.avatarSize,
+          Space.avatarSize,
+        )
+        let avatar = new Buttons.Avatar({
+          within: container,
+          avatarId: this.selectedAvatar,
+          border: i,
+          f: () => {
+            items.forEach((a) => a.deselect())
+            avatar.select()
+            this.selectedBorder = i
+          },
+        })
+        sizer.add(container)
+        items.push(avatar)
+
+        if (i === this.selectedBorder) {
+          avatar.select()
+        } else {
+          avatar.deselect()
+        }
+      }
     }
+
+    // Update the layout
+    this.cosmeticGrid.layout()
   }
 
   private createName() {
@@ -136,57 +275,6 @@ class AlterDeckMenu extends Menu {
     sizer.addSpace().add(container).addSpace()
 
     return sizer
-  }
-
-  private createAvatar() {
-    let fixSizer = this.scene.rexUI.add.fixWidthSizer({
-      space: { line: Space.pad },
-    })
-
-    let sizer
-    let avatars = []
-    for (let i = 0; i < 6; i++) {
-      // On mobile, all avatars are on 1 line
-      if (Flags.mobile ? i === 0 : i % 3 === 0) {
-        sizer = this.scene.rexUI.add.sizer({
-          space: {
-            item: Space.pad,
-          },
-        })
-
-        fixSizer.add(sizer)
-      }
-
-      const container = new ContainerLite(
-        this.scene,
-        0,
-        0,
-        Space.avatarSize,
-        Space.avatarSize,
-      )
-      let avatar = new Buttons.Avatar({
-        within: container,
-        avatarId: i,
-        f: () => {
-          // Deselect all avatars, then select this one, remember which is selected
-          avatars.forEach((a) => a.deselect())
-          avatar.select()
-
-          this.selectedAvatar = i
-        },
-      })
-      sizer.add(container)
-      avatars.push(avatar)
-
-      // Select the right avatar
-      if (i === this.selectedAvatar) {
-        avatar.select()
-      } else {
-        avatar.deselect()
-      }
-    }
-
-    return fixSizer
   }
 
   private createImport() {
@@ -270,10 +358,9 @@ class AlterDeckMenu extends Menu {
       within: container,
       text: this.confirmString,
       f: () => {
-        // TODO border
         const cosmeticSet: CosmeticSet = {
           avatar: this.selectedAvatar,
-          border: 0,
+          border: this.selectedBorder,
         }
         createCallback(this.name, cosmeticSet, this.deckCode)
 
