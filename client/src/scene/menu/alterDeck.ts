@@ -93,25 +93,22 @@ class AlterDeckMenu extends Menu {
     this.sizer
       .add(this.createName())
       .addNewLine()
-      .addNewLine()
       .add(this.createCosmeticTabs())
       .addNewLine()
       .add(this.createCosmeticOptions())
       .addNewLine()
-      .addNewLine()
       .add(this.createImport())
-      .addNewLine()
       .addNewLine()
       .add(this.createButtons(createCallback))
   }
 
   private createCosmeticTabs() {
-    let sizer = this.scene.rexUI.add.sizer({
-      space: { item: Space.pad },
+    const sizer = this.scene.rexUI.add.sizer({
+      width: width - Space.pad * 2,
     })
 
     const tabs = ['Icon', 'Border']
-    tabs.forEach((tabText) => {
+    tabs.forEach((tabText, index) => {
       const container = new ContainerLite(
         this.scene,
         0,
@@ -128,6 +125,10 @@ class AlterDeckMenu extends Menu {
         },
       })
       sizer.add(container)
+      // Add space after all but the last button
+      if (index < tabs.length - 1) {
+        sizer.addSpace()
+      }
     })
 
     return sizer
