@@ -16,6 +16,7 @@ import {
 } from '../../../../shared/settings'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
+import UserDataServer from '../../network/userDataServer'
 
 const width = 500
 const inputTextWidth = 200
@@ -65,8 +66,13 @@ class AlterDeckMenu extends Menu {
 
     this.name = params.deckName
     this.selectedAvatar =
-      params.cosmeticSet?.avatar ?? Math.floor(Math.random() * 6)
-    this.selectedBorder = params.cosmeticSet?.border ?? 0
+      params.cosmeticSet?.avatar ??
+      UserDataServer.getUserData().cosmeticSet?.avatar ??
+      Math.floor(Math.random() * 6)
+    this.selectedBorder =
+      params.cosmeticSet?.border ??
+      UserDataServer.getUserData().cosmeticSet?.border ??
+      0
     this.titleString = titleString
     this.confirmString = confirmString
 

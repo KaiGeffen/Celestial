@@ -20,6 +20,7 @@ import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
 import { BuilderBase, BuilderScene } from '../builderScene'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
+import UserDataServer from '../../network/userDataServer'
 const width = Space.decklistPanelWidth
 
 // Region of the deck builder which contains all the decklists
@@ -173,7 +174,8 @@ export default class DecklistsRegion {
     if (UserSettings._get('decks').length >= DecklistSettings.MAX_DECKS) {
       return false
     } else {
-      this.createCallback()(undefined, undefined, [])
+      const cosmeticSet: CosmeticSet = UserDataServer.getUserData().cosmeticSet
+      this.createCallback()(undefined, cosmeticSet, [])
       return true
     }
   }

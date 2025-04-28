@@ -289,6 +289,7 @@ export default class UserDataServer {
         cosmeticSet: {
           avatar: 0,
           border: 0,
+          relic: 0,
         },
       }
     } else {
