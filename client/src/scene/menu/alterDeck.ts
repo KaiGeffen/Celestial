@@ -67,12 +67,10 @@ class AlterDeckMenu extends Menu {
     this.name = params.deckName
     this.selectedAvatar =
       params.cosmeticSet?.avatar ??
-      UserDataServer.getUserData().cosmeticSet?.avatar ??
-      Math.floor(Math.random() * 6)
+      UserDataServer.getUserData().cosmeticSet?.avatar
     this.selectedBorder =
       params.cosmeticSet?.border ??
-      UserDataServer.getUserData().cosmeticSet?.border ??
-      0
+      UserDataServer.getUserData().cosmeticSet?.border
     this.titleString = titleString
     this.confirmString = confirmString
 
