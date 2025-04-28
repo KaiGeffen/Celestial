@@ -65,6 +65,13 @@ export default class TheirBoardRegion extends Region {
       .setOrigin(0)
       .setRotation(Math.PI)
 
+    background.setScale(
+      background.width >= Space.windowWidth
+        ? 1
+        : Space.windowWidth / background.width,
+      1,
+    )
+
     // 7 is the height of the shadow
     const y = Space.todoHandOffset + Space.pad + 7
     background.setPosition(Space.windowWidth + Space.pad, y)

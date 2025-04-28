@@ -6,7 +6,7 @@ import {
   MatchTutorialWS,
 } from '../network/net'
 // Import Settings itself
-import { UserSettings } from '../settings/settings'
+import { Space, UserSettings } from '../settings/settings'
 import BaseScene from './baseScene'
 import Animator from './matchRegions/animator'
 import Region from './matchRegions/baseRegion'
@@ -407,6 +407,12 @@ export class View {
       .on('pointerover', () => {
         this.scene.hint.hide()
       })
+
+    background.setScale(
+      background.width >= Space.windowWidth
+        ? 1
+        : Space.windowWidth / background.width,
+    )
 
     this.searching = new Regions.Searching().create(scene, avatarId)
 
