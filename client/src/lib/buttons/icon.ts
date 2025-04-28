@@ -2,7 +2,15 @@ import 'phaser'
 import Button from './button'
 
 export default class Icon extends Button {
-  constructor({ within, name, x = 0, y = 0, f = () => {}, muteClick = false }) {
+  constructor({
+    within,
+    name,
+    x = 0,
+    y = 0,
+    f = () => {},
+    muteClick = false,
+    hint = '',
+  }) {
     super(within, x, y, {
       icon: {
         name,
@@ -15,5 +23,9 @@ export default class Icon extends Button {
         mute: muteClick,
       },
     })
+
+    if (hint) {
+      this.makeHintable(hint)
+    }
   }
 }

@@ -156,6 +156,7 @@ export default class HomeScene extends BaseScene {
       x: Space.pad + Space.iconSize * 0.5,
       y: Space.pad + Space.iconSize * 0.5,
       f: () => this.signalError('Quests coming soon!'),
+      hint: 'Quests',
     })
 
     new Buttons.Icon({
@@ -164,6 +165,7 @@ export default class HomeScene extends BaseScene {
       x: Space.pad * 2 + Space.iconSize * 1.5,
       y: Space.pad + Space.iconSize * 0.5,
       f: () => this.signalError('Friends coming soon!'),
+      hint: 'Friends',
     })
 
     // Second row
@@ -173,6 +175,7 @@ export default class HomeScene extends BaseScene {
       x: Space.pad + Space.iconSize * 0.5,
       y: Space.pad * 2 + Space.iconSize * 1.5,
       f: () => this.scene.start('StoreScene'),
+      hint: 'Store',
     })
 
     new Buttons.Icon({
@@ -183,6 +186,7 @@ export default class HomeScene extends BaseScene {
       f: () => {
         this.scene.start('MatchHistoryScene')
       },
+      hint: 'Match History',
     })
 
     new Buttons.Icon({
@@ -196,6 +200,7 @@ export default class HomeScene extends BaseScene {
           hint: 'leaderboard',
         })
       },
+      hint: 'Leaderboard',
     })
   }
 
