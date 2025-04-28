@@ -135,9 +135,11 @@ export default function createUserDataServer() {
               gems: 0,
               coins: 0,
               last_daily_reward: new Date(),
-              // Cosmetic set defaults
-              avatar_id: 0,
-              border_id: 0,
+              cosmetic_set: JSON.stringify({
+                avatar: 0,
+                border: 0,
+                relic: 0,
+              }),
             }
             await db.insert(players).values(data)
 
@@ -202,7 +204,7 @@ export default function createUserDataServer() {
           if (!id) return
           await db
             .update(players)
-            .set({ avatar_id: value.avatar, border_id: value.border })
+            .set({ cosmetic_set: JSON.stringify(value) })
             .where(eq(players.id, id))
         })
     } catch (e) {
@@ -226,9 +228,7 @@ async function sendUserData(
     gems: number
     coins: number
     last_daily_reward: Date
-    // Cosmetic set formed from this
-    avatar_id: number
-    border_id: number
+    cosmetic_set: string
   },
 ) {
   let decks: Deck[] = []
@@ -258,11 +258,8 @@ async function sendUserData(
     gems: data.gems,
     coins: data.coins,
     lastDailyReward: data.last_daily_reward,
-    ownedItems, // Add owned items to the response
-    cosmeticSet: {
-      avatar: data.avatar_id,
-      border: data.border_id,
-    },
+    ownedItems,
+    cosmeticSet: JSON.parse(data.cosmetic_set),
   })
 
   // Update last active time

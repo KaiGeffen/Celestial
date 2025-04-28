@@ -61,8 +61,7 @@ export const players = pgTable(
     last_daily_reward: timestamp('last_daily_reward').notNull(),
 
     // Cosmetic set
-    avatar_id: integer('avatar_id').notNull(),
-    border_id: integer('border_id').notNull(),
+    cosmetic_set: varchar('cosmetic_set', { length: 1000 }).notNull(),
   },
   (table) => ({
     emailIdx: uniqueIndex('email_idx').on(table.email),
