@@ -184,6 +184,9 @@ export default class FilterRegion {
         this.filterCostAry[i] = false
       }
 
+      this.searchObj.setText('')
+      this.searchText = ''
+
       this.scene.filter()
     }
   }
