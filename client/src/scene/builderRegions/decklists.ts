@@ -90,7 +90,11 @@ export default class DecklistsRegion {
   }
 
   selectDeck(i: number): void {
-    this.decklistOnClick(i)()
+    try {
+      this.decklistOnClick(i)()
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   // Set the currently selected deck name to the given name
