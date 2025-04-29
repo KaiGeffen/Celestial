@@ -33,11 +33,11 @@ export class Time {
   }
 
   static builderSlide(): number {
-    return 300
+    return 250
   }
 
   static optionsTabSlide(): number {
-    return 300
+    return 250
   }
 
   // How long an onscreen message lingers

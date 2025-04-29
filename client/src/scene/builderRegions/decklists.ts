@@ -113,7 +113,7 @@ export default class DecklistsRegion {
     deckCode: number[],
   ): void {
     // Use a default deck name if it's not specified
-    if (name === undefined || name === '') {
+    if (!name) {
       const number = this.decklistBtns.length + 1
       name = `Deck ${number}`
     }
@@ -334,6 +334,7 @@ export default class DecklistsRegion {
         y: 0,
         f: this.newDeckCallback(),
         muteClick: true,
+        hint: 'New deck',
       })
     }
 
@@ -382,7 +383,7 @@ export default class DecklistsRegion {
       0,
       name,
       () => {},
-      this.deleteDeck(i, container),
+      this.deleteDeck(i),
     )
       .setDepth(2)
       .setOnClick(this.decklistOnClick(i))
@@ -458,7 +459,7 @@ export default class DecklistsRegion {
   }
 
   // Callback for deleting deck with given index
-  private deleteDeck(deckIndex: number, container: ContainerLite): () => void {
+  private deleteDeck(deckIndex: number): () => void {
     let callback = () => {
       // Adjust which deck index is now selected
       if (this.savedDeckIndex === deckIndex) {

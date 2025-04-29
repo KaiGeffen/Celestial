@@ -230,6 +230,7 @@ export default class DeckRegion {
       y: 0,
       f: this.openEditMenu(),
       muteClick: true,
+      hint: 'Edit details',
     })
 
     // Add a copy button that allows user to copy their deck code
@@ -246,6 +247,7 @@ export default class DeckRegion {
       x: 0,
       y: 0,
       f: this.shareCallback(),
+      hint: 'Share deck-code',
     })
 
     // Add a graph button for showing the distribution of costs in the deck
@@ -262,6 +264,7 @@ export default class DeckRegion {
       x: 0,
       y: 0,
       f: this.distributionCallback(),
+      hint: 'Cost distribution',
     })
 
     // Start button - Show how many cards are in deck, and enable user to start if deck is full
@@ -551,7 +554,6 @@ export default class DeckRegion {
   }
 
   hidePanel(): void {
-    // this.scrollablePanel.setX(X_START)
     this.scene.tweens.add({
       targets: this.scrollablePanel,
       x: X_START,
@@ -561,11 +563,9 @@ export default class DeckRegion {
   }
 
   showPanel(): void {
-    const x = Flags.mobile ? 0 : Space.decklistPanelWidth
-    // this.scrollablePanel.x = x
     this.scene.tweens.add({
       targets: this.scrollablePanel,
-      x: x,
+      x: Space.decklistPanelWidth,
       duration: Time.builderSlide(),
       ease: Ease.slide,
     })

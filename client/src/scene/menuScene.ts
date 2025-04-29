@@ -53,23 +53,6 @@ export default class MenuScene extends BaseMenuScene {
     })
   }
 
-  private addTitle(s: string) {
-    this.add
-      .text(
-        Space.windowWidth / 2,
-        Space.windowHeight / 2 - 150,
-        s,
-        Style.menuTitle,
-      )
-      .setOrigin(0.5)
-  }
-
-  private addMessage(s: string) {
-    this.add
-      .text(Space.windowWidth / 2, Space.windowHeight / 2, s, Style.basic)
-      .setOrigin(0.5)
-  }
-
   private addBackground() {
     const x = Space.windowWidth / 2
     const y = Space.windowHeight / 2
