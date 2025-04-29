@@ -1,20 +1,8 @@
 import 'phaser'
 
-import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
-
 import Card from '../../../../shared/state/card'
 import { CardImage } from '../../lib/cardImage'
-import {
-  Style,
-  Color,
-  UserSettings,
-  Space,
-  Time,
-  Scroll,
-  Ease,
-  Flags,
-} from '../../settings/settings'
+import { Space, Time, Scroll, Ease, Flags } from '../../settings/settings'
 import Catalog from '../../../../shared/state/catalog'
 import { BuilderBase } from '../builderScene'
 import newScrollablePanel from '../../lib/scrollablePanel'
@@ -23,11 +11,9 @@ import newScrollablePanel from '../../lib/scrollablePanel'
 export default class CatalogRegion {
   // Overwrite the 'scene' property of container to specifically be a BuilderScene
   scene: BuilderBase
-  container: ContainerLite
 
   // The scrollable panel on which the catalog exists
-  private scrollablePanel: ScrollablePanel
-  panel
+  private panel
 
   // Full list of all cards in the catalog (Even those invisible)
   cardCatalog: CardImage[]
@@ -35,38 +21,26 @@ export default class CatalogRegion {
   // Create this region, offset by the given width
   create(scene: BuilderBase, x: number) {
     this.scene = scene
-    this.container = new ContainerLite(scene)
-
-    this.panel = this.createPanel(scene, x)
-
     this.cardCatalog = []
 
-    // Add each card
+    this.createPanel(scene, x)
+
+    // Add each card, sorted by cost
     let pool = Flags.devCardsEnabled
       ? [...Catalog.collectibleCards, ...Catalog.betaCards]
       : Catalog.collectibleCards
-    pool = pool.sort((a, b) => a.cost - b.cost)
-
-    for (let i = 0; i < pool.length; i++) {
-      let cardImage = this.addCardToCatalog(pool[i], i)
-
-      this.panel.getElement('panel').add(cardImage.container)
-    }
+    pool
+      .sort((a, b) => a.cost - b.cost)
+      .forEach((card) => {
+        this.createCard(card)
+      })
 
     this.panel.layout()
 
     return this
   }
 
-  private createPanel(scene: BuilderBase, x: number) {
-    // NOTE Scroller is in both environments
-    // x += Mobile ? Space.scrollWidth : 0
-
-    // TODO Rename x
-
-    const width = Space.windowWidth - x
-    const height = Space.windowHeight
-
+  private createPanel(scene: BuilderBase, x: number): void {
     // Make the object
     let panel = scene.rexUI.add.fixWidthSizer({
       space: {
@@ -78,13 +52,11 @@ export default class CatalogRegion {
         line: Space.pad,
       },
     })
-    let superPanel = (this.scrollablePanel = newScrollablePanel(scene, {
+    this.panel = newScrollablePanel(scene, {
       x: Space.windowWidth,
       y: 0,
-      width: width,
-      height: height,
-
-      scrollMode: 0,
+      width: Space.windowWidth - x,
+      height: Space.windowHeight,
 
       panel: {
         child: panel,
@@ -95,14 +67,14 @@ export default class CatalogRegion {
         slider: { top: Space.filterBarHeight },
       },
 
-      slider: Flags.mobile ? undefined : Scroll(scene),
-    }).setOrigin(1, 0))
+      slider: Scroll(scene),
+    }).setOrigin(1, 0)
 
     // TODO
     // Update panel when mousewheel scrolls
     scene.input.on(
       'wheel',
-      function (pointer: Phaser.Input.Pointer, gameObject, dx, dy, dz, event) {
+      (pointer: Phaser.Input.Pointer, gameObject, dx, dy, dz, event) => {
         // Return if the pointer is outside of the panel
         if (pointer.x < panel.getLeftCenter().x) {
           return
@@ -112,15 +84,13 @@ export default class CatalogRegion {
         this.scene['hint'].hide()
 
         // Scroll panel down by amount wheel moved
-        superPanel.childOY -= dy
+        this.panel.childOY -= dy
 
         // Ensure that panel isn't out bounds (Below 0% or above 100% scroll)
-        superPanel.t = Math.max(0, superPanel.t)
-        superPanel.t = Math.min(0.999999, superPanel.t)
+        this.panel.t = Math.max(0, this.panel.t)
+        this.panel.t = Math.min(0.999999, this.panel.t)
       },
     )
-
-    return superPanel
   }
 
   // Filter which cards can be selected in the catalog based on current filtering parameters
@@ -150,8 +120,10 @@ export default class CatalogRegion {
     this.panel.layout()
   }
 
-  private addCardToCatalog(card: Card, index: number): CardImage {
-    let cardImage = new CardImage(card, this.container, !Flags.mobile)
+  private createCard(card: Card): void {
+    const container = this.panel.getElement('panel')
+
+    const cardImage = new CardImage(card, container)
       .setOnClick(this.onClickCatalogCard(card))
       .setFocusOptions(
         'Add',
@@ -165,8 +137,6 @@ export default class CatalogRegion {
 
     // Add this cardImage to the maintained list of cardImages in the catalog
     this.cardCatalog.push(cardImage)
-
-    return cardImage
   }
 
   // Event when a card in the catalog is clicked
@@ -194,7 +164,7 @@ export default class CatalogRegion {
     const width = Space.windowWidth - x
 
     // Ratio of how much panel has been scrolled
-    const ratio = this.scrollablePanel.t
+    const ratio = this.panel.t
 
     // Animate shift
     if (this.panel.minWidth > width) {
@@ -204,8 +174,8 @@ export default class CatalogRegion {
         duration: Time.builderSlide(),
         ease: Ease.slide,
         onUpdate: () => {
-          this.scrollablePanel.layout()
-          this.scrollablePanel.t = ratio
+          this.panel.layout()
+          this.panel.t = ratio
         },
       })
     }
@@ -213,11 +183,11 @@ export default class CatalogRegion {
 
   // Shift the catalog to the left to fill the absence of deck panel
   shiftLeft(): void {
-    const x = Space.decklistPanelWidth // + (Flags.mobile ? Space.sliderWidth : 0)
+    const x = Space.decklistPanelWidth
     const width = Space.windowWidth - x
 
     // Ratio of how much panel has been scrolled
-    const ratio = this.scrollablePanel.t
+    const ratio = this.panel.t
 
     // Animate shift
     if (this.panel.minWidth < width) {
@@ -227,8 +197,8 @@ export default class CatalogRegion {
         duration: Time.builderSlide(),
         ease: Ease.slide,
         onUpdate: () => {
-          this.scrollablePanel.layout()
-          this.scrollablePanel.t = ratio
+          this.panel.layout()
+          this.panel.t = ratio
         },
       })
     }
