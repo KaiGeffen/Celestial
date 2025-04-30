@@ -126,6 +126,7 @@ export default class BaseScene extends SharedBaseScene {
       x: Space.windowWidth - Space.pad,
       y: Space.pad,
       f: this.openMenu(),
+      muteClick: true,
     })
       .setOrigin(1, 0)
       .setDepth(10)
