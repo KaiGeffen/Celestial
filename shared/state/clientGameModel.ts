@@ -90,6 +90,7 @@ function hideHiddenInformation(model: GameModel) {
   // Hide the opponent's vision
   model.status[1].vision = 0
 
+  // TODO Enable this but hide some info
   // Hide the opponent's animations
   model.animations[1] = []
 

@@ -133,7 +133,7 @@ export default class CardLocation {
   ): [number, number] {
     const x = 200 + Space.cardWidth / 2
     const y = todoTheirHandHeight
-    return [x - container.x, y - container.y]
+    return [x - (container?.x || 0), y - (container?.y || 0)]
   }
 
   static ourDiscard(
