@@ -20,6 +20,11 @@ export default class MenuScene extends BaseMenuScene {
   create(params): void {
     super.create(params)
 
+    // Hide any hint on the originating scene
+    if (params?.activeScene?.hint) {
+      params.activeScene.hint.hide()
+    }
+
     this.sceneEnding = false
 
     this.playSound('open')

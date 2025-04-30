@@ -452,6 +452,7 @@ export default class DecklistsRegion {
       } else {
         this.scene.scene.launch('MenuScene', {
           menu: 'newDeck',
+          activeScene: this.scene,
           callback: this.createCallback(),
         })
       }

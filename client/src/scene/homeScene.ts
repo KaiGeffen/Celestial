@@ -198,6 +198,7 @@ export default class HomeScene extends BaseScene {
         this.scene.launch('MenuScene', {
           menu: 'leaderboard',
           hint: 'leaderboard',
+          activeScene: this,
         })
       },
       hint: 'Leaderboard',
