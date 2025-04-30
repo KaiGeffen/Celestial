@@ -24,11 +24,8 @@ export default class Animator {
   }
 
   animate(state: GameModel): void {
-    const isRecapStart = state.story.resolvedActs.length === 0
-    if (state.isRecap && isRecapStart) {
-      this.animateRecapStart(state)
-      return
-    }
+    // Animate any cards being revealed
+    this.animateAllReveals(state)
 
     for (let owner = 0; owner < 2; owner++) {
       for (let i = 0; i < state.animations[owner].length; i++) {
@@ -358,6 +355,23 @@ export default class Animator {
     })
   }
 
+  // Animate all cards newly revealed on this state
+  private animateAllReveals(state: GameModel): void {
+    let acts = state.story.acts
+    let amtSeen = 0
+    for (let i = 0; i < acts.length; i++) {
+      // If it was hidden, flip it over
+      if (this.lastHiddenCards[i]) {
+        let card = this.view.story.cards[i]
+
+        if (card.card.id !== Catalog.cardback.id) {
+          this.animateReveal(card, amtSeen)
+          amtSeen++
+        }
+      }
+    }
+  }
+
   // Animate a card being revealed
   private animateReveal(card: CardImage, i: number): void {
     // Animate the back of the card flipping
@@ -406,30 +420,11 @@ export default class Animator {
     })
   }
 
-  // Animate cards being flipped over at the start of a recap
-  private animateRecapStart(state: GameModel): void {
-    let acts = state.story.acts
-    let amtSeen = 0
-    for (let i = 0; i < acts.length; i++) {
-      // If it was hidden, flip it over
-      if (this.lastHiddenCards[i]) {
-        let act = acts[i]
-
-        let card = this.view.story.cards[i]
-
-        this.animateReveal(card, amtSeen)
-
-        amtSeen++
-      }
-    }
-  }
-
   private getHiddenCards(state: GameModel): boolean[] {
     let result = []
 
     for (let i = 0; i < state.story.acts.length; i++) {
-      // TODO No unnamed constant / DRY
-      result[i] = state.story.acts[i].card.name === 'Catalog.Cardback'
+      result[i] = state.story.acts[i].card.id === Catalog.cardback.id
     }
 
     return result
