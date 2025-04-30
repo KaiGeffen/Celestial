@@ -76,7 +76,7 @@ export default class ModeMenu extends Menu {
   }
 
   private createPVE(activeScene: Phaser.Scene, deck: Deck) {
-    let sizer = this.scene['rexUI'].add.sizer({ width: width - Space.pad * 2 })
+    let sizer = this.scene.rexUI.add.sizer({ width: width - Space.pad * 2 })
 
     const txt = this.scene.add.text(
       0,
@@ -105,7 +105,7 @@ export default class ModeMenu extends Menu {
   }
 
   private createPVP(activeScene: Phaser.Scene, deck: Deck) {
-    let sizer = this.scene['rexUI'].add.sizer({ width: width - Space.pad * 2 })
+    let sizer = this.scene.rexUI.add.sizer({ width: width - Space.pad * 2 })
 
     const txt = this.scene.add.text(0, 0, 'Versus human opponent', Style.basic)
 
@@ -129,7 +129,7 @@ export default class ModeMenu extends Menu {
   }
 
   private createPWD(activeScene: Phaser.Scene, deck: Deck) {
-    let sizer = this.scene['rexUI'].add.sizer({ width: width - Space.pad * 2 })
+    let sizer = this.scene.rexUI.add.sizer({ width: width - Space.pad * 2 })
 
     const txt = this.scene.add.text(0, 0, 'Versus same password', Style.basic)
 

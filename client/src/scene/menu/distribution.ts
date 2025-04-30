@@ -12,7 +12,7 @@ export default class DistributionMenu extends Menu {
 
     const costs = this.getCosts(params.currentDeck)
 
-    let panel = scene['rexUI'].add.fixWidthSizer({
+    let panel = scene.rexUI.add.fixWidthSizer({
       x: Space.windowWidth / 2,
       y: Space.windowHeight / 2,
       align: 'center',
@@ -23,7 +23,7 @@ export default class DistributionMenu extends Menu {
     })
 
     // Add background
-    let rect = scene['rexUI'].add
+    let rect = scene.rexUI.add
       .roundRectangle(0, 0, 0, 0, Space.corner, Color.backgroundDark, 1)
       .setInteractive()
     panel.addBackground(rect)

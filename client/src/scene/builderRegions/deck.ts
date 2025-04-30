@@ -112,7 +112,7 @@ export default class DeckRegion {
   private createPanel(
     startCallback: () => void,
   ): Phaser.GameObjects.GameObject {
-    this.panel = this.scene['rexUI'].add.fixWidthSizer({
+    this.panel = this.scene.rexUI.add.fixWidthSizer({
       width: width,
       space: {
         top: Space.padSmall,
@@ -130,7 +130,7 @@ export default class DeckRegion {
       .setInteractive()
 
     const pad = Space.padSmall + (Flags.mobile ? Space.pad : 0)
-    let sizer = this.scene['rexUI'].add
+    let sizer = this.scene.rexUI.add
       .fixWidthSizer({
         space: { top: pad, bottom: pad },
       })
@@ -171,7 +171,7 @@ export default class DeckRegion {
   // Create title text, return a sizer with all of them
   private createTitle() {
     // Sizer for the top of the header
-    let sizerTop = this.scene['rexUI'].add.fixWidthSizer({
+    let sizerTop = this.scene.rexUI.add.fixWidthSizer({
       width: width,
       align: Flags.mobile ? 'left' : 'center',
     })
@@ -283,7 +283,7 @@ export default class DeckRegion {
     })
 
     // Make a container for all of the buttons
-    let sizerButtons = this.scene['rexUI'].add.fixWidthSizer({
+    let sizerButtons = this.scene.rexUI.add.fixWidthSizer({
       width:
         width - Space.pad - (Flags.mobile ? 0 : Space.avatarSize + Space.pad),
       align: 'center',

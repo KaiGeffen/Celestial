@@ -68,7 +68,7 @@ export default class OptionsMenu extends Menu {
     }
 
     // Sizer with tabs on left, contents on right
-    this.subsizer = this.scene['rexUI'].add.sizer({
+    this.subsizer = this.scene.rexUI.add.sizer({
       space: {
         item: Space.pad / 2,
         left: Space.pad,
@@ -105,7 +105,7 @@ export default class OptionsMenu extends Menu {
       .rectangle(0, 0, highlightWidth, height, COLOR, 1)
       .setOrigin(0, 0.5)
 
-    let tabsSizer = this.scene['rexUI'].add.fixWidthSizer(
+    let tabsSizer = this.scene.rexUI.add.fixWidthSizer(
       Flags.mobile
         ? {}
         : {
@@ -183,7 +183,7 @@ export default class OptionsMenu extends Menu {
   }
 
   private createGeneralPanel(activeScene: BaseScene) {
-    let sizer = this.scene['rexUI'].add
+    let sizer = this.scene.rexUI.add
       .sizer({
         orientation: 'vertical',
         space: {
@@ -216,7 +216,7 @@ export default class OptionsMenu extends Menu {
     return sizer
   }
   private createAudioPanel() {
-    let sizer = this.scene['rexUI'].add
+    let sizer = this.scene.rexUI.add
       .sizer({
         orientation: 'vertical',
         space: {
@@ -242,8 +242,8 @@ export default class OptionsMenu extends Menu {
   }
 
   private createRulebookPanel() {
-    let sizer = this.scene['rexUI'].add.fixWidthSizer({ width: this.subwidth })
-    let scrollable = this.scene['rexUI'].add
+    let sizer = this.scene.rexUI.add.fixWidthSizer({ width: this.subwidth })
+    let scrollable = this.scene.rexUI.add
       .scrollablePanel({
         space: {
           // top: Space.pad,
@@ -266,7 +266,7 @@ export default class OptionsMenu extends Menu {
       .hide()
 
     // Add text to the scrollable panel
-    let txt = this.scene['rexUI'].add.BBCodeText(0, 0, rulebookString, {
+    let txt = this.scene.rexUI.add.BBCodeText(0, 0, rulebookString, {
       ...BBStyle.optionsBlock,
       wrap: { width: this.subwidth },
     })
@@ -277,8 +277,8 @@ export default class OptionsMenu extends Menu {
   }
 
   private createCreditsPanel() {
-    let sizer = this.scene['rexUI'].add.fixWidthSizer({ width: this.subwidth })
-    let scrollable = this.scene['rexUI'].add
+    let sizer = this.scene.rexUI.add.fixWidthSizer({ width: this.subwidth })
+    let scrollable = this.scene.rexUI.add
       .scrollablePanel({
         space: {
           left: Space.pad / 2,
@@ -299,7 +299,7 @@ export default class OptionsMenu extends Menu {
       .hide()
 
     // Add text to the scrollable panel
-    let txt = this.scene['rexUI'].add.BBCodeText(0, 0, creditsString, {
+    let txt = this.scene.rexUI.add.BBCodeText(0, 0, creditsString, {
       ...BBStyle.optionsBlock,
       wrap: { width: this.subwidth },
     })
@@ -311,7 +311,7 @@ export default class OptionsMenu extends Menu {
 
   // Elements within the panels:
   private createSkipTutorial(activeScene: BaseScene) {
-    let sizer = this.scene['rexUI'].add.sizer({ width: this.subwidth })
+    let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
     let txtHint = this.scene.add.text(0, 0, 'Skip Tutorial:', Style.basic)
     sizer.add(txtHint)
@@ -419,7 +419,7 @@ export default class OptionsMenu extends Menu {
   }
 
   private createQuit(activeScene: BaseScene) {
-    let sizer = this.scene['rexUI'].add.sizer({ width: this.subwidth })
+    let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
     let containerQuit = new ContainerLite(
       this.scene,
@@ -452,7 +452,7 @@ export default class OptionsMenu extends Menu {
   }
 
   private createMasterVolume() {
-    let sizer = this.scene['rexUI'].add.sizer({
+    let sizer = this.scene.rexUI.add.sizer({
       width: this.subwidth,
       orientation: 'vertical',
       space: { item: Space.pad },
@@ -471,7 +471,7 @@ export default class OptionsMenu extends Menu {
   }
 
   private createMusicVolume() {
-    let sizer = this.scene['rexUI'].add.sizer({
+    let sizer = this.scene.rexUI.add.sizer({
       width: this.subwidth,
       orientation: 'vertical',
       space: { item: Space.pad },
@@ -494,7 +494,7 @@ export default class OptionsMenu extends Menu {
   }
 
   private createDialogVolume() {
-    let sizer = this.scene['rexUI'].add.sizer({
+    let sizer = this.scene.rexUI.add.sizer({
       width: this.subwidth,
       orientation: 'vertical',
       space: { item: Space.pad },
@@ -521,7 +521,7 @@ export default class OptionsMenu extends Menu {
       height: 20,
       orientation: 'x',
 
-      track: this.scene['rexUI'].add.roundRectangle(
+      track: this.scene.rexUI.add.roundRectangle(
         0,
         0,
         this.subwidth,
@@ -529,7 +529,7 @@ export default class OptionsMenu extends Menu {
         10,
         Color.sliderTrack,
       ),
-      indicator: this.scene['rexUI'].add.roundRectangle(
+      indicator: this.scene.rexUI.add.roundRectangle(
         0,
         0,
         0,

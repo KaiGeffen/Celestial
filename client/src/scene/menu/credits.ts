@@ -1,11 +1,7 @@
 import 'phaser'
-import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
-
-import RoundRectangle from 'phaser3-rex-plugins/plugins/roundrectangle.js'
-import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 import Menu from './menu'
-import { Space, Color, Style, UserSettings } from '../../settings/settings'
+import { Space, Color, Style } from '../../settings/settings'
 import MenuScene from '../menuScene'
 
 const width = 600
@@ -18,7 +14,7 @@ export default class CreditsMenu extends Menu {
     this.createContent()
 
     // Add panel to a scrollable panel
-    let scrollable = this.createScrollablePanel(scene, this.sizer)
+    let scrollable = this.createScrollablePanel(this.sizer)
     scrollable.layout()
   }
 
@@ -30,12 +26,12 @@ export default class CreditsMenu extends Menu {
     this.sizer.add(txt)
   }
 
-  private createScrollablePanel(scene: Phaser.Scene, panel) {
-    let background = scene['rexUI'].add
+  private createScrollablePanel(panel) {
+    let background = this.scene.rexUI.add
       .roundRectangle(0, 0, 0, 0, Space.corner, Color.backgroundDark)
       .setInteractive()
 
-    let scrollable = scene['rexUI'].add.scrollablePanel({
+    let scrollable = this.scene.rexUI.add.scrollablePanel({
       x: Space.windowWidth / 2,
       y: Space.windowHeight / 2,
       width: 50,

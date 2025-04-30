@@ -77,7 +77,7 @@ export default class DeckRegion {
   private createPanel(
     startCallback: () => void,
   ): Phaser.GameObjects.GameObject {
-    this.panel = this.scene['rexUI'].add.fixWidthSizer()
+    this.panel = this.scene.rexUI.add.fixWidthSizer()
 
     return this.panel
   }
@@ -98,7 +98,7 @@ export default class DeckRegion {
         Color.backgroundDark,
       )
 
-      sizer = this.scene['rexUI'].add
+      sizer = this.scene.rexUI.add
         .sizer({
           space: {
             left: Space.pad,
@@ -324,7 +324,7 @@ export default class DeckRegion {
 
   // Create a scrollable panel with all of the cards user has chosen
   private createChosenCardList() {
-    this.chosenPanel = this.scene['rexUI'].add.fixWidthSizer()
+    this.chosenPanel = this.scene.rexUI.add.fixWidthSizer()
 
     return this.chosenPanel
   }
@@ -332,7 +332,7 @@ export default class DeckRegion {
   // Create a scrollable panel with all of the given required cards
   private createRequiredCardList(cards: number[]) {
     // Create the sizer that contains the cards
-    let sizer = this.scene['rexUI'].add.fixWidthSizer()
+    let sizer = this.scene.rexUI.add.fixWidthSizer()
 
     this.setDeck(
       cards.map((id) => Catalog.allCards.find((card) => card.id === id)),

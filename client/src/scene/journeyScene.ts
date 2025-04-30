@@ -127,6 +127,7 @@ export default class JourneyScene extends BaseScene {
           },
         })
       },
+      muteClick: true,
       depth: 10,
     }).setNoScroll()
   }

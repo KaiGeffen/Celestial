@@ -74,7 +74,7 @@ export default class SearchMenu extends Menu {
 
   // Create the buttons at the bottom
   private createButtons(callback: (string) => void) {
-    let sizer = this.scene['rexUI'].add.sizer({
+    let sizer = this.scene.rexUI.add.sizer({
       width: width,
       space: {
         left: Space.pad,

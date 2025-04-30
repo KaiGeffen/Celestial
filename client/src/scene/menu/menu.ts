@@ -82,7 +82,7 @@ export default class Menu {
   }
 
   protected createSizer(): void {
-    this.sizer = this.scene['rexUI'].add.fixWidthSizer({
+    this.sizer = this.scene.rexUI.add.fixWidthSizer({
       x: Space.windowWidth / 2,
       y: Space.windowHeight / 2,
       width: this.width,
@@ -98,7 +98,7 @@ export default class Menu {
     })
 
     // Add background
-    let rect = this.scene['rexUI'].add
+    let rect = this.scene.rexUI.add
       .roundRectangle(0, 0, 0, 0, Space.corner, Color.backgroundDark, 1)
       .setInteractive()
     this.sizer.addBackground(rect)
@@ -123,7 +123,7 @@ export default class Menu {
   // Add the given string as text to the sizer
   protected createText(s: string): any {
     const width = this.width - Space.pad * 2
-    let sizer = this.scene['rexUI'].add.sizer({ width: width })
+    let sizer = this.scene.rexUI.add.sizer({ width: width })
 
     let txt = this.scene.add.text(0, 0, s, Style.basic).setWordWrapWidth(width)
 

@@ -1,58 +1,58 @@
-import 'phaser';
-import { Color, Space, Style } from '../../settings/settings';
-import Menu from './menu';
+import 'phaser'
+import { Color, Space, Style } from '../../settings/settings'
+import Menu from './menu'
 import MenuScene from '../menuScene'
 
-
 export default class RulebookMenu extends Menu {
-	constructor(scene: MenuScene, params) {
-		super(scene)
+  constructor(scene: MenuScene, params) {
+    super(scene)
 
-		this.createContent()
+    this.createContent()
 
-		// Add panel to a scrollable panel
-		let scrollable = this.createScrollablePanel()
-		scrollable.layout()
-	}
+    // Add panel to a scrollable panel
+    let scrollable = this.createScrollablePanel()
+    scrollable.layout()
+  }
 
-	private createContent() {
-		let txt = this.scene.add.text(0, 0, rulebookString, Style.basic)
-		.setWordWrapWidth(Space.windowWidth - Space.pad * 4)
+  private createContent() {
+    let txt = this.scene.add
+      .text(0, 0, rulebookString, Style.basic)
+      .setWordWrapWidth(Space.windowWidth - Space.pad * 4)
 
-		this.sizer.add(txt)
-	}
+    this.sizer.add(txt)
+  }
 
-	private createScrollablePanel() {
-		let background = this.scene['rexUI'].add.roundRectangle(0, 0, 0, 0, Space.corner, Color.backgroundDark)
-		.setInteractive()
+  private createScrollablePanel() {
+    let background = this.scene.rexUI.add
+      .roundRectangle(0, 0, 0, 0, Space.corner, Color.backgroundDark)
+      .setInteractive()
 
-		let scrollable = this.scene['rexUI'].add.scrollablePanel({
-			x: Space.windowWidth/2,
-			y: Space.windowHeight/2,
-			width: 50,
-			height: Space.windowHeight - Space.pad * 2,
+    let scrollable = this.scene.rexUI.add.scrollablePanel({
+      x: Space.windowWidth / 2,
+      y: Space.windowHeight / 2,
+      width: 50,
+      height: Space.windowHeight - Space.pad * 2,
 
-			header: this.createHeader('Rulebook', Space.maxTextWidth),
-			
-			panel: {
-				child: this.sizer.setDepth(1)
-			},
-			background: background,
+      header: this.createHeader('Rulebook', Space.maxTextWidth),
 
-			mouseWheelScroller: {
-				speed: 1
-			},
-		})
+      panel: {
+        child: this.sizer.setDepth(1),
+      },
+      background: background,
 
-		// NOTE This is a fix for sizer objects not deleting properly in all cases
-		scrollable.name = 'top'
+      mouseWheelScroller: {
+        speed: 1,
+      },
+    })
 
-		return scrollable
-	}
+    // NOTE This is a fix for sizer objects not deleting properly in all cases
+    scrollable.name = 'top'
+
+    return scrollable
+  }
 }
 
-const rulebookString = 
-`>>> SECTIONS
+const rulebookString = `>>> SECTIONS
 Overview
 Start of match
 Start phase

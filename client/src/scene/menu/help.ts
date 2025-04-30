@@ -27,7 +27,7 @@ export default class HelpMenu extends Menu {
 
   // Create the buttons at the bottom
   private createButtons(scene: Phaser.Scene, callback: () => void) {
-    let sizer = scene['rexUI'].add.sizer({
+    let sizer = this.scene.rexUI.add.sizer({
       width: width,
       space: {
         item: Space.pad,

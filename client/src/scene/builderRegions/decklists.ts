@@ -319,7 +319,7 @@ export default class DecklistsRegion {
       )
       sizer.add(line)
 
-      let hintSizer = this.scene['rexUI'].add.sizer({
+      let hintSizer = this.scene.rexUI.add.sizer({
         width: width - Space.pad * 2,
       })
       sizer.add(hintSizer)

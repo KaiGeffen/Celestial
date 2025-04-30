@@ -58,7 +58,7 @@ export default class ChoosePremade extends Menu {
 
   // This menu has a custom sizer that fills the whole screen and has different spacing
   protected createSizer(): void {
-    this.sizer = this.scene['rexUI'].add
+    this.sizer = this.scene.rexUI.add
       .fixWidthSizer({
         width: Space.windowWidth,
         space: {
@@ -96,7 +96,7 @@ export default class ChoosePremade extends Menu {
       Color.backgroundLight,
     )
 
-    let panel = this.scene['rexUI'].add
+    let panel = this.scene.rexUI.add
       .sizer({
         width: Space.windowWidth,
         space: {
@@ -156,7 +156,7 @@ export default class ChoosePremade extends Menu {
 
   // Create all of the content about the selected character
   private createPanel(): any {
-    let panel = this.scene['rexUI'].add.sizer({
+    let panel = this.scene.rexUI.add.sizer({
       space: {
         left: Space.pad,
         bottom: Space.buttonHeight + Space.padSmall,
@@ -178,7 +178,7 @@ export default class ChoosePremade extends Menu {
   }
 
   private createDescriptionText(): any {
-    let panel = this.scene['rexUI'].add.fixWidthSizer({
+    let panel = this.scene.rexUI.add.fixWidthSizer({
       space: {
         bottom: Flags.mobile ? Space.buttonHeight * 2 : 0,
       },
@@ -194,7 +194,7 @@ export default class ChoosePremade extends Menu {
       Space.maxTextWidth + Space.padSmall * 2,
       Space.windowWidth - Space.avatarWidth - Space.pad * 3,
     )
-    this.txtDescription = this.scene['rexUI'].add
+    this.txtDescription = this.scene.rexUI.add
       .BBCodeText(0, 0, '', BBStyle.description)
       .setWrapWidth(
         width -
@@ -243,7 +243,7 @@ export default class ChoosePremade extends Menu {
       ? this.scrollablePanel.width
       : this.txtDescription.displayWidth
 
-    let panel = this.scene['rexUI'].add
+    let panel = this.scene.rexUI.add
       .sizer({
         x: this.avatarFull.displayWidth + Space.pad * 2,
         y: Space.windowHeight - Space.pad,

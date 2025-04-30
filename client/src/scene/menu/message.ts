@@ -28,7 +28,7 @@ export default class ConfirmMenu extends Menu {
   }
 
   private createTextAndCard(card: Card, s: string): void {
-    let sizer = this.scene['rexUI'].add.sizer({
+    let sizer = this.scene.rexUI.add.sizer({
       width: this.width - Space.pad * 2,
       space: { item: Space.pad },
     })
