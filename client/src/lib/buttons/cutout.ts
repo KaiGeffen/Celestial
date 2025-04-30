@@ -82,15 +82,15 @@ export default class Cutout extends Button {
       within.add(txt)
     }
 
-    // TODO
-    const txtCost = this.scene.add['rexBBCodeText'](
+    // Cost and points of the card
+    const txtCost = this.scene.add.rexBBCodeText(
       -164,
       -22,
       `[b]${card.cost}[/b]`,
       BBStyle.cardStats,
     )
     within.add(txtCost)
-    const txtPoints = this.scene.add['rexBBCodeText'](
+    const txtPoints = this.scene.add.rexBBCodeText(
       -130,
       -12,
       `[b]${card.points}[/b]`,

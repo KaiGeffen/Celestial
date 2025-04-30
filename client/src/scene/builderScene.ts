@@ -227,8 +227,7 @@ export class BuilderScene extends BuilderBase {
 
   setSearchVisible(value: boolean): void {
     if (this.filterRegion.searchObj !== undefined) {
-      // TODO Better integrate rexUI types
-      this.filterRegion.searchObj['setVisible'](value)
+      this.filterRegion.searchObj.setVisible(value)
     }
   }
 

@@ -156,7 +156,7 @@ export class GameScene extends BaseScene {
       net.playCard(i, this.currentVersion)
     })
     view.ourBoard.setDisplayCostCallback((cost: number) => {
-      this.view.ourScore['displayCost'](cost)
+      this.view.ourScore.displayCost(cost)
     })
     view.ourAvatar.setEmoteCallback(() => {
       this.net.signalEmote()

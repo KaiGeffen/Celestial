@@ -273,12 +273,13 @@ export class CardImage {
     let hint = this.scene.hint
 
     // Cost
-    this.txtCost = this.scene.add['rexBBCodeText'](
-      -Space.cardWidth / 2 + statOffset1,
-      -Space.cardHeight / 2 + statOffset1,
-      `[b]${this.card.cost}[/b]`,
-      BBStyle.cardStats,
-    )
+    this.txtCost = this.scene.add
+      .rexBBCodeText(
+        -Space.cardWidth / 2 + statOffset1,
+        -Space.cardHeight / 2 + statOffset1,
+        `[b]${this.card.cost}[/b]`,
+        BBStyle.cardStats,
+      )
       .setVisible(this.card.id !== Catalog.cardback.id)
       .setOrigin(0.5)
       .on('pointerover', () =>
@@ -291,12 +292,13 @@ export class CardImage {
       .on('pointerdown', () => this.clickCallback())
 
     // Points
-    this.txtPoints = this.scene.add['rexBBCodeText'](
-      -Space.cardWidth / 2 + statOffset1,
-      -Space.cardHeight / 2 + statOffset2,
-      `[b]${this.card.points}[/b]`,
-      BBStyle.cardStats,
-    )
+    this.txtPoints = this.scene.add
+      .rexBBCodeText(
+        -Space.cardWidth / 2 + statOffset1,
+        -Space.cardHeight / 2 + statOffset2,
+        `[b]${this.card.points}[/b]`,
+        BBStyle.cardStats,
+      )
       .setVisible(this.card.id !== Catalog.cardback.id)
       .setOrigin(0.5)
       .on('pointerover', () =>
