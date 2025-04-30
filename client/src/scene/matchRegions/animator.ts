@@ -41,6 +41,8 @@ export default class Animator {
         // Transform a card
         else if (animation.from === Zone.Transform) {
           this.animateTransform(animation, i, owner)
+        } else if (animation.from === Zone.Status) {
+          // TODO
         }
         // In all other cases, move it from start to end
         else {
