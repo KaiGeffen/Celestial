@@ -1,5 +1,6 @@
 import 'phaser'
 import jwt_decode from 'jwt-decode'
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import type { CredentialResponse } from 'google-one-tap'
 import type { GoogleJwtPayload } from '../types/google'
 import Loader from '../loader/loader'
@@ -21,6 +22,9 @@ import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
 // Scene for user to select a sign in option, without loading assets
 export class SigninScene extends Phaser.Scene {
+  // Allows for typing objects in RexUI library
+  rexUI: RexUIPlugin
+
   // True when user is signed or chose to be a guest
   signedInOrGuest: boolean = false
   guestButton: Button
@@ -85,7 +89,7 @@ export class SigninScene extends Phaser.Scene {
       }
     }
 
-    let txt = this['rexUI'].add
+    let txt = this.rexUI.add
       .BBCodeText(
         Space.windowWidth / 2,
         Space.windowHeight / 2,

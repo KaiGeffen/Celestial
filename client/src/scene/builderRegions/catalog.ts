@@ -81,7 +81,7 @@ export default class CatalogRegion {
         }
 
         // Hide the hint, which might have been scrolled away from
-        this.scene['hint'].hide()
+        this.scene.hint.hide()
 
         // Scroll panel down by amount wheel moved
         this.panel.childOY -= dy

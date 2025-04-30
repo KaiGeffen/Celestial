@@ -44,12 +44,8 @@ export default class ModeMenu extends Menu {
   }
 
   private createPasswordEntry() {
-    this.inputText = this.scene.add['rexInputText'](
-      0,
-      0,
-      width - Space.pad * 2,
-      40,
-      {
+    this.inputText = this.scene.add
+      .rexInputText(0, 0, width - Space.pad * 2, 40, {
         type: 'text',
         text: '', // Retain the last password
         align: 'center',
@@ -61,16 +57,16 @@ export default class ModeMenu extends Menu {
         maxLength: 10,
         selectAll: true,
         id: 'search-field',
-      },
-    ).on('textchange', (inputText) => {
-      this.password = inputText.text
+      })
+      .on('textchange', (inputText) => {
+        this.password = inputText.text
 
-      if (inputText.text === '') {
-        this.btnPwd.disable()
-      } else {
-        this.btnPwd.enable()
-      }
-    })
+        if (inputText.text === '') {
+          this.btnPwd.disable()
+        } else {
+          this.btnPwd.enable()
+        }
+      })
 
     return this.inputText
   }

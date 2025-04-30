@@ -40,12 +40,8 @@ export default class SearchMenu extends Menu {
       Space.textboxHeight,
     )
 
-    this.textboxSearch = this.scene.add['rexInputText'](
-      0,
-      0,
-      Space.textboxWidth,
-      Space.textboxHeight,
-      {
+    this.textboxSearch = this.scene.add
+      .rexInputText(0, 0, Space.textboxWidth, Space.textboxHeight, {
         type: 'text',
         text: start,
         align: 'center',
@@ -57,8 +53,8 @@ export default class SearchMenu extends Menu {
         maxLength: 40,
         selectAll: true,
         id: 'search-field',
-      },
-    ).removeInteractive()
+      })
+      .removeInteractive()
 
     // Reskin for text input
     let icon = this.scene.add.image(
