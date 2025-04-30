@@ -49,7 +49,7 @@ export default class AvatarButton extends Button {
 
     // Set it so the avatar emotes briefly when clicked
     if (emotive) {
-      this.onClick = this.doEmote
+      this.onClick = () => this.doEmote()
     }
   }
 

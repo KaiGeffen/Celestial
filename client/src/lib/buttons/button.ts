@@ -473,7 +473,7 @@ export default class Button {
 }
 
 function thisThenThat(f: () => void, g: () => void): () => void {
-  return function () {
+  return () => {
     f()
     g()
   }
