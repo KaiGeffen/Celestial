@@ -127,7 +127,12 @@ export class JourneyBuilderScene extends BuilderBase {
       const aiDeck: Deck = {
         name: 'AI Deck',
         cards: this.params.opponent,
-        cosmeticSet: this.deckRegion.cosmeticSet,
+        // TODO: Make this is specific to the mission
+        cosmeticSet: {
+          avatar: 0,
+          border: 0,
+          relic: 0,
+        },
       }
 
       // Start a match against an ai opponent with the specified deck
