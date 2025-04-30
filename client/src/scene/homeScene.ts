@@ -211,7 +211,7 @@ export default class HomeScene extends BaseScene {
 
     // Journey
     new Buttons.HomeScene(this, buttonWidth / 2 + Space.pad, y, 'Journey', () =>
-      this.scene.start('AdventureScene'),
+      this.scene.start('JourneyScene'),
     )
 
     // Play

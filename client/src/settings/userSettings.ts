@@ -28,14 +28,14 @@ export class UserSettings {
       // List to use when playing with in development content
       devDecks: [],
 
-      // For adventure mode, for each card, whether or not that card has been unlocked
+      // For journey mode, for each card, whether or not that card has been unlocked
       inventory: getStartingInventory(),
 
       // List of each mission by its id, and if the player has completed it
       completedMissions: [],
 
-      // Coordinates for the camera in adventure mode
-      adventureCoordinates: {
+      // Coordinates for the camera in journey mode
+      journeyCoordinates: {
         x: 4650 - Space.windowWidth / 2,
         y: 700 - Space.windowHeight / 2,
       },

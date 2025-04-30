@@ -104,7 +104,7 @@ export const Color: Record<string, any> = {
   passText: CoreColors.blackS,
   roundResult: CoreColors.blackS,
 
-  // Adventure
+  // Journey
   mapIndicator: CoreColors.blue,
 
   // Tutorial

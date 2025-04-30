@@ -58,10 +58,10 @@ export class Time {
   // Time for menu to open / close
   static menuTransition = 200
 
-  // Stillframes in adventure mode scrolling
+  // Stillframes in journey mode scrolling
   static stillframeScroll = 2000
 
-  // Stillframes in adventure mode fading out
+  // Stillframes in journey mode fading out
   static stillframeFade = 500
 
   // On the searching scene, how long between when the avatar swaps

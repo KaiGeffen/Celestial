@@ -19,7 +19,7 @@ const DIRECTORIES = [
   'img/icon',
   'img/store',
   'img/background',
-  'img/story',
+  'img/journey',
   'img/border',
   'img/relic',
   'img/pet',

@@ -5,9 +5,6 @@ import 'phaser'
 import GameModel from '../../../../shared/state/gameModel'
 import { Space, Flags } from '../../settings/settings'
 
-// Amount of room to leave to the right of the last card in either hand
-const minRoom = (Flags.mobile ? 210 : 342) + Space.cardWidth / 2
-
 // TODO Remove this, deck and discard are no longer used
 const todoTheirHandHeight = -Space.todoHandOffset
 

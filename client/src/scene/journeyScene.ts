@@ -12,12 +12,10 @@ import Buttons from '../lib/buttons/buttons'
 import Button from '../lib/buttons/button'
 
 import Catalog from '../../../shared/state/catalog'
-import { adventureNode, adventureData } from '../adventures/adventure'
+import { journeyNode, journeyData } from '../journey/journey'
 
-// TODO Remove the arrow images because drag is now default
-
-// TODO Make consistent with Journey (Change adventure to journey or vice verca)
-export default class AdventureScene extends BaseScene {
+// TODO Make consistent with Journey (Change journey to journey or vice verca)
+export default class JourneyScene extends BaseScene {
   panDirection
 
   map: Phaser.GameObjects.Image
@@ -30,7 +28,7 @@ export default class AdventureScene extends BaseScene {
 
   constructor() {
     super({
-      key: 'AdventureScene',
+      key: 'JourneyScene',
     })
   }
 
@@ -38,7 +36,7 @@ export default class AdventureScene extends BaseScene {
     super.create()
 
     // Create the background
-    this.map = this.add.image(0, 0, 'story-Map').setOrigin(0).setInteractive()
+    this.map = this.add.image(0, 0, 'journey-Map').setOrigin(0).setInteractive()
     this.enableDrag()
 
     // Bound camera on this map
@@ -48,7 +46,7 @@ export default class AdventureScene extends BaseScene {
     this.createHelpButton()
 
     // Add all of the available nodes
-    this.addAdventureData()
+    this.addJourneyData()
 
     if (params.stillframe !== undefined) {
       this.createStillframe(params)
@@ -65,7 +63,7 @@ export default class AdventureScene extends BaseScene {
     }
 
     // Scroll to the given position
-    const coords = UserSettings._get('adventureCoordinates')
+    const coords = UserSettings._get('journeyCoordinates')
     this.cameras.main.scrollX = coords.x
     this.cameras.main.scrollY = coords.y
 
@@ -80,7 +78,7 @@ export default class AdventureScene extends BaseScene {
     }
 
     if (this.panDirection !== undefined) {
-      AdventureScene.moveCamera(
+      JourneyScene.moveCamera(
         this.cameras.main,
         this.panDirection[0],
         this.panDirection[1],
@@ -95,7 +93,7 @@ export default class AdventureScene extends BaseScene {
       const dx = ((pointer.x - pointer.downX) * delta) / 100
       const dy = ((pointer.y - pointer.downY) * delta) / 100
 
-      AdventureScene.moveCamera(camera, dx, dy)
+      JourneyScene.moveCamera(camera, dx, dy)
     }
 
     // Switch the frame of the animated elements every frame
@@ -171,7 +169,7 @@ export default class AdventureScene extends BaseScene {
         () => {
           const camera = this.cameras.main
           camera.centerOn(btn.icon.x, btn.icon.y)
-          AdventureScene.rememberCoordinates(camera)
+          JourneyScene.rememberCoordinates(camera)
         },
         'mission',
         true,
@@ -191,7 +189,7 @@ export default class AdventureScene extends BaseScene {
     let container = this.add.container().setDepth(11)
 
     let img = this.add
-      .image(Space.windowWidth / 2, 0, `story-Story 4`)
+      .image(Space.windowWidth / 2, 0, `journey-Story 4`)
       .setOrigin(0.5, 0)
       .setInteractive()
 
@@ -289,15 +287,15 @@ export default class AdventureScene extends BaseScene {
     params.stillframe = undefined
 
     // Reposition the stillframe to be visible to the camera
-    const coords = UserSettings._get('adventureCoordinates')
+    const coords = UserSettings._get('journeyCoordinates')
     container.setPosition(coords.x, coords.y)
   }
 
   // Add all of the missions to the panel
-  private addAdventureData(): void {
+  private addJourneyData(): void {
     let completed: boolean[] = UserSettings._get('completedMissions')
 
-    let unlockedMissions = adventureData.filter(function (mission) {
+    let unlockedMissions = journeyData.filter(function (mission) {
       // Return whether any of the necessary conditions have been met
       // Prereqs are in CNF (Or of sets of Ands)
       return mission.prereq.some(function (prereqs, _) {
@@ -307,9 +305,9 @@ export default class AdventureScene extends BaseScene {
       })
     })
 
-    // Add each of the adventures as its own line
+    // Add each of the journeys as its own line
     this.animatedBtns = []
-    unlockedMissions.forEach((mission: adventureNode) => {
+    unlockedMissions.forEach((mission: journeyNode) => {
       // For now, it's all either the waving figure or ? icon
       const nodeType = 'deck' in mission ? 'Mission' : 'QuestionMark'
       let btn = new Buttons.Mission(
@@ -330,17 +328,17 @@ export default class AdventureScene extends BaseScene {
   }
 
   // Return the function for what happens when the given mission node is clicked on
-  private missionOnClick(mission: adventureNode): () => void {
+  private missionOnClick(mission: journeyNode): () => void {
     return () => {
       if ('deck' in mission) {
-        this.scene.start('AdventureBuilderScene', mission)
+        this.scene.start('JourneyBuilderScene', mission)
       } else {
         // Complete the mission
         UserSettings._setIndex('completedMissions', mission.id, true)
 
         // Show tip
         if ('tip' in mission) {
-          this.scene.start('AdventureScene', { txt: mission.tip })
+          this.scene.start('JourneyScene', { txt: mission.tip })
         }
         // Unlock the card
         else if ('card' in mission) {
@@ -348,9 +346,9 @@ export default class AdventureScene extends BaseScene {
 
           const card = Catalog.getCardById(mission.card)
           if (card === undefined) {
-            this.scene.start('AdventureScene', { txt: 'Error, card undefined' })
+            this.scene.start('JourneyScene', { txt: 'Error, card undefined' })
           } else {
-            this.scene.start('AdventureScene', {
+            this.scene.start('JourneyScene', {
               txt: card.story,
               card: card,
             })
@@ -366,7 +364,7 @@ export default class AdventureScene extends BaseScene {
     this.input.on(
       'gameobjectwheel',
       (pointer, gameObject, dx, dy, dz, event) => {
-        AdventureScene.moveCamera(camera, dx, dy)
+        JourneyScene.moveCamera(camera, dx, dy)
       },
     )
   }
@@ -444,12 +442,12 @@ export default class AdventureScene extends BaseScene {
     camera.scrollY = Math.max(0, camera.scrollY + dy)
 
     // Remember the camera position
-    AdventureScene.rememberCoordinates(camera)
+    JourneyScene.rememberCoordinates(camera)
   }
 
   // Remember the position of the camera so the next time this scene launches it's in the same place
   private static rememberCoordinates(camera): void {
-    UserSettings._set('adventureCoordinates', {
+    UserSettings._set('journeyCoordinates', {
       x: camera.scrollX,
       y: camera.scrollY,
     })

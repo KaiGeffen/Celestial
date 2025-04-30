@@ -79,13 +79,13 @@ export class BuilderBase extends BaseScene {
   }
 }
 
-export class AdventureBuilderScene extends BuilderBase {
+export class JourneyBuilderScene extends BuilderBase {
   journeyRegion: JourneyRegion
 
   constructor() {
     super({
-      key: 'AdventureBuilderScene',
-      lastScene: 'AdventureScene',
+      key: 'JourneyBuilderScene',
+      lastScene: 'JourneyScene',
     })
   }
 
@@ -131,7 +131,7 @@ export class AdventureBuilderScene extends BuilderBase {
       }
 
       // Start a match against an ai opponent with the specified deck
-      this.scene.start('AdventureGameScene', {
+      this.scene.start('JourneyGameScene', {
         deck: this.journeyRegion.getDeck(),
         aiDeck: aiDeck,
         missionID: this.params.id,

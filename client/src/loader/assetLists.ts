@@ -297,7 +297,7 @@ export const assetLists = {
       "Texture"
     ]
   },
-  "story": {
+  "journey": {
     "files": [
       "Map",
       "Match",

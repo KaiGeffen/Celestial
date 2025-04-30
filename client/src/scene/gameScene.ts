@@ -552,12 +552,10 @@ export class StandardGameScene extends GameScene {
   }
 }
 
-export class AdventureGameScene extends GameScene {
+export class JourneyGameScene extends GameScene {
   winSeen: boolean
 
-  constructor(
-    args = { key: 'AdventureGameScene', lastScene: 'AdventureScene' },
-  ) {
+  constructor(args = { key: 'JourneyGameScene', lastScene: 'JourneyScene' }) {
     super(args)
   }
 

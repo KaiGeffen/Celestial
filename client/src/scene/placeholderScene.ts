@@ -34,7 +34,7 @@ export default class PlaceholderScene extends BaseScene {
 const s = `
 Having completed the tutorial, you're now ready to play the full game!
 
-From the title screen you can continue the single-player adventure mode, slowly accumulating cards and learning about the 6 unique characters as they traverse the city.
+From the title screen you can continue the single-player Journey mode, slowly accumulating cards and learning about the 6 unique characters as they traverse the city.
 
 Alternatively, in Free Play you can choose from any premade deck to play against the AI or a human opponent, or make your own deck from any of the cards in the game.
 

@@ -375,7 +375,7 @@ export class ResultsRegionTutorial extends ResultsRegion {
     return () => {
       // If we are done with tutorials,
       if (this.missionID >= TUTORIAL_LENGTH) {
-        this.scene.scene.start('AdventureScene', { stillframe: 4 })
+        this.scene.scene.start('JourneyScene', { stillframe: 4 })
       } else {
         this.scene.scene.start('TutorialGameScene', {
           missionID: this.missionID,

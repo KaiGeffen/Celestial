@@ -8,7 +8,7 @@ import water from './water.json'
 
 import intro from './intro.json'
 
-export const adventureData: adventureNode[] = [
+export const journeyData: journeyNode[] = [
   ...intro,
   ...birds,
   ...ashes,
@@ -20,7 +20,7 @@ export const adventureData: adventureNode[] = [
 ]
 
 // Base interface with common properties
-interface AdventureBase {
+interface JourneyBase {
   name: string
   x: number
   y: number
@@ -28,20 +28,20 @@ interface AdventureBase {
   prereq: number[][]
 }
 
-interface MissionNode extends AdventureBase {
+interface MissionNode extends JourneyBase {
   deck: number[]
   opponent: number[]
   storyTitle?: string
   storyText?: string
 }
 
-interface CardNode extends AdventureBase {
+interface CardNode extends JourneyBase {
   card: number
 }
 
-interface TipNode extends AdventureBase {
+interface TipNode extends JourneyBase {
   tip: string
 }
 
-// Adventure is the union of all node types
-export type adventureNode = MissionNode | CardNode | TipNode
+// Journey is the union of all node types
+export type journeyNode = MissionNode | CardNode | TipNode

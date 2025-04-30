@@ -202,7 +202,7 @@ export class SearchingRegionTutorial extends Region {
       .image(
         Space.windowWidth / 2,
         0,
-        `story-Story ${tutorialNum === 0 ? 1 : 3}`,
+        `journey-Story ${tutorialNum === 0 ? 1 : 3}`,
       )
       .setOrigin(0.5, 0)
       .setInteractive()
@@ -274,7 +274,7 @@ export class SearchingRegionTutorial extends Region {
           this.currentFrame += 1
 
           // Change the background image
-          this.img.setTexture(`story-Story ${this.currentFrame}`)
+          this.img.setTexture(`journey-Story ${this.currentFrame}`)
 
           this.tweenImage()
 

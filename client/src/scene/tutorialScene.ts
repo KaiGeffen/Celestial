@@ -1,7 +1,7 @@
 import 'phaser'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
-import { AdventureGameScene } from './gameScene'
+import { JourneyGameScene } from './gameScene'
 import data from '../catalog/tutorial.json'
 import { Space, Color, BBStyle, Time, Depth, Flags } from '../settings/settings'
 import Button from '../lib/buttons/button'
@@ -14,7 +14,7 @@ import { Animation } from '../../../shared/animation'
 import { Zone } from '../../../shared/state/zone'
 import GameModel from '../../../shared/state/gameModel'
 
-export default class TutorialGameScene extends AdventureGameScene {
+export default class TutorialGameScene extends JourneyGameScene {
   // How far into the tutorial (How many lines of text you have seen)
   progress: number
 
@@ -32,9 +32,7 @@ export default class TutorialGameScene extends AdventureGameScene {
 
   isTutorial = true
 
-  constructor(
-    args = { key: 'TutorialGameScene', lastScene: 'AdventureScene' },
-  ) {
+  constructor(args = { key: 'TutorialGameScene', lastScene: 'JourneyScene' }) {
     super(args)
   }
 
