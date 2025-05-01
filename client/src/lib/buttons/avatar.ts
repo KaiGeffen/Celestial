@@ -21,6 +21,7 @@ export default class AvatarButton extends Button {
     f = () => {},
     emotive = false,
     origin = [0.5, 0.5],
+    muteClick = false,
   }) {
     if (avatarId !== undefined) {
       name = avatarNames[avatarId]
@@ -35,7 +36,7 @@ export default class AvatarButton extends Button {
         click: f,
       },
       sound: {
-        mute: true,
+        mute: emotive || muteClick,
       },
     })
 

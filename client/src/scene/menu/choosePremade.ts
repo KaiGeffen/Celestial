@@ -129,7 +129,7 @@ export default class ChoosePremade extends Menu {
           this.setContent(avatarDetails[i])
 
           // Scroll up the content
-          this.scrollablePanel.scrollToTop()
+          this.scrollablePanel?.scrollToTop()
           this.sizer.layout()
         },
       })
