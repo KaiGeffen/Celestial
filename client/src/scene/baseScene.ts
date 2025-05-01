@@ -225,10 +225,7 @@ export class BaseSceneWithHeader extends BaseScene {
       text: 'Back',
       x: Space.pad + Space.buttonWidth / 2,
       y: this.headerHeight / 2,
-      f: () => {
-        this.sound.play('click')
-        this.scene.start('HomeScene')
-      },
+      f: () => this.scene.start('HomeScene'),
     })
 
     // Create title back in center

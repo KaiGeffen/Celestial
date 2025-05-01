@@ -90,10 +90,7 @@ export default class StoreScene extends BaseSceneWithHeader {
     new Buttons.Basic({
       within: container,
       text: 'Purchase 💎',
-      f: () => {
-        this.sound.play('click')
-        this.scene.launch('MenuScene', { menu: 'purchaseGems' })
-      },
+      f: () => this.scene.launch('MenuScene', { menu: 'purchaseGems' }),
     })
     sizer.add(container)
 
