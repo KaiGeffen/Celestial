@@ -137,7 +137,7 @@ class Fates extends Card {
     super.play(player, game, index, bonus)
 
     // Atropos the inevitable
-    if (super.exhale(6, game, player)) {
+    if (super.exhale(5, game, player)) {
       super.reset(game)
     }
 
@@ -155,7 +155,7 @@ class Fates extends Card {
 const fates = new Fates({
   name: 'Fates',
   id: 93,
-  text: "Exhale 6: Set both players' points to 0.\nExhale 3: Nourish 2\nExhale 1: Birth 1",
+  text: "Exhale 5: Set both players' points to 0.\nExhale 3: Nourish 2\nExhale 1: Birth 1",
   beta: true,
 })
 

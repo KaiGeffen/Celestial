@@ -158,7 +158,7 @@ const storytime = new Storytime({
   name: 'Storytime',
   id: 82,
   cost: 6,
-  points: 2,
+  points: 3,
   text: 'Create a copy in hand of each card later in the 	story with base-cost 0.',
   beta: true,
 })
