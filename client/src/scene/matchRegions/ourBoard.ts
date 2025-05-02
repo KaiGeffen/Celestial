@@ -18,7 +18,7 @@ import { GameScene } from '../gameScene'
 import { MechanicsSettings } from '../../../../shared/settings'
 
 // The y distance card moves up when hovered
-const HOVER_OFFSET = Space.cardHeight / 2
+const HOVER_OFFSET = Space.cardHeight / 2 + Space.padSmall
 
 export default class OurBoardRegion extends Region {
   // Function called when elements in this region are interacted with
@@ -204,7 +204,7 @@ export default class OurBoardRegion extends Region {
 
       // If shift is held or card was hovered, raise the card immediately
       if (i === this.raisedCardIndex || this.isShiftHeld) {
-        card.container.setY(-Space.cardHeight / 2)
+        card.container.setY(-HOVER_OFFSET)
       }
 
       const cost = state.cardCosts[i]
@@ -239,7 +239,7 @@ export default class OurBoardRegion extends Region {
         const pointer = this.scene.input.activePointer
         const pointerOverCard = card.image
           .getBounds()
-          .contains(pointer.x, pointer.y - Space.cardHeight / 2)
+          .contains(pointer.x, pointer.y - HOVER_OFFSET)
 
         if (pointerOverCard) {
           card.image.emit('pointerover')
@@ -263,7 +263,7 @@ export default class OurBoardRegion extends Region {
         // Raise the card
         this.scene.tweens.add({
           targets: card.container,
-          y: -Space.cardHeight / 2,
+          y: -HOVER_OFFSET,
           duration: Time.playCard() / 2,
           ease: 'Sine.easeOut',
         })
@@ -321,7 +321,7 @@ export default class OurBoardRegion extends Region {
     this.cards.forEach((card, index) => {
       this.scene.tweens.add({
         targets: card.container,
-        y: -Space.cardHeight / 2,
+        y: -HOVER_OFFSET,
         duration: Time.playCard() / 2,
         ease: 'Sine.easeOut',
       })
