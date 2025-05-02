@@ -17,6 +17,7 @@ export class CardImage {
   card: Card
   image: Phaser.GameObjects.Image
   visible = true
+  interactive = false
 
   // Visual elements that appear on the cardImage
   txtCost: BBCodeText
@@ -122,6 +123,7 @@ export class CardImage {
 
   setOnClick(f: () => void, removeListeners = false): this {
     this.clickCallback = f
+    this.interactive = true
     return this
   }
 
@@ -437,14 +439,16 @@ export class CardImage {
     }
 
     return () => {
-      // If already hovered, exit
+      // Don't do anything if hover has already happened
       if (this.hovered) {
         return
       }
       this.hovered = true
 
-      // Apply the highlight effect
-      doHighlight()
+      // Apply the highlight effect if it's interactive
+      if (this.interactive) {
+        doHighlight()
+      }
 
       // Do the callback
       this.hoverCallback()
