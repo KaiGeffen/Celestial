@@ -32,9 +32,10 @@ export class CardImage {
   // The card's cost, if it has been changed
   cost: number
 
-  hoverCallback = () => {}
-  exitCallback = () => {}
-  clickCallback = () => {}
+  // Use arrow functions for callbacks to preserve 'this'
+  hoverCallback: () => void = () => {}
+  exitCallback: () => void = () => {}
+  clickCallback: () => void = () => {}
 
   // The index of this container within its parent container before it was brought to top
   renderIndex: number = undefined
@@ -102,60 +103,38 @@ export class CardImage {
   }
 
   destroy(): void {
-    ;[this.image, this.txtCost, this.txtPoints, this.container].forEach(
-      (obj) => {
-        obj.destroy()
-      },
+    ;[this.image, this.txtCost, this.txtPoints, this.container].forEach((obj) =>
+      obj.destroy(),
     )
   }
 
-  show(): CardImage {
+  show(): this {
     this.container.setVisible(true)
     this.visible = true
-
     return this
   }
 
-  hide(): CardImage {
+  hide(): this {
     this.container.setVisible(false)
     this.visible = false
-
     return this
   }
 
-  // Set the callback to fire when this card's image is clicked
-  setOnClick(f: () => void, removeListeners = false): CardImage {
-    // let callback
-    // if (removeListeners || this.clickCallback === undefined) {
-    //   callback = f
-    // }
-    // else {
-    //   callback = () => {
-    //     this.clickCallback()
-    //     f()
-    //   }
-    // }
-
+  setOnClick(f: () => void, removeListeners = false): this {
     this.clickCallback = f
-
     return this
   }
 
-  // Set the callback to fire when this card's image is hovered, and one for when exited
-  setOnHover(fHover: () => void, fExit: () => void): CardImage {
-    var oldHover = this.hoverCallback
+  setOnHover(fHover: () => void, fExit: () => void): this {
+    const oldHover = this.hoverCallback
     this.hoverCallback = () => {
       oldHover()
       fHover()
     }
 
-    var oldExit = this.exitCallback
+    const oldExit = this.exitCallback
     this.exitCallback = () => {
-      // Don't do the callback if this isn't currently hovered
-      if (!this.hovered) {
-        return
-      }
-
+      if (!this.hovered) return
       oldExit()
       fExit()
     }
@@ -163,15 +142,13 @@ export class CardImage {
     return this
   }
 
-  removeOnHover(): CardImage {
+  removeOnHover(): this {
     this.hoverCallback = () => {}
     this.exitCallback = () => {}
-
     return this
   }
 
-  // Set whether this card is playable
-  setPlayable(isPlayable: Boolean): void {
+  setPlayable(isPlayable: boolean): void {
     if (isPlayable) {
       this.clearTint()
     } else {
@@ -180,33 +157,29 @@ export class CardImage {
   }
 
   // Set that a card has resolved (In the story)
-  setResolved(): CardImage {
+  setResolved(): this {
     this.setTint(Color.cardGreyed)
-
     return this
   }
 
-  setPosition(position: [number, number]): CardImage {
+  setPosition(position: [number, number]): this {
     this.container.setPosition(position[0], position[1])
-
     return this
   }
 
   // Set the displayed cost of this card, don't change the cost if cost is null
-  setCost(cost: number): CardImage {
+  setCost(cost: number): this {
     if (cost !== null) {
       this.cost = cost
-
       this.txtCost.setText(
         `[b][stroke=${Color.cardStatChanged}]${cost}[/stroke][/b]`,
       )
     }
-
     return this
   }
 
   // Set this to be the given card, if it isn't already
-  setCard(card: Card): CardImage {
+  setCard(card: Card): this {
     if (this.card.id !== card.id) {
       this.card = card
 
@@ -219,18 +192,15 @@ export class CardImage {
       this.createStats()
       this.createText()
     }
-
     return this
   }
-  // Set the displayed point value of the card, or hide it if it's equal to the default value
-  setPoints(amt: number): CardImage {
-    // TODO Generalize once it's not just pet and child that have dynamic version
+
+  setPoints(amt: number): this {
     if (this.card.points !== this.card.basePoints || this.card.beta) {
       this.txtPoints.setText(
         `[b][stroke=${Color.cardStatChanged}]${amt}[/stroke][/b]`,
       )
     }
-
     return this
   }
 
@@ -238,7 +208,7 @@ export class CardImage {
     s: string,
     closeOnClick?: () => boolean,
     getCount?: () => number,
-  ): CardImage {
+  ): this {
     this.focusString = s
     if (closeOnClick) {
       this.focusCloseOnClick = closeOnClick
@@ -517,13 +487,14 @@ export class CardImage {
     this.image.setTint(color)
     this.txtCost.setTint(color)
     this.txtPoints.setTint(color)
-    this.txtText.setTint(color)
+    // this.txtText.setTint(color)
   }
 
   private clearTint(): void {
     this.image.clearTint()
     this.txtCost.clearTint()
     this.txtPoints.clearTint()
+    // this.txtText.clearTint()
   }
 
   /**
