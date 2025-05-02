@@ -88,9 +88,9 @@ export default class HomeScene extends BaseScene {
           menu: 'userProfile',
           activeScene: this,
           outerAvatar: avatar,
-          muteClick: true,
         })
       },
+      muteClick: true,
     })
 
     // Add username and ELO
