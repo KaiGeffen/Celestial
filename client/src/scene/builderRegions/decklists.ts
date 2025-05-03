@@ -519,4 +519,9 @@ export default class DecklistsRegion {
       }
     })
   }
+
+  onWindowResize(): void {
+    this.scrollablePanel.setMinSize(width, Space.windowHeight)
+    this.scrollablePanel.layout()
+  }
 }

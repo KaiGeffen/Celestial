@@ -186,6 +186,8 @@ export class BuilderScene extends BuilderBase {
   }
 
   onWindowResize(): void {
+    this.decklistsRegion.onWindowResize()
+    this.deckRegion.onWindowResize()
     this.catalogRegion.onWindowResize()
   }
 

@@ -333,7 +333,6 @@ export default class HomeScene extends BaseScene {
 
           // Adjust background width based on new text width
           bg.width = questText.width + padding * 2
-          bg.setPosition(x + padding, y + padding)
         }
       }
 
