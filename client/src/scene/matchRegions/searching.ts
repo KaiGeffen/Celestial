@@ -17,7 +17,11 @@ export default class SearchingRegion extends Region {
 
   create(scene: GameScene, avatarId: number): Region {
     this.scene = scene
-    this.container = scene.add.container(0, 0).setDepth(Depth.searching)
+    this.container = scene.add.container().setDepth(Depth.searching)
+    this.scene.plugins.get('rexAnchor')['add'](this.container, {
+      x: `50%`,
+      y: `50%`,
+    })
 
     this.createBackground(scene)
 
@@ -87,15 +91,13 @@ export default class SearchingRegion extends Region {
 
   private createBackground(scene: Phaser.Scene): void {
     let background = scene.add
-      .rectangle(
-        0,
-        0,
-        Space.windowWidth,
-        Space.windowHeight,
-        Color.backgroundLight,
-      )
-      .setOrigin(0)
+      .rectangle(0, 0, 1, 1, Color.backgroundLight)
       .setInteractive()
+
+    this.scene.plugins.get('rexAnchor')['add'](background, {
+      width: `100%`,
+      height: `100%`,
+    })
 
     this.container.add(background)
   }
@@ -103,66 +105,44 @@ export default class SearchingRegion extends Region {
   private createAvatars(scene: Phaser.Scene, avatarId: number): void {
     const scale = Math.min(1, Space.windowHeight / 600)
     let avatar = scene.add
-      .image(0, Space.windowHeight / 2, `avatar-${avatarNames[avatarId]}Full`)
+      .image(-Space.windowWidth / 2, 0, `avatar-${avatarNames[avatarId]}Full`)
       .setScale(scale)
       .setOrigin(0, 0.5)
 
     this.mysteryAvatar = scene.add
-      .image(
-        Space.windowWidth,
-        Space.windowHeight / 2,
-        `avatar-${avatarNames[0]}Full`,
-      )
+      .image(Space.windowWidth / 2, 0, `avatar-${avatarNames[0]}Full`)
       .setScale(scale)
-      .setOrigin(1, 0.5)
       .setTint(Color.grey)
+      .setOrigin(1, 0.5)
 
     this.container.add([avatar, this.mysteryAvatar])
   }
 
   private createText(scene: Phaser.Scene): void {
     this.txtTitle = scene.add
-      .text(
-        Space.windowWidth / 2,
-        Space.windowHeight / 2 - 100,
-        'Searching for an opponent',
-        Style.announcement,
-      )
+      .text(0, -100, 'Searching for an opponent', Style.announcement)
       .setOrigin(0.5)
 
     // Time text
-    this.txtTime = scene.add
-      .text(
-        Space.windowWidth / 2,
-        Space.windowHeight / 2,
-        '',
-        Style.announcement,
-      )
-      .setOrigin(0.5)
-
-    // Background for text
-    const width = Space.windowWidth - 2 * this.mysteryAvatar.width
-    const height = Space.windowHeight // this.mysteryAvatar.height
+    this.txtTime = scene.add.text(0, 0, '', Style.announcement).setOrigin(0.5)
 
     this.container.add([this.txtTitle, this.txtTime])
   }
 
   private addButtons(scene: GameScene): void {
-    let btn = new Buttons.Basic({
+    new Buttons.Basic({
       within: this.container,
       text: 'Cancel',
-      x: Space.windowWidth / 2,
-      y: Space.windowHeight / 2 + 100,
-      f: () => {
-        // Return to the last scene
-        scene.doBack()
-      },
+      y: 100,
+      f: () => scene.doBack(),
     })
   }
 }
 
 // Height of the tutorial text
 const TEXT_HEIGHT = 225
+
+// TODO Move to a separate file, it's a different region!
 
 // A separate initial region seen during the tutorial
 export class SearchingRegionTutorial extends Region {
@@ -176,7 +156,11 @@ export class SearchingRegionTutorial extends Region {
 
   create(scene: GameScene, tutorialNum: number): Region {
     this.scene = scene
-    this.container = scene.add.container(0, 0).setDepth(Depth.searching)
+    this.container = scene.add.container().setDepth(Depth.searching)
+    this.scene.plugins.get('rexAnchor')['add'](this.container, {
+      x: `50%`,
+      y: `50%`,
+    })
 
     // For the first tutorial, show first 3 frames
     this.currentFrame = tutorialNum === 0 ? 1 : 3
@@ -199,12 +183,7 @@ export class SearchingRegionTutorial extends Region {
 
   private createImage(scene: Phaser.Scene, tutorialNum: number): void {
     this.img = scene.add
-      .image(
-        Space.windowWidth / 2,
-        0,
-        `journey-Story ${tutorialNum === 0 ? 1 : 3}`,
-      )
-      .setOrigin(0.5, 0)
+      .image(0, 0, `journey-Story ${tutorialNum === 0 ? 1 : 3}`)
       .setInteractive()
 
     // Ensure that image fits perfectly in window
@@ -218,21 +197,20 @@ export class SearchingRegionTutorial extends Region {
 
   private createText(scene: GameScene, tutorialNum: number): void {
     this.background = scene.add
-      .rectangle(
-        0,
-        Space.windowHeight - TEXT_HEIGHT,
-        Space.windowWidth,
-        TEXT_HEIGHT,
-        Color.backgroundLight,
-      )
-      .setOrigin(0)
+      .rectangle(0, 0, 1, TEXT_HEIGHT, Color.backgroundLight)
+      .setOrigin(0.5, 0)
       .setAlpha(0.8)
     scene.plugins.get('rexDropShadowPipeline')['add'](this.background, {
       distance: 3,
       shadowColor: 0x000000,
     })
+    scene.plugins.get('rexAnchor')['add'](this.background, {
+      y: `50%-${TEXT_HEIGHT}`,
+      width: `100%`,
+    })
 
-    let txt = scene.add
+    // Create the dialog text
+    const txt = scene.add
       .text(0, 0, '', Style.stillframe)
       .setWordWrapWidth(Space.stillframeTextWidth)
 
@@ -240,8 +218,6 @@ export class SearchingRegionTutorial extends Region {
     this.textbox = scene.rexUI.add
       .textBox({
         text: txt,
-        x: Space.pad,
-        y: this.background.y,
         space: {
           left: Space.pad,
           right: Space.pad,
@@ -255,15 +231,28 @@ export class SearchingRegionTutorial extends Region {
       .start(s, 50)
       .setOrigin(0)
 
+    this.scene.plugins.get('rexAnchor')['add'](this.textbox, {
+      x: `-50%+${Space.pad}`,
+      y: `50%-${TEXT_HEIGHT}`,
+    })
+
     this.container.add([this.background, txt, this.textbox])
   }
 
   private createButton(scene, tutorialNum): void {
+    const container = scene.add.container()
+
+    // NOTE 50% because it's in a 50% anchor already so it ends up at 100
+    this.scene.plugins.get('rexAnchor')['add'](container, {
+      x: `50%-${Space.pad + Space.buttonWidth / 2}`,
+      y: `50%-${Space.pad + Space.buttonHeight / 2}`,
+    })
+
+    this.container.add(container)
+
     this.btn = new Buttons.Basic({
-      within: this.container,
+      within: container,
       text: 'Continue',
-      x: Space.windowWidth - Space.pad - Space.buttonWidth / 2,
-      y: Space.windowHeight - Space.pad - Space.buttonHeight / 2,
       f: () => {
         // If typing isn't complete, complete it
         if (this.textbox.isTyping) {
@@ -306,7 +295,7 @@ export class SearchingRegionTutorial extends Region {
 
   private tweenImage(): void {
     // Y of the image when flush with the bottom
-    const downFully = Space.windowHeight - this.img.displayHeight
+    const downFully = Space.windowHeight * 1.5 - this.img.displayHeight
 
     // First end any tweens that are playing (Previous stillframes)
     this.scene.tweens.getTweens().forEach((tween) => {

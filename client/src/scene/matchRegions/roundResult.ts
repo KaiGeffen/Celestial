@@ -13,10 +13,14 @@ export default class RoundResultRegion extends Region {
   create(scene: GameScene): RoundResultRegion {
     this.scene = scene
     this.container = scene.add.container().setDepth(Depth.roundResult)
+    this.scene.plugins.get('rexAnchor')['add'](this.container, {
+      x: `50%`,
+      y: `50%`,
+    })
 
     // Image in the center saying if you won/lost/tied
     this.roundResult = scene.add
-      .sprite(Space.windowWidth / 2, Space.windowHeight / 2, 'icon-RoundWin', 2)
+      .sprite(0, 0, 'icon-RoundWin', 2)
       .setAlpha(0)
       .setInteractive()
 
