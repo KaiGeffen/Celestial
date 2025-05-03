@@ -7,12 +7,10 @@ import { GameScene } from '../gameScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
 import Buttons from '../../lib/buttons/buttons'
-import Button from '../../lib/buttons/button'
 
 export default class OverlayRegion extends Region {
   txtTitle: Phaser.GameObjects.Text
 
-  // fSwitch is the callback for if this overlay switches to another overlay
   create(scene: GameScene, title: string): OverlayRegion {
     this.scene = scene
 
@@ -21,14 +19,20 @@ export default class OverlayRegion extends Region {
       .setDepth(Depth.pileOverlays)
       .setVisible(false)
 
+    // TODO Anchor and have the cards stay centered after a resize
+
     // Create the background
     let background = scene.add
-      .rectangle(0, 0, Space.windowWidth, Space.windowHeight, Color.darken, 0.8)
+      .rectangle(0, 0, 1, 1, Color.darken, 0.8)
       .setOrigin(0)
       .setInteractive()
-      .on('pointerdown', () => {
-        this.container.setVisible(false)
-      })
+      .on('pointerdown', () => this.container.setVisible(false))
+
+    // Anchor background
+    scene.plugins.get('rexAnchor')['add'](background, {
+      width: `100%`,
+      height: `100%`,
+    })
 
     // TODO Hide during mulligan, adjust to pile sizes, text specific to each pile
     this.txtTitle = scene.add

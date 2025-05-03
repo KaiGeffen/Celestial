@@ -143,12 +143,17 @@ export default class HomeScene extends BaseScene {
   }
 
   private createIcons(): void {
-    const iconContainer = this.add.container(Space.windowWidth - width, 0)
+    const iconContainer = this.add.container()
     const background = this.rexUI.add
       .roundRectangle(0, 0, width, height, 5, 0xffffff)
       .setAlpha(0.3)
       .setOrigin(0, 0)
     iconContainer.add(background)
+
+    // Anchor to right
+    this.plugins.get('rexAnchor')['add'](iconContainer, {
+      x: `100%-${width}`,
+    })
 
     // First row
     new Buttons.Icon({
@@ -207,41 +212,69 @@ export default class HomeScene extends BaseScene {
   }
 
   createPrimaryButtons() {
+    // TODO Put these elsewhere to not confuse with standard button sizes
     const buttonWidth = 220
     const buttonHeight = 120
-    const y = Space.windowHeight - (buttonHeight / 2 + Space.pad)
 
     // Journey
-    new Buttons.HomeScene(this, buttonWidth / 2 + Space.pad, y, 'Journey', () =>
-      this.scene.start('JourneyScene'),
-    )
-
-    // Play
-    new Buttons.HomeScene(
-      this,
-      Space.windowWidth - (buttonWidth / 2 + Space.pad),
-      y,
-      'Play',
-      () => this.scene.start('BuilderScene', { isTutorial: false }),
-    )
+    const journeyContainer = this.add.container()
+    new Buttons.HomeScene({
+      within: journeyContainer,
+      text: 'Journey',
+      f: () => this.scene.start('JourneyScene'),
+    })
+    this.plugins.get('rexAnchor')['add'](journeyContainer, {
+      x: `0%+${buttonWidth / 2 + Space.pad}`,
+      y: `100%-${buttonHeight / 2 + Space.pad}`,
+    })
 
     // Discord
-    new Buttons.HomeScene(this, Space.windowWidth / 2, y, 'Discord', () =>
-      window.open(Url.discord, '_blank'),
-    )
+    const discordContainer = this.add.container()
+    new Buttons.HomeScene({
+      within: discordContainer,
+      text: 'Discord',
+      f: () => window.open(Url.discord, '_blank'),
+    })
+    this.plugins.get('rexAnchor')['add'](discordContainer, {
+      x: `50%`,
+      y: `100%-${buttonHeight / 2 + Space.pad}`,
+    })
+
+    // Play
+    const playContainer = this.add.container()
+    new Buttons.HomeScene({
+      within: playContainer,
+      text: 'Play',
+      f: () => this.scene.start('BuilderScene', { isTutorial: false }),
+    })
+    this.plugins.get('rexAnchor')['add'](playContainer, {
+      x: `100%-${buttonWidth / 2 + Space.pad}`,
+      y: `100%-${buttonHeight / 2 + Space.pad}`,
+    })
   }
 
   private createFeedbackButton(): void {
+    const container = this.add.container()
     new Buttons.Basic({
-      within: this,
+      within: container,
       text: 'Feedback',
-      x: Space.windowWidth - Space.padSmall - Space.buttonWidth / 2,
-      y: Space.pad * 4 + Space.iconSize * 2 + Space.buttonHeight * 0.5,
       f: () => window.open(Url.feedback, '_blank'),
+    })
+
+    // Anchor to right
+    this.plugins.get('rexAnchor')['add'](container, {
+      x: `100%-${Space.padSmall + Space.buttonWidth / 2}`,
+      y: `0%+${Space.pad * 4 + Space.iconSize * 2 + Space.buttonHeight * 0.5}`,
     })
   }
 
   private createQuestText(): void {
+    const container = this.add.container()
+    this.plugins.get('rexAnchor')['add'](container, {
+      x: `100%-${Space.pad}`,
+      y: `100%-${Space.pad * 2 + 120}`,
+    })
+
     // Check if daily quest is available
     const isQuestAvailable = isDailyQuestAvailable()
 
@@ -249,15 +282,11 @@ export default class HomeScene extends BaseScene {
     const padding = Space.padSmall
     const bgColor = Color.backgroundLight
 
-    // Define position
-    const x = Space.windowWidth - Space.pad
-    const y = Space.windowHeight - Space.pad * 2 - 120
-
     // Create text with initial value
     const questText = this.add
       .text(
-        x,
-        y,
+        0,
+        0,
         isQuestAvailable
           ? 'Daily Quest Available!'
           : `Next Quest: ${getTimeUntilNextQuest()}`,
@@ -269,8 +298,8 @@ export default class HomeScene extends BaseScene {
     // Create background based on text dimensions
     const bg = this.add
       .rectangle(
-        x + padding,
-        y + padding,
+        padding,
+        padding,
         questText.width + padding * 2,
         questText.height + padding * 2,
         bgColor,
@@ -279,6 +308,8 @@ export default class HomeScene extends BaseScene {
       .setStrokeStyle(2, isQuestAvailable ? Color.gold : Color.backgroundDark)
       .setOrigin(1, 1)
       .setDepth(9)
+
+    container.add([bg, questText])
 
     // If quest is not available, set up timer to update every second
     if (!isQuestAvailable) {

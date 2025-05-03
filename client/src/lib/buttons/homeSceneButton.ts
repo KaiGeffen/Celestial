@@ -5,14 +5,14 @@ import RoundRectangle from 'phaser3-rex-plugins/plugins/roundrectangle.js'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
 export default class HomeSceneButton extends Button {
-  constructor(
-    within: Phaser.Scene | Phaser.GameObjects.Container,
-    x: number,
-    y: number,
-    text: string,
-    f: () => void = () => {},
-    muteClick: boolean = false,
-  ) {
+  constructor({
+    within,
+    x = 0,
+    y = 0,
+    text = '',
+    f = () => {},
+    muteClick = false,
+  }) {
     super(within, x, y, {
       text: {
         text: text.toUpperCase(),
