@@ -92,7 +92,7 @@ export class JourneyBuilderScene extends BuilderBase {
   create(params): void {
     super.create(params)
 
-    this.catalogRegion = new CatalogRegion().create(this, Space.deckPanelWidth)
+    this.catalogRegion = new CatalogRegion().create(this)
 
     // TODO Not just the 100s digit number
     const avatar = (Math.floor(params.id / 100) - 1) % 6
@@ -167,10 +167,7 @@ export class BuilderScene extends BuilderBase {
   create(params): void {
     super.create(params)
 
-    this.catalogRegion = new CatalogRegion().create(
-      this,
-      Space.decklistPanelWidth,
-    )
+    this.catalogRegion = new CatalogRegion().create(this)
 
     this.deckRegion = new DeckRegion().create(
       this,
@@ -186,6 +183,10 @@ export class BuilderScene extends BuilderBase {
     if (this.lastDecklist !== undefined) {
       this.decklistsRegion.selectDeck(this.lastDecklist)
     }
+  }
+
+  onWindowResize(): void {
+    this.catalogRegion.onWindowResize()
   }
 
   addCardToDeck(card: Card): string {

@@ -15,15 +15,18 @@ export default class CatalogRegion {
   // The scrollable panel on which the catalog exists
   private panel
 
+  // Whether the catalog has been shifted to the right
+  private shifted = false
+
   // Full list of all cards in the catalog (Even those invisible)
   cardCatalog: CardImage[]
 
   // Create this region, offset by the given width
-  create(scene: BuilderBase, x: number) {
+  create(scene: BuilderBase) {
     this.scene = scene
     this.cardCatalog = []
 
-    this.createPanel(scene, x)
+    this.createPanel(scene)
 
     // Add each card, sorted by cost
     let pool = Flags.devCardsEnabled
@@ -40,7 +43,7 @@ export default class CatalogRegion {
     return this
   }
 
-  private createPanel(scene: BuilderBase, x: number): void {
+  private createPanel(scene: BuilderBase): void {
     // Make the object
     let panel = scene.rexUI.add.fixWidthSizer({
       space: {
@@ -55,7 +58,7 @@ export default class CatalogRegion {
     this.panel = newScrollablePanel(scene, {
       x: Space.windowWidth,
       y: 0,
-      width: Space.windowWidth - x,
+      width: Space.windowWidth - Space.decklistPanelWidth,
       height: Space.windowHeight,
 
       panel: {
@@ -158,6 +161,8 @@ export default class CatalogRegion {
 
   // Shift the catalog to the right to make room for the deck panel
   shiftRight(): void {
+    this.shifted = true
+
     const x = Flags.mobile
       ? Space.deckPanelWidth
       : Space.decklistPanelWidth + Space.deckPanelWidth
@@ -183,6 +188,8 @@ export default class CatalogRegion {
 
   // Shift the catalog to the left to fill the absence of deck panel
   shiftLeft(): void {
+    this.shifted = false
+
     const x = Space.decklistPanelWidth
     const width = Space.windowWidth - x
 
@@ -202,5 +209,16 @@ export default class CatalogRegion {
         },
       })
     }
+  }
+
+  onWindowResize(): void {
+    const width = this.shifted
+      ? Space.windowWidth - Space.decklistPanelWidth - Space.deckPanelWidth
+      : Space.windowWidth - Space.decklistPanelWidth
+
+    this.panel.setMinSize(width, Space.windowHeight)
+    this.panel.setX(Space.windowWidth)
+
+    this.panel.layout()
   }
 }
