@@ -2,7 +2,7 @@ import Card from './card'
 import { Story } from './story'
 import { Avatar } from './avatar'
 
-import { Animation } from '../animation'
+import { Animation, Visibility } from '../animation'
 import { Zone } from './zone'
 import { Statuses } from './status'
 import { MechanicsSettings } from '../settings'
@@ -257,7 +257,7 @@ export default class GameModel {
     return null
   }
 
-  create(player: number, card: Card) {
+  create(player: number, card: Card, known = true) {
     if (this.hand[player].length < MechanicsSettings.HAND_CAP) {
       this.hand[player].push(card)
       this.animations[player].push(
@@ -266,6 +266,9 @@ export default class GameModel {
           to: Zone.Hand,
           card: card,
           index2: this.hand[player].length - 1,
+          visibility: known
+            ? Visibility.KnowAllDetails
+            : Visibility.KnowItOccurred,
         }),
       )
       return card
@@ -406,6 +409,7 @@ export default class GameModel {
         card: act.card,
         index: i,
         index2: this.hand[act.owner].length - 1,
+        visibility: Visibility.KnowAllDetails,
       }),
     )
   }
