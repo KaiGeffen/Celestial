@@ -1,5 +1,9 @@
 import Card from './card'
+import Catalog from './catalog'
 import type GameModel from './gameModel'
+import { Zone } from './zone'
+import { Visibility } from '../animation'
+import { match } from 'assert'
 
 export default function getClientGameModel(
   orig: GameModel,
@@ -90,9 +94,8 @@ function hideHiddenInformation(model: GameModel) {
   // Hide the opponent's vision
   model.status[1].vision = 0
 
-  // TODO Enable this but hide some info
-  // Hide the opponent's animations
-  model.animations[1] = []
+  // Hide some of the opponent's animations
+  hideHiddenOpponentAnimations(model)
 
   // Hide the opponent's amtDrawn
   model.amtDrawn[1] = 0
@@ -117,4 +120,41 @@ function hideDeckOrder(model: GameModel) {
       return card1.cost - card2.cost
     }
   })
+}
+
+function hideHiddenOpponentAnimations(model: GameModel) {
+  model.animations[1] = model.animations[1]
+    // Hide initial cards drawn for the opponent
+    .filter((_) => model.versionNo > 0)
+    // Hide mulligan choices
+    .filter((animation) => animation.from !== Zone.Mulligan)
+    // Obfuscate the cards opponent is drawing
+    .map((animation) => {
+      if (animation.to === Zone.Hand) {
+        switch (animation.visibility) {
+          case Visibility.KnowItOccurred:
+            // Know that a card has been drawn but don't know the card
+            // e.g., mask the card
+            animation.card = Catalog.cardback
+            break
+          case Visibility.KnowAllDetails:
+            // Know that a card has been drawn and know the card
+            // e.g., leave the card as is
+            // (no action needed)
+            break
+          case Visibility.FullyUnknown:
+            // Don't know the action occurred
+            // e.g., maybe remove or hide the animation
+            // (handle as needed, e.g., set to null or skip)
+            animation.card = null
+            break
+          default:
+            // Optional: handle unexpected values
+            break
+        }
+      }
+      return animation
+    })
+    // Remove any animations that are now null
+    .filter((animation) => animation.card !== null)
 }

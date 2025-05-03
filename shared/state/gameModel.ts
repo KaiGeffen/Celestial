@@ -214,6 +214,7 @@ export default class GameModel {
             to: Zone.Discard,
             index: i,
             index2: discardPileIndex,
+            card: card,
           }),
         )
 
