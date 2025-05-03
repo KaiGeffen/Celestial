@@ -106,7 +106,7 @@ const phoenix = new Phoenix({
   cost: 5,
   points: 5,
   qualities: [Quality.VISIBLE, Quality.FLEETING],
-  text: 'Visible\nFleeting\nGive each card with fleeting in your deck or discard pile +1 point.',
+  text: 'Visible\nFleeting\nGive each card with Fleeting in your deck or discard pile +1 point.',
   story:
     'Cracks in the shell\nShell falls away\nI stretch into wide possibilities',
 })
