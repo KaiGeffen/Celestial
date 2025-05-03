@@ -32,14 +32,13 @@ export default class OurScoreRegion extends Region {
 
   create(scene: GameScene): this {
     this.scene = scene
-    this.container = scene.add
-      .container(
-        Space.windowWidth - this.width,
-        Space.windowHeight - this.height,
-      )
-      .setDepth(Depth.ourScore)
+    this.container = scene.add.container().setDepth(Depth.ourScore)
 
-    // this.createBackground()
+    // Anchor to bottom right
+    scene.plugins.get('rexAnchor')['add'](this.container, {
+      x: `100%-${this.width}`,
+      y: `100%-${this.height}`,
+    })
 
     this.createWins()
     this.createRelic()

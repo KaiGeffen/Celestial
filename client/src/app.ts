@@ -25,6 +25,7 @@ import DropShadowPipelinePlugin from 'phaser3-rex-plugins/plugins/dropshadowpipe
 import ContainerLitePlugin from 'phaser3-rex-plugins/plugins/containerlite-plugin.js'
 import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
 import StoreScene from './scene/storeScene'
+import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin.js'
 // import UIComponent from 'phaser3-rex-plugins/templates/ui/ui-components.js'
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -107,6 +108,11 @@ const config: Phaser.Types.Core.GameConfig = {
       {
         key: 'rexContainerLitePlugin',
         plugin: ContainerLitePlugin,
+        start: true,
+      },
+      {
+        key: 'rexAnchor',
+        plugin: AnchorPlugin,
         start: true,
       },
     ],

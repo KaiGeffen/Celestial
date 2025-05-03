@@ -35,9 +35,13 @@ export default class PassRegion extends Region {
 
   create(scene: GameScene): PassRegion {
     this.scene = scene
-    this.container = scene.add
-      .container(Space.windowWidth, Space.windowHeight / 2)
-      .setDepth(Depth.pass)
+    this.container = scene.add.container(0, 0).setDepth(Depth.pass)
+
+    // Anchor to right
+    scene.plugins.get('rexAnchor')['add'](this.container, {
+      x: `100%`,
+      y: `50%`,
+    })
 
     // Pass and recap button
     this.createButtons()
