@@ -109,26 +109,6 @@ export default class Region {
     // this.hotkeyHints = []
   }
 
-  // Animate the given card being emphasized
-  protected animateEmphasis(card: CardImage, delay: number): void {
-    card.hide()
-
-    // Animate moving x direction, appearing at start
-    this.scene.tweens.add({
-      targets: card.container,
-      alpha: 0,
-      scale: 2,
-      delay: delay,
-      duration: Time.recapTweenWithPause(),
-      onStart: function (tween, targets, _) {
-        card.show()
-      },
-      onComplete: function (tween, targets, _) {
-        card.destroy()
-      },
-    })
-  }
-
   // Show / hide the hotkey hints
   setHotkeyHintVisible(show: boolean): void {
     this.hotkeyHints.forEach((hint) => {
