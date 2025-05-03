@@ -21,9 +21,10 @@ export default class OurAvatarRegion extends Region {
 
   create(scene: GameScene): this {
     this.scene = scene
-    this.container = scene.add
-      .container(0, Space.windowHeight - height)
-      .setDepth(Depth.ourAvatar)
+    this.container = scene.add.container().setDepth(Depth.ourAvatar)
+    this.scene.plugins.get('rexAnchor')['add'](this.container, {
+      y: `100%-${height}`,
+    })
 
     this.createBackground()
     this.createStatusDisplay()

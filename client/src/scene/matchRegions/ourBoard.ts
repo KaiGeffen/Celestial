@@ -44,9 +44,10 @@ export default class OurBoardRegion extends Region {
     this.scene = scene
     this.cards = []
 
-    this.container = scene.add
-      .container(0, Space.windowHeight)
-      .setDepth(Depth.ourHand)
+    this.container = scene.add.container().setDepth(Depth.ourHand)
+    this.scene.plugins.get('rexAnchor')['add'](this.container, {
+      y: `100%`,
+    })
 
     this.createBackground(scene)
 
