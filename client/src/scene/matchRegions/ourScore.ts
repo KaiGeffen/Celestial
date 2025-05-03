@@ -6,12 +6,13 @@ import { MechanicsSettings } from '../../../../shared/settings'
 import { GameScene } from '../gameScene'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
-const width = Space.iconSize * 3 + Space.pad * 4
-const height = Space.todoHandOffset + Space.pad
-const BREATH_X = 30 + Space.padSmall
-const BREATH_Y = height - 30 - Space.padSmall
-
 export default class OurScoreRegion extends Region {
+  // Move these inside the class as fields so they're set on instantiation
+  private width = Space.iconSize * 3 + Space.pad * 4
+  private height = Space.todoHandOffset + Space.pad
+  private BREATH_X = 30 + Space.padSmall
+  private BREATH_Y = this.height - 30 - Space.padSmall
+
   // For the current state, the maximum and current amount of breath we have
   maxBreath: number
   currentBreath: number
@@ -32,7 +33,10 @@ export default class OurScoreRegion extends Region {
   create(scene: GameScene): this {
     this.scene = scene
     this.container = scene.add
-      .container(Space.windowWidth - width, Space.windowHeight - height)
+      .container(
+        Space.windowWidth - this.width,
+        Space.windowHeight - this.height,
+      )
       .setDepth(Depth.ourScore)
 
     // this.createBackground()
@@ -77,7 +81,7 @@ export default class OurScoreRegion extends Region {
 
   private createBackground(): void {
     const background = this.scene.add
-      .rectangle(0, 0, width, height, Color.backgroundDark)
+      .rectangle(0, 0, this.width, this.height, Color.backgroundDark)
       .setOrigin(0)
 
     this.container.add(background)
@@ -86,7 +90,7 @@ export default class OurScoreRegion extends Region {
   private createWins(): void {
     // Create a vertical sizer
     const winsSizer = new Sizer(this.scene, {
-      x: width / 2,
+      x: this.width / 2,
       y: 0,
       orientation: 'vertical',
       space: { top: Space.padSmall, item: 4 },
@@ -106,19 +110,19 @@ export default class OurScoreRegion extends Region {
 
   private createRelic(): void {
     this.relic = this.scene.add
-      .image(width / 2, 0, 'relic-Dandelion')
+      .image(this.width / 2, 0, 'relic-Dandelion')
       .setOrigin(0.5, 1)
     this.container.add(this.relic)
   }
 
   private createBreath(): void {
-    const x = width / 2 + 20
+    const x = this.width / 2 + 20
     this.txtBreath = this.scene.add
-      .text(x, BREATH_Y, '', Style.todoScore)
+      .text(x, this.BREATH_Y, '', Style.todoScore)
       .setOrigin(0, 1)
 
     const hintBreath = this.scene.add
-      .text(x, BREATH_Y, 'Breath', Style.todoSubtext)
+      .text(x, this.BREATH_Y, 'Breath', Style.todoSubtext)
       .setOrigin(0, 0)
 
     this.container.add([this.txtBreath, hintBreath])
@@ -147,7 +151,7 @@ export default class OurScoreRegion extends Region {
     key: string,
     images: Phaser.GameObjects.Image[],
   ): void {
-    const center = [BREATH_X, BREATH_Y]
+    const center = [this.BREATH_X, this.BREATH_Y]
     const radius = 30
 
     // 10 is the max displayed breath, but player could have more

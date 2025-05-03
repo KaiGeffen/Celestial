@@ -14,10 +14,6 @@ import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { Flags } from '../../settings/flags'
 import Buttons from '../../lib/buttons/buttons'
 
-// Y of the buttons
-const width = Space.iconSize * 3 + Space.pad * 4
-const height = Space.todoHandOffset + Space.pad
-
 // During the round, shows Pass button, who has passed, and who has priority
 export default class TheirScoreRegion extends Region {
   recapCallback: () => void
@@ -32,10 +28,14 @@ export default class TheirScoreRegion extends Region {
   // Relic icon
   relic: Phaser.GameObjects.Image
 
+  // Move these inside the class as fields so they're set on instantiation
+  private width = Space.iconSize * 3 + Space.pad * 4
+  private height = Space.todoHandOffset + Space.pad
+
   create(scene: GameScene): this {
     this.scene = scene
     this.container = scene.add
-      .container(Space.windowWidth - width, 0)
+      .container(Space.windowWidth - this.width, 0)
       .setDepth(Depth.theirScore)
 
     // this.createBackground()
@@ -90,7 +90,7 @@ export default class TheirScoreRegion extends Region {
 
   private createBackground(): void {
     const background = this.scene.add
-      .rectangle(0, 0, width, height, Color.backgroundDark)
+      .rectangle(0, 0, this.width, this.height, Color.backgroundDark)
       .setOrigin(0)
 
     this.container.add(background)
@@ -173,8 +173,8 @@ export default class TheirScoreRegion extends Region {
   private createWins(): void {
     // Create a vertical sizer
     const winsSizer = new Sizer(this.scene, {
-      x: width / 2,
-      y: height,
+      x: this.width / 2,
+      y: this.height,
       orientation: 'vertical',
       space: { bottom: Space.padSmall, item: 4 },
     }).setOrigin(0.5, 1)
@@ -194,7 +194,7 @@ export default class TheirScoreRegion extends Region {
 
   private createRelic(): void {
     this.relic = this.scene.add
-      .image(width / 2, height, 'relic-Dandelion')
+      .image(this.width / 2, this.height, 'relic-Dandelion')
       .setRotation(Math.PI)
       .setOrigin(0.5, 1)
     this.container.add(this.relic)
