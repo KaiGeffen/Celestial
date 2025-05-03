@@ -18,13 +18,14 @@ export default class OverlayRegion extends Region {
       .container()
       .setDepth(Depth.pileOverlays)
       .setVisible(false)
-
-    // TODO Anchor and have the cards stay centered after a resize
+    this.scene.plugins.get('rexAnchor')['add'](this.container, {
+      x: `50%`,
+      y: `50%`,
+    })
 
     // Create the background
     let background = scene.add
       .rectangle(0, 0, 1, 1, Color.darken, 0.8)
-      .setOrigin(0)
       .setInteractive()
       .on('pointerdown', () => this.container.setVisible(false))
 
@@ -36,12 +37,7 @@ export default class OverlayRegion extends Region {
 
     // TODO Hide during mulligan, adjust to pile sizes, text specific to each pile
     this.txtTitle = scene.add
-      .text(
-        Space.windowWidth / 2,
-        Space.windowHeight / 2 + Space.cardHeight / 2,
-        title,
-        Style.announcementOverBlack,
-      )
+      .text(0, Space.cardHeight / 2, title, Style.announcementOverBlack)
       .setOrigin(0.5, 0)
 
     this.container.add([background, this.txtTitle])
@@ -56,8 +52,8 @@ export default class OverlayRegion extends Region {
     new Buttons.Basic({
       within: this.container,
       text: 'Other',
-      x: Space.pad + Space.buttonWidth / 2,
-      y: Space.pad + Space.buttonHeight / 2,
+      x: -(Space.windowWidth / 2 - Space.pad - Space.buttonWidth / 2),
+      y: -(Space.windowHeight / 2 - Space.pad - Space.buttonHeight / 2),
       f: callback,
     })
 
