@@ -132,6 +132,7 @@ function hideHiddenOpponentAnimations(model: GameModel) {
     .map((animation) => {
       if (animation.to === Zone.Hand) {
         switch (animation.visibility) {
+          case undefined:
           case Visibility.KnowItOccurred:
             // Know that a card has been drawn but don't know the card
             // e.g., mask the card
