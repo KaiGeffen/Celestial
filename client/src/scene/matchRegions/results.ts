@@ -42,17 +42,24 @@ export default class ResultsRegion extends Region {
 
   create(scene: GameScene): ResultsRegion {
     this.scene = scene
-    this.container = scene.add.container(0, 0).setDepth(Depth.results)
     this.seen = false
+    this.container = scene.add.container().setDepth(Depth.results)
+    this.scene.plugins.get('rexAnchor')['add'](this.container, {
+      x: `50%`,
+      y: `50%`,
+    })
 
     // Create background
     let background = scene.add
-      .rectangle(0, 0, Space.windowWidth, Space.windowHeight, Color.darken, 0.9)
-      .setOrigin(0)
+      .rectangle(0, 0, 1, 1, Color.darken, 0.9)
       .setInteractive()
       .on('pointerdown', () => {
         this.hide()
       })
+    this.scene.plugins.get('rexAnchor')['add'](background, {
+      width: `100%`,
+      height: `100%`,
+    })
     this.container.add(background)
 
     this.createContent()
@@ -103,31 +110,32 @@ export default class ResultsRegion extends Region {
   }
 
   protected createButtons() {
+    const container = this.scene.add.container()
+    this.container.add(container)
+    this.scene.plugins.get('rexAnchor')['add'](container, {
+      y: `50%-${Space.pad + Space.buttonHeight / 2}`,
+    })
+
     // Exit
-    let y = Space.windowHeight - (Space.pad + Space.buttonHeight / 2)
     new Buttons.Basic({
-      within: this.container,
+      within: container,
       text: 'Exit Match',
-      x: Space.windowWidth / 2 + Space.pad + Space.buttonWidth,
-      y,
+      x: Space.pad + Space.buttonWidth,
       f: this.exitCallback(),
     })
 
     // Replay
     new Buttons.Basic({
-      within: this.container,
+      within: container,
       text: 'Play Again',
-      x: Space.windowWidth / 2,
-      y: y,
       f: this.newMatchCallback(),
     })
 
     // Review
     new Buttons.Basic({
-      within: this.container,
+      within: container,
       text: 'Hide',
-      x: Space.windowWidth / 2 - Space.pad - Space.buttonWidth,
-      y,
+      x: -Space.pad - Space.buttonWidth,
       f: this.reviewCallback(),
     })
   }
@@ -136,8 +144,8 @@ export default class ResultsRegion extends Region {
     // Win/Lose text
     this.txtResult = this.scene.add
       .text(
-        Space.windowWidth / 2,
-        Space.pad,
+        0,
+        -this.HEIGHT / 2 + Space.pad,
         'Victory',
         Style.announcementOverBlack,
       )
@@ -148,22 +156,10 @@ export default class ResultsRegion extends Region {
 
     // Your avatar
     this.ourAvatar = this.scene.add
-      .image(
-        Flags.mobile
-          ? Space.avatarWidth / 2
-          : Space.windowWidth / 2 - this.WIDTH,
-        Space.windowHeight / 2,
-        'avatar-JulesFull',
-      )
+      .image(-this.WIDTH, 0, 'avatar-JulesFull')
       .setInteractive()
     this.theirAvatar = this.scene.add
-      .image(
-        Flags.mobile
-          ? Space.windowWidth - Space.avatarWidth / 2
-          : Space.windowWidth / 2 + this.WIDTH,
-        Space.windowHeight / 2,
-        'avatar-MiaFull',
-      )
+      .image(this.WIDTH, 0, 'avatar-MiaFull')
       .setInteractive()
 
     this.container.add([
@@ -179,8 +175,6 @@ export default class ResultsRegion extends Region {
 
     const panel = this.scene.rexUI.add
       .scrollablePanel({
-        x: Space.windowWidth / 2,
-        y: Space.windowHeight / 2,
         width: this.WIDTH,
         height: this.HEIGHT,
 

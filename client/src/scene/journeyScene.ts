@@ -109,16 +109,10 @@ export default class JourneyScene extends BaseScene {
   }
 
   private createHelpButton(): void {
-    const x =
-      Space.windowWidth -
-      Space.buttonWidth / 2 -
-      (Space.iconSize + Space.pad * 2)
-    const y = Space.buttonHeight / 2 + Space.pad
+    const container = this.add.container().setDepth(10)
     new Buttons.Basic({
-      within: this,
+      within: container,
       text: 'Help',
-      x,
-      y,
       f: () => {
         this.scene.launch('MenuScene', {
           menu: 'help',
@@ -128,8 +122,15 @@ export default class JourneyScene extends BaseScene {
         })
       },
       muteClick: true,
-      depth: 10,
     }).setNoScroll()
+
+    // Anchor in top right
+    const dx = Space.buttonWidth / 2 + Space.iconSize + Space.pad * 2
+    const dy = Space.buttonHeight / 2 + Space.pad
+    this.plugins.get('rexAnchor')['add'](container, {
+      x: `100%-${dx}`,
+      y: `0%+${dy}`,
+    })
   }
 
   // Create a popup for the card specified in params
