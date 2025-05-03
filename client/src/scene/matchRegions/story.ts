@@ -36,7 +36,7 @@ export default class StoryRegion extends Region {
     )
 
     // If this is a recap, add the already played cards greyed out
-    // TODO
+    // TODO: Either enable the onClick callback or remove its api
     let resolvedI = 0
     for (; resolvedI < state.story.resolvedActs.length; resolvedI++) {
       const act: Act = state.story.resolvedActs[resolvedI]
@@ -47,7 +47,7 @@ export default class StoryRegion extends Region {
       )
         .setResolved()
         .moveToTopOnHover()
-        .setOnClick(this.callback(resolvedI))
+      // .setOnClick(this.callback(resolvedI))
 
       this.temp.push(card)
     }
@@ -63,7 +63,7 @@ export default class StoryRegion extends Region {
 
       // Only allow jumping around in the recap if we are playing a recap
       if (state.isRecap && !Flags.mobile) {
-        card.setOnClick(this.callback(resolvedI + i))
+        // card.setOnClick(this.callback(resolvedI + i))
       }
 
       cards.push(card)
