@@ -102,6 +102,12 @@ export default class Menu {
       .roundRectangle(0, 0, 0, 0, Space.corner, Color.backgroundDark, 1)
       .setInteractive()
     this.sizer.addBackground(rect)
+
+    // Anchor in center of screen
+    this.scene.plugins.get('rexAnchor')['add'](this.sizer, {
+      x: `50%`,
+      y: `50%`,
+    })
   }
 
   // Create a generic cancel button

@@ -123,14 +123,18 @@ export default class BaseScene extends SharedBaseScene {
     this.btnOptions = new Buttons.Icon({
       name: 'Options',
       within: this,
-      x: Space.windowWidth - Space.pad,
-      y: Space.pad,
       f: this.openMenu(),
       muteClick: true,
     })
       .setOrigin(1, 0)
       .setDepth(10)
       .setNoScroll()
+
+    // Anchor to top right
+    this.plugins.get('rexAnchor')['add'](this.btnOptions.icon, {
+      x: `100%-${Space.pad}`,
+      y: `0%+${Space.pad}`,
+    })
 
     // When esc key is pressed, toggle the menu open/closed
     let esc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC)

@@ -59,21 +59,18 @@ export default class MenuScene extends BaseMenuScene {
   }
 
   private addBackground() {
-    const x = Space.windowWidth / 2
-    const y = Space.windowHeight / 2
-
     // Invisible background rectangles, stops other containers from being clicked
-    let invisBackground = this.add.rectangle(
-      x,
-      y,
-      Space.windowWidth,
-      Space.windowHeight,
-      0x000000,
-      0.7,
-    )
-    invisBackground.setInteractive()
-    invisBackground.on('pointerdown', () => {
-      this.menu.close()
+    const invisBackground = this.add
+      .rectangle(0, 0, 1, 1, 0x000000, 0.7)
+      .setInteractive()
+      .on('pointerdown', () => this.menu.close())
+
+    // Anchor in center taking up full screen
+    this.plugins.get('rexAnchor')['add'](invisBackground, {
+      x: `50%`,
+      y: `50%`,
+      width: `100%`,
+      height: `100%`,
     })
   }
 
