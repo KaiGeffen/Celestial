@@ -8,10 +8,7 @@ import { Space, Color, Time, Style, Depth } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 
 import { CardImage } from '../../lib/cardImage'
-import Card from '../../../../shared/state/card'
 import GameModel from '../../../../shared/state/gameModel'
-import { Animation } from '../../../../shared/animation'
-import { Zone } from '../../../../shared/state/zone'
 import { GameScene } from '../gameScene'
 import { UserSettings } from '../../settings/userSettings'
 import Button from '../../lib/buttons/button'
@@ -39,22 +36,26 @@ export default class MulliganRegion extends Region {
     this.cards = []
     this.mulliganChoices = [false, false, false]
 
-    this.container = scene.add.container(0, 0).setDepth(Depth.mulligan)
+    this.container = scene.add.container().setDepth(Depth.mulligan)
+    this.scene.plugins.get('rexAnchor')['add'](this.container, {
+      x: `50%`,
+      y: `50%`,
+    })
 
     // Add the background
     this.container.add(this.createBackground(scene))
 
     let txtHint = scene.add
       .text(
-        Space.windowWidth / 2,
-        Space.windowHeight / 2 - Space.cardHeight / 2 - Space.pad / 2,
+        0,
+        -(Space.cardHeight / 2 + Space.pad / 2),
         'Click cards to replace',
         Style.basic,
       )
       .setOrigin(0.5, 1)
     let txtTitle = scene.add
       .text(
-        Space.windowWidth / 2,
+        0,
         txtHint.y - Space.pad / 2 - txtHint.height,
         'Starting Hand',
         Style.announcement,
@@ -62,28 +63,27 @@ export default class MulliganRegion extends Region {
       .setOrigin(0.5, 1)
 
     this.txtPriority = scene.add
-      .text(
-        Space.windowWidth / 2,
-        Space.windowHeight / 2 + Space.cardHeight / 2 + Space.pad * 2,
-        '',
-        Style.basic,
-      )
+      .text(0, Space.cardHeight / 2 + Space.pad * 2, '', Style.basic)
       .setOrigin(0.5, 1)
 
     // Ready button
-    const x = Space.windowWidth / 2
-    const y = Space.windowHeight / 2 + Space.cardHeight / 2 + Space.pad * 4
     this.btnReady = new Buttons.Basic({
       within: this.container,
       text: 'Ready',
-      x,
-      y,
+      x: 0,
+      y: Space.cardHeight / 2 + Space.pad * 4,
       f: () => {
         this.onButtonClick()
       },
       returnHotkey: true,
     })
-    this.addHotkeyHint([x, y], 'SPACE')
+    this.addHotkeyHint(
+      [
+        Space.windowWidth / 2,
+        Space.windowHeight / 2 + Space.cardHeight / 2 + Space.pad * 4,
+      ],
+      'SPACE',
+    )
 
     this.addHotkeyListeners()
 
@@ -166,11 +166,10 @@ export default class MulliganRegion extends Region {
   }
 
   private createBackground(scene: Phaser.Scene): Phaser.GameObjects.GameObject {
-    const points = `0 ${Space.handHeight} 30 0 230 0 230 ${Space.handHeight}`
     let background = new RoundRectangle(
       scene,
-      Space.windowWidth / 2,
-      Space.windowHeight / 2,
+      0,
+      0,
       3 * Space.cardWidth + 4 * Space.pad,
       Space.cardHeight + 2 * Space.pad + 200,
       Space.corner,
