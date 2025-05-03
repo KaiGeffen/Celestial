@@ -462,4 +462,9 @@ export default class DeckRegion {
 
     return count
   }
+
+  onWindowResize(): void {
+    this.scrollablePanel.setMinSize(width, Space.windowHeight)
+    this.scrollablePanel.layout()
+  }
 }

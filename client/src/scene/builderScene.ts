@@ -3,7 +3,7 @@ import Card from '../../../shared/state/card'
 import BaseScene from './baseScene'
 import { Deck } from '../../../shared/types/deck'
 
-import CatalogRegion from './builderRegions/catalog'
+import CatalogRegion, { CatalogRegionJourney } from './builderRegions/catalog'
 import DeckRegion from './builderRegions/deck'
 import DecklistsRegion from './builderRegions/decklists'
 import FilterRegion from './builderRegions/filter'
@@ -92,7 +92,7 @@ export class JourneyBuilderScene extends BuilderBase {
   create(params): void {
     super.create(params)
 
-    this.catalogRegion = new CatalogRegion().create(this)
+    this.catalogRegion = new CatalogRegionJourney().create(this)
 
     // TODO Not just the 100s digit number
     const avatar = (Math.floor(params.id / 100) - 1) % 6
@@ -109,6 +109,11 @@ export class JourneyBuilderScene extends BuilderBase {
 
     // Must filter out cards that you don't have access to
     this.filter()
+  }
+
+  onWindowResize(): void {
+    this.journeyRegion.onWindowResize()
+    this.catalogRegion.onWindowResize()
   }
 
   addCardToDeck(card: Card): string {

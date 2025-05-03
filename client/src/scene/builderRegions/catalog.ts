@@ -13,7 +13,7 @@ export default class CatalogRegion {
   scene: BuilderBase
 
   // The scrollable panel on which the catalog exists
-  private panel
+  protected panel
 
   // Whether the catalog has been shifted to the right
   private shifted = false
@@ -220,5 +220,24 @@ export default class CatalogRegion {
     this.panel.setX(Space.windowWidth)
 
     this.panel.layout()
+  }
+}
+
+export class CatalogRegionJourney extends CatalogRegion {
+  create(scene: BuilderBase) {
+    super.create(scene)
+
+    this.panel
+      .setMinSize(Space.windowWidth - Space.deckPanelWidth, Space.windowHeight)
+      .layout()
+
+    return this
+  }
+
+  onWindowResize(): void {
+    this.panel
+      .setMinSize(Space.windowWidth - Space.deckPanelWidth, Space.windowHeight)
+      .setX(Space.windowWidth)
+      .layout()
   }
 }
