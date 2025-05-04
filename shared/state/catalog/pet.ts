@@ -279,8 +279,8 @@ class Sample extends Card {
 const sample = new Sample({
   name: 'Sample',
   id: 81,
-  cost: 3,
-  points: 3,
+  cost: 4,
+  points: 4,
   text: 'Costs 1 less for each of the following statuses you have: Nourish, Inspired, Sight.',
   beta: true,
 })
