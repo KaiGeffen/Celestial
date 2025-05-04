@@ -1,20 +1,20 @@
 import 'phaser'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
-import { JourneyGameScene } from './gameScene'
+import { JourneyMatchScene } from './matchScene'
 import data from '../catalog/tutorial.json'
 import { Space, Color, BBStyle, Time, Depth, Flags } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 import { CardImage } from '../lib/cardImage'
 import Catalog from '../../../shared/state/catalog'
-import { ResultsRegionTutorial } from './matchRegions/results'
+import { ResultsRegionTutorial } from './matchRegions/matchResults'
 import { SearchingRegionTutorial } from './matchRegions/searching'
 import { Animation } from '../../../shared/animation'
 import { Zone } from '../../../shared/state/zone'
 import GameModel from '../../../shared/state/gameModel'
 
-export default class TutorialGameScene extends JourneyGameScene {
+export default class TutorialMatchScene extends JourneyMatchScene {
   // How far into the tutorial (How many lines of text you have seen)
   progress: number
 
@@ -32,7 +32,7 @@ export default class TutorialGameScene extends JourneyGameScene {
 
   isTutorial = true
 
-  constructor(args = { key: 'TutorialGameScene', lastScene: 'JourneyScene' }) {
+  constructor(args = { key: 'TutorialMatchScene', lastScene: 'JourneyScene' }) {
     super(args)
   }
 

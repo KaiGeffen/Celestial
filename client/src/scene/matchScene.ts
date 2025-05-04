@@ -26,8 +26,7 @@ import OurScoreRegion from './matchRegions/ourScore'
 import MulliganRegion from './matchRegions/mulliganRegion'
 import CompanionRegion from './matchRegions/companion'
 
-// TODO Rename to Match
-export class GameScene extends BaseScene {
+export class MatchScene extends BaseScene {
   params: any
 
   view: View
@@ -83,7 +82,6 @@ export class GameScene extends BaseScene {
 
   beforeExit() {
     this.net.exitMatch()
-    console.log('About to exit')
     UserDataServer.refreshUserData()
   }
 
@@ -181,25 +179,6 @@ export class GameScene extends BaseScene {
       },
     )
 
-    // Buttons TODO Rework these
-    // view.ourButtons.setRecapCallback(() => {
-    // })
-
-    // view.ourButtons.setPassCallback(() => {
-    // 	net.playCard(10)
-    // })
-
-    // view.ourButtons.setSkipCallback(() => {
-    // 	that.tweens.getTweens().forEach((tween) => {
-    // 		tween.complete()
-    // 	})
-
-    // 	// Set variables to a state where a recap isn't playing
-    // 	that.view.paused = false
-    // })
-    // view.ourButtons.setPlayCallback(() => {that.view.paused = false})
-    // view.ourButtons.setPauseCallback(() => {that.view.paused = true})
-
     // Story
     view.story.setCallback((i: number) => {
       return function () {
@@ -237,9 +216,6 @@ export class GameScene extends BaseScene {
       const choice: [boolean, boolean, boolean] = view.mulligan.mulliganChoices
       net.doMulligan(choice)
     })
-
-    // Results
-    // TODO
   }
 
   // Try to display the next queued state TODO Recovery if we've been waiting too long
@@ -395,7 +371,7 @@ export class View {
 
   pet: CompanionRegion
 
-  constructor(scene: GameScene, avatarId: number) {
+  constructor(scene: MatchScene, avatarId: number) {
     this.scene = scene
 
     let background = scene.add
@@ -462,7 +438,7 @@ export class View {
     this.mulligan = new Regions.Mulligan().create(scene)
 
     // Results are visible after the game is over
-    this.results = new Regions.Results().create(scene)
+    this.results = new Regions.MatchResults().create(scene)
     this.results.hide()
 
     this.animator = new Animator(scene, this)
@@ -535,8 +511,8 @@ export class View {
   }
 }
 
-export class StandardGameScene extends GameScene {
-  constructor(args = { key: 'StandardGameScene', lastScene: 'BuilderScene' }) {
+export class StandardMatchScene extends MatchScene {
+  constructor(args = { key: 'StandardMatchScene', lastScene: 'BuilderScene' }) {
     super(args)
   }
 
@@ -552,10 +528,10 @@ export class StandardGameScene extends GameScene {
   }
 }
 
-export class JourneyGameScene extends GameScene {
+export class JourneyMatchScene extends MatchScene {
   winSeen: boolean
 
-  constructor(args = { key: 'JourneyGameScene', lastScene: 'JourneyScene' }) {
+  constructor(args = { key: 'JourneyMatchScene', lastScene: 'JourneyScene' }) {
     super(args)
   }
 

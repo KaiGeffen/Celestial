@@ -9,7 +9,7 @@ import Buttons from '../../lib/buttons/buttons'
 
 import { CardImage } from '../../lib/cardImage'
 import GameModel from '../../../../shared/state/gameModel'
-import { GameScene } from '../gameScene'
+import { MatchScene } from '../matchScene'
 import { UserSettings } from '../../settings/userSettings'
 import Button from '../../lib/buttons/button'
 import { MechanicsSettings } from '../../../../shared/settings'
@@ -30,7 +30,7 @@ export default class MulliganRegion extends Region {
   // The callback for when the button is clicked
   onButtonClick: () => void
 
-  create(scene: GameScene): MulliganRegion {
+  create(scene: MatchScene): MulliganRegion {
     this.scene = scene
 
     this.cards = []

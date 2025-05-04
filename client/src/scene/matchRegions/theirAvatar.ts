@@ -12,7 +12,7 @@ import {
   Color,
 } from '../../settings/settings'
 import Region from './baseRegion'
-import { GameScene } from '../gameScene'
+import { MatchScene } from '../matchScene'
 import CardLocation from './cardLocation'
 import AvatarButton from '../../lib/buttons/avatar'
 
@@ -28,7 +28,7 @@ export default class TheirAvatarRegion extends Region {
 
   avatar: AvatarButton
 
-  create(scene: GameScene): this {
+  create(scene: MatchScene): this {
     this.scene = scene
     this.container = scene.add.container().setDepth(Depth.theirAvatar)
 

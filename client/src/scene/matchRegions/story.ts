@@ -2,7 +2,7 @@ import 'phaser'
 import { CardImage } from '../../lib/cardImage'
 import GameModel from '../../../../shared/state/gameModel'
 import { Space, Style, Depth, Time, Flags } from '../../settings/settings'
-import { GameScene } from '../gameScene'
+import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
 import Act from '../../../../shared/state/act'
@@ -16,7 +16,7 @@ export default class StoryRegion extends Region {
   // This is slightly wrong, because the top hand is smaller than this hand height
   MIDDLE = Space.windowHeight / 2 - Space.handHeight
 
-  create(scene: GameScene): StoryRegion {
+  create(scene: MatchScene): StoryRegion {
     this.scene = scene
     this.lastScores = [0, 0]
 

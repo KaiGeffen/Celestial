@@ -162,8 +162,6 @@ export default class BaseScene extends SharedBaseScene {
 
   private openMenu(): () => void {
     return () => {
-      // TODO This check for multiple open menus should be handled in menuScene.ts
-
       // Don't open the menu if it's open already
       if (this.scene.isActive('MenuScene')) {
         return

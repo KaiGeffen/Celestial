@@ -172,7 +172,7 @@ export class SigninScene extends Phaser.Scene {
       for (let i = 0; i < TUTORIAL_LENGTH; i++) {
         // If this tutorial mission hasn't been completed, jump to that mission
         if (!missions[i]) {
-          this.scene.start('TutorialGameScene', {
+          this.scene.start('TutorialMatchScene', {
             isTutorial: false, // TODO This is old, remove
             deck: undefined,
             mmCode: `ai:t${i}`,

@@ -88,7 +88,7 @@ export default class ModeMenu extends Menu {
       f: () => {
         activeScene.scene.stop()
 
-        this.scene.scene.start('StandardGameScene', {
+        this.scene.scene.start('StandardMatchScene', {
           isPvp: false,
           deck: deck,
           aiDeck: getRandomAiDeck(),
@@ -112,7 +112,7 @@ export default class ModeMenu extends Menu {
       f: () => {
         activeScene.scene.stop()
 
-        this.scene.scene.start('StandardGameScene', {
+        this.scene.scene.start('StandardMatchScene', {
           isPvp: true,
           deck: deck,
           password: '',
@@ -136,7 +136,7 @@ export default class ModeMenu extends Menu {
       f: () => {
         activeScene.scene.stop()
 
-        this.scene.scene.start('StandardGameScene', {
+        this.scene.scene.start('StandardMatchScene', {
           isPvp: true,
           deck: deck,
           password: this.password,

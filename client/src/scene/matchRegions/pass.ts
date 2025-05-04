@@ -12,7 +12,7 @@ import {
   UserSettings,
   Depth,
 } from '../../settings/settings'
-import { GameScene } from '../gameScene'
+import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import { MechanicsSettings } from '../../../../shared/settings'
 import Buttons from '../../lib/buttons/buttons'
@@ -33,7 +33,7 @@ export default class PassRegion extends Region {
   yourPass: Phaser.GameObjects.Container
   theirPass: Phaser.GameObjects.Container
 
-  create(scene: GameScene): PassRegion {
+  create(scene: MatchScene): PassRegion {
     this.scene = scene
     this.container = scene.add.container(0, 0).setDepth(Depth.pass)
 

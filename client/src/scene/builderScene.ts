@@ -141,7 +141,7 @@ export class JourneyBuilderScene extends BuilderBase {
       }
 
       // Start a match against an ai opponent with the specified deck
-      this.scene.start('JourneyGameScene', {
+      this.scene.start('JourneyMatchScene', {
         deck: this.journeyRegion.getDeck(),
         aiDeck: aiDeck,
         missionID: this.params.id,

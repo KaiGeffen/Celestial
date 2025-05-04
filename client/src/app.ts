@@ -3,8 +3,8 @@ import 'phaser'
 import MenuScene from './scene/menuScene'
 import { PreloadScene, SigninScene } from './scene/preloadScene'
 import HomeScene from './scene/homeScene'
-import { StandardGameScene, JourneyGameScene } from './scene/gameScene'
-import TutorialGameScene from './scene/tutorialScene'
+import { StandardMatchScene, JourneyMatchScene } from './scene/matchScene'
+import TutorialMatchScene from './scene/tutorialScene'
 import { BuilderScene, JourneyBuilderScene } from './scene/builderScene'
 import MatchHistoryScene from './scene/matchHistoryScene'
 
@@ -46,9 +46,9 @@ const config: Phaser.Types.Core.GameConfig = {
     SigninScene,
     HomeScene,
     MenuScene,
-    StandardGameScene,
-    JourneyGameScene,
-    TutorialGameScene,
+    StandardMatchScene,
+    JourneyMatchScene,
+    TutorialMatchScene,
     JourneyBuilderScene,
     PlaceholderScene,
     BuilderScene,

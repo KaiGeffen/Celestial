@@ -14,7 +14,7 @@ import {
 } from '../../settings/settings'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
-import { GameScene } from '../gameScene'
+import { MatchScene } from '../matchScene'
 import { MechanicsSettings } from '../../../../shared/settings'
 
 // The y distance card moves up when hovered
@@ -40,7 +40,7 @@ export default class OurBoardRegion extends Region {
   // Track whether shift is held
   isShiftHeld = false
 
-  create(scene: GameScene): this {
+  create(scene: MatchScene): this {
     this.scene = scene
     this.cards = []
 

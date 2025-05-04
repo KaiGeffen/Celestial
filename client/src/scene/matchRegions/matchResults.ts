@@ -15,7 +15,7 @@ import GameModel from '../../../../shared/state/gameModel'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import avatarNames from '../../lib/avatarNames'
 
-export default class ResultsRegion extends Region {
+export default class MatchResultsRegion extends Region {
   // Whether the results have been seen already
   seen: boolean
 
@@ -40,7 +40,7 @@ export default class ResultsRegion extends Region {
         Space.windowHeight - (Space.buttonHeight + Space.pad * 2) * 2,
       )
 
-  create(scene: GameScene): ResultsRegion {
+  create(scene: MatchScene): this {
     this.scene = scene
     this.seen = false
     this.container = scene.add.container().setDepth(Depth.results)
@@ -346,11 +346,11 @@ export default class ResultsRegion extends Region {
   }
 }
 
-import { GameScene } from '../gameScene'
+import { MatchScene } from '../matchScene'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 
-export class ResultsRegionTutorial extends ResultsRegion {
+export class ResultsRegionTutorial extends MatchResultsRegion {
   missionID: number
 
   protected createButtons() {
@@ -371,7 +371,7 @@ export class ResultsRegionTutorial extends ResultsRegion {
       if (this.missionID >= TUTORIAL_LENGTH) {
         this.scene.scene.start('JourneyScene', { stillframe: 4 })
       } else {
-        this.scene.scene.start('TutorialGameScene', {
+        this.scene.scene.start('TutorialMatchScene', {
           missionID: this.missionID,
         })
       }

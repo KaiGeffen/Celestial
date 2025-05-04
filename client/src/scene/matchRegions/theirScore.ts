@@ -9,7 +9,7 @@ import {
   Color,
 } from '../../settings/settings'
 import Region from './baseRegion'
-import { GameScene } from '../gameScene'
+import { MatchScene } from '../matchScene'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { Flags } from '../../settings/flags'
 import Buttons from '../../lib/buttons/buttons'
@@ -32,7 +32,7 @@ export default class TheirScoreRegion extends Region {
   private width = Space.iconSize * 3 + Space.pad * 4
   private height = Space.todoHandOffset + Space.pad
 
-  create(scene: GameScene): this {
+  create(scene: MatchScene): this {
     this.scene = scene
     this.container = scene.add.container(0, 0).setDepth(Depth.theirScore)
 

@@ -1,7 +1,7 @@
 import 'phaser'
 import { Depth, Space } from '../../settings/settings'
 import Region from './baseRegion'
-import { GameScene } from '../gameScene'
+import { MatchScene } from '../matchScene'
 import GameModel from '../../../../shared/state/gameModel'
 
 interface Butterfly {
@@ -41,7 +41,7 @@ export default class CompanionRegion extends Region {
     0xe0b0ff, // Light purple
   ]
 
-  create(scene: GameScene): this {
+  create(scene: MatchScene): this {
     this.scene = scene
 
     const width = Space.avatarSize + Space.pad * 2

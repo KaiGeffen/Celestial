@@ -1,16 +1,14 @@
 import 'phaser'
-import RoundRectangle from 'phaser3-rex-plugins/plugins/roundrectangle.js'
 import GameModel from '../../../../shared/state/gameModel'
-import { Color, Space, Style, Depth, Time } from '../../settings/settings'
+import { Depth } from '../../settings/settings'
 import Region from './baseRegion'
-import { GameScene } from '../gameScene'
+import { MatchScene } from '../matchScene'
 
 // Shows the current scores of the night's performance
-// As well as any buttons
 export default class RoundResultRegion extends Region {
   roundResult: Phaser.GameObjects.Sprite
 
-  create(scene: GameScene): RoundResultRegion {
+  create(scene: MatchScene): RoundResultRegion {
     this.scene = scene
     this.container = scene.add.container().setDepth(Depth.roundResult)
     this.scene.plugins.get('rexAnchor')['add'](this.container, {
@@ -32,7 +30,6 @@ export default class RoundResultRegion extends Region {
   displayState(state: GameModel): void {
     this.deleteTemp()
 
-    // TODO
     // On the final state of the recap, animate the text of round results
     const isRecapEnd = ['win', 'lose', 'tie'].includes(state.sound)
     if (state.isRecap && isRecapEnd) {

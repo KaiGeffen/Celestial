@@ -3,7 +3,7 @@ import GameModel from '../../../../shared/state/gameModel'
 import { Depth, Space, Style, Flags, Color } from '../../settings/settings'
 import Region from './baseRegion'
 import { MechanicsSettings } from '../../../../shared/settings'
-import { GameScene } from '../gameScene'
+import { MatchScene } from '../matchScene'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 export default class OurScoreRegion extends Region {
@@ -30,7 +30,7 @@ export default class OurScoreRegion extends Region {
   // Relic icon
   relic: Phaser.GameObjects.Image
 
-  create(scene: GameScene): this {
+  create(scene: MatchScene): this {
     this.scene = scene
     this.container = scene.add.container().setDepth(Depth.ourScore)
 

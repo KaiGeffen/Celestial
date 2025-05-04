@@ -4,7 +4,7 @@ import Buttons from '../../lib/buttons/buttons'
 import GameModel from '../../../../shared/state/gameModel'
 import { Color, Depth, Space, Style } from '../../settings/settings'
 import Region from './baseRegion'
-import { GameScene } from '../gameScene'
+import { MatchScene } from '../matchScene'
 import { UserSettings } from '../../settings/userSettings'
 import AvatarButton from '../../lib/buttons/avatar'
 
@@ -19,7 +19,7 @@ export default class OurAvatarRegion extends Region {
   btnDiscard: Button
   avatar: AvatarButton
 
-  create(scene: GameScene): this {
+  create(scene: MatchScene): this {
     this.scene = scene
     this.container = scene.add.container().setDepth(Depth.ourAvatar)
     this.scene.plugins.get('rexAnchor')['add'](this.container, {

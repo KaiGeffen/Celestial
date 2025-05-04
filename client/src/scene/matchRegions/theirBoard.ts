@@ -11,7 +11,7 @@ import {
   UserSettings,
   Color,
 } from '../../settings/settings'
-import { GameScene } from '../gameScene'
+import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
 
@@ -22,7 +22,7 @@ export default class TheirBoardRegion extends Region {
   btnDeck: Button
   btnDiscard: Button
 
-  create(scene: GameScene): this {
+  create(scene: MatchScene): this {
     this.scene = scene
 
     this.container = scene.add.container(0, 0).setDepth(Depth.theirHand)

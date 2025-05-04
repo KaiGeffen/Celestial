@@ -117,7 +117,7 @@ export default class JourneyScene extends BaseScene {
         this.scene.launch('MenuScene', {
           menu: 'help',
           callback: () => {
-            this.scene.start('TutorialGameScene', { missionID: 0 })
+            this.scene.start('TutorialMatchScene', { missionID: 0 })
           },
         })
       },

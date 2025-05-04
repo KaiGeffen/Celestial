@@ -4,19 +4,19 @@ import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 import UserDataServer from './userDataServer'
 
 import { Flags } from '../settings/settings'
-import { GameScene } from '../scene/gameScene'
+import { MatchScene } from '../scene/matchScene'
 import { Mulligan } from '../../../shared/settings'
 import { MatchClientWS } from '../../../shared/network/matchWS'
 import { Deck } from '../../../shared/types/deck'
 
 // TODO Figure out this global scene situation, smells bad
 // NOTE Need this because could be normal game scene or tutorial scene (They are different)
-var scene: GameScene
+var scene: MatchScene
 
 export class MatchWS {
   socket: MatchClientWS
 
-  constructor(newScene: GameScene) {
+  constructor(newScene: MatchScene) {
     scene = newScene
 
     const socket = (this.socket = this.getSocket())
@@ -101,7 +101,7 @@ export class MatchWS {
 }
 
 export class MatchTutorialWS extends MatchWS {
-  constructor(newScene: GameScene, num: number) {
+  constructor(newScene: MatchScene, num: number) {
     super(newScene)
 
     this.socket.onOpen(() => {
@@ -114,7 +114,7 @@ export class MatchTutorialWS extends MatchWS {
 }
 
 export class MatchPveWS extends MatchWS {
-  constructor(newScene: GameScene, deck: Deck, aiDeck: Deck) {
+  constructor(newScene: MatchScene, deck: Deck, aiDeck: Deck) {
     super(newScene)
 
     this.socket.onOpen(() => {
@@ -129,7 +129,7 @@ export class MatchPveWS extends MatchWS {
 }
 
 export class MatchPvpWS extends MatchWS {
-  constructor(newScene: GameScene, deck: Deck, password: string) {
+  constructor(newScene: MatchScene, deck: Deck, password: string) {
     super(newScene)
 
     this.socket.onOpen(() => {

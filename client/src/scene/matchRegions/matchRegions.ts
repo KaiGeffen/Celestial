@@ -10,7 +10,7 @@ import PassRegion from './pass'
 import RoundResultRegion from './roundResult'
 
 import MulliganRegion from './mulliganRegion'
-import ResultsRegion from './results'
+import MatchResultsRegion from './matchResults'
 import OurAvatarRegion from './ourAvatar'
 import TheirAvatarRegion from './theirAvatar'
 import CompanionRegion from './companion'
@@ -44,7 +44,7 @@ export default class Regions {
 
   // Regions for special periods of the game
   static Mulligan = MulliganRegion
-  static Results = ResultsRegion
+  static MatchResults = MatchResultsRegion
 
   static Companion = CompanionRegion
 }
