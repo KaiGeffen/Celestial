@@ -17,6 +17,18 @@ export default class MenuScene extends BaseMenuScene {
     })
   }
 
+  init(params): void {
+    // Start with no alpha, fade in
+    const camera = this.cameras.main
+    camera.alpha = 0
+
+    this.tweens.add({
+      targets: camera,
+      alpha: 1,
+      duration: Time.menuTransition,
+    })
+  }
+
   create(params): void {
     super.create(params)
 
@@ -40,22 +52,6 @@ export default class MenuScene extends BaseMenuScene {
     })
 
     this.scene.bringToTop()
-
-    this.transitionIn()
-  }
-
-  // Play a transition as this menu opens
-  transitionIn(): void {
-    const camera = this.cameras.main
-
-    this.tweens.add({
-      targets: camera,
-      alpha: 1,
-      duration: Time.menuTransition,
-      onStart: () => {
-        camera.alpha = 0
-      },
-    })
   }
 
   private addBackground() {
