@@ -19,7 +19,7 @@
     },
     {
       "italic": "Dove is about freedom and letting go. To fly unfettered to any height.",
-      "bold": "Dove costs 1 breath to play, and earns 1 point. It also has the following effects:\nOnce Dove has been added to the story, it will be visible to both players.\nWhen Dove resolves it will be removed from the game instead of moving to your discard pile.",
+      "bold": "Dove costs 1 breath to play, and earns 1 point. Both players can see it in the story, and after earning points it is removed from the game.",
       "align": "card"
     },
     {
@@ -29,7 +29,7 @@
     },
     {
       "italic": "Mercy is a tale of the whole world’s compassion, it is that perfect moment when tension washes away completely.",
-      "bold": "Mercy costs 3 breath to play, is worth 3 points when it resolves, and will cause both players to draw a card.",
+      "bold": "Mercy costs 3 breath to play, is worth 3 points, and after earning points both players draw a card.",
       "align": "card"
     },
     {
