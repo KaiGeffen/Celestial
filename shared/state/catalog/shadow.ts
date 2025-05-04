@@ -233,7 +233,7 @@ const vampire = new Vampire({
   name: 'Vampire',
   id: 49,
   cost: 6,
-  points: 7,
+  points: 6,
   text: "Worth -X where X is your opponent's points.\nCosts 1 less for each card in the story.",
   beta: true,
 })
