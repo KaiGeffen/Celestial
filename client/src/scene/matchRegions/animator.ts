@@ -8,6 +8,7 @@ import { CardImage } from '../../lib/cardImage'
 import { Space, Time, Depth, Ease } from '../../settings/settings'
 import Catalog from '../../../../shared/state/catalog'
 import { View } from '../gameScene'
+import Card from '../../../../shared/state/card'
 
 export default class Animator {
   scene: GameScene
@@ -80,6 +81,9 @@ export default class Animator {
     owner: number,
   ): [number, number] {
     switch (animation.from) {
+      case Zone.Mulligan:
+        return CardLocation.mulligan(this.container, animation.index)
+
       case Zone.Deck:
         if (owner === 0) {
           return CardLocation.ourDeck()
@@ -153,7 +157,7 @@ export default class Animator {
     return [300, 300]
   }
 
-  private createCard(card, start: [number, number] = [0, 0]): CardImage {
+  private createCard(card: Card, start: [number, number] = [0, 0]): CardImage {
     let cardImage = new CardImage(
       card || Catalog.cardback,
       this.container,
@@ -267,25 +271,17 @@ export default class Animator {
     iAnimation: number,
     state: GameModel,
   ) {
-    if (owner === 1) {
-      return
-    }
+    // Should end in deck or hand
+    const end = this.getEnd(animation, state, owner)
+    const start = this.getStart(animation, state, owner)
 
-    // Get the cardImage that is being referenced
-    let card = this.view.mulligan.cards[animation.index]
-
-    // Make a new copy of that card in the same position but in this container
-    card = this.createCard(card.card, [
-      card.container.x,
-      card.container.y,
-    ]).show()
-
-    // Should go to our deck
-    let end = this.getEnd(animation, state, owner)
+    // Make a new cardImage of this card
+    let cardImage = this.createCard(animation.card, start).show()
 
     let permanentCard = this.getCard(animation, owner)
+
     this.animateCard(
-      card,
+      cardImage,
       end,
       iAnimation,
       permanentCard,
