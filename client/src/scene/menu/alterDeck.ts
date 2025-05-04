@@ -80,9 +80,6 @@ class AlterDeckMenu extends Menu {
 
     // Focus the name field
     this.nameInputText.setFocus()
-
-    // Reskin all of the input texts
-    this.reskinInputText()
   }
 
   private createContent(
@@ -269,14 +266,20 @@ class AlterDeckMenu extends Menu {
         this.name = inputText.text
       })
 
+    // Chrome
+    const chrome = this.scene.add.image(0, 0, 'icon-InputText')
+
+    // Container with textbox and chrome
     let container = new ContainerLite(
       this.scene,
       0,
       0,
       Space.textboxWidth,
       Space.textboxHeight,
-      this.nameInputText,
+      [this.nameInputText, chrome],
     )
+
+    // Add the objects centered
     sizer.addSpace().add(container).addSpace()
 
     return sizer
@@ -311,14 +314,20 @@ class AlterDeckMenu extends Menu {
         }
       })
 
+    // Chrome
+    const chrome = this.scene.add.image(0, 0, 'icon-InputText')
+
+    // Container with textbox and chrome
     let container = new ContainerLite(
       this.scene,
       0,
       0,
       Space.textboxWidth,
       Space.textboxHeight,
-      this.deckCodeInputText,
+      [this.deckCodeInputText, chrome],
     )
+
+    // Add the objects centered
     sizer.addSpace().add(container).addSpace()
 
     return sizer
@@ -377,20 +386,6 @@ class AlterDeckMenu extends Menu {
     })
 
     return container
-  }
-
-  // Change the way each of this scene's input texts look
-  private reskinInputText(): void {
-    this.scene.add.image(
-      this.nameInputText.x,
-      this.nameInputText.y,
-      'icon-InputText',
-    )
-    this.scene.add.image(
-      this.deckCodeInputText.x,
-      this.deckCodeInputText.y,
-      'icon-InputText',
-    )
   }
 }
 
