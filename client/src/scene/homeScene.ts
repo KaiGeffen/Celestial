@@ -75,6 +75,11 @@ export default class HomeScene extends BaseScene {
       .roundRectangle(0, 0, regionWidth, regionHeight, 5, 0xffffff)
       .setAlpha(0.3)
       .setOrigin(0.5, 0)
+    this.plugins.get('rexDropShadowPipeline')['add'](background, {
+      distance: 10,
+      angle: -45,
+      shadowColor: 0x000000,
+    })
     userDetails.add(background)
 
     // Add avatar
@@ -114,6 +119,11 @@ export default class HomeScene extends BaseScene {
     const smallBg1 = this.rexUI.add
       .roundRectangle(0, y, regionWidth, subHeight, 5, 0xffffff)
       .setAlpha(0.3)
+    this.plugins.get('rexDropShadowPipeline')['add'](smallBg1, {
+      distance: 10,
+      angle: -45,
+      shadowColor: 0x000000,
+    })
     const amtGems = userData.gems || 0
     const txtGem = this.add
       .text(0, y, `${amtGems} 💎`, Style.username)
@@ -124,6 +134,11 @@ export default class HomeScene extends BaseScene {
     const smallBg2 = this.rexUI.add
       .roundRectangle(0, y, regionWidth, subHeight, 5, 0xffffff)
       .setAlpha(0.3)
+    this.plugins.get('rexDropShadowPipeline')['add'](smallBg2, {
+      distance: 10,
+      angle: -45,
+      shadowColor: 0x000000,
+    })
     const amtCoins = userData.coins || 0
     const txtCoins = this.add
       .text(0, y, `${amtCoins}💰`, Style.username)
@@ -148,6 +163,11 @@ export default class HomeScene extends BaseScene {
       .roundRectangle(0, 0, width, height, 5, 0xffffff)
       .setAlpha(0.3)
       .setOrigin(0, 0)
+    this.plugins.get('rexDropShadowPipeline')['add'](background, {
+      distance: 10,
+      angle: -45,
+      shadowColor: 0x000000,
+    })
     iconContainer.add(background)
 
     // Anchor to right
