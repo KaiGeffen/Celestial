@@ -54,6 +54,7 @@ export class AchievementManager {
       const now = new Date()
       const day = now.getDay()
       const hours = now.getHours()
+      console.log('Current hour is', hours)
       if (day === 3 && hours >= 19 && hours <= 20) {
         await this.unlock(playerId, 7)
       }

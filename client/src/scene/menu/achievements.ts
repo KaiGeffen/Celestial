@@ -91,7 +91,6 @@ export default class AchievementsMenu extends Menu {
       space: {
         item: Space.padSmall,
         top: Space.padSmall,
-        bottom: Space.padSmall,
       },
     })
 
@@ -132,8 +131,8 @@ export default class AchievementsMenu extends Menu {
         .add(
           this.scene.add
             .text(0, 0, description, Style.basic)
-            .setWordWrapWidth(width * 0.6)
-            .setFixedSize(width * 0.6, 0),
+            .setWordWrapWidth(width * 0.5)
+            .setFixedSize(width * 0.5, 0),
           {
             proportion: 5,
           },

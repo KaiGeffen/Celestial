@@ -14,11 +14,11 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
   1: {
     title: 'Day 2',
     description: 'Log in a second day.',
-    image: 'avatar-Imani',
   },
   2: {
     title: 'Day 3',
     description: 'Log in a third day.',
+    image: 'avatar-Imani',
   },
   3: {
     title: 'Day 4',
