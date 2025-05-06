@@ -252,6 +252,9 @@ async function sendUserData(
   // Convert transactions to a list of owned item IDs
   const ownedItems = transactions.map((t) => t.item_id)
 
+  // Get list of achievements
+  const achievements = await AchievementManager.getAchievements(id)
+
   ws.send({
     type: 'sendUserData',
     inventory: data.inventory,
@@ -264,6 +267,7 @@ async function sendUserData(
     lastDailyReward: data.last_daily_reward,
     ownedItems,
     cosmeticSet: JSON.parse(data.cosmetic_set),
+    achievements,
   })
 
   // Update last active time

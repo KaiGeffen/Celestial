@@ -1,5 +1,6 @@
 import { Deck } from '../types/deck'
 import { CosmeticSet } from '../types/cosmeticSet'
+import { Achievement } from '../types/achievement'
 export interface UserDataClientMessages {
   sendToken: {
     email: string
@@ -45,6 +46,7 @@ export interface UserDataServerMessages {
     lastDailyReward: Date
     ownedItems: number[]
     cosmeticSet: CosmeticSet
+    achievements: Achievement[]
   }
   purchaseItemSuccess: {
     itemId: number

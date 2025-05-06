@@ -1,3 +1,4 @@
+import { Achievement } from '../../shared/types/achievement'
 import { db } from './db/db'
 import { achievements } from './db/schema'
 import { eq, and } from 'drizzle-orm'
@@ -13,6 +14,21 @@ export class AchievementManager {
     for (let i = 1; i <= 6; i++) {
       await this.unlockIf24hSincePrevious(playerId, i)
     }
+  }
+
+  // Get all of the achievements for player, also set them to seen
+  static async getAchievements(playerId: string): Promise<Achievement[]> {
+    const result = await db
+      .select()
+      .from(achievements)
+      .where(eq(achievements.player_id, playerId))
+
+    await db
+      .update(achievements)
+      .set({ seen: true })
+      .where(eq(achievements.player_id, playerId))
+
+    return result
   }
 
   // Unlock achievementId if not already unlocked
@@ -33,6 +49,7 @@ export class AchievementManager {
         .values({
           player_id: playerId,
           achievement_id: achievementId,
+          seen: false,
         })
         .execute()
     }
@@ -81,6 +98,7 @@ export class AchievementManager {
         .values({
           player_id: playerId,
           achievement_id: achievementId,
+          seen: false,
         })
         .execute()
     }

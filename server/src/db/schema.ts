@@ -144,7 +144,7 @@ export const achievements = pgTable(
       .references(() => players.id, { onDelete: 'cascade' }),
     achievement_id: integer('achievement_id').notNull(),
     progress: integer('progress').notNull().default(0),
-    seen: boolean('seen').notNull().default(false),
+    seen: boolean('seen').notNull(),
     date_unlocked: timestamp('date_unlocked').notNull().defaultNow(),
   },
   (table) => ({
