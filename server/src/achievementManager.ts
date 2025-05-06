@@ -43,14 +43,25 @@ export class AchievementManager {
     isPlayer1: boolean,
   ) {
     if (playerId === null) return
-    // 8: Played 10 games against anyone (With at least 5 rounds)
-    if (!isPvp && game.roundResults.length >= 5) {
-      await this.incrementProgress(playerId, 8)
-    }
 
-    // 9: Won against another player
-    if (isPvp && game.winner === (isPlayer1 ? 0 : 1)) {
-      await this.unlock(playerId, 9)
+    if (isPvp) {
+      // 9: Won against another player
+      if (game.winner === (isPlayer1 ? 0 : 1)) {
+        await this.unlock(playerId, 9)
+      }
+
+      // 7: Played between 7-8 PM EST Wednesday
+      const now = new Date()
+      const day = now.getDay()
+      const hours = now.getHours()
+      if (day === 3 && hours >= 19 && hours <= 20) {
+        await this.unlock(playerId, 7)
+      }
+    } else {
+      // 8: Played 10 games against anyone (With at least 5 rounds)
+      if (game.roundResults.length >= 5) {
+        await this.incrementProgress(playerId, 8)
+      }
     }
   }
 

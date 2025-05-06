@@ -39,7 +39,7 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
   },
   7: {
     title: 'Game Night',
-    description: 'Play a match Wednesday at 7PM EST.',
+    description: 'Play a PVP match Wednesday between 7-8PM EST.',
     image: 'border-Thorns',
   },
   8: {
