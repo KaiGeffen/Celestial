@@ -55,6 +55,11 @@ export default class HomeScene extends BaseScene {
     if (UserDataServer.isLoggedIn()) {
       this.createQuestText()
     }
+
+    this.scene.launch('MenuScene', {
+      menu: 'achievements',
+      activeScene: this,
+    })
   }
 
   private createUserDetails(): void {

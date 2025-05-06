@@ -1,26 +1,40 @@
 export interface AchievementMeta {
   title: string
   description: string
-  image: string
+  image?: string
   // The progress needed to complete this achievement
   progress?: number
 }
 
 export const achievementsMeta: Record<number, AchievementMeta> = {
   0: {
-    title: 'First Steps',
+    title: 'Welcome!',
     description: 'Log in for the first time.',
-    image: 'avatar-Jules',
   },
   1: {
-    title: 'Daily Devotee',
-    description: 'Log in two days in a row.',
-    image: 'avatar-Jules',
-    progress: 4,
+    title: 'Day 2',
+    description: 'Log in a second day.',
+    image: 'avatar-Imani',
   },
   2: {
-    title: 'Threepeat',
-    description: 'Log in three days in a row.',
-    image: 'avatar-Mia',
+    title: 'Day 3',
+    description: 'Log in a third day.',
+  },
+  3: {
+    title: 'Day 4',
+    description: 'Log in a fourth day.',
+  },
+  4: {
+    title: 'Day 5',
+    description: 'Log in a fifth day.',
+  },
+  5: {
+    title: 'Day 6',
+    description: 'Log in a sixth day.',
+  },
+  6: {
+    title: 'Day 7',
+    description: 'Log in a seventh day.',
+    image: 'avatar-Mitra',
   },
 }
