@@ -9,6 +9,7 @@ import {
   isDailyQuestAvailable,
 } from '../utils/dailyQuestUtils'
 import MenuScene from './menuScene'
+import { achievementsMeta } from '../lib/achievementsData'
 
 const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
@@ -56,10 +57,8 @@ export default class HomeScene extends BaseScene {
       this.createQuestText()
     }
 
-    this.scene.launch('MenuScene', {
-      menu: 'achievements',
-      activeScene: this,
-    })
+    // Check if there are any unseen achievements and show achievements menu if so
+    this.checkAndShowUnseenAchievements()
   }
 
   private createUserDetails(): void {
@@ -372,6 +371,20 @@ export default class HomeScene extends BaseScene {
         callback: updateQuestTime,
         callbackScope: this,
         loop: true,
+      })
+    }
+  }
+
+  private checkAndShowUnseenAchievements(): void {
+    const userAchievements = UserDataServer.getUserData()?.achievements || []
+
+    // Check if any achievements are unseen
+    const hasUnseenAchievements = userAchievements.some((ach) => !ach.seen)
+
+    if (hasUnseenAchievements) {
+      this.scene.launch('MenuScene', {
+        menu: 'achievements',
+        activeScene: this,
       })
     }
   }
