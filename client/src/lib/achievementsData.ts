@@ -9,7 +9,7 @@ export interface AchievementMeta {
 export const achievementsMeta: Record<number, AchievementMeta> = {
   0: {
     title: 'Welcome!',
-    description: 'Log in for the first time.',
+    description: "You've arrived :)",
   },
   1: {
     title: 'Day 2',
@@ -36,5 +36,20 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
     title: 'Day 7',
     description: 'Log in a seventh day.',
     image: 'avatar-Mitra',
+  },
+  7: {
+    title: 'Game Night',
+    description: 'Play a match Wednesday at 7PM EST.',
+    image: 'border-Thorns',
+  },
+  8: {
+    title: 'Getting Started',
+    description: 'Play 10 games against the computer.',
+    image: 'avatar-Kitz',
+  },
+  9: {
+    title: 'Getting Serious',
+    description: 'Play 1 game against a friend.',
+    image: 'avatar-Mia',
   },
 }

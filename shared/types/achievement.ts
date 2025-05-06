@@ -1,6 +1,6 @@
 // Data about an achievement
 export interface Achievement {
-  id: number
+  achievement_id: number
   progress: number
   seen: boolean
 }

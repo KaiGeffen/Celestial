@@ -5,12 +5,16 @@ import MenuScene from '../menuScene'
 import UserDataServer from '../../network/userDataServer'
 import { achievementsMeta } from '../../lib/achievementsData'
 
-const width = 700
-const height = 500
+const width = 900
+const height = 600
 
 export default class AchievementsMenu extends Menu {
   constructor(scene: MenuScene, params) {
     super(scene, width, params)
+
+    // Base sizer has no pad between lines
+    this.sizer.space.line = 0
+
     this.createHeader('Achievements')
     this.createContent()
     this.layout()
@@ -22,10 +26,13 @@ export default class AchievementsMenu extends Menu {
       UserDataServer.getUserData()?.achievements || []
     ).reduce(
       (acc, ach) => {
-        acc[ach.id] = ach
+        acc[ach.achievement_id] = ach
         return acc
       },
-      {} as Record<number, { id: number; progress: number; seen: boolean }>,
+      {} as Record<
+        number,
+        { achievement_id: number; progress: number; seen: boolean }
+      >,
     )
 
     // Sort achievements into three groups
@@ -51,6 +58,10 @@ export default class AchievementsMenu extends Menu {
     const headerSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
       width: width,
+      space: {
+        left: Space.padSmall,
+        right: Space.padSmall,
+      },
     })
     headerSizer
       .add(this.scene.add.text(0, 0, 'Title', Style.basic), { proportion: 2 })
@@ -65,9 +76,12 @@ export default class AchievementsMenu extends Menu {
     // Rows
     const rowsSizer = this.scene.rexUI.add.sizer({
       orientation: 'vertical',
-      width: width,
       height: height,
-      space: { item: 5 },
+      space: {
+        item: Space.padSmall,
+        top: Space.padSmall,
+        bottom: Space.padSmall,
+      },
     })
 
     // Helper to add a row
@@ -80,31 +94,43 @@ export default class AchievementsMenu extends Menu {
       }
 
       // Create row with background and spacing
-      const rowSizer = this.scene.rexUI.add.sizer({
+      const singleRowSizer = this.scene.rexUI.add.sizer({
         orientation: 'horizontal',
         width: width,
-        space: { item: 10 },
+        space: {
+          left: Space.padSmall,
+          right: Space.padSmall,
+          top: Space.padSmall,
+          bottom: Space.padSmall,
+          item: 10,
+        },
       })
 
       // Add background to the row
       console.log(backgroundColor)
       if (backgroundColor) {
-        rowSizer.addBackground(
+        singleRowSizer.addBackground(
           this.scene.add.rectangle(0, 0, 1, 1, backgroundColor),
         )
       }
 
       // Add row content
-      rowSizer
+      singleRowSizer
         .add(this.scene.add.text(0, 0, meta.title, Style.basic), {
           proportion: 2,
         })
-        .add(this.scene.add.text(0, 0, description, Style.basic), {
-          proportion: 5,
-        })
+        .add(
+          this.scene.add
+            .text(0, 0, description, Style.basic)
+            .setWordWrapWidth(width * 0.6)
+            .setFixedSize(width * 0.5, 0),
+          {
+            proportion: 5,
+          },
+        )
         .add(this.scene.add.image(0, 0, meta.image))
 
-      rowsSizer.add(rowSizer)
+      rowsSizer.add(singleRowSizer)
     }
 
     // Add in the requested order:
