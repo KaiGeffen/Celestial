@@ -9,6 +9,7 @@ import {
   timestamp,
   index,
   serial,
+  boolean,
 } from 'drizzle-orm/pg-core'
 
 /*
@@ -133,3 +134,23 @@ export const newsletter_signups = pgTable('newsletter_signups', {
   email: varchar('email', { length: 255 }).notNull().unique(),
   created_at: timestamp('created_at').notNull().defaultNow(),
 })
+
+export const achievements = pgTable(
+  'achievements',
+  {
+    id: serial('id').primaryKey(),
+    player_id: uuid('player_id')
+      .notNull()
+      .references(() => players.id, { onDelete: 'cascade' }),
+    achievement_id: integer('achievement_id').notNull(),
+    progress: integer('progress').notNull().default(0),
+    seen: boolean('seen').notNull().default(false),
+    date_unlocked: timestamp('date_unlocked').notNull().defaultNow(),
+  },
+  (table) => ({
+    playerIdx: index('achievement_player_idx').on(table.player_id),
+    achievementIdx: index('achievement_achievement_idx').on(
+      table.achievement_id,
+    ),
+  }),
+)

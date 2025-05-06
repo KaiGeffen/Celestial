@@ -14,6 +14,7 @@ import { UserDataServerWS } from '../../../shared/network/userDataWS'
 import { Deck } from '../../../shared/types/deck'
 import { STORE_ITEMS } from '../../../shared/storeItems'
 import { cosmeticsTransactions } from '../db/schema'
+import { AchievementManager } from '../achievementManager'
 
 // Create the websocket server
 export default function createUserDataServer() {
@@ -72,6 +73,9 @@ export default function createUserDataServer() {
           // Send user their data
           await sendUserData(ws, id, result[0])
         }
+
+        // Handle achievements
+        await AchievementManager.onConnection(id)
       })
         .on('refreshUserData', async () => {
           if (!id) return
