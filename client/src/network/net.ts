@@ -120,7 +120,7 @@ export class MatchPveWS extends MatchWS {
     this.socket.onOpen(() => {
       this.socket.send({
         type: 'initPve',
-        uuid: '',
+        uuid: UserDataServer.getUserData().uuid || '',
         deck: deck,
         aiDeck: aiDeck,
       })

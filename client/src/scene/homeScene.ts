@@ -8,8 +8,6 @@ import {
   getTimeUntilNextQuest,
   isDailyQuestAvailable,
 } from '../utils/dailyQuestUtils'
-import MenuScene from './menuScene'
-import { achievementsMeta } from '../lib/achievementsData'
 
 const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
@@ -17,8 +15,6 @@ const height = Space.iconSize * 2 + Space.pad * 3
 export default class HomeScene extends BaseScene {
   // Add this property to the class
   private questTimer: Phaser.Time.TimerEvent = null
-  private headerIcons: Phaser.GameObjects.Container
-  private statsContainer: Phaser.GameObjects.Container
 
   constructor() {
     super({

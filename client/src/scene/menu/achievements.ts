@@ -3,7 +3,7 @@ import { Style, Space, Color } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import UserDataServer from '../../network/userDataServer'
-import { achievementsMeta } from '../../lib/achievementsData'
+import { achievementsMeta } from '../../../../shared/achievementsData'
 
 const width = 900
 const height = 600
@@ -107,7 +107,6 @@ export default class AchievementsMenu extends Menu {
       })
 
       // Add background to the row
-      console.log(backgroundColor)
       if (backgroundColor) {
         singleRowSizer.addBackground(
           this.scene.add.rectangle(0, 0, 1, 1, backgroundColor),

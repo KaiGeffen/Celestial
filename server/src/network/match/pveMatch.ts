@@ -3,6 +3,7 @@ import { getAction } from '../../ai'
 import getClientGameModel from '../../../../shared/state/clientGameModel'
 import { MatchServerWS } from '../../../../shared/network/matchWS'
 import { Deck } from '../../../../shared/types/deck'
+import { AchievementManager } from '../../achievementManager'
 
 class PveMatch extends Match {
   constructor(ws: MatchServerWS, uuid: string, deck: Deck, aiDeck: Deck) {
@@ -19,6 +20,16 @@ class PveMatch extends Match {
       this.game.model.winner === null
     ) {
       await this.opponentActs()
+    }
+
+    // Update achievements at the end of the game
+    if (this.game.model.winner !== null && this.uuid1 !== null) {
+      await AchievementManager.onGamePlayed(
+        this.uuid1,
+        this.game.model,
+        false,
+        false,
+      )
     }
   }
 

@@ -3,6 +3,7 @@ import { MatchServerWS } from '../../../../shared/network/matchWS'
 import { updateMatchResult } from '../../db/updateMatchResult'
 import { Deck } from '../../../../shared/types/deck'
 import { MechanicsSettings } from '../../../../shared/settings'
+import { AchievementManager } from '../../achievementManager'
 
 class PvpMatch extends Match {
   timerCheckInterval: NodeJS.Timeout
@@ -47,6 +48,20 @@ class PvpMatch extends Match {
     // If there is a winner, update wins/losses/elo accordingly
     if (this.game.model.winner !== null) {
       await this.updateMatchResult(this.game.model.winner)
+
+      // Update achievements
+      await AchievementManager.onGamePlayed(
+        this.uuid1,
+        this.game.model,
+        true,
+        false,
+      )
+      await AchievementManager.onGamePlayed(
+        this.uuid2,
+        this.game.model,
+        true,
+        true,
+      )
     }
   }
 

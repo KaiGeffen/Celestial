@@ -49,7 +49,7 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
   },
   9: {
     title: 'Getting Serious',
-    description: 'Play 1 game against a friend.',
+    description: 'Win 1 game against a another player.',
     image: 'avatar-Mia',
   },
 }
