@@ -166,6 +166,7 @@ import { RegisterUsernameMenu } from './registerUsername'
 import PurchaseGemsMenu from './purchaseGems'
 import PurchaseItemMenu from './purchaseItem'
 import UserProfileMenu from './userProfile'
+import AchievementsMenu from './achievements'
 
 const menus = {
   options: OptionsMenu,
@@ -186,6 +187,7 @@ const menus = {
   purchaseGems: PurchaseGemsMenu,
   purchaseItem: PurchaseItemMenu,
   userProfile: UserProfileMenu,
+  achievements: AchievementsMenu,
 }
 
 // Function exposed for the creation of custom menus

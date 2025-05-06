@@ -181,7 +181,12 @@ export default class HomeScene extends BaseScene {
       name: 'Quest',
       x: Space.pad + Space.iconSize * 0.5,
       y: Space.pad + Space.iconSize * 0.5,
-      f: () => this.signalError('Quests coming soon!'),
+      f: () => {
+        this.scene.launch('MenuScene', {
+          menu: 'achievements',
+          activeScene: this,
+        })
+      },
       hint: 'Quests',
     })
 

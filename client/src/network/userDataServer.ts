@@ -13,7 +13,7 @@ import type { GoogleJwtPayload } from '../types/google'
 import { UserDataClientWS } from '../../../shared/network/userDataWS'
 import { Deck } from '../../../shared/types/deck'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
-
+import { Achievement } from '../../../shared/types/achievement'
 const ip = '127.0.0.1'
 const port = 5555
 // Custom code for closing websocket connection due to invalid token
@@ -31,6 +31,7 @@ type UserData = null | {
   lastDailyReward: Date
   ownedItems: number[]
   cosmeticSet: CosmeticSet
+  achievements: Achievement[]
 }
 
 export default class UserDataServer {
@@ -129,6 +130,7 @@ export default class UserDataServer {
           lastDailyReward: Date
           ownedItems: number[]
           cosmeticSet: CosmeticSet
+          achievements: Achievement[]
         }) => {
           // Store the uuid and user data after successful login
           this.userData = {
@@ -291,6 +293,7 @@ export default class UserDataServer {
           border: 0,
           relic: 0,
         },
+        achievements: [],
       }
     } else {
       return this.userData
