@@ -33,6 +33,7 @@ export class AchievementManager {
     }
   }
 
+  // Called after a game is played
   static async onGamePlayed(
     playerId: string,
     game: GameModel,
@@ -41,13 +42,16 @@ export class AchievementManager {
     // Whether this is the player1 or player2 in a pvp match
     isPlayer1: boolean,
   ) {
+    if (playerId === null) return
+    // 8: Played 10 games against anyone (With at least 5 rounds)
+    if (!isPvp && game.roundResults.length >= 5) {
+      await this.incrementProgress(playerId, 8)
+    }
+
     // 9: Won against another player
     if (isPvp && game.winner === (isPlayer1 ? 0 : 1)) {
       await this.unlock(playerId, 9)
     }
-
-    // 8: Played 10 games against anyone
-    await this.incrementProgress(playerId, 8)
   }
 
   // Unlock achievementId if not already unlocked

@@ -43,14 +43,25 @@ export default class AchievementsMenu extends Menu {
     Object.keys(achievementsMeta).forEach((idStr) => {
       const id = Number(idStr)
       const userAch = userAchievements[id]
-      if (userAch) {
-        if (!userAch.seen) {
-          unseenUnlocked.push(id)
-        } else {
-          seenUnlocked.push(id)
-        }
-      } else {
+      if (!userAch) {
         locked.push(id)
+      } else {
+        // Progress achievement not yet completed
+        const meta = achievementsMeta[id]
+        if (
+          typeof meta.progress === 'number' &&
+          userAch.progress < meta.progress
+        ) {
+          locked.push(id)
+        }
+        // Unlocked, maybe not yet seen
+        else {
+          if (!userAch.seen) {
+            unseenUnlocked.push(id)
+          } else {
+            seenUnlocked.push(id)
+          }
+        }
       }
     })
 
@@ -89,7 +100,7 @@ export default class AchievementsMenu extends Menu {
       const userAch = userAchievements[id]
       const userProgress = userAch ? userAch.progress : 0
       let description = meta.description
-      if (typeof meta.progress === 'number') {
+      if (typeof meta.progress === 'number' && userProgress < meta.progress) {
         description += ` (${userProgress}/${meta.progress})`
       }
 
@@ -122,7 +133,7 @@ export default class AchievementsMenu extends Menu {
           this.scene.add
             .text(0, 0, description, Style.basic)
             .setWordWrapWidth(width * 0.6)
-            .setFixedSize(width * 0.5, 0),
+            .setFixedSize(width * 0.6, 0),
           {
             proportion: 5,
           },

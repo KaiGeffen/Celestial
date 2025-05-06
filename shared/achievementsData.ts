@@ -46,10 +46,11 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
     title: 'Getting Started',
     description: 'Play 10 games against the computer.',
     image: 'avatar-Kitz',
+    progress: 10,
   },
   9: {
     title: 'Getting Serious',
-    description: 'Win 1 game against a another player.',
+    description: 'Win 1 game against another player.',
     image: 'avatar-Mia',
   },
 }
