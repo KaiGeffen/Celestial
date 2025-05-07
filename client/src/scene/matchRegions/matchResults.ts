@@ -12,7 +12,6 @@ import {
 } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import GameModel from '../../../../shared/state/gameModel'
-import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import avatarNames from '../../lib/avatarNames'
 import newScrollablePanel from '../../lib/scrollablePanel'
 
@@ -74,10 +73,10 @@ export default class MatchResultsRegion extends Region {
     this.deleteTemp()
 
     // If the game isn't over, hide this
-    // if (state.winner === null) {
-    //   this.hide()
-    //   return
-    // }
+    if (state.winner === null) {
+      this.hide()
+      return
+    }
 
     // If we are in a recap, hide this
     if (state.isRecap) {
@@ -91,14 +90,6 @@ export default class MatchResultsRegion extends Region {
       return
     }
 
-    state.roundResults = [
-      [1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [
-        4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-        23,
-      ],
-    ]
-
     // Avatars
     const av1 = avatarNames[state.cosmeticSets[0].avatar]
     const av2 = avatarNames[state.cosmeticSets[1].avatar]
@@ -111,7 +102,7 @@ export default class MatchResultsRegion extends Region {
     // Further detail how each round went
     this.displayRoundResults(state)
 
-    // Ensure panel layout TODO Broken
+    // Ensure panel layout
     this.panel.setVisible(true).layout()
 
     this.show()
@@ -216,8 +207,10 @@ export default class MatchResultsRegion extends Region {
 
   private createBackground() {
     const background = this.scene.rexUI.add
-      .roundRectangle(0, 0, 0, 0, Space.corner, Color.backgroundDark)
+      .roundRectangle(0, 0, 1, 1, Space.corner, Color.backgroundDark)
       .setDepth(Depth.results)
+      // TODO This causes the panel to not be click and draggable
+      .setInteractive()
 
     // Add a border around the shape TODO Make a class for this to keep it dry
     let postFxPlugin = this.scene.plugins.get('rexOutlinePipeline')
@@ -229,7 +222,7 @@ export default class MatchResultsRegion extends Region {
     return background
   }
 
-  private createHeader(): ContainerLite {
+  private createHeader(): FixWidthSizer {
     const background = this.scene.add
       .rectangle(0, 0, 1, 1, Color.backgroundLight)
       .setInteractive()
@@ -339,27 +332,6 @@ export default class MatchResultsRegion extends Region {
       sizer.add(txt)
       this.scrollablePanel.add(sizer)
     }
-  }
-
-  // TODO Make dry with other scenes
-  // Update the panel when user scrolls with their mouse wheel
-  private updateOnScroll(panel, scrollablePanel) {
-    this.scene.input.on(
-      'wheel',
-      (pointer: Phaser.Input.Pointer, gameObject, dx, dy, dz, event) => {
-        // Return if the pointer is outside of the panel
-        if (!panel.getBounds().contains(pointer.x, pointer.y)) {
-          return
-        }
-
-        // Scroll panel down by amount wheel moved
-        scrollablePanel.childOY -= dy
-
-        // Ensure that panel isn't out bounds (Below 0% or above 100% scroll)
-        scrollablePanel.t = Math.max(0, scrollablePanel.t)
-        scrollablePanel.t = Math.min(0.999999, scrollablePanel.t)
-      },
-    )
   }
 }
 
