@@ -4,6 +4,9 @@ export interface AchievementMeta {
   image?: string
   // The progress needed to complete this achievement
   progress?: number
+  // The cosmetics this unlocks
+  iconUnlock?: number
+  borderUnlock?: number
 }
 
 export const achievementsMeta: Record<number, AchievementMeta> = {
@@ -19,6 +22,7 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
     title: 'Day 3',
     description: 'Log in a third day.',
     image: 'avatar-Imani',
+    iconUnlock: 4,
   },
   3: {
     title: 'Day 4',
@@ -36,21 +40,25 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
     title: 'Day 7',
     description: 'Log in a seventh day.',
     image: 'avatar-Mitra',
+    iconUnlock: 5,
   },
   7: {
     title: 'Game Night',
     description: 'Play a PVP match Wednesday between 7-8PM EST.',
     image: 'border-Thorns',
+    borderUnlock: 1,
   },
   8: {
     title: 'Getting Started',
     description: 'Play 10 games against the computer.',
     image: 'avatar-Kitz',
     progress: 10,
+    iconUnlock: 3,
   },
   9: {
     title: 'Getting Serious',
     description: 'Win 1 game against another player.',
     image: 'avatar-Mia',
+    iconUnlock: 2,
   },
 }

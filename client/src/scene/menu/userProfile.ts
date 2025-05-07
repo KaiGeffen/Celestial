@@ -3,13 +3,13 @@ import { Style, Color, Space } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
-import Button from '../../lib/buttons/button'
 import UserDataServer from '../../network/userDataServer'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import AvatarButton from '../../lib/buttons/avatar'
 import BaseScene from '../baseScene'
 import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
+import { achievementsMeta } from '../../../../shared/achievementsData'
 
 export default class UserProfileMenu extends Menu {
   // The avatar on the homeScene
@@ -210,8 +210,29 @@ export default class UserProfileMenu extends Menu {
   }
 
   private createIconGrid() {
-    // Add placeholder cosmetic items
-    for (let i = 0; i < 6; i++) {
+    const userData = UserDataServer.getUserData()
+    const unlockedAvatars = new Set<number>()
+
+    // Default avatars
+    unlockedAvatars.add(0)
+    unlockedAvatars.add(1)
+
+    // Add avatars unlocked through achievements
+    userData.achievements.forEach((achievement) => {
+      const meta = achievementsMeta[achievement.achievement_id]
+      if (meta?.iconUnlock !== undefined) {
+        // Only unlock if progress requirement is met
+        if (
+          meta.progress === undefined ||
+          achievement.progress >= meta.progress
+        ) {
+          unlockedAvatars.add(meta.iconUnlock)
+        }
+      }
+    })
+
+    // Add unlocked cosmetic items
+    Array.from(unlockedAvatars).forEach((avatarId, index) => {
       const container = new ContainerLite(
         this.scene,
         0,
@@ -221,24 +242,42 @@ export default class UserProfileMenu extends Menu {
       )
       new Buttons.Avatar({
         within: container,
-        avatarId: i,
+        avatarId: avatarId,
         f: () => {
           const newSet = {
-            avatar: i,
+            avatar: avatarId,
             border: UserDataServer.getUserData().cosmeticSet.border,
           }
           this.updateCosmeticSet(newSet)
         },
       })
-      this.gridSizer.add(container, i % 3, Math.floor(i / 3))
-    }
+      this.gridSizer.add(container, index % 3, Math.floor(index / 3))
+    })
   }
 
   private createBorderGrid() {
-    // Add border options (no border and thorn border for now)
-    const borderOptions = ['this is just a length', 'todo']
+    const userData = UserDataServer.getUserData()
+    const unlockedBorders = new Set<number>()
 
-    for (let i = 0; i < borderOptions.length; i++) {
+    // Default border (0)
+    unlockedBorders.add(0)
+
+    // Add borders unlocked through achievements
+    userData.achievements.forEach((achievement) => {
+      const meta = achievementsMeta[achievement.achievement_id]
+      if (meta?.borderUnlock !== undefined) {
+        // Only unlock if progress requirement is met
+        if (
+          meta.progress === undefined ||
+          achievement.progress >= meta.progress
+        ) {
+          unlockedBorders.add(meta.borderUnlock)
+        }
+      }
+    })
+
+    // Add unlocked border options
+    Array.from(unlockedBorders).forEach((borderId, index) => {
       const container = new ContainerLite(
         this.scene,
         0,
@@ -251,18 +290,18 @@ export default class UserProfileMenu extends Menu {
       const avatar = new Buttons.Avatar({
         within: container,
         name: this.currentAvatar.name,
-        border: i,
+        border: borderId,
         f: () => {
           const newSet = {
             avatar: UserDataServer.getUserData().cosmeticSet.avatar,
-            border: i,
+            border: borderId,
           }
           this.updateCosmeticSet(newSet)
         },
       })
 
-      this.gridSizer.add(container, i % 3, Math.floor(i / 3))
-    }
+      this.gridSizer.add(container, index % 3, Math.floor(index / 3))
+    })
   }
 
   private createRelicGrid() {

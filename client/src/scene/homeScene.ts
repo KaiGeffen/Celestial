@@ -188,6 +188,7 @@ export default class HomeScene extends BaseScene {
         })
       },
       hint: 'Quests',
+      muteClick: true,
     })
 
     new Buttons.Icon({
@@ -197,6 +198,7 @@ export default class HomeScene extends BaseScene {
       y: Space.pad + Space.iconSize * 0.5,
       f: () => this.signalError('Friends coming soon!'),
       hint: 'Friends',
+      muteClick: true,
     })
 
     // Second row
@@ -233,6 +235,7 @@ export default class HomeScene extends BaseScene {
         })
       },
       hint: 'Leaderboard',
+      muteClick: true,
     })
   }
 
