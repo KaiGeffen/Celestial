@@ -14,6 +14,7 @@ import Buttons from '../../lib/buttons/buttons'
 import GameModel from '../../../../shared/state/gameModel'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import avatarNames from '../../lib/avatarNames'
+import newScrollablePanel from '../../lib/scrollablePanel'
 
 export default class MatchResultsRegion extends Region {
   // Whether the results have been seen already
@@ -23,7 +24,7 @@ export default class MatchResultsRegion extends Region {
   txtResult: Phaser.GameObjects.Text
 
   // Scrollable panel containing details about the results of each round
-  scrollablePanel
+  scrollablePanel: FixWidthSizer
 
   // Avatar images for both players
   ourAvatar: Phaser.GameObjects.Image
@@ -73,10 +74,10 @@ export default class MatchResultsRegion extends Region {
     this.deleteTemp()
 
     // If the game isn't over, hide this
-    if (state.winner === null) {
-      this.hide()
-      return
-    }
+    // if (state.winner === null) {
+    //   this.hide()
+    //   return
+    // }
 
     // If we are in a recap, hide this
     if (state.isRecap) {
@@ -89,6 +90,14 @@ export default class MatchResultsRegion extends Region {
       this.hide()
       return
     }
+
+    state.roundResults = [
+      [1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [
+        4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+        23,
+      ],
+    ]
 
     // Avatars
     const av1 = avatarNames[state.cosmeticSets[0].avatar]
@@ -107,6 +116,20 @@ export default class MatchResultsRegion extends Region {
 
     this.show()
     this.seen = true
+  }
+
+  hide(): this {
+    this.panel.setVisible(false)
+    super.hide()
+
+    return this
+  }
+
+  show(): this {
+    this.panel.setVisible(true)
+    super.show()
+
+    return this
   }
 
   protected createButtons() {
@@ -151,9 +174,6 @@ export default class MatchResultsRegion extends Region {
       )
       .setOrigin(0.5, 0)
 
-    // Create the panel with more details about the results
-    this.panel = this.createResultsPanel()
-
     // Your avatar
     this.ourAvatar = this.scene.add
       .image(-this.WIDTH, 0, 'avatar-JulesFull')
@@ -162,46 +182,42 @@ export default class MatchResultsRegion extends Region {
       .image(this.WIDTH, 0, 'avatar-MiaFull')
       .setInteractive()
 
+    // Create the panel with more details about the results
+    this.createResultsPanel()
+
     this.container.add([
       this.txtResult,
       this.ourAvatar,
       this.theirAvatar,
-      this.panel,
+      // this.panel, NOTE Scrollable panel is bugged with containers
     ])
   }
 
   private createResultsPanel() {
-    let background = this.createBackground()
+    const background = this.createBackground()
 
-    const panel = this.scene.rexUI.add
-      .scrollablePanel({
-        width: this.WIDTH,
-        height: this.HEIGHT,
-
-        background: background,
-
-        header: this.createHeader(),
-
-        panel: {
-          child: this.createScrollablePanel(),
-        },
-      })
+    // NOTE Scrollable panel is bugged with containers, so it has it's own anchor
+    this.panel = newScrollablePanel(this.scene, {
+      width: this.WIDTH,
+      height: this.HEIGHT,
+      background: background,
+      header: this.createHeader(),
+      panel: {
+        child: this.createScrollablePanel(),
+      },
+      anchor: {
+        x: `50%`,
+        y: `50%`,
+      },
+    })
       .setDepth(Depth.results)
-
-    this.updateOnScroll(this.scrollablePanel, panel)
-
-    return panel
+      .setOrigin(0.5)
   }
 
   private createBackground() {
-    const background = this.scene.rexUI.add.roundRectangle(
-      0,
-      0,
-      0,
-      0,
-      Space.corner,
-      Color.backgroundDark,
-    )
+    const background = this.scene.rexUI.add
+      .roundRectangle(0, 0, 0, 0, Space.corner, Color.backgroundDark)
+      .setDepth(Depth.results)
 
     // Add a border around the shape TODO Make a class for this to keep it dry
     let postFxPlugin = this.scene.plugins.get('rexOutlinePipeline')
@@ -233,6 +249,7 @@ export default class MatchResultsRegion extends Region {
         },
       })
       .addBackground(background)
+      .setDepth(Depth.results)
 
     let txt = this.scene.add
       .rexBBCodeText(0, 0, 'Results:', {
@@ -240,7 +257,7 @@ export default class MatchResultsRegion extends Region {
         fontSize: '30px',
       })
       .setOrigin(0.5)
-
+      .setDepth(Depth.results)
     sizer.add(txt)
 
     return sizer
@@ -248,6 +265,8 @@ export default class MatchResultsRegion extends Region {
 
   private createScrollablePanel() {
     this.scrollablePanel = this.scene.rexUI.add.fixWidthSizer({
+      x: 0,
+      y: 0,
       align: 'center',
       space: {
         top: Space.pad,
@@ -278,8 +297,6 @@ export default class MatchResultsRegion extends Region {
 
   // Display details about how each round went in the scrollable panel
   private displayRoundResults(state: GameModel): void {
-    let result = ''
-
     for (let i = 0; i < state.roundResults[0].length; i++) {
       const round = i + 1
 
@@ -349,6 +366,7 @@ export default class MatchResultsRegion extends Region {
 import { MatchScene } from '../matchScene'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
+import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 
 export class ResultsRegionTutorial extends MatchResultsRegion {
   missionID: number
