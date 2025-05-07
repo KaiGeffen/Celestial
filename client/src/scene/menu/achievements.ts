@@ -3,7 +3,11 @@ import { Style, Space, Color } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import UserDataServer from '../../network/userDataServer'
-import { achievementsMeta } from '../../../../shared/achievementsData'
+import {
+  AchievementMeta,
+  achievementsMeta,
+} from '../../../../shared/achievementsData'
+import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite'
 
 const width = 900
 const height = 600
@@ -95,7 +99,11 @@ export default class AchievementsMenu extends Menu {
     })
 
     // Helper to add a row
-    const addRow = (id: number, meta, backgroundColor?: number) => {
+    const addRow = (
+      id: number,
+      meta: AchievementMeta,
+      backgroundColor?: number,
+    ) => {
       const userAch = userAchievements[id]
       const userProgress = userAch ? userAch.progress : 0
       let description = meta.description
@@ -124,6 +132,14 @@ export default class AchievementsMenu extends Menu {
       }
 
       // Add row content
+      const rewardContainer = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        Space.avatarSize,
+        meta.image ? Space.avatarSize : 0,
+        this.scene.add.image(0, 0, meta.image),
+      )
       singleRowSizer
         .add(this.scene.add.text(0, 0, meta.title, Style.basic), {
           proportion: 2,
@@ -137,7 +153,7 @@ export default class AchievementsMenu extends Menu {
             proportion: 5,
           },
         )
-        .add(this.scene.add.image(0, 0, meta.image))
+        .add(rewardContainer)
 
       rowsSizer.add(singleRowSizer)
     }
