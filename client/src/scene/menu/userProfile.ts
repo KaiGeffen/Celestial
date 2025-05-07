@@ -10,6 +10,7 @@ import BaseScene from '../baseScene'
 import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import { achievementsMeta } from '../../../../shared/achievementsData'
+import { getUnlockedAvatars, getUnlockedBorders } from '../../lib/cosmetics'
 
 export default class UserProfileMenu extends Menu {
   // The avatar on the homeScene
@@ -210,26 +211,7 @@ export default class UserProfileMenu extends Menu {
   }
 
   private createIconGrid() {
-    const userData = UserDataServer.getUserData()
-    const unlockedAvatars = new Set<number>()
-
-    // Default avatars
-    unlockedAvatars.add(0)
-    unlockedAvatars.add(1)
-
-    // Add avatars unlocked through achievements
-    userData.achievements.forEach((achievement) => {
-      const meta = achievementsMeta[achievement.achievement_id]
-      if (meta?.iconUnlock !== undefined) {
-        // Only unlock if progress requirement is met
-        if (
-          meta.progress === undefined ||
-          achievement.progress >= meta.progress
-        ) {
-          unlockedAvatars.add(meta.iconUnlock)
-        }
-      }
-    })
+    const unlockedAvatars = getUnlockedAvatars()
 
     // Add unlocked cosmetic items
     Array.from(unlockedAvatars).forEach((avatarId, index) => {
@@ -256,25 +238,7 @@ export default class UserProfileMenu extends Menu {
   }
 
   private createBorderGrid() {
-    const userData = UserDataServer.getUserData()
-    const unlockedBorders = new Set<number>()
-
-    // Default border (0)
-    unlockedBorders.add(0)
-
-    // Add borders unlocked through achievements
-    userData.achievements.forEach((achievement) => {
-      const meta = achievementsMeta[achievement.achievement_id]
-      if (meta?.borderUnlock !== undefined) {
-        // Only unlock if progress requirement is met
-        if (
-          meta.progress === undefined ||
-          achievement.progress >= meta.progress
-        ) {
-          unlockedBorders.add(meta.borderUnlock)
-        }
-      }
-    })
+    const unlockedBorders = getUnlockedBorders()
 
     // Add unlocked border options
     Array.from(unlockedBorders).forEach((borderId, index) => {

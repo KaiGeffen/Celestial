@@ -17,6 +17,7 @@ import {
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 import UserDataServer from '../../network/userDataServer'
+import { getUnlockedAvatars, getUnlockedBorders } from '../../lib/cosmetics'
 
 const width = 500
 const inputTextWidth = 200
@@ -168,8 +169,11 @@ class AlterDeckMenu extends Menu {
 
     if (this.currentTab === tab.ICON) {
       // Create avatar grid
-      for (let i = 0; i < 6; i++) {
-        if (i % 3 === 0) {
+      const unlockedAvatars = Array.from(getUnlockedAvatars())
+      let index = 0
+
+      for (const avatarId of unlockedAvatars) {
+        if (index % 3 === 0) {
           sizer = this.scene.rexUI.add.sizer({
             space: { item: Space.pad },
           })
@@ -185,28 +189,32 @@ class AlterDeckMenu extends Menu {
         )
         let avatar = new Buttons.Avatar({
           within: container,
-          avatarId: i,
+          avatarId: avatarId,
           border: this.selectedBorder,
           f: () => {
             items.forEach((a) => a.deselect())
             avatar.select()
-            this.selectedAvatar = i
+            this.selectedAvatar = avatarId
           },
         })
         sizer.add(container)
         items.push(avatar)
 
-        if (i === this.selectedAvatar) {
+        if (avatarId === this.selectedAvatar) {
           avatar.select()
         } else {
           avatar.deselect()
         }
+
+        index++
       }
     } else {
       // Create border grid
-      const borderOptions = ['this is just a length', 'todo']
-      for (let i = 0; i < borderOptions.length; i++) {
-        if (i % 3 === 0) {
+      const unlockedBorders = Array.from(getUnlockedBorders())
+      let index = 0
+
+      for (const borderId of unlockedBorders) {
+        if (index % 3 === 0) {
           sizer = this.scene.rexUI.add.sizer({
             space: { item: Space.pad },
           })
@@ -223,21 +231,23 @@ class AlterDeckMenu extends Menu {
         let avatar = new Buttons.Avatar({
           within: container,
           avatarId: this.selectedAvatar,
-          border: i,
+          border: borderId,
           f: () => {
             items.forEach((a) => a.deselect())
             avatar.select()
-            this.selectedBorder = i
+            this.selectedBorder = borderId
           },
         })
         sizer.add(container)
         items.push(avatar)
 
-        if (i === this.selectedBorder) {
+        if (borderId === this.selectedBorder) {
           avatar.select()
         } else {
           avatar.deselect()
         }
+
+        index++
       }
     }
 
