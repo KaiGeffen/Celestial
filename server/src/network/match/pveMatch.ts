@@ -10,6 +10,25 @@ class PveMatch extends Match {
     super(ws, uuid, deck, null, null, aiDeck)
   }
 
+  // Given ws is disconnecting
+  async doExit(disconnectingWs: MatchServerWS) {
+    if (this.game === null) return
+    // AI wins by default
+    if (this.game.model.winner == null) this.game.model.winner = 1
+
+    // Update achievements if user logged in
+    await AchievementManager.onGamePlayed(
+      this.uuid1,
+      this.game.model,
+      false,
+      true,
+    )
+
+    // NOTE Game is null to prevent doExit from being called again
+    this.game = null
+    disconnectingWs.close()
+  }
+
   async notifyState() {
     await super.notifyState()
 
@@ -20,16 +39,6 @@ class PveMatch extends Match {
       this.game.model.winner === null
     ) {
       await this.opponentActs()
-    }
-
-    // Update achievements at the end of the game
-    if (this.game.model.winner !== null && this.uuid1 !== null) {
-      await AchievementManager.onGamePlayed(
-        this.uuid1,
-        this.game.model,
-        false,
-        false,
-      )
     }
   }
 

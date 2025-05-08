@@ -44,7 +44,7 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
   },
   7: {
     title: 'Game Night',
-    description: 'Play a PVP match Wednesday between 7-8PM EST.',
+    description: 'Play a PVP match Wednesday between 7-9PM EST.',
     image: 'border-Thorns',
     borderUnlock: 1,
   },
@@ -61,4 +61,40 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
     image: 'avatar-Mia',
     iconUnlock: 2,
   },
+
+  // Fun things
+  10: {
+    title: 'Big Time',
+    description: 'Earn at least 20 points in a round.',
+  },
+  11: {
+    title: 'Bigger Time',
+    description: 'Earn at least 30 points in a round.',
+  },
+  12: {
+    title: 'Letting Go',
+    description:
+      'End a game with 6 or fewer cards between your deck, discard pile, and hand.',
+  },
+  13: {
+    title: 'Tower of Babel',
+    description: 'End a game with 20 or more cards in your discard pile.',
+  },
+  14: {
+    title: 'Crawl Away',
+    description: 'Win a round in which you earn 0 or fewer points.',
+  },
+  15: {
+    title: 'My Love',
+    description: 'End a game with a card in hand worth at least 10 points.',
+  },
+  // TODO Hard to do
+  // 16: {
+  //   title: 'Inevitable Future',
+  //   description: 'Play The Future for free.',
+  // },
+  // 17: {
+  //   title: 'The Future is Now',
+  //   description: 'Play The Future for free.',
+  // },
 }

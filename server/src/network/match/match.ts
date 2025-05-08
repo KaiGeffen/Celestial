@@ -139,10 +139,8 @@ class Match implements Match {
     }
   }
 
-  // Given ws is disconnecting, implemented in pvpMatch
-  async doExit(disconnectingWs: MatchServerWS) {
-    this.ws1 = null // TODO Remove
-  }
+  // Called when given ws is disconnecting, implemented in children
+  async doExit(disconnectingWs: MatchServerWS) {}
 
   // Get the name of player with given uuid
   private async getUsernameElo(

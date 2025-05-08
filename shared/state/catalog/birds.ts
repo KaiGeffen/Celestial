@@ -90,7 +90,7 @@ class Phoenix extends Card {
       for (let i = 0; i < zone.length; i++) {
         let card = zone[i]
         if (card.qualities.includes(Quality.FLEETING)) {
-          const cardCopy = this.copy()
+          const cardCopy = card.copy()
           cardCopy.points += 1
 
           // Replace the original card with the new copy

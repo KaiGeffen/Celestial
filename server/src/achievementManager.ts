@@ -3,6 +3,7 @@ import { db } from './db/db'
 import { achievements } from './db/schema'
 import { eq, and, is, sql } from 'drizzle-orm'
 import GameModel from '../../shared/state/gameModel'
+import Card from '../../shared/state/card'
 
 export class AchievementManager {
   // Get all of the achievements for player
@@ -37,25 +38,67 @@ export class AchievementManager {
   ) {
     if (playerId === null) return
 
+    const player = isPlayer1 ? 0 : 1
+
     if (isPvp) {
       // 9: Won against another player
-      if (game.winner === (isPlayer1 ? 0 : 1)) {
+      if (game.winner === player) {
         await this.unlock(playerId, 9)
       }
 
-      // 7: Played between 7-8 PM EST Wednesday
+      // 7: Played between 7-9 PM EST Wednesday
       const now = new Date()
       const day = now.getDay()
       const hours = now.getHours()
-      console.log('Current hour is', hours)
-      if (day === 3 && hours >= 19 && hours <= 20) {
+      if (day === 3 && hours >= 19 && hours <= 21) {
         await this.unlock(playerId, 7)
       }
     } else {
-      // 8: Played 10 games against anyone (With at least 5 rounds)
+      // 8: Played 10 games against computer (With at least 5 rounds)
       if (game.roundResults.length >= 5) {
         await this.incrementProgress(playerId, 8)
       }
+    }
+
+    // 10: Earn at least 20 points in a round
+    if (game.roundResults[player].some((amt: number) => amt >= 20)) {
+      await this.unlock(playerId, 10)
+    }
+
+    // 11: Earn at least 30 points in a round
+    if (game.roundResults[player].some((amt: number) => amt >= 30)) {
+      await this.unlock(playerId, 11)
+    }
+
+    // 12: End a game with 6 or fewer cards between your deck, discard pile, and hand
+    if (
+      game.deck[player].length +
+        game.pile[player].length +
+        game.hand[player].length <=
+      6
+    ) {
+      await this.unlock(playerId, 12)
+    }
+
+    // 13: End a game with 20 or more cards in your discard pile
+    if (game.pile[player].length >= 20) {
+      await this.unlock(playerId, 13)
+    }
+
+    // 14: Win a round in which you earn 0 or less points
+    if (
+      game.roundResults[isPlayer1 ? 0 : 1].some((amt: number, index) => {
+        const ourPoints = amt
+        const theirPoints = game.roundResults[player][index]
+        return ourPoints <= 0 && ourPoints > theirPoints
+      })
+    ) {
+      await this.unlock(playerId, 14)
+    }
+
+    // 15: Have a card worth 10 or more points in your hand as the game ends
+    if (game.hand[player].some((card: Card) => card.points >= 10)) {
+      await this.unlock(playerId, 15)
     }
   }
 
