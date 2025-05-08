@@ -65,11 +65,11 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
   // Fun things
   10: {
     title: 'Big Time',
-    description: 'Earn at least 20 points in a round.',
+    description: 'Earn at least 20 points in a single round.',
   },
   11: {
     title: 'Bigger Time',
-    description: 'Earn at least 30 points in a round.',
+    description: 'Earn at least 30 points in a single round.',
   },
   12: {
     title: 'Letting Go',

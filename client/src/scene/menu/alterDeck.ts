@@ -1,9 +1,9 @@
 import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import avatarNames from '../../lib/avatarNames'
+import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
-import { Color, Space, Style, Flags } from '../../settings/settings'
+import { Color, Space } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import {
@@ -15,7 +15,6 @@ import {
   MechanicsSettings,
 } from '../../../../shared/settings'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
-import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 import UserDataServer from '../../network/userDataServer'
 import { getUnlockedAvatars, getUnlockedBorders } from '../../lib/cosmetics'
 
@@ -52,7 +51,7 @@ class AlterDeckMenu extends Menu {
 
   // Container for the cosmetic options
   private cosmeticOptionsContainer: ContainerLite
-  private cosmeticGrid: FixWidthSizer
+  private cosmeticGrid: GridSizer
 
   btnConfirm: Button
 
@@ -146,13 +145,33 @@ class AlterDeckMenu extends Menu {
       Space.avatarSize * 2 + Space.pad * 3,
     )
 
-    // Create the grid sizer
-    this.cosmeticGrid = this.scene.rexUI.add.fixWidthSizer({
-      space: { line: Space.pad },
+    // Create a sizer to center the grid
+    const centerSizer = this.scene.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: { item: Space.pad },
     })
 
-    // Add the grid to the container
-    this.cosmeticOptionsContainer.add(this.cosmeticGrid)
+    // Create the grid sizer with 3 columns
+    this.cosmeticGrid = this.scene.rexUI.add.gridSizer({
+      column: 3,
+      row: 2,
+      width: Space.avatarSize * 3 + Space.pad * 4,
+      height: Space.avatarSize * 2 + Space.pad * 3,
+      space: {
+        column: Space.pad,
+        row: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+      },
+    })
+
+    // Add the grid to the center sizer
+    centerSizer.add(this.cosmeticGrid)
+
+    // Add the center sizer to the container
+    this.cosmeticOptionsContainer.add(centerSizer)
 
     // Create initial content
     this.updateCosmeticGrid()
@@ -164,22 +183,13 @@ class AlterDeckMenu extends Menu {
     // Clear the grid
     this.cosmeticGrid.removeAll(true)
 
-    let sizer
     let items = []
 
     if (this.currentTab === tab.ICON) {
       // Create avatar grid
       const unlockedAvatars = Array.from(getUnlockedAvatars())
-      let index = 0
 
-      for (const avatarId of unlockedAvatars) {
-        if (index % 3 === 0) {
-          sizer = this.scene.rexUI.add.sizer({
-            space: { item: Space.pad },
-          })
-          this.cosmeticGrid.add(sizer)
-        }
-
+      unlockedAvatars.forEach((avatarId, index) => {
         const container = new ContainerLite(
           this.scene,
           0,
@@ -197,7 +207,7 @@ class AlterDeckMenu extends Menu {
             this.selectedAvatar = avatarId
           },
         })
-        sizer.add(container)
+        this.cosmeticGrid.add(container, index % 3, Math.floor(index / 3))
         items.push(avatar)
 
         if (avatarId === this.selectedAvatar) {
@@ -205,22 +215,12 @@ class AlterDeckMenu extends Menu {
         } else {
           avatar.deselect()
         }
-
-        index++
-      }
+      })
     } else {
       // Create border grid
       const unlockedBorders = Array.from(getUnlockedBorders())
-      let index = 0
 
-      for (const borderId of unlockedBorders) {
-        if (index % 3 === 0) {
-          sizer = this.scene.rexUI.add.sizer({
-            space: { item: Space.pad },
-          })
-          this.cosmeticGrid.add(sizer)
-        }
-
+      unlockedBorders.forEach((borderId, index) => {
         const container = new ContainerLite(
           this.scene,
           0,
@@ -238,7 +238,7 @@ class AlterDeckMenu extends Menu {
             this.selectedBorder = borderId
           },
         })
-        sizer.add(container)
+        this.cosmeticGrid.add(container, index % 3, Math.floor(index / 3))
         items.push(avatar)
 
         if (borderId === this.selectedBorder) {
@@ -246,9 +246,7 @@ class AlterDeckMenu extends Menu {
         } else {
           avatar.deselect()
         }
-
-        index++
-      }
+      })
     }
 
     // Update the layout
