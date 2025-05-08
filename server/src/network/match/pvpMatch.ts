@@ -54,13 +54,13 @@ class PvpMatch extends Match {
         this.uuid1,
         this.game.model,
         true,
-        true,
+        0,
       )
       await AchievementManager.onGamePlayed(
         this.uuid2,
         this.game.model,
         true,
-        false,
+        1,
       )
     }
   }

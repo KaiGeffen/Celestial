@@ -9,6 +9,7 @@ import { players } from '../../db/schema'
 import { eq } from 'drizzle-orm'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
+import { AchievementManager } from '../../achievementManager'
 
 interface Match {
   ws1: MatchServerWS | null
@@ -81,6 +82,8 @@ class Match implements Match {
   // Notify players of the state of the game
   async notifyState() {
     if (this.game === null) return
+
+    AchievementManager.onStateUpdate(this.uuid1, this.uuid2, this.game.model)
 
     /*
       Send each state since last input

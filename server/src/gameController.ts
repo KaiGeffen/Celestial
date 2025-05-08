@@ -31,6 +31,7 @@ class ServerController {
 
     for (const player of [0, 1]) {
       this.model.animations[player] = []
+      this.model.amtDrawn[player] = 0
 
       for (
         let i = 0;

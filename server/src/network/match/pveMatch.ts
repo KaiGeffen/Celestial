@@ -17,12 +17,7 @@ class PveMatch extends Match {
     if (this.game.model.winner == null) this.game.model.winner = 1
 
     // Update achievements if user logged in
-    await AchievementManager.onGamePlayed(
-      this.uuid1,
-      this.game.model,
-      false,
-      true,
-    )
+    await AchievementManager.onGamePlayed(this.uuid1, this.game.model, false, 0)
 
     // NOTE Game is null to prevent doExit from being called again
     this.game = null

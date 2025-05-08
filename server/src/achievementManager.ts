@@ -33,12 +33,9 @@ export class AchievementManager {
     game: GameModel,
     // Whether this is a pvp match
     isPvp: boolean,
-    // Whether this is the player1 or player2 in a pvp match
-    isPlayer1: boolean,
+    player: number,
   ) {
     if (playerId === null) return
-
-    const player = isPlayer1 ? 0 : 1
 
     if (isPvp) {
       // 9: Won against another player
@@ -55,7 +52,7 @@ export class AchievementManager {
       }
     } else {
       // 8: Played 10 games against computer (With at least 5 rounds)
-      if (game.roundResults.length >= 5) {
+      if (game.roundResults[0].length >= 5) {
         await this.incrementProgress(playerId, 8)
       }
     }
@@ -80,14 +77,9 @@ export class AchievementManager {
       await this.unlock(playerId, 12)
     }
 
-    // 13: End a game with 20 or more cards in your discard pile
-    if (game.pile[player].length >= 20) {
-      await this.unlock(playerId, 13)
-    }
-
     // 14: Win a round in which you earn 0 or less points
     if (
-      game.roundResults[isPlayer1 ? 0 : 1].some((amt: number, index) => {
+      game.roundResults[player].some((amt: number, index) => {
         const ourPoints = amt
         const theirPoints = game.roundResults[player][index]
         return ourPoints <= 0 && ourPoints > theirPoints
@@ -95,10 +87,60 @@ export class AchievementManager {
     ) {
       await this.unlock(playerId, 14)
     }
+  }
 
-    // 15: Have a card worth 10 or more points in your hand as the game ends
+  // Called after an in-game action
+  static async onStateUpdate(uuid1: string, uuid2: string, game: GameModel) {
+    if (uuid1) {
+      await this.onStateUpdateForPlayer(uuid1, game, 0)
+    }
+    if (uuid2) {
+      await this.onStateUpdateForPlayer(uuid2, game, 1)
+    }
+  }
+
+  private static async onStateUpdateForPlayer(
+    playerId: string,
+    game: GameModel,
+    player: number,
+  ) {
+    // 13: Have a discard pile containing 15 or more cards
+    if (game.pile[player].length >= 15) {
+      await this.unlock(playerId, 13)
+    }
+
+    // 15: Have a card worth 10 or more points in your hand
     if (game.hand[player].some((card: Card) => card.points >= 10)) {
       await this.unlock(playerId, 15)
+    }
+
+    // 16: Hold The Future in hand with cost 0
+    if (
+      game.hand[player].some(
+        (card: Card) =>
+          card.name === 'The Future' && card.getCost(player, game) === 0,
+      )
+    ) {
+      await this.unlock(playerId, 16)
+    }
+
+    // 17: Have Inspired, Nourish, and Vision at the same time
+    if (
+      game.status[player].inspired > 0 &&
+      game.status[player].nourish > 0 &&
+      game.status[player].vision > 0
+    ) {
+      await this.unlock(playerId, 17)
+    }
+
+    // 18: Draw 6 cards in a single round
+    if (game.amtDrawn[player] >= 6) {
+      await this.unlock(playerId, 18)
+    }
+
+    // 19: Have 15 or more breath
+    if (game.breath[player] >= 15) {
+      await this.unlock(playerId, 19)
     }
   }
 

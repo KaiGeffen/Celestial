@@ -74,11 +74,11 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
   12: {
     title: 'Letting Go',
     description:
-      'End a game with 6 or fewer cards between your deck, discard pile, and hand.',
+      'End the game with 6 or fewer cards between your deck, discard pile, and hand.',
   },
   13: {
     title: 'Tower of Babel',
-    description: 'End a game with 20 or more cards in your discard pile.',
+    description: 'Have 15 or more cards in your discard pile.',
   },
   14: {
     title: 'Crawl Away',
@@ -86,15 +86,22 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
   },
   15: {
     title: 'My Love',
-    description: 'End a game with a card in hand worth at least 10 points.',
+    description: 'Hold a card worth 10 or more points in your hand.',
   },
-  // TODO Hard to do
-  // 16: {
-  //   title: 'Inevitable Future',
-  //   description: 'Play The Future for free.',
-  // },
-  // 17: {
-  //   title: 'The Future is Now',
-  //   description: 'Play The Future for free.',
-  // },
+  16: {
+    title: 'The Future is Now',
+    description: 'Hold The Future in hand with cost 0.',
+  },
+  17: {
+    title: 'All Things',
+    description: 'Have Inspired, Nourish, and Vision at the same time.',
+  },
+  18: {
+    title: 'Torrent of Cards',
+    description: 'Draw 6 or more cards in a single round.',
+  },
+  19: {
+    title: 'In Awe',
+    description: 'Have 15 or more breath.',
+  },
 }
