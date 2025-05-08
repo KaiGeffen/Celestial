@@ -29,6 +29,7 @@ export interface UserDataClientMessages {
   setCosmeticSet: {
     value: CosmeticSet
   }
+  setAchievementsSeen: {}
 }
 
 export interface UserDataServerMessages {

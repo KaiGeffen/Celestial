@@ -211,6 +211,10 @@ export default function createUserDataServer() {
             .set({ cosmetic_set: JSON.stringify(value) })
             .where(eq(players.id, id))
         })
+        .on('setAchievementsSeen', async () => {
+          if (!id) return
+          await AchievementManager.setAchievementsSeen(id)
+        })
     } catch (e) {
       console.error('Error in user data server:', e)
     }

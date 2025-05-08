@@ -300,6 +300,20 @@ export default class UserDataServer {
     }
   }
 
+  static setAchievementsSeen(): void {
+    if (wsServer === undefined) {
+      throw 'Setting achievements seen when server ws doesnt exist.'
+    }
+
+    this.userData.achievements.forEach((achievement) => {
+      achievement.seen = true
+    })
+
+    wsServer.send({
+      type: 'setAchievementsSeen',
+    })
+  }
+
   private static convertBoolArrayToBitString(array: boolean[]): string {
     return array.map((value) => (value ? '1' : '0')).join('')
   }

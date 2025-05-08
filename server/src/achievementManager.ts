@@ -5,19 +5,12 @@ import { eq, and, is, sql } from 'drizzle-orm'
 import GameModel from '../../shared/state/gameModel'
 
 export class AchievementManager {
-  // Get all of the achievements for player, also set them to seen
+  // Get all of the achievements for player
   static async getAchievements(playerId: string): Promise<Achievement[]> {
     const result = await db
       .select()
       .from(achievements)
       .where(eq(achievements.player_id, playerId))
-
-    await db
-      .update(achievements)
-      .set({ seen: true })
-      .where(eq(achievements.player_id, playerId))
-
-    // TODO This won't show the first time you unlock a progress achievement, because seen will get set to true before then
 
     return result
   }
@@ -64,6 +57,13 @@ export class AchievementManager {
         await this.incrementProgress(playerId, 8)
       }
     }
+  }
+
+  static async setAchievementsSeen(playerId: string) {
+    await db
+      .update(achievements)
+      .set({ seen: true })
+      .where(eq(achievements.player_id, playerId))
   }
 
   // Unlock achievementId if not already unlocked

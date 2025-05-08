@@ -21,6 +21,10 @@ export default class AchievementsMenu extends Menu {
 
     this.createHeader('Achievements')
     this.createContent()
+
+    // Set achievements as seen on server
+    UserDataServer.setAchievementsSeen()
+
     this.layout()
   }
 
