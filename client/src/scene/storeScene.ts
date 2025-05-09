@@ -28,10 +28,12 @@ export default class StoreScene extends BaseSceneWithHeader {
   }
 
   private createBackground(): void {
-    this.add
-      .image(0, 0, 'background-Match')
-      .setOrigin(0)
-      .setSize(Space.windowWidth, Space.windowHeight)
+    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
+
+    this.plugins.get('rexAnchor')['add'](background, {
+      width: `100%`,
+      height: `100%`,
+    })
   }
 
   private createCategoriesText(): void {

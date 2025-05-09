@@ -172,6 +172,8 @@ export class BuilderScene extends BuilderBase {
   create(params): void {
     super.create(params)
 
+    this.createBackground()
+
     this.catalogRegion = new CatalogRegion().create(this)
 
     this.deckRegion = new DeckRegion().create(
@@ -242,6 +244,15 @@ export class BuilderScene extends BuilderBase {
     if (this.filterRegion.searchObj !== undefined) {
       this.filterRegion.searchObj.setVisible(value)
     }
+  }
+
+  private createBackground(): void {
+    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
+
+    this.plugins.get('rexAnchor')['add'](background, {
+      width: `100%`,
+      height: `100%`,
+    })
   }
 
   // Remember what deck / decklist was selected

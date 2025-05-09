@@ -298,8 +298,8 @@ export const assetLists = {
   },
   "background": {
     "files": [
-      "Match",
-      "Texture"
+      "Dark",
+      "Light"
     ],
     "pixelArt": false
   },
