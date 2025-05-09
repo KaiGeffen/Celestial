@@ -5,7 +5,7 @@
     "x": 4920,
     "y": 764,
     "prereq": [[]],
-    "tip": "Welcome to the game!\nTo begin playing, click on any node to compete in a mission. You can make ur deck, some cards are required, etc, etc.\nTo replay the tutorial, click the node at right."
+    "tip": "Welcome to the game!\nTo begin playing, click on any node to compete in a mission. Some cards will be automatically included, but the rest are up to you.\nTo replay the tutorial, click the node at right."
   },
   {
     "name": "Tip 2",

@@ -32,9 +32,11 @@ export default class HomeScene extends BaseScene {
     Cinematic.ensure()
 
     // Create Logo
-    this.add
-      .image(Space.windowWidth / 2, Space.pad, 'chrome-Logo')
-      .setOrigin(0.5, 0)
+    const logo = this.add.image(0, 0, 'chrome-Logo').setOrigin(0.5, 0)
+    this.plugins.get('rexAnchor')['add'](logo, {
+      x: `50%`,
+      y: `0%+${Space.pad}`,
+    })
 
     // Create the avatar and details about user
     this.createUserDetails()
