@@ -8,6 +8,7 @@ interface AssetList {
   [directory: string]: {
     files: string[]
     dimensions?: { [filename: string]: { width: number; height: number } }
+    pixelArt?: boolean
   }
 }
 
@@ -27,6 +28,16 @@ const DIRECTORIES = [
   'img/chrome',
   'sfx',
   'dialog',
+]
+
+// Directories that should not use pixel art
+const NON_PIXEL_ART_DIRS = [
+  'sfx',
+  'dialog',
+  'pet',
+  'roundResult',
+  'background',
+  'chrome',
 ]
 
 // Function to convert PNG to WebP using Sharp
@@ -67,6 +78,7 @@ function parseDimensions(
 async function getAssetFiles(dir: string): Promise<{
   files: string[]
   dimensions?: { [filename: string]: { width: number; height: number } }
+  pixelArt?: boolean
 }> {
   const fullPath = path.join(ASSETS_ROOT, dir)
   if (!fs.existsSync(fullPath)) {
@@ -86,6 +98,7 @@ async function getAssetFiles(dir: string): Promise<{
   const result = {
     files: [] as string[],
     dimensions: {} as { [filename: string]: { width: number; height: number } },
+    pixelArt: !NON_PIXEL_ART_DIRS.includes(dir.split('/').pop()!),
   }
 
   const entries = fs.readdirSync(fullPath, { withFileTypes: true })

@@ -40,7 +40,8 @@ export const assetLists = {
         "width": 130,
         "height": 130
       }
-    }
+    },
+    "pixelArt": true
   },
   "card": {
     "files": [
@@ -157,7 +158,8 @@ export const assetLists = {
       "Wing Clipping",
       "Wound",
       "Yearn"
-    ]
+    ],
+    "pixelArt": true
   },
   "cutout": {
     "files": [
@@ -222,7 +224,8 @@ export const assetLists = {
       "Uprising",
       "Veteran",
       "Wing Clipping"
-    ]
+    ],
+    "pixelArt": true
   },
   "icon": {
     "files": [
@@ -273,7 +276,8 @@ export const assetLists = {
         "width": 80,
         "height": 80
       }
-    }
+    },
+    "pixelArt": true
   },
   "store": {
     "files": [
@@ -289,13 +293,15 @@ export const assetLists = {
       "Jules",
       "ThornBorder-full",
       "ThornBorder"
-    ]
+    ],
+    "pixelArt": true
   },
   "background": {
     "files": [
       "Match",
       "Texture"
-    ]
+    ],
+    "pixelArt": false
   },
   "journey": {
     "files": [
@@ -306,13 +312,15 @@ export const assetLists = {
       "Story 2",
       "Story 3",
       "Story 4"
-    ]
+    ],
+    "pixelArt": true
   },
   "border": {
     "files": [
       "None",
       "Thorns"
-    ]
+    ],
+    "pixelArt": true
   },
   "relic": {
     "files": [
@@ -323,12 +331,14 @@ export const assetLists = {
         "width": 80,
         "height": 160
       }
-    }
+    },
+    "pixelArt": true
   },
   "pet": {
     "files": [
       "Butterfly"
-    ]
+    ],
+    "pixelArt": false
   },
   "roundResult": {
     "files": [
@@ -349,7 +359,8 @@ export const assetLists = {
         "width": 563,
         "height": 258
       }
-    }
+    },
+    "pixelArt": false
   },
   "chrome": {
     "files": [
@@ -360,7 +371,8 @@ export const assetLists = {
       "Logo",
       "ResultGlow",
       "SearchBar"
-    ]
+    ],
+    "pixelArt": false
   },
   "sfx": {
     "files": [

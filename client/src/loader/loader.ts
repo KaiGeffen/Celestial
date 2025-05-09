@@ -13,6 +13,7 @@ interface AssetInfo {
       height: number
     }
   }
+  pixelArt?: boolean
 }
 
 export default class Loader {
@@ -83,6 +84,22 @@ export default class Loader {
     scene.load.on('complete', () => {
       // Generate the animations for match results
       Loader.loadAnimations(scene)
+
+      // Set texture filtering based on pixelArt flag
+      Object.entries(
+        assetLists as unknown as Record<string, AssetInfo>,
+      ).forEach(([directory, info]) => {
+        if (directory === 'sfx' || directory === 'dialog') {
+          return // Skip audio
+        }
+        info.files.forEach((file: string) => {
+          const key = `${directory}-${file}`
+          const texture = scene.textures.get(key)
+          if (texture && info.pixelArt) {
+            texture.setFilter(Phaser.Textures.NEAREST)
+          }
+        })
+      })
     })
   }
 
