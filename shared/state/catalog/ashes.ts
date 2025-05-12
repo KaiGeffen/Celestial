@@ -91,15 +91,6 @@ class Parch extends Card {
 
     super.play(player, game, index, bonus)
 
-    for (let i = 0; i < game.story.acts.length; i++) {
-      const act = game.story.acts[i]
-      if (act.owner === player) {
-        game.removeAct(i)
-      } else {
-        i++
-      }
-    }
-
     // NOTE This is done because some cards add themselves to the story when they are discarded
     // Story index being considered
     let i = 0
@@ -114,17 +105,13 @@ class Parch extends Card {
       }
     }
   }
-
-  onPlay(player: number, game: GameModel) {
-    game.status[player].unlocked = true
-  }
 }
 const parch = new Parch({
   name: 'Parch',
   id: 64,
   cost: 3,
-  points: 2,
-  text: 'Worth +1 for each of your cards later in the story. Discard those cards.\nWhen played, your cards cost 0 this round.',
+  points: 3,
+  text: 'Worth +1 for each of your cards later in the story. Discard those cards.',
   story:
     'We drank and we drank, then\nWe washed and fed fountains, then\nWe watered and we swam, then\nNow we lick our parched lips',
 })

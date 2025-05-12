@@ -105,11 +105,7 @@ export default class GameModel {
 
   // Get the cost of given player playing the given card
   getCost(card: Card, player: number): number {
-    if (this.status[player].unlocked) {
-      return 0
-    } else {
-      return card.getCost(player, this)
-    }
+    return card.getCost(player, this)
   }
 
   // Return a full deepcopy of this object

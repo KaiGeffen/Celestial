@@ -328,7 +328,6 @@ class ServerController {
     // Clear statuses that are removed at start of round
     this.model.status[player].inspired = 0
     this.model.status[player].vision = 0
-    this.model.status[player].unlocked = false
 
     // Add inspired and breath equal to the amount of inspire
     this.model.status[player].inspired = this.model.status[player].inspire

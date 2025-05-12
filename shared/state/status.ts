@@ -11,7 +11,6 @@ export class Statuses {
     copy.inspired = this.inspired
     copy.nourish = this.nourish
     copy.vision = this.vision
-    copy.unlocked = this.unlocked
     return copy
   }
 }
