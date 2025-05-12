@@ -92,11 +92,9 @@ class Parch extends Card {
     super.play(player, game, index, bonus)
 
     // NOTE This is done because some cards add themselves to the story when they are discarded
-    // Story index being considered
-    let i = 0
-    // This many times discard the card if its owner is you
+    // Check this many cards (Discarding yours, ignoring theirs)
     const maxCount = game.story.acts.length
-    for (let count = 0; count < maxCount; count++) {
+    for (let count = 0, i = 0; count < maxCount; count++) {
       const act = game.story.acts[i]
       if (act.owner === player) {
         game.removeAct(i)
