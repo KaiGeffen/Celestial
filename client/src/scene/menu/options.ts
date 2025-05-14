@@ -231,12 +231,55 @@ export default class OptionsMenu extends Menu {
       )
       .hide()
 
+    // Elements used in the below callbacks
+    const music = document.getElementById('music') as HTMLAudioElement
+    const dialogAudio = document.getElementById('dialog') as HTMLAudioElement
+
+    // Add each sizer
     sizer
-      .add(this.createMasterVolume(), { expand: true })
+      .add(
+        this.createVolumeSection(
+          'Master Volume:',
+          UserSettings._get('volume'),
+          (value) => {
+            UserSettings._set('volume', value)
+            this.scene.sound.volume = value * 5
+
+            // Ensure that all other audio is playing, since this may have transitioned from 0 volume
+            music.volume = value * UserSettings._get('musicVolume')
+            music.play()
+            dialogAudio.volume = value * UserSettings._get('dialogVolume')
+          },
+        ),
+        { expand: true },
+      )
       .addSpace()
-      .add(this.createMusicVolume(), { expand: true })
+      .add(
+        this.createVolumeSection(
+          'Music Volume:',
+          UserSettings._get('musicVolume'),
+          (value) => {
+            UserSettings._set('musicVolume', value)
+
+            music.volume = value * UserSettings._get('volume')
+            music.play()
+          },
+        ),
+        { expand: true },
+      )
       .addSpace()
-      .add(this.createDialogVolume(), { expand: true })
+      .add(
+        this.createVolumeSection(
+          'Dialog Volume:',
+          UserSettings._get('dialogVolume'),
+          (value) => {
+            UserSettings._set('dialogVolume', value)
+
+            dialogAudio.volume = value * UserSettings._get('volume')
+          },
+        ),
+        { expand: true },
+      )
 
     return sizer
   }
@@ -451,64 +494,21 @@ export default class OptionsMenu extends Menu {
     return sizer
   }
 
-  private createMasterVolume() {
-    let sizer = this.scene.rexUI.add.sizer({
+  private createVolumeSection(
+    s: string,
+    initialValue: number,
+    callback: (value) => void,
+  ) {
+    const sizer = this.scene.rexUI.add.sizer({
       width: this.subwidth,
       orientation: 'vertical',
       space: { item: Space.pad },
     })
 
-    let txtHint = this.scene.add.text(0, 0, 'Master Volume:', Style.basic)
+    const txtHint = this.scene.add.text(0, 0, s, Style.basic)
     sizer.add(txtHint)
 
-    let slider = this.getSlider(UserSettings._get('volume'), (value) => {
-      UserSettings._set('volume', value)
-      this.scene.sound.volume = value * 5
-    })
-    sizer.add(slider)
-
-    return sizer
-  }
-
-  private createMusicVolume() {
-    let sizer = this.scene.rexUI.add.sizer({
-      width: this.subwidth,
-      orientation: 'vertical',
-      space: { item: Space.pad },
-    })
-
-    let txtHint = this.scene.add.text(0, 0, 'Music Volume:', Style.basic)
-    sizer.add(txtHint)
-
-    let slider = this.getSlider(UserSettings._get('musicVolume'), (value) => {
-      UserSettings._set('musicVolume', value)
-
-      const music = document.getElementById('music') as HTMLAudioElement
-
-      music.volume = value
-      music.play()
-    })
-    sizer.add(slider)
-
-    return sizer
-  }
-
-  private createDialogVolume() {
-    let sizer = this.scene.rexUI.add.sizer({
-      width: this.subwidth,
-      orientation: 'vertical',
-      space: { item: Space.pad },
-    })
-
-    let txtHint = this.scene.add.text(0, 0, 'Dialog Volume:', Style.basic)
-    sizer.add(txtHint)
-
-    let slider = this.getSlider(UserSettings._get('dialogVolume'), (value) => {
-      UserSettings._set('dialogVolume', value)
-
-      const dialogAudio = document.getElementById('dialog') as HTMLAudioElement
-      dialogAudio.volume = value
-    })
+    const slider = this.getSlider(initialValue, callback)
     sizer.add(slider)
 
     return sizer
