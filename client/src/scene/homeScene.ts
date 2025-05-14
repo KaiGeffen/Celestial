@@ -184,10 +184,14 @@ export default class HomeScene extends BaseScene {
       x: Space.pad + Space.iconSize * 0.5,
       y: Space.pad + Space.iconSize * 0.5,
       f: () => {
-        this.scene.launch('MenuScene', {
-          menu: 'achievements',
-          activeScene: this,
-        })
+        if (UserDataServer.isLoggedIn()) {
+          this.scene.launch('MenuScene', {
+            menu: 'achievements',
+            activeScene: this,
+          })
+        } else {
+          this.signalError('Must be signed in.')
+        }
       },
       hint: 'Quests',
       muteClick: true,
@@ -198,7 +202,13 @@ export default class HomeScene extends BaseScene {
       name: 'Friends',
       x: Space.pad * 2 + Space.iconSize * 1.5,
       y: Space.pad + Space.iconSize * 0.5,
-      f: () => this.signalError('Friends coming soon!'),
+      f: () => {
+        if (UserDataServer.isLoggedIn()) {
+          this.signalError('Friends coming soon!')
+        } else {
+          this.signalError('Must be signed in.')
+        }
+      },
       hint: 'Friends',
       muteClick: true,
     })
@@ -209,7 +219,13 @@ export default class HomeScene extends BaseScene {
       name: 'Store',
       x: Space.pad + Space.iconSize * 0.5,
       y: Space.pad * 2 + Space.iconSize * 1.5,
-      f: () => this.scene.start('StoreScene'),
+      f: () => {
+        if (UserDataServer.isLoggedIn()) {
+          this.scene.start('StoreScene')
+        } else {
+          this.signalError('Must be signed in.')
+        }
+      },
       hint: 'Store',
     })
 
@@ -219,7 +235,11 @@ export default class HomeScene extends BaseScene {
       x: Space.pad * 2 + Space.iconSize * 1.5,
       y: Space.pad * 2 + Space.iconSize * 1.5,
       f: () => {
-        this.scene.start('MatchHistoryScene')
+        if (UserDataServer.isLoggedIn()) {
+          this.scene.start('MatchHistoryScene')
+        } else {
+          this.signalError('Must be signed in.')
+        }
       },
       hint: 'Match History',
     })
