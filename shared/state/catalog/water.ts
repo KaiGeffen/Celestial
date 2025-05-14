@@ -53,7 +53,6 @@ const fishingBoat = new FishingBoat({
   name: 'Fishing Boat',
   id: 32,
   cost: 2,
-  points: 1,
   text: 'Put the top 3 cards with base cost 1 from your deck into your hand.',
 })
 
