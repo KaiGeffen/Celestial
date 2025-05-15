@@ -344,13 +344,16 @@ export class ResultsRegionTutorial extends MatchResultsRegion {
   missionID: number
 
   protected createButtons() {
+    const container = this.scene.add.container()
+    this.container.add(container)
+    this.scene.plugins.get('rexAnchor')['add'](container, {
+      y: `50%-${Space.pad + Space.buttonHeight / 2}`,
+    })
+
     // Continue
-    let y = Space.windowHeight - (Space.pad + Space.buttonHeight / 2)
     new Buttons.Basic({
-      within: this.container,
+      within: container,
       text: 'Continue',
-      x: Space.windowWidth / 2,
-      y,
       f: this.continueCallback(),
     })
   }
