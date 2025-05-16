@@ -117,6 +117,7 @@ export async function updateMatchResultPVE(
   const playerData = await getPlayerData(playerId)
   const aiData = {
     username: 'Computer',
+    elo: 0,
   }
 
   const winnerId = wasPlayerWin ? playerId : null

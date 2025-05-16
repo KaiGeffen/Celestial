@@ -14,11 +14,10 @@ class PveMatch extends Match {
   // Given ws is disconnecting
   async doExit(disconnectingWs: MatchServerWS) {
     if (this.game === null) return
-    // AI wins by default
-    if (this.game.model.winner == null) this.game.model.winner = 1
 
-    // Update achievements if user logged in
-    await AchievementManager.onGamePlayed(this.uuid1, this.game.model, false, 0)
+    // AI wins by default
+    this.game.setWinnerViaDisconnect(1)
+    await this.notifyState()
 
     // NOTE Game is null to prevent doExit from being called again
     this.game = null
