@@ -186,6 +186,7 @@ export default class Animator {
         break
 
       case Zone.Story:
+        // TODO The local array has includes resolved cards, while the animation index doesn't, causing a bug
         card = this.view.story.cards[animation.index2]
         break
 
