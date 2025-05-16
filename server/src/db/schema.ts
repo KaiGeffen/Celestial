@@ -51,6 +51,10 @@ export const players = pgTable(
     losses: integer('losses').notNull(),
     elo: integer('elo').notNull(),
     decks: varchar('decks', { length: 1000 }).array().notNull(),
+
+    // Single Player Records
+    pve_wins: integer('pve_wins').notNull(),
+    pve_losses: integer('pve_losses').notNull(),
     inventory: varchar('inventory', { length: 1000 }).notNull(),
     completedmissions: varchar('completedmissions', { length: 1000 }).notNull(),
 

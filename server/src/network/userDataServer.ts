@@ -133,6 +133,8 @@ export default function createUserDataServer() {
               losses: 0,
               elo: 1000,
               decks: decks.map((deck) => JSON.stringify(deck)),
+              pve_wins: 0,
+              pve_losses: 0,
               inventory: inventory,
               completedmissions: missions,
               lastactive: new Date().toISOString(),

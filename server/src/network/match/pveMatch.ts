@@ -13,7 +13,7 @@ class PveMatch extends Match {
 
   // Given ws is disconnecting
   async doExit(disconnectingWs: MatchServerWS) {
-    if (this.game === null) return
+    if (this.game === null || this.game.model.winner !== null) return
 
     // AI wins by default
     this.game.setWinnerViaDisconnect(1)

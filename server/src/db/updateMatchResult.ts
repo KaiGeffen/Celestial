@@ -136,6 +136,23 @@ export async function updateMatchResultPVE(
     loserDeck,
     roundsWLT,
   )
+
+  // Update the number of pve wins and losses
+  if (wasPlayerWin) {
+    await db
+      .update(players)
+      .set({
+        pve_wins: sql`${players.pve_wins} + 1`,
+      })
+      .where(eq(players.id, playerId))
+  } else {
+    await db
+      .update(players)
+      .set({
+        pve_losses: sql`${players.pve_losses} + 1`,
+      })
+      .where(eq(players.id, playerId))
+  }
 }
 
 // Insert this match into the match history table
