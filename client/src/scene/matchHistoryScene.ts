@@ -609,6 +609,9 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
   }
 
   private createRow(entry: MatchHistoryEntry) {
+    // TODO This is pretty specific, consider adding a flag instead of relying on hardcoded string
+    const isPVE = entry.opponentUsername === 'Computer'
+
     let sizer = this.rexUI.add.sizer({
       orientation: 'vertical',
       width: width,
@@ -654,7 +657,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       .text(
         0,
         0,
-        ` ${entry.opponentUsername}(${entry.opponentElo})`,
+        ` ${entry.opponentUsername}` + (isPVE ? '' : ` (${entry.opponentElo})`),
         Style.basic,
       )
       .setOrigin(0, 0.5)
@@ -673,7 +676,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       origin: [1, 0.5],
     })
     const userText = this.add
-      .text(0, 0, ` ${entry.deck.name}(${entry.elo})`, Style.basic)
+      .text(
+        0,
+        0,
+        ` ${entry.deck.name}` + (isPVE ? '' : ` (${entry.elo})`),
+        Style.basic,
+      )
       .setOrigin(0, 0.5)
     userContainer.add(userText)
 
