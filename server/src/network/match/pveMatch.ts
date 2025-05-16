@@ -3,8 +3,8 @@ import { getAction } from '../../ai'
 import getClientGameModel from '../../../../shared/state/clientGameModel'
 import { MatchServerWS } from '../../../../shared/network/matchWS'
 import { Deck } from '../../../../shared/types/deck'
-import { AchievementManager } from '../../achievementManager'
 import { updateMatchResultPVE } from '../../db/updateMatchResult'
+import { AchievementManager } from '../../achievementManager'
 
 class PveMatch extends Match {
   constructor(ws: MatchServerWS, uuid: string, deck: Deck, aiDeck: Deck) {
@@ -76,6 +76,9 @@ class PveMatch extends Match {
     ).catch((error) => {
       console.error('Error updating match results:', error)
     })
+
+    // Update achievements if user logged in
+    await AchievementManager.onGamePlayed(this.uuid1, this.game.model, false, 0)
   }
 }
 
