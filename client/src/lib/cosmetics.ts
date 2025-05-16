@@ -1,7 +1,7 @@
 import UserDataServer from '../network/userDataServer'
 import { achievementsMeta } from '../../../shared/achievementsData'
 
-export function getUnlockedAvatars(): Set<number> {
+export function getUnlockedAvatars(): number[] {
   const userData = UserDataServer.getUserData()
   const unlockedAvatars = new Set<number>()
 
@@ -23,7 +23,8 @@ export function getUnlockedAvatars(): Set<number> {
     }
   })
 
-  return unlockedAvatars
+  // Return a sorted array
+  return Array.from(unlockedAvatars).sort((a, b) => a - b)
 }
 
 export function getUnlockedBorders(): Set<number> {

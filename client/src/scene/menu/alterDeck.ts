@@ -187,7 +187,7 @@ class AlterDeckMenu extends Menu {
 
     if (this.currentTab === tab.ICON) {
       // Create avatar grid
-      const unlockedAvatars = Array.from(getUnlockedAvatars())
+      const unlockedAvatars = getUnlockedAvatars()
 
       unlockedAvatars.forEach((avatarId, index) => {
         const container = new ContainerLite(
@@ -218,7 +218,7 @@ class AlterDeckMenu extends Menu {
       })
     } else {
       // Create border grid
-      const unlockedBorders = Array.from(getUnlockedBorders())
+      const unlockedBorders = getUnlockedBorders()
 
       unlockedBorders.forEach((borderId, index) => {
         const container = new ContainerLite(
