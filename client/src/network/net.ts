@@ -42,8 +42,8 @@ export class MatchWS {
       })
 
     socket.ws.onclose = () => {
-      scene.signalError('Disconnected from the server')
-      console.error('Disconnected from the server')
+      // scene.signalError('Disconnected from the server')
+      console.error('Server ws closed')
     }
 
     socket.ws.onerror = (error) => {
