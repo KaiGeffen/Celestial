@@ -4,6 +4,7 @@ import getClientGameModel from '../../../../shared/state/clientGameModel'
 import { MatchServerWS } from '../../../../shared/network/matchWS'
 import { Deck } from '../../../../shared/types/deck'
 import { AchievementManager } from '../../achievementManager'
+import { updateMatchResultPVE } from '../../db/updateMatchResult'
 
 class PveMatch extends Match {
   constructor(ws: MatchServerWS, uuid: string, deck: Deck, aiDeck: Deck) {
@@ -55,10 +56,28 @@ class PveMatch extends Match {
     await this.notifyState()
   }
 
-  // async addAiOpponent(i: number | null = null) {
-  //   await this.addDeck(1, get_computer_deck(i), 0)
-  //   this.vs_ai = true
-  // }
+  protected async updateDatabases() {
+    const winner = this.game.model.winner
+
+    // How many rounds won/lost/tied
+    const roundsWLT: [number, number, number] = [
+      this.game.model.wins[winner],
+      this.game.model.wins[winner ^ 1],
+      this.game.model.roundCount -
+        this.game.model.wins[winner] -
+        this.game.model.wins[winner ^ 1],
+    ]
+
+    await updateMatchResultPVE(
+      this.uuid1,
+      this.deck1,
+      this.deck2,
+      winner === 0,
+      roundsWLT,
+    ).catch((error) => {
+      console.error('Error updating match results:', error)
+    })
+  }
 }
 
 export default PveMatch

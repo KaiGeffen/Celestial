@@ -1,9 +1,8 @@
 import Match from './match'
 import { MatchServerWS } from '../../../../shared/network/matchWS'
-import { updateMatchResult } from '../../db/updateMatchResult'
+import { updateMatchResultPVP } from '../../db/updateMatchResult'
 import { Deck } from '../../../../shared/types/deck'
 import { MechanicsSettings } from '../../../../shared/settings'
-import { AchievementManager } from '../../achievementManager'
 
 class PvpMatch extends Match {
   timerCheckInterval: NodeJS.Timeout
@@ -19,6 +18,35 @@ class PvpMatch extends Match {
     super(ws1, uuid1, deck1, ws2, uuid2, deck2)
 
     // this.startTimerCheck() TODO Enable once in prod
+  }
+
+  protected async updateDatabases() {
+    const winner = this.game.model.winner
+
+    const idWinner = winner === 0 ? this.uuid1 : this.uuid2
+    const idLoser = winner === 0 ? this.uuid2 : this.uuid1
+
+    const winnerDeck = winner === 0 ? this.deck1 : this.deck2
+    const loserDeck = winner === 0 ? this.deck2 : this.deck1
+
+    // How many rounds won/lost/tied
+    const roundsWLT: [number, number, number] = [
+      this.game.model.wins[winner],
+      this.game.model.wins[winner ^ 1],
+      this.game.model.roundCount -
+        this.game.model.wins[winner] -
+        this.game.model.wins[winner ^ 1],
+    ]
+
+    await updateMatchResultPVP(
+      idWinner,
+      idLoser,
+      winnerDeck,
+      loserDeck,
+      roundsWLT,
+    ).catch((error) => {
+      console.error('Error updating match results:', error)
+    })
   }
 
   // Given ws is disconnecting
@@ -40,57 +68,6 @@ class PvpMatch extends Match {
         ws.close()
       }),
     )
-  }
-
-  async notifyState(): Promise<void> {
-    await super.notifyState()
-
-    // If there is a winner, update wins/losses/elo accordingly
-    if (this.game.model.winner !== null) {
-      await this.updateMatchResult(this.game.model.winner)
-
-      // Update achievements
-      await AchievementManager.onGamePlayed(
-        this.uuid1,
-        this.game.model,
-        true,
-        0,
-      )
-      await AchievementManager.onGamePlayed(
-        this.uuid2,
-        this.game.model,
-        true,
-        1,
-      )
-    }
-  }
-
-  // Update the database records for this match
-  private async updateMatchResult(winner: number) {
-    const idWinner = winner === 0 ? this.uuid1 : this.uuid2
-    const idLoser = winner === 0 ? this.uuid2 : this.uuid1
-
-    const winnerDeck = winner === 0 ? this.deck1 : this.deck2
-    const loserDeck = winner === 0 ? this.deck2 : this.deck1
-
-    // How many rounds won/lost/tied
-    const roundsWLT: [number, number, number] = [
-      this.game.model.wins[winner],
-      this.game.model.wins[winner ^ 1],
-      this.game.model.roundCount -
-        this.game.model.wins[winner] -
-        this.game.model.wins[winner ^ 1],
-    ]
-
-    await updateMatchResult(
-      idWinner,
-      idLoser,
-      winnerDeck,
-      loserDeck,
-      roundsWLT,
-    ).catch((error) => {
-      console.error('Error updating match results:', error)
-    })
   }
 
   // Start an interval to autopass if the user has no time left

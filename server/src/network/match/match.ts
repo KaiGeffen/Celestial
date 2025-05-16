@@ -107,7 +107,28 @@ class Match implements Match {
         })
       }),
     )
+
+    // Handle database and achievement updates as game ends
+    if (this.game.model.winner !== null) {
+      await this.updateDatabases()
+
+      // Update achievements
+      await AchievementManager.onGamePlayed(
+        this.uuid1,
+        this.game.model,
+        true,
+        0,
+      )
+      await AchievementManager.onGamePlayed(
+        this.uuid2,
+        this.game.model,
+        true,
+        1,
+      )
+    }
   }
+
+  protected async updateDatabases() {}
 
   async doMulligan(player: number, mulligan: Mulligan) {
     this.game.doMulligan(player, mulligan)
