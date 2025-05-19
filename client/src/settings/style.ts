@@ -169,13 +169,6 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     fontSize: '24px',
     color: Color.cardText,
   },
-  hotkeyHint: {
-    fontFamily: mainFont,
-    fontSize: '50px',
-    color: Color.whiteS,
-    stroke: Color.blackS,
-    strokeThickness: 4,
-  },
   homeSceneButton: {
     fontFamily: altFont,
     fontSize: '40px',
@@ -313,5 +306,27 @@ export const BBStyle: Record<string, any> = {
     fontSize: FontSettings.huge.size,
     color: '#353F4E',
     halign: 'center',
+  },
+  // Hints showing which hotkey to press for each stack / card
+  hotkeyHint: {
+    fontFamily: mainFont,
+    fontSize: '50px',
+
+    color: Color.hintFill,
+    backgroundColor: Color.hintBackground,
+    backgroundStrokeColor: '#0005',
+    backgroundStrokeLineWidth: 2,
+    backgroundCornerRadius: 5,
+    wrap: {
+      mode: 'word',
+      width: Space.maxTextWidth,
+    },
+    // strokeThickness: 3,
+    padding: {
+      left: Space.padSmall,
+      right: Space.padSmall,
+      top: Space.padSmall,
+      bottom: Space.padSmall,
+    },
   },
 }
