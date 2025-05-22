@@ -72,6 +72,8 @@ export class SigninScene extends Phaser.Scene {
       },
       depth: -1,
     })
+      // Hide the guest button if user is already signed in
+      .setVisible(localStorage.getItem('gsi_token') === null)
 
     // TODO Use y value
     this.createGoogleGSIButton()

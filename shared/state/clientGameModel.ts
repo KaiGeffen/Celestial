@@ -50,6 +50,7 @@ function reverseAttributes(model: GameModel): void {
     'wins',
     'amtPasses',
     'amtDrawn',
+    'cosmeticSets',
   ]
 
   for (const attr of listAttributes) {
