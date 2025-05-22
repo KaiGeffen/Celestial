@@ -153,27 +153,16 @@ export class AchievementManager {
 
   // Unlock achievementId if not already unlocked
   private static async unlock(playerId: string, achievementId: number) {
-    const existing = await db
-      .select()
-      .from(achievements)
-      .where(
-        and(
-          eq(achievements.player_id, playerId),
-          eq(achievements.achievement_id, achievementId),
-        ),
-      )
-      .limit(1)
-    if (existing.length === 0) {
-      await db
-        .insert(achievements)
-        .values({
-          player_id: playerId,
-          achievement_id: achievementId,
-          progress: 0,
-          seen: false,
-        })
-        .execute()
-    }
+    await db
+      .insert(achievements)
+      .values({
+        player_id: playerId,
+        achievement_id: achievementId,
+        progress: 0,
+        seen: false,
+      })
+      .onConflictDoNothing()
+      .execute()
   }
 
   // Unlock achievementId if 24h have passed since previous achievement was unlocked
