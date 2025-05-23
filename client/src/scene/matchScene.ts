@@ -133,7 +133,7 @@ export class MatchScene extends BaseScene {
           while (version >= 0 && this.queuedStates[version].isRecap) {
             version--
           }
-          this.currentVersion = version + 1
+          this.currentVersion = version
           break
         }
       }
