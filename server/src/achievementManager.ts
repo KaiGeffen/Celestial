@@ -145,7 +145,7 @@ export class AchievementManager {
   }
 
   static async setAchievementsSeen(playerId: string) {
-    await db
+    const result = await db
       .update(achievements)
       .set({ seen: true })
       .where(eq(achievements.player_id, playerId))

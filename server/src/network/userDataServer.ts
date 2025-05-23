@@ -72,10 +72,10 @@ export default function createUserDataServer() {
         } else if (result.length === 1) {
           // Send user their data
           await sendUserData(ws, id, result[0])
-        }
 
-        // Handle achievements
-        await AchievementManager.onConnection(id)
+          // Handle achievements
+          await AchievementManager.onConnection(id)
+        }
       })
         .on('refreshUserData', async () => {
           if (!id) return

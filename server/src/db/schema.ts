@@ -156,5 +156,9 @@ export const achievements = pgTable(
     achievementIdx: index('achievement_achievement_idx').on(
       table.achievement_id,
     ),
+    uniquePlayerAchievement: uniqueIndex('unique_player_achievement').on(
+      table.player_id,
+      table.achievement_id,
+    ),
   }),
 )
