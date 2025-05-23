@@ -16,7 +16,7 @@ export class UserSettings {
       volume: 0.5,
       musicVolume: 0.5,
       dialogVolume: 0.5,
-      animationSpeed: Flags.local ? 1 : 0.25, // Max speed if playing locally
+      animationSpeed: 0.1,
       // Whether the player should pass automatically if there's nothing they can play
       autopass: true,
 

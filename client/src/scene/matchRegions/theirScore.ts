@@ -136,12 +136,13 @@ export default class TheirScoreRegion extends Region {
         // Get current speed
         const currentSpeed = UserSettings._get('animationSpeed')
 
-        // Cycle through speeds: 0.25 -> 0.5 -> 1 -> 2 -> 0.25
+        // Cycle through speeds: 0.1 -> 0.25 -> 0.5 -> 1 -> 2 -> 0.1
         let newSpeed
-        if (currentSpeed < 0.3) newSpeed = 0.5
-        else if (currentSpeed < 0.7) newSpeed = 1
-        else if (currentSpeed < 1.5) newSpeed = 2
-        else newSpeed = 0.25
+        if (currentSpeed < 0.25) newSpeed = 0.25
+        else if (currentSpeed < 0.5) newSpeed = 0.5
+        else if (currentSpeed < 1) newSpeed = 1
+        else if (currentSpeed < 2) newSpeed = 2
+        else newSpeed = 0.1
 
         // Update the setting
         UserSettings._set('animationSpeed', newSpeed)

@@ -4,7 +4,7 @@ import { UserSettings } from './settings'
 export class Time {
   // Time for a card to be played from hand to story
   static playCard(): number {
-    return 400
+    return Time.recapTween()
   }
 
   static recapStateMinimum(): number {

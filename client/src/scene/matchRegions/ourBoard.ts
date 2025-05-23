@@ -1,17 +1,7 @@
 import 'phaser'
-import Button from '../../lib/buttons/button'
-import Buttons from '../../lib/buttons/buttons'
 import { CardImage } from '../../lib/cardImage'
 import GameModel from '../../../../shared/state/gameModel'
-import {
-  Depth,
-  Space,
-  Style,
-  Time,
-  Flags,
-  UserSettings,
-  Color,
-} from '../../settings/settings'
+import { Depth, Space, Time, UserSettings } from '../../settings/settings'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
 import { MatchScene } from '../matchScene'
@@ -144,7 +134,7 @@ export default class OurBoardRegion extends Region {
       card.removeOnHover()
 
       // Hide any hints
-      this.scene['hint'].hide()
+      this.scene.hint.hide()
 
       // Send card to story
       this.scene.tweens.add({
