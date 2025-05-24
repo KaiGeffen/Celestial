@@ -66,7 +66,9 @@ export class CardImage {
     // Stat text
     this.createStats()
     this.createText()
-    this.createTitle()
+    if (card.id !== Catalog.cardback.id) {
+      this.createTitle()
+    }
 
     if (!Flags.mobile) {
       this.image
