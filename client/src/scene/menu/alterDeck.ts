@@ -17,13 +17,16 @@ import {
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import UserDataServer from '../../network/userDataServer'
 import { getUnlockedAvatars, getUnlockedBorders } from '../../lib/cosmetics'
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
-const width = 500
+const width = 900
 const inputTextWidth = 200
 
 enum tab {
   ICON,
   BORDER,
+  RELIC,
+  PET,
 }
 
 class AlterDeckMenu extends Menu {
@@ -51,7 +54,7 @@ class AlterDeckMenu extends Menu {
 
   // Container for the cosmetic options
   private cosmeticOptionsContainer: ContainerLite
-  private cosmeticGrid: GridSizer
+  private cosmeticChoicesSizer: Sizer
 
   btnConfirm: Button
 
@@ -98,9 +101,7 @@ class AlterDeckMenu extends Menu {
       .addNewLine()
       .add(this.createCosmeticOptions())
       .addNewLine()
-      .add(this.createImport())
-      .addNewLine()
-      .add(this.createButtons(createCallback))
+      .add(this.createFooter(createCallback))
   }
 
   private createCosmeticTabs() {
@@ -108,7 +109,7 @@ class AlterDeckMenu extends Menu {
       width: width - Space.pad * 2,
     })
 
-    const tabs = ['Icon', 'Border']
+    const tabs = ['Icon', 'Border', 'Relic', 'Pet']
     tabs.forEach((tabText, index) => {
       const container = new ContainerLite(
         this.scene,
@@ -121,6 +122,10 @@ class AlterDeckMenu extends Menu {
         within: container,
         text: tabText,
         f: () => {
+          if (tabText === 'Relic' || tabText === 'Pet') {
+            this.scene.signalError('Coming soon')
+            return
+          }
           this.currentTab = tabText === 'Icon' ? tab.ICON : tab.BORDER
           this.updateCosmeticGrid()
         },
@@ -142,7 +147,7 @@ class AlterDeckMenu extends Menu {
       0,
       0,
       width,
-      Space.avatarSize * 2 + Space.pad * 3,
+      Space.avatarSize + Space.pad * 2,
     )
 
     // Create a sizer to center the grid
@@ -151,24 +156,13 @@ class AlterDeckMenu extends Menu {
       space: { item: Space.pad },
     })
 
-    // Create the grid sizer with 3 columns
-    this.cosmeticGrid = this.scene.rexUI.add.gridSizer({
-      column: 3,
-      row: 2,
-      width: Space.avatarSize * 3 + Space.pad * 4,
-      height: Space.avatarSize * 2 + Space.pad * 3,
-      space: {
-        column: Space.pad,
-        row: Space.pad,
-        top: Space.pad,
-        bottom: Space.pad,
-        left: Space.pad,
-        right: Space.pad,
-      },
+    // Create the sizer for avatars/borders
+    this.cosmeticChoicesSizer = this.scene.rexUI.add.sizer({
+      space: { item: Space.pad },
     })
 
-    // Add the grid to the center sizer
-    centerSizer.add(this.cosmeticGrid)
+    // Add the sizer to the center sizer
+    centerSizer.add(this.cosmeticChoicesSizer)
 
     // Add the center sizer to the container
     this.cosmeticOptionsContainer.add(centerSizer)
@@ -180,16 +174,16 @@ class AlterDeckMenu extends Menu {
   }
 
   private updateCosmeticGrid() {
-    // Clear the grid
-    this.cosmeticGrid.removeAll(true)
+    // Clear the sizer
+    this.cosmeticChoicesSizer.removeAll(true)
 
     let items = []
 
     if (this.currentTab === tab.ICON) {
-      // Create avatar grid
+      // Create avatar sizer
       const unlockedAvatars = getUnlockedAvatars()
 
-      unlockedAvatars.forEach((avatarId, index) => {
+      unlockedAvatars.forEach((avatarId) => {
         const container = new ContainerLite(
           this.scene,
           0,
@@ -207,7 +201,7 @@ class AlterDeckMenu extends Menu {
             this.selectedAvatar = avatarId
           },
         })
-        this.cosmeticGrid.add(container, index % 3, Math.floor(index / 3))
+        this.cosmeticChoicesSizer.add(container)
         items.push(avatar)
 
         if (avatarId === this.selectedAvatar) {
@@ -217,10 +211,10 @@ class AlterDeckMenu extends Menu {
         }
       })
     } else {
-      // Create border grid
+      // Create border sizer
       const unlockedBorders = getUnlockedBorders()
 
-      unlockedBorders.forEach((borderId, index) => {
+      unlockedBorders.forEach((borderId) => {
         const container = new ContainerLite(
           this.scene,
           0,
@@ -238,7 +232,7 @@ class AlterDeckMenu extends Menu {
             this.selectedBorder = borderId
           },
         })
-        this.cosmeticGrid.add(container, index % 3, Math.floor(index / 3))
+        this.cosmeticChoicesSizer.add(container)
         items.push(avatar)
 
         if (borderId === this.selectedBorder) {
@@ -250,7 +244,7 @@ class AlterDeckMenu extends Menu {
     }
 
     // Update the layout
-    this.cosmeticGrid.layout()
+    this.cosmeticChoicesSizer.layout()
   }
 
   private createName() {
@@ -293,15 +287,41 @@ class AlterDeckMenu extends Menu {
     return sizer
   }
 
-  private createImport() {
-    let sizer = this.scene.rexUI.add.sizer()
+  private createDeckCodeCopyAndPaste() {
+    // Create a sizer for the deck code section
+    let deckCodeSizer = this.scene.rexUI.add.sizer()
 
+    // Create share button container
+    let containerShare = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth / 3,
+      Space.avatarSize / 2,
+    )
+    new Buttons.Icon({
+      name: 'Share',
+      within: containerShare,
+      x: 0,
+      y: 0,
+      f: () => {
+        // Copy the deck's code to clipboard
+        const encodedDeck = encodeShareableDeckCode(this.deckCode)
+        navigator.clipboard.writeText(encodedDeck)
+
+        // Inform user deck code was copied
+        this.scene.showMessage('Deck code copied to clipboard.')
+      },
+      hint: 'Export deck-code',
+    })
+
+    // Create the deck code input text
     this.deckCodeInputText = this.scene.add
       .rexInputText(0, 0, inputTextWidth, 50, {
         type: 'text',
         text: '',
         align: 'center',
-        placeholder: 'Import deck code',
+        placeholder: 'Import deck-code',
         tooltip: 'Import a deck from clipboard.',
         fontFamily: 'Mulish',
         fontSize: '24px',
@@ -322,11 +342,11 @@ class AlterDeckMenu extends Menu {
         }
       })
 
-    // Chrome
+    // Chrome for the input text
     const chrome = this.scene.add.image(0, 0, 'icon-InputText')
 
     // Container with textbox and chrome
-    let container = new ContainerLite(
+    let inputContainer = new ContainerLite(
       this.scene,
       0,
       0,
@@ -335,14 +355,13 @@ class AlterDeckMenu extends Menu {
       [this.deckCodeInputText, chrome],
     )
 
-    // Add the objects centered
-    sizer.addSpace().add(container).addSpace()
+    // Add both elements to the sizer
+    deckCodeSizer.add(containerShare).add(inputContainer)
 
-    return sizer
+    return deckCodeSizer
   }
 
-  // Create the buttons at the bottom which navigate to other scenes/menus
-  private createButtons(
+  private createFooter(
     createCallback: (
       name: string,
       cosmeticSet: CosmeticSet,
@@ -355,6 +374,8 @@ class AlterDeckMenu extends Menu {
 
     sizer
       .add(this.createCancelButton())
+      .addSpace()
+      .add(this.createDeckCodeCopyAndPaste())
       .addSpace()
       .add(this.createConfirm(createCallback))
 
