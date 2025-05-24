@@ -66,6 +66,7 @@ export class CardImage {
     // Stat text
     this.createStats()
     this.createText()
+    this.createTitle()
 
     if (!Flags.mobile) {
       this.image
@@ -90,12 +91,7 @@ export class CardImage {
     // If the card image doesn't exist, use a default image
     // if (!this.scene.textures.exists(`card-${this.card.name}`)) {
     if (this.card.beta) {
-      const name = this.scene.add
-        .text(0, -Space.cardHeight / 2, this.card.name, Style.todoBetaCardName)
-        .setOrigin(0.5, 0)
       this.image.setTexture('card-Beta')
-
-      this.container.add(name)
     }
 
     if (interactive) {
@@ -355,6 +351,19 @@ export class CardImage {
       .on('pointerdown', () => this.clickCallback())
 
     this.container.add(this.txtText)
+  }
+
+  private createTitle(): void {
+    const name = this.scene.add
+      .text(
+        -Space.cardWidth / 2 + 56,
+        -Space.cardHeight / 2 + 2,
+        this.card.name,
+        Style.todoBetaCardName,
+      )
+      .setOrigin(0)
+
+    this.container.add(name)
   }
 
   // Move this cardImage above everything else in its container when it's hovered
