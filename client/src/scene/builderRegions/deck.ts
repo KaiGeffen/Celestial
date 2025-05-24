@@ -150,13 +150,10 @@ export default class DeckRegion {
     )
     this.avatar = new Buttons.Avatar({
       within: containerAvatar,
-      emotive: true,
+      f: this.openEditMenu(),
+      muteClick: true,
     })
-    if (Flags.mobile) {
-      containerAvatar.setVisible(false)
-    } else {
-      sizer.add(containerAvatar)
-    }
+    sizer.add(containerAvatar)
 
     // Give the background a drop shadow
     this.scene.plugins.get('rexDropShadowPipeline')['add'](background, {
@@ -250,23 +247,6 @@ export default class DeckRegion {
       hint: 'Share deck-code',
     })
 
-    // Add a graph button for showing the distribution of costs in the deck
-    let containerDistribution = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth / 3,
-      Space.avatarSize / 2,
-    )
-    new Buttons.Icon({
-      name: 'Distribution',
-      within: containerDistribution,
-      x: 0,
-      y: 0,
-      f: this.distributionCallback(),
-      hint: 'Cost distribution',
-    })
-
     // Start button - Show how many cards are in deck, and enable user to start if deck is full
     let containerStart = new ContainerLite(
       this.scene,
@@ -294,9 +274,6 @@ export default class DeckRegion {
     }
     sizerButtons.add(containerEdit)
     sizerButtons.add(containerShare)
-    if (!Flags.mobile) {
-      sizerButtons.add(containerDistribution)
-    }
     sizerButtons.add(
       containerStart,
       Flags.mobile ? { padding: { left: Space.pad } } : {},
@@ -535,16 +512,6 @@ export default class DeckRegion {
 
       // Inform user deck code was copied
       this.scene.showMessage('Deck code copied to clipboard.')
-    }
-  }
-
-  private distributionCallback(): () => void {
-    return () => {
-      this.scene.scene.launch('MenuScene', {
-        menu: 'distribution',
-        // Used to form the graph
-        currentDeck: this.deck,
-      })
     }
   }
 

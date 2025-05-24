@@ -211,14 +211,6 @@ export class PreloadScene extends SigninScene {
   }
 
   create() {
-    if (Flags.online) {
-      // Gain access to chart plugin
-      this.load.script(
-        'chartjs',
-        'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js',
-      )
-    }
-
     // When loading is complete, if user selected an option, start home screen
     this.load.on('complete', () => {
       if (this.signedInOrGuest) {

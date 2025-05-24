@@ -157,7 +157,6 @@ import HelpMenu from './help'
 import { NewDeckMenu, EditDeckMenu } from './alterDeck'
 import ModeMenu from './mode'
 import ConfirmMenu from './confirm'
-import DistributionMenu from './distribution'
 import MessageMenu from './message'
 import FocusMenu from './focus'
 import SearchMenu from './search'
@@ -177,7 +176,6 @@ const menus = {
   mode: ModeMenu,
   editDeck: EditDeckMenu,
   confirm: ConfirmMenu,
-  distribution: DistributionMenu,
   message: MessageMenu,
   help: HelpMenu,
   focus: FocusMenu,
