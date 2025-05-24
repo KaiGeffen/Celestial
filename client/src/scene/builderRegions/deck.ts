@@ -428,6 +428,7 @@ export default class DeckRegion {
         callback: this.editCallback,
         deckName: this.txtDeckName.text,
         cosmeticSet: this.cosmeticSet,
+        deckCode: this.getDeckCode(),
         activeScene: this.scene,
       })
     }

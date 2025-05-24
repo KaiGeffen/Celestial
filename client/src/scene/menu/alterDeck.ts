@@ -76,6 +76,7 @@ class AlterDeckMenu extends Menu {
       UserDataServer.getUserData().cosmeticSet?.border
     this.titleString = titleString
     this.confirmString = confirmString
+    this.deckCode = params.deckCode ?? []
 
     this.createContent(params.callback)
 
