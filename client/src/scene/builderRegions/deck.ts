@@ -58,10 +58,6 @@ export default class DeckRegion {
   private avatar: AvatarButton
   private txtDeckName: RexUIPlugin.BBCodeText
 
-  // Buttons
-  private btnEdit: Button
-  private btnShare: Button
-
   create(
     scene: BuilderScene,
     startCallback: () => void,
@@ -195,65 +191,13 @@ export default class DeckRegion {
 
   // Create buttons, return a sizer with all of them
   private createButtons(startCallback: () => void) {
-    // TODO Abstract each of these to make it more clear what mobile looks like
-    // TODO Add a back button for mobile
-    let containerBack = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth / 3,
-      Space.avatarSize / 2,
-    )
-    new Buttons.Icon({
-      name: 'Recap',
-      within: containerBack,
-      x: 0,
-      y: 0,
-      f: this.backCallback(),
-    })
-
-    // Add an edit button that allows user to change details about their deck
-    let containerEdit = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth / 3,
-      Space.avatarSize / 2,
-    )
-    this.btnEdit = new Buttons.Icon({
-      name: 'Edit',
-      within: containerEdit,
-      x: 0,
-      y: 0,
-      f: this.openEditMenu(),
-      muteClick: true,
-      hint: 'Edit details',
-    })
-
-    // Add a copy button that allows user to copy their deck code
-    let containerShare = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth / 3,
-      Space.avatarSize / 2,
-    )
-    this.btnShare = new Buttons.Icon({
-      name: 'Share',
-      within: containerShare,
-      x: 0,
-      y: 0,
-      f: this.shareCallback(),
-      hint: 'Share deck-code',
-    })
-
     // Start button - Show how many cards are in deck, and enable user to start if deck is full
     let containerStart = new ContainerLite(
       this.scene,
       0,
       0,
       Space.buttonWidth,
-      Space.avatarSize / 2,
+      Space.avatarSize,
     )
     this.btnStart = new Buttons.Basic({
       within: containerStart,
@@ -263,21 +207,13 @@ export default class DeckRegion {
     })
 
     // Make a container for all of the buttons
-    let sizerButtons = this.scene.rexUI.add.fixWidthSizer({
-      width:
-        width - Space.pad - (Flags.mobile ? 0 : Space.avatarSize + Space.pad),
-      align: 'center',
-    })
-
-    if (Flags.mobile) {
-      sizerButtons.add(containerBack)
-    }
-    sizerButtons.add(containerEdit)
-    sizerButtons.add(containerShare)
-    sizerButtons.add(
-      containerStart,
-      Flags.mobile ? { padding: { left: Space.pad } } : {},
-    )
+    let sizerButtons = this.scene.rexUI.add
+      .fixWidthSizer({
+        width:
+          width - Space.pad - (Flags.mobile ? 0 : Space.avatarSize + Space.pad),
+        align: 'center',
+      })
+      .add(containerStart)
 
     return sizerButtons
   }
@@ -342,10 +278,6 @@ export default class DeckRegion {
 
   // Set the current deck, and return whether the given deck was valid
   setDeck(deck: Card[], panel = this.panel): boolean {
-    // Enable the edit and share icons
-    this.btnEdit.enable()
-    this.btnShare.enable()
-
     // Remove the current deck
     this.deck.forEach((cutout) => cutout.destroy())
     this.deck = []
@@ -393,9 +325,6 @@ export default class DeckRegion {
     this.deck.forEach((cutout) => {
       cutout.setPremade()
     })
-
-    // Disable the edit button
-    this.btnEdit.disable()
 
     return this
   }
@@ -501,17 +430,6 @@ export default class DeckRegion {
         cosmeticSet: this.cosmeticSet,
         activeScene: this.scene,
       })
-    }
-  }
-
-  private shareCallback(): () => void {
-    return () => {
-      // Copy the deck's code to clipboard
-      const encodedDeck = encodeShareableDeckCode(this.scene.getDeckCode())
-      navigator.clipboard.writeText(encodedDeck)
-
-      // Inform user deck code was copied
-      this.scene.showMessage('Deck code copied to clipboard.')
     }
   }
 
