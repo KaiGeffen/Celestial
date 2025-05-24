@@ -262,7 +262,7 @@ export default class DecklistsRegion {
       .addBackground(background)
 
     // Premade button
-    let containerPremade = new ContainerLite(
+    const containerPremade = new ContainerLite(
       this.scene,
       0,
       0,
@@ -291,52 +291,21 @@ export default class DecklistsRegion {
     })
     sizer.add(containerPremade)
 
-    if (Flags.mobile) {
-      let containerNew = new ContainerLite(
-        this.scene,
-        0,
-        0,
-        Space.iconSize,
-        Space.buttonHeight,
-      )
-      new Buttons.Icon({
-        name: 'New',
-        within: containerNew,
-        x: 0,
-        y: 0,
-        f: this.newDeckCallback(),
-      })
-      sizer.add(containerNew)
-    } else {
-      let line = this.scene.add.line(
-        0,
-        0,
-        0,
-        0,
-        Space.iconSeparation + Space.pad,
-        0,
-        Color.line,
-      )
-      sizer.add(line)
-
-      let hintSizer = this.scene.rexUI.add.sizer({
-        width: width - Space.pad * 2,
-      })
-      sizer.add(hintSizer)
-
-      let txtHint = this.scene.add.text(0, 0, 'My Decks:', Style.basic)
-      hintSizer.add(txtHint).addSpace()
-
-      const btnNew = new Buttons.Icon({
-        name: 'New',
-        within: hintSizer,
-        x: 0,
-        y: 0,
-        f: this.newDeckCallback(),
-        muteClick: true,
-        hint: 'New deck',
-      })
-    }
+    // Custom button
+    const containerCustom = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    this.btnPremade = new Buttons.Basic({
+      within: containerCustom,
+      text: 'Custom',
+      f: this.newDeckCallback(),
+      muteClick: true,
+    })
+    sizer.add(containerCustom)
 
     return sizer
   }
