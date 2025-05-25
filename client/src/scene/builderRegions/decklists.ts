@@ -21,12 +21,12 @@ import Catalog from '../../../../shared/state/catalog'
 import { BuilderBase, BuilderScene } from '../builderScene'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import UserDataServer from '../../network/userDataServer'
+
 const width = Space.decklistPanelWidth
 
 // Region of the deck builder which contains all the decklists
 export default class DecklistsRegion {
   scene: BuilderScene
-  container: ContainerLite
 
   scrollablePanel: ScrollablePanel
   panel
@@ -46,7 +46,6 @@ export default class DecklistsRegion {
   // Create the are where player can manipulate their decks
   create(scene: BuilderScene) {
     this.scene = scene
-    this.container = new ContainerLite(scene)
 
     this.createPanel()
 
@@ -196,8 +195,6 @@ export default class DecklistsRegion {
   // Create the full panel
   private createPanel() {
     this.scrollablePanel = newScrollablePanel(this.scene, {
-      x: 0,
-      y: 0,
       width: width,
       height: Space.windowHeight,
 

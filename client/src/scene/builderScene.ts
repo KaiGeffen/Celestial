@@ -12,6 +12,8 @@ import { Space } from '../settings/settings'
 import { DecklistSettings } from '../../../shared/settings'
 import Catalog from '../../../shared/state/catalog'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
+import Buttons from '../lib/buttons/buttons'
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 // Features common between all builders
 export class BuilderBase extends BaseScene {
@@ -113,7 +115,7 @@ export class JourneyBuilderScene extends BuilderBase {
 
   onWindowResize(): void {
     this.journeyRegion.onWindowResize()
-    this.catalogRegion.onWindowResize()
+    this.catalogRegion.resize(Space.deckPanelWidth)
   }
 
   addCardToDeck(card: Card): string {
@@ -161,6 +163,8 @@ export class JourneyBuilderScene extends BuilderBase {
 
 export class BuilderScene extends BuilderBase {
   lastDecklist: number
+  pinned: boolean = true
+  sizer: Sizer
 
   constructor() {
     super({
@@ -186,16 +190,50 @@ export class BuilderScene extends BuilderBase {
 
     this.filterRegion = new FilterRegion().create(this, false)
 
+    // Add each sizer to a main sizer
+    this.sizer = this.rexUI.add
+      .sizer()
+      .setOrigin(0)
+      .add(this.decklistsRegion.scrollablePanel)
+      .add(this.deckRegion.scrollablePanel)
+      .hide(this.deckRegion.scrollablePanel)
+
+    // Add the pin / unpin button
+    this.addPinButton()
+
     // Set starting deck
     if (this.lastDecklist !== undefined) {
       this.decklistsRegion.selectDeck(this.lastDecklist)
     }
   }
 
+  private addPinButton() {
+    // Add the SmallX button to the scene
+    new Buttons.Icon({
+      name: 'SmallX',
+      within: this,
+      x: Space.pad,
+      y: Space.filterBarHeight + Space.pad,
+      f: () => {
+        this.pinned = !this.pinned
+        if (this.pinned) {
+          this.sizer.show(this.decklistsRegion.scrollablePanel)
+        } else {
+          this.sizer.hide(this.decklistsRegion.scrollablePanel)
+        }
+
+        this.sizer.layout()
+
+        // Resize the catalog
+        this.catalogRegion.resize(this.sizer.width)
+      },
+    }).setDepth(100)
+  }
+
   onWindowResize(): void {
     this.decklistsRegion.onWindowResize()
     this.deckRegion.onWindowResize()
-    this.catalogRegion.onWindowResize()
+    this.catalogRegion.resize(this.sizer.width)
   }
 
   addCardToDeck(card: Card): string {
@@ -229,12 +267,16 @@ export class BuilderScene extends BuilderBase {
   }
 
   setDeck(deckCode: Card[]): boolean {
-    // Animate the deck panel sliding out to be seen
-    this.deckRegion.showPanel()
-    this.catalogRegion.shiftRight()
+    // Show the deck region
+    this.sizer.show(this.deckRegion.scrollablePanel).layout()
 
-    let result = super.setDeck(deckCode)
+    // Resize the catalog
+    this.catalogRegion.resize(this.sizer.width)
 
+    // Get the new deck
+    const result = super.setDeck(deckCode)
+
+    // Update the saved deck
     this.updateSavedDeck(this.getDeckCode())
 
     return result
@@ -307,8 +349,9 @@ export class BuilderScene extends BuilderBase {
   // Deselect whatever decklist is selected
   deselect(): void {
     this.decklistsRegion.deselect()
+    this.sizer.hide(this.deckRegion.scrollablePanel).layout()
 
-    this.deckRegion.hidePanel()
-    this.catalogRegion.shiftLeft()
+    // Resize the catalog
+    this.catalogRegion.resize(this.sizer.width)
   }
 }

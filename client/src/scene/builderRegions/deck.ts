@@ -44,7 +44,7 @@ export default class DeckRegion {
   ) => void
 
   // The panel within which all of the cards are
-  private scrollablePanel: ScrollablePanel
+  scrollablePanel: ScrollablePanel
   private panel
 
   // Button allowing user to Start, or showing the count of cards in their deck

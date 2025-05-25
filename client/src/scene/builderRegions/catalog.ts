@@ -211,15 +211,17 @@ export default class CatalogRegion {
     }
   }
 
-  onWindowResize(): void {
-    const width = this.shifted
-      ? Space.windowWidth - Space.decklistPanelWidth - Space.deckPanelWidth
-      : Space.windowWidth - Space.decklistPanelWidth
+  resize(occupiedWidth: number): void {
+    const width = Space.windowWidth - occupiedWidth
+    const ratio = this.panel.t
 
-    this.panel.setMinSize(width, Space.windowHeight)
-    this.panel.setX(Space.windowWidth)
+    this.panel
+      .setMinSize(width, Space.windowHeight)
+      .setX(Space.windowWidth)
+      .layout()
 
-    this.panel.layout()
+    // Ensure that panel is within scroll bounds
+    this.panel.t = Math.min(0.999999, ratio)
   }
 }
 
@@ -232,12 +234,5 @@ export class CatalogRegionJourney extends CatalogRegion {
       .layout()
 
     return this
-  }
-
-  onWindowResize(): void {
-    this.panel
-      .setMinSize(Space.windowWidth - Space.deckPanelWidth, Space.windowHeight)
-      .setX(Space.windowWidth)
-      .layout()
   }
 }
