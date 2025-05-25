@@ -198,15 +198,22 @@ export class BuilderScene extends BuilderBase {
     this.sizer = this.rexUI.add
       .sizer({
         orientation: 'horizontal',
+        anchor: {
+          width: '100%',
+          height: '100%',
+        },
       })
       .add(this.decklistsRegion.scrollablePanel)
       .add(this.deckRegion.scrollablePanel)
-      .add(this.catalogRegion.scrollablePanel)
-      .setOrigin(0)
-      .layout()
+      .hide(this.deckRegion.scrollablePanel)
+      .add(this.catalogRegion.scrollablePanel, { expand: true, proportion: 1 })
+
+    this.sizer.setOrigin(0).layout()
   }
 
   onWindowResize(): void {
+    return
+    // TODO: Fix this
     this.decklistsRegion.onWindowResize()
     this.deckRegion.onWindowResize()
     this.catalogRegion.onWindowResize()

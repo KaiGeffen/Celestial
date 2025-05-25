@@ -45,22 +45,16 @@ export default class CatalogRegion {
 
   private createPanel(scene: BuilderBase): void {
     // Make the object
-    let panel = scene.rexUI.add.fixWidthSizer({
+    let panel = scene.rexUI.add.sizer({
       space: {
         left: Space.pad,
         right: Space.pad,
         top: Space.filterBarHeight + Space.pad,
         bottom: Space.pad - 10,
         item: Space.pad,
-        line: Space.pad,
       },
     })
     this.scrollablePanel = newScrollablePanel(scene, {
-      x: Space.windowWidth,
-      y: 0,
-      width: Space.windowWidth - Space.decklistPanelWidth,
-      height: Space.windowHeight,
-
       panel: {
         child: panel,
       },
