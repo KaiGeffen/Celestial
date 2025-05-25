@@ -60,8 +60,8 @@ function getSpace() {
     // Dimensions for common buttons
     buttonWidth: 150,
     buttonHeight: 58,
-    textboxWidth: 255,
-    textboxHeight: 40,
+    textboxWidth: 296,
+    textboxHeight: 58,
 
     cutoutHeight: 49,
 
