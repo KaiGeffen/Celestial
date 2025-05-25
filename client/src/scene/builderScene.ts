@@ -12,6 +12,7 @@ import { Space } from '../settings/settings'
 import { DecklistSettings } from '../../../shared/settings'
 import Catalog from '../../../shared/state/catalog'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 // Features common between all builders
 export class BuilderBase extends BaseScene {
@@ -19,6 +20,8 @@ export class BuilderBase extends BaseScene {
   deckRegion: DeckRegion
   decklistsRegion: DecklistsRegion
   filterRegion: FilterRegion
+
+  sizer: Sizer
 
   // The params with which this class was invoked
   params
@@ -190,6 +193,17 @@ export class BuilderScene extends BuilderBase {
     if (this.lastDecklist !== undefined) {
       this.decklistsRegion.selectDeck(this.lastDecklist)
     }
+
+    // Layout each region
+    this.sizer = this.rexUI.add
+      .sizer({
+        orientation: 'horizontal',
+      })
+      .add(this.decklistsRegion.scrollablePanel)
+      .add(this.deckRegion.scrollablePanel)
+      .add(this.catalogRegion.scrollablePanel)
+      .setOrigin(0)
+      .layout()
   }
 
   onWindowResize(): void {
@@ -230,8 +244,9 @@ export class BuilderScene extends BuilderBase {
 
   setDeck(deckCode: Card[]): boolean {
     // Animate the deck panel sliding out to be seen
-    this.deckRegion.showPanel()
-    this.catalogRegion.shiftRight()
+    // this.deckRegion.scrollablePanel.setVisible(true)
+    this.sizer.show(this.deckRegion.scrollablePanel)
+    this.sizer.layout()
 
     let result = super.setDeck(deckCode)
 
@@ -308,7 +323,7 @@ export class BuilderScene extends BuilderBase {
   deselect(): void {
     this.decklistsRegion.deselect()
 
-    this.deckRegion.hidePanel()
-    this.catalogRegion.shiftLeft()
+    this.sizer.hide(this.deckRegion.scrollablePanel)
+    this.sizer.layout()
   }
 }

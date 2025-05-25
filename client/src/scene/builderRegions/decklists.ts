@@ -21,6 +21,7 @@ import Catalog from '../../../../shared/state/catalog'
 import { BuilderBase, BuilderScene } from '../builderScene'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import UserDataServer from '../../network/userDataServer'
+
 const width = Space.decklistPanelWidth
 
 // Region of the deck builder which contains all the decklists

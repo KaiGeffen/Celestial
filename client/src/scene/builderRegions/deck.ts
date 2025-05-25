@@ -9,7 +9,6 @@ import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import Cutout from '../../lib/buttons/cutout'
 import Card from '../../../../shared/state/card'
-import { decodeCard, encodeShareableDeckCode } from '../../../../shared/codec'
 import {
   Color,
   Space,
@@ -44,7 +43,7 @@ export default class DeckRegion {
   ) => void
 
   // The panel within which all of the cards are
-  private scrollablePanel: ScrollablePanel
+  scrollablePanel: ScrollablePanel
   private panel
 
   // Button allowing user to Start, or showing the count of cards in their deck
@@ -441,21 +440,11 @@ export default class DeckRegion {
   }
 
   hidePanel(): void {
-    this.scene.tweens.add({
-      targets: this.scrollablePanel,
-      x: X_START,
-      duration: Time.builderSlide(),
-      ease: Ease.slide,
-    })
+    this.scrollablePanel.setVisible(false)
   }
 
   showPanel(): void {
-    this.scene.tweens.add({
-      targets: this.scrollablePanel,
-      x: Space.decklistPanelWidth,
-      duration: Time.builderSlide(),
-      ease: Ease.slide,
-    })
+    this.scrollablePanel.setVisible(true)
   }
 
   isOverfull(): boolean {

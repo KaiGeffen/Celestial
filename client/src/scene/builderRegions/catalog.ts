@@ -13,7 +13,7 @@ export default class CatalogRegion {
   scene: BuilderBase
 
   // The scrollable panel on which the catalog exists
-  protected panel
+  scrollablePanel
 
   // Whether the catalog has been shifted to the right
   private shifted = false
@@ -38,7 +38,7 @@ export default class CatalogRegion {
         this.createCard(card)
       })
 
-    this.panel.layout()
+    this.scrollablePanel.layout()
 
     return this
   }
@@ -55,7 +55,7 @@ export default class CatalogRegion {
         line: Space.pad,
       },
     })
-    this.panel = newScrollablePanel(scene, {
+    this.scrollablePanel = newScrollablePanel(scene, {
       x: Space.windowWidth,
       y: 0,
       width: Space.windowWidth - Space.decklistPanelWidth,
@@ -87,18 +87,18 @@ export default class CatalogRegion {
         this.scene.hint.hide()
 
         // Scroll panel down by amount wheel moved
-        this.panel.childOY -= dy
+        this.scrollablePanel.childOY -= dy
 
         // Ensure that panel isn't out bounds (Below 0% or above 100% scroll)
-        this.panel.t = Math.max(0, this.panel.t)
-        this.panel.t = Math.min(0.999999, this.panel.t)
+        this.scrollablePanel.t = Math.max(0, this.scrollablePanel.t)
+        this.scrollablePanel.t = Math.min(0.999999, this.scrollablePanel.t)
       },
     )
   }
 
   // Filter which cards can be selected in the catalog based on current filtering parameters
   filter(filterFunction: (card: Card) => boolean): void {
-    let sizer = this.panel.getElement('panel')
+    let sizer = this.scrollablePanel.getElement('panel')
     sizer.clear()
 
     // For each card in the catalog, add it to the sizer if it satisfies
@@ -118,13 +118,13 @@ export default class CatalogRegion {
     }
 
     // Reset the scroll
-    this.panel.t = 0
+    this.scrollablePanel.t = 0
 
-    this.panel.layout()
+    this.scrollablePanel.layout()
   }
 
   private createCard(card: Card): void {
-    const container = this.panel.getElement('panel')
+    const container = this.scrollablePanel.getElement('panel')
 
     const cardImage = new CardImage(card, container)
       .setOnClick(this.onClickCatalogCard(card))
@@ -169,18 +169,18 @@ export default class CatalogRegion {
     const width = Space.windowWidth - x
 
     // Ratio of how much panel has been scrolled
-    const ratio = this.panel.t
+    const ratio = this.scrollablePanel.t
 
     // Animate shift
-    if (this.panel.minWidth > width) {
+    if (this.scrollablePanel.minWidth > width) {
       this.scene.tweens.add({
-        targets: this.panel,
+        targets: this.scrollablePanel,
         minWidth: width,
         duration: Time.builderSlide(),
         ease: Ease.slide,
         onUpdate: () => {
-          this.panel.layout()
-          this.panel.t = ratio
+          this.scrollablePanel.layout()
+          this.scrollablePanel.t = ratio
         },
       })
     }
@@ -194,18 +194,18 @@ export default class CatalogRegion {
     const width = Space.windowWidth - x
 
     // Ratio of how much panel has been scrolled
-    const ratio = this.panel.t
+    const ratio = this.scrollablePanel.t
 
     // Animate shift
-    if (this.panel.minWidth < width) {
+    if (this.scrollablePanel.minWidth < width) {
       this.scene.tweens.add({
-        targets: this.panel,
+        targets: this.scrollablePanel,
         minWidth: width,
         duration: Time.builderSlide(),
         ease: Ease.slide,
         onUpdate: () => {
-          this.panel.layout()
-          this.panel.t = ratio
+          this.scrollablePanel.layout()
+          this.scrollablePanel.t = ratio
         },
       })
     }
@@ -216,10 +216,10 @@ export default class CatalogRegion {
       ? Space.windowWidth - Space.decklistPanelWidth - Space.deckPanelWidth
       : Space.windowWidth - Space.decklistPanelWidth
 
-    this.panel.setMinSize(width, Space.windowHeight)
-    this.panel.setX(Space.windowWidth)
+    this.scrollablePanel.setMinSize(width, Space.windowHeight)
+    this.scrollablePanel.setX(Space.windowWidth)
 
-    this.panel.layout()
+    this.scrollablePanel.layout()
   }
 }
 
@@ -227,7 +227,7 @@ export class CatalogRegionJourney extends CatalogRegion {
   create(scene: BuilderBase) {
     super.create(scene)
 
-    this.panel
+    this.scrollablePanel
       .setMinSize(Space.windowWidth - Space.deckPanelWidth, Space.windowHeight)
       .layout()
 
@@ -235,7 +235,7 @@ export class CatalogRegionJourney extends CatalogRegion {
   }
 
   onWindowResize(): void {
-    this.panel
+    this.scrollablePanel
       .setMinSize(Space.windowWidth - Space.deckPanelWidth, Space.windowHeight)
       .setX(Space.windowWidth)
       .layout()
