@@ -218,7 +218,7 @@ export default class DeckRegion {
     // Create an overlap sizer to position the count text over the button
     let overlapSizer = this.scene.rexUI.add
       .overlapSizer({
-        width: Space.buttonWidth,
+        width: width - Space.avatarSize - Space.pad * 2,
         height: Space.bigButtonHeight,
       })
       .add(containerStart)
@@ -226,15 +226,7 @@ export default class DeckRegion {
         offsetY: Space.bigButtonHeight / 2 - Space.pad,
       })
 
-    // Make a container for all of the buttons
-    let sizerButtons = this.scene.rexUI.add
-      .fixWidthSizer({
-        width: width - Space.avatarSize - Space.pad * 2,
-        align: 'center',
-      })
-      .add(overlapSizer)
-
-    return sizerButtons
+    return overlapSizer
   }
 
   // Add the given card and return the created cardImage
@@ -410,6 +402,7 @@ export default class DeckRegion {
 
     // Update the count text
     this.txtCount.setText(`${totalCount}/${MechanicsSettings.DECK_SIZE}`)
+    this.txtCount.setVisible(totalCount !== MechanicsSettings.DECK_SIZE)
 
     // Enable/disable the start button based on deck size
     if (totalCount === MechanicsSettings.DECK_SIZE) {
