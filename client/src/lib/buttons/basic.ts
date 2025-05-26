@@ -3,25 +3,28 @@ import Button from './button'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import { UserSettings } from '../../settings/userSettings'
 
-export default class BasicButton extends Button {
-  constructor({
-    within,
-    text = '',
-    x = 0,
-    y = 0,
-    f = () => {},
-    muteClick = false,
-    returnHotkey = false,
-    origin = [0.5, 0.5],
-    depth = undefined,
-  }) {
+class BaseButton extends Button {
+  constructor(
+    icon: string,
+    {
+      within,
+      text = '',
+      x = 0,
+      y = 0,
+      f = () => {},
+      muteClick = false,
+      returnHotkey = false,
+      origin = [0.5, 0.5],
+      depth = undefined,
+    },
+  ) {
     super(within, x, y, {
       text: {
         text: text.toUpperCase(),
         interactive: false,
       },
       icon: {
-        name: 'Button',
+        name: icon,
         interactive: true,
       },
       callbacks: {
@@ -76,5 +79,17 @@ export default class BasicButton extends Button {
     this.icon.setFrame(0)
 
     return this
+  }
+}
+
+export class BasicButton extends BaseButton {
+  constructor(args) {
+    super('Button', args)
+  }
+}
+
+export class BigButton extends BaseButton {
+  constructor(args) {
+    super('BigButton', args)
   }
 }

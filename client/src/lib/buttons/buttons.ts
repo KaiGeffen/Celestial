@@ -1,4 +1,4 @@
-import BasicButton from './basic'
+import { BasicButton, BigButton } from './basic'
 import AvatarButton from './avatar'
 import DecklistButton from './decklist'
 import TextButton from './text'
@@ -13,6 +13,7 @@ import Moon from './moon'
 // Export all of the available buttons
 export default class Buttons {
   static Basic = BasicButton
+  static Big = BigButton
   static Avatar = AvatarButton
   static Decklist = DecklistButton
   static Text = TextButton

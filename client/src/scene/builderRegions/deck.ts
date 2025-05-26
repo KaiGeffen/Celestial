@@ -197,9 +197,9 @@ export default class DeckRegion {
       0,
       0,
       Space.buttonWidth,
-      Space.avatarSize,
+      Space.bigButtonHeight,
     )
-    this.btnStart = new Buttons.Basic({
+    this.btnStart = new Buttons.Big({
       within: containerStart,
       text: `0/${MechanicsSettings.DECK_SIZE}`,
       f: startCallback,
