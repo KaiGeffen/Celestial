@@ -18,6 +18,7 @@ export default class Cinematic {
 
     // Remove hiding from it
     animation.style.display = ''
+    animation.play()
 
     // Make sure the right file is playing
     if (animation.src === '') {

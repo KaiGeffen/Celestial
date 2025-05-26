@@ -30,9 +30,13 @@ export default class FilterRegion {
     this.scene = scene
     this.filterUnowned = filterUnowned
 
-    const background = scene.add
-      .rectangle(0, 0, 100, 100, Color.backgroundLight)
-      .setDepth(2)
+    const background = scene.add.rectangle(
+      0,
+      0,
+      100,
+      100,
+      Color.backgroundLight,
+    )
 
     // Add drop shadow to background
     scene.plugins.get('rexDropShadowPipeline')['add'](background, {
@@ -55,7 +59,7 @@ export default class FilterRegion {
       .add(this.createBackButton().setDepth(2))
       .add(this.createSearchText().setDepth(2))
       .add(this.createFilterButtons().setDepth(2))
-      .addBackground(background)
+      .addBackground(background.setDepth(2))
       .layout()
 
     return this

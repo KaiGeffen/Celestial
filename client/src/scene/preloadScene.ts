@@ -20,6 +20,8 @@ import ensureMusic from '../loader/audioManager'
 import Cinematic from '../lib/cinematic'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
+const GSI_TOKEN_KEY = 'gsi_token'
+
 // Scene for user to select a sign in option, without loading assets
 export class SigninScene extends Phaser.Scene {
   // Allows for typing objects in RexUI library
@@ -36,24 +38,28 @@ export class SigninScene extends Phaser.Scene {
   }
 
   create(): void {
-    // Sign in button is visible while on this scene and hidden otherwise
-    document.getElementById('signin').hidden = false
-    this.events.on('shutdown', () => {
-      document.getElementById('signin').hidden = true
-    })
-
-    // Ensure user is signed out
+    // Clear any session storage (Related to a single page visit, not local storage)
     UserSettings.clearSessionStorage()
 
     // Ensure animation is displayed
     Cinematic.ensure()
 
-    // Add buttons to sign in or play as a guest
-    this.createButtons()
+    // If user is signed in, log them in
+    const storedToken = localStorage.getItem(GSI_TOKEN_KEY)
+    if (storedToken !== null) {
+      const payload = jwt_decode<GoogleJwtPayload>(storedToken)
+      UserDataServer.login(payload, this.game, () => this.onOptionClick())
+    }
+    // If user is not signed in, show gsi and guest button
+    else {
+      // Sign in is visible on this page, hidden on all other pages
+      document.getElementById('signin').hidden = false
+      this.events.on('shutdown', () => {
+        document.getElementById('signin').hidden = true
+      })
 
-    // On mobile, encourage user to lock in landscape mode
-    if (Flags.mobile) {
-      this.createLandscapeMessaging()
+      // Add buttons to sign in or play as a guest
+      this.createButtons()
     }
   }
 
@@ -73,48 +79,10 @@ export class SigninScene extends Phaser.Scene {
       depth: -1,
     })
       // Hide the guest button if user is already signed in
-      .setVisible(localStorage.getItem('gsi_token') === null)
+      .setVisible(localStorage.getItem(GSI_TOKEN_KEY) === null)
 
     // TODO Use y value
     this.createGoogleGSIButton()
-  }
-
-  // Create elements which encourage the user to be in landscape mode
-  private createLandscapeMessaging(): void {
-    function isLandscape() {
-      switch (screen.orientation.type) {
-        case 'landscape-primary':
-        case 'landscape-secondary':
-          return true
-        default:
-          return false
-      }
-    }
-
-    let txt = this.rexUI.add
-      .BBCodeText(
-        Space.windowWidth / 2,
-        Space.windowHeight / 2,
-        'Use landscape mode',
-        BBStyle.error,
-      )
-      .setOrigin(0.5)
-      .setInteractive()
-      .setVisible(!isLandscape())
-
-    screen.orientation.onchange = () => {
-      // Brief delay to ensure that dimensions have changed
-      setTimeout(() => {
-        // Center guest button
-        const x = window.innerWidth / 2
-        const y = window.innerHeight / 2
-        this.guestButton.setPosition(x, y)
-        txt.setPosition(x, y)
-      }, 5)
-
-      // Set blocking text visibility based on new orientation
-      txt.setVisible(!isLandscape())
-    }
   }
 
   private onOptionClick(): void {
@@ -140,7 +108,7 @@ export class SigninScene extends Phaser.Scene {
       auto_select: true,
       callback: (token: CredentialResponse) => {
         // Store the token for next time
-        localStorage.setItem('gsi_token', token.credential)
+        localStorage.setItem(GSI_TOKEN_KEY, token.credential)
 
         const payload = jwt_decode<GoogleJwtPayload>(token.credential)
 
@@ -157,13 +125,6 @@ export class SigninScene extends Phaser.Scene {
       text: 'signin',
       width: Space.buttonWidth,
     })
-
-    // User was previously signed in, try to auto-login
-    const storedToken = localStorage.getItem('gsi_token')
-    if (storedToken) {
-      const payload = jwt_decode<GoogleJwtPayload>(storedToken)
-      UserDataServer.login(payload, this.game, () => this.onOptionClick())
-    }
   }
 
   // Navigate to the first scene user should see (Home or Tutorial)
