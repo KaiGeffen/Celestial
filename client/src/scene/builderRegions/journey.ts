@@ -36,6 +36,7 @@ export default class DeckRegion {
   private avatarID: number
 
   private txtChoice: Phaser.GameObjects.Text
+  private txtCount: Phaser.GameObjects.Text
 
   create(
     scene: Phaser.Scene,
@@ -138,21 +139,38 @@ export default class DeckRegion {
       sizer.add(container).addSpace()
     }
 
-    // Start button - Show how many cards are in deck, and enable user to start if deck is full
+    // Start button with count text overlay
     let containerStart = new ContainerLite(
       this.scene,
       0,
       0,
       Space.buttonWidth,
-      Space.avatarSize,
+      Space.bigButtonHeight,
     )
-    this.btnStart = new Buttons.Basic({
+    this.btnStart = new Buttons.Big({
       within: containerStart,
-      text: `0/${MechanicsSettings.DECK_SIZE}`,
+      text: 'Start',
       f: startCallback,
       muteClick: true,
     })
-    sizer.add(containerStart).addSpace()
+
+    // Add text showing card count
+    this.txtCount = this.scene.add
+      .text(0, 0, '0/15', Style.basic)
+      .setOrigin(0.5)
+
+    // Create an overlap sizer to position the count text over the button
+    let overlapSizer = this.scene.rexUI.add
+      .overlapSizer({
+        width: width - Space.avatarSize - Space.pad * 2,
+        height: Space.bigButtonHeight,
+      })
+      .add(containerStart)
+      .add(this.txtCount, {
+        offsetY: Space.bigButtonHeight / 2 - Space.pad,
+      })
+
+    sizer.add(overlapSizer).addSpace()
 
     // Add this deck's avatar
     let containerAvatar = new ContainerLite(
@@ -401,13 +419,14 @@ export default class DeckRegion {
       )
     }
 
+    // Update the count text
+    this.txtCount.setText(`${totalCount}/${MechanicsSettings.DECK_SIZE}`)
+    this.txtCount.setVisible(totalCount !== MechanicsSettings.DECK_SIZE)
+
+    // Enable/disable the start button based on deck size
     if (totalCount === MechanicsSettings.DECK_SIZE) {
-      this.btnStart.setText('Start')
       this.btnStart.enable()
     } else {
-      this.btnStart.setText(`${totalCount}/${MechanicsSettings.DECK_SIZE}`)
-
-      // TODO Grey out the button, have a disable method for button class
       // For debugging, allow sub-15 card decks locally
       if (location.port !== '4949') {
         this.btnStart.disable()
