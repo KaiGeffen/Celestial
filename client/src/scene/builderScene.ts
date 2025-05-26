@@ -198,6 +198,11 @@ export class BuilderScene extends BuilderBase {
       .add(this.deckRegion.scrollablePanel)
       .hide(this.deckRegion.scrollablePanel)
 
+    if (!this.pinned) {
+      this.sizer.hide(this.decklistsRegion.scrollablePanel)
+      this.catalogRegion.resize(this.sizer.width)
+    }
+
     // Add the pin / unpin button
     this.addPinButton()
 
