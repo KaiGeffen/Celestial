@@ -205,7 +205,7 @@ export default class DeckRegion {
     )
     this.btnStart = new Buttons.Big({
       within: containerStart,
-      text: 'Start',
+      text: 'Play',
       f: startCallback,
       muteClick: true,
     })
