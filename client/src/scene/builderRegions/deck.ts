@@ -17,6 +17,7 @@ import {
   Time,
   Ease,
   Flags,
+  Style,
 } from '../../settings/settings'
 import { BuilderScene } from '../builderScene'
 import newScrollablePanel from '../../lib/scrollablePanel'
@@ -57,6 +58,9 @@ export default class DeckRegion {
   cosmeticSet: CosmeticSet
   private avatar: AvatarButton
   private txtDeckName: RexUIPlugin.BBCodeText
+
+  // Add text showing card count
+  private txtCount: Phaser.GameObjects.Text
 
   create(
     scene: BuilderScene,
@@ -201,19 +205,34 @@ export default class DeckRegion {
     )
     this.btnStart = new Buttons.Big({
       within: containerStart,
-      text: `0/${MechanicsSettings.DECK_SIZE}`,
+      text: 'Start',
       f: startCallback,
       muteClick: true,
     })
 
+    // Add text showing card count
+    this.txtCount = this.scene.add
+      .text(0, 0, '0/15', Style.basic)
+      .setOrigin(0.5)
+
+    // Create an overlap sizer to position the count text over the button
+    let overlapSizer = this.scene.rexUI.add
+      .overlapSizer({
+        width: Space.buttonWidth,
+        height: Space.bigButtonHeight,
+      })
+      .add(containerStart)
+      .add(this.txtCount, {
+        offsetY: Space.bigButtonHeight / 2 - Space.pad,
+      })
+
     // Make a container for all of the buttons
     let sizerButtons = this.scene.rexUI.add
       .fixWidthSizer({
-        width:
-          width - Space.pad - (Flags.mobile ? 0 : Space.avatarSize + Space.pad),
+        width: width - Space.avatarSize - Space.pad * 2,
         align: 'center',
       })
-      .add(containerStart)
+      .add(overlapSizer)
 
     return sizerButtons
   }
@@ -389,16 +408,17 @@ export default class DeckRegion {
       totalCount += cutout.count
     })
 
+    // Update the count text
+    this.txtCount.setText(`${totalCount}/${MechanicsSettings.DECK_SIZE}`)
+
+    // Enable/disable the start button based on deck size
     if (totalCount === MechanicsSettings.DECK_SIZE) {
-      this.btnStart.setText('Start')
       this.btnStart.enable()
     } else {
-      this.btnStart.setText(`${totalCount}/${MechanicsSettings.DECK_SIZE}`)
-
       // For debugging, allow sub-15 card decks locally
-      if (!Flags.local) {
-        this.btnStart.disable()
-      }
+      // if (!Flags.local) {
+      this.btnStart.disable()
+      // }
     }
   }
 
