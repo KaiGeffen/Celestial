@@ -8,6 +8,7 @@ import Buttons from '../../lib/buttons/buttons'
 import UButton from '../../lib/buttons/underlined'
 
 import { BuilderBase } from '../builderScene'
+import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite'
 
 const maxCostFilter: number = 7
 
@@ -29,98 +30,66 @@ export default class FilterRegion {
     this.scene = scene
     this.filterUnowned = filterUnowned
 
-    if (Flags.mobile) {
-      const x = Space.windowWidth - Space.pad * 2 - (Space.iconSize * 3) / 2
-      const y = Space.pad + Space.iconSize / 2
-      let container = scene.add.container(x, y)
-      let btnSearch = new Buttons.Icon({
-        name: 'Search',
-        within: container,
-        x: 0,
-        y: 0,
-        f: () => {
-          this.scene.scene.launch('MenuScene', {
-            menu: 'search',
-            callback: (s: string) => {
-              // Filter the visible cards based on the text
-              this.searchText = s
-              this.scene.filter()
-            },
-            start: this.searchText,
-          })
+    const background = scene.add
+      .rectangle(0, 0, 100, 100, Color.backgroundLight)
+      .setDepth(2)
+
+    // Add drop shadow to background
+    scene.plugins.get('rexDropShadowPipeline')['add'](background, {
+      distance: 3,
+      angle: -90,
+      shadowColor: 0x000000,
+    })
+
+    scene.rexUI.add
+      .sizer({
+        space: {
+          left: Space.pad,
+          right: Space.pad,
+          top: Space.padSmall,
+          bottom: Space.padSmall,
+          item: Space.pad * 2,
         },
       })
-    } else {
-      let container = scene.add.container().setDepth(2)
-
-      this.createBackground(container)
-
-      new Buttons.Basic({
-        within: container,
-        text: 'Back',
-        x: Space.pad + Space.buttonWidth / 2,
-        y: 40,
-        f: () => {
-          scene.doBack()
-        },
-      })
-
-      this.createFilterButtons(container)
-
-      this.createTextSearch(container)
-    }
+      .setOrigin(0)
+      .add(this.createBackButton().setDepth(2))
+      .add(this.createSearchText().setDepth(2))
+      .add(this.createFilterButtons().setDepth(2))
+      .addBackground(background)
+      .layout()
 
     return this
   }
 
-  private createBackground(container: Phaser.GameObjects.Container) {
-    let background
-    background = this.scene.add
-      .image(0, 0, 'chrome-SearchBar')
-      .setOrigin(0)
-      .setInteractive(
-        new Phaser.Geom.Rectangle(
-          0,
-          0,
-          Space.windowWidth - 40,
-          Space.filterBarHeight,
-        ),
-        Phaser.Geom.Rectangle.Contains,
-      )
-
-    container.add(background)
+  private createBackButton() {
+    const container = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: container,
+      text: 'Back',
+      f: () => {
+        this.scene.doBack()
+      },
+    })
+    return container
   }
 
-  private createFilterButtons(container: Phaser.GameObjects.Container) {
-    // Where the filter buttons start
-    const x0 = 620
-    const y = 40
-
-    // Cost filters
-    container.add(
-      this.scene.add.text(x0, y, 'Cost:', Style.builder).setOrigin(1, 0.5),
+  private createSearchText() {
+    const container = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.textboxWidth,
+      Space.textboxHeight,
     )
 
-    let btns = []
-    for (let i = 0; i <= 7; i++) {
-      let s = i === 7 ? '7+' : i.toString()
-      let btn = new UButton(container, x0 + 35 + i * 41, y, s)
-      btn.setOnClick(this.onClickFilterButton(i, btns))
-
-      btns.push(btn)
-    }
-    let btnX = new Buttons.Icon({
-      name: 'SmallX',
-      within: container,
-      x: x0 + 44 + 8 * 41,
-      y: y + 3,
-      f: this.onClearFilters(btns),
-    })
-  }
-
-  private createTextSearch(container: Phaser.GameObjects.Container) {
     this.searchObj = this.scene.add
-      .rexInputText(369, 40, Space.textboxWidth, Space.textboxHeight, {
+      .rexInputText(0, 0, Space.textboxWidth, Space.textboxHeight, {
         type: 'text',
         text: this.searchText,
         align: 'center',
@@ -145,13 +114,55 @@ export default class FilterRegion {
       .removeInteractive()
 
     // Reskin for text input
-    let icon = this.scene.add.image(
-      this.searchObj.x,
-      this.searchObj.y,
-      'icon-InputText',
-    )
+    let icon = this.scene.add.image(0, 0, 'icon-InputText')
 
     container.add([this.searchObj, icon])
+
+    return container
+  }
+
+  private createFilterButtons() {
+    const sizer = this.scene.rexUI.add.sizer({
+      space: {
+        item: Space.padSmall,
+      },
+    })
+
+    // Cost filters
+    sizer.add(
+      this.scene.add.text(0, 0, 'Cost:', Style.builder).setOrigin(1, 0.5),
+    )
+
+    // Make a sizer with no space between items for the buttons
+    const buttonsSizer = this.scene.rexUI.add.sizer()
+    sizer.add(buttonsSizer)
+
+    let btns = []
+    for (let i = 0; i <= 7; i++) {
+      const container = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        41,
+        Space.buttonHeight,
+      )
+      buttonsSizer.add(container)
+
+      let s = i === 7 ? '7+' : i.toString()
+
+      let btn = new UButton(container, 0, 0, s)
+      btn.setOnClick(this.onClickFilterButton(i, btns))
+
+      btns.push(btn)
+    }
+
+    new Buttons.Icon({
+      name: 'SmallX',
+      within: sizer,
+      f: this.onClearFilters(btns),
+    })
+
+    return sizer
   }
 
   private onClickFilterButton(thisI: number, btns: UButton[]): () => void {
