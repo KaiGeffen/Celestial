@@ -20,7 +20,7 @@ class BaseButton extends Button {
   ) {
     super(within, x, y, {
       text: {
-        text: text.toUpperCase(),
+        text: text,
         interactive: false,
       },
       icon: {
@@ -91,5 +91,8 @@ export class BasicButton extends BaseButton {
 export class BigButton extends BaseButton {
   constructor(args) {
     super('BigButton', args)
+
+    // Increase font size
+    this.txt.setFontSize(35)
   }
 }
