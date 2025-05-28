@@ -646,12 +646,20 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     const timeText = this.add.text(0, 0, `\t${timeS}`, Style.basic)
 
     // Opponent Info
-    const oppContainer = new ContainerLite(this).setOrigin(0)
+    const oppSizer = this.rexUI.add.sizer({
+      space: { left: -Space.avatarSize },
+    })
+    const oppAvatarContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.avatarSize,
+      Space.avatarSize,
+    )
     new Buttons.Avatar({
-      within: oppContainer,
+      within: oppAvatarContainer,
       avatarId: entry.opponentDeck.cosmeticSet.avatar,
       border: entry.opponentDeck.cosmeticSet.border,
-      origin: [1, 0.5],
     })
     const oppText = this.add
       .text(
@@ -661,19 +669,27 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         Style.basic,
       )
       .setOrigin(0, 0.5)
-    oppContainer.add(oppText)
+    oppSizer.add(oppAvatarContainer).add(oppText)
 
     // Results text
     const resultS = `     ${entry.wasWin ? 'Win' : 'Loss'}\n    ${entry.roundsWon}-${entry.roundsLost}-${entry.roundsTied}`
     let resultsText = this.add.text(0, 0, resultS, Style.basic)
 
     // User Info
-    const userContainer = new ContainerLite(this).setOrigin(0)
+    const userSizer = this.rexUI.add.sizer({
+      space: { left: -Space.avatarSize },
+    })
+    const userAvatarContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.avatarSize,
+      Space.avatarSize,
+    )
     new Buttons.Avatar({
-      within: userContainer,
+      within: userAvatarContainer,
       avatarId: entry.deck.cosmeticSet.avatar,
       border: entry.deck.cosmeticSet.border,
-      origin: [1, 0.5],
     })
     const userText = this.add
       .text(
@@ -683,7 +699,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         Style.basic,
       )
       .setOrigin(0, 0.5)
-    userContainer.add(userText)
+    userSizer.add(userAvatarContainer).add(userText)
 
     // Create expand button with arrow and make sure it's interactive
     let expandText = this.add
@@ -709,9 +725,9 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     collapsedSizer
       .addBackground(background)
       .add(timeText, { proportion: 1.5 })
-      .add(oppContainer, { proportion: 2 })
+      .add(oppSizer, { proportion: 2 })
       .add(resultsText, { proportion: 1.5 })
-      .add(userContainer, { proportion: 2 })
+      .add(userSizer, { proportion: 2 })
       .add(expandText, { proportion: 0.5 })
 
     sizer.add(collapsedSizer).add(expandedContent).addBackground(background)
@@ -824,8 +840,6 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     new Buttons.Icon({
       name: 'Share',
       within: container,
-      x: 0,
-      y: 0,
       f: this.shareCallback(cards),
     })
     return container
