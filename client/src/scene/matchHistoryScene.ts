@@ -830,16 +830,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
 
   private getShareButton(cards: number[]): ContainerLite {
     // Add the copy button
-    const container = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.iconSize,
-      Space.iconSize,
-    )
+    const container = new ContainerLite(this)
     new Buttons.Icon({
       name: 'Share',
       within: container,
+      x: Space.avatarSize / 2 + Space.iconSize / 2,
+      y: Space.iconSize / 2 + Space.pad,
       f: this.shareCallback(cards),
     })
     return container
