@@ -81,7 +81,7 @@ export class AchievementManager {
     if (
       game.roundResults[player].some((amt: number, index) => {
         const ourPoints = amt
-        const theirPoints = game.roundResults[player][index]
+        const theirPoints = game.roundResults[player ^ 1][index]
         return ourPoints <= 0 && ourPoints > theirPoints
       })
     ) {
