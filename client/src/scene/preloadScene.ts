@@ -65,14 +65,10 @@ export class SigninScene extends Phaser.Scene {
 
   // Create buttons for each of the signin options (Guest, OAuth)
   private createButtons(): void {
-    const x = Space.windowWidth / 2
-    const y = Space.windowHeight - Space.buttonHeight / 2 - Space.pad
-
+    const guestButtonContainer = this.add.container()
     this.guestButton = new Buttons.Basic({
-      within: this,
+      within: guestButtonContainer,
       text: 'Guest',
-      x,
-      y,
       f: () => {
         this.onOptionClick()
       },
@@ -81,7 +77,11 @@ export class SigninScene extends Phaser.Scene {
       // Hide the guest button if user is already signed in
       .setVisible(localStorage.getItem(GSI_TOKEN_KEY) === null)
 
-    // TODO Use y value
+    this.plugins.get('rexAnchor')['add'](guestButtonContainer, {
+      x: `50%`,
+      y: `100%-${Space.pad + Space.buttonHeight / 2}`,
+    })
+
     this.createGoogleGSIButton()
   }
 
