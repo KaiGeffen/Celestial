@@ -151,6 +151,9 @@ export default function createUserDataServer() {
 
             // Send user their data
             await sendUserData(ws, id, data)
+
+            // Handle initial achievement
+            await AchievementManager.onConnection(id)
           },
         )
         // TODO Separate this to another "Store" server eventually
