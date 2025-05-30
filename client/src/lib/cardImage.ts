@@ -23,6 +23,7 @@ export class CardImage {
   txtCost: BBCodeText
   txtPoints: BBCodeText
   txtText: BBCodeText
+  txtTitle: Phaser.GameObjects.Text
 
   // A container just for this cardImage and elements within it
   container: ContainerLite | Phaser.GameObjects.Container
@@ -184,13 +185,18 @@ export class CardImage {
       this.card = card
 
       // Destroy each of the existing elements
-      ;[this.txtCost, this.txtPoints, this.txtText].forEach((obj) => {
-        obj.destroy()
-      })
+      ;[this.txtCost, this.txtPoints, this.txtText, this.txtTitle].forEach(
+        (obj) => {
+          if (obj) {
+            obj.destroy()
+          }
+        },
+      )
 
       this.image.setTexture(`card-${card.name}`)
       this.createStats()
       this.createText()
+      this.createTitle()
     }
     return this
   }
@@ -356,7 +362,7 @@ export class CardImage {
   }
 
   private createTitle(): void {
-    const name = this.scene.add
+    this.txtTitle = this.scene.add
       .text(
         -Space.cardWidth / 2 + 56,
         -Space.cardHeight / 2 + 2,
@@ -365,7 +371,7 @@ export class CardImage {
       )
       .setOrigin(0)
 
-    this.container.add(name)
+    this.container.add(this.txtTitle)
   }
 
   // Move this cardImage above everything else in its container when it's hovered
