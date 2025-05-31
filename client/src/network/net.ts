@@ -46,9 +46,9 @@ export class MatchWS {
       console.error('Server ws closed')
     }
 
-    socket.ws.onerror = (error) => {
-      scene.signalError(`WebSocket error: ${error}`)
-      console.error('WebSocket error:', error)
+    socket.ws.onerror = (event: Event) => {
+      scene.signalError(`WebSocket error: ${event}`)
+      console.error('WebSocket error!')
     }
   }
 
