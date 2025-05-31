@@ -1,0 +1,17 @@
+{
+  "name": "celestial-load-test",
+  "version": "1.0.0",
+  "description": "Load testing for Celestial game",
+  "main": "loadTest.ts",
+  "scripts": {
+    "test": "ts-node loadTest.ts"
+  },
+  "dependencies": {
+    "ws": "^8.16.0",
+    "@types/ws": "^8.5.10",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.1.5",
+    "uuid": "^9.0.1",
+    "@types/uuid": "^9.0.8"
+  }
+}
