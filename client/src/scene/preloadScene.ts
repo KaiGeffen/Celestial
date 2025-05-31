@@ -169,6 +169,14 @@ export class PreloadScene extends SigninScene {
 
     // Load the assets used in this scene
     Loader.preload(this)
+
+    if (Flags.online) {
+      // Gain access to chart plugin for premade decks
+      this.load.script(
+        'chartjs',
+        'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js',
+      )
+    }
   }
 
   create() {

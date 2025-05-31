@@ -11,7 +11,7 @@ import MatchHistoryScene from './scene/matchHistoryScene'
 import JourneyScene from './scene/journeyScene'
 import PlaceholderScene from './scene/placeholderScene'
 
-import { Color, Space, Flags } from './settings/settings'
+import { Space } from './settings/settings'
 import addResizeHandler from './loader/windowResizeManager'
 
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
@@ -26,7 +26,6 @@ import ContainerLitePlugin from 'phaser3-rex-plugins/plugins/containerlite-plugi
 import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
 import StoreScene from './scene/storeScene'
 import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin.js'
-// import UIComponent from 'phaser3-rex-plugins/templates/ui/ui-components.js'
 
 const config: Phaser.Types.Core.GameConfig = {
   title: 'Celestial',
