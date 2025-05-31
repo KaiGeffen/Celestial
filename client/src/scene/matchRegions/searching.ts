@@ -259,13 +259,16 @@ export class SearchingRegionTutorial extends Region {
           this.textbox.stop(true)
         }
         // Otherwise move on to the next frame
-        else if (this.currentFrame < 3) {
+        else if (this.currentFrame < STORY_TEXT[tutorialNum].length) {
           this.currentFrame += 1
 
-          // Change the background image
-          this.img.setTexture(`journey-Story ${this.currentFrame}`)
+          // NOTE This is a hack to get the first tutorial to have 2 text per image frame
+          if ([3, 5].includes(this.currentFrame)) {
+            // Change the background image
+            this.img.setTexture(`journey-Story ${(this.currentFrame + 1) / 2}`)
 
-          this.tweenImage()
+            this.tweenImage()
+          }
 
           // Change the text
           const s = STORY_TEXT[tutorialNum][this.currentFrame - 1]
@@ -331,15 +334,11 @@ export class SearchingRegionTutorial extends Region {
 
 const STORY_TEXT = [
   [
-    `We called out to the people of the world.
-In desperation, curiosity, and humor.
-Come to our city, teach us what you've learned.`,
-
-    `One by one they arrived, guided by stars, and were greeted with excitement at the gate.`,
-
-    `"Traveler!
-Welcome to the city, we're glad you made it.
-What stories have you brought to tell us?"`,
+    `As your last breath leaves your lips, the soft sound of singing and sparkle of starlight stirs you.`,
+    `Step after step, you walk a path marked by countless footprints, set in clouds high above the stars.`,
+    `Finally, a great gate opens before you, and two figures with warm smiles step out to greet you.`,
+    `"Traveler!" the figure calls out. "You've arrived at last!"`,
+    `"Welcome to the City. What stories have you brought from your life to share with us?"`,
   ],
 
   [
