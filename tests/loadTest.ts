@@ -1,6 +1,5 @@
 import WebSocket from 'ws'
 import { performance } from 'perf_hooks'
-import { v4 as uuidv4 } from 'uuid'
 import { exec } from 'child_process'
 import { promisify } from 'util'
 
@@ -105,7 +104,6 @@ async function performGameAction(state: GameState) {
 async function createUserConnection(userId: number): Promise<void> {
   try {
     const socket = new WebSocket(SERVER_URL)
-    const userUuid = uuidv4()
     const gameState: GameState = {
       socket,
       userId,
@@ -125,7 +123,6 @@ async function createUserConnection(userId: number): Promise<void> {
       socket.send(
         JSON.stringify({
           type: 'initPvp',
-          uuid: userUuid,
           deck: mockDeck,
           password: '', // Empty password for public matchmaking
         }),
