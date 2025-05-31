@@ -41,6 +41,7 @@
     "@types/google-one-tap": "^1.2.2",
     "@types/google.accounts": "^0.0.5",
     "@types/socket.io": "^2.1.13",
+    "chart.js": "^4.4.9",
     "dgram": "^1.0.1",
     "gapi": "^0.0.3",
     "googleapis": "^110.0.0",
