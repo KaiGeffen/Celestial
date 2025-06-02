@@ -409,9 +409,9 @@ export default class DeckRegion {
       this.btnStart.enable()
     } else {
       // For debugging, allow sub-15 card decks locally
-      // if (!Flags.local) {
-      this.btnStart.disable()
-      // }
+      if (!Flags.local) {
+        this.btnStart.disable()
+      }
     }
   }
 

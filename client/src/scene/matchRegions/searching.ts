@@ -337,7 +337,7 @@ const STORY_TEXT = [
     `As your last breath leaves your lips, the soft sound of singing and sparkle of starlight stirs you.`,
     `Step after step, you walk a path marked by countless footprints, set in clouds high above the stars.`,
     `Finally, a great gate opens before you, and two figures with warm smiles step out to greet you.`,
-    `"Traveler!" the figure calls out. "You've arrived at last!"`,
+    `"Traveler!" one figure calls out. "You've arrived at last!"`,
     `"Welcome to the City. What stories have you brought from your life to share with us?"`,
   ],
 

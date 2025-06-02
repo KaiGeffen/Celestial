@@ -28,9 +28,6 @@ export class CardImage {
   // A container just for this cardImage and elements within it
   container: ContainerLite | Phaser.GameObjects.Container
 
-  // Whether or not this object is hovered currently
-  hovered = false
-
   // The card's cost, if it has been changed
   cost: number
 
@@ -135,7 +132,6 @@ export class CardImage {
 
     const oldExit = this.exitCallback
     this.exitCallback = () => {
-      if (!this.hovered) return
       oldExit()
       fExit()
     }
@@ -351,12 +347,10 @@ export class CardImage {
           }
         }
       })
-      .on('areaout', () => {
-        this.onHoverExit()()
-        hint.hide()
-      })
-      .setInteractive()
+      .on('areaout', () => hint.hide())
+      .on('pointerout', this.onHoverExit())
       .on('pointerdown', () => this.clickCallback())
+      .setInteractive()
 
     this.container.add(this.txtText)
   }
@@ -444,27 +438,17 @@ export class CardImage {
   }
 
   private onHover(): () => void {
-    const doHighlight = () => {
-      var postFxPlugin = this.scene.plugins.get('rexOutlinePipeline')
-
-      postFxPlugin['remove'](this.image)
-      postFxPlugin['add'](this.image, {
-        thickness: Space.highlightWidth,
-        outlineColor: Color.outline,
-        quality: 0.3,
-      })
-    }
-
     return () => {
-      // Don't do anything if hover has already happened
-      if (this.hovered) {
-        return
-      }
-      this.hovered = true
-
       // Apply the highlight effect if it's interactive
       if (this.interactive) {
-        doHighlight()
+        const postFxPlugin: any = this.scene.plugins.get('rexOutlinePipeline')
+
+        postFxPlugin.remove(this.image)
+        postFxPlugin.add(this.image, {
+          thickness: Space.highlightWidth,
+          outlineColor: Color.outline,
+          quality: 0.3,
+        })
       }
 
       // Do the callback
@@ -474,10 +458,6 @@ export class CardImage {
 
   private onHoverExit(ignoreOverInternal = false): () => void {
     return () => {
-      if (!this.hovered) {
-        return
-      }
-
       // If still over the internal elements, exit
       const pointer = this.scene.input.activePointer
 
@@ -498,9 +478,6 @@ export class CardImage {
 
       // Do the callback
       this.exitCallback()
-
-      // Set the parameter to no longer hovered
-      this.hovered = false
     }
   }
 
