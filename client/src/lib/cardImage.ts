@@ -15,15 +15,16 @@ export class CardImage {
   scene: BaseScene
 
   card: Card
-  image: Phaser.GameObjects.Image
   visible = true
   interactive = false
 
   // Visual elements that appear on the cardImage
+  image: Phaser.GameObjects.Image
   txtCost: BBCodeText
   txtPoints: BBCodeText
   txtText: BBCodeText
   txtTitle: Phaser.GameObjects.Text
+  outline: any // Pipeline golden outline around the card
 
   // A container just for this cardImage and elements within it
   container: ContainerLite | Phaser.GameObjects.Container
@@ -38,6 +39,8 @@ export class CardImage {
 
   // The index of this container within its parent container before it was brought to top
   renderIndex: number = undefined
+
+  // The outline visual effect
 
   // In focus menu, the string describing what action to take with this card
   private focusString = ''
@@ -68,6 +71,7 @@ export class CardImage {
       this.createTitle()
     }
 
+    // Make events for the card
     if (!Flags.mobile) {
       this.image
         .on('pointerover', this.onHover())
@@ -93,6 +97,9 @@ export class CardImage {
     if (this.card.beta) {
       this.image.setTexture('card-Beta')
     }
+
+    // Visual effect
+    this.createOutline()
 
     if (interactive) {
       this.image.setInteractive()
@@ -368,6 +375,15 @@ export class CardImage {
     this.container.add(this.txtTitle)
   }
 
+  private createOutline(): void {
+    const plugin: any = this.scene.plugins.get('rexOutlinePipeline')
+    this.outline = plugin.add(this.image, {
+      thickness: 0,
+      outlineColor: Color.outline,
+      quality: 0.3,
+    })
+  }
+
   // Move this cardImage above everything else in its container when it's hovered
   moveToTopOnHover(): CardImage {
     let container = this.container
@@ -441,14 +457,7 @@ export class CardImage {
     return () => {
       // Apply the highlight effect if it's interactive
       if (this.interactive) {
-        const postFxPlugin: any = this.scene.plugins.get('rexOutlinePipeline')
-
-        postFxPlugin.remove(this.image)
-        postFxPlugin.add(this.image, {
-          thickness: Space.highlightWidth,
-          outlineColor: Color.outline,
-          quality: 0.3,
-        })
+        this.outline.thickness = Space.highlightWidth
       }
 
       // Do the callback
@@ -456,25 +465,17 @@ export class CardImage {
     }
   }
 
-  private onHoverExit(ignoreOverInternal = false): () => void {
+  private onHoverExit(): () => void {
     return () => {
       // If still over the internal elements, exit
       const pointer = this.scene.input.activePointer
 
-      // Check if any of the internal elements are highlighted (Keywords, references, etc)
-      let overInternal = false
-      ;[this.txtCost, this.txtPoints, this.txtText].forEach((obj) => {
-        if (obj.getBounds().contains(pointer.x, pointer.y)) {
-          overInternal = true
-        }
-      })
-
-      if (!ignoreOverInternal && overInternal) {
+      // Don't do exit if still within bounds of the image
+      if (this.image.getBounds().contains(pointer.x, pointer.y)) {
         return
       }
 
-      // Remove the highlight effect
-      this.scene.plugins.get('rexOutlinePipeline')['remove'](this.image)
+      this.outline.thickness = 0
 
       // Do the callback
       this.exitCallback()
