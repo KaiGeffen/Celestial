@@ -127,7 +127,6 @@ const refresh = new RefreshCard({
   cost: 1,
   points: 1,
   text: 'Refresh',
-  beta: true,
 })
 
 class Overflow extends RefreshCard {
@@ -149,7 +148,6 @@ const overflow = new Overflow({
   cost: 3,
   points: -1,
   text: 'Refresh\nWorth +1 for each card in your hand.',
-  beta: true,
 })
 
 class Fish extends Card {
@@ -166,7 +164,6 @@ const fish = new Fish({
   cost: 3,
   points: 2,
   text: 'When you draw this, increase its points by 1 permanently.',
-  beta: true,
 })
 
 class Cloud extends RefreshCard {
@@ -192,7 +189,6 @@ const cloud = new Cloud({
   cost: 5,
   points: 5,
   text: 'Refresh\nExhale 2: Draw 3 cards.',
-  beta: true,
 })
 
 // A pearl? Some crystal jewelery
@@ -210,10 +206,9 @@ const precious = new Precious({
   cost: 2,
   points: 1,
   text: 'Discard your hand, draw that many cards.',
-  beta: true,
 })
 
-class LeveeBreaks extends Card {
+class DamBreaks extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -229,13 +224,12 @@ class LeveeBreaks extends Card {
     }
   }
 }
-const leveeBreaks = new LeveeBreaks({
-  name: 'LeveeBreaks',
+const damBreaks = new DamBreaks({
+  name: 'Dam Breaks',
   id: 104,
   cost: 4,
   points: 4,
   text: 'Exhale 1: Discard 3 cards. Add your hand to the story after this.',
-  beta: true,
 })
 
 export {
@@ -251,6 +245,6 @@ export {
   fish,
   cloud,
   precious,
-  leveeBreaks,
+  damBreaks,
   overflow,
 }

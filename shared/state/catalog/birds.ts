@@ -151,7 +151,6 @@ const fledgling = new Fledgling({
   id: 59,
   cost: 1,
   text: 'Morning: Worth +1 permanently.',
-  beta: true,
 })
 
 class Nest extends Card {
@@ -166,7 +165,6 @@ const nest = new Nest({
   cost: 2,
   points: 0,
   text: 'Morning: Create a Dove in the story.',
-  beta: true,
 })
 
 const truth = new Card({
@@ -174,7 +172,6 @@ const truth = new Card({
   id: 61,
   cost: 6,
   points: 7,
-  beta: true,
 })
 
 class Defiance extends Card {
@@ -203,10 +200,9 @@ const defiance = new Defiance({
   cost: 5,
   points: 3,
   text: 'Costs 1 less for each card your opponent can see in the story.',
-  beta: true,
 })
 
-class Silence extends Card {
+class LayBare extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -227,14 +223,13 @@ class Silence extends Card {
     }
   }
 }
-const silence = new Silence({
-  name: 'Silence',
+const layBare = new LayBare({
+  name: 'Lay Bare',
   id: 30,
   cost: 2,
   points: 2,
   qualities: [Quality.VISIBLE],
   text: 'Visible\nExhale 1: The next card in the story loses all card-text.',
-  beta: true,
 })
 
 class Vulture extends Card {
@@ -249,7 +244,6 @@ const vulture = new Vulture({
   points: 5,
   qualities: [Quality.VISIBLE, Quality.FLEETING],
   text: 'Visible\nFleeting\nWhen played, gain Nourish -2.',
-  beta: true,
 })
 
 class Rooster extends Card {
@@ -281,7 +275,6 @@ const rooster = new Rooster({
   cost: 1,
   points: 1,
   text: 'Morning: Trigger the morning ability of the top card below this with morning.',
-  beta: true,
 })
 
 class LetGo extends Card {
@@ -297,7 +290,6 @@ const letGo = new LetGo({
   cost: 4,
   points: 4,
   text: 'Remove from the game the top four cards of your discard pile.',
-  beta: true,
 })
 
 export {
@@ -311,7 +303,7 @@ export {
   nest,
   truth,
   defiance,
-  silence,
+  layBare,
   vulture,
   rooster,
   letGo,

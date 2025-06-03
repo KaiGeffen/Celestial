@@ -258,7 +258,6 @@ const goliath = new Goliath({
   cost: 8,
   points: 8,
   text: 'Discard the next card in the story and the top 2 cards of your deck.',
-  beta: true,
 })
 
 class Firebug extends Card {
@@ -272,7 +271,6 @@ const firebug = new Firebug({
   id: 41,
   points: 1,
   text: 'Discard a card.',
-  beta: true,
 })
 
 class Immolant extends Card {
@@ -298,7 +296,6 @@ const immolant = new Immolant({
   cost: 1,
   points: 1,
   text: 'When this is discarded, add it next in the story.',
-  beta: true,
 })
 
 class Spark extends Card {
@@ -322,7 +319,6 @@ const spark = new Spark({
   id: 70,
   cost: 1,
   text: 'When played, gain 3 breath.\nDiscard your next card in the story.',
-  beta: true,
 })
 
 export {
@@ -335,7 +331,7 @@ export {
   cling,
   death,
   fromAshes,
-  // BETA
+  // Expansion
   goliath,
   firebug,
   immolant,
