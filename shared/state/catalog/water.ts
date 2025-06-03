@@ -189,10 +189,10 @@ const cloud = new Cloud({
   cost: 5,
   points: 5,
   text: 'Refresh\nExhale 2: Draw 3 cards.',
+  beta: true,
 })
 
-// A pearl? Some crystal jewelery
-class Precious extends Card {
+class GainAndLoss extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
     const length = game.hand[player].length
@@ -200,8 +200,8 @@ class Precious extends Card {
     game.draw(player, length)
   }
 }
-const precious = new Precious({
-  name: 'Precious',
+const gainAndLoss = new GainAndLoss({
+  name: 'Gain and Loss',
   id: 103,
   cost: 2,
   points: 1,
@@ -244,7 +244,7 @@ export {
   refresh,
   fish,
   cloud,
-  precious,
+  gainAndLoss as precious,
   damBreaks,
   overflow,
 }
