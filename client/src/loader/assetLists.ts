@@ -62,7 +62,7 @@ export const assetLists = {
       "Child",
       "Clear View",
       "Cling",
-      "Cloak Of Stars",
+      "Cloak of Stars",
       "Cloud",
       "Conquer",
       "Cosmos",

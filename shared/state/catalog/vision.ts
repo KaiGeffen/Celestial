@@ -243,7 +243,7 @@ class BeggingBowl extends Card {
   }
 }
 const beggingBowl = new BeggingBowl({
-  name: 'BeggingBowl',
+  name: 'Begging Bowl',
   id: 92,
   cost: 2,
   text: "This consumes your opponent's Nourish.",
