@@ -41,6 +41,14 @@ const decks: Deck[] = [
       border: 0,
     },
   },
+  {
+    name: 'Sight for computer',
+    cards: [50, 27, 27, 27, 27, 25, 88, 88, 31, 39, 11, 13, 91, 45, 45],
+    cosmeticSet: {
+      avatar: 5,
+      border: 0,
+    },
+  },
 ]
 
 export default function getRandomAiDeck(): Deck {
