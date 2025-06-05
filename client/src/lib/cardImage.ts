@@ -60,7 +60,11 @@ export class CardImage {
     this.createContainer(outerContainer)
 
     // Card image
-    this.image = this.scene.add.image(0, 0, `card-${card.name}`)
+    // If the card image doesn't exist, use a default image
+    const imageName = this.scene.textures.exists(`card-${this.card.name}`)
+      ? `card-${this.card.name}`
+      : 'card-Beta'
+    this.image = this.scene.add.image(0, 0, imageName)
     this.image.setDisplaySize(Space.cardWidth, Space.cardHeight)
     this.container.add(this.image)
 
@@ -89,13 +93,6 @@ export class CardImage {
           callback: () => this.clickCallback(),
         })
       })
-    }
-
-    // TODO After the new round of cards is released, remove the beta check and use the texture check
-    // If the card image doesn't exist, use a default image
-    // if (!this.scene.textures.exists(`card-${this.card.name}`)) {
-    if (this.card.beta) {
-      this.image.setTexture('card-Beta')
     }
 
     // Visual effect
@@ -196,7 +193,10 @@ export class CardImage {
         },
       )
 
-      this.image.setTexture(`card-${card.name}`)
+      const imageName = this.scene.textures.exists(`card-${this.card.name}`)
+        ? `card-${this.card.name}`
+        : 'card-Beta'
+      this.image.setTexture(imageName)
       this.createStats()
       this.createText()
       this.createTitle()
