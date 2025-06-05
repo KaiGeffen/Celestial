@@ -145,7 +145,6 @@ const yearn = new Yearn({
   cost: 1,
   points: 1,
   text: 'Exhale 3: Add the top card of your discard pile to the story after this if it has base cost 3 or less.',
-  beta: true,
 })
 
 class Pomegranate extends Card {
@@ -159,7 +158,6 @@ const pomegranate = new Pomegranate({
   id: 52,
   cost: 5,
   text: 'Nourish 6',
-  beta: true,
 })
 
 class Abundance extends Card {
@@ -179,7 +177,6 @@ const abundance = new Abundance({
   cost: 2,
   points: 2,
   text: 'Exhale 1: If you have 7 or more points, Nourish 3.',
-  beta: true,
 })
 
 class Rose extends Card {
@@ -195,10 +192,9 @@ const rose = new Rose({
   points: -1,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nNourish 2',
-  beta: true,
 })
 
-class Celebration extends Card {
+class Parade extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -233,17 +229,15 @@ class Celebration extends Card {
     }
   }
 }
-const celebration = new Celebration({
-  name: 'Celebration',
+const parade = new Parade({
+  name: 'Parade',
   id: 79,
   cost: 3,
   points: 3,
   text: 'Exhale 5: Add each card with base-cost 3 or less from your hand to the story after this.',
-  beta: true,
 })
 
-// TODO Rename
-class Supernova extends Card {
+class MeAndHer extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -252,16 +246,15 @@ class Supernova extends Card {
     }
   }
 }
-const supernova = new Supernova({
-  name: 'Supernova',
+const meAndHer = new MeAndHer({
+  name: 'Me and Her',
   id: 80,
   cost: 4,
   points: 4,
   text: 'Exhale 4: Double your points.',
-  beta: true,
 })
 
-class Sample extends Card {
+class Sensualist extends Card {
   getCost(player: number, game: GameModel) {
     let cost = this.cost
     if (game.status[player].nourish !== 0) {
@@ -276,13 +269,12 @@ class Sample extends Card {
     return Math.max(0, cost)
   }
 }
-const sample = new Sample({
-  name: 'Sample',
+const sensualist = new Sensualist({
+  name: 'Sensualist',
   id: 81,
   cost: 4,
   points: 4,
   text: 'Costs 1 less for each of the following statuses you have: Nourish, Inspired, Sight.',
-  beta: true,
 })
 
 export {
@@ -297,7 +289,7 @@ export {
   pomegranate,
   abundance,
   rose,
-  celebration,
-  supernova,
-  sample,
+  parade,
+  meAndHer,
+  sensualist,
 }

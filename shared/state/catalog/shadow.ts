@@ -1,7 +1,7 @@
 import Card from '../card'
 import { Quality } from '../quality'
 import GameModel from '../gameModel'
-import { wound } from './tokens'
+// import { wound } from './tokens'
 
 class Dagger extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -183,24 +183,22 @@ const victim = new Victim({
   id: 43,
   cost: 1,
   text: 'If you lose this round, Nourish -1 your opponent for each point you lost by.',
-  beta: true,
 })
 
-class Rupture extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
-    game.create(player ^ 1, wound)
-  }
-}
-const rupture = new Rupture({
-  name: 'Rupture',
-  id: 72,
-  cost: 1,
-  text: "Create a Wound in your opponent's hand.",
-  beta: true,
-})
+// class Rupture extends Card {
+//   play(player: number, game: GameModel, index: number, bonus: number) {
+//     super.play(player, game, index, bonus)
+//     game.create(player ^ 1, wound)
+//   }
+// }
+// const rupture = new Rupture({
+//   name: 'Rupture',
+//   id: 72,
+//   cost: 1,
+//   text: "Create a Wound in your opponent's hand.",
+// })
 
-class Craving extends Card {
+class LostInShadow extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
     if (
@@ -210,13 +208,12 @@ class Craving extends Card {
     }
   }
 }
-const craving = new Craving({
-  name: 'Craving',
+const lostInShadow = new LostInShadow({
+  name: 'Lost in Shadow',
   id: 47,
   cost: 2,
   points: 4,
   text: 'Discard your hand unless you have a card with base-cost 6 or more later in the story.',
-  beta: true,
 })
 
 class Vampire extends Card {
@@ -235,7 +232,6 @@ const vampire = new Vampire({
   cost: 6,
   points: 6,
   text: "Worth -X where X is your opponent's points.\nCosts 1 less for each card in the story.",
-  beta: true,
 })
 
 export {
@@ -248,9 +244,8 @@ export {
   hurricane,
   wingClipping,
   sickness,
-  // BETA
   victim,
-  rupture,
-  craving,
+  // rupture,
+  lostInShadow as craving,
   vampire,
 }

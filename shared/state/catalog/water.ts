@@ -189,7 +189,6 @@ const cloud = new Cloud({
   cost: 5,
   points: 5,
   text: 'Refresh\nExhale 2: Draw 3 cards.',
-  beta: true,
 })
 
 class GainAndLoss extends Card {

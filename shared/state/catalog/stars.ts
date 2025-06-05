@@ -156,7 +156,6 @@ const fates = new Fates({
   name: 'Fates',
   id: 93,
   text: "Exhale 5: Set both players' points to 0.\nExhale 3: Nourish 2\nExhale 1: Birth 1",
-  beta: true,
 })
 
 class Hero extends Card {
@@ -183,7 +182,6 @@ const hero = new Hero({
   name: 'Hero',
   id: 94,
   text: 'Exhale 5: Worth +4.\nExhale 3: Discard the next card in the story.\nExhale 1: Inspire 1',
-  beta: true,
 })
 
 class Possibility extends Card {
@@ -199,7 +197,6 @@ const possibility = new Possibility({
   cost: 4,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nIncrease your max breath by 1 permanently.',
-  beta: true,
 })
 
 class CloakOfStars extends Card {
@@ -221,7 +218,6 @@ const cloakOfStars = new CloakOfStars({
   id: 96,
   cost: 3,
   text: 'Gain 3 breath.\nMorning: Inspired 1 for each breath you ended the last round with.',
-  beta: true,
 })
 
 class Dreamer extends Card {
@@ -242,7 +238,6 @@ const dreamer = new Dreamer({
   cost: 1,
   points: 1,
   text: 'Draw a card if your hand is empty.\nExhale 1: Worth +1.',
-  beta: true,
 })
 
 class Pride extends Card {
@@ -261,7 +256,6 @@ const pride = new Pride({
   cost: 3,
   points: 3,
   text: 'Morning: Exhale 2: Add this to the story. Discard a card.',
-  beta: true,
 })
 
 export {
