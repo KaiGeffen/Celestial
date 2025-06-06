@@ -33,12 +33,10 @@ export default class MatchResultsRegion extends Region {
   panel: ScrollablePanel
 
   WIDTH = 300
-  HEIGHT = Flags.mobile
-    ? Space.windowHeight - (Space.buttonHeight + Space.pad * 2) * 2
-    : Math.min(
-        Space.avatarHeight,
-        Space.windowHeight - (Space.buttonHeight + Space.pad * 2) * 2,
-      )
+  HEIGHT = Math.min(
+    Space.avatarHeight,
+    Space.windowHeight - (Space.buttonHeight + Space.pad * 2) * 2,
+  )
 
   create(scene: MatchScene): this {
     this.scene = scene
@@ -49,21 +47,8 @@ export default class MatchResultsRegion extends Region {
       y: `50%`,
     })
 
-    // Create background
-    let background = scene.add
-      .rectangle(0, 0, 1, 1, Color.darken, 0.9)
-      .setInteractive()
-      .on('pointerdown', () => {
-        this.hide()
-      })
-    this.scene.plugins.get('rexAnchor')['add'](background, {
-      width: `100%`,
-      height: `100%`,
-    })
-    this.container.add(background)
-
+    this.createBackground()
     this.createContent()
-
     this.createButtons()
 
     return this
@@ -123,6 +108,20 @@ export default class MatchResultsRegion extends Region {
     return this
   }
 
+  private createBackground() {
+    let background = this.scene.add
+      .rectangle(0, 0, 1, 1, Color.darken, 0.9)
+      .setInteractive()
+      .on('pointerdown', () => {
+        this.hide()
+      })
+    this.scene.plugins.get('rexAnchor')['add'](background, {
+      width: `100%`,
+      height: `100%`,
+    })
+    this.container.add(background)
+  }
+
   protected createButtons() {
     const container = this.scene.add.container()
     this.container.add(container)
@@ -156,14 +155,15 @@ export default class MatchResultsRegion extends Region {
 
   private createContent() {
     // Win/Lose text
+    //this.HEIGHT / 2 - Space.pad
     this.txtResult = this.scene.add
       .text(
         0,
-        -this.HEIGHT / 2 + Space.pad,
+        -(this.HEIGHT / 2 + Space.pad),
         'Victory',
         Style.announcementOverBlack,
       )
-      .setOrigin(0.5, 0)
+      .setOrigin(0.5, 1)
 
     // Your avatar
     this.ourAvatar = this.scene.add
@@ -185,7 +185,7 @@ export default class MatchResultsRegion extends Region {
   }
 
   private createResultsPanel() {
-    const background = this.createBackground()
+    const background = this.createSizerBackground()
 
     // NOTE Scrollable panel is bugged with containers, so it has it's own anchor
     this.panel = newScrollablePanel(this.scene, {
@@ -205,7 +205,7 @@ export default class MatchResultsRegion extends Region {
       .setOrigin(0.5)
   }
 
-  private createBackground() {
+  private createSizerBackground() {
     const background = this.scene.rexUI.add
       .roundRectangle(0, 0, 1, 1, Space.corner, Color.backgroundDark)
       .setDepth(Depth.results)
