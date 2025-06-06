@@ -30,6 +30,8 @@ export default class OurBoardRegion extends Region {
   // Track whether shift is held
   isShiftHeld = false
 
+  background: Phaser.GameObjects.Image
+
   create(scene: MatchScene): this {
     this.scene = scene
     this.cards = []
@@ -106,6 +108,17 @@ export default class OurBoardRegion extends Region {
     )
 
     this.container.add(background)
+  }
+
+  onWindowResize(): void {
+    this.background.setScale(
+      this.background.width >= Space.windowWidth
+        ? 1
+        : Space.windowWidth / this.background.width,
+      1,
+    )
+
+    this.background.setPosition(0, -(Space.todoHandOffset + Space.pad + 7))
   }
 
   // Rename old onCardClick to onCardPlay

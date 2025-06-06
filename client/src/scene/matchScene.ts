@@ -331,6 +331,11 @@ export class MatchScene extends BaseScene {
       }
     })
   }
+
+  onWindowResize(): void {
+    this.view.ourBoard.onWindowResize()
+    this.view.theirBoard.onWindowResize()
+  }
 }
 
 // The View of MVC - What is presented to the user
