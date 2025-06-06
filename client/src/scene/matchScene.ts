@@ -6,7 +6,7 @@ import {
   MatchTutorialWS,
 } from '../network/net'
 // Import Settings itself
-import { Space, UserSettings } from '../settings/settings'
+import { Ease, Space, UserSettings } from '../settings/settings'
 import BaseScene from './baseScene'
 import Animator from './matchRegions/animator'
 import Region from './matchRegions/baseRegion'
@@ -371,10 +371,12 @@ export class View {
 
   pet: CompanionRegion
 
+  background: Phaser.GameObjects.Image
+
   constructor(scene: MatchScene, avatarId: number) {
     this.scene = scene
 
-    let background = scene.add
+    this.background = scene.add
       .image(0, 0, 'background-Dark')
       .setOrigin(0)
       .setDepth(-1)
@@ -384,10 +386,10 @@ export class View {
         this.scene.hint.hide()
       })
 
-    background.setScale(
-      background.width >= Space.windowWidth
+    this.background.setScale(
+      this.background.width >= Space.windowWidth
         ? 1
-        : Space.windowWidth / background.width,
+        : Space.windowWidth / this.background.width,
     )
 
     this.searching = new Regions.Searching().create(scene, avatarId)
@@ -479,13 +481,45 @@ export class View {
     // Animate the state
     this.animator.animate(state)
 
-    // Play whatever sound this new state brings
-    if (state.sound !== null) {
-      this.scene.playSound(state.sound)
-    }
-
     // Update pet
     this.pet.displayState(state)
+
+    // At night, background is dark
+    this.tweenBackgroundTint(state.isRecap)
+  }
+
+  // Tween the background tint between day and night
+  private tweenBackgroundTint(isRecap: boolean) {
+    const startTint = this.background.tintTopLeft
+    const endTint = isRecap ? 0x666666 : 0xffffff
+
+    const startR = (startTint >> 16) & 0xff
+    const startG = (startTint >> 8) & 0xff
+    const startB = startTint & 0xff
+
+    const endR = (endTint >> 16) & 0xff
+    const endG = (endTint >> 8) & 0xff
+    const endB = endTint & 0xff
+
+    this.scene.tweens.add({
+      targets: { t: 0 },
+      t: 1,
+      duration: 400,
+      ease: Ease.basic,
+      onUpdate: (tween) => {
+        const t = tween.getValue()
+        const r = Math.round(startR + (endR - startR) * t)
+        const g = Math.round(startG + (endG - startG) * t)
+        const b = Math.round(startB + (endB - startB) * t)
+        const tint = (r << 16) | (g << 8) | b
+        this.background.setTint(tint)
+      },
+      onComplete: () => {
+        if (!isRecap) {
+          this.background.clearTint()
+        }
+      },
+    })
   }
 
   // Show the given overlay and hide all others
