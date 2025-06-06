@@ -99,7 +99,7 @@ export default class Menu {
 
     // Add background
     let rect = this.scene.rexUI.add
-      .roundRectangle(0, 0, 0, 0, Space.corner, Color.backgroundDark, 1)
+      .roundRectangle(0, 0, 1, 1, Space.corner, Color.backgroundDark, 1)
       .setInteractive()
     this.sizer.addBackground(rect)
 
