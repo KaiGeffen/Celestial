@@ -60,10 +60,12 @@ export default class TheirBoardRegion extends Region {
   }
 
   private createBackground(): void {
+    // NOTE 7 is the height of the shadow
+    const y = Space.todoHandOffset + Space.pad + 7
     const background = this.scene.add
-      .image(0, 0, 'chrome-Hand')
-      .setOrigin(0)
+      .image(0, y, 'chrome-Hand')
       .setRotation(Math.PI)
+      .setOrigin(1, 0)
 
     background.setScale(
       background.width >= Space.windowWidth
@@ -71,10 +73,6 @@ export default class TheirBoardRegion extends Region {
         : Space.windowWidth / background.width,
       1,
     )
-
-    // 7 is the height of the shadow
-    const y = Space.todoHandOffset + Space.pad + 7
-    background.setPosition(Space.windowWidth + Space.pad, y)
 
     this.container.add(background)
   }
