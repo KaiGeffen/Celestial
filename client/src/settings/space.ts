@@ -43,7 +43,7 @@ function getSpace() {
     // Dimensions of the hand regions
     handHeight: Flags.mobile ? 80 : 160,
     // Standard corner width for rounded rectangles
-    corner: 10,
+    corner: 0,
     // For basic text
     maxTextWidth: 500, // Note must be more than twice cardWidth for hints
 
