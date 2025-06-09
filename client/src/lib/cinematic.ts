@@ -19,6 +19,10 @@ export default class Cinematic {
     // Remove hiding from it
     animation.style.display = ''
 
+    // Show the logo as well
+    const logo = document.getElementById('logo-container')
+    if (logo) logo.style.display = 'flex'
+
     // Make sure the right file is playing
     if (animation.src === '') {
       animation.src = 'assets/animation/Jules.mp4'
@@ -37,5 +41,9 @@ export default class Cinematic {
 
     const animation: HTMLVideoElement = <HTMLVideoElement>animations.item(0)
     animation.style.display = 'none'
+
+    // Hide the logo as well
+    const logo = document.getElementById('logo-container')
+    if (logo) logo.style.display = 'none'
   }
 }

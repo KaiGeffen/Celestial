@@ -212,7 +212,6 @@ export const assetLists = {
       "Hold Tight",
       "Hollow",
       "Hug",
-      "Hug",
       "Hungry Ghost",
       "Hurricane",
       "Iceberg",
@@ -415,9 +414,7 @@ export const assetLists = {
       "CloudBottom",
       "CloudTop",
       "Hand",
-      "Logo",
-      "ResultGlow",
-      "SearchBar"
+      "ResultGlow"
     ],
     "pixelArt": false
   },

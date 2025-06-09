@@ -75,10 +75,16 @@
   </script>
 </head>
 <body>
-  <!-- playsinline and muted enable mobile autoplay -->
+  <!-- Animation -->
   <video class="animation" id="animation" loop autoplay playsinline muted style="display: none;">
     <source src="" type=video/mp4>
   </video>
+
+  <!-- Logo -->
+  <div id="logo-container" style="position: absolute; top: 0; left: 0; width: 100%; display: none; justify-content: center; pointer-events: none;">
+    <img src="assets/logo.svg" alt="Celestial Logo" style="width: 20vw; height: auto; display: block; pointer-events: none;" />
+  </div>
+  
   
   <div class="game" id="game">
 
