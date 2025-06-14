@@ -1,7 +1,7 @@
 import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
-import avatarDetails from '../../catalog/avatarDetails.json'
+import avatarDetails from '../../data/avatarDetails.json'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import Hint from '../../lib/hint'

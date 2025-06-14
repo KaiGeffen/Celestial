@@ -5,7 +5,7 @@ import Buttons from '../../lib/buttons/buttons'
 import { Color, Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
-import getRandomAiDeck from '../../catalog/aiDecks'
+import getRandomAiDeck from '../../data/aiDecks'
 import { Deck } from '../../../../shared/types/deck'
 
 const width = 550

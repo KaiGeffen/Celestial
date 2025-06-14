@@ -15,7 +15,7 @@ import {
 import newScrollablePanel from '../../lib/scrollablePanel'
 import { DecklistSettings } from '../../../../shared/settings'
 import avatarNames from '../../lib/avatarNames'
-import premadeDecklists from '../../catalog/premadeDecklists'
+import premadeDecklists from '../../data/premadeDecklists'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
 import { BuilderBase, BuilderScene } from '../builderScene'

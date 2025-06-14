@@ -2,7 +2,7 @@ import 'phaser'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
 import { JourneyMatchScene } from './matchScene'
-import data from '../catalog/tutorial.json'
+import data from '../data/tutorial.json'
 import { Space, Color, BBStyle, Time, Depth, Flags } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'

@@ -1,6 +1,6 @@
 import 'phaser'
 import BaseScene from './baseScene'
-import avatarDetails from '../catalog/avatarDetails.json'
+import avatarDetails from '../data/avatarDetails.json'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer.js'
 import { Style, Space } from '../settings/settings'
 import AvatarButton from '../lib/buttons/avatar'
