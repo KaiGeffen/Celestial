@@ -31,6 +31,7 @@ export default class JourneyScene extends BaseScene {
 
   // NEW FLOW
   decklist: Decklist
+  characterSelect: Phaser.GameObjects.Container
   missionDetails: Sizer
 
   constructor() {
@@ -56,13 +57,15 @@ export default class JourneyScene extends BaseScene {
     this.enableScrolling()
 
     // Create the first screen
-    // this.createCharacterSelect()
+    this.createCharacterSelect()
 
     // Create the mission screen
     this.createMissionDetails()
   }
 
   private createCharacterSelect() {
+    this.characterSelect = this.add.container()
+
     // Somehow randomly get the characters that will appear
     // TODO
     const characters = [JOURNEY_CHARACTERS[0], JOURNEY_CHARACTERS[1]]
@@ -87,7 +90,16 @@ export default class JourneyScene extends BaseScene {
       const button = new Buttons.Basic({
         within: btnContainer,
         text: 'Select',
-        f: () => this.showCharacterStoryPanel(char.index),
+        f: () => {
+          this.decklist.setDeck(
+            // TODO Do better
+            premadeDecklists[char.deckIndex].map((id) =>
+              Catalog.getCardById(id),
+            ),
+          )
+          this.characterSelect.setAlpha(0)
+          this.missionDetails.show().layout()
+        },
       })
 
       sizer.add(image).add(text).add(btnContainer)
@@ -104,6 +116,8 @@ export default class JourneyScene extends BaseScene {
       y: `50%`,
       right: `100%-${Space.pad}`,
     })
+
+    this.characterSelect.add(sizers[0]).add(sizers[1])
   }
 
   private createMissionDetails() {
@@ -140,6 +154,8 @@ export default class JourneyScene extends BaseScene {
       left: `0%+${Space.pad}`,
       y: `50%`,
     })
+
+    this.missionDetails.hide()
   }
 
   private createHeader(mission) {
@@ -191,6 +207,10 @@ export default class JourneyScene extends BaseScene {
     new Buttons.Basic({
       within: cont1,
       text: 'Back',
+      f: () => {
+        this.characterSelect.setAlpha(1)
+        this.missionDetails.hide()
+      },
     })
     const cont2 = new ContainerLite(
       this,
