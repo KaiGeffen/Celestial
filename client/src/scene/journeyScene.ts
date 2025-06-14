@@ -17,6 +17,7 @@ import Cutout from '../lib/buttons/cutout'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import JOURNEY_CHARACTERS from '../data/journeyCharacters'
 import Decklist from '../lib/decklist'
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 export default class JourneyScene extends BaseScene {
   panDirection
@@ -27,6 +28,10 @@ export default class JourneyScene extends BaseScene {
 
   characterContainers: Phaser.GameObjects.Container[] = []
   storyPanel: Phaser.GameObjects.Container | null = null
+
+  // NEW FLOW
+  decklist: Decklist
+  missionDetails: Sizer
 
   constructor() {
     super({
@@ -106,19 +111,32 @@ export default class JourneyScene extends BaseScene {
     const mission = JOURNEY_CHARACTERS[0]
 
     // Create a sizer for the mission details
-    const sizer = this.rexUI.add.sizer({
+    this.missionDetails = this.rexUI.add.sizer({
       orientation: 'vertical',
-      space: { item: Space.pad },
+      space: {
+        item: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+      },
     })
+
+    const background = this.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
 
     const headerSizer = this.createHeader(mission)
     const decklistSizer = this.createDecklist()
     const btnSizer = this.createButtons()
 
-    sizer.add(headerSizer).add(decklistSizer).add(btnSizer).layout()
+    this.missionDetails
+      .add(headerSizer)
+      .add(decklistSizer)
+      .add(btnSizer)
+      .addBackground(background)
+      .layout()
 
     // Add an anchor for the sizer
-    this.plugins.get('rexAnchor')['add'](sizer, {
+    this.plugins.get('rexAnchor')['add'](this.missionDetails, {
       left: `0%+${Space.pad}`,
       y: `50%`,
     })
@@ -148,11 +166,13 @@ export default class JourneyScene extends BaseScene {
   }
 
   private createDecklist() {
-    const decklist: Decklist = new Decklist(this, this.onClickCutout())
+    this.decklist = new Decklist(this, this.onClickCutout())
 
-    decklist.setDeck(premadeDecklists[0].map((id) => Catalog.getCardById(id)))
+    this.decklist.setDeck(
+      premadeDecklists[0].map((id) => Catalog.getCardById(id)),
+    )
 
-    return decklist.sizer
+    return this.decklist.sizer
   }
 
   private createButtons() {
@@ -202,7 +222,8 @@ export default class JourneyScene extends BaseScene {
   private onClickCutout(): (cutout: Cutout) => () => void {
     return (cutout: Cutout) => {
       return () => {
-        console.log(cutout.card.name)
+        this.decklist.removeCard(cutout.card)
+        this.missionDetails.layout()
       }
     }
   }

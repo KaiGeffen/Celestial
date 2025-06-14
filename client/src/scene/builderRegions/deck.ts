@@ -276,6 +276,7 @@ export default class DeckRegion {
   private onClickCutout(): (cutout: Cutout) => () => void {
     return (cutout: Cutout) => {
       return () => {
+        this.decklist.removeCard(cutout.card)
         let pointer: Phaser.Input.Pointer = this.scene.input.activePointer
 
         // If right clicking, add another copy
