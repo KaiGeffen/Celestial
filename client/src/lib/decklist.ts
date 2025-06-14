@@ -87,10 +87,8 @@ export default class Decklist {
     this.countCards = 0
 
     // Add the new deck
-    console.log('setting deck', deck)
     for (let i = 0; i < deck.length; i++) {
       let card = deck[i]
-      console.log('adding card', card)
       this.addCard(card)
     }
 
@@ -117,7 +115,6 @@ export default class Decklist {
 
   // Add a new cutout to the decklist
   private addNewCutout(card: Card) {
-    console.log('adding new cutout', card)
     let container = new ContainerLite(
       this.scene,
       0,
@@ -142,8 +139,6 @@ export default class Decklist {
         this.cutouts.splice(i, 0, newCutout)
         this.countCards++
 
-        console.log('added new cutout')
-
         return
       }
     }
@@ -152,7 +147,5 @@ export default class Decklist {
     this.sizer.add(container).layout()
     this.cutouts.push(newCutout)
     this.countCards++
-
-    console.log('added new cutout')
   }
 }
