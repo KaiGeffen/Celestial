@@ -91,21 +91,28 @@ export default class JourneyScene extends BaseScene {
           : (3 * Space.windowWidth) / 4 + spacing
       // Container for image, text, and button
       const container = this.add.container(x, centerY)
-      // Character image
-      const img = this.add
-        .image(0, 0, char.image)
-        .setDisplaySize(imgWidth, imgHeight)
-        .setOrigin(0.5)
+      // Character image (preserve aspect ratio)
+      const img = this.add.image(0, 0, char.image).setOrigin(0.5)
+      // Optionally scale down if too large for viewport
+      const maxW = imgWidth,
+        maxH = imgHeight
+      const scale = Math.min(maxW / img.width, maxH / img.height, 1)
+      img.setScale(scale)
       // Select button
       const btn = new Buttons.Basic({
         within: container,
         text: 'Select',
-        y: imgHeight / 2 + 40,
+        y: img.displayHeight / 2 + 40,
         f: () => this.showCharacterStoryPanel(char.index),
       })
       // Select text
       const txt = this.add
-        .text(0, imgHeight / 2 + 90, `"${char.selectText}"`, Style.basic)
+        .text(
+          0,
+          img.displayHeight / 2 + 90,
+          `"${char.selectText}"`,
+          Style.basic,
+        )
         .setOrigin(0.5, 0)
       container.add([img, txt])
       this.characterContainers.push(container)
@@ -133,18 +140,26 @@ export default class JourneyScene extends BaseScene {
       align: 'center',
       space: { item: 30 },
     })
-    // Top: avatar, title, quote (side by side)
+    // Top: avatar, title, quote (side by side, vertical stack)
     const headerSizer = this.rexUI.add.sizer({
       orientation: 'horizontal',
       space: { item: 30 },
     })
     // Avatar icon
-    const avatarContainer = new ContainerLite(this, 0, 0, 100, 100)
+    const avatarContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.avatarSize,
+      Space.avatarSize,
+    )
     new Buttons.Avatar({
       within: avatarContainer,
       avatarId: char.index,
       border: 0,
       emotive: false,
+      x: Space.avatarSize / 2,
+      y: Space.avatarSize / 2,
     })
     // Title and quote
     const titleText = this.add.text(0, 0, char.storyTitle, Style.announcement)
@@ -152,7 +167,12 @@ export default class JourneyScene extends BaseScene {
     const titleSizer = this.rexUI.add.sizer({ orientation: 'vertical' })
     titleSizer.add(titleText).add(quoteText)
     headerSizer.add(avatarContainer).add(titleSizer)
-    sizer.add(headerSizer)
+    // Stack headerSizer, deckSizer, and btnSizer vertically
+    const verticalStack = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: { item: 20 },
+    })
+    verticalStack.add(headerSizer)
     // Deck display (cutouts)
     const deckSizer = this.rexUI.add.sizer({
       orientation: 'vertical',
@@ -187,7 +207,7 @@ export default class JourneyScene extends BaseScene {
       cutout.setText(`x${cardCounts[id]}`)
       deckSizer.add(container)
     })
-    sizer.add(deckSizer)
+    verticalStack.add(deckSizer)
     // Bottom: 3 buttons in a sizer
     const btnSizer = this.rexUI.add.sizer({
       orientation: 'horizontal',
@@ -228,13 +248,31 @@ export default class JourneyScene extends BaseScene {
     new Buttons.Basic({
       within: btnStartContainer,
       text: 'Start',
-      f: () => {},
+      f: () => {
+        // Launch a journey match with the selected deck and avatar
+        const deck = {
+          name: `${avatarNames[char.index]} Premade`,
+          cards: deckIds,
+          cosmeticSet: { avatar: char.index, border: 0 },
+        }
+        // Set AI deck to the other character's premade deck
+        const otherChar = CHARACTER_DATA.find((c) => c.index !== char.index)
+        const aiDeck = otherChar
+          ? {
+              name: `${avatarNames[otherChar.index]} Premade`,
+              cards: premadeDecklists[otherChar.deckIndex],
+              cosmeticSet: { avatar: otherChar.index, border: 0 },
+            }
+          : undefined
+        this.scene.start('JourneyMatchScene', { deck, aiDeck })
+      },
     })
     btnSizer
       .add(btnBackContainer)
       .add(btnCustomizeContainer)
       .add(btnStartContainer)
-    sizer.add(btnSizer)
+    verticalStack.add(btnSizer)
+    sizer.add(verticalStack)
     sizer.layout()
     panel.add(sizer)
     this.storyPanel = panel
