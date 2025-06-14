@@ -26,7 +26,7 @@ import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
 import AvatarButton from '../../lib/buttons/avatar'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
-
+import Decklist from '../../lib/decklist'
 const width = Space.deckPanelWidth // + Space.pad * 2
 
 // Where the panel starts
@@ -46,7 +46,6 @@ export default class DeckRegion {
 
   // The panel within which all of the cards are
   scrollablePanel: ScrollablePanel
-  private panel
 
   // Button allowing user to Start, or showing the count of cards in their deck
   private btnStart: Button
@@ -61,6 +60,9 @@ export default class DeckRegion {
 
   // Add text showing card count
   private txtCount: Phaser.GameObjects.Text
+
+  // TODO Move up, the decklist
+  private decklist: Decklist
 
   create(
     scene: BuilderScene,
@@ -83,6 +85,8 @@ export default class DeckRegion {
   private createScrollable(startCallback: () => void) {
     let background = this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
 
+    this.decklist = new Decklist(this.scene)
+
     this.scrollablePanel = newScrollablePanel(this.scene, {
       x: X_START,
       y: 0,
@@ -90,7 +94,7 @@ export default class DeckRegion {
       height: Space.windowHeight,
 
       panel: {
-        child: this.createPanel(startCallback),
+        child: this.decklist.sizer,
       },
 
       header: this.createHeader(startCallback),
@@ -107,19 +111,6 @@ export default class DeckRegion {
     }
 
     return this.scrollablePanel
-  }
-
-  private createPanel(
-    startCallback: () => void,
-  ): Phaser.GameObjects.GameObject {
-    this.panel = this.scene.rexUI.add.fixWidthSizer({
-      width: width,
-      space: {
-        top: Space.padSmall,
-      },
-    })
-
-    return this.panel
   }
 
   private createHeader(
@@ -230,82 +221,28 @@ export default class DeckRegion {
   }
 
   // Add the given card and return the created cardImage
-  addCardToDeck(card: Card, panel = this.panel): string {
-    let totalCount = 0
-    this.deck.forEach((cutout) => {
-      totalCount += cutout.count
-    })
-
-    // NOTE Limit the max number of cards so that database doesn't get taxed
-    if (totalCount >= MechanicsSettings.DECK_SIZE * 2) {
-      return 'Deck is overfull.'
-    }
-
-    // If this card exists in the deck already, increment it
-    let alreadyInDeck = false
-    this.deck.forEach((cutout) => {
-      if (cutout.name === card.name) {
-        cutout.increment()
-        alreadyInDeck = true
-      }
-    })
-
-    if (!alreadyInDeck) {
-      // If it doesn't, create a new cutout
-      let container = new ContainerLite(
-        this.scene,
-        0,
-        0,
-        Space.deckPanelWidth,
-        Space.cutoutHeight,
-      )
-      let cutout = new Cutout(container, card)
-      cutout.setOnClick(this.onClickCutout(cutout))
-
-      // Add the container in the right position in the panel
-      let index = this.addToPanelSorted(container, card, panel)
-
-      this.scrollablePanel.layout()
-
-      this.deck.splice(index, 0, cutout)
-    }
-
-    // Update start button to reflect new amount of cards in deck
-    this.updateText()
-
-    // TODO Why does this return a string?
-    return
+  addCardToDeck(card: Card, panel = this.decklist.sizer): void {
+    console.log('add')
+    // TODO Remove panel
+    this.decklist.addCard(card)
   }
 
   getDeck(): Deck {
     return {
       name: this.txtDeckName.text,
-      cards: this.deck.reduce((acc, cutout) => {
-        return [...acc, ...Array(cutout.count).fill(cutout.card.id)]
-      }, [] as number[]),
+      cards: this.decklist.getCards(),
       cosmeticSet: this.cosmeticSet,
     }
   }
 
   // Set the current deck, and return whether the given deck was valid
-  setDeck(deck: Card[], panel = this.panel): boolean {
-    // Remove the current deck
-    this.deck.forEach((cutout) => cutout.destroy())
-    this.deck = []
-    this.updateText()
+  setDeck(deck: Card[]): boolean {
+    console.log('set')
+    this.decklist.setDeck(deck)
 
-    // Add the new deck
-    for (let i = 0; i < deck.length; i++) {
-      let card = deck[i]
-      this.addCardToDeck(card, panel)
-    }
-
-    // TODO Decouple this from cutout
-    // Stop cutouts from flashing
-    this.deck.forEach((cutout) => cutout.stopFlash())
-
-    // Scroll to the top of the page
     this.scrollablePanel.t = 0
+
+    this.scrollablePanel.layout()
 
     return true
   }
@@ -342,13 +279,7 @@ export default class DeckRegion {
 
   // Get the deck code for player's current deck
   getDeckCode(): number[] {
-    let result = []
-    this.deck.forEach((cutout) => {
-      for (let i = 0; i < cutout.count; i++) {
-        result.push(cutout.card.id)
-      }
-    })
-    return result
+    return this.decklist.getDeckCode()
   }
 
   // Remove the card from deck which has given index, or add another if right-click
@@ -415,25 +346,6 @@ export default class DeckRegion {
     }
   }
 
-  private addToPanelSorted(child: ContainerLite, card: Card, panel): number {
-    for (let i = 0; i < this.deck.length; i++) {
-      const cutout = this.deck[i]
-
-      if (
-        cutout.card.cost > card.cost ||
-        (cutout.card.cost === card.cost && cutout.card.name > card.name)
-      ) {
-        panel.insert(i, child)
-        return i
-      }
-    }
-
-    // Default insertion is at the end, if it's not before any existing element
-    let end = this.deck.length
-    panel.insert(end, child)
-    return end
-  }
-
   private openEditMenu(): () => void {
     return () => {
       this.scene.scene.launch('MenuScene', {
@@ -444,12 +356,6 @@ export default class DeckRegion {
         deckCode: this.getDeckCode(),
         activeScene: this.scene,
       })
-    }
-  }
-
-  private backCallback(): () => void {
-    return () => {
-      this.scene.deselect()
     }
   }
 

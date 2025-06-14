@@ -149,13 +149,15 @@ export default class CatalogRegion {
       const muteSound =
         !this.scene['journeyRegion'] &&
         this.scene.decklistsRegion.savedDeckIndex === undefined
-      const errorMsg = this.scene.addCardToDeck(card)
+      this.scene.addCardToDeck(card)
 
-      if (errorMsg !== undefined) {
-        this.scene.signalError(errorMsg)
-      } else if (!muteSound) {
-        this.scene.sound.play('click')
-      }
+      // const errorMsg = '' // TODO fix
+
+      // if (errorMsg !== undefined) {
+      // this.scene.signalError(errorMsg)
+      // } else if (!muteSound) {
+      this.scene.sound.play('click')
+      // }
     }
   }
 
