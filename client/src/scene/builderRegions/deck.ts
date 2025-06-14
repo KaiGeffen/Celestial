@@ -26,12 +26,12 @@ import Catalog from '../../../../shared/state/catalog'
 import AvatarButton from '../../lib/buttons/avatar'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import Decklist from '../../lib/decklist'
-const width = Space.deckPanelWidth // + Space.pad * 2
+const width = Space.cutoutWidth // + Space.pad * 2
 
 // Where the panel starts
 const X_START = Flags.mobile
-  ? -Space.deckPanelWidth - Space.pad - Space.sliderWidth
-  : Space.decklistPanelWidth - Space.deckPanelWidth - Space.pad
+  ? -Space.cutoutWidth - Space.pad - Space.sliderWidth
+  : Space.decklistPanelWidth - Space.cutoutWidth - Space.pad
 
 export default class DeckRegion {
   private scene: BuilderScene

@@ -115,7 +115,7 @@ export class JourneyBuilderScene extends BuilderBase {
 
   onWindowResize(): void {
     this.journeyRegion.onWindowResize()
-    this.catalogRegion.resize(Space.deckPanelWidth)
+    this.catalogRegion.resize(Space.cutoutWidth)
   }
 
   addCardToDeck(card: Card): void {

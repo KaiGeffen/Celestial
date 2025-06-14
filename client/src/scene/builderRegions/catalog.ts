@@ -166,8 +166,8 @@ export default class CatalogRegion {
     this.shifted = true
 
     const x = Flags.mobile
-      ? Space.deckPanelWidth
-      : Space.decklistPanelWidth + Space.deckPanelWidth
+      ? Space.cutoutWidth
+      : Space.decklistPanelWidth + Space.cutoutWidth
     const width = Space.windowWidth - x
 
     // Ratio of how much panel has been scrolled
@@ -232,7 +232,7 @@ export class CatalogRegionJourney extends CatalogRegion {
     super.create(scene)
 
     this.panel
-      .setMinSize(Space.windowWidth - Space.deckPanelWidth, Space.windowHeight)
+      .setMinSize(Space.windowWidth - Space.cutoutWidth, Space.windowHeight)
       .layout()
 
     return this

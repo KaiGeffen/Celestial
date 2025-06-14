@@ -119,7 +119,7 @@ export default class Decklist {
       this.scene,
       0,
       0,
-      Space.deckPanelWidth,
+      Space.cutoutWidth,
       Space.cutoutHeight,
     )
     const newCutout = new Cutout(container, card)

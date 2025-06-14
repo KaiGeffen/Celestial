@@ -51,8 +51,7 @@ function getSpace() {
     filterBarHeight: Flags.mobile ? 0 : 80,
 
     decklistPanelWidth: 240,
-    // NOTE cutout width is 350
-    deckPanelWidth: 350 + (Flags.mobile ? 0 : 10),
+    cutoutWidth: 350,
 
     // Textbox text in the tutorial that plays while stillframes show
     stillframeTextWidth: width - 120,

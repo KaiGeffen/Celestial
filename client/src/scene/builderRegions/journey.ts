@@ -14,7 +14,7 @@ import { MechanicsSettings } from '../../../../shared/settings'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
 
-const width = Space.deckPanelWidth // + Space.pad * 2
+const width = Space.cutoutWidth // + Space.pad * 2
 
 export default class DeckRegion {
   private scene
@@ -231,7 +231,7 @@ export default class DeckRegion {
         this.scene,
         0,
         0,
-        Space.deckPanelWidth,
+        Space.cutoutWidth,
         Space.cutoutHeight,
       ) // TODO
       let cutout = new Cutout(container, card)
