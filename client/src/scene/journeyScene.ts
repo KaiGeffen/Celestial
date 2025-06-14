@@ -18,6 +18,7 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import JOURNEY_CHARACTERS from '../data/journeyCharacters'
 import Decklist from '../lib/decklist'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
+import { Deck } from '../../../shared/types/deck'
 
 export default class JourneyScene extends BaseScene {
   panDirection
@@ -212,17 +213,17 @@ export default class JourneyScene extends BaseScene {
         this.missionDetails.hide()
       },
     })
-    const cont2 = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: cont2,
-      text: 'Customize',
-    })
+    // const cont2 = new ContainerLite(
+    //   this,
+    //   0,
+    //   0,
+    //   Space.buttonWidth,
+    //   Space.buttonHeight,
+    // )
+    // new Buttons.Basic({
+    //   within: cont2,
+    //   text: 'Customize',
+    // })
     const cont3 = new ContainerLite(
       this,
       0,
@@ -233,8 +234,22 @@ export default class JourneyScene extends BaseScene {
     new Buttons.Basic({
       within: cont3,
       text: 'Start',
+      f: () => {
+        console.log(this.decklist.getDeckCode())
+        const deck: Deck = {
+          name: 'foooooo',
+          cards: this.decklist.getDeckCode(),
+          cosmeticSet: { avatar: 0, border: 0 },
+        }
+
+        this.scene.start('JourneyMatchScene', {
+          deck: deck,
+          // TODO
+          aiDeck: deck,
+        })
+      },
     })
-    btnSizer.add(cont1).add(cont2).add(cont3)
+    btnSizer.add(cont1).add(cont3)
 
     return btnSizer
   }
