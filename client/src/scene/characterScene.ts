@@ -2,7 +2,6 @@ import 'phaser'
 import BaseScene from './baseScene'
 import avatarDetails from '../catalog/avatarDetails.json'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer.js'
-import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel.js'
 import { Style, Space } from '../settings/settings'
 import AvatarButton from '../lib/buttons/avatar'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -27,14 +26,18 @@ const CHARACTERS: CharacterInfo[] = avatarDetails.map((char) => ({
 
 export default class CharacterProfileScene extends BaseScene {
   private selectedCharacterIndex = 0
+  private mainSizer: Sizer
+  private portraitContainer: Phaser.GameObjects.Container
   private portraitImage: Phaser.GameObjects.Image
-  private infoSizer: Sizer
-  private scrollPanel: ScrollablePanel
+  private nameText: Phaser.GameObjects.Text
+  private rightSizer: Sizer
+  private headerSizer: Sizer
+  private avatarButtons: AvatarButton[] = []
+  private descText: Phaser.GameObjects.Text
   private expBarBg: Phaser.GameObjects.Rectangle
   private expBar: Phaser.GameObjects.Rectangle
   private expText: Phaser.GameObjects.Text
-  private nameText: Phaser.GameObjects.Text
-  private descText: Phaser.GameObjects.Text
+  private progressSizer: Sizer
 
   constructor() {
     super({ key: 'CharacterProfileScene' })
@@ -52,158 +55,99 @@ export default class CharacterProfileScene extends BaseScene {
       height: '100%',
     })
 
-    this.createPortrait()
-    this.createHeader()
-    this.createContents()
-    this.createProgress()
+    this.createMainSizer()
+    // this.createPortrait()
+    this.createRightPanel()
+    this.mainSizer.layout()
   }
 
-  createPortrait() {
+  createMainSizer() {
     const width = this.cameras.main.width
     const height = this.cameras.main.height
-    const char = CHARACTERS[this.selectedCharacterIndex]
-    const portraitKey = `avatar-${char.name}Full`
-    this.portraitImage = this.add.image(0, 0, portraitKey)
-    this.plugins.get('rexAnchor')['add'](this.portraitImage, {
+    // Main horizontal sizer
+    this.mainSizer = this.rexUI.add.sizer()
+    this.plugins.get('rexAnchor')['add'](this.mainSizer, {
       left: 'left',
       top: 'top',
+      width: '100%',
       height: '100%',
     })
-    // Maintain aspect ratio for fullsize avatar
-    this.portraitImage.once('texturecomplete', () => {
-      const naturalWidth = this.portraitImage.width
-      const naturalHeight = this.portraitImage.height
-      const scale = this.cameras.main.height / naturalHeight
-      this.portraitImage.setDisplaySize(
-        naturalWidth * scale,
-        this.cameras.main.height,
-      )
-    })
-    if (this.portraitImage.texture.key !== '__MISSING') {
-      // If already loaded
-      const naturalWidth = this.portraitImage.width
-      const naturalHeight = this.portraitImage.height
-      const scale = this.cameras.main.height / naturalHeight
-      this.portraitImage.setDisplaySize(
-        naturalWidth * scale,
-        this.cameras.main.height,
-      )
-    }
-    // Add character name at the bottom of the fullsize image
-    const charName = `${char.name} — ${char.surname}`
-    this.nameText = this.add.text(0, 0, charName, {
-      ...Style.announcement,
-      wordWrap: { width: width * 0.5 - 48 },
-      align: 'center',
-    })
-    this.plugins.get('rexAnchor')['add'](this.nameText, {
-      left: 'left',
-      bottom: 'bottom-32',
-      width: '50%',
-    })
-  }
 
-  createHeader() {
-    const width = this.cameras.main.width
-    const height = this.cameras.main.height
-    // 1. Header: Horizontal scrollable panel for avatar selection
-    this.scrollPanel = this.rexUI.add.scrollablePanel({
-      x: 0,
-      y: 0,
-      width: width * 0.5 - 48,
-      height: 100,
-      scrollMode: 0, // horizontal
-      panel: {
-        child: this.createAvatarRow(),
-        mask: { padding: 1 },
-      },
-      slider: false,
-      mouseWheelScroller: false,
-      space: { left: 0, right: 0, top: 0, bottom: 0, panel: 0 },
-    })
-  }
+    // Left: Portrait container
+    this.mainSizer.add(this.createPortrait())
+    // this.portraitContainer = this.add.container(0, 0)
+    // this.mainSizer.add(this.portraitContainer, {
+    //   proportion: 1,
+    //   align: 'center',
+    //   expand: true,
+    // })
 
-  createContents() {
-    const width = this.cameras.main.width
-    const height = this.cameras.main.height
-    const char = CHARACTERS[this.selectedCharacterIndex]
-    // 2. Info: Only description
-    this.descText = this.add.text(0, 0, char.description, {
-      ...Style.basic,
-      wordWrap: { width: width * 0.5 - 48 },
-      align: 'center',
-    })
-    const infoSection = this.rexUI.add.sizer({
+    // Right: Vertical sizer for header, description, progress
+    this.rightSizer = this.rexUI.add.sizer({
       orientation: 'vertical',
-      space: { item: 12 },
-    })
-    infoSection.add(this.descText, { align: 'center' })
-    // Create the right info sizer and add header and info
-    this.infoSizer = this.rexUI.add.sizer({
-      orientation: 'vertical',
-      x: width * 0.75,
-      y: height / 2,
-      width: width * 0.5,
-      height: height,
       space: { item: 24, top: 48, left: 24, right: 24, bottom: 48 },
     })
-    this.infoSizer.add(this.scrollPanel, { align: 'center' })
-    this.infoSizer.add(infoSection, {
+    this.mainSizer.add(this.rightSizer, {
       proportion: 1,
       align: 'center',
       expand: true,
     })
-    this.infoSizer.layout()
+    this.mainSizer.layout()
   }
 
-  createProgress() {
-    const width = this.cameras.main.width
+  createPortrait() {
+    const fixRatio = () => {
+      const height = this.cameras.main.height
+      console.log('fixRatio', height)
+      this.portraitImage.setDisplaySize((height * 2) / 3, height)
+      this.mainSizer.layout()
+    }
+
+    // Portrait image
     const char = CHARACTERS[this.selectedCharacterIndex]
-    const barWidth = width * 0.5 - 96
-    const barHeight = 24
-    const exp = char.exp ?? 0
-    const expToNext = char.expToNext ?? 100
-    const expPercent = Math.min(exp / expToNext, 1)
-    this.expBarBg = this.add
-      .rectangle(0, 0, barWidth, barHeight, 0x222222, 0.7)
-      .setOrigin(0.5, 0.5)
-    this.expBar = this.add
-      .rectangle(
-        -barWidth / 2 + (barWidth * expPercent) / 2,
-        0,
-        barWidth * expPercent,
-        barHeight,
-        0x00cfff,
-        1,
-      )
-      .setOrigin(0.5, 0.5)
-    this.expText = this.add
-      .text(0, 0, `${exp} / ${expToNext} EXP`, {
-        ...Style.basic,
-        fontSize: '18px',
-      })
-      .setOrigin(0.5, 0.5)
-    const expSizer = this.rexUI.add.sizer({
-      orientation: 'vertical',
-      space: { item: 4 },
+    this.portraitImage = this.add.image(0, 0, `avatar-${char.name}Full`)
+
+    this.plugins.get('rexAnchor')['add'](this.portraitImage, {
+      //   left: 'left',
+      //   bottom: 'bottom',
+      onUpdateViewportCallback: fixRatio,
     })
-    const expBarSizer = this.rexUI.add.sizer({ orientation: 'horizontal' })
-    expBarSizer.add(this.expBarBg, { align: 'center' })
-    expBarSizer.add(this.expBar, { align: 'center' })
-    expSizer.add(expBarSizer, { align: 'center' })
-    expSizer.add(this.expText, { align: 'center' })
-    // Add to infoSizer at the bottom
-    this.infoSizer.add(expSizer, { align: 'center' })
-    this.infoSizer.layout()
+
+    fixRatio()
+
+    return this.portraitImage
   }
 
-  createAvatarRow() {
-    const rowSizer = this.rexUI.add.sizer({
-      orientation: 'horizontal',
-      space: { item: 16 },
+  createRightPanel() {
+    // Header
+    this.createHeader()
+    // Description/content
+    const width = this.cameras.main.width
+    this.descText = this.add.text(0, 0, '', {
+      ...Style.basic,
+      wordWrap: { width: width * 0.5 - 48 },
+      align: 'center',
     })
+    // Footer (progress)
+    this.createProgress()
+    // Add to rightSizer: header, content, footer
+    this.rightSizer.add(this.headerSizer, { align: 'center' })
+    this.rightSizer.add(this.descText, {
+      proportion: 1,
+      align: 'center',
+      expand: true,
+    })
+    this.rightSizer.add(this.progressSizer, { align: 'center' })
+    this.rightSizer.layout()
+  }
+
+  createHeader() {
+    this.headerSizer = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      space: { item: Space.pad },
+    })
+    this.avatarButtons = []
     CHARACTERS.forEach((char, idx) => {
-      // Use AvatarButton in a ContainerLite, as in alterDeck.ts
       const container = new ContainerLite(
         this,
         0,
@@ -211,25 +155,75 @@ export default class CharacterProfileScene extends BaseScene {
         Space.avatarSize,
         Space.avatarSize,
       )
-      new AvatarButton({
+      const avatarBtn = new AvatarButton({
         within: container,
         name: char.name,
-        x: Space.avatarSize / 2,
-        y: Space.avatarSize / 2,
         emotive: false,
         muteClick: true,
-        origin: [0.5, 0.5],
         f: () => {
-          this.selectedCharacterIndex = idx
-          this.scene.restart() // Recreate the scene to update everything
+          if (this.selectedCharacterIndex !== idx) {
+            this.selectedCharacterIndex = idx
+            this.updateCharacterDisplay()
+          }
         },
       })
-      rowSizer.add(container)
-      // Add spacing except after the last button
-      if (idx < CHARACTERS.length - 1) {
-        rowSizer.addSpace(Space.pad)
+      this.avatarButtons.push(avatarBtn)
+      this.headerSizer.add(container)
+    })
+  }
+
+  createProgress() {
+    const width = this.cameras.main.width
+    const barWidth = width * 0.5 - 96
+    const barHeight = 24
+    this.expBarBg = this.add
+      .rectangle(0, 0, barWidth, barHeight, 0x222222, 0.7)
+      .setOrigin(0.5, 0.5)
+    this.expBar = this.add
+      .rectangle(-barWidth / 2, 0, 0, barHeight, 0x00cfff, 1)
+      .setOrigin(0.5, 0.5)
+    this.expText = this.add
+      .text(0, 0, '', {
+        ...Style.basic,
+        fontSize: '18px',
+      })
+      .setOrigin(0.5, 0.5)
+    this.progressSizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: { item: 4 },
+    })
+    const expBarSizer = this.rexUI.add.sizer({ orientation: 'horizontal' })
+    expBarSizer.add(this.expBarBg, { align: 'center' })
+    expBarSizer.add(this.expBar, { align: 'center' })
+    this.progressSizer.add(expBarSizer, { align: 'center' })
+    this.progressSizer.add(this.expText, { align: 'center' })
+  }
+
+  updateCharacterDisplay() {
+    const width = this.cameras.main.width
+    const height = this.cameras.main.height
+    const char = CHARACTERS[this.selectedCharacterIndex]
+    // Update portrait
+    this.portraitImage.setTexture(`avatar-${char.name}Full`)
+
+    // Update name
+    this.nameText.setText(`${char.name} — ${char.surname}`)
+    // Update description
+    this.descText.setText(char.description)
+    // Update progress bar
+    const exp = char.exp ?? 0
+    const expToNext = char.expToNext ?? 100
+    const expPercent = Math.min(exp / expToNext, 1)
+    const barWidth = width * 0.5 - 96
+    this.expBar.width = barWidth * expPercent
+    this.expText.setText(`${exp} / ${expToNext} EXP`)
+    // Update avatar button selection highlight (if you want to add a visual cue)
+    this.avatarButtons.forEach((btn, idx) => {
+      if (idx === this.selectedCharacterIndex) {
+        btn.select && btn.select()
+      } else {
+        btn.deselect && btn.deselect()
       }
     })
-    return rowSizer
   }
 }
