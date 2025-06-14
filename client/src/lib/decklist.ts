@@ -13,9 +13,14 @@ export default class Decklist {
   sizer: Sizer
   cutouts: Cutout[] = []
   countCards: number = 0
+  cutoutClickCallback: (cutout: Cutout) => () => void
 
-  constructor(scene: BaseScene) {
+  constructor(
+    scene: BaseScene,
+    cutoutClickCallback: (cutout: Cutout) => () => void,
+  ) {
     this.scene = scene
+    this.cutoutClickCallback = cutoutClickCallback
 
     this.sizer = this.scene.rexUI.add.sizer({
       orientation: 'vertical',
@@ -25,6 +30,7 @@ export default class Decklist {
     })
   }
 
+  // Add a new card to the deck
   addCard(card: Card) {
     // If card count exceeds maximum, return error TODO
     if (this.countCards >= MechanicsSettings.DECK_SIZE * 2) {
@@ -46,6 +52,34 @@ export default class Decklist {
     this.addNewCutout(card)
   }
 
+  // Remove a copy of the given card from the deck, return whether cutout is fully removed
+  removeCard(card: Card): boolean {
+    // Find the cutout
+    for (let i = 0; i < this.cutouts.length; i++) {
+      const cutout = this.cutouts[i]
+
+      if (cutout.card.id === card.id) {
+        // Update values
+        cutout.decrement()
+        this.countCards--
+
+        // If fully removed, remove from deck list
+        if (cutout.count === 0) {
+          this.cutouts.splice(i, 1)
+          cutout.destroy()
+
+          return true
+        }
+
+        return false
+      }
+    }
+
+    // Cutout wasn't found
+    return false
+  }
+
+  // Set the deck to the given cards
   setDeck(deck: Card[]) {
     // Remove the current deck
     this.cutouts.forEach((cutout) => cutout.destroy())
@@ -92,6 +126,7 @@ export default class Decklist {
       Space.cutoutHeight,
     )
     const newCutout = new Cutout(container, card)
+    newCutout.setOnClick(this.cutoutClickCallback(newCutout))
 
     // Add at the right index
     for (let i = 0; i < this.cutouts.length; i++) {

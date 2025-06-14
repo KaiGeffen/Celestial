@@ -174,35 +174,6 @@ export default class Cutout extends Button {
     return this
   }
 
-  // Set that this card is a part of a premade deck
-  setPremade(): Cutout {
-    const signalError = () => {
-      this.scene['signalError']("Can't make changes to premade decks.")
-    }
-
-    if (Flags.mobile) {
-      this.onClick = () => {
-        this.scene.scene.launch('MenuScene', {
-          menu: 'focus',
-          card: this.card,
-          cost: undefined,
-          getCount: () => {
-            return this.count
-          },
-          btnString: 'Remove',
-          closeOnClick: () => {
-            return true
-          },
-          callback: signalError,
-        })
-      }
-    } else {
-      this.onClick = signalError
-    }
-
-    return this
-  }
-
   tween: Phaser.Tweens.Tween
   stopFlash(): void {
     if (this.tween) {
