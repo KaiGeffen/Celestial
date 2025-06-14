@@ -11,7 +11,6 @@ import {
 import Buttons from '../lib/buttons/buttons'
 import Button from '../lib/buttons/button'
 import premadeDecklists from '../data/premadeDecklists'
-import avatarNames from '../lib/avatarNames'
 import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -32,8 +31,11 @@ export default class JourneyScene extends BaseScene {
 
   // NEW FLOW
   decklist: Decklist
+
+  // Views
   characterSelect: Phaser.GameObjects.Container
   missionDetails: Sizer
+  postMatch: Phaser.GameObjects.Container
 
   constructor() {
     super({
@@ -62,6 +64,9 @@ export default class JourneyScene extends BaseScene {
 
     // Create the mission screen
     this.createMissionDetails()
+
+    // Create post match screen
+    this.createPostMatch()
   }
 
   private createCharacterSelect() {
@@ -80,6 +85,10 @@ export default class JourneyScene extends BaseScene {
       })
 
       const image = this.add.image(0, 0, char.image)
+      this.plugins.get('rexDropShadowPipeline')['add'](image, {
+        distance: 3,
+        shadowColor: 0x000000,
+      })
       const text = this.add.text(0, 0, char.selectText, Style.basic)
       const btnContainer = new ContainerLite(
         this,
@@ -88,7 +97,7 @@ export default class JourneyScene extends BaseScene {
         Space.buttonWidth,
         Space.buttonHeight,
       )
-      const button = new Buttons.Basic({
+      new Buttons.Basic({
         within: btnContainer,
         text: 'Select',
         f: () => {
@@ -137,13 +146,19 @@ export default class JourneyScene extends BaseScene {
       },
     })
 
-    const background = this.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
+    const background = this.add.image(0, 0, 'background-Light')
+    this.plugins.get('rexDropShadowPipeline')['add'](background, {
+      distance: 3,
+      shadowColor: 0x000000,
+    })
 
+    const txtTitle = this.add.text(0, 0, 'Jules Story', Style.announcement)
     const headerSizer = this.createHeader(mission)
     const decklistSizer = this.createDecklist()
     const btnSizer = this.createButtons()
 
     this.missionDetails
+      .add(txtTitle)
       .add(headerSizer)
       .add(decklistSizer)
       .add(btnSizer)
@@ -157,6 +172,16 @@ export default class JourneyScene extends BaseScene {
     })
 
     this.missionDetails.hide()
+  }
+
+  private createPostMatch() {
+    // this.postMatch = this.add.container()
+    // // TODO
+    // const image = this.add.image(0, 0, 'avatar-JulesFull')
+    //   this.plugins.get('rexDropShadowPipeline')['add'](image, {
+    //     distance: 3,
+    //     shadowColor: 0x000000,
+    //   })
   }
 
   private createHeader(mission) {
@@ -176,7 +201,10 @@ export default class JourneyScene extends BaseScene {
       within: container,
       avatarId: mission.index,
     })
-    const txt = this.add.text(0, 0, mission.storyQuote, Style.basic)
+    const txt = this.add.text(0, 0, mission.storyQuote, {
+      ...Style.basic,
+      wordWrap: { width: 300 },
+    })
     headerSizer.add(container).add(txt)
 
     return headerSizer
