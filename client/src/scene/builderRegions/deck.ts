@@ -56,12 +56,10 @@ export default class DeckRegion {
   cosmeticSet: CosmeticSet
   private avatar: AvatarButton
   private txtDeckName: RexUIPlugin.BBCodeText
+  private decklist: Decklist
 
   // Add text showing card count
   private txtCount: Phaser.GameObjects.Text
-
-  // TODO Move up, the decklist
-  private decklist: Decklist
 
   create(
     scene: BuilderScene,
@@ -220,7 +218,7 @@ export default class DeckRegion {
   }
 
   // Add the given card and return the created cardImage
-  addCardToDeck(card: Card, panel = this.decklist.sizer): void {
+  addCardToDeck(card: Card): void {
     this.decklist.addCard(card)
     this.updateText()
   }

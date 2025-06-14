@@ -16,6 +16,7 @@ import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import JOURNEY_CHARACTERS from '../data/journeyCharacters'
+import Decklist from '../lib/decklist'
 
 export default class JourneyScene extends BaseScene {
   panDirection
@@ -123,44 +124,6 @@ export default class JourneyScene extends BaseScene {
     })
   }
 
-  private createDecklist() {
-    const decklistSizer = this.rexUI.add.sizer({
-      orientation: 'vertical',
-    })
-
-    const deckIds = premadeDecklists[0]
-    // Count cards by id
-    const cardCounts: { [id: number]: number } = {}
-    deckIds.forEach((id) => (cardCounts[id] = (cardCounts[id] || 0) + 1))
-    // Sort by cost, then name
-    const sortedIds = Object.keys(cardCounts)
-      .map(Number)
-      .sort((a, b) => {
-        const ca = Catalog.getCardById(a)
-        const cb = Catalog.getCardById(b)
-        if (!ca || !cb) return 0
-        if (ca.cost !== cb.cost) return ca.cost - cb.cost
-        return ca.name.localeCompare(cb.name)
-      })
-    sortedIds.forEach((id) => {
-      const card = Catalog.getCardById(id)
-      if (!card) return
-      const container = new ContainerLite(
-        this,
-        0,
-        0,
-        Space.deckPanelWidth,
-        Space.cutoutHeight,
-      )
-      const cutout = new Cutout(container, card)
-      cutout.count = cardCounts[id]
-      cutout.setText(`x${cardCounts[id]}`)
-      decklistSizer.add(container)
-    })
-
-    return decklistSizer
-  }
-
   private createHeader(mission) {
     const headerSizer = this.rexUI.add.sizer({
       orientation: 'horizontal',
@@ -182,6 +145,14 @@ export default class JourneyScene extends BaseScene {
     headerSizer.add(container).add(txt)
 
     return headerSizer
+  }
+
+  private createDecklist() {
+    const decklist: Decklist = new Decklist(this, this.onClickCutout())
+
+    decklist.setDeck(premadeDecklists[0].map((id) => Catalog.getCardById(id)))
+
+    return decklist.sizer
   }
 
   private createButtons() {
@@ -226,6 +197,14 @@ export default class JourneyScene extends BaseScene {
     btnSizer.add(cont1).add(cont2).add(cont3)
 
     return btnSizer
+  }
+
+  private onClickCutout(): (cutout: Cutout) => () => void {
+    return (cutout: Cutout) => {
+      return () => {
+        console.log(cutout.card.name)
+      }
+    }
   }
 
   showCharacterChoices() {
