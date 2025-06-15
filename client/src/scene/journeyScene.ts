@@ -14,10 +14,12 @@ import premadeDecklists from '../data/premadeDecklists'
 import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import JOURNEY_CHARACTERS from '../data/journeyCharacters'
+import JOURNEY_MISSIONS from '../data/journeyCharacters'
 import Decklist from '../lib/decklist'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { Deck } from '../../../shared/types/deck'
+import avatarNames from '../lib/avatarNames'
+import AvatarButton from '../lib/buttons/avatar'
 
 export default class JourneyScene extends BaseScene {
   panDirection
@@ -29,8 +31,13 @@ export default class JourneyScene extends BaseScene {
   characterContainers: Phaser.GameObjects.Container[] = []
   storyPanel: Phaser.GameObjects.Container | null = null
 
-  // NEW FLOW
+  // Mission details
+  txtMissionTitle: Phaser.GameObjects.Text
+  txtMissionDescription: Phaser.GameObjects.Text
+  avatar: AvatarButton
   decklist: Decklist
+
+  // Timer until next journey available
   txtTimer: Phaser.GameObjects.Text
 
   // Views
@@ -86,22 +93,28 @@ export default class JourneyScene extends BaseScene {
 
     // Somehow randomly get the characters that will appear
     // TODO
-    const characters = [JOURNEY_CHARACTERS[0], JOURNEY_CHARACTERS[1]]
+    const missionTracks = JOURNEY_MISSIONS
 
     // For each character, add the avatar, text, button
-    const sizers = characters.map((char) => {
+    const sizers = missionTracks.map((missions, avatarIndex) => {
+      // TODO Use the level to get the right mission
+      const mission = missions[0]
+
+      const name = avatarNames[avatarIndex]
+
       // Form a sizer for this character
       const sizer = this.rexUI.add.sizer({
         orientation: 'vertical',
         space: { item: Space.pad },
       })
 
-      const image = this.add.image(0, 0, char.image)
+      const image = this.add.image(0, 0, `avatar-${name}Full`)
       this.plugins.get('rexDropShadowPipeline')['add'](image, {
         distance: 3,
         shadowColor: 0x000000,
       })
-      const text = this.add.text(0, 0, char.selectText, Style.basic)
+      const text = this.add.text(0, 0, name, Style.basic)
+      // Select button
       const btnContainer = new ContainerLite(
         this,
         0,
@@ -113,12 +126,16 @@ export default class JourneyScene extends BaseScene {
         within: btnContainer,
         text: 'Select',
         f: () => {
+          // Set all information based on selected character
+          this.txtMissionTitle.setText(`${name}'s Story`)
+          this.txtMissionDescription.setText(mission.missionText)
+          this.avatar.setAvatar(avatarIndex)
+          // TODO Get this in a better way
           this.decklist.setDeck(
-            // TODO Do better
-            premadeDecklists[char.deckIndex].map((id) =>
-              Catalog.getCardById(id),
-            ),
+            mission.deck.map((id) => Catalog.getCardById(id)),
           )
+
+          // Set the right views visible/invisible
           this.characterSelectView.setAlpha(0)
           this.missionDetailsView.show().layout()
         },
@@ -143,9 +160,6 @@ export default class JourneyScene extends BaseScene {
   }
 
   private createMissionDetails() {
-    // Get the mission details TODO
-    const mission = JOURNEY_CHARACTERS[0]
-
     // Create a sizer for the mission details
     this.missionDetailsView = this.rexUI.add.sizer({
       orientation: 'vertical',
@@ -164,13 +178,13 @@ export default class JourneyScene extends BaseScene {
       shadowColor: 0x000000,
     })
 
-    const txtTitle = this.add.text(0, 0, 'Jules Story', Style.announcement)
-    const headerSizer = this.createHeader(mission)
+    this.txtMissionTitle = this.add.text(0, 0, '', Style.announcement)
+    const headerSizer = this.createHeader()
     const decklistSizer = this.createDecklist()
     const btnSizer = this.createButtons()
 
     this.missionDetailsView
-      .add(txtTitle)
+      .add(this.txtMissionTitle)
       .add(headerSizer)
       .add(decklistSizer)
       .add(btnSizer)
@@ -311,7 +325,7 @@ export default class JourneyScene extends BaseScene {
     })
   }
 
-  private createHeader(mission) {
+  private createHeader() {
     const headerSizer = this.rexUI.add.sizer({
       orientation: 'horizontal',
       space: { item: Space.pad },
@@ -324,15 +338,14 @@ export default class JourneyScene extends BaseScene {
       Space.avatarSize,
       Space.avatarSize,
     )
-    const avatar = new Buttons.Avatar({
+    this.avatar = new AvatarButton({
       within: container,
-      avatarId: mission.index,
     })
-    const txt = this.add.text(0, 0, mission.storyQuote, {
+    this.txtMissionDescription = this.add.text(0, 0, '', {
       ...Style.basic,
       wordWrap: { width: 300 },
     })
-    headerSizer.add(container).add(txt)
+    headerSizer.add(container).add(this.txtMissionDescription)
 
     return headerSizer
   }
