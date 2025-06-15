@@ -143,12 +143,8 @@ export default class DeckRegion {
     })
     sizer.add(containerAvatar)
 
-    // Give the background a drop shadow
-    this.scene.plugins.get('rexDropShadowPipeline')['add'](background, {
-      distance: 3,
-      angle: -90,
-      shadowColor: 0x000000,
-    })
+    // Background shadow
+    this.scene.addShadow(background, -90)
 
     return sizer
   }

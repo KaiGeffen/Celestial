@@ -239,11 +239,7 @@ export default class DecklistsRegion {
   private createHeader(): FixWidthSizer {
     // Make a background with a drop shadow straight down
     let background = this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundDark)
-    this.scene.plugins.get('rexDropShadowPipeline')['add'](background, {
-      distance: 3,
-      angle: -90,
-      shadowColor: 0x000000,
-    })
+    this.scene.addShadow(background, -90)
 
     let sizer = this.scene.rexUI.add
       .fixWidthSizer({

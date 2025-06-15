@@ -145,11 +145,7 @@ export default class ChoosePremade extends Menu {
     }
 
     // Give the background a drop shadow
-    this.scene.plugins.get('rexDropShadowPipeline')['add'](background, {
-      distance: 3,
-      angle: -90,
-      shadowColor: 0x000000,
-    })
+    this.scene.addShadow(background, -90)
 
     return panel
   }

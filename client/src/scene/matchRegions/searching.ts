@@ -200,10 +200,8 @@ export class SearchingRegionTutorial extends Region {
       .rectangle(0, 0, 1, TEXT_HEIGHT, Color.backgroundLight)
       .setOrigin(0.5, 0)
       .setAlpha(0.8)
-    scene.plugins.get('rexDropShadowPipeline')['add'](this.background, {
-      distance: 3,
-      shadowColor: 0x000000,
-    })
+    scene.addShadow(this.background)
+
     scene.plugins.get('rexAnchor')['add'](this.background, {
       y: `50%-${TEXT_HEIGHT}`,
       width: `100%`,

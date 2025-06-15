@@ -226,11 +226,7 @@ export default class MatchResultsRegion extends Region {
     const background = this.scene.add
       .rectangle(0, 0, 1, 1, Color.backgroundLight)
       .setInteractive()
-    this.scene.plugins.get('rexDropShadowPipeline')['add'](background, {
-      distance: 3,
-      angle: -90,
-      shadowColor: 0x000000,
-    })
+    this.scene.addShadow(background, -90)
 
     let sizer = this.scene.rexUI.add
       .fixWidthSizer({

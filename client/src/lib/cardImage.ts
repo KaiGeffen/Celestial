@@ -495,31 +495,6 @@ export class CardImage {
     this.txtPoints.clearTint()
     // this.txtText.clearTint()
   }
-
-  /**
-   * @deprecated The method should not be used
-   */
-  // Show which player controls the card while it's in the story
-  showController(player: number): CardImage {
-    return this
-
-    let color, angle
-    if (player === 0) {
-      color = 0x0000ff
-      angle = -90
-    } else {
-      color = 0xff0000
-      angle = 90
-    }
-
-    this.scene.plugins.get('rexDropShadowPipeline')['add'](this.image, {
-      distance: 10,
-      angle: angle,
-      shadowColor: color,
-    })
-
-    return this
-  }
 }
 
 // For mobile, the larger, full-sized CardImage

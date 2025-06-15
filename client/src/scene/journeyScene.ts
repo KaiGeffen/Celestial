@@ -110,10 +110,8 @@ export default class JourneyScene extends BaseScene {
       })
 
       const image = this.add.image(0, 0, `avatar-${name}Full`)
-      this.plugins.get('rexDropShadowPipeline')['add'](image, {
-        distance: 3,
-        shadowColor: 0x000000,
-      })
+      this.addShadow(image)
+
       const text = this.add.text(0, 0, name, Style.basic)
       // Select button
       const btnContainer = new ContainerLite(
@@ -176,10 +174,7 @@ export default class JourneyScene extends BaseScene {
     })
 
     const background = this.add.image(0, 0, 'background-Light')
-    this.plugins.get('rexDropShadowPipeline')['add'](background, {
-      distance: 3,
-      shadowColor: 0x000000,
-    })
+    this.addShadow(background)
 
     this.txtMissionTitle = this.add.text(0, 0, '', Style.announcement)
     const headerSizer = this.createHeader()
@@ -209,17 +204,11 @@ export default class JourneyScene extends BaseScene {
     // Avatar image
     // TODO use the avatar
     const image = this.add.image(0, 0, 'avatar-JulesFull')
-    this.plugins.get('rexDropShadowPipeline')['add'](image, {
-      distance: 3,
-      shadowColor: 0x000000,
-    })
+    this.addShadow(image)
 
     // Contents
     const background = this.add.image(0, 0, 'background-Light')
-    this.plugins.get('rexDropShadowPipeline')['add'](background, {
-      distance: 3,
-      shadowColor: 0x000000,
-    })
+    this.addShadow(background)
     const sizer = this.rexUI.add.sizer({
       orientation: 'vertical',
       space: {
@@ -289,10 +278,7 @@ export default class JourneyScene extends BaseScene {
     })
 
     const background = this.add.image(0, 0, 'background-Light')
-    this.plugins.get('rexDropShadowPipeline')['add'](background, {
-      distance: 3,
-      shadowColor: 0x000000,
-    })
+    this.addShadow(background)
 
     const txtNotice = this.add.text(
       0,
@@ -349,6 +335,7 @@ export default class JourneyScene extends BaseScene {
     this.txtMissionDescription = this.add.text(0, 0, '', {
       ...Style.basic,
       wordWrap: { width: 300 },
+      fixedWidth: 300,
     })
     headerSizer.add(container).add(this.txtMissionDescription)
 

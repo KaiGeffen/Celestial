@@ -68,12 +68,8 @@ export default class Menu {
     let txt = this.scene.add.text(0, 0, s, Style.announcement)
     sizer.addSpace().add(txt).addSpace()
 
-    // Add a drop shadow going down from the background
-    this.scene.plugins.get('rexDropShadowPipeline')['add'](background, {
-      distance: 3,
-      angle: -90,
-      shadowColor: 0x000000,
-    })
+    // Background shadow
+    this.scene.addShadow(background, -90)
 
     // Add the sizer to the main menu sizer
     this.sizer.add(sizer).addNewLine()

@@ -13,6 +13,7 @@ import newScrollablePanel from '../../lib/scrollablePanel'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
+import BaseScene from '../baseScene'
 
 const width = Space.cutoutWidth // + Space.pad * 2
 
@@ -39,7 +40,7 @@ export default class DeckRegion {
   private txtCount: Phaser.GameObjects.Text
 
   create(
-    scene: Phaser.Scene,
+    scene: BaseScene,
     startCallback: () => void,
     avatarID: number,
     storyTitle: string,
@@ -111,11 +112,7 @@ export default class DeckRegion {
         .addBackground(background)
 
       // Add a drop shadow going down from the background
-      this.scene.plugins.get('rexDropShadowPipeline')['add'](background, {
-        distance: 3,
-        angle: -90,
-        shadowColor: 0x000000,
-      })
+      this.scene.addShadow(background, -90)
     }
 
     // Back button - on Mobile
