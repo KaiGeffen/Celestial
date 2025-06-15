@@ -568,8 +568,8 @@ export class StandardMatchScene extends MatchScene {
 }
 
 export class JourneyMatchScene extends MatchScene {
-  expGained = 10 // Default exp gained, goes up if they win
-  postMatchText = ''
+  expGained: number
+  postMatchText: string
 
   constructor(args = { key: 'JourneyMatchScene', lastScene: 'JourneyScene' }) {
     super(args)
@@ -578,7 +578,11 @@ export class JourneyMatchScene extends MatchScene {
   create() {
     super.create()
 
+    // Set to winText when they win
     this.postMatchText = this.params.loseText
+
+    // Default exp gained, goes up if they win
+    this.expGained = 10
   }
 
   // Ensure that user gets exp

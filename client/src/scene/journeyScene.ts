@@ -294,8 +294,14 @@ export default class JourneyScene extends BaseScene {
       shadowColor: 0x000000,
     })
 
-    const txtNotice = this.add.text(0, 0, 'Daily journey complete', Style.basic)
-    this.txtTimer = this.add.text(0, 0, 'Check back in:\n03:02:11', Style.basic)
+    const txtNotice = this.add.text(
+      0,
+      0,
+      'Daily journey complete',
+      Style.announcement,
+    )
+    const txtTimerReminder = this.add.text(0, 0, 'Check back in:', Style.basic)
+    this.txtTimer = this.add.text(0, 0, '00:00:00', Style.basic)
     const btnContainer = new ContainerLite(
       this,
       0,
@@ -311,6 +317,7 @@ export default class JourneyScene extends BaseScene {
 
     this.waitingView
       .add(txtNotice)
+      .add(txtTimerReminder)
       .add(this.txtTimer)
       .add(btnContainer)
       .addBackground(background)
@@ -436,7 +443,6 @@ export default class JourneyScene extends BaseScene {
 
   update(time, delta): void {
     // Update the timer
-
     const now = new Date()
     let target = new Date(now)
     if (now.getHours() < 12) {
@@ -455,7 +461,9 @@ export default class JourneyScene extends BaseScene {
       (timeUntilNextJourney % (1000 * 60 * 60)) / (1000 * 60),
     )
     const seconds = Math.floor((timeUntilNextJourney % (1000 * 60)) / 1000)
-    this.txtTimer.setText(`Check back in:\n${hours}:${minutes}:${seconds}`)
+    this.txtTimer.setText(
+      `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
+    )
 
     // If pointer is released, stop panning
     if (!this.input.activePointer.isDown) {
