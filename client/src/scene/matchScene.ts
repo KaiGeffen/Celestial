@@ -568,8 +568,8 @@ export class StandardMatchScene extends MatchScene {
 }
 
 export class JourneyMatchScene extends MatchScene {
-  winSeen: boolean
   expGained = 10 // Default exp gained, goes up if they win
+  postMatchText = ''
 
   constructor(args = { key: 'JourneyMatchScene', lastScene: 'JourneyScene' }) {
     super(args)
@@ -578,14 +578,14 @@ export class JourneyMatchScene extends MatchScene {
   create() {
     super.create()
 
-    // Must be reset each time this scene is run
-    this.winSeen = false
+    this.postMatchText = this.params.loseText
   }
 
   // Ensure that user gets exp
   queueState(state: GameModel): void {
     if (state.winner === 0) {
       this.expGained = 100
+      this.postMatchText = this.params.winText
     }
     super.queueState(state)
   }
@@ -603,6 +603,7 @@ export class JourneyMatchScene extends MatchScene {
       this.scene.start('JourneyScene', {
         postMatch: true,
         expGained: this.expGained,
+        postMatchText: this.postMatchText,
       })
     }
   }

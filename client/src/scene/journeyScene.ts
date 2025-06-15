@@ -32,6 +32,7 @@ export default class JourneyScene extends BaseScene {
   storyPanel: Phaser.GameObjects.Container | null = null
 
   // Mission details
+  selectedMission
   txtMissionTitle: Phaser.GameObjects.Text
   txtMissionDescription: Phaser.GameObjects.Text
   avatar: AvatarButton
@@ -75,7 +76,7 @@ export default class JourneyScene extends BaseScene {
     this.createMissionDetails()
 
     // Create post match screen
-    this.createPostMatch(params.expGained ?? 10)
+    this.createPostMatch(params.expGained ?? 10, params.postMatchText ?? '')
 
     // Create waiting notice
     this.createWaitingNotice()
@@ -130,7 +131,9 @@ export default class JourneyScene extends BaseScene {
           this.txtMissionTitle.setText(`${name}'s Story`)
           this.txtMissionDescription.setText(mission.missionText)
           this.avatar.setAvatar(avatarIndex)
-          // TODO Get this in a better way
+
+          this.selectedMission = mission
+
           this.decklist.setDeck(
             mission.deck.map((id) => Catalog.getCardById(id)),
           )
@@ -200,7 +203,7 @@ export default class JourneyScene extends BaseScene {
     this.missionDetailsView.hide()
   }
 
-  private createPostMatch(expGained: number) {
+  private createPostMatch(expGained: number, postMatchText: string) {
     this.postMatchView = this.add.container().setAlpha(0)
 
     // Avatar image
@@ -226,12 +229,7 @@ export default class JourneyScene extends BaseScene {
       },
     })
     const title = this.add.text(0, 0, 'Story Complete!', Style.announcement)
-    const txt = this.add.text(
-      0,
-      0,
-      `"Thank you!"\n"You know, I used to think I had to shine so bright no one could see the real me. Now, I'm just… here. Ordinary, and that's enough?'`,
-      Style.basic,
-    )
+    const txt = this.add.text(0, 0, postMatchText, Style.basic)
     // TODO Progress bar / exp gained / unlocks unlocked
     const txtExpGained = this.add.text(
       0,
@@ -404,15 +402,21 @@ export default class JourneyScene extends BaseScene {
       text: 'Start',
       f: () => {
         const deck: Deck = {
-          name: 'todo name me',
+          name: 'Journey deck',
           cards: this.decklist.getDeckCode(),
+          cosmeticSet: { avatar: this.selectedMission.avatar, border: 0 },
+        }
+        const opponentDeck: Deck = {
+          name: 'todo name me',
+          cards: this.selectedMission.opponentDeck,
           cosmeticSet: { avatar: 0, border: 0 },
         }
 
         this.scene.start('JourneyMatchScene', {
           deck: deck,
-          // TODO
-          aiDeck: { ...deck, cards: [] },
+          aiDeck: opponentDeck,
+          winText: this.selectedMission.winText,
+          loseText: this.selectedMission.loseText,
         })
       },
     })
