@@ -33,9 +33,10 @@ export default class JourneyScene extends BaseScene {
   decklist: Decklist
 
   // Views
-  characterSelect: Phaser.GameObjects.Container
-  missionDetails: Sizer
-  postMatch: Phaser.GameObjects.Container
+  characterSelectView: Phaser.GameObjects.Container
+  missionDetailsView: Sizer
+  postMatchView: Phaser.GameObjects.Container
+  waitingView: Sizer
 
   constructor() {
     super({
@@ -60,17 +61,20 @@ export default class JourneyScene extends BaseScene {
     this.enableScrolling()
 
     // Create the first screen
-    this.createCharacterSelect()
+    // this.createCharacterSelect()
 
     // Create the mission screen
-    this.createMissionDetails()
+    // this.createMissionDetails()
 
     // Create post match screen
     this.createPostMatch()
+
+    // Create waiting notice
+    this.createWaitingNotice()
   }
 
   private createCharacterSelect() {
-    this.characterSelect = this.add.container()
+    this.characterSelectView = this.add.container()
 
     // Somehow randomly get the characters that will appear
     // TODO
@@ -107,8 +111,8 @@ export default class JourneyScene extends BaseScene {
               Catalog.getCardById(id),
             ),
           )
-          this.characterSelect.setAlpha(0)
-          this.missionDetails.show().layout()
+          this.characterSelectView.setAlpha(0)
+          this.missionDetailsView.show().layout()
         },
       })
 
@@ -127,7 +131,7 @@ export default class JourneyScene extends BaseScene {
       right: `100%-${Space.pad}`,
     })
 
-    this.characterSelect.add(sizers[0]).add(sizers[1])
+    this.characterSelectView.add(sizers[0]).add(sizers[1])
   }
 
   private createMissionDetails() {
@@ -135,7 +139,7 @@ export default class JourneyScene extends BaseScene {
     const mission = JOURNEY_CHARACTERS[0]
 
     // Create a sizer for the mission details
-    this.missionDetails = this.rexUI.add.sizer({
+    this.missionDetailsView = this.rexUI.add.sizer({
       orientation: 'vertical',
       space: {
         item: Space.pad,
@@ -157,7 +161,7 @@ export default class JourneyScene extends BaseScene {
     const decklistSizer = this.createDecklist()
     const btnSizer = this.createButtons()
 
-    this.missionDetails
+    this.missionDetailsView
       .add(txtTitle)
       .add(headerSizer)
       .add(decklistSizer)
@@ -166,22 +170,135 @@ export default class JourneyScene extends BaseScene {
       .layout()
 
     // Add an anchor for the sizer
-    this.plugins.get('rexAnchor')['add'](this.missionDetails, {
+    this.plugins.get('rexAnchor')['add'](this.missionDetailsView, {
       left: `0%+${Space.pad}`,
       y: `50%`,
     })
 
-    this.missionDetails.hide()
+    this.missionDetailsView.hide()
   }
 
   private createPostMatch() {
-    // this.postMatch = this.add.container()
-    // // TODO
-    // const image = this.add.image(0, 0, 'avatar-JulesFull')
-    //   this.plugins.get('rexDropShadowPipeline')['add'](image, {
-    //     distance: 3,
-    //     shadowColor: 0x000000,
-    //   })
+    this.postMatchView = this.add.container()
+
+    // Avatar image
+    // TODO use the avatar
+    const image = this.add.image(0, 0, 'avatar-JulesFull')
+    this.plugins.get('rexDropShadowPipeline')['add'](image, {
+      distance: 3,
+      shadowColor: 0x000000,
+    })
+
+    // Contents
+    const background = this.add.image(0, 0, 'background-Light')
+    this.plugins.get('rexDropShadowPipeline')['add'](background, {
+      distance: 3,
+      shadowColor: 0x000000,
+    })
+    const sizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: {
+        item: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+      },
+    })
+    const title = this.add.text(0, 0, 'Story Complete!', Style.announcement)
+    const txt = this.add.text(
+      0,
+      0,
+      `“Thank you!”\n“You know, I used to think I had to shine so bright no one could see the real me. Now, I’m just… here. Ordinary, and that’s enough.?'`,
+      Style.basic,
+    )
+    // TODO Progress bar / exp gained / unlocks unlocked
+    const btnContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.avatarSize,
+      Space.avatarSize,
+    )
+    new Buttons.Basic({
+      within: btnContainer,
+      text: 'Next',
+      f: () => {
+        this.postMatchView.setAlpha(0)
+        this.waitingView.show()
+      },
+    })
+
+    sizer
+      .add(title)
+      .add(txt)
+      .add(btnContainer)
+      .addBackground(background)
+      .layout()
+    this.postMatchView.add(sizer)
+
+    // Anchors
+    this.plugins.get('rexAnchor')['add'](image, {
+      y: `50%`,
+      left: `0%+${Space.pad}`,
+    })
+    this.plugins.get('rexAnchor')['add'](sizer, {
+      y: `50%`,
+      right: `100%-${Space.pad}`,
+    })
+
+    // Add everything to the container
+    this.postMatchView.add(image).add(sizer)
+  }
+
+  private createWaitingNotice() {
+    this.waitingView = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: {
+        item: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+      },
+    })
+
+    const background = this.add.image(0, 0, 'background-Light')
+    this.plugins.get('rexDropShadowPipeline')['add'](background, {
+      distance: 3,
+      shadowColor: 0x000000,
+    })
+
+    const txtNotice = this.add.text(0, 0, 'Daily journey complete', Style.basic)
+    const txtTimer = this.add.text(
+      0,
+      0,
+      'Check back in:\n03:02:11',
+      Style.basic,
+    )
+    const btnContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: btnContainer,
+      text: 'Exit',
+      f: () => this.scene.start('HomeScene'),
+    })
+
+    this.waitingView
+      .add(txtNotice)
+      .add(txtTimer)
+      .add(btnContainer)
+      .addBackground(background)
+      .layout()
+      .hide()
+
+    this.plugins.get('rexAnchor')['add'](this.waitingView, {
+      x: `50%`,
+      y: `50%`,
+    })
   }
 
   private createHeader(mission) {
@@ -237,8 +354,8 @@ export default class JourneyScene extends BaseScene {
       within: cont1,
       text: 'Back',
       f: () => {
-        this.characterSelect.setAlpha(1)
-        this.missionDetails.hide()
+        this.characterSelectView.setAlpha(1)
+        this.missionDetailsView.hide()
       },
     })
     // const cont2 = new ContainerLite(
@@ -286,7 +403,7 @@ export default class JourneyScene extends BaseScene {
     return (cutout: Cutout) => {
       return () => {
         this.decklist.removeCard(cutout.card)
-        this.missionDetails.layout()
+        this.missionDetailsView.layout()
       }
     }
   }
