@@ -134,7 +134,7 @@ export default class MatchResultsRegion extends Region {
       within: container,
       text: 'Exit Match',
       x: Space.pad + Space.buttonWidth,
-      f: this.exitCallback(),
+      f: this.scene.doExit(),
     })
 
     // Replay
@@ -267,12 +267,6 @@ export default class MatchResultsRegion extends Region {
     })
 
     return this.scrollablePanel
-  }
-
-  private exitCallback(): () => void {
-    return () => {
-      this.scene.doBack()
-    }
   }
 
   private newMatchCallback(): () => void {

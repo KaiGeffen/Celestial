@@ -31,6 +31,7 @@ export default class JourneyScene extends BaseScene {
 
   // NEW FLOW
   decklist: Decklist
+  txtTimer: Phaser.GameObjects.Text
 
   // Views
   characterSelectView: Phaser.GameObjects.Container
@@ -61,20 +62,27 @@ export default class JourneyScene extends BaseScene {
     this.enableScrolling()
 
     // Create the first screen
-    // this.createCharacterSelect()
+    this.createCharacterSelect()
 
     // Create the mission screen
-    // this.createMissionDetails()
+    this.createMissionDetails()
 
     // Create post match screen
-    this.createPostMatch()
+    this.createPostMatch(params.expGained ?? 10)
 
     // Create waiting notice
     this.createWaitingNotice()
+
+    // Show view depending on context
+    if (params.postMatch) {
+      this.postMatchView.setAlpha(1)
+    } else {
+      this.characterSelectView.setAlpha(1)
+    }
   }
 
   private createCharacterSelect() {
-    this.characterSelectView = this.add.container()
+    this.characterSelectView = this.add.container().setAlpha(0)
 
     // Somehow randomly get the characters that will appear
     // TODO
@@ -178,8 +186,8 @@ export default class JourneyScene extends BaseScene {
     this.missionDetailsView.hide()
   }
 
-  private createPostMatch() {
-    this.postMatchView = this.add.container()
+  private createPostMatch(expGained: number) {
+    this.postMatchView = this.add.container().setAlpha(0)
 
     // Avatar image
     // TODO use the avatar
@@ -207,10 +215,16 @@ export default class JourneyScene extends BaseScene {
     const txt = this.add.text(
       0,
       0,
-      `“Thank you!”\n“You know, I used to think I had to shine so bright no one could see the real me. Now, I’m just… here. Ordinary, and that’s enough.?'`,
+      `"Thank you!"\n"You know, I used to think I had to shine so bright no one could see the real me. Now, I'm just… here. Ordinary, and that's enough?'`,
       Style.basic,
     )
     // TODO Progress bar / exp gained / unlocks unlocked
+    const txtExpGained = this.add.text(
+      0,
+      0,
+      `+${expGained} EXP Gained`,
+      Style.basic,
+    )
     const btnContainer = new ContainerLite(
       this,
       0,
@@ -230,6 +244,7 @@ export default class JourneyScene extends BaseScene {
     sizer
       .add(title)
       .add(txt)
+      .add(txtExpGained)
       .add(btnContainer)
       .addBackground(background)
       .layout()
@@ -268,12 +283,7 @@ export default class JourneyScene extends BaseScene {
     })
 
     const txtNotice = this.add.text(0, 0, 'Daily journey complete', Style.basic)
-    const txtTimer = this.add.text(
-      0,
-      0,
-      'Check back in:\n03:02:11',
-      Style.basic,
-    )
+    this.txtTimer = this.add.text(0, 0, 'Check back in:\n03:02:11', Style.basic)
     const btnContainer = new ContainerLite(
       this,
       0,
@@ -289,7 +299,7 @@ export default class JourneyScene extends BaseScene {
 
     this.waitingView
       .add(txtNotice)
-      .add(txtTimer)
+      .add(this.txtTimer)
       .add(btnContainer)
       .addBackground(background)
       .layout()
@@ -380,9 +390,8 @@ export default class JourneyScene extends BaseScene {
       within: cont3,
       text: 'Start',
       f: () => {
-        console.log(this.decklist.getDeckCode())
         const deck: Deck = {
-          name: 'foooooo',
+          name: 'todo name me',
           cards: this.decklist.getDeckCode(),
           cosmeticSet: { avatar: 0, border: 0 },
         }
@@ -390,7 +399,7 @@ export default class JourneyScene extends BaseScene {
         this.scene.start('JourneyMatchScene', {
           deck: deck,
           // TODO
-          aiDeck: deck,
+          aiDeck: { ...deck, cards: [] },
         })
       },
     })
@@ -409,6 +418,28 @@ export default class JourneyScene extends BaseScene {
   }
 
   update(time, delta): void {
+    // Update the timer
+
+    const now = new Date()
+    let target = new Date(now)
+    if (now.getHours() < 12) {
+      // Next noon today
+      target.setHours(12, 0, 0, 0)
+    } else {
+      // Next midnight (start of tomorrow)
+      target.setDate(now.getDate() + 1)
+      target.setHours(0, 0, 0, 0)
+    }
+    const NEXT_JOURNEY_TIME = target
+
+    const timeUntilNextJourney = NEXT_JOURNEY_TIME.getTime() - Date.now()
+    const hours = Math.floor(timeUntilNextJourney / (1000 * 60 * 60))
+    const minutes = Math.floor(
+      (timeUntilNextJourney % (1000 * 60 * 60)) / (1000 * 60),
+    )
+    const seconds = Math.floor((timeUntilNextJourney % (1000 * 60)) / 1000)
+    this.txtTimer.setText(`Check back in:\n${hours}:${minutes}:${seconds}`)
+
     // If pointer is released, stop panning
     if (!this.input.activePointer.isDown) {
       this.panDirection = undefined

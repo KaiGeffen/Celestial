@@ -264,7 +264,7 @@ export default class HomeScene extends BaseScene {
     new Buttons.HomeScene({
       within: journeyContainer,
       text: 'Journey',
-      f: () => this.scene.start('JourneyScene'),
+      f: () => this.scene.start('JourneyScene', { postMatch: false }),
     })
     this.plugins.get('rexAnchor')['add'](journeyContainer, {
       x: `0%+${buttonWidth / 2 + Space.pad}`,

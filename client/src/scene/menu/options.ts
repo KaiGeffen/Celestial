@@ -482,12 +482,11 @@ export default class OptionsMenu extends Menu {
       within: containerQuit,
       text: 'Quit',
       f: () => {
-        // Stop the other active scene
-        activeScene.beforeExit()
-        activeScene.scene.stop()
+        // Stop this menu scene
+        this.scene.scene.stop()
 
-        // Stop this scene and start the home scene
-        this.scene.scene.start('HomeScene')
+        // Exit the active scene
+        activeScene.doExit()()
       },
     })
 

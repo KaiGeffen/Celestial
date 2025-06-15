@@ -569,6 +569,7 @@ export class StandardMatchScene extends MatchScene {
 
 export class JourneyMatchScene extends MatchScene {
   winSeen: boolean
+  expGained = 10 // Default exp gained, goes up if they win
 
   constructor(args = { key: 'JourneyMatchScene', lastScene: 'JourneyScene' }) {
     super(args)
@@ -581,11 +582,10 @@ export class JourneyMatchScene extends MatchScene {
     this.winSeen = false
   }
 
-  // When the player wins for the first time, unlock appropriately
+  // Ensure that user gets exp
   queueState(state: GameModel): void {
-    if (!this.winSeen && state.winner === 0) {
-      this.winSeen = true
-      this.unlockMissionRewards()
+    if (state.winner === 0) {
+      this.expGained = 100
     }
     super.queueState(state)
   }
@@ -597,10 +597,13 @@ export class JourneyMatchScene extends MatchScene {
     elo2: number,
   ): void {}
 
-  private unlockMissionRewards(): void {
-    // Set that user has completed the missions with this id
-    if (this.params.missionID !== undefined) {
-      UserSettings._setIndex('completedMissions', this.params.missionID, true)
+  doExit(): () => void {
+    return () => {
+      this.beforeExit()
+      this.scene.start('JourneyScene', {
+        postMatch: true,
+        expGained: this.expGained,
+      })
     }
   }
 }
