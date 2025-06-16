@@ -171,6 +171,8 @@ export default class Cutout extends Button {
       this.scene['signalError']("Can't remove a required card.")
     }
 
+    this.updateText()
+
     return this
   }
 
@@ -182,7 +184,9 @@ export default class Cutout extends Button {
   }
 
   private updateText(): Cutout {
-    const char = 'x'
+    const char = this.required ? '🔒' : 'x'
+
+    console.log(char)
 
     this.setText(`${char}${this.count}`)
 

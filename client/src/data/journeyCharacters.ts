@@ -2,7 +2,10 @@ export type JourneyMission = {
   selectText: string
   missionText: string
   uponRoundWinText: [string, string, string, string, string, string]
-  deck: number[]
+  deck: {
+    required: number[]
+    optional: number[]
+  }
   opponentDeck: number[]
   winText: string
   loseText: string
@@ -24,7 +27,10 @@ const JOURNEY_MISSIONS: JourneyMissionTracks = [
         '4 Hrmmmm :/',
         '5 Wait, I got it!',
       ],
-      deck: [56, 65, 65, 12, 12, 7, 7, 7, 7, 4, 4, 4, 4, 4, 4],
+      deck: {
+        required: [56, 65, 65, 12, 12],
+        optional: [7, 7, 7, 7, 4, 4, 4, 4, 4, 4],
+      },
       opponentDeck: [],
       winText: 'You are a true friend.',
       loseText: 'You are a true friend, but I did lose :/',
@@ -44,7 +50,10 @@ const JOURNEY_MISSIONS: JourneyMissionTracks = [
         `4`,
         `5 let's go bay-beeeee`,
       ],
-      deck: [21, 20, 20, 17, 17, 14, 14, 6, 3, 3, 3, 3, 3, 0, 0],
+      deck: {
+        required: [21, 20, 20, 17, 17],
+        optional: [14, 14, 6, 3, 3, 3, 3, 3, 0, 0],
+      },
       opponentDeck: [1, 1, 1],
       winText: 'Fire stuff idk...',
       loseText: 'I have burned too bright!',
@@ -64,7 +73,10 @@ const JOURNEY_MISSIONS: JourneyMissionTracks = [
         `4 I am not afraid of the dark`,
         `5 I am not afraid of the dark`,
       ],
-      deck: [1, 1, 1, 1, 1, 1, 35, 35, 13, 20, 19, 19, 19, 19, 23],
+      deck: {
+        required: [1, 1, 1, 1, 1, 1],
+        optional: [35, 35, 13, 20, 19, 19, 19, 19, 23],
+      },
       opponentDeck: [],
       winText: 'You are a true shadow.',
       loseText: 'I lost oh nooooo',
@@ -84,7 +96,10 @@ const JOURNEY_MISSIONS: JourneyMissionTracks = [
         `4 I am not afraid of the cat`,
         `5 I am not afraid of the cat`,
       ],
-      deck: [0, 0, 4, 4, 28, 33, 33, 33, 33, 34, 34, 11, 11, 11, 71],
+      deck: {
+        required: [0, 0, 4, 4, 28],
+        optional: [33, 33, 33, 33, 34, 34, 11, 11, 11, 71],
+      },
       opponentDeck: [],
       winText: 'I have won.',
       loseText: 'I lost :/',
@@ -104,7 +119,10 @@ const JOURNEY_MISSIONS: JourneyMissionTracks = [
         `4 I am not afraid of the doula`,
         `5 I am not afraid of the doula`,
       ],
-      deck: [22, 22, 66, 60, 10, 11, 8, 8, 8, 4, 4, 2, 2, 2, 2],
+      deck: {
+        required: [22, 22, 66, 60, 10],
+        optional: [11, 8, 8, 8, 4, 4, 2, 2, 2, 2],
+      },
       opponentDeck: [],
       winText: 'I have won and I am a doula.',
       loseText: 'I lost and I am a doula.',
@@ -124,7 +142,10 @@ const JOURNEY_MISSIONS: JourneyMissionTracks = [
         `4 I am not afraid of the seeker`,
         `5 I am not afraid of the seeker`,
       ],
-      deck: [50, 27, 27, 27, 27, 25, 88, 88, 31, 39, 11, 13, 91, 45, 45],
+      deck: {
+        required: [50, 27, 27, 27, 27],
+        optional: [25, 88, 88, 31, 39, 11, 13, 91, 45, 45],
+      },
       opponentDeck: [],
       winText: 'I have won and I am a seeker.',
       loseText: 'I lost and I am a seeker.',

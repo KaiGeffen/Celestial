@@ -329,10 +329,6 @@ export default class JourneyScene extends BaseScene {
   private createDecklist() {
     this.decklist = new Decklist(this, this.onClickCutout())
 
-    this.decklist.setDeck(
-      premadeDecklists[0].map((id) => Catalog.getCardById(id)),
-    )
-
     return this.decklist.sizer
   }
 
@@ -415,7 +411,10 @@ export default class JourneyScene extends BaseScene {
     this.avatar.setAvatar(avatarIndex)
 
     // Update the decklist
-    this.decklist.setDeck(mission.deck.map((id) => Catalog.getCardById(id)))
+    this.decklist.setJourneyDeck(
+      mission.deck.required.map((id) => Catalog.getCardById(id)),
+      mission.deck.optional.map((id) => Catalog.getCardById(id)),
+    )
   }
 
   private onClickCutout(): (cutout: Cutout) => () => void {

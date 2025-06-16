@@ -95,6 +95,19 @@ export default class Decklist {
     return true
   }
 
+  setJourneyDeck(requiredCards: Card[], optionalCards: Card[]) {
+    this.setDeck(requiredCards)
+    this.cutouts.forEach((cutout) => {
+      cutout.setRequired()
+      console.log(cutout.card.name)
+    })
+
+    for (let i = 0; i < optionalCards.length; i++) {
+      let card = optionalCards[i]
+      this.addCard(card)
+    }
+  }
+
   // Get all cards in the deck listed as their id
   getCards(): number[] {
     return this.cutouts.reduce((acc, cutout) => {
