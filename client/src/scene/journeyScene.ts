@@ -155,16 +155,14 @@ export default class JourneyScene extends BaseScene {
     // Create a sizer for the mission details
     this.missionDetailsView = this.rexUI.add
       .sizer({
-        orientation: 'horizontal',
         space: {
-          item: Space.pad,
           top: Space.pad,
           bottom: Space.pad,
           left: Space.pad,
           right: Space.pad,
         },
       })
-      .setOrigin(0, 0.5)
+      .setOrigin(0)
 
     const background = this.add.image(0, 0, 'background-Light').setInteractive()
     this.addShadow(background)
@@ -193,7 +191,7 @@ export default class JourneyScene extends BaseScene {
     this.cardPoolSizer = this.createCardPool()
 
     this.missionDetailsView
-      .add(leftSizer)
+      .add(leftSizer, { expand: true })
       .add(this.cardPoolSizer)
       .addBackground(background)
       .layout()
@@ -201,7 +199,7 @@ export default class JourneyScene extends BaseScene {
     // Add an anchor for the sizer
     this.plugins.get('rexAnchor')['add'](this.missionDetailsView, {
       left: `0%+${Space.pad}`,
-      y: `50%`,
+      top: `0%+${Space.pad}`,
     })
 
     this.missionDetailsView.hide()
