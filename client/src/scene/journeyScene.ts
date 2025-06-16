@@ -90,6 +90,9 @@ export default class JourneyScene extends BaseScene {
       const image = this.add.image(0, 0, `avatar-${name}Full`).setInteractive()
       this.addShadow(image)
 
+      // Exp bar
+      const expBarSizer = this.getExpBarSizer(avatarIndex)
+
       const text = this.add.text(0, 0, mission.selectText, Style.basic)
 
       // Select button
@@ -113,7 +116,13 @@ export default class JourneyScene extends BaseScene {
         },
       })
 
-      sizer.add(image).add(text).add(btnContainer)
+      const imageSizer = this.rexUI.add.sizer({
+        orientation: 'vertical',
+        space: { item: -40 },
+      })
+      imageSizer.add(image).add(expBarSizer)
+
+      sizer.add(imageSizer).add(text).add(btnContainer)
 
       return sizer.layout()
     })
@@ -467,6 +476,38 @@ export default class JourneyScene extends BaseScene {
 
     // We are guaranteeing 2 results in the above loop
     return results as [[JourneyMission, number], [JourneyMission, number]]
+  }
+
+  // Set the exp bar for the given avatar
+  private getExpBarSizer(avatarID: number): Sizer {
+    const avatarExp = UserSettings._get('avatarExperience')[avatarID] || 0
+    const expMax = 1000
+    const expValue = Math.min(avatarExp / expMax, 1)
+    const expBar = this.add
+      .rexLineProgress({
+        width: Space.avatarWidth - Space.pad * 2,
+        height: 10,
+        barColor: Color.progressBar,
+        trackColor: Color.progressBarTrack,
+        trackStrokeColor: Color.progressBarTrackStroke,
+        trackStrokeThickness: 4,
+        value: expValue,
+        valuechangeCallback: () => {
+          console.log('valuechangeCallback')
+        },
+      })
+      .setAlpha(0.4)
+    const expLabel = this.add.text(0, 0, `EXP: ${avatarExp} / ${expMax}`, {
+      ...Style.basic,
+      fontSize: '16px',
+    })
+
+    const sizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+    })
+    sizer.add(expBar).add(expLabel)
+
+    return sizer
   }
 
   update(time, delta): void {

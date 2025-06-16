@@ -22,6 +22,7 @@ import GlowFilterPipelinePlugin from 'phaser3-rex-plugins/plugins/glowfilterpipe
 import DissolvePipelinePlugin from 'phaser3-rex-plugins/plugins/dissolvepipeline-plugin.js'
 import OutlinePipelinePlugin from 'phaser3-rex-plugins/plugins/outlinepipeline-plugin.js'
 import DropShadowPipelinePlugin from 'phaser3-rex-plugins/plugins/dropshadowpipeline-plugin.js'
+import LineProgressPlugin from 'phaser3-rex-plugins/plugins/lineprogress-plugin.js'
 import ContainerLitePlugin from 'phaser3-rex-plugins/plugins/containerlite-plugin.js'
 import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
 import StoreScene from './scene/storeScene'
@@ -116,6 +117,11 @@ const config: Phaser.Types.Core.GameConfig = {
       {
         key: 'rexAnchor',
         plugin: AnchorPlugin,
+        start: true,
+      },
+      {
+        key: 'rexLineProgress',
+        plugin: LineProgressPlugin,
         start: true,
       },
     ],

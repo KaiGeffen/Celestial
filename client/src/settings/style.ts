@@ -55,12 +55,6 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     fontSize: Flags.mobile ? '40px' : '60px',
     color: Color.passText,
   },
-  // Text on cards that references other cards
-  reference: {
-    fontFamily: mainFont,
-    fontSize: '14px',
-    color: '#11223300',
-  },
   // Surname for characters in premade deck
   surname: {
     fontFamily: mainFont,
