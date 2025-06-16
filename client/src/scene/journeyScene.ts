@@ -372,11 +372,11 @@ export default class JourneyScene extends BaseScene {
     this.cardPool = new Decklist(this, this.onClickCardPool())
 
     const cards = []
-    for (let i = 0; i <= 60; i++) {
-      for (let j = 0; j < 99; j++) {
-        cards.push(Catalog.getCardById(i))
+    Catalog.collectibleCards.forEach((card) => {
+      for (let i = 0; i < 99; i++) {
+        cards.push(card)
       }
-    }
+    })
 
     this.cardPool.setDeck(cards)
 
@@ -391,10 +391,6 @@ export default class JourneyScene extends BaseScene {
       slider: {
         track: this.add.rectangle(0, 0, 20, 1, Color.progressBarTrack),
         thumb: this.add.rectangle(0, 0, 20, 1, Color.progressBar),
-      },
-      mouseWheelScroller: {
-        focus: false,
-        speed: 0.1,
       },
     })
 
@@ -476,6 +472,12 @@ export default class JourneyScene extends BaseScene {
   private onClickCardPool(): (cutout: Cutout) => () => void {
     return (cutout: Cutout) => {
       return () => {
+        // Don't allow adding required cards
+        if (this.selectedMission.deck.required.includes(cutout.card.id)) {
+          this.signalError('Cannot add more copies of required cards')
+          return
+        }
+
         this.decklist.addCard(cutout.card)
         this.missionDetailsView.layout()
         this.updateDeckState()
