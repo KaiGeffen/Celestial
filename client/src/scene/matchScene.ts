@@ -567,10 +567,20 @@ export class StandardMatchScene extends MatchScene {
   }
 }
 
+// TODO Move to another file
+const EXP_ON_LOSS = 10
+const EXP_ON_WIN = 100
+
 export class JourneyMatchScene extends MatchScene {
   expGained: number
   postMatchText: string
   uponRoundWinText: [string, string, string, string, string, string]
+
+  // Whether the user has already gained experience from winning the match
+  winExpGained: boolean
+
+  // The avatar that the user is playing as
+  avatar: number
 
   constructor(args = { key: 'JourneyMatchScene', lastScene: 'JourneyScene' }) {
     super(args)
@@ -579,23 +589,33 @@ export class JourneyMatchScene extends MatchScene {
   create() {
     super.create()
 
+    // Ensure that experience is only gained once
+    this.winExpGained = false
+
+    // Set the avatar that the user is playing as
+    this.avatar = this.params.avatar
+
     // Set the dialog that shows the first time you have a given number of rounds won
     this.uponRoundWinText = this.params.uponRoundWinText.slice()
 
     // Set to winText when they win
     this.postMatchText = this.params.loseText
 
-    // Default exp gained, goes up if they win
-    this.expGained = 10
+    // Default exp gained, gain more if they win
+    this.expGained = EXP_ON_LOSS
+    this.grantExp(EXP_ON_LOSS)
   }
 
   // Ensure that user gets exp
   queueState(state: GameModel): void {
-    // Handle winner
-    if (state.winner === 0) {
-      this.expGained = 100
+    // Set post match text and exp gained
+    if (state.winner === 0 && !this.winExpGained) {
       this.postMatchText = this.params.winText
+      this.expGained = EXP_ON_WIN
+      this.grantExp(EXP_ON_WIN - EXP_ON_LOSS)
+      this.winExpGained = true
     }
+
     super.queueState(state)
   }
 
@@ -631,5 +651,10 @@ export class JourneyMatchScene extends MatchScene {
         postMatchText: this.postMatchText,
       })
     }
+  }
+
+  // Grant the given amount of experience to the user
+  private grantExp(exp: number): void {
+    UserSettings._increment('avatarExperience', this.avatar, exp)
   }
 }

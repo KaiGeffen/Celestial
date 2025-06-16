@@ -177,8 +177,9 @@ export default class JourneyScene extends BaseScene {
     this.postMatchView = this.add.container().setAlpha(0)
 
     // Avatar image
-    // TODO use the avatar
-    const image = this.add.image(0, 0, 'avatar-JulesFull').setInteractive()
+    const image = this.add
+      .image(0, 0, `avatar-${avatarNames[this.selectedAvatar]}Full`)
+      .setInteractive()
     this.addShadow(image)
 
     // Contents
@@ -384,6 +385,7 @@ export default class JourneyScene extends BaseScene {
         this.scene.start('JourneyMatchScene', {
           deck: deck,
           aiDeck: opponentDeck,
+          avatar: this.selectedAvatar,
           uponRoundWinText: this.selectedMission.uponRoundWinText,
           winText: this.selectedMission.winText,
           loseText: this.selectedMission.loseText,

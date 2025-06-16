@@ -39,6 +39,9 @@ export class UserSettings {
         x: 4650 - Space.windowWidth / 2,
         y: 700 - Space.windowHeight / 2,
       },
+
+      // The experience with each avatar
+      avatarExperience: [0, 0, 0, 0, 0, 0],
     }
 
     for (var key in defaultSettings) {
@@ -124,6 +127,13 @@ export class UserSettings {
     this._set(key, ary)
 
     return result
+  }
+
+  // Increment the given index of array by given amount
+  static _increment(key: string, index: number, amt: number): void {
+    let ary = this._get(key)
+    ary[index] += amt
+    this._set(key, ary)
   }
 
   // Get the quantity of a given card in inventory
