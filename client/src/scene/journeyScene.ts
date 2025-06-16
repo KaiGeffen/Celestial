@@ -91,10 +91,11 @@ export default class JourneyScene extends BaseScene {
         space: { item: Space.pad },
       })
 
-      const image = this.add.image(0, 0, `avatar-${name}Full`)
+      const image = this.add.image(0, 0, `avatar-${name}Full`).setInteractive()
       this.addShadow(image)
 
-      const text = this.add.text(0, 0, name, Style.basic)
+      const text = this.add.text(0, 0, mission.selectText, Style.basic)
+
       // Select button
       const btnContainer = new ContainerLite(
         this,
@@ -147,7 +148,7 @@ export default class JourneyScene extends BaseScene {
       },
     })
 
-    const background = this.add.image(0, 0, 'background-Light')
+    const background = this.add.image(0, 0, 'background-Light').setInteractive()
     this.addShadow(background)
 
     this.txtMissionTitle = this.add.text(0, 0, '', Style.announcement)
@@ -177,11 +178,11 @@ export default class JourneyScene extends BaseScene {
 
     // Avatar image
     // TODO use the avatar
-    const image = this.add.image(0, 0, 'avatar-JulesFull')
+    const image = this.add.image(0, 0, 'avatar-JulesFull').setInteractive()
     this.addShadow(image)
 
     // Contents
-    const background = this.add.image(0, 0, 'background-Light')
+    const background = this.add.image(0, 0, 'background-Light').setInteractive()
     this.addShadow(background)
     const sizer = this.rexUI.add.sizer({
       orientation: 'vertical',
@@ -251,7 +252,7 @@ export default class JourneyScene extends BaseScene {
       },
     })
 
-    const background = this.add.image(0, 0, 'background-Light')
+    const background = this.add.image(0, 0, 'background-Light').setInteractive()
     this.addShadow(background)
 
     const txtNotice = this.add.text(
