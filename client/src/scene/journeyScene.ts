@@ -19,6 +19,7 @@ import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { Deck } from '../../../shared/types/deck'
 import avatarNames from '../lib/avatarNames'
 import AvatarButton from '../lib/buttons/avatar'
+import newScrollablePanel from '../lib/scrollablePanel'
 
 export default class JourneyScene extends BaseScene {
   // Mission details
@@ -28,6 +29,8 @@ export default class JourneyScene extends BaseScene {
   txtMissionDescription: Phaser.GameObjects.Text
   avatar: AvatarButton
   decklist: Decklist
+  cardPool: Decklist
+  startBtn: any
 
   // Timer until next journey available
   txtTimer: Phaser.GameObjects.Text
@@ -37,6 +40,9 @@ export default class JourneyScene extends BaseScene {
   missionDetailsView: Sizer
   postMatchView: Phaser.GameObjects.Container
   waitingView: Sizer
+
+  // Card pool sizer
+  cardPoolSizer: Sizer
 
   constructor() {
     super({
@@ -143,7 +149,7 @@ export default class JourneyScene extends BaseScene {
   private createMissionDetails() {
     // Create a sizer for the mission details
     this.missionDetailsView = this.rexUI.add.sizer({
-      orientation: 'vertical',
+      orientation: 'horizontal',
       space: {
         item: Space.pad,
         top: Space.pad,
@@ -156,22 +162,49 @@ export default class JourneyScene extends BaseScene {
     const background = this.add.image(0, 0, 'background-Light').setInteractive()
     this.addShadow(background)
 
+    // Left side sizer
+    const leftSizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: { item: Space.pad },
+    })
+
     this.txtMissionTitle = this.add.text(0, 0, '', Style.announcement)
     const headerSizer = this.createHeader()
     const decklistSizer = this.createDecklist()
     const btnSizer = this.createButtons()
 
-    this.missionDetailsView
+    leftSizer
       .add(this.txtMissionTitle)
       .add(headerSizer)
       .add(decklistSizer)
       .add(btnSizer)
-      .addBackground(background)
-      .layout()
+
+    this.missionDetailsView.add(leftSizer).addBackground(background).layout()
 
     // Add an anchor for the sizer
     this.plugins.get('rexAnchor')['add'](this.missionDetailsView, {
       left: `0%+${Space.pad}`,
+      y: `50%`,
+    })
+
+    // Create card pool sizer
+    this.cardPoolSizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: {
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+      },
+    })
+
+    // Add card pool to its own sizer
+    const cardPool = this.createCardPool()
+    this.cardPoolSizer.add(cardPool).layout()
+
+    // Position card pool sizer
+    this.plugins.get('rexAnchor')['add'](this.cardPoolSizer, {
+      right: `100%-${Space.pad}`,
       y: `50%`,
     })
 
@@ -332,6 +365,53 @@ export default class JourneyScene extends BaseScene {
     return this.decklist.sizer
   }
 
+  private createCardPool() {
+    this.cardPool = new Decklist(this, this.onClickCardPool())
+
+    // Create array of 99 copies of each card from 0 to 60
+    const cards = []
+    for (let i = 0; i <= 60; i++) {
+      for (let j = 0; j < 99; j++) {
+        cards.push(Catalog.getCardById(i))
+      }
+    }
+
+    this.cardPool.setDeck(cards)
+
+    // Create a scrollable panel
+    const panel = newScrollablePanel(this, {
+      x: 0,
+      y: 0,
+      width: Space.cardWidth + Space.pad * 2,
+      height: Space.windowHeight - Space.pad * 2,
+      scrollMode: 'vertical',
+      background: this.add.rectangle(0, 0, 1, 1, Color.background),
+      panel: {
+        child: this.cardPool.sizer,
+        mask: {
+          padding: 1,
+        },
+      },
+      slider: {
+        track: this.add.rectangle(0, 0, 20, 1, Color.progressBarTrack),
+        thumb: this.add.rectangle(0, 0, 20, 1, Color.progressBar),
+      },
+      mouseWheelScroller: {
+        focus: false,
+        speed: 0.1,
+      },
+      space: {
+        left: Space.pad,
+        right: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+      },
+    })
+    panel.setName('cardPool')
+
+    return panel
+  }
+
   private createButtons() {
     const btnSizer = this.rexUI.add.sizer({
       space: { item: Space.pad },
@@ -353,17 +433,7 @@ export default class JourneyScene extends BaseScene {
         this.missionDetailsView.hide()
       },
     })
-    // const cont2 = new ContainerLite(
-    //   this,
-    //   0,
-    //   0,
-    //   Space.buttonWidth,
-    //   Space.buttonHeight,
-    // )
-    // new Buttons.Basic({
-    //   within: cont2,
-    //   text: 'Customize',
-    // })
+
     const cont3 = new ContainerLite(
       this,
       0,
@@ -371,7 +441,7 @@ export default class JourneyScene extends BaseScene {
       Space.buttonWidth,
       Space.buttonHeight,
     )
-    new Buttons.Basic({
+    this.startBtn = new Buttons.Basic({
       within: cont3,
       text: 'Start',
       f: () => {
@@ -396,9 +466,41 @@ export default class JourneyScene extends BaseScene {
         })
       },
     })
+    this.startBtn.enabled = false
     btnSizer.add(cont1).add(cont3)
 
     return btnSizer
+  }
+
+  private onClickCutout(): (cutout: Cutout) => () => void {
+    return (cutout: Cutout) => {
+      return () => {
+        this.decklist.removeCard(cutout.card)
+        this.missionDetailsView.layout()
+        this.updateDeckState()
+      }
+    }
+  }
+
+  private onClickCardPool(): (cutout: Cutout) => () => void {
+    return (cutout: Cutout) => {
+      return () => {
+        this.decklist.addCard(cutout.card)
+        this.missionDetailsView.layout()
+        this.updateDeckState()
+      }
+    }
+  }
+
+  private updateDeckState() {
+    const deckSize = this.decklist.getDeckCode().length
+
+    // Show/hide card pool based on deck size
+    const wasVisible = this.cardPoolSizer.visible
+    this.cardPoolSizer.visible = deckSize < 15
+
+    // Enable/disable start button based on deck size
+    this.startBtn.enabled = deckSize === 15
   }
 
   private setMissionInfo(mission: JourneyMission, avatarIndex: number) {
@@ -415,15 +517,39 @@ export default class JourneyScene extends BaseScene {
       mission.deck.required.map((id) => Catalog.getCardById(id)),
       mission.deck.optional.map((id) => Catalog.getCardById(id)),
     )
+
+    // Update deck state after setting initial deck
+    this.updateDeckState()
   }
 
-  private onClickCutout(): (cutout: Cutout) => () => void {
-    return (cutout: Cutout) => {
-      return () => {
-        // TODO
-        // this.decklist.removeCard(cutout.card)
-        // this.missionDetailsView.layout()
-      }
+  update(time, delta): void {
+    // // Update the timer
+    // const now = new Date()
+    // let target = new Date(now)
+    // if (now.getHours() < 12) {
+    //   // Next noon today
+    //   target.setHours(12, 0, 0, 0)
+    // } else {
+    //   // Next midnight (start of tomorrow)
+    //   target.setDate(now.getDate() + 1)
+    //   target.setHours(0, 0, 0, 0)
+    // }
+    // const NEXT_JOURNEY_TIME = target
+    // const timeUntilNextJourney = NEXT_JOURNEY_TIME.getTime() - Date.now()
+    // const hours = Math.floor(timeUntilNextJourney / (1000 * 60 * 60))
+    // const minutes = Math.floor(
+    //   (timeUntilNextJourney % (1000 * 60 * 60)) / (1000 * 60),
+    // )
+    // const seconds = Math.floor((timeUntilNextJourney % (1000 * 60)) / 1000)
+    // this.txtTimer.setText(
+    //   `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
+    // )
+  }
+
+  beforeExit() {
+    // Stop the map scene when exiting journey
+    if (this.scene.isActive('MapScene')) {
+      this.scene.stop('MapScene')
     }
   }
 
@@ -507,36 +633,5 @@ export default class JourneyScene extends BaseScene {
     sizer.add(expBar).add(expLabel)
 
     return sizer
-  }
-
-  update(time, delta): void {
-    // // Update the timer
-    // const now = new Date()
-    // let target = new Date(now)
-    // if (now.getHours() < 12) {
-    //   // Next noon today
-    //   target.setHours(12, 0, 0, 0)
-    // } else {
-    //   // Next midnight (start of tomorrow)
-    //   target.setDate(now.getDate() + 1)
-    //   target.setHours(0, 0, 0, 0)
-    // }
-    // const NEXT_JOURNEY_TIME = target
-    // const timeUntilNextJourney = NEXT_JOURNEY_TIME.getTime() - Date.now()
-    // const hours = Math.floor(timeUntilNextJourney / (1000 * 60 * 60))
-    // const minutes = Math.floor(
-    //   (timeUntilNextJourney % (1000 * 60 * 60)) / (1000 * 60),
-    // )
-    // const seconds = Math.floor((timeUntilNextJourney % (1000 * 60)) / 1000)
-    // this.txtTimer.setText(
-    //   `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
-    // )
-  }
-
-  beforeExit() {
-    // Stop the map scene when exiting journey
-    if (this.scene.isActive('MapScene')) {
-      this.scene.stop('MapScene')
-    }
   }
 }

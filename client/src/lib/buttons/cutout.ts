@@ -186,8 +186,6 @@ export default class Cutout extends Button {
   private updateText(): Cutout {
     const char = this.required ? '🔒' : 'x'
 
-    console.log(char)
-
     this.setText(`${char}${this.count}`)
 
     this.stopFlash()

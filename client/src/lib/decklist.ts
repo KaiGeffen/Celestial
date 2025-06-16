@@ -32,11 +32,6 @@ export default class Decklist {
 
   // Add a new card to the deck
   addCard(card: Card) {
-    // If card count exceeds maximum, return error TODO
-    if (this.countCards >= MechanicsSettings.DECK_SIZE * 2) {
-      return
-    }
-
     // If card exists in deck, increment it
     for (let i = 0; i < this.cutouts.length; i++) {
       const cutout = this.cutouts[i]
@@ -99,7 +94,6 @@ export default class Decklist {
     this.setDeck(requiredCards)
     this.cutouts.forEach((cutout) => {
       cutout.setRequired()
-      console.log(cutout.card.name)
     })
 
     for (let i = 0; i < optionalCards.length; i++) {
