@@ -570,6 +570,7 @@ export class StandardMatchScene extends MatchScene {
 export class JourneyMatchScene extends MatchScene {
   expGained: number
   postMatchText: string
+  uponRoundWinText: [string, string, string, string, string, string]
 
   constructor(args = { key: 'JourneyMatchScene', lastScene: 'JourneyScene' }) {
     super(args)
@@ -577,6 +578,9 @@ export class JourneyMatchScene extends MatchScene {
 
   create() {
     super.create()
+
+    // Set the dialog that shows the first time you have a given number of rounds won
+    this.uponRoundWinText = this.params.uponRoundWinText.slice()
 
     // Set to winText when they win
     this.postMatchText = this.params.loseText
@@ -587,11 +591,28 @@ export class JourneyMatchScene extends MatchScene {
 
   // Ensure that user gets exp
   queueState(state: GameModel): void {
+    // Handle winner
     if (state.winner === 0) {
       this.expGained = 100
       this.postMatchText = this.params.winText
     }
     super.queueState(state)
+  }
+
+  displayState(state: GameModel): boolean {
+    const result = super.displayState(state)
+    if (!result) return false
+
+    // Display the upon round win text, then ensure it doesn't show again
+    if (!state.isRecap && state.mulligansComplete.every((m) => m)) {
+      const s = this.uponRoundWinText[state.wins[0]]
+      if (s) {
+        this.signalError(s)
+        this.uponRoundWinText[state.wins[0]] = undefined
+      }
+    }
+
+    return result
   }
 
   signalMatchFound(

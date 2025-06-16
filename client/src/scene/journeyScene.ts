@@ -14,7 +14,7 @@ import premadeDecklists from '../data/premadeDecklists'
 import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import JOURNEY_MISSIONS from '../data/journeyCharacters'
+import JOURNEY_MISSIONS, { JourneyMission } from '../data/journeyCharacters'
 import Decklist from '../lib/decklist'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { Deck } from '../../../shared/types/deck'
@@ -32,7 +32,8 @@ export default class JourneyScene extends BaseScene {
   storyPanel: Phaser.GameObjects.Container | null = null
 
   // Mission details
-  selectedMission
+  selectedMission: JourneyMission
+  selectedAvatar: number
   txtMissionTitle: Phaser.GameObjects.Text
   txtMissionDescription: Phaser.GameObjects.Text
   avatar: AvatarButton
@@ -125,16 +126,8 @@ export default class JourneyScene extends BaseScene {
         within: btnContainer,
         text: 'Select',
         f: () => {
-          // Set all information based on selected character
-          this.txtMissionTitle.setText(`${name}'s Story`)
-          this.txtMissionDescription.setText(mission.missionText)
-          this.avatar.setAvatar(avatarIndex)
-
-          this.selectedMission = mission
-
-          this.decklist.setDeck(
-            mission.deck.map((id) => Catalog.getCardById(id)),
-          )
+          // Set mission info
+          this.setMissionInfo(mission, avatarIndex)
 
           // Set the right views visible/invisible
           this.characterSelectView.setAlpha(0)
@@ -398,7 +391,7 @@ export default class JourneyScene extends BaseScene {
         const deck: Deck = {
           name: 'Journey deck',
           cards: this.decklist.getDeckCode(),
-          cosmeticSet: { avatar: this.selectedMission.avatar, border: 0 },
+          cosmeticSet: { avatar: this.selectedAvatar, border: 0 },
         }
         const opponentDeck: Deck = {
           name: 'todo name me',
@@ -409,6 +402,7 @@ export default class JourneyScene extends BaseScene {
         this.scene.start('JourneyMatchScene', {
           deck: deck,
           aiDeck: opponentDeck,
+          uponRoundWinText: this.selectedMission.uponRoundWinText,
           winText: this.selectedMission.winText,
           loseText: this.selectedMission.loseText,
         })
@@ -417,6 +411,19 @@ export default class JourneyScene extends BaseScene {
     btnSizer.add(cont1).add(cont3)
 
     return btnSizer
+  }
+
+  private setMissionInfo(mission: JourneyMission, avatarIndex: number) {
+    this.selectedMission = mission
+    this.selectedAvatar = avatarIndex
+
+    // Update the text / avatar
+    this.txtMissionTitle.setText(`${avatarNames[avatarIndex]}'s Story`)
+    this.txtMissionDescription.setText(mission.missionText)
+    this.avatar.setAvatar(avatarIndex)
+
+    // Update the decklist
+    this.decklist.setDeck(mission.deck.map((id) => Catalog.getCardById(id)))
   }
 
   private onClickCutout(): (cutout: Cutout) => () => void {
