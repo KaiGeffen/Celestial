@@ -196,12 +196,12 @@ export const BBStyle: Record<string, any> = {
       width: Space.maxTextWidth,
     },
   },
-  // TODO This could be moved above, a BB can be instantiated with a normal style dictionary
   // Cost / Points shown above each card
   cardStats: {
     fontFamily: mainFont,
     fontSize: '30px',
     color: Color.cardText,
+    // TODO Add letter spacing after at least Phaser 3.6.0
   },
   // The textbox for the card
   cardText: {

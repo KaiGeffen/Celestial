@@ -27,6 +27,7 @@ import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
 import StoreScene from './scene/storeScene'
 import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin.js'
 import CharacterProfileScene from './scene/characterScene'
+import MapScene from './scene/MapScene'
 
 const config: Phaser.Types.Core.GameConfig = {
   title: 'Celestial',
@@ -52,6 +53,7 @@ const config: Phaser.Types.Core.GameConfig = {
     JourneyBuilderScene,
     PlaceholderScene,
     BuilderScene,
+    MapScene,
     JourneyScene,
     MatchHistoryScene,
     StoreScene,

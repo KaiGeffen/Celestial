@@ -9,7 +9,6 @@ import {
   Ease,
 } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
-import Button from '../lib/buttons/button'
 import premadeDecklists from '../data/premadeDecklists'
 import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
@@ -22,15 +21,6 @@ import avatarNames from '../lib/avatarNames'
 import AvatarButton from '../lib/buttons/avatar'
 
 export default class JourneyScene extends BaseScene {
-  panDirection
-
-  map: Phaser.GameObjects.Image
-
-  isDragging = false
-
-  characterContainers: Phaser.GameObjects.Container[] = []
-  storyPanel: Phaser.GameObjects.Container | null = null
-
   // Mission details
   selectedMission: JourneyMission
   selectedAvatar: number
@@ -57,18 +47,9 @@ export default class JourneyScene extends BaseScene {
   create(params): void {
     super.create()
 
-    // Create the background
-    this.map = this.add.image(0, 0, 'journey-Map').setOrigin(0).setInteractive()
-    this.enableDrag()
-
-    // Bound camera on this map
-    this.cameras.main.setBounds(0, 0, this.map.width, this.map.height)
-
-    // Add button for help menu
-    // this.createHelpButton()
-
-    // Add scroll functionality
-    this.enableScrolling()
+    // Launch map behind this scene
+    this.scene.launch('MapScene')
+    this.scene.sendToBack('MapScene')
 
     // Create the first screen
     this.createCharacterSelect()
@@ -291,7 +272,7 @@ export default class JourneyScene extends BaseScene {
     new Buttons.Basic({
       within: btnContainer,
       text: 'Exit',
-      f: () => this.scene.start('HomeScene'),
+      f: () => this.doExit()(),
     })
 
     this.waitingView
@@ -429,8 +410,9 @@ export default class JourneyScene extends BaseScene {
   private onClickCutout(): (cutout: Cutout) => () => void {
     return (cutout: Cutout) => {
       return () => {
-        this.decklist.removeCard(cutout.card)
-        this.missionDetailsView.layout()
+        // TODO
+        // this.decklist.removeCard(cutout.card)
+        // this.missionDetailsView.layout()
       }
     }
   }
@@ -458,101 +440,12 @@ export default class JourneyScene extends BaseScene {
     this.txtTimer.setText(
       `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
     )
+  }
 
-    // If pointer is released, stop panning
-    if (!this.input.activePointer.isDown) {
-      this.panDirection = undefined
+  beforeExit() {
+    // Stop the map scene when exiting journey
+    if (this.scene.isActive('MapScene')) {
+      this.scene.stop('MapScene')
     }
-
-    if (this.panDirection !== undefined) {
-      JourneyScene.moveCamera(
-        this.cameras.main,
-        this.panDirection[0],
-        this.panDirection[1],
-      )
-    }
-
-    // Dragging
-    if (this.isDragging && this.panDirection === undefined) {
-      const camera = this.cameras.main
-      const pointer = this.input.activePointer
-
-      const dx = ((pointer.x - pointer.downX) * delta) / 100
-      const dy = ((pointer.y - pointer.downY) * delta) / 100
-
-      JourneyScene.moveCamera(camera, dx, dy)
-    }
-  }
-
-  private createHelpButton(): void {
-    const container = this.add.container().setDepth(10)
-    new Buttons.Basic({
-      within: container,
-      text: 'Help',
-      f: () => {
-        this.scene.launch('MenuScene', {
-          menu: 'help',
-          callback: () => {
-            this.scene.start('TutorialMatchScene', { missionID: 0 })
-          },
-        })
-      },
-      muteClick: true,
-    }).setNoScroll()
-
-    // Anchor in top right
-    const dx = Space.buttonWidth / 2 + Space.iconSize + Space.pad * 2
-    const dy = Space.buttonHeight / 2 + Space.pad
-    this.plugins.get('rexAnchor')['add'](container, {
-      x: `100%-${dx}`,
-      y: `0%+${dy}`,
-    })
-  }
-
-  private enableScrolling(): void {
-    let camera = this.cameras.main
-
-    this.input.on(
-      'gameobjectwheel',
-      (pointer, gameObject, dx, dy, dz, event) => {
-        JourneyScene.moveCamera(camera, dx, dy)
-      },
-    )
-  }
-
-  private enableDrag(): void {
-    // Arrow pointing from the start of the drag to current position
-    const arrow = this.scene.scene.add
-      .image(0, 0, 'icon-Arrow')
-      .setAlpha(0)
-      .setScrollFactor(0)
-
-    // Map can be dragged
-    this.input
-      .setDraggable(this.map)
-      .on('dragstart', (event) => {
-        this.isDragging = true
-      })
-      .on('drag', (event) => {
-        const angle = Phaser.Math.Angle.Between(
-          event.downX,
-          event.downY,
-          event.x,
-          event.y,
-        )
-        arrow
-          .setPosition(event.downX, event.downY)
-          .setRotation(angle + Phaser.Math.DegToRad(90))
-          .setAlpha(1)
-      })
-      .on('dragend', () => {
-        this.isDragging = false
-        arrow.setAlpha(0)
-      })
-  }
-
-  private static moveCamera(camera, dx, dy): void {
-    camera.scrollX = Math.max(0, camera.scrollX + dx)
-    camera.scrollY = Math.max(0, camera.scrollY + dy)
   }
 }

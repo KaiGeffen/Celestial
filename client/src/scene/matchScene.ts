@@ -599,7 +599,7 @@ export class JourneyMatchScene extends MatchScene {
     super.queueState(state)
   }
 
-  displayState(state: GameModel): boolean {
+  protected displayState(state: GameModel): boolean {
     const result = super.displayState(state)
     if (!result) return false
 
