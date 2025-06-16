@@ -51,6 +51,86 @@ const JOURNEY_MISSIONS: JourneyMissionTracks = [
     },
     // More levels
   ],
+  // Mia
+  [
+    {
+      selectText: 'Shadows uwu',
+      missionText: `gotta go shadow or something`,
+      uponRoundWinText: [
+        `0 I am afraid of the dark`,
+        `1 I am not afraid of the dark`,
+        `2 I am not afraid of the dark`,
+        `3 I am not afraid of the dark`,
+        `4 I am not afraid of the dark`,
+        `5 I am not afraid of the dark`,
+      ],
+      deck: [1, 1, 1, 1, 1, 1, 35, 35, 13, 20, 19, 19, 19, 19, 23],
+      opponentDeck: [],
+      winText: 'You are a true shadow.',
+      loseText: 'I lost oh nooooo',
+    },
+    // More levels
+  ],
+  // Kitz
+  [
+    {
+      selectText: 'I am a cat',
+      missionText: `I am a cat and this is my mission`,
+      uponRoundWinText: [
+        `0 I am afraid of the cat`,
+        `1 I am not afraid of the cat`,
+        `2 I am not afraid of the cat`,
+        `3 I am not afraid of the cat`,
+        `4 I am not afraid of the cat`,
+        `5 I am not afraid of the cat`,
+      ],
+      deck: [0, 0, 4, 4, 28, 33, 33, 33, 33, 34, 34, 11, 11, 11, 71],
+      opponentDeck: [],
+      winText: 'I have won.',
+      loseText: 'I lost :/',
+    },
+    // More levels
+  ],
+  // Imani
+  [
+    {
+      selectText: 'I am a doula',
+      missionText: `I am a doula and this is my mission`,
+      uponRoundWinText: [
+        `0 I am afraid of the doula`,
+        `1 I am not afraid of the doula`,
+        `2 I am not afraid of the doula`,
+        `3 I am not afraid of the doula`,
+        `4 I am not afraid of the doula`,
+        `5 I am not afraid of the doula`,
+      ],
+      deck: [22, 22, 66, 60, 10, 11, 8, 8, 8, 4, 4, 2, 2, 2, 2],
+      opponentDeck: [],
+      winText: 'I have won and I am a doula.',
+      loseText: 'I lost and I am a doula.',
+    },
+    // More levels
+  ],
+  // Mitra
+  [
+    {
+      selectText: 'I am a seeker',
+      missionText: `I am a seeker and this is my mission`,
+      uponRoundWinText: [
+        `0 I am afraid of the seeker`,
+        `1 I am not afraid of the seeker`,
+        `2 I am not afraid of the seeker`,
+        `3 I am not afraid of the seeker`,
+        `4 I am not afraid of the seeker`,
+        `5 I am not afraid of the seeker`,
+      ],
+      deck: [50, 27, 27, 27, 27, 25, 88, 88, 31, 39, 11, 13, 91, 45, 45],
+      opponentDeck: [],
+      winText: 'I have won and I am a seeker.',
+      loseText: 'I lost and I am a seeker.',
+    },
+    // More levels
+  ],
 ]
 
 export default JOURNEY_MISSIONS

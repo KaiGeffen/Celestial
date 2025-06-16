@@ -74,15 +74,11 @@ export default class JourneyScene extends BaseScene {
   private createCharacterSelect() {
     this.characterSelectView = this.add.container().setAlpha(0)
 
-    // Somehow randomly get the characters that will appear
-    // TODO
-    const missionTracks = JOURNEY_MISSIONS
+    // Get the 2 characters that appear this time
+    const missionTracks = this.getMissionChoices()
 
     // For each character, add the avatar, text, button
-    const sizers = missionTracks.map((missions, avatarIndex) => {
-      // TODO Use the level to get the right mission
-      const mission = missions[0]
-
+    const sizers = missionTracks.map(([mission, avatarIndex]) => {
       const name = avatarNames[avatarIndex]
 
       // Form a sizer for this character
@@ -262,8 +258,8 @@ export default class JourneyScene extends BaseScene {
       'Daily journey complete',
       Style.announcement,
     )
-    const txtTimerReminder = this.add.text(0, 0, 'Check back in:', Style.basic)
-    this.txtTimer = this.add.text(0, 0, '00:00:00', Style.basic)
+    const txtHint = this.add.text(0, 0, 'You can start again!', Style.basic)
+    // this.txtTimer = this.add.text(0, 0, '00:00:00', Style.basic)
     const btnContainer = new ContainerLite(
       this,
       0,
@@ -274,13 +270,16 @@ export default class JourneyScene extends BaseScene {
     new Buttons.Basic({
       within: btnContainer,
       text: 'Exit',
-      f: () => this.doExit()(),
+      f: () => {
+        this.waitingView.hide()
+        this.characterSelectView.setAlpha(1)
+      },
     })
 
     this.waitingView
       .add(txtNotice)
-      .add(txtTimerReminder)
-      .add(this.txtTimer)
+      .add(txtHint)
+      // .add(this.txtTimer)
       .add(btnContainer)
       .addBackground(background)
       .layout()
@@ -420,29 +419,78 @@ export default class JourneyScene extends BaseScene {
     }
   }
 
-  update(time, delta): void {
-    // Update the timer
-    const now = new Date()
-    let target = new Date(now)
-    if (now.getHours() < 12) {
-      // Next noon today
-      target.setHours(12, 0, 0, 0)
-    } else {
-      // Next midnight (start of tomorrow)
-      target.setDate(now.getDate() + 1)
-      target.setHours(0, 0, 0, 0)
-    }
-    const NEXT_JOURNEY_TIME = target
+  // Get the missions that appear this time
+  private getMissionChoices(): [
+    [JourneyMission, number],
+    [JourneyMission, number],
+  ] {
+    // Total exp with all avatars
+    const totalExp = UserSettings._get('avatarExperience').reduce(
+      (acc, curr) => acc + curr,
+      0,
+    )
 
-    const timeUntilNextJourney = NEXT_JOURNEY_TIME.getTime() - Date.now()
-    const hours = Math.floor(timeUntilNextJourney / (1000 * 60 * 60))
-    const minutes = Math.floor(
-      (timeUntilNextJourney % (1000 * 60 * 60)) / (1000 * 60),
-    )
-    const seconds = Math.floor((timeUntilNextJourney % (1000 * 60)) / 1000)
-    this.txtTimer.setText(
-      `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
-    )
+    // 1. Determine allowed indices
+    let maxIdx = 5
+    if (totalExp < 1200) maxIdx = 4
+    if (totalExp < 800) maxIdx = 3
+    if (totalExp < 200) maxIdx = 1
+    const allowed = Array.from({ length: maxIdx + 1 }, (_, i) => i)
+
+    // 2. Deterministic seed from UTC date
+    const now = new Date()
+    const seedStr = `${now.getUTCFullYear()}-${now.getUTCMonth()}-${now.getUTCDate()}`
+    let seed = 0
+    for (let i = 0; i < seedStr.length; i++)
+      seed = (seed * 31 + seedStr.charCodeAt(i)) & 0xffffffff
+
+    // Simple deterministic RNG (mulberry32)
+    function mulberry32(a: number) {
+      return function () {
+        let t = (a += 0x6d2b79f5)
+        t = Math.imul(t ^ (t >>> 15), t | 1)
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+      }
+    }
+    const rand = mulberry32(seed)
+
+    // 3. Randomly pick 2 unique indices
+    const results: [JourneyMission, number][] = []
+    while (results.length < 2) {
+      const idx = allowed[Math.floor(rand() * allowed.length)]
+      if (results.find((result) => result[1] === idx)) continue
+
+      // TODO Get the right mission based off this avatar's exp
+      results.push([JOURNEY_MISSIONS[idx][0], idx])
+    }
+
+    // We are guaranteeing 2 results in the above loop
+    return results as [[JourneyMission, number], [JourneyMission, number]]
+  }
+
+  update(time, delta): void {
+    // // Update the timer
+    // const now = new Date()
+    // let target = new Date(now)
+    // if (now.getHours() < 12) {
+    //   // Next noon today
+    //   target.setHours(12, 0, 0, 0)
+    // } else {
+    //   // Next midnight (start of tomorrow)
+    //   target.setDate(now.getDate() + 1)
+    //   target.setHours(0, 0, 0, 0)
+    // }
+    // const NEXT_JOURNEY_TIME = target
+    // const timeUntilNextJourney = NEXT_JOURNEY_TIME.getTime() - Date.now()
+    // const hours = Math.floor(timeUntilNextJourney / (1000 * 60 * 60))
+    // const minutes = Math.floor(
+    //   (timeUntilNextJourney % (1000 * 60 * 60)) / (1000 * 60),
+    // )
+    // const seconds = Math.floor((timeUntilNextJourney % (1000 * 60)) / 1000)
+    // this.txtTimer.setText(
+    //   `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
+    // )
   }
 
   beforeExit() {

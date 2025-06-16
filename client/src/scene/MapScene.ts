@@ -61,7 +61,6 @@ export default class MapScene extends Scene {
 
       MapScene.moveCamera(camera, dx, dy)
     }
-    console.log(this.cameras.main.scrollX, this.cameras.main.scrollY)
   }
 
   private enableScrolling(): void {
