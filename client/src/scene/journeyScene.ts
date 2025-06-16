@@ -9,7 +9,6 @@ import {
   Ease,
 } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
-import premadeDecklists from '../data/premadeDecklists'
 import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -20,6 +19,8 @@ import { Deck } from '../../../shared/types/deck'
 import avatarNames from '../lib/avatarNames'
 import AvatarButton from '../lib/buttons/avatar'
 import newScrollablePanel from '../lib/scrollablePanel'
+import { MechanicsSettings } from '../../../shared/settings'
+import Button from '../lib/buttons/button'
 
 export default class JourneyScene extends BaseScene {
   // Mission details
@@ -29,8 +30,9 @@ export default class JourneyScene extends BaseScene {
   txtMissionDescription: Phaser.GameObjects.Text
   avatar: AvatarButton
   decklist: Decklist
+  // The decklist with all collectible cards
   cardPool: Decklist
-  startBtn: any
+  startBtn: Button
 
   // Timer until next journey available
   txtTimer: Phaser.GameObjects.Text
@@ -43,6 +45,9 @@ export default class JourneyScene extends BaseScene {
 
   // Card pool sizer
   cardPoolSizer: Sizer
+
+  // Card pool text reference
+  cardPoolText: Phaser.GameObjects.Text
 
   constructor() {
     super({
@@ -148,16 +153,18 @@ export default class JourneyScene extends BaseScene {
 
   private createMissionDetails() {
     // Create a sizer for the mission details
-    this.missionDetailsView = this.rexUI.add.sizer({
-      orientation: 'horizontal',
-      space: {
-        item: Space.pad,
-        top: Space.pad,
-        bottom: Space.pad,
-        left: Space.pad,
-        right: Space.pad,
-      },
-    })
+    this.missionDetailsView = this.rexUI.add
+      .sizer({
+        orientation: 'horizontal',
+        space: {
+          item: Space.pad,
+          top: Space.pad,
+          bottom: Space.pad,
+          left: Space.pad,
+          right: Space.pad,
+        },
+      })
+      .setOrigin(0, 0.5)
 
     const background = this.add.image(0, 0, 'background-Light').setInteractive()
     this.addShadow(background)
@@ -179,32 +186,21 @@ export default class JourneyScene extends BaseScene {
       .add(decklistSizer)
       .add(btnSizer)
 
-    this.missionDetailsView.add(leftSizer).addBackground(background).layout()
+    // Create card pool sizer
+    this.cardPoolSizer = this.rexUI.add.sizer()
+
+    // Add card pool to its own sizer
+    this.cardPoolSizer = this.createCardPool()
+
+    this.missionDetailsView
+      .add(leftSizer)
+      .add(this.cardPoolSizer)
+      .addBackground(background)
+      .layout()
 
     // Add an anchor for the sizer
     this.plugins.get('rexAnchor')['add'](this.missionDetailsView, {
       left: `0%+${Space.pad}`,
-      y: `50%`,
-    })
-
-    // Create card pool sizer
-    this.cardPoolSizer = this.rexUI.add.sizer({
-      orientation: 'vertical',
-      space: {
-        top: Space.pad,
-        bottom: Space.pad,
-        left: Space.pad,
-        right: Space.pad,
-      },
-    })
-
-    // Add card pool to its own sizer
-    const cardPool = this.createCardPool()
-    this.cardPoolSizer.add(cardPool).layout()
-
-    // Position card pool sizer
-    this.plugins.get('rexAnchor')['add'](this.cardPoolSizer, {
-      right: `100%-${Space.pad}`,
       y: `50%`,
     })
 
@@ -365,10 +361,18 @@ export default class JourneyScene extends BaseScene {
     return this.decklist.sizer
   }
 
-  private createCardPool() {
+  private createCardPool(): Sizer {
+    const sizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+    })
+
+    // Add text explaining the card pool
+    this.cardPoolText = this.add.text(0, 0, '', Style.basic)
+    this.cardPoolText.setOrigin(0.5, 0)
+
+    // Create the decklist with 99 of each card
     this.cardPool = new Decklist(this, this.onClickCardPool())
 
-    // Create array of 99 copies of each card from 0 to 60
     const cards = []
     for (let i = 0; i <= 60; i++) {
       for (let j = 0; j < 99; j++) {
@@ -380,17 +384,11 @@ export default class JourneyScene extends BaseScene {
 
     // Create a scrollable panel
     const panel = newScrollablePanel(this, {
-      x: 0,
-      y: 0,
-      width: Space.cardWidth + Space.pad * 2,
-      height: Space.windowHeight - Space.pad * 2,
+      width: Space.cutoutWidth + Space.pad * 2,
+      height: Space.windowHeight - Space.pad * 6,
       scrollMode: 'vertical',
-      background: this.add.rectangle(0, 0, 1, 1, Color.background),
       panel: {
         child: this.cardPool.sizer,
-        mask: {
-          padding: 1,
-        },
       },
       slider: {
         track: this.add.rectangle(0, 0, 20, 1, Color.progressBarTrack),
@@ -400,16 +398,11 @@ export default class JourneyScene extends BaseScene {
         focus: false,
         speed: 0.1,
       },
-      space: {
-        left: Space.pad,
-        right: Space.pad,
-        top: Space.pad,
-        bottom: Space.pad,
-      },
     })
-    panel.setName('cardPool')
 
-    return panel
+    sizer.add(this.cardPoolText).add(panel)
+
+    return sizer
   }
 
   private createButtons() {
@@ -494,13 +487,22 @@ export default class JourneyScene extends BaseScene {
 
   private updateDeckState() {
     const deckSize = this.decklist.getDeckCode().length
+    const remainingCards = MechanicsSettings.DECK_SIZE - deckSize
 
-    // Show/hide card pool based on deck size
-    const wasVisible = this.cardPoolSizer.visible
-    this.cardPoolSizer.visible = deckSize < 15
+    // Update card pool text
+    this.cardPoolText.setText(
+      `Select ${remainingCards} more cards for your deck`,
+    )
+
+    if (deckSize === MechanicsSettings.DECK_SIZE) {
+      this.cardPoolSizer.hide()
+    } else {
+      this.cardPoolSizer.show()
+    }
+    this.missionDetailsView.layout()
 
     // Enable/disable start button based on deck size
-    this.startBtn.enabled = deckSize === 15
+    this.startBtn.enabled = deckSize === MechanicsSettings.DECK_SIZE
   }
 
   private setMissionInfo(mission: JourneyMission, avatarIndex: number) {
