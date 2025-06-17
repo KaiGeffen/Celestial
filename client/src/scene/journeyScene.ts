@@ -1,13 +1,6 @@
 import 'phaser'
 import BaseScene from './baseScene'
-import {
-  Style,
-  Space,
-  Color,
-  UserSettings,
-  Time,
-  Ease,
-} from '../settings/settings'
+import { Style, Space, Color, UserSettings, Flags } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
 import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
@@ -368,15 +361,26 @@ export default class JourneyScene extends BaseScene {
     this.cardPoolText = this.add.text(0, 0, '', Style.basic)
     this.cardPoolText.setOrigin(0.5, 0)
 
-    // Create the decklist with 99 of each card
+    // Create the decklist with each card you can add
     this.cardPool = new Decklist(this, this.onClickCardPool())
 
     const cards = []
-    Catalog.collectibleCards.forEach((card) => {
-      for (let i = 0; i < 99; i++) {
-        cards.push(card)
-      }
-    })
+    // Devs have all cards unlocked
+    if (Flags.devCardsEnabled) {
+      Catalog.collectibleCards.forEach((card) => {
+        for (let i = 0; i < 99; i++) {
+          cards.push(card)
+        }
+      })
+    } else {
+      UserSettings._get('inventory').forEach((isPresent, index) => {
+        if (isPresent) {
+          for (let i = 0; i < 99; i++) {
+            cards.push(Catalog.getCardById(index))
+          }
+        }
+      })
+    }
 
     this.cardPool.setDeck(cards)
 
@@ -634,9 +638,7 @@ export default class JourneyScene extends BaseScene {
         trackStrokeColor: Color.progressBarTrackStroke,
         trackStrokeThickness: 4,
         value: expValue,
-        valuechangeCallback: () => {
-          console.log('valuechangeCallback')
-        },
+        valuechangeCallback: () => {},
       })
       .setAlpha(0.4)
     const expLabel = this.add.text(0, 0, `EXP: ${avatarExp} / ${expMax}`, {

@@ -61,8 +61,11 @@ export class UserSettings {
 
     if (key in sessionStorage) {
       return JSON.parse(sessionStorage.getItem(key))
-    } else {
+    } else if (key in localStorage) {
       return JSON.parse(localStorage.getItem(key))
+    } else {
+      console.log('key not found', key)
+      return null
     }
   }
 
