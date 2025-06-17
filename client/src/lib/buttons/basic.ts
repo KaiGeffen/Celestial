@@ -52,7 +52,7 @@ class BaseButton extends Button {
   }
 
   setText(s: string): Button {
-    return super.setText(s.toUpperCase())
+    return super.setText(s)
   }
 
   // Button is a spritesheet with different states

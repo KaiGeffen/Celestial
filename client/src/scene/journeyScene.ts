@@ -432,25 +432,41 @@ export default class JourneyScene extends BaseScene {
       within: cont3,
       text: 'Start',
       f: () => {
-        const deck: Deck = {
-          name: 'Journey deck',
-          cards: this.decklist.getDeckCode(),
-          cosmeticSet: { avatar: this.selectedAvatar, border: 0 },
-        }
-        const opponentDeck: Deck = {
-          name: 'todo name me',
-          cards: this.selectedMission.opponentDeck,
-          cosmeticSet: { avatar: 0, border: 0 },
-        }
+        const deckSize = this.decklist.getDeckCode().length
+        if (deckSize === MechanicsSettings.DECK_SIZE) {
+          // Start journey
+          const deck: Deck = {
+            name: 'Journey deck',
+            cards: this.decklist.getDeckCode(),
+            cosmeticSet: { avatar: this.selectedAvatar, border: 0 },
+          }
+          const opponentDeck: Deck = {
+            name: 'todo name me',
+            cards: this.selectedMission.opponentDeck,
+            cosmeticSet: { avatar: 0, border: 0 },
+          }
 
-        this.scene.start('JourneyMatchScene', {
-          deck: deck,
-          aiDeck: opponentDeck,
-          avatar: this.selectedAvatar,
-          uponRoundWinText: this.selectedMission.uponRoundWinText,
-          winText: this.selectedMission.winText,
-          loseText: this.selectedMission.loseText,
-        })
+          this.scene.start('JourneyMatchScene', {
+            deck: deck,
+            aiDeck: opponentDeck,
+            avatar: this.selectedAvatar,
+            uponRoundWinText: this.selectedMission.uponRoundWinText,
+            winText: this.selectedMission.winText,
+            loseText: this.selectedMission.loseText,
+          })
+        } else {
+          // Reset deck
+          this.decklist.setJourneyDeck(
+            this.selectedMission.deck.required.map((id) =>
+              Catalog.getCardById(id),
+            ),
+            this.selectedMission.deck.optional.map((id) =>
+              Catalog.getCardById(id),
+            ),
+          )
+          this.missionDetailsView.layout()
+          this.updateDeckState()
+        }
       },
     })
     this.startBtn.enabled = false
@@ -496,13 +512,12 @@ export default class JourneyScene extends BaseScene {
 
     if (deckSize === MechanicsSettings.DECK_SIZE) {
       this.cardPoolSizer.hide()
+      this.startBtn.setText('Start')
     } else {
       this.cardPoolSizer.show()
+      this.startBtn.setText('Reset')
     }
     this.missionDetailsView.layout()
-
-    // Enable/disable start button based on deck size
-    this.startBtn.enabled = deckSize === MechanicsSettings.DECK_SIZE
   }
 
   private setMissionInfo(mission: JourneyMission, avatarIndex: number) {
