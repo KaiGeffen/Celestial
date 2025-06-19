@@ -5,7 +5,7 @@ import Buttons from '../lib/buttons/buttons'
 import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import JOURNEY_MISSIONS, { JourneyMission } from '../data/journeyCharacters'
+import { JOURNEY_MISSIONS, JourneyMission } from '../data/journeyCharacters'
 import Decklist from '../lib/decklist'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { Deck } from '../../../shared/types/deck'
@@ -586,10 +586,11 @@ export default class JourneyScene extends BaseScene {
     )
 
     // 1. Determine allowed indices
-    let maxIdx = 5
-    if (totalExp < 1200) maxIdx = 4
-    if (totalExp < 800) maxIdx = 3
-    if (totalExp < 200) maxIdx = 1
+    let maxIdx = 1
+    // let maxIdx = 5
+    // if (totalExp < 1200) maxIdx = 4
+    // if (totalExp < 800) maxIdx = 3
+    // if (totalExp < 200) maxIdx = 1
     const allowed = Array.from({ length: maxIdx + 1 }, (_, i) => i)
 
     // 2. Deterministic seed from UTC date
@@ -617,7 +618,9 @@ export default class JourneyScene extends BaseScene {
       if (results.find((result) => result[1] === idx)) continue
 
       // TODO Get the right mission based off this avatar's exp
-      results.push([JOURNEY_MISSIONS[idx][0], idx])
+      const avatarMissionTrack = JOURNEY_MISSIONS[idx]
+      const mission = avatarMissionTrack[avatarMissionTrack.length - 1]
+      results.push([mission, idx])
     }
 
     // We are guaranteeing 2 results in the above loop
