@@ -7,6 +7,12 @@ import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import avatarNames from '../lib/avatarNames'
 import AvatarButton from '../lib/buttons/avatar'
 import { getUnlockedAvatars } from '../lib/cosmetics'
+import {
+  getLevelFromExp,
+  getLevelProgress,
+  getExpToNextLevel,
+  MAX_LEVEL,
+} from '../data/levelProgression'
 
 export default class CharacterProfileScene extends BaseScene {
   // Character details
@@ -168,8 +174,9 @@ export default class CharacterProfileScene extends BaseScene {
 
     const avatarExp =
       UserSettings._get('avatarExperience')[this.selectedAvatar] || 0
-    const expMax = 1000
-    const expValue = Math.min(avatarExp / expMax, 1)
+    const levelData = getLevelFromExp(avatarExp)
+    const progress = getLevelProgress(avatarExp)
+    const expToNext = getExpToNextLevel(avatarExp)
 
     this.expBar = this.add
       .rexLineProgress({
@@ -179,15 +186,22 @@ export default class CharacterProfileScene extends BaseScene {
         trackColor: Color.progressBarTrack,
         trackStrokeColor: Color.progressBarTrackStroke,
         trackStrokeThickness: 4,
-        value: expValue,
+        value: progress,
         valuechangeCallback: () => {},
       })
       .setAlpha(0.4)
 
-    this.expLabel = this.add.text(0, 0, `EXP: ${avatarExp} / ${expMax}`, {
-      ...Style.basic,
-      fontSize: '16px',
-    })
+    this.expLabel = this.add.text(
+      0,
+      0,
+      levelData.level === MAX_LEVEL
+        ? `Level ${levelData.level} (MAX)`
+        : `Level ${levelData.level} - ${expToNext} EXP to next\nClick to unlock TODO UNLOCKS`,
+      {
+        ...Style.basic,
+        fontSize: '16px',
+      },
+    )
 
     sizer.add(this.expBar).add(this.expLabel)
 
@@ -216,10 +230,15 @@ export default class CharacterProfileScene extends BaseScene {
   private updateProgressBar() {
     const avatarExp =
       UserSettings._get('avatarExperience')[this.selectedAvatar] || 0
-    const expMax = 1000
-    const expValue = Math.min(avatarExp / expMax, 1)
+    const levelData = getLevelFromExp(avatarExp)
+    const progress = getLevelProgress(avatarExp)
+    const expToNext = getExpToNextLevel(avatarExp)
 
-    this.expBar.setValue(expValue)
-    this.expLabel.setText(`EXP: ${avatarExp} / ${expMax}`)
+    this.expBar.setValue(progress)
+    this.expLabel.setText(
+      levelData.level === MAX_LEVEL
+        ? `Level ${levelData.level} (MAX)`
+        : `Level ${levelData.level} - ${expToNext} EXP to next\nClick to unlock TODO UNLOCKS`,
+    )
   }
 }
