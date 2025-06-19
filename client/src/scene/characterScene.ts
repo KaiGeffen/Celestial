@@ -1,153 +1,119 @@
 import 'phaser'
 import BaseScene from './baseScene'
-import avatarDetails from '../data/avatarDetails.json'
-import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer.js'
-import { Style, Space } from '../settings/settings'
-import AvatarButton from '../lib/buttons/avatar'
+import { Style, Space, Color, UserSettings } from '../settings/settings'
+import Buttons from '../lib/buttons/buttons'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-
-// Character data from avatarDetails.json
-interface CharacterInfo {
-  name: string
-  surname: string
-  description: string
-  chart: number[]
-  exp?: number
-  level?: number
-  expToNext?: number
-}
-
-const CHARACTERS: CharacterInfo[] = avatarDetails.map((char) => ({
-  ...char,
-  exp: 100, // Placeholder, replace with real data
-  level: 1, // Placeholder, replace with real data
-  expToNext: 200, // Placeholder, replace with real data
-}))
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
+import avatarNames from '../lib/avatarNames'
+import AvatarButton from '../lib/buttons/avatar'
+import { getUnlockedAvatars } from '../lib/cosmetics'
 
 export default class CharacterProfileScene extends BaseScene {
-  private selectedCharacterIndex = 0
-  private mainSizer: Sizer
-  private portraitContainer: Phaser.GameObjects.Container
-  private portraitImage: Phaser.GameObjects.Image
-  private nameText: Phaser.GameObjects.Text
-  private rightSizer: Sizer
-  private headerSizer: Sizer
-  private avatarButtons: AvatarButton[] = []
-  private descText: Phaser.GameObjects.Text
-  private expBarBg: Phaser.GameObjects.Rectangle
-  private expBar: Phaser.GameObjects.Rectangle
-  private expText: Phaser.GameObjects.Text
-  private progressSizer: Sizer
+  // Character details
+  selectedAvatar: number
+  avatar: AvatarButton
+  txtCharacterName: Phaser.GameObjects.Text
+  txtCharacterDescription: Phaser.GameObjects.Text
+  expBar: any
+  expLabel: Phaser.GameObjects.Text
+
+  // Views
+  mainSizer: Sizer
+  rightSizer: Sizer
 
   constructor() {
-    super({ key: 'CharacterProfileScene' })
+    super({
+      key: 'CharacterProfileScene',
+    })
   }
 
-  create(): void {
+  create(params): void {
     super.create()
-    const width = this.cameras.main.width
-    const height = this.cameras.main.height
 
-    // Add background image (same as builderScene.ts)
-    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
-    this.plugins.get('rexAnchor')['add'](background, {
-      width: '100%',
-      height: '100%',
+    // Default to first avatar if none selected
+    this.selectedAvatar = params?.avatarId ?? 0
+
+    // Create the main layout
+    this.createMainLayout()
+
+    // Add back button
+    new Buttons.Basic({
+      within: this,
+      x: Space.buttonWidth / 2 + Space.pad,
+      y: Space.buttonHeight / 2 + Space.pad,
+      text: 'Back',
+      f: () => this.scene.start('HomeScene'),
     })
-
-    this.createMainSizer()
-    // this.createPortrait()
-    this.createRightPanel()
-    this.mainSizer.layout()
   }
 
-  createMainSizer() {
-    const width = this.cameras.main.width
-    const height = this.cameras.main.height
-    // Main horizontal sizer
-    this.mainSizer = this.rexUI.add.sizer()
-    this.plugins.get('rexAnchor')['add'](this.mainSizer, {
-      left: 'left',
-      top: 'top',
-      width: '100%',
-      height: '100%',
+  private createMainLayout() {
+    // Create the main sizer that will contain everything
+    this.mainSizer = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      space: { item: Space.pad * 2 },
+      anchor: {
+        x: '50%',
+        y: '50%',
+        width: '100%',
+        height: '100%',
+      },
     })
 
-    // Left: Portrait container
-    this.mainSizer.add(this.createPortrait())
-    // this.portraitContainer = this.add.container(0, 0)
-    // this.mainSizer.add(this.portraitContainer, {
-    //   proportion: 1,
-    //   align: 'center',
-    //   expand: true,
-    // })
+    // Add background
+    const background = this.add.image(0, 0, 'background-Light').setInteractive()
 
-    // Right: Vertical sizer for header, description, progress
+    // Create the full art image
+    const image = this.add
+      .image(0, 0, `avatar-${avatarNames[this.selectedAvatar]}Full`)
+      .setInteractive()
+
+    // Create the right side content
     this.rightSizer = this.rexUI.add.sizer({
       orientation: 'vertical',
-      space: { item: 24, top: 48, left: 24, right: 24, bottom: 48 },
+      space: { item: Space.pad * 2 },
     })
-    this.mainSizer.add(this.rightSizer, {
-      proportion: 1,
-      align: 'center',
-      expand: true,
-    })
-    this.mainSizer.layout()
+
+    // Create avatar selection row
+    const avatarSizer = this.createAvatarSelection()
+
+    // Create character description
+    const descriptionSizer = this.createDescription()
+
+    // Create progress bar
+    const progressSizer = this.createProgressBar()
+
+    // Add all elements to the right sizer
+    this.rightSizer
+      .add(avatarSizer)
+      .add(descriptionSizer)
+      .add(progressSizer)
+      .addSpace()
+      .layout()
+
+    // Add both the image and right content to the main sizer
+    this.mainSizer
+      .add(image)
+      .add(this.rightSizer)
+      .addBackground(background)
+      .layout()
   }
 
-  createPortrait() {
-    const fixRatio = () => {
-      const height = this.cameras.main.height
-      console.log('fixRatio', height)
-      this.portraitImage.setDisplaySize((height * 2) / 3, height)
-      this.mainSizer.layout()
-    }
-
-    // Portrait image
-    const char = CHARACTERS[this.selectedCharacterIndex]
-    this.portraitImage = this.add.image(0, 0, `avatar-${char.name}Full`)
-
-    this.plugins.get('rexAnchor')['add'](this.portraitImage, {
-      //   left: 'left',
-      //   bottom: 'bottom',
-      onUpdateViewportCallback: fixRatio,
+  private createAvatarSelection(): Sizer {
+    const sizer = this.rexUI.add.sizer({
+      space: {
+        item: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+      },
     })
 
-    fixRatio()
+    // Get unlocked avatars
+    const unlockedAvatars = getUnlockedAvatars()
 
-    return this.portraitImage
-  }
-
-  createRightPanel() {
-    // Header
-    this.createHeader()
-    // Description/content
-    const width = this.cameras.main.width
-    this.descText = this.add.text(0, 0, '', {
-      ...Style.basic,
-      wordWrap: { width: width * 0.5 - 48 },
-      align: 'center',
-    })
-    // Footer (progress)
-    this.createProgress()
-    // Add to rightSizer: header, content, footer
-    this.rightSizer.add(this.headerSizer, { align: 'center' })
-    this.rightSizer.add(this.descText, {
-      proportion: 1,
-      align: 'center',
-      expand: true,
-    })
-    this.rightSizer.add(this.progressSizer, { align: 'center' })
-    this.rightSizer.layout()
-  }
-
-  createHeader() {
-    this.headerSizer = this.rexUI.add.sizer({
-      orientation: 'horizontal',
-      space: { item: Space.pad },
-    })
-    this.avatarButtons = []
-    CHARACTERS.forEach((char, idx) => {
+    // Create avatar buttons
+    unlockedAvatars.forEach((avatarId) => {
       const container = new ContainerLite(
         this,
         0,
@@ -155,75 +121,105 @@ export default class CharacterProfileScene extends BaseScene {
         Space.avatarSize,
         Space.avatarSize,
       )
-      const avatarBtn = new AvatarButton({
+      const avatar = new Buttons.Avatar({
         within: container,
-        name: char.name,
-        emotive: false,
-        muteClick: true,
+        avatarId: avatarId,
         f: () => {
-          if (this.selectedCharacterIndex !== idx) {
-            this.selectedCharacterIndex = idx
-            this.updateCharacterDisplay()
-          }
+          this.selectedAvatar = avatarId
+          this.updateCharacterView()
         },
       })
-      this.avatarButtons.push(avatarBtn)
-      this.headerSizer.add(container)
-    })
-  }
 
-  createProgress() {
-    const width = this.cameras.main.width
-    const barWidth = width * 0.5 - 96
-    const barHeight = 24
-    this.expBarBg = this.add
-      .rectangle(0, 0, barWidth, barHeight, 0x222222, 0.7)
-      .setOrigin(0.5, 0.5)
-    this.expBar = this.add
-      .rectangle(-barWidth / 2, 0, 0, barHeight, 0x00cfff, 1)
-      .setOrigin(0.5, 0.5)
-    this.expText = this.add
-      .text(0, 0, '', {
-        ...Style.basic,
-        fontSize: '18px',
-      })
-      .setOrigin(0.5, 0.5)
-    this.progressSizer = this.rexUI.add.sizer({
-      orientation: 'vertical',
-      space: { item: 4 },
-    })
-    const expBarSizer = this.rexUI.add.sizer({ orientation: 'horizontal' })
-    expBarSizer.add(this.expBarBg, { align: 'center' })
-    expBarSizer.add(this.expBar, { align: 'center' })
-    this.progressSizer.add(expBarSizer, { align: 'center' })
-    this.progressSizer.add(this.expText, { align: 'center' })
-  }
-
-  updateCharacterDisplay() {
-    const width = this.cameras.main.width
-    const height = this.cameras.main.height
-    const char = CHARACTERS[this.selectedCharacterIndex]
-    // Update portrait
-    this.portraitImage.setTexture(`avatar-${char.name}Full`)
-
-    // Update name
-    this.nameText.setText(`${char.name} — ${char.surname}`)
-    // Update description
-    this.descText.setText(char.description)
-    // Update progress bar
-    const exp = char.exp ?? 0
-    const expToNext = char.expToNext ?? 100
-    const expPercent = Math.min(exp / expToNext, 1)
-    const barWidth = width * 0.5 - 96
-    this.expBar.width = barWidth * expPercent
-    this.expText.setText(`${exp} / ${expToNext} EXP`)
-    // Update avatar button selection highlight (if you want to add a visual cue)
-    this.avatarButtons.forEach((btn, idx) => {
-      if (idx === this.selectedCharacterIndex) {
-        btn.select && btn.select()
-      } else {
-        btn.deselect && btn.deselect()
+      if (avatarId === this.selectedAvatar) {
+        avatar.select()
       }
+
+      sizer.add(container)
     })
+
+    return sizer
+  }
+
+  private createDescription(): Sizer {
+    const sizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: { item: Space.pad },
+    })
+
+    this.txtCharacterName = this.add.text(0, 0, '', Style.announcement)
+    this.txtCharacterDescription = this.add.text(0, 0, '', {
+      ...Style.basic,
+      wordWrap: { width: 400 },
+    })
+
+    sizer.add(this.txtCharacterName).add(this.txtCharacterDescription)
+
+    // Update text with initial values
+    this.updateCharacterText()
+
+    return sizer
+  }
+
+  private createProgressBar(): Sizer {
+    const sizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: { item: Space.pad },
+    })
+
+    const avatarExp =
+      UserSettings._get('avatarExperience')[this.selectedAvatar] || 0
+    const expMax = 1000
+    const expValue = Math.min(avatarExp / expMax, 1)
+
+    this.expBar = this.add
+      .rexLineProgress({
+        width: 400,
+        height: 10,
+        barColor: Color.progressBar,
+        trackColor: Color.progressBarTrack,
+        trackStrokeColor: Color.progressBarTrackStroke,
+        trackStrokeThickness: 4,
+        value: expValue,
+        valuechangeCallback: () => {},
+      })
+      .setAlpha(0.4)
+
+    this.expLabel = this.add.text(0, 0, `EXP: ${avatarExp} / ${expMax}`, {
+      ...Style.basic,
+      fontSize: '16px',
+    })
+
+    sizer.add(this.expBar).add(this.expLabel)
+
+    return sizer
+  }
+
+  private updateCharacterView() {
+    // Update the full art image
+    const image = this.mainSizer.getChildren()[0] as Phaser.GameObjects.Image
+    image.setTexture(`avatar-${avatarNames[this.selectedAvatar]}Full`)
+
+    // Update the text
+    this.updateCharacterText()
+
+    // Update progress bar
+    this.updateProgressBar()
+  }
+
+  private updateCharacterText() {
+    this.txtCharacterName.setText(avatarNames[this.selectedAvatar])
+    this.txtCharacterDescription.setText(
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+    )
+  }
+
+  private updateProgressBar() {
+    const avatarExp =
+      UserSettings._get('avatarExperience')[this.selectedAvatar] || 0
+    const expMax = 1000
+    const expValue = Math.min(avatarExp / expMax, 1)
+
+    this.expBar.setValue(expValue)
+    this.expLabel.setText(`EXP: ${avatarExp} / ${expMax}`)
   }
 }
