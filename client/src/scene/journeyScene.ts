@@ -21,6 +21,7 @@ import {
   MAX_LEVEL,
   MAX_EXP,
 } from '../data/levelProgression'
+import Card from '../../../shared/state/card'
 
 export default class JourneyScene extends BaseScene {
   // Mission details
@@ -372,24 +373,28 @@ export default class JourneyScene extends BaseScene {
     // Create the decklist with each card you can add
     this.cardPool = new Decklist(this, this.onClickCardPool())
 
-    const cards = []
+    const cardSet = new Set<Card>()
     // Devs have all cards unlocked
     if (Flags.devCardsEnabled) {
       Catalog.collectibleCards.forEach((card) => {
-        for (let i = 0; i < 99; i++) {
-          cards.push(card)
-        }
+        cardSet.add(card)
       })
     } else {
       UserSettings._get('inventory').forEach((isPresent, index) => {
         if (isPresent) {
-          for (let i = 0; i < 99; i++) {
-            cards.push(Catalog.getCardById(index))
-          }
+          cardSet.add(Catalog.getCardById(index))
         }
       })
     }
 
+    // Add optional cards from the current mission and remove required cards
+    if (this.selectedMission) {
+      this.selectedMission.deck.optional.forEach((cardId) => {
+        cardSet.add(Catalog.getCardById(cardId))
+      })
+    }
+
+    const cards = Array.from(cardSet)
     this.cardPool.setDeck(cards)
 
     // Create a scrollable panel
@@ -532,6 +537,35 @@ export default class JourneyScene extends BaseScene {
     this.missionDetailsView.layout()
   }
 
+  private refreshCardPool() {
+    const cardSet = new Set<Card>()
+    // Devs have all cards unlocked
+    if (Flags.devCardsEnabled) {
+      Catalog.collectibleCards.forEach((card) => {
+        cardSet.add(card)
+      })
+    } else {
+      UserSettings._get('inventory').forEach((isPresent, index) => {
+        if (isPresent) {
+          cardSet.add(Catalog.getCardById(index))
+        }
+      })
+    }
+
+    // Add optional cards from the current mission and remove required cards
+    if (this.selectedMission) {
+      this.selectedMission.deck.optional.forEach((cardId) => {
+        cardSet.add(Catalog.getCardById(cardId))
+      })
+      this.selectedMission.deck.required.forEach((cardId) => {
+        cardSet.delete(Catalog.getCardById(cardId))
+      })
+    }
+
+    const cards = Array.from(cardSet)
+    this.cardPool.setDeck(cards)
+  }
+
   private setMissionInfo(mission: JourneyMission, avatarIndex: number) {
     this.selectedMission = mission
     this.selectedAvatar = avatarIndex
@@ -547,32 +581,11 @@ export default class JourneyScene extends BaseScene {
       mission.deck.optional.map((id) => Catalog.getCardById(id)),
     )
 
+    // Refresh the card pool to include optional cards from this mission
+    this.refreshCardPool()
+
     // Update deck state after setting initial deck
     this.updateDeckState()
-  }
-
-  update(time, delta): void {
-    // // Update the timer
-    // const now = new Date()
-    // let target = new Date(now)
-    // if (now.getHours() < 12) {
-    //   // Next noon today
-    //   target.setHours(12, 0, 0, 0)
-    // } else {
-    //   // Next midnight (start of tomorrow)
-    //   target.setDate(now.getDate() + 1)
-    //   target.setHours(0, 0, 0, 0)
-    // }
-    // const NEXT_JOURNEY_TIME = target
-    // const timeUntilNextJourney = NEXT_JOURNEY_TIME.getTime() - Date.now()
-    // const hours = Math.floor(timeUntilNextJourney / (1000 * 60 * 60))
-    // const minutes = Math.floor(
-    //   (timeUntilNextJourney % (1000 * 60 * 60)) / (1000 * 60),
-    // )
-    // const seconds = Math.floor((timeUntilNextJourney % (1000 * 60)) / 1000)
-    // this.txtTimer.setText(
-    //   `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
-    // )
   }
 
   beforeExit() {
