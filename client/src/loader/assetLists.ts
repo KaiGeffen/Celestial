@@ -63,7 +63,6 @@ export const assetLists = {
       "Cling",
       "Cloak of Stars",
       "Cloud",
-      "Cloud",
       "Conquer",
       "Cosmos",
       "Cradle",
@@ -82,7 +81,6 @@ export const assetLists = {
       "Enlightenment",
       "Excess",
       "Fates",
-      "Firebug",
       "Firebug",
       "Fish",
       "Fishing Boat",
@@ -137,7 +135,6 @@ export const assetLists = {
       "Refresh",
       "Riddle",
       "Rooster",
-      "Rose",
       "Rose",
       "Rupture",
       "Sample",
@@ -455,8 +452,6 @@ export const assetLists = {
       "resolve 4",
       "resolve 5",
       "shuffle",
-      "starve",
-      "success",
       "tie",
       "win"
     ]

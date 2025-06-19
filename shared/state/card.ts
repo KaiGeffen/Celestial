@@ -175,6 +175,7 @@ export default class Card {
     game.animations[player].push(
       new Animation({
         from: Zone.Status,
+        index: 0,
       }),
     )
     game.status[player].inspire += amt
@@ -184,6 +185,7 @@ export default class Card {
     game.animations[player].push(
       new Animation({
         from: Zone.Status,
+        index: 1,
       }),
     )
     game.status[player].nourish += amt
@@ -193,6 +195,7 @@ export default class Card {
     game.animations[player].push(
       new Animation({
         from: Zone.Status,
+        index: -1,
       }),
     )
     game.status[player].nourish -= amt

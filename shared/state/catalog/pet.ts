@@ -68,7 +68,6 @@ class Pet extends Card {
     game.pile[player].push(pet)
 
     super.play(player, game, index, bonus)
-    // game.soundEffect = SoundEffect.Meow;
   }
 }
 const pet = new Pet(1)

@@ -125,7 +125,6 @@ const cradle = new Cradle({
 
 class Uprising extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    // game.soundEffect = SoundEffect.Crowd;
     super.play(player, game, index, bonus + index)
   }
 

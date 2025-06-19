@@ -486,6 +486,9 @@ export class View {
     // Animate the state
     this.animator.animate(state)
 
+    // Play the sound
+    this.scene.playSound(state.sound)
+
     // Update pet
     this.pet.displayState(state)
 

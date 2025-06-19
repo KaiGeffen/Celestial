@@ -43,7 +43,14 @@ export default class Animator {
         else if (animation.from === Zone.Transform) {
           this.animateTransform(animation, i, owner)
         } else if (animation.from === Zone.Status) {
-          // TODO
+          // TODO Clarify all this and make a negative nourish sound
+          // if (animation.index === 0) {
+          //   this.scene.playSound('inspire')
+          // } else if (animation.index === 1) {
+          //   this.scene.playSound('nourish')
+          // } else if (animation.index === -1) {
+          //   this.scene.playSound('nourish')
+          // }
         }
         // In all other cases, move it from start to end
         else {

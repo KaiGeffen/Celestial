@@ -7,7 +7,6 @@ import { Animation } from '../../animation'
 
 class Dove extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    // game.sound_effect = SoundEffect.Bird
     super.play(player, game, index, bonus)
   }
 }
