@@ -193,7 +193,7 @@ export default class JourneyScene extends BaseScene {
 
     this.missionDetailsView
       .add(leftSizer, { expand: true })
-      .add(this.cardPoolSizer)
+      .add(this.cardPoolSizer, { expand: true })
       .addBackground(background)
       .layout()
 
@@ -346,8 +346,8 @@ export default class JourneyScene extends BaseScene {
     })
     this.txtMissionDescription = this.add.text(0, 0, '', {
       ...Style.basic,
-      wordWrap: { width: 300 },
-      fixedWidth: 300,
+      wordWrap: { width: Space.cutoutWidth },
+      fixedWidth: Space.cutoutWidth,
       maxLines: 10,
     })
     headerSizer.add(container).add(this.txtMissionDescription)

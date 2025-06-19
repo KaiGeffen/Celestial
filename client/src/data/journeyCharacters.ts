@@ -67,7 +67,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [0, 0, 4, 4, 4, 4, 9, 7, 7, 51, 51, 18],
-        optional: [],
+        optional: [3, 3, 3],
       },
       opponentDeck: [3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 11, 11, 14, 14, 17],
       winText: 'I am Jules, and I am light.',
@@ -86,7 +86,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [65, 65, 7, 7, 7, 4, 4, 4, 4, 4],
-        optional: [],
+        optional: [3, 3, 3],
       },
       opponentDeck: [21, 51, 51, 14, 14, 11, 11, 6, 7, 7, 3, 3, 4, 4, 5],
       winText: 'I am Jules, and I have found peace.',
@@ -105,7 +105,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [56, 65, 12],
-        optional: [],
+        optional: [7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
       },
       opponentDeck: [21, 20, 20, 17, 14, 14, 14, 6, 3, 3, 3, 3, 0, 0, 0],
       winText: 'I am the sun, and I shine.',
@@ -124,7 +124,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [21, 20, 51, 63, 63],
-        optional: [],
+        optional: [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
       },
       opponentDeck: [12, 12, 12, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
       winText: 'I am the morning dew, pure and fresh.',
@@ -143,7 +143,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [51, 40, 40, 32, 63, 1, 3],
-        optional: [],
+        optional: [7, 7, 7, 7, 7, 7, 7, 7],
       },
       opponentDeck: [12, 12, 12, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
       winText: 'I am the gamecock, and I have won.',
@@ -162,7 +162,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [56, 71, 71, 69, 69],
-        optional: [],
+        optional: [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
       },
       opponentDeck: [12, 12, 12, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
       winText: 'I am ecology, and I am in balance.',
@@ -204,7 +204,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [0, 0, 0, 3, 3, 3, 3, 6, 14, 14, 14, 17, 17],
-        optional: [],
+        optional: [21, 20],
       },
       opponentDeck: [11, 11, 11, 11, 7, 7, 7, 4, 4, 4, 4, 4, 4, 0, 0],
       winText: 'The fire consumes all.',
@@ -223,7 +223,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [0, 0, 3, 3, 3, 3, 6, 14, 14, 14, 17, 17, 21],
-        optional: [],
+        optional: [20, 20],
       },
       opponentDeck: [5, 5, 5, 3, 3, 3, 6, 12, 14, 14, 13, 13, 17, 17, 17],
       winText: 'Death has claimed another.',
@@ -242,7 +242,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [14, 14, 14, 17, 17, 20, 20, 21],
-        optional: [],
+        optional: [0, 0, 0, 0, 0, 0, 0],
       },
       opponentDeck: [56, 51, 51, 11, 12, 7, 7, 7, 4, 4, 4, 4, 4, 0, 0],
       winText: 'I cling to life and victory.',
@@ -261,7 +261,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [21, 17, 17, 5, 5, 5, 0, 0],
-        optional: [],
+        optional: [14, 14, 14, 14, 14, 14, 14],
       },
       opponentDeck: [56, 65, 65, 51, 12, 12, 7, 7, 7, 4, 4, 4, 4, 4, 4],
       winText: 'I have conquered the depths.',
@@ -280,7 +280,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [15, 15, 3, 3, 0, 0],
-        optional: [],
+        optional: [14, 14, 14, 14, 14, 14, 14, 14, 14],
       },
       opponentDeck: [12, 12, 12, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
       winText: 'What is mine remains mine.',
@@ -299,7 +299,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [21, 68, 68, 64, 64],
-        optional: [],
+        optional: [14, 14, 14, 14, 14, 14, 14, 14, 14, 14],
       },
       opponentDeck: [12, 12, 12, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
       winText: 'I have parched the land.',
@@ -318,7 +318,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [34, 74, 74, 3, 3, 3],
-        optional: [],
+        optional: [14, 14, 14, 14, 14, 14, 14, 14, 14],
       },
       opponentDeck: [12, 12, 12, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
       winText: 'From ashes, new life has sprouted.',
@@ -360,7 +360,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [1, 1, 1, 1, 1, 19, 19, 19, 19],
-        optional: [],
+        optional: [35, 35, 35, 35, 35, 35, 35],
       },
       opponentDeck: [18, 18, 51, 51, 15, 15, 48, 48, 48, 7, 7, 33, 33, 4, 4],
       winText: 'The shadows have spoken.',
@@ -379,7 +379,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [1, 1, 1, 3, 12, 68, 68, 17],
-        optional: [],
+        optional: [35, 35, 35, 35, 35, 35, 35],
       },
       opponentDeck: [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
       winText: 'I have conquered the nightmare.',
@@ -398,7 +398,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [1, 1, 1, 1, 35, 35],
-        optional: [],
+        optional: [19, 19, 19, 19, 19, 19, 19, 19, 19],
       },
       opponentDeck: [56, 56, 57, 57, 51, 51, 14, 11, 11, 11, 6, 1, 1, 1, 1],
       winText: 'I have escaped the shadows.',
@@ -417,7 +417,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [20, 19, 19, 19, 16, 16, 1, 1],
-        optional: [],
+        optional: [35, 35, 35, 35, 35, 35, 35],
       },
       opponentDeck: [18, 18, 15, 15, 48, 48, 12, 12, 6, 6, 3, 3, 3, 0, 0],
       winText: 'I am free in my grounded state.',
@@ -436,7 +436,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [13, 13, 11, 68, 31, 31, 31, 1, 1, 0, 0],
-        optional: [],
+        optional: [35, 35, 35, 35],
       },
       opponentDeck: [46, 57, 14, 11, 11, 11, 8, 8, 31, 31, 3, 3, 3, 2, 2],
       winText: 'I have fed the hungry shadows.',
@@ -455,7 +455,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [65, 65, 58, 58, 7, 4, 4, 4],
-        optional: [],
+        optional: [35, 35, 35, 35, 35, 35, 35],
       },
       opponentDeck: [23, 57, 65, 51, 51, 11, 11, 69, 7, 7, 4, 4, 4, 4, 4],
       winText: 'I have learned from the sickness.',
@@ -474,7 +474,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [20, 19, 57, 71],
-        optional: [],
+        optional: [35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35],
       },
       opponentDeck: [23, 20, 20, 19, 19, 17, 17, 11, 12, 7, 7, 5, 5, 5, 5],
       winText: "I have embraced the shadow's constriction.",
@@ -516,7 +516,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [11, 11, 11, 34, 34, 33, 33, 33, 4, 0, 0, 0],
-        optional: [],
+        optional: [28, 28, 28],
       },
       opponentDeck: [21, 20, 19, 19, 19, 17, 14, 12, 6, 6, 63, 63, 5, 5, 5],
       winText: 'My companion and I are victorious.',
@@ -535,7 +535,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [23, 18, 15, 11, 34, 9, 9, 33, 0, 0],
-        optional: [],
+        optional: [28, 28, 28, 28, 28],
       },
       opponentDeck: [23, 20, 19, 19, 19, 57, 51, 11, 11, 11, 6, 6, 63, 63, 0],
       winText: 'The oak stands tall and proud.',
@@ -554,7 +554,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [14, 71, 71, 12, 34, 33, 3, 0],
-        optional: [],
+        optional: [28, 28, 28, 28, 28, 28, 28],
       },
       opponentDeck: [23, 46, 51, 15, 40, 12, 9, 6, 7, 7, 63, 63, 63, 63, 0],
       winText: 'Gentle rain has nurtured us to victory.',
@@ -573,7 +573,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [51, 13, 13, 48, 48, 11, 11, 4, 0],
-        optional: [],
+        optional: [28, 28, 28, 28, 28, 28],
       },
       opponentDeck: [21, 17, 17, 14, 68, 68, 6, 31, 31, 3, 3, 3, 3, 3, 76],
       winText: 'The bounty is ours to share.',
@@ -592,7 +592,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [76, 76],
-        optional: [],
+        optional: [28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28],
       },
       opponentDeck: [21, 20, 20, 17, 14, 14, 14, 6, 3, 3, 3, 3, 0, 0, 0],
       winText: 'The hollow has been filled with love.',
@@ -611,7 +611,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [34, 33, 33, 28, 28, 28],
-        optional: [],
+        optional: [28, 28, 28, 28, 28, 28, 28, 28, 28],
       },
       opponentDeck: [21, 20, 20, 17, 14, 14, 14, 6, 3, 3, 3, 3, 0, 0, 0],
       winText: 'Night vision has guided us to victory.',
@@ -630,7 +630,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [56, 11, 11, 69, 69],
-        optional: [],
+        optional: [28, 28, 28, 28, 28, 28, 28, 28, 28, 28],
       },
       opponentDeck: [21, 20, 20, 17, 14, 14, 14, 6, 3, 3, 3, 3, 0, 0, 0],
       winText: 'The sunflowers have bloomed together.',
@@ -672,7 +672,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [2, 2, 2, 9, 9, 11, 13, 18, 18],
-        optional: [],
+        optional: [22, 22, 22, 22, 22, 22],
       },
       opponentDeck: [18, 18, 51, 51, 15, 15, 48, 48, 48, 7, 7, 33, 33, 4, 4],
       winText: 'New life has been brought into the world.',
@@ -691,7 +691,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [2, 2, 11, 53, 53, 53, 51],
-        optional: [],
+        optional: [22, 22, 22, 22, 22, 22, 22, 22],
       },
       opponentDeck: [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
       winText: 'The legacy of posterity is preserved.',
@@ -710,7 +710,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [8, 8, 8, 31, 48, 48, 13, 13, 23],
-        optional: [],
+        optional: [22, 22, 22, 22, 22, 22],
       },
       opponentDeck: [0, 3, 3, 3, 3, 6, 74, 74, 12, 14, 14, 14, 51, 46, 46],
       winText: 'The miracle of birth is complete.',
@@ -729,7 +729,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [2, 2, 0, 60, 60, 60, 16],
-        optional: [],
+        optional: [22, 22, 22, 22, 22, 22, 22, 22],
       },
       opponentDeck: [63, 63, 63, 63, 7, 7, 7, 11, 12, 40, 40, 51, 51, 21, 56],
       winText: 'The cradle has nurtured new life.',
@@ -748,7 +748,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [2, 2, 2, 6, 15, 22, 22],
-        optional: [],
+        optional: [22, 22, 22, 22, 22, 22, 22, 22],
       },
       opponentDeck: [25, 25, 25, 6, 31, 7, 39, 39, 39, 15, 40, 67, 67, 57, 45],
       winText: 'The future has been secured.',
@@ -767,7 +767,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [2, 2, 2, 10, 10, 22, 22],
-        optional: [],
+        optional: [22, 22, 22, 22, 22, 22, 22, 22],
       },
       opponentDeck: [63, 25, 25, 7, 69, 69, 39, 39, 48, 11, 13, 13, 57, 57, 23],
       winText: 'The ancestry has been honored.',
@@ -786,7 +786,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [55, 55, 55, 19, 19, 19, 44, 44],
-        optional: [],
+        optional: [22, 22, 22, 22, 22, 22, 22],
       },
       opponentDeck: [0, 4, 28, 28, 28, 33, 33, 33, 34, 34, 11, 11, 11, 11, 71],
       winText: 'The rebirth has been completed.',
@@ -942,7 +942,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       ],
       deck: {
         required: [50, 4, 4, 7, 7],
-        optional: [],
+        optional: [27, 27, 27, 27, 27, 27, 27, 27, 27, 27],
       },
       opponentDeck: [2, 63, 3, 3, 8, 8, 8, 31, 48, 48, 60, 15, 18, 22, 22],
       winText: 'The dawn has brought new understanding.',
