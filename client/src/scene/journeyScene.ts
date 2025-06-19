@@ -14,6 +14,13 @@ import AvatarButton from '../lib/buttons/avatar'
 import newScrollablePanel from '../lib/scrollablePanel'
 import { MechanicsSettings } from '../../../shared/settings'
 import Button from '../lib/buttons/button'
+import {
+  getLevelFromExp,
+  getLevelProgress,
+  getExpToNextLevel,
+  MAX_LEVEL,
+  MAX_EXP,
+} from '../data/levelProgression'
 
 export default class JourneyScene extends BaseScene {
   // Mission details
@@ -340,6 +347,7 @@ export default class JourneyScene extends BaseScene {
       ...Style.basic,
       wordWrap: { width: 300 },
       fixedWidth: 300,
+      maxLines: 10,
     })
     headerSizer.add(container).add(this.txtMissionDescription)
 
@@ -617,9 +625,19 @@ export default class JourneyScene extends BaseScene {
       const idx = allowed[Math.floor(rand() * allowed.length)]
       if (results.find((result) => result[1] === idx)) continue
 
-      // TODO Get the right mission based off this avatar's exp
+      // Get the right mission based off this avatar's exp
+      const avatarExp = UserSettings._get('avatarExperience')[idx] || 0
+      const levelData = getLevelFromExp(avatarExp)
       const avatarMissionTrack = JOURNEY_MISSIONS[idx]
-      const mission = avatarMissionTrack[avatarMissionTrack.length - 1]
+
+      // Use level to determine mission index (level 1 = index 0, etc.)
+      // Clamp to available missions
+      const missionIndex = Math.min(
+        levelData.level - 1,
+        avatarMissionTrack.length - 1,
+      )
+      const mission = avatarMissionTrack[missionIndex]
+
       results.push([mission, idx])
     }
 
@@ -630,8 +648,10 @@ export default class JourneyScene extends BaseScene {
   // Set the exp bar for the given avatar
   private getExpBarSizer(avatarID: number): Sizer {
     const avatarExp = UserSettings._get('avatarExperience')[avatarID] || 0
-    const expMax = 1000
-    const expValue = Math.min(avatarExp / expMax, 1)
+    const levelData = getLevelFromExp(avatarExp)
+    const progress = getLevelProgress(avatarExp)
+    const expToNext = getExpToNextLevel(avatarExp)
+
     const expBar = this.add
       .rexLineProgress({
         width: Space.avatarWidth - Space.pad * 2,
@@ -640,14 +660,22 @@ export default class JourneyScene extends BaseScene {
         trackColor: Color.progressBarTrack,
         trackStrokeColor: Color.progressBarTrackStroke,
         trackStrokeThickness: 4,
-        value: expValue,
+        value: progress,
         valuechangeCallback: () => {},
       })
       .setAlpha(0.4)
-    const expLabel = this.add.text(0, 0, `EXP: ${avatarExp} / ${expMax}`, {
-      ...Style.basic,
-      fontSize: '16px',
-    })
+
+    const expLabel = this.add.text(
+      0,
+      0,
+      levelData.level === MAX_LEVEL
+        ? `Level ${levelData.level} (MAX)`
+        : `Level ${levelData.level} - ${expToNext} EXP to next`,
+      {
+        ...Style.basic,
+        fontSize: '16px',
+      },
+    )
 
     const sizer = this.rexUI.add.sizer({
       orientation: 'vertical',
