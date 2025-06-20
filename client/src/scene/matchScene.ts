@@ -571,7 +571,7 @@ export class StandardMatchScene extends MatchScene {
 }
 
 // TODO Move to another file
-const EXP_ON_LOSS = 10
+const EXP_ON_LOSS = 0
 const EXP_ON_WIN = 100
 
 export class JourneyMatchScene extends MatchScene {
@@ -599,7 +599,7 @@ export class JourneyMatchScene extends MatchScene {
     this.avatar = this.params.avatar
 
     // Set the dialog that shows the first time you have a given number of rounds won
-    this.uponRoundWinText = this.params.uponRoundWinText.slice()
+    this.uponRoundWinText = this.params.uponRoundWinText?.slice() ?? []
 
     // Set to winText when they win
     this.postMatchText = this.params.loseText

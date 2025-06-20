@@ -20,6 +20,7 @@ import {
   getExpToNextLevel,
   MAX_LEVEL,
   MAX_EXP,
+  getNextUnlock,
 } from '../data/levelProgression'
 import Card from '../../../shared/state/card'
 
@@ -58,6 +59,15 @@ export default class JourneyScene extends BaseScene {
 
   create(params): void {
     super.create()
+
+    // TODO Temporary
+    // this.selectedAvatar = 0
+    // params = {
+    //   ...params,
+    //   postMatch: true,
+    //   expGained: 100,
+    //   postMatchText: 'Test',
+    // }
 
     // Launch map behind this scene
     this.scene.launch('MapScene')

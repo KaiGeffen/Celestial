@@ -1,3 +1,11 @@
+import Catalog from '../../../shared/state/catalog'
+
+// Helper function to create arrays of card IDs
+const x = (cardName: string, count: number): number[] => {
+  const card = Catalog.getCard(cardName)
+  return card ? Array(count).fill(card.id) : []
+}
+
 export type JourneyMission = {
   selectText: string
   missionText: string
@@ -28,10 +36,10 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
         '5 Wait, I got it!',
       ],
       deck: {
-        required: [56, 65, 65, 12, 12],
-        optional: [7, 7, 7, 7, 4, 4, 4, 4, 4, 4],
+        required: [0, 0, 4, 4, 4, 4, 6, 6, 7, 7, 12, 12, 13, 18, 18],
+        optional: [],
       },
-      opponentDeck: [],
+      opponentDeck: [3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 11, 11, 14, 14, 17],
       winText: 'You are a true friend.',
       loseText: 'You are a true friend, but I did lose :/',
     },
@@ -47,8 +55,8 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
         `The canvas is calling to me.`,
       ],
       deck: {
-        required: [0, 0, 4, 4, 4, 4, 9, 6, 7, 7, 12, 12, 13, 18, 18],
-        optional: [],
+        required: [0, 0, 4, 4, 4, 4, 4, 4, 12, 12, 13, 56],
+        optional: [7, 7, 9],
       },
       opponentDeck: [3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 11, 11, 14, 14, 17],
       winText: 'The little voice was right. I got through this.',
