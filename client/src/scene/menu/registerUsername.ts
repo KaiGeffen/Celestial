@@ -32,7 +32,7 @@ export class RegisterUsernameMenu extends Menu {
   private async checkUsername(username: string) {
     try {
       const response = await fetch(
-        `https://celestialtcg.com/check_username_availability/${username}`,
+        `https://celestialdecks.gg/check_username_availability/${username}`,
       )
 
       if (!response.ok) {
