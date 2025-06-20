@@ -94,7 +94,7 @@ export class MatchWS {
     if (Flags.local) {
       return new TypedWebSocket(`ws://${URL}:${MATCH_PORT}`)
     } else {
-      const fullPath = `wss://celestialtcg.com/match_ws`
+      const fullPath = `wss://celestialdecks.gg/match_ws`
       return new TypedWebSocket(fullPath)
     }
   }

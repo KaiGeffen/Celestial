@@ -479,7 +479,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       }
 
       const response = await fetch(
-        `https://celestialtcg.com/match_history/${uuid}`,
+        `https://celestialdecks.gg/match_history/${uuid}`,
       )
       if (!response.ok) {
         throw new Error('Failed to fetch match history data')

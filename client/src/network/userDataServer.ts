@@ -361,7 +361,7 @@ export default class UserDataServer {
     } else {
       // The WS location on DO
       // let loc = window.location
-      const fullPath = `wss://celestialtcg.com/user_data_ws`
+      const fullPath = `wss://celestialdecks.gg/user_data_ws`
       return new TypedWebSocket(fullPath)
     }
   }

@@ -36,7 +36,7 @@ export default class LeaderboardMenu extends Menu {
 
   private async fetchLeaderboardData() {
     try {
-      const response = await fetch(`https://celestialtcg.com/leaderboard`)
+      const response = await fetch(`https://celestialdecks.gg/leaderboard`)
       if (!response.ok) {
         throw new Error('Failed to fetch leaderboard data')
       }
