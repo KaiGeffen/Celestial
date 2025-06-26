@@ -159,7 +159,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     color: Color.todoSubtext,
   },
   todoBetaCardName: {
-    fontFamily: mainFont,
+    fontFamily: altFont,
     fontSize: '24px',
     color: Color.cardText,
   },
