@@ -1,7 +1,6 @@
 import 'phaser'
 import { Style, Space } from '../settings/settings'
 import BaseScene from './baseScene'
-import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 
 export default class PlaceholderScene extends BaseScene {
@@ -12,6 +11,12 @@ export default class PlaceholderScene extends BaseScene {
   }
 
   create(): void {
+    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
+    this.plugins.get('rexAnchor')['add'](background, {
+      width: `100%`,
+      height: `100%`,
+    })
+
     this.add
       .text(Space.windowWidth / 2, Space.windowHeight / 2, s, {
         ...Style.basic,
@@ -34,7 +39,7 @@ export default class PlaceholderScene extends BaseScene {
 const s = `
 Having completed the tutorial, you're now ready to play the full game!
 
-From the title screen you can continue the single-player Journey mode, slowly accumulating cards and learning about the 6 unique characters as they traverse the city.
+From the title screen, you can play the single-player Journey mode, slowly accumulating cards and learning about the 6 unique characters as they traverse the city.
 
 Alternatively, in Free Play you can choose from any premade deck to play against the AI or a human opponent, or make your own deck from any of the cards in the game.
 
