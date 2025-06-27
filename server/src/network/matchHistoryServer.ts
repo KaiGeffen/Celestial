@@ -5,6 +5,7 @@ import { MATCH_HISTORY_PORT } from '../../../shared/network/settings'
 import { db } from '../db/db'
 import { matchHistory } from '../db/schema'
 import { MatchHistoryEntry } from '../../../shared/types/matchHistory'
+import { logFunnelEvent } from '../db/analytics'
 
 export default function createMatchHistoryServer() {
   const app = express()
@@ -15,6 +16,9 @@ export default function createMatchHistoryServer() {
   // GET endpoint for match history data
   app.get('/match_history/:uuid', async (req, res) => {
     const uuid = req.params.uuid
+
+    // Log funnel event for match history access
+    logFunnelEvent(uuid, 'home_scene_options', 'match_history')
 
     try {
       const matches = await db
