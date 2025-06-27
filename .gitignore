@@ -13,8 +13,8 @@ scripts/
 # dist #
 dist/
 
-# Compiled index.html #
-index.html
+# Compiled index.html in the client (Not about or privacy) #
+/client/index.html
 
 # Project settings #
 .idea/
