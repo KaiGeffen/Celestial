@@ -1,0 +1,399 @@
+/* Hiiiiii ^_^ */
+:root {
+  --color-navy: #353f4e;
+  --color-gold: #fabd5d;
+  --color-white: #ffffff;
+  --color-black: #000000;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: url("assets/background.jpg") center/cover fixed no-repeat;
+}
+
+.hero {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-bottom: 2%;
+  text-align: center;
+}
+
+.logo {
+  width: 500px;
+  height: auto;
+  margin-bottom: 16px;
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+h2 {
+  font-family: "Cinzel", serif;
+  font-size: 50px;
+  color: var(--color-navy);
+}
+
+.landing-p {
+  font-family: "Mulish", sans-serif;
+  font-size: 30px;
+  font-weight: bold;
+  color: var(--color-navy);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+p {
+  font-family: "Mulish", sans-serif;
+  font-size: 30px;
+  color: var(--color-navy);
+}
+
+.play-button {
+  width: 300px;
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.play-button:hover {
+  transform: scale(1.05);
+}
+
+.about-section {
+  position: relative;
+  padding: 5% 10%;
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.about-content {
+  flex: 1;
+  padding-right: 5%;
+}
+
+.about-title {
+  font-family: "Cinzel", serif;
+  font-size: 64px;
+  color: var(--color-black);
+  margin-bottom: 20px;
+}
+
+.about-subtitle {
+  font-family: "Mulish", sans-serif;
+  font-size: 24px;
+  color: var(--color-navy);
+  margin-bottom: 30px;
+}
+
+.video-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.video-container iframe {
+  width: 100%;
+  aspect-ratio: 16/9;
+  max-width: 640px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.newsletter-section {
+  position: relative;
+  background: rgba(44, 52, 62, 0.9);
+  padding: 5% 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.newsletter-title {
+  font-family: "Cinzel", serif;
+  font-size: 48px;
+  color: var(--color-gold);
+  margin-bottom: 20px;
+}
+
+.newsletter-text {
+  font-family: "Mulish", sans-serif;
+  font-size: 24px;
+  color: var(--color-gold);
+  max-width: 600px;
+  margin-bottom: 30px;
+}
+
+.newsletter-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 400px;
+}
+
+#email-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 18px;
+  font-family: "Mulish", sans-serif;
+}
+
+.signup-button {
+  background: var(--color-gold);
+  color: var(--color-navy);
+  font-family: "Mulish", sans-serif;
+  font-size: 24px;
+  padding: 12px 40px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  width: 100%;
+  max-width: 200px;
+}
+
+.signup-button:hover {
+  transform: scale(1.05);
+}
+
+.features-section {
+  position: relative;
+  padding: 5% 10%;
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.feature {
+  flex: 1;
+  text-align: center;
+}
+
+.feature h2 {
+  margin-bottom: 16px;
+}
+
+.feature p {
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+
+.feature-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.social-section {
+  position: relative;
+  background: rgba(44, 52, 62, 0.9);
+  padding: 32px 10%;
+  text-align: center;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 64px;
+}
+
+.social-link {
+  font-family: "Cinzel", serif;
+  font-size: 32px;
+  color: var(--color-gold);
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.social-link:hover {
+  transform: scale(1.05);
+}
+
+.signup-message {
+  margin-top: 1rem;
+  text-align: center;
+  font-family: "Mulish", sans-serif;
+  font-size: 0.9rem;
+}
+
+/* Mobile Responsiveness */
+@media screen and (max-width: 768px) {
+  .hero {
+    min-height: 100vh;
+    padding: 1rem;
+  }
+
+  .logo {
+    width: 80%;
+    max-width: 300px;
+  }
+
+  .landing-p {
+    font-size: 1rem;
+    margin: 1rem 0;
+  }
+
+  .play-button {
+    width: 80%;
+    max-width: 250px;
+  }
+
+  .about-section {
+    flex-direction: column;
+    padding: 2rem 1rem;
+    gap: 2rem;
+  }
+
+  .about-content {
+    width: 100%;
+  }
+
+  .about-title {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .about-subtitle {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .video-container {
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    position: relative;
+  }
+
+  .video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .newsletter-section {
+    padding: 2rem 1rem;
+  }
+
+  .newsletter-title {
+    font-size: 1.8rem;
+  }
+
+  .newsletter-text {
+    font-size: 1rem;
+    margin: 1rem 0;
+  }
+
+  .newsletter-form {
+    width: 100%;
+  }
+
+  #email-input {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .features-section {
+    flex-direction: column;
+    padding: 2rem 1rem;
+    gap: 2rem;
+  }
+
+  .feature {
+    width: 100%;
+  }
+
+  .feature h2 {
+    font-size: 1.5rem;
+  }
+
+  .feature p {
+    font-size: 1rem;
+  }
+
+  .feature-image {
+    width: 100%;
+    height: auto;
+  }
+
+  .social-section {
+    padding: 2rem 1rem;
+  }
+
+  .social-links {
+    gap: 1.5rem;
+  }
+
+  .social-link {
+    font-size: 1rem;
+  }
+}
+
+/* Additional fixes for very small screens */
+@media screen and (max-width: 480px) {
+  .about-title {
+    font-size: 1.5rem;
+  }
+
+  .newsletter-title {
+    font-size: 1.5rem;
+  }
+
+  .feature h2 {
+    font-size: 1.3rem;
+  }
+
+  .social-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+}

@@ -1,0 +1,5 @@
+# Build the container
+docker build -t about .
+
+# Run it
+docker run -d --name about --network celestial_net -p 8080:8080 about
