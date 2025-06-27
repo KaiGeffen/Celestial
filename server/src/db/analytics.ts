@@ -16,7 +16,7 @@ export async function logTutorialProgress(
   turn_reached: number,
 ) {
   if (!player_id) {
-    console.log('For some reason, player_id is undefined')
+    console.log('Error: player_id is undefined when logging tutorial progress')
     return
   }
 
@@ -72,7 +72,7 @@ export async function logFunnelEvent(
   metadata?: number,
 ) {
   if (!player_id) {
-    console.log('For some reason, player_id is undefined')
+    console.log('Error: player_id is undefined when logging funnel event')
     return
   }
 

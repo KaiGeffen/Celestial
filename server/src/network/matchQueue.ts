@@ -114,7 +114,7 @@ class MatchQueue {
 
     ws.on('initTutorial', async (data) => {
       console.log('Tutorial:', data.num)
-      const match = new TutorialMatch(ws, data.num)
+      const match = new TutorialMatch(ws, data.num, data.uuid)
       registerEvents(ws, match, 0)
 
       // Start the match

@@ -1,4 +1,3 @@
-import { TypedWebSocket } from '../../../../shared/network/typedWebSocket'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { TutorialController } from '../../tutorialController'
 import PveMatch from './pveMatch'
@@ -8,11 +7,11 @@ import { MatchServerWS } from '../../../../shared/network/matchWS'
 class TutorialMatch extends PveMatch {
   tutorialNum: number
 
-  constructor(ws: MatchServerWS, num: number) {
+  constructor(ws: MatchServerWS, num: number, uuid: string) {
     // TODO Weird to start a normal game, then erase it
     super(
       ws,
-      '',
+      uuid,
       { name: '', cards: [], cosmeticSet: { avatar: 0, border: 0 } },
       { name: '', cards: [], cosmeticSet: { avatar: 0, border: 0 } },
     )
@@ -20,6 +19,8 @@ class TutorialMatch extends PveMatch {
     this.tutorialNum = num
     this.game = new TutorialController(num)
     this.game.start()
+
+    console.log(this.uuid1, this.uuid2)
 
     // Log tutorial start progress
     logTutorialProgress(this.uuid1, `tutorial_${num + 1}`, 0)

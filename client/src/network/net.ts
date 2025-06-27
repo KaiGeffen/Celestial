@@ -108,6 +108,7 @@ export class MatchTutorialWS extends MatchWS {
       this.socket.send({
         type: 'initTutorial',
         num: num,
+        uuid: UserDataServer.getUserData().uuid || '',
       })
     })
   }
