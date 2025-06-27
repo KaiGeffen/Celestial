@@ -7,11 +7,12 @@ import { MechanicsSettings } from '../../../shared/settings'
 import { MatchServerWS } from '../../../shared/network/matchWS'
 import Catalog from '../../../shared/state/catalog'
 import { Deck } from '../../../shared/types/deck'
+import { logFunnelEvent } from '../db/analytics'
 
 /*
 TODO
 List of ongoing games
-Disconnecting then reconnecting puts you back in your game
+Disconnecting then reconnecting should put you back in your game
 Init includes information about the game type you're looking for
 */
 
@@ -40,6 +41,9 @@ class MatchQueue {
       const match = new PveMatch(ws, data.uuid, data.deck, data.aiDeck)
       registerEvents(ws, match, 0)
 
+      // Analytics
+      logFunnelEvent(data.uuid, 'play_mode', 'pve')
+
       // Start the match
       await match.notifyState()
     })
@@ -56,6 +60,9 @@ class MatchQueue {
         }
       })
 
+      // Analytics
+      logFunnelEvent(data.uuid, 'play_mode', 'pvp_queued_up')
+
       // Check if there is another player, and they are still ready
       const otherPlayer: WaitingPlayer = searchingPlayers[data.password]
       if (otherPlayer) {
@@ -69,6 +76,9 @@ class MatchQueue {
             .map((cardId) => Catalog.getCardById(cardId).name)
             .join(', '),
         )
+
+        // Analytics
+        logFunnelEvent(otherPlayer.uuid, 'play_mode', 'pvp_match_found')
 
         // Create a PvP match
         const match = new PvpMatch(

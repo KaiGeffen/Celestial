@@ -1,11 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import { and, desc, eq, or } from 'drizzle-orm'
-import { v5 as uuidv5 } from 'uuid'
-import {
-  MATCH_HISTORY_PORT,
-  UUID_NAMESPACE,
-} from '../../../shared/network/settings'
+import { MATCH_HISTORY_PORT } from '../../../shared/network/settings'
 import { db } from '../db/db'
 import { matchHistory } from '../db/schema'
 import { MatchHistoryEntry } from '../../../shared/types/matchHistory'
@@ -19,8 +15,6 @@ export default function createMatchHistoryServer() {
   // GET endpoint for match history data
   app.get('/match_history/:uuid', async (req, res) => {
     const uuid = req.params.uuid
-      ? uuidv5(req.params.uuid, UUID_NAMESPACE)
-      : null
 
     try {
       const matches = await db

@@ -6,14 +6,15 @@ import BaseScene from '../scene/baseScene'
 import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 import {
   URL,
-  MATCH_PORT,
   USER_DATA_PORT,
+  UUID_NAMESPACE,
 } from '../../../shared/network/settings'
 import type { GoogleJwtPayload } from '../types/google'
 import { UserDataClientWS } from '../../../shared/network/userDataWS'
 import { Deck } from '../../../shared/types/deck'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import { Achievement } from '../../../shared/types/achievement'
+import { v5 as uuidv5 } from 'uuid'
 const ip = '127.0.0.1'
 const port = 5555
 // Custom code for closing websocket connection due to invalid token
@@ -57,7 +58,7 @@ export default class UserDataServer {
     */
 
     const email = payload.email
-    const uuid = payload.sub
+    const uuid = uuidv5(payload.sub, UUID_NAMESPACE)
     const jti = payload.jti
 
     wsServer = UserDataServer.getSocket()
