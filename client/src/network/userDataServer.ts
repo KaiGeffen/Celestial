@@ -67,9 +67,9 @@ export default class UserDataServer {
     wsServer.onOpen(() => {
       wsServer.send({
         type: 'sendToken',
-        email: email,
-        uuid: uuid,
-        jti: jti,
+        email,
+        uuid,
+        jti,
       })
     })
 
@@ -135,7 +135,7 @@ export default class UserDataServer {
         }) => {
           // Store the uuid and user data after successful login
           this.userData = {
-            uuid: uuid,
+            uuid,
             ...data,
           }
 
