@@ -20,7 +20,7 @@ import ensureMusic from '../loader/audioManager'
 import Cinematic from '../lib/cinematic'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
-const GSI_TOKEN_KEY = 'gsi_token'
+const GSI_TOKEN_KEY = 'gsi_token_v2'
 
 // Scene for user to select a sign in option, without loading assets
 export class SigninScene extends Phaser.Scene {
