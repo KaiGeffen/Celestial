@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -17,7 +17,7 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://about.celestialdecks.gg/" />
+    <meta property="og:url" content="https://celestialdecks.gg/about/" />
     <meta
       property="og:title"
       content="Celestial Decks - A Story-Driven Card Game"
@@ -28,7 +28,7 @@
     />
     <meta
       property="og:image"
-      content="https://about.celestialdecks.gg/assets/social-preview.png"
+      content="https://celestialdecks.gg/about/assets/social-preview.png"
     />
 
     <!-- Twitter -->
@@ -45,7 +45,7 @@
     />
     <meta
       name="twitter:image"
-      content="https://about.celestialdecks.gg/assets/social-preview.png"
+      content="https://celestialdecks.gg/about/assets/social-preview.png"
     />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -214,28 +214,28 @@
     </section>
 
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const video = document.getElementById("animation");
+      document.addEventListener('DOMContentLoaded', function () {
+        const video = document.getElementById('animation')
         video.play().catch(function (error) {
-          console.log("Video autoplay failed:", error);
-        });
+          console.log('Video autoplay failed:', error)
+        })
 
         if (isMobile()) {
-          const playFree = document.getElementById("play-free-container");
-          const mobileMsg = document.getElementById("mobile-message");
-          const noDownload = document.getElementById("no-download");
-          if (playFree) playFree.style.display = "none";
-          if (mobileMsg) mobileMsg.style.display = "block";
-          if (noDownload) noDownload.style.display = "none";
+          const playFree = document.getElementById('play-free-container')
+          const mobileMsg = document.getElementById('mobile-message')
+          const noDownload = document.getElementById('no-download')
+          if (playFree) playFree.style.display = 'none'
+          if (mobileMsg) mobileMsg.style.display = 'block'
+          if (noDownload) noDownload.style.display = 'none'
         }
 
         // Mobile detection and UI update
         function isMobile() {
           return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent
-          );
+            navigator.userAgent,
+          )
         }
-      });
+      })
     </script>
   </body>
 </html>
