@@ -13,7 +13,7 @@ Celestial can be learned in under 10 minutes, while also having a high skill cei
 
 To begin the game, each player draws 3 cards, then may take a single mulligan. To mulligan, select any number of cards in your hand that you don't want to keep. You'lll draw new cards to replace them, then shuffle the old cards away.
 
-The story is cleared between rounds, but cards in hand and other effects remain. At the beginning of each round, you draw 2 new cards, increase your max breath by 1 (up to a limit of 10), and reset your current breath amount. Then the player who most recently played a card in a previous round takes the first turn.
+The story is cleared between rounds, but cards in hand and other effects remain. At the beginning of each round, you draw 2 new cards, increase your max breath by 1 (for the first 10 rounds), and reset your current breath amount. Then the player who most recently played a card in a previous round takes the first turn.
 
 [size=30][b]Action phase[/b][/size]
 

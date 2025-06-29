@@ -105,25 +105,25 @@ export default class PassRegion extends Region {
       // Under the special condition where:
       // Max breath reached, can play card, start of round
       // The player is not allowed to pass
-      const canPlay = state.cardCosts.some((cost) => cost <= state.breath[0])
-      if (
-        state.maxBreath[0] === MechanicsSettings.BREATH_CAP &&
-        canPlay &&
-        state.story.acts.length === 0
-      ) {
-        this.btnPass
-          .setOnClick(() => {
-            const s = "You can't pass to start the 10th or later round."
-            this.scene.signalError(s)
-          })
-          .enable()
-      }
+      // const canPlay = state.cardCosts.some((cost) => cost <= state.breath[0])
+      // if (
+      //   state.roundCount + 1 >= MechanicsSettings.BREATH_CAP &&
+      //   canPlay &&
+      //   state.story.acts.length === 0
+      // ) {
+      //   this.btnPass
+      //     .setOnClick(() => {
+      //       const s = "You can't pass to start the 10th or later round."
+      //       this.scene.signalError(s)
+      //     })
+      //     .enable()
+      // }
       // Otherwise, allow them to pass as normal
-      else {
-        this.btnPass.enable().setOnClick(() => {
-          this.callback()
-        }, true)
-      }
+      // else {
+      this.btnPass.enable().setOnClick(() => {
+        this.callback()
+      }, true)
+      // }
     } else {
       this.btnPass.disable()
     }

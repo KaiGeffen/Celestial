@@ -84,9 +84,9 @@ Each round has the following structure: start phase, action phase, end phase.
 
 >>> START PHASE
 In the start phase, the following things occur in the following order:
+* The last player to resolve a card receives priority.
 * Any 'start of round' effects trigger (ex: Sun).
-* If one player has won more rounds than the other, that player receives priority. Otherwise, priority is determined at random.
-* Each player's maximum breath increases by 1 if it is less than 10.
+* Each player's maximum breath increases by 1 if this is round 1 through 10.
 * Each player's current breath is set to their maximum breath.
 * Each player draws 2 cards.
 
