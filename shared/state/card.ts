@@ -101,12 +101,8 @@ export default class Card {
       if (card.name === 'Child') {
         // NOTE This replacement is done so that the replay doesn't show the eventual point value before it's achieved
         const newCard = new Card({
-          name: 'Child',
-          id: 1003,
+          ...card,
           points: amt + card.points,
-          basePoints: 0,
-          text: 'Fleeting',
-          qualities: [Quality.FLEETING],
         })
         game.hand[player][i] = newCard
         return
