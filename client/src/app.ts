@@ -27,7 +27,7 @@ import ContainerLitePlugin from 'phaser3-rex-plugins/plugins/containerlite-plugi
 import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
 import StoreScene from './scene/storeScene'
 import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin.js'
-import CharacterProfileScene from './scene/characterScene'
+import CharacterProfileScene from './scene/characterProfileScene'
 import MapScene from './scene/MapScene'
 
 const config: Phaser.Types.Core.GameConfig = {

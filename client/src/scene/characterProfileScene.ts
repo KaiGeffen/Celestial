@@ -16,7 +16,8 @@ import {
 
 export default class CharacterProfileScene extends BaseScene {
   // Character details
-  selectedAvatar: number
+  selectedAvatar = 0
+  fullAvatar: Phaser.GameObjects.Image
   avatar: AvatarButton
   txtCharacterName: Phaser.GameObjects.Text
   txtCharacterDescription: Phaser.GameObjects.Text
@@ -24,8 +25,7 @@ export default class CharacterProfileScene extends BaseScene {
   expLabel: Phaser.GameObjects.Text
 
   // Views
-  mainSizer: Sizer
-  rightSizer: Sizer
+  sizer: Sizer
 
   constructor() {
     super({
@@ -33,14 +33,27 @@ export default class CharacterProfileScene extends BaseScene {
     })
   }
 
-  create(params): void {
+  create(): void {
     super.create()
 
-    // Default to first avatar if none selected
-    this.selectedAvatar = params?.avatarId ?? 0
+    // Main sizer that takes up full page
+    this.sizer = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      space: { item: Space.pad },
+      anchor: {
+        x: 'center',
+        y: 'center',
+        width: '100%',
+        height: '100%',
+      },
+    })
 
-    // Create the main layout
-    this.createMainLayout()
+    // Add both sides to the main sizer
+    this.sizer
+      .addBackground(this.createBackground())
+      .add(this.createLeftSide())
+      .add(this.createRightSide())
+      .layout()
 
     // Add back button
     new Buttons.Basic({
@@ -52,29 +65,20 @@ export default class CharacterProfileScene extends BaseScene {
     })
   }
 
-  private createMainLayout() {
-    // Create the main sizer that will contain everything
-    this.mainSizer = this.rexUI.add.sizer({
-      orientation: 'horizontal',
-      space: { item: Space.pad * 2 },
-      anchor: {
-        x: '50%',
-        y: '50%',
-        width: '100%',
-        height: '100%',
-      },
-    })
-
-    // Add background
-    const background = this.add.image(0, 0, 'background-Light').setInteractive()
-
+  private createLeftSide(): Phaser.GameObjects.Image {
     // Create the full art image
-    const image = this.add
-      .image(0, 0, `avatar-${avatarNames[this.selectedAvatar]}Full`)
-      .setInteractive()
+    this.fullAvatar = this.add.image(
+      0,
+      0,
+      `avatar-${avatarNames[this.selectedAvatar]}Full`,
+    )
 
-    // Create the right side content
-    this.rightSizer = this.rexUI.add.sizer({
+    return this.fullAvatar
+  }
+
+  private createRightSide(): Sizer {
+    // Create the right side content - vertically divided into 3 parts
+    const sizer = this.rexUI.add.sizer({
       orientation: 'vertical',
       space: { item: Space.pad * 2 },
     })
@@ -89,19 +93,13 @@ export default class CharacterProfileScene extends BaseScene {
     const progressSizer = this.createProgressBar()
 
     // Add all elements to the right sizer
-    this.rightSizer
-      .add(avatarSizer)
-      .add(descriptionSizer)
-      .add(progressSizer)
-      .addSpace()
-      .layout()
+    sizer.add(avatarSizer).add(descriptionSizer).add(progressSizer)
 
-    // Add both the image and right content to the main sizer
-    this.mainSizer
-      .add(image)
-      .add(this.rightSizer)
-      .addBackground(background)
-      .layout()
+    return sizer
+  }
+
+  private createBackground(): Phaser.GameObjects.Image {
+    return this.add.image(0, 0, 'background-Light')
   }
 
   private createAvatarSelection(): Sizer {
@@ -210,8 +208,7 @@ export default class CharacterProfileScene extends BaseScene {
 
   private updateCharacterView() {
     // Update the full art image
-    const image = this.mainSizer.getChildren()[0] as Phaser.GameObjects.Image
-    image.setTexture(`avatar-${avatarNames[this.selectedAvatar]}Full`)
+    this.fullAvatar.setTexture(`avatar-${avatarNames[this.selectedAvatar]}Full`)
 
     // Update the text
     this.updateCharacterText()
@@ -238,7 +235,7 @@ export default class CharacterProfileScene extends BaseScene {
     this.expLabel.setText(
       levelData.level === MAX_LEVEL
         ? `Level ${levelData.level} (MAX)`
-        : `Level ${levelData.level} - ${expToNext} EXP to next\nClick to unlock TODO UNLOCKS`,
+        : `Level ${levelData.level} - ${expToNext} EXP to next`,
     )
   }
 }
