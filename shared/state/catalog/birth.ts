@@ -168,19 +168,18 @@ class Pregnant extends Card {
     const card = new Card({
       name: child.name,
       id: child.id,
-      points: 2,
       text: child.text,
       qualities: child.qualities,
       basePoints: child.basePoints,
     })
-    game.createInDeck(player, card)
+    game.createOnDeck(player, card)
   }
 }
 const pregnant = new Pregnant({
   name: 'Pregnant',
   id: 83,
   cost: 1,
-  text: 'Create a 0:2 Child in your deck.',
+  text: 'Create a Child on top of your deck.',
 })
 
 class PassOn extends Card {
@@ -204,7 +203,7 @@ class JustLikeDad extends Card {
 
     if (super.exhale(2, game, player)) {
       if (game.story.acts.length > 0) {
-        const card = game.story.acts[0].card
+        const card = game.story.acts[game.story.acts.length - 1].card
         game.create(player, card)
       }
     }
@@ -215,7 +214,7 @@ const justLikeDad = new JustLikeDad({
   id: 85,
   cost: 1,
   points: 1,
-  text: 'Exhale 2: Create a copy in hand of the next card in the story.',
+  text: 'Exhale 2: Create a copy in hand of the last card in the story.',
 })
 
 class Hug extends Card {

@@ -10,7 +10,7 @@ import ContainerLite from 'phaser3-rex-plugins/templates/ui/container/Container'
 
 export default class Decklist {
   private scene: BaseScene
-  sizer: Sizer
+  sizer
   cutouts: Cutout[] = []
   countCards: number = 0
   cutoutClickCallback: (cutout: Cutout) => () => void
@@ -22,10 +22,13 @@ export default class Decklist {
     this.scene = scene
     this.cutoutClickCallback = cutoutClickCallback
 
-    this.sizer = this.scene.rexUI.add.sizer({
-      orientation: 'vertical',
+    this.sizer = this.scene.rexUI.add.fixWidthSizer({
+      width: Space.cutoutWidth + 10,
+      // orientation: 'vertical',
       space: {
         top: Space.padSmall,
+        left: 5,
+        right: 5,
       },
     })
   }

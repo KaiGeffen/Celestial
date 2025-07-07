@@ -298,24 +298,6 @@ export default class GameModel {
     this.deck[player].push(card)
   }
 
-  createInDeck(player: number, card: Card) {
-    this.animations[player].push(
-      new Animation({
-        from: Zone.Gone,
-        to: Zone.Deck,
-        card: card,
-        index2: 0,
-      }),
-    )
-
-    // Add the card at a random position
-    this.deck[player].splice(
-      Math.floor(Math.random() * this.deck[player].length),
-      0,
-      card,
-    )
-  }
-
   createInStory(player: number, card: Card) {
     this.story.addAct(card, player)
   }
