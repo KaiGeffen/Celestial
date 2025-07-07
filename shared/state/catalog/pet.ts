@@ -197,7 +197,7 @@ class Parade extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    if (super.exhale(5, game, player)) {
+    if (super.exhale(4, game, player)) {
       let amtAdded = 0
       for (let iHand = 0; iHand < game.hand[player].length; iHand++) {
         // If the card costs 3 or less
@@ -233,7 +233,7 @@ const parade = new Parade({
   id: 79,
   cost: 3,
   points: 3,
-  text: 'Exhale 5: Add each card with base-cost 3 or less from your hand to the story after this.',
+  text: 'Exhale 4: Add each card with base-cost 3 or less from your hand to the story after this.',
 })
 
 class MeAndHer extends Card {

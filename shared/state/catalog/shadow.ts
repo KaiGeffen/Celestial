@@ -246,6 +246,6 @@ export {
   sickness,
   victim,
   // rupture,
-  lostInShadow as craving,
+  lostInShadow,
   vampire,
 }

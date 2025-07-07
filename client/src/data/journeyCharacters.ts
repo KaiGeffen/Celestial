@@ -36,7 +36,14 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
         '5 Wait, I got it!',
       ],
       deck: {
-        required: [0, 0, 4, 4, 4, 4, 6, 6, 7, 7, 12, 12, 13, 18, 18],
+        required: [
+          ...x('Stars', 3),
+          ...x('Dove', 4),
+          ...x('Dash', 2),
+          ...x('Mercy', 3),
+          ...x('Hurricane', 1),
+          ...x('Uprising', 2),
+        ],
         optional: [],
       },
       opponentDeck: [3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 11, 11, 14, 14, 17],
@@ -55,8 +62,14 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
         `The canvas is calling to me.`,
       ],
       deck: {
-        required: [0, 0, 4, 4, 4, 4, 4, 4, 12, 12, 13, 56],
-        optional: [7, 7, 9],
+        required: [
+          ...x('Stars', 3),
+          ...x('Dove', 5),
+          ...x('Starling', 3),
+          ...x('Mercy', 1),
+          ...x('Uprising', 1),
+        ],
+        optional: [...x('Dash', 3)],
       },
       opponentDeck: [3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 11, 11, 14, 14, 17],
       winText: 'The little voice was right. I got through this.',
