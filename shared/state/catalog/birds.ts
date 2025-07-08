@@ -170,7 +170,7 @@ const truth = new Card({
   name: 'Truth',
   id: 61,
   cost: 6,
-  points: 7,
+  points: 8,
 })
 
 class Defiance extends Card {

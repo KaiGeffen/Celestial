@@ -178,7 +178,7 @@ class Pregnant extends Card {
 const pregnant = new Pregnant({
   name: 'Pregnant',
   id: 83,
-  cost: 1,
+  cost: 2,
   text: 'Create a Child on top of your deck.',
 })
 
