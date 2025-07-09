@@ -323,7 +323,7 @@ export const assetLists = {
         "height": 80
       }
     },
-    "pixelArt": true
+    "pixelArt": false
   },
   "store": {
     "files": [
