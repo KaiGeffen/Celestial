@@ -12,7 +12,7 @@ export default function createNewsletterServer() {
   app.use(
     cors({
       // Specifically allow the about subdomain
-      origin: 'https://about.celestialtcg.com',
+      origin: 'https://about.celestialdecks.gg',
       methods: ['POST', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Accept'],
       credentials: true,

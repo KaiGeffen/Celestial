@@ -15,6 +15,7 @@ export interface MatchClientMessages {
   }
   initTutorial: {
     num: number
+    uuid: string
   }
   playCard: {
     cardNum: number

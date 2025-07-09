@@ -162,3 +162,31 @@ export const achievements = pgTable(
     ),
   }),
 )
+
+export const analytics = pgTable(
+  'analytics',
+  {
+    id: serial('id').primaryKey(),
+    player_id: uuid('player_id')
+      .notNull()
+      .references(() => players.id, { onDelete: 'cascade' }),
+    time: timestamp('time').notNull().defaultNow(),
+    event_type: varchar('event_type', { length: 64 }).notNull(), // e.g., 'register', 'tutorial_progress', 'play_click', etc.
+    funnel_step: varchar('funnel_step', { length: 64 }).notNull(), // e.g., 'register', 'tutorial1_start', etc.
+    metadata: integer('metadata'), // Amount for things like what turn they got to, etc. based on the event type
+  },
+  (table) => ({
+    playerEventIdx: index('analytics_player_event_idx').on(
+      table.player_id,
+      table.event_type,
+    ),
+    eventTypeIdx: index('analytics_event_type_idx').on(
+      table.player_id,
+      table.event_type,
+    ),
+    funnelStepIdx: index('analytics_funnel_step_idx').on(
+      table.player_id,
+      table.funnel_step,
+    ),
+  }),
+)

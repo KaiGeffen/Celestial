@@ -9,7 +9,7 @@ const execAsync = promisify(exec)
 const NUM_USERS = 1000
 const USE_LIVE_SERVER = true // Set to false to test locally
 const SERVER_URL = USE_LIVE_SERVER
-  ? 'wss://celestialtcg.com/match_ws' // Live server
+  ? 'wss://celestialdecks.gg/match_ws' // Live server
   : 'ws://localhost:5555' // Local server
 const BATCH_SIZE = 500 // Number of users to connect in each batch
 const BATCH_DELAY = 1000 // Delay between batches in milliseconds

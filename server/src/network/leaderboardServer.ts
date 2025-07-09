@@ -5,6 +5,7 @@ import { desc, sql } from 'drizzle-orm'
 import { LEADERBOARD_PORT } from '../../../shared/network/settings'
 import { db } from '../db/db'
 import { players } from '../db/schema'
+import { logFunnelEvent } from '../db/analytics'
 
 export default function createLeaderboardServer() {
   const app = express()
@@ -13,7 +14,12 @@ export default function createLeaderboardServer() {
   app.use(cors())
 
   // GET endpoint for leaderboard data
-  app.get('/leaderboard', async (req, res) => {
+  app.get('/leaderboard/:uuid', async (req, res) => {
+    const uuid = req.params.uuid
+
+    // Log funnel event for leaderboard access
+    logFunnelEvent(uuid, 'home_scene_options', 'leaderboard')
+
     try {
       const leaderboardData = await db
         .select({

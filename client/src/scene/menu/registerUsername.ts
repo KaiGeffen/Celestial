@@ -1,14 +1,14 @@
 import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Buttons from '../../lib/buttons/buttons'
-import { Color, Space, Style } from '../../settings/settings'
+import { Color, Space, Style, Url } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import UserDataServer from '../../network/userDataServer'
 import Button from '../../lib/buttons/button'
 import { USERNAME_AVAILABILITY_PORT } from '../../../../shared/network/settings'
 
-const width = 500
+const width = 700
 const inputTextWidth = 200
 
 export class RegisterUsernameMenu extends Menu {
@@ -63,6 +63,8 @@ export class RegisterUsernameMenu extends Menu {
     this.sizer
       .add(this.createUsernameInput())
       .addNewLine()
+      .add(this.createDisclaimerText())
+      .addNewLine()
       .add(this.createErrorText())
       .addNewLine()
       .add(this.createButtons())
@@ -74,6 +76,21 @@ export class RegisterUsernameMenu extends Menu {
 
     let sizer = this.scene.rexUI.add.sizer()
     sizer.addSpace().add(this.errorText).addSpace()
+    return sizer
+  }
+
+  private createDisclaimerText() {
+    const disclaimerMessage =
+      'Celestial is in Beta!\n\nParts of the game may be buggy or subject to change, and your progress may be lost. We also collect gameplay analytics (such as tutorial completion rates) to help us improve the experience.\n\nPlease join the Discord!'
+
+    let text = this.scene.add
+      .text(0, 0, disclaimerMessage, Style.basic)
+      .setWordWrapWidth(width - Space.pad * 2)
+      .setAlign('center')
+
+    let sizer = this.scene.rexUI.add.sizer()
+    sizer.addSpace().add(text).addSpace()
+
     return sizer
   }
 
@@ -124,6 +141,8 @@ export class RegisterUsernameMenu extends Menu {
     sizer
       .add(this.createCancelButton())
       .addSpace()
+      .add(this.createDiscordButton())
+      .addSpace()
       .add(this.createConfirmButton())
 
     return sizer
@@ -150,6 +169,24 @@ export class RegisterUsernameMenu extends Menu {
       },
       returnHotkey: true,
     }).disable()
+
+    return container
+  }
+
+  private createDiscordButton() {
+    let container = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+
+    let discordButton = new Buttons.Basic({
+      within: container,
+      text: 'Discord',
+      f: () => window.open(Url.discord, '_blank'),
+    })
 
     return container
   }

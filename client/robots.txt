@@ -1,4 +1,4 @@
-# about.celestialdecks.gg
+# about.celestialtcg.com
 User-agent: *
 Allow: /
 
@@ -10,5 +10,4 @@ Disallow: /ws/
 Disallow: /assets/splash.webp
 
 # Sitemaps
-Sitemap: https://about.celestialdecks.gg/sitemap.xml
 Sitemap: https://celestialdecks.gg/sitemap.xml 

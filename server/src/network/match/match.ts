@@ -1,9 +1,7 @@
 import { ServerController } from '../../gameController'
-import { MechanicsSettings, Mulligan } from '../../../../shared/settings'
+import { Mulligan } from '../../../../shared/settings'
 import getClientGameModel from '../../../../shared/state/clientGameModel'
 import { MatchServerWS } from '../../../../shared/network/matchWS'
-import { v5 as uuidv5 } from 'uuid'
-import { UUID_NAMESPACE } from '../../../../shared/network/settings'
 import { db } from '../../db/db'
 import { players } from '../../db/schema'
 import { eq } from 'drizzle-orm'
@@ -34,9 +32,9 @@ class Match implements Match {
     deck2: Deck,
   ) {
     this.ws1 = ws1
-    this.uuid1 = uuid1 ? uuidv5(uuid1, UUID_NAMESPACE) : null
+    this.uuid1 = uuid1
     this.ws2 = ws2
-    this.uuid2 = uuid2 ? uuidv5(uuid2, UUID_NAMESPACE) : null
+    this.uuid2 = uuid2
 
     this.deck1 = deck1
     this.deck2 = deck2

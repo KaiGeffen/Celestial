@@ -2,7 +2,6 @@ import express from 'express'
 import cors from 'cors'
 import Stripe from 'stripe'
 import { eq, sql } from 'drizzle-orm'
-import { v5 as uuidv5 } from 'uuid'
 
 import { PAYMENT_PORT, UUID_NAMESPACE } from '../../../shared/network/settings'
 import { db } from '../db/db'
@@ -43,9 +42,6 @@ export default function createPaymentServer() {
         return res.status(400).json({ error: 'Missing required parameters' })
       }
 
-      // Convert Google ID to your UUID format
-      const userId = uuidv5(uuid, UUID_NAMESPACE)
-
       // Get package details
       const packageDetails = Object.values(GEM_PACKAGES).find(
         (pkg) => pkg.id === gemPackage,
@@ -74,7 +70,7 @@ export default function createPaymentServer() {
         success_url: `${req.headers.origin || 'http://localhost:4949'}`,
         cancel_url: `${req.headers.origin || 'http://localhost:4949'}`,
         metadata: {
-          userId,
+          uuid,
           gemAmount: packageDetails.gems.toString(),
           gemPackage,
         },

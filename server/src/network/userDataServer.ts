@@ -1,10 +1,6 @@
 import { WebSocketServer } from 'ws'
-import { v5 as uuidv5 } from 'uuid'
 
-import {
-  USER_DATA_PORT,
-  UUID_NAMESPACE,
-} from '../../../shared/network/settings'
+import { USER_DATA_PORT } from '../../../shared/network/settings'
 import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 
 import { db } from '../db/db'
@@ -55,16 +51,14 @@ export default function createUserDataServer() {
       let potentialEmail: string = null
 
       ws.on('sendToken', async ({ email, uuid, jti }) => {
-        // Generate UUID v5 from Google's user ID
-        const userId = uuidv5(uuid, UUID_NAMESPACE)
-        id = userId
+        id = uuid
         potentialEmail = email
 
         // Check if user exists in database
         const result = await db
           .select()
           .from(players)
-          .where(eq(players.id, userId))
+          .where(eq(players.id, uuid))
           .limit(1)
 
         if (result.length === 0) {

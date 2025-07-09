@@ -1,10 +1,7 @@
 import 'phaser'
-import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
-import { Color, Space, Style, BBStyle, Flags } from '../../settings/settings'
+import { Color, Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
-import { LEADERBOARD_PORT, URL } from '../../../../shared/network/settings'
 import UserDataServer from '../../network/userDataServer'
 
 const height = (Space.windowHeight * 2) / 3
@@ -36,7 +33,10 @@ export default class LeaderboardMenu extends Menu {
 
   private async fetchLeaderboardData() {
     try {
-      const response = await fetch(`https://celestialdecks.gg/leaderboard`)
+      const userData = UserDataServer.getUserData()
+      const response = await fetch(
+        `https://celestialdecks.gg/leaderboard/${userData.uuid}`,
+      )
       if (!response.ok) {
         throw new Error('Failed to fetch leaderboard data')
       }

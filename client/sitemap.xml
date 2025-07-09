@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://about.celestialdecks.gg/</loc>
-    <lastmod>2025-04-14</lastmod>
+    <loc>https://celestialdecks.gg/about/</loc>
+    <lastmod>2025-06-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://celestialdecks.gg/</loc>
-    <lastmod>2025-04-14</lastmod>
+    <lastmod>2025-06-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://celestialdecks.gg/privacy/</loc>
+    <lastmod>2025-06-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.0</priority>
   </url>
 </urlset>
