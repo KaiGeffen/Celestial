@@ -17,14 +17,14 @@ const decks: Deck[] = [
       border: 0,
     },
   },
-  {
-    name: 'Oak Cling',
-    cards: [23, 20, 19, 19, 19, 19, 13, 11, 12, 1, 1, 1, 1, 1, 1],
-    cosmeticSet: {
-      avatar: 2,
-      border: 0,
-    },
-  },
+  // {
+  //   name: 'Oak Cling',
+  //   cards: [23, 20, 19, 19, 19, 19, 13, 11, 12, 1, 1, 1, 1, 1, 1],
+  //   cosmeticSet: {
+  //     avatar: 2,
+  //     border: 0,
+  //   },
+  // },
   {
     name: 'Is this pet idk',
     cards: [71, 11, 11, 11, 11, 34, 34, 33, 33, 33, 4, 28, 28, 28, 0],
