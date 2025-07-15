@@ -517,13 +517,6 @@ export default class JourneyScene extends BaseScene {
       })
     }
 
-    // Remove required cards from the choosable pool
-    if (this.selectedMission) {
-      this.selectedMission.deck.forEach((cardId) => {
-        cardSet.delete(Catalog.getCardById(cardId))
-      })
-    }
-
     // Set the decklist element to have this set of cards
     this.cardPool.setDeck(Array.from(cardSet))
   }

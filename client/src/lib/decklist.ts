@@ -39,7 +39,7 @@ export default class Decklist {
     for (let i = 0; i < this.cutouts.length; i++) {
       const cutout = this.cutouts[i]
 
-      if (cutout.card.id === card.id) {
+      if (cutout.card.id === card.id && !cutout.required) {
         cutout.increment()
         this.countCards++
         return
@@ -56,7 +56,7 @@ export default class Decklist {
     for (let i = 0; i < this.cutouts.length; i++) {
       const cutout = this.cutouts[i]
 
-      if (cutout.card.id === card.id) {
+      if (cutout.card.id === card.id && !cutout.required) {
         // Update values
         cutout.decrement()
         this.countCards--
