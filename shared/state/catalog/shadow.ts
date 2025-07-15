@@ -2,7 +2,7 @@ import Card from '../card'
 import { Quality } from '../quality'
 import GameModel from '../gameModel'
 import { Zone } from '../zone'
-import { Animation } from '../../animation'
+import { Animation, Visibility } from '../../animation'
 // import { wound } from './tokens'
 
 class Dagger extends Card {
@@ -143,20 +143,23 @@ class WingClipping extends Card {
       const card = game.hand[player ^ 1].shift()
       game.deck[player ^ 1].push(card)
 
-      game.animations[player ^ 1].push(
-        new Animation({
-          from: Zone.Hand,
-          to: Zone.Deck,
-          card: card,
-        }),
-      )
+      // game.animations[player ^ 1].push(
+      //   new Animation({
+      //     from: Zone.Hand,
+      //     to: Zone.Deck,
+      //     card: card,
+      //     index: 0,
+      //     index2: 0,
+      //     visibility: Visibility.KnowItOccurred,
+      //   }),
+      // )
     }
   }
 }
 const wingClipping = new WingClipping({
   name: 'Wing Clipping',
   id: 16,
-  cost: 5,
+  // cost: 5,
   points: 4,
   text: 'Your opponent puts the leftmost card of their hand on top of their deck.',
   story:
