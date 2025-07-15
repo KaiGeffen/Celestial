@@ -159,7 +159,7 @@ class WingClipping extends Card {
 const wingClipping = new WingClipping({
   name: 'Wing Clipping',
   id: 16,
-  // cost: 5,
+  cost: 5,
   points: 4,
   text: 'Your opponent puts the leftmost card of their hand on top of their deck.',
   story:

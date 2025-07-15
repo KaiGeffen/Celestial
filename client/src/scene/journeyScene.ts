@@ -109,7 +109,7 @@ export default class JourneyScene extends BaseScene {
         space: { item: Space.pad },
       })
 
-      const image = this.add.image(0, 0, `avatar-${name}Full`).setInteractive()
+      const image = this.add.image(0, 0, `avatar-${name}Full`)
       this.addShadow(image)
 
       // Exp bar
