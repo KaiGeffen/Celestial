@@ -43,10 +43,10 @@ const UNLOCKS_PER_CHARACTER = [
   [
     [Catalog.getCard('Dagger'), Catalog.getCard('Shadow')],
     [Catalog.getCard('Hungry Ghost')],
-    [Catalog.getCard('Imprison')],
+    [Catalog.getCard('Victim')],
     [Catalog.getCard('Nightmare')],
     [Catalog.getCard('Wing Clipping')],
-    [Catalog.getCard('Victim')],
+    [Catalog.getCard('Imprison')],
     [Catalog.getCard('Sickness')],
     [Catalog.getCard('Boa')],
     [Catalog.getCard('Lost in Shadow')],

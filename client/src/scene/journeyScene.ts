@@ -562,8 +562,9 @@ export default class JourneyScene extends BaseScene {
 
     // 1. Determine which characters might appear
     let maxIdx = 5
-    if (totalExp < 1200) maxIdx = 4
-    if (totalExp < 800) maxIdx = 3
+    if (totalExp < 2200) maxIdx = 4
+    if (totalExp < 1200) maxIdx = 3
+    if (totalExp < 600) maxIdx = 2
     if (totalExp < 200) maxIdx = 1
     const allowed = Array.from({ length: maxIdx + 1 }, (_, i) => i)
 
