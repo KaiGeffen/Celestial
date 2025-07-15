@@ -5,7 +5,7 @@ import Buttons from '../lib/buttons/buttons'
 import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import { JOURNEY_MISSIONS, JourneyMission } from '../data/journeyCharacters'
+import { JOURNEY_MISSIONS, JourneyMission } from '../data/journeyMissions'
 import Decklist from '../lib/decklist'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { Deck } from '../../../shared/types/deck'
@@ -382,25 +382,6 @@ export default class JourneyScene extends BaseScene {
     // Create the decklist with each card you can add
     this.cardPool = new Decklist(this, this.onClickCardPool())
 
-    const cardSet: Set<Card> = getUnlockedCards()
-
-    // Enable dev flag to have all cards
-    if (Flags.devCardsEnabled) {
-      Catalog.collectibleCards.forEach((card) => {
-        cardSet.add(card)
-      })
-    }
-
-    // Add optional cards from the current mission and remove required cards
-    if (this.selectedMission) {
-      this.selectedMission.deck.optional.forEach((cardId) => {
-        cardSet.add(Catalog.getCardById(cardId))
-      })
-    }
-
-    const cards = Array.from(cardSet)
-    this.cardPool.setDeck(cards)
-
     // Create a scrollable panel
     const panel = newScrollablePanel(this, {
       width: Space.cutoutWidth + Space.pad * 2,
@@ -478,12 +459,7 @@ export default class JourneyScene extends BaseScene {
         } else {
           // Reset deck
           this.decklist.setJourneyDeck(
-            this.selectedMission.deck.required.map((id) =>
-              Catalog.getCardById(id),
-            ),
-            this.selectedMission.deck.optional.map((id) =>
-              Catalog.getCardById(id),
-            ),
+            this.selectedMission.deck.map((id) => Catalog.getCardById(id)),
           )
           this.missionDetailsView.layout()
           this.updateDeckState()
@@ -509,12 +485,6 @@ export default class JourneyScene extends BaseScene {
   private onClickCardPool(): (cutout: Cutout) => () => void {
     return (cutout: Cutout) => {
       return () => {
-        // Don't allow adding required cards
-        if (this.selectedMission.deck.required.includes(cutout.card.id)) {
-          this.signalError('Cannot add more copies of required cards')
-          return
-        }
-
         this.decklist.addCard(cutout.card)
         this.missionDetailsView.layout()
         this.updateDeckState()
@@ -542,32 +512,24 @@ export default class JourneyScene extends BaseScene {
   }
 
   private refreshCardPool() {
-    const cardSet = new Set<Card>()
-    // Devs have all cards unlocked
+    const cardSet: Set<Card> = getUnlockedCards()
+
+    // Enable dev flag to have all cards
     if (Flags.devCardsEnabled) {
       Catalog.collectibleCards.forEach((card) => {
         cardSet.add(card)
       })
-    } else {
-      UserSettings._get('inventory').forEach((isPresent, index) => {
-        if (isPresent) {
-          cardSet.add(Catalog.getCardById(index))
-        }
-      })
     }
 
-    // Add optional cards from the current mission and remove required cards
+    // Remove required cards from the choosable pool
     if (this.selectedMission) {
-      this.selectedMission.deck.optional.forEach((cardId) => {
-        cardSet.add(Catalog.getCardById(cardId))
-      })
-      this.selectedMission.deck.required.forEach((cardId) => {
+      this.selectedMission.deck.forEach((cardId) => {
         cardSet.delete(Catalog.getCardById(cardId))
       })
     }
 
-    const cards = Array.from(cardSet)
-    this.cardPool.setDeck(cards)
+    // Set the decklist element to have this set of cards
+    this.cardPool.setDeck(Array.from(cardSet))
   }
 
   private setMissionInfo(mission: JourneyMission, avatarIndex: number) {
@@ -581,8 +543,7 @@ export default class JourneyScene extends BaseScene {
 
     // Update the decklist
     this.decklist.setJourneyDeck(
-      mission.deck.required.map((id) => Catalog.getCardById(id)),
-      mission.deck.optional.map((id) => Catalog.getCardById(id)),
+      mission.deck.map((id) => Catalog.getCardById(id)),
     )
 
     // Refresh the card pool to include optional cards from this mission
