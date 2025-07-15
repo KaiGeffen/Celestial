@@ -567,12 +567,11 @@ export default class JourneyScene extends BaseScene {
       0,
     )
 
-    // 1. Determine allowed indices
-    let maxIdx = 1
-    // let maxIdx = 5
-    // if (totalExp < 1200) maxIdx = 4
-    // if (totalExp < 800) maxIdx = 3
-    // if (totalExp < 200) maxIdx = 1
+    // 1. Determine which characters might appear
+    let maxIdx = 5
+    if (totalExp < 1200) maxIdx = 4
+    if (totalExp < 800) maxIdx = 3
+    if (totalExp < 200) maxIdx = 1
     const allowed = Array.from({ length: maxIdx + 1 }, (_, i) => i)
 
     // 2. Deterministic seed from UTC date
@@ -593,15 +592,14 @@ export default class JourneyScene extends BaseScene {
     }
     const rand = mulberry32(seed)
 
-    // 3. Randomly pick 2 unique indices
+    // 3. Randomly pick 2 unique characters
     const results: [JourneyMission, number][] = []
     while (results.length < 2) {
       const idx = allowed[Math.floor(rand() * allowed.length)]
       if (results.find((result) => result[1] === idx)) continue
 
       // Get the right mission based off this avatar's exp
-      const avatarExp = UserSettings._get('avatarExperience')[idx] || 0
-      const level = getCharacterLevel(avatarExp).level
+      const level = getCharacterLevel(idx).level
       const avatarMissionTrack = JOURNEY_MISSIONS[idx]
 
       // Use level to determine mission index (level 1 = index 0, etc.)
