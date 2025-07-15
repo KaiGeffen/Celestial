@@ -384,15 +384,11 @@ export default class JourneyScene extends BaseScene {
 
     // Create a scrollable panel
     const panel = newScrollablePanel(this, {
-      width: Space.cutoutWidth + Space.pad * 2,
+      width: Space.cutoutWidth,
       height: Space.windowHeight - Space.pad * 6,
       scrollMode: 'vertical',
       panel: {
         child: this.cardPool.sizer,
-      },
-      slider: {
-        track: this.add.rectangle(0, 0, 20, 1, Color.progressBarTrack),
-        thumb: this.add.rectangle(0, 0, 20, 1, Color.progressBar),
       },
     })
 
