@@ -192,7 +192,7 @@ export default class CharacterProfileScene extends BaseScene {
       0,
       level === MAX_LEVEL
         ? `Level ${level} (MAX)`
-        : `Level ${level} - ${expToNext} EXP to next\nClick to unlock TODO UNLOCKS`,
+        : `Level ${level} - ${expToNext} EXP to next`,
       {
         ...Style.basic,
         fontSize: '16px',
@@ -223,11 +223,9 @@ export default class CharacterProfileScene extends BaseScene {
   }
 
   private updateProgressBar() {
-    const avatarExp =
-      UserSettings._get('avatarExperience')[this.selectedAvatar] || 0
-    const level = getCharacterLevel(avatarExp).level
-    const progress = getCharacterLevelProgress(avatarExp)
-    const expToNext = getCharacterExpToNextLevel(avatarExp)
+    const level = getCharacterLevel(this.selectedAvatar).level
+    const progress = getCharacterLevelProgress(this.selectedAvatar)
+    const expToNext = getCharacterExpToNextLevel(this.selectedAvatar)
 
     this.expBar.setValue(progress)
     this.expLabel.setText(

@@ -173,7 +173,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
   [
     {
       selectText: `Let's do this!`,
-      missionText: `You can only run for so long before the shadows catch up.`,
+      missionText: `I have to win fast! The ashes I left behind will find me soon.`,
       uponRoundWinText: [
         `Fire begins`,
         ``,
@@ -190,7 +190,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
         ...x('Mercy', 2),
         ...x('Veteran', 2),
       ],
-      opponentDeck: [1, 1, 1],
+      opponentDeck: [11, 11, 11, 11, 7, 7, 7, 4, 4, 4, 4, 4, 4, 0, 0],
       winText: 'Fire stuff idk...',
       loseText: 'I have burned too bright!',
     },
@@ -212,7 +212,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
         ...x('Arsonist', 2),
         ...x('Veteran', 2),
       ],
-      opponentDeck: [11, 11, 11, 11, 7, 7, 7, 4, 4, 4, 4, 4, 4, 0, 0],
+      opponentDeck: [5, 5, 5, 3, 3, 3, 6, 12, 14, 14, 13, 13, 17, 17, 17],
       winText: 'The fire consumes all.',
       loseText: 'The spark still smolders.',
     },
@@ -234,7 +234,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
         ...x('Veteran', 2),
         ...x('Death', 1),
       ],
-      opponentDeck: [5, 5, 5, 3, 3, 3, 6, 12, 14, 14, 13, 13, 17, 17, 17],
+      opponentDeck: [56, 51, 51, 11, 12, 7, 7, 7, 4, 4, 4, 4, 4, 0, 0],
       winText: 'Death has claimed another.',
       loseText: 'The fire still burns within.',
     },
