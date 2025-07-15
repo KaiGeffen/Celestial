@@ -8,9 +8,9 @@ import avatarNames from '../lib/avatarNames'
 import AvatarButton from '../lib/buttons/avatar'
 import { getUnlockedAvatars } from '../lib/cosmetics'
 import {
-  getLevelFromExp,
-  getLevelProgress,
-  getExpToNextLevel,
+  getCharacterLevel,
+  getCharacterLevelProgress,
+  getCharacterExpToNextLevel,
   MAX_LEVEL,
 } from '../data/levelProgression'
 
@@ -170,11 +170,9 @@ export default class CharacterProfileScene extends BaseScene {
       space: { item: Space.pad },
     })
 
-    const avatarExp =
-      UserSettings._get('avatarExperience')[this.selectedAvatar] || 0
-    const levelData = getLevelFromExp(avatarExp)
-    const progress = getLevelProgress(avatarExp)
-    const expToNext = getExpToNextLevel(avatarExp)
+    const level = getCharacterLevel(this.selectedAvatar).level
+    const progress = getCharacterLevelProgress(this.selectedAvatar)
+    const expToNext = getCharacterExpToNextLevel(this.selectedAvatar)
 
     this.expBar = this.add
       .rexLineProgress({
@@ -192,9 +190,9 @@ export default class CharacterProfileScene extends BaseScene {
     this.expLabel = this.add.text(
       0,
       0,
-      levelData.level === MAX_LEVEL
-        ? `Level ${levelData.level} (MAX)`
-        : `Level ${levelData.level} - ${expToNext} EXP to next\nClick to unlock TODO UNLOCKS`,
+      level === MAX_LEVEL
+        ? `Level ${level} (MAX)`
+        : `Level ${level} - ${expToNext} EXP to next\nClick to unlock TODO UNLOCKS`,
       {
         ...Style.basic,
         fontSize: '16px',
@@ -227,15 +225,15 @@ export default class CharacterProfileScene extends BaseScene {
   private updateProgressBar() {
     const avatarExp =
       UserSettings._get('avatarExperience')[this.selectedAvatar] || 0
-    const levelData = getLevelFromExp(avatarExp)
-    const progress = getLevelProgress(avatarExp)
-    const expToNext = getExpToNextLevel(avatarExp)
+    const level = getCharacterLevel(avatarExp).level
+    const progress = getCharacterLevelProgress(avatarExp)
+    const expToNext = getCharacterExpToNextLevel(avatarExp)
 
     this.expBar.setValue(progress)
     this.expLabel.setText(
-      levelData.level === MAX_LEVEL
-        ? `Level ${levelData.level} (MAX)`
-        : `Level ${levelData.level} - ${expToNext} EXP to next`,
+      level === MAX_LEVEL
+        ? `Level ${level} (MAX)`
+        : `Level ${level} - ${expToNext} EXP to next`,
     )
   }
 }

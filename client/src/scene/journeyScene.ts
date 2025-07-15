@@ -15,14 +15,13 @@ import newScrollablePanel from '../lib/scrollablePanel'
 import { MechanicsSettings } from '../../../shared/settings'
 import Button from '../lib/buttons/button'
 import {
-  getLevelFromExp,
-  getLevelProgress,
-  getExpToNextLevel,
+  getCharacterLevel,
+  getCharacterLevelProgress,
+  getCharacterExpToNextLevel,
   MAX_LEVEL,
-  MAX_EXP,
-  getNextUnlock,
 } from '../data/levelProgression'
 import Card from '../../../shared/state/card'
+import getUnlockedCards from '../data/journeyCardInventory'
 
 export default class JourneyScene extends BaseScene {
   // Mission details
@@ -383,17 +382,12 @@ export default class JourneyScene extends BaseScene {
     // Create the decklist with each card you can add
     this.cardPool = new Decklist(this, this.onClickCardPool())
 
-    const cardSet = new Set<Card>()
-    // Devs have all cards unlocked
+    const cardSet: Set<Card> = getUnlockedCards()
+
+    // Enable dev flag to have all cards
     if (Flags.devCardsEnabled) {
       Catalog.collectibleCards.forEach((card) => {
         cardSet.add(card)
-      })
-    } else {
-      UserSettings._get('inventory').forEach((isPresent, index) => {
-        if (isPresent) {
-          cardSet.add(Catalog.getCardById(index))
-        }
       })
     }
 
@@ -650,15 +644,12 @@ export default class JourneyScene extends BaseScene {
 
       // Get the right mission based off this avatar's exp
       const avatarExp = UserSettings._get('avatarExperience')[idx] || 0
-      const levelData = getLevelFromExp(avatarExp)
+      const level = getCharacterLevel(avatarExp).level
       const avatarMissionTrack = JOURNEY_MISSIONS[idx]
 
       // Use level to determine mission index (level 1 = index 0, etc.)
       // Clamp to available missions
-      const missionIndex = Math.min(
-        levelData.level - 1,
-        avatarMissionTrack.length - 1,
-      )
+      const missionIndex = Math.min(level - 1, avatarMissionTrack.length - 1)
       const mission = avatarMissionTrack[missionIndex]
 
       results.push([mission, idx])
@@ -670,10 +661,9 @@ export default class JourneyScene extends BaseScene {
 
   // Set the exp bar for the given avatar
   private getExpBarSizer(avatarID: number): Sizer {
-    const avatarExp = UserSettings._get('avatarExperience')[avatarID] || 0
-    const levelData = getLevelFromExp(avatarExp)
-    const progress = getLevelProgress(avatarExp)
-    const expToNext = getExpToNextLevel(avatarExp)
+    const level = getCharacterLevel(avatarID).level
+    const progress = getCharacterLevelProgress(avatarID)
+    const expToNext = getCharacterExpToNextLevel(avatarID)
 
     const expBar = this.add
       .rexLineProgress({
@@ -691,9 +681,9 @@ export default class JourneyScene extends BaseScene {
     const expLabel = this.add.text(
       0,
       0,
-      levelData.level === MAX_LEVEL
-        ? `Level ${levelData.level} (MAX)`
-        : `Level ${levelData.level} - ${expToNext} EXP to next`,
+      level === MAX_LEVEL
+        ? `Level ${level} (MAX)`
+        : `Level ${level} - ${expToNext} EXP to next`,
       {
         ...Style.basic,
         fontSize: '16px',
