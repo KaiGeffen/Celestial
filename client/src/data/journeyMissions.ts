@@ -182,7 +182,14 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
         `4`,
         `5 let's go bay-beeeee`,
       ],
-      deck: [21, 20, 20, 17, 17],
+
+      deck: [
+        ...x('Stars', 3),
+        ...x('Impulse', 5),
+        ...x('Dash', 1),
+        ...x('Mercy', 2),
+        ...x('Veteran', 2),
+      ],
       opponentDeck: [1, 1, 1],
       winText: 'Fire stuff idk...',
       loseText: 'I have burned too bright!',
@@ -198,7 +205,13 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
         `The inferno rages.`,
         `I am the fire.`,
       ],
-      deck: [0, 0, 0, 3, 3, 3, 3, 6, 14, 14, 14, 17, 17],
+
+      deck: [
+        ...x('Stars', 2),
+        ...x('Impulse', 5),
+        ...x('Arsonist', 2),
+        ...x('Veteran', 2),
+      ],
       opponentDeck: [11, 11, 11, 11, 7, 7, 7, 4, 4, 4, 4, 4, 4, 0, 0],
       winText: 'The fire consumes all.',
       loseText: 'The spark still smolders.',
@@ -214,7 +227,13 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
         `I am the bringer of death.`,
         `From ashes, new life will grow.`,
       ],
-      deck: [0, 0, 3, 3, 3, 3, 6, 14, 14, 14, 17, 17, 21],
+
+      deck: [
+        ...x('Impulse', 5),
+        ...x('Arsonist', 2),
+        ...x('Veteran', 2),
+        ...x('Death', 1),
+      ],
       opponentDeck: [5, 5, 5, 3, 3, 3, 6, 12, 14, 14, 13, 13, 17, 17, 17],
       winText: 'Death has claimed another.',
       loseText: 'The fire still burns within.',
@@ -230,13 +249,19 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
         `I cling to hope.`,
         `From ashes, I rise.`,
       ],
-      deck: [14, 14, 14, 17, 17, 20, 20, 21],
+
+      deck: [
+        ...x('Stars', 2),
+        ...x('Arsonist', 3),
+        ...x('Cling', 2),
+        ...x('Death', 1),
+      ],
       opponentDeck: [56, 51, 51, 11, 12, 7, 7, 7, 4, 4, 4, 4, 4, 0, 0],
       winText: 'I cling to life and victory.',
       loseText: 'The ashes still hold potential.',
     },
     {
-      selectText: 'Bonus: Drown',
+      selectText: 'Mine',
       missionText: `Sometimes the fire meets water, and everything drowns in the conflict. The heat and the cold battle for dominance, and I am caught in the middle.`,
       uponRoundWinText: [
         `The fire meets water.`,
@@ -246,7 +271,13 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
         `I am submerged in chaos.`,
         `I will not drown.`,
       ],
-      deck: [21, 17, 17, 5, 5, 5, 0, 0],
+
+      deck: [
+        ...x('Impulse', 4),
+        ...x('Mine', 2),
+        ...x('Cling', 2),
+        ...x('Death', 1),
+      ],
       opponentDeck: [56, 65, 65, 51, 12, 12, 7, 7, 7, 4, 4, 4, 4, 4, 4],
       winText: 'I have conquered the depths.',
       loseText: 'The water has claimed me.',
