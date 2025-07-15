@@ -1,6 +1,8 @@
 import Card from '../card'
 import { Quality } from '../quality'
 import GameModel from '../gameModel'
+import { Zone } from '../zone'
+import { Animation } from '../../animation'
 // import { wound } from './tokens'
 
 class Dagger extends Card {
@@ -135,21 +137,28 @@ const hurricane = new Hurricane({
 
 class WingClipping extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    // Worth 2 less for each card in the opponent's hand
-    bonus -= 2 * game.hand[player ^ 1].length
-
     super.play(player, game, index, bonus)
 
-    // The opponent discards 2 cards
-    game.discard(player ^ 1, 2)
+    if (game.hand[player ^ 1].length > 0) {
+      const card = game.hand[player ^ 1].shift()
+      game.deck[player ^ 1].push(card)
+
+      game.animations[player ^ 1].push(
+        new Animation({
+          from: Zone.Hand,
+          to: Zone.Deck,
+          card: card,
+        }),
+      )
+    }
   }
 }
 const wingClipping = new WingClipping({
   name: 'Wing Clipping',
   id: 16,
   cost: 5,
-  points: 6,
-  text: "Worth -2 for each card in the opponent's hand. Your opponent discards 2 cards.",
+  points: 4,
+  text: 'Your opponent puts the leftmost card of their hand on top of their deck.',
   story:
     'We walked and ran and played then\nYou leave me behind\nI gasp as the space between us grows',
 })
