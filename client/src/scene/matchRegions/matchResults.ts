@@ -2,14 +2,7 @@ import 'phaser'
 
 import Region from './baseRegion'
 
-import {
-  Space,
-  Color,
-  Style,
-  BBStyle,
-  Depth,
-  Flags,
-} from '../../settings/settings'
+import { Space, Color, Style, BBStyle, Depth } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import GameModel from '../../../../shared/state/gameModel'
 import avatarNames from '../../lib/avatarNames'

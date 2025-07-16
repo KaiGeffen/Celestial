@@ -180,13 +180,9 @@ export default class HomeScene extends BaseScene {
       x: Space.pad * 2 + Space.iconSize * 1.5,
       y: Space.pad + Space.iconSize * 0.5,
       f: () => {
-        if (UserDataServer.isLoggedIn()) {
-          this.scene.start('CharacterProfileScene')
-        } else {
-          this.signalError('Must be signed in.')
-        }
+        this.scene.start('CharacterProfileScene')
       },
-      hint: 'Friends',
+      hint: 'Characters',
       muteClick: true,
     })
 

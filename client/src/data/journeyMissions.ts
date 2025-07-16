@@ -23,7 +23,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
   [
     {
       selectText: 'Help me find my truth!',
-      missionText: `Don't hold back. The only thing you owe anyone is your truth.`,
+      missionText: `This is placeholder text. For the first mission, your entire deck is decided for you.`,
       uponRoundWinText: [
         `I won't stop until I know the truth.`,
         '1',
@@ -46,7 +46,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
     },
     {
       selectText: 'Blank Canvas',
-      missionText: `mission text goes here uwu`,
+      missionText: `Now you select more cards for the deck.`,
       uponRoundWinText: [
         `The blank canvas remains...`,
         `Maybe there's something worth painting.`,
