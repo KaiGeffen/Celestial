@@ -5,15 +5,7 @@ import type { CredentialResponse } from 'google-one-tap'
 import type { GoogleJwtPayload } from '../types/google'
 import Loader from '../loader/loader'
 import UserDataServer from '../network/userDataServer'
-import {
-  Color,
-  Space,
-  Style,
-  BBStyle,
-  Url,
-  UserSettings,
-  Flags,
-} from '../settings/settings'
+import { Space, Url, UserSettings, Flags } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 import ensureMusic from '../loader/audioManager'

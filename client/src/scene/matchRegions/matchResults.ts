@@ -44,6 +44,9 @@ export default class MatchResultsRegion extends Region {
     this.createContent()
     this.createButtons()
 
+    // Start hidden
+    this.hide()
+
     return this
   }
 
@@ -122,30 +125,27 @@ export default class MatchResultsRegion extends Region {
       y: `50%-${Space.pad + Space.buttonHeight / 2}`,
     })
 
-    // Exit
-    new Buttons.Basic({
-      within: container,
-      text: 'Exit Match',
-      x: (Space.pad + Space.buttonWidth) / 2,
-      f: () => {
-        this.scene.beforeExit()
-        this.scene.scene.start('BuilderScene')
-      },
-    })
-
-    // Replay
-    // new Buttons.Basic({
-    //   within: container,
-    //   text: 'Play Again',
-    //   f: this.newMatchCallback(),
-    // })
-
     // Review
     new Buttons.Basic({
       within: container,
       text: 'Hide',
-      x: -(Space.pad + Space.buttonWidth) / 2,
+      x: -(Space.pad + Space.buttonWidth),
       f: this.reviewCallback(),
+    })
+
+    // Replay
+    new Buttons.Basic({
+      within: container,
+      text: 'Play Again',
+      f: this.newMatchCallback(),
+    })
+
+    // Exit
+    new Buttons.Basic({
+      within: container,
+      text: 'Exit Match',
+      x: Space.pad + Space.buttonWidth,
+      f: this.scene.doExit(),
     })
   }
 
@@ -268,7 +268,7 @@ export default class MatchResultsRegion extends Region {
     }
   }
 
-  private reviewCallback(): () => void {
+  protected reviewCallback(): () => void {
     return () => {
       this.hide()
     }
@@ -325,7 +325,6 @@ import { MatchScene } from '../matchScene'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
-import Button from 'phaser3-rex-plugins/templates/ui/click/Click'
 
 export class ResultsRegionTutorial extends MatchResultsRegion {
   missionID: number
@@ -356,5 +355,31 @@ export class ResultsRegionTutorial extends MatchResultsRegion {
         })
       }
     }
+  }
+}
+
+export class ResultsRegionJourney extends MatchResultsRegion {
+  protected createButtons() {
+    const container = this.scene.add.container()
+    this.container.add(container)
+    this.scene.plugins.get('rexAnchor')['add'](container, {
+      y: `50%-${Space.pad + Space.buttonHeight / 2}`,
+    })
+
+    // Review
+    new Buttons.Basic({
+      within: container,
+      text: 'Hide',
+      x: -(Space.pad + Space.buttonWidth) / 2,
+      f: this.reviewCallback(),
+    })
+
+    // Exit
+    new Buttons.Basic({
+      within: container,
+      text: 'Exit Match',
+      x: (Space.pad + Space.buttonWidth) / 2,
+      f: this.scene.doExit(),
+    })
   }
 }

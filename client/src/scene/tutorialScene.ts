@@ -50,7 +50,6 @@ export default class TutorialMatchScene extends JourneyMatchScene {
     // Replace the results screen with tutorial results
     this.view.results = new ResultsRegionTutorial().create(this)
     this.view.results['missionID'] = this.params.missionID + 1
-    this.view.results.hide()
 
     // Replace the searching screen with still frames
     this.view.searching.hide()

@@ -25,6 +25,7 @@ import StoryRegion from './matchRegions/story'
 import OurScoreRegion from './matchRegions/ourScore'
 import MulliganRegion from './matchRegions/mulliganRegion'
 import CompanionRegion from './matchRegions/companion'
+import { ResultsRegionJourney } from './matchRegions/matchResults'
 
 export class MatchScene extends BaseScene {
   params: any
@@ -444,9 +445,7 @@ export class View {
     // These regions are only visible during certain times
     this.mulligan = new Regions.Mulligan().create(scene)
 
-    // Results are visible after the game is over
     this.results = new Regions.MatchResults().create(scene)
-    this.results.hide()
 
     this.animator = new Animator(scene, this)
 
@@ -570,6 +569,13 @@ export class StandardMatchScene extends MatchScene {
 
     super.signalMatchFound(name1, name2, elo1, elo2)
   }
+
+  doExit(): () => void {
+    return () => {
+      this.beforeExit()
+      this.scene.start('BuilderScene')
+    }
+  }
 }
 
 // TODO Move to another file
@@ -593,6 +599,9 @@ export class JourneyMatchScene extends MatchScene {
 
   create() {
     super.create()
+
+    // Replace the results screen with journey version
+    this.view.results = new ResultsRegionJourney().create(this)
 
     // Ensure that experience is only gained once
     this.winExpGained = false
