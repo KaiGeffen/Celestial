@@ -126,22 +126,25 @@ export default class MatchResultsRegion extends Region {
     new Buttons.Basic({
       within: container,
       text: 'Exit Match',
-      x: Space.pad + Space.buttonWidth,
-      f: this.scene.doExit(),
+      x: (Space.pad + Space.buttonWidth) / 2,
+      f: () => {
+        this.scene.beforeExit()
+        this.scene.scene.start('BuilderScene')
+      },
     })
 
     // Replay
-    new Buttons.Basic({
-      within: container,
-      text: 'Play Again',
-      f: this.newMatchCallback(),
-    })
+    // new Buttons.Basic({
+    //   within: container,
+    //   text: 'Play Again',
+    //   f: this.newMatchCallback(),
+    // })
 
     // Review
     new Buttons.Basic({
       within: container,
       text: 'Hide',
-      x: -Space.pad - Space.buttonWidth,
+      x: -(Space.pad + Space.buttonWidth) / 2,
       f: this.reviewCallback(),
     })
   }
@@ -322,6 +325,7 @@ import { MatchScene } from '../matchScene'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
+import Button from 'phaser3-rex-plugins/templates/ui/click/Click'
 
 export class ResultsRegionTutorial extends MatchResultsRegion {
   missionID: number
