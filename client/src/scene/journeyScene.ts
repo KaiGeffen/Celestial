@@ -114,7 +114,12 @@ export default class JourneyScene extends BaseScene {
       // Exp bar
       const expBarSizer = this.getExpBarSizer(avatarIndex)
 
-      const text = this.add.text(0, 0, mission.selectText, Style.basic)
+      const text = this.add.text(
+        0,
+        0,
+        mission.selectText,
+        Style.todoJourneyTitle,
+      )
 
       // Select button
       const btnContainer = new ContainerLite(

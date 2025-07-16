@@ -183,7 +183,6 @@ export default class HomeScene extends BaseScene {
         this.scene.start('CharacterProfileScene')
       },
       hint: 'Characters',
-      muteClick: true,
     })
 
     // Second row

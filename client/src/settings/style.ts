@@ -170,6 +170,13 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     stroke: Color.blackS,
     strokeThickness: 3,
   },
+  todoJourneyTitle: {
+    fontFamily: mainFont,
+    fontSize: '26px',
+    color: Color.basicText,
+    stroke: Color.whiteS,
+    strokeThickness: 2,
+  },
 }
 
 // The styling for BBCode objects, from the rexui module

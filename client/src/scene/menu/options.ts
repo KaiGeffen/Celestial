@@ -389,6 +389,7 @@ export default class OptionsMenu extends Menu {
           hint: 'skip the tutorial',
         })
       },
+      muteClick: true,
     })
     sizer.add(container)
 
