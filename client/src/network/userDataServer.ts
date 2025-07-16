@@ -1,7 +1,7 @@
 import 'phaser'
 
 import Card from '../../../shared/state/card'
-import { Flags, UserSettings } from '../settings/settings'
+import { Flags, Url, UserSettings } from '../settings/settings'
 import BaseScene from '../scene/baseScene'
 import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 import {
@@ -172,7 +172,7 @@ export default class UserDataServer {
     console.log('Logging out')
 
     // Clear the sign-in token
-    localStorage.removeItem('gsi_token')
+    localStorage.removeItem(Url.gsi_token)
 
     if (UserDataServer.isLoggedIn()) {
       console.log('server was logged in and now its logging out...')

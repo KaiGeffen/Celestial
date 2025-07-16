@@ -20,8 +20,6 @@ import ensureMusic from '../loader/audioManager'
 import Cinematic from '../lib/cinematic'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
-const GSI_TOKEN_KEY = 'gsi_token_v2'
-
 // Scene for user to select a sign in option, without loading assets
 export class SigninScene extends Phaser.Scene {
   // Allows for typing objects in RexUI library
@@ -45,7 +43,7 @@ export class SigninScene extends Phaser.Scene {
     Cinematic.ensure()
 
     // If user is signed in, log them in
-    const storedToken = localStorage.getItem(GSI_TOKEN_KEY)
+    const storedToken = localStorage.getItem(Url.gsi_token)
     if (storedToken !== null) {
       const payload = jwt_decode<GoogleJwtPayload>(storedToken)
       UserDataServer.login(payload, this.game, () => this.onOptionClick())
@@ -75,7 +73,7 @@ export class SigninScene extends Phaser.Scene {
       depth: -1,
     })
       // Hide the guest button if user is already signed in
-      .setVisible(localStorage.getItem(GSI_TOKEN_KEY) === null)
+      .setVisible(localStorage.getItem(Url.gsi_token) === null)
 
     this.plugins.get('rexAnchor')['add'](guestButtonContainer, {
       x: `50%`,
@@ -89,7 +87,9 @@ export class SigninScene extends Phaser.Scene {
     this.signedInOrGuest = true
 
     // Make the buttons unclickable
-    this.guestButton.disable()
+    if (this.guestButton) {
+      this.guestButton.disable()
+    }
     document.getElementById('signin').hidden = true
 
     // Ensure that music is playing
@@ -108,7 +108,7 @@ export class SigninScene extends Phaser.Scene {
       auto_select: true,
       callback: (token: CredentialResponse) => {
         // Store the token for next time
-        localStorage.setItem(GSI_TOKEN_KEY, token.credential)
+        localStorage.setItem(Url.gsi_token, token.credential)
 
         const payload = jwt_decode<GoogleJwtPayload>(token.credential)
 

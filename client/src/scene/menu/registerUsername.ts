@@ -143,6 +143,8 @@ export class RegisterUsernameMenu extends Menu {
       .addSpace()
       .add(this.createDiscordButton())
       .addSpace()
+      .add(this.createPrivacyPolicyButton())
+      .addSpace()
       .add(this.createConfirmButton())
 
     return sizer
@@ -182,10 +184,28 @@ export class RegisterUsernameMenu extends Menu {
       Space.buttonHeight,
     )
 
-    let discordButton = new Buttons.Basic({
+    new Buttons.Basic({
       within: container,
       text: 'Discord',
       f: () => window.open(Url.discord, '_blank'),
+    })
+
+    return container
+  }
+
+  private createPrivacyPolicyButton() {
+    let container = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+
+    new Buttons.Basic({
+      within: container,
+      text: 'Privacy',
+      f: () => window.open(Url.privacyPolicy, '_blank'),
     })
 
     return container
