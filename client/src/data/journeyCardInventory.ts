@@ -65,7 +65,7 @@ const UNLOCKS_PER_CHARACTER = [
   ],
   // Imani
   [
-    [Catalog.getCard('Nascence')],
+    [Catalog.getCard('Nascence'), Catalog.getCard('Hug')],
     [Catalog.getCard('Birth')],
     [Catalog.getCard('The Future')],
     [Catalog.getCard('Posterity')],
