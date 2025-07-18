@@ -15,7 +15,7 @@
 html,
 body {
   min-height: 100%;
-  background: url("assets/background.jpg") center/cover fixed no-repeat;
+  background: url('assets/background.jpg') center/cover fixed no-repeat;
 }
 
 .hero {
@@ -35,9 +35,10 @@ body {
 
 .header {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 0;
   right: 0;
+  transform: translateY(-50%);
   text-align: center;
 }
 
@@ -68,14 +69,14 @@ body {
 }
 
 h2 {
-  font-family: "Cinzel", serif;
-  font-size: 50px;
+  font-family: 'Recoleta', serif;
+  font-size: 30px;
   color: var(--color-navy);
 }
 
 .landing-p {
-  font-family: "Mulish", sans-serif;
-  font-size: 30px;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 22px;
   font-weight: bold;
   color: var(--color-navy);
   line-height: 1.5;
@@ -83,8 +84,9 @@ h2 {
 }
 
 p {
-  font-family: "Mulish", sans-serif;
+  font-family: 'Josefin Sans', sans-serif;
   font-size: 30px;
+  font-weight: 300;
   color: var(--color-navy);
 }
 
@@ -113,15 +115,16 @@ p {
 }
 
 .about-title {
-  font-family: "Cinzel", serif;
+  font-family: 'Recoleta', serif;
   font-size: 64px;
   color: var(--color-black);
   margin-bottom: 20px;
 }
 
 .about-subtitle {
-  font-family: "Mulish", sans-serif;
+  font-family: 'Josefin Sans', sans-serif;
   font-size: 24px;
+  font-weight: 300;
   color: var(--color-navy);
   margin-bottom: 30px;
 }
@@ -152,15 +155,16 @@ p {
 }
 
 .newsletter-title {
-  font-family: "Cinzel", serif;
+  font-family: 'Recoleta', serif;
   font-size: 48px;
   color: var(--color-gold);
   margin-bottom: 20px;
 }
 
 .newsletter-text {
-  font-family: "Mulish", sans-serif;
+  font-family: 'Josefin Sans', sans-serif;
   font-size: 24px;
+  font-weight: 300;
   color: var(--color-gold);
   max-width: 600px;
   margin-bottom: 30px;
@@ -181,14 +185,16 @@ p {
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 18px;
-  font-family: "Mulish", sans-serif;
+  font-family: 'Josefin Sans', sans-serif;
+  font-weight: 300;
 }
 
 .signup-button {
   background: var(--color-gold);
   color: var(--color-navy);
-  font-family: "Mulish", sans-serif;
+  font-family: 'Josefin Sans', sans-serif;
   font-size: 24px;
+  font-weight: 400;
   padding: 12px 40px;
   border: none;
   border-radius: 8px;
@@ -221,6 +227,7 @@ p {
 
 .feature p {
   font-size: 24px;
+  font-weight: 300;
   margin-bottom: 24px;
 }
 
@@ -245,8 +252,9 @@ p {
 }
 
 .social-link {
-  font-family: "Cinzel", serif;
+  font-family: 'Josefin Sans', sans-serif;
   font-size: 32px;
+  font-weight: 300;
   color: var(--color-gold);
   text-decoration: none;
   transition: transform 0.2s;
@@ -259,8 +267,9 @@ p {
 .signup-message {
   margin-top: 1rem;
   text-align: center;
-  font-family: "Mulish", sans-serif;
+  font-family: 'Josefin Sans', sans-serif;
   font-size: 0.9rem;
+  font-weight: 300;
 }
 
 /* Mobile Responsiveness */
