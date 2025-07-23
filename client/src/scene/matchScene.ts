@@ -639,11 +639,11 @@ export class JourneyMatchScene extends MatchScene {
 
     // Display the upon round win text, then ensure it doesn't show again
     if (!state.isRecap && state.mulligansComplete.every((m) => m)) {
-      const s = this.uponRoundWinText[state.wins[0]]
-      if (s) {
-        this.signalError(s)
-        this.uponRoundWinText[state.wins[0]] = undefined
-      }
+      // const s = this.uponRoundWinText[state.wins[0]]
+      // if (s) {
+      //   this.signalError(s)
+      //   this.uponRoundWinText[state.wins[0]] = undefined
+      // }
     }
 
     return result
