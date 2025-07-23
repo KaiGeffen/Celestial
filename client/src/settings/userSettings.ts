@@ -85,6 +85,8 @@ export class UserSettings {
         Server.sendInventory(value)
       } else if (key === 'completedMissions') {
         Server.sendCompletedMissions(value)
+      } else if (key === 'avatarExperience') {
+        Server.sendAvatarExperience(value)
       }
     } else {
       localStorage.setItem(key, JSON.stringify(value))

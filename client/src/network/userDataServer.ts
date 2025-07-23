@@ -123,6 +123,7 @@ export default class UserDataServer {
         (data: {
           inventory: string
           completedMissions: string
+          avatarExperience: number[]
           decks: Deck[]
           username: string
           elo: number
@@ -231,6 +232,17 @@ export default class UserDataServer {
     })
   }
 
+  // Send server user's experience with each avatar
+  static sendAvatarExperience(experience: number[]): void {
+    if (wsServer === undefined) {
+      throw 'Sending avatar experience when server ws doesnt exist.'
+    }
+    wsServer.send({
+      type: 'sendAvatarExperience',
+      experience: experience,
+    })
+  }
+
   // Send server user's list of completed missions
   static purchaseItem(id: number, cost: number): void {
     if (wsServer === undefined) {
@@ -323,6 +335,7 @@ export default class UserDataServer {
   private static loadUserData(data: {
     inventory: string
     completedMissions: string
+    avatarExperience: number[]
     decks: Deck[]
     username: string
     elo: number
@@ -350,6 +363,10 @@ export default class UserDataServer {
     )
 
     sessionStorage.setItem('decks', JSON.stringify(data.decks))
+    sessionStorage.setItem(
+      'avatarExperience',
+      JSON.stringify(data.avatarExperience),
+    )
   }
 
   // TODO Clarify if we reuse a UserSessionWS or create a new ws even for signed in users
