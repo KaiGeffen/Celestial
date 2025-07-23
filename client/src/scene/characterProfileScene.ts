@@ -13,6 +13,7 @@ import {
   getCharacterExpToNextLevel,
   MAX_LEVEL,
 } from '../data/levelProgression'
+import avatarDescriptions from '../data/avatarDescriptions'
 
 export default class CharacterProfileScene extends BaseScene {
   // Character details
@@ -218,7 +219,7 @@ export default class CharacterProfileScene extends BaseScene {
   private updateCharacterText() {
     this.txtCharacterName.setText(avatarNames[this.selectedAvatar])
     this.txtCharacterDescription.setText(
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      avatarDescriptions[this.selectedAvatar],
     )
   }
 
