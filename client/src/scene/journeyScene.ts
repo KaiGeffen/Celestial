@@ -381,7 +381,17 @@ export default class JourneyScene extends BaseScene {
   private createDecklist() {
     this.decklist = new Decklist(this, this.onClickCutout())
 
-    return this.decklist.sizer
+    // Create a scrollable panel for the main decklist
+    const panel = newScrollablePanel(this, {
+      width: Space.cutoutWidth,
+      height: Space.windowHeight - 420,
+      scrollMode: 'vertical',
+      panel: {
+        child: this.decklist.sizer,
+      },
+    })
+
+    return panel
   }
 
   private createCardPool(): Sizer {
