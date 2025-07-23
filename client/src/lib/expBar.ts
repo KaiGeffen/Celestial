@@ -42,7 +42,7 @@ export function createExpBar(
       maxLevel: MAX_LEVEL,
       exp: currentExp,
     },
-    easeDuration: 1000,
+    easeDuration: 2000,
   })
 
   // Gain the exp

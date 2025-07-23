@@ -169,10 +169,9 @@ export default class CharacterProfileScene extends BaseScene {
     this.updateCharacterText()
 
     // Update progress bar
-    this.expBar.setExp(0)
-    // this.expBar.setExp(
-    //   UserSettings._get('avatarExperience')[this.selectedAvatar],
-    // )
+    this.expBar.resetExp(
+      UserSettings._get('avatarExperience')[this.selectedAvatar] || 0,
+    )
   }
 
   private updateCharacterText() {
