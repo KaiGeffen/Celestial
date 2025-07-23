@@ -7,13 +7,10 @@ import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import avatarNames from '../lib/avatarNames'
 import AvatarButton from '../lib/buttons/avatar'
 import { getUnlockedAvatars } from '../lib/cosmetics'
-import {
-  getCharacterLevel,
-  getCharacterLevelProgress,
-  getCharacterExpToNextLevel,
-  MAX_LEVEL,
-} from '../data/levelProgression'
 import avatarDescriptions from '../data/avatarDescriptions'
+import { createExpBar } from '../lib/expBar'
+import ExpBar from 'phaser3-rex-plugins/templates/ui/expbar/ExpBar'
+import { getCharacterLevel } from '../data/levelProgression'
 
 export default class CharacterProfileScene extends BaseScene {
   // Character details
@@ -22,8 +19,7 @@ export default class CharacterProfileScene extends BaseScene {
   avatar: AvatarButton
   txtCharacterName: Phaser.GameObjects.Text
   txtCharacterDescription: Phaser.GameObjects.Text
-  expBar: any
-  expLabel: Phaser.GameObjects.Text
+  expBar: ExpBar
 
   // Views
   sizer: Sizer
@@ -90,11 +86,11 @@ export default class CharacterProfileScene extends BaseScene {
     // Create character description
     const descriptionSizer = this.createDescription()
 
-    // Create progress bar
-    const progressSizer = this.createProgressBar()
+    // Create exp bar
+    this.expBar = createExpBar(this, this.selectedAvatar)
 
     // Add all elements to the right sizer
-    sizer.add(avatarSizer).add(descriptionSizer).add(progressSizer)
+    sizer.add(avatarSizer).add(descriptionSizer).add(this.expBar)
 
     return sizer
   }
@@ -165,46 +161,6 @@ export default class CharacterProfileScene extends BaseScene {
     return sizer
   }
 
-  private createProgressBar(): Sizer {
-    const sizer = this.rexUI.add.sizer({
-      orientation: 'vertical',
-      space: { item: Space.pad },
-    })
-
-    const level = getCharacterLevel(this.selectedAvatar).level
-    const progress = getCharacterLevelProgress(this.selectedAvatar)
-    const expToNext = getCharacterExpToNextLevel(this.selectedAvatar)
-
-    this.expBar = this.add
-      .rexLineProgress({
-        width: 400,
-        height: 10,
-        barColor: Color.progressBar,
-        trackColor: Color.progressBarTrack,
-        trackStrokeColor: Color.progressBarTrackStroke,
-        trackStrokeThickness: 4,
-        value: progress,
-        valuechangeCallback: () => {},
-      })
-      .setAlpha(0.4)
-
-    this.expLabel = this.add.text(
-      0,
-      0,
-      level === MAX_LEVEL
-        ? `Level ${level} (MAX)`
-        : `Level ${level} - ${expToNext} EXP to next`,
-      {
-        ...Style.basic,
-        fontSize: '16px',
-      },
-    )
-
-    sizer.add(this.expBar).add(this.expLabel)
-
-    return sizer
-  }
-
   private updateCharacterView() {
     // Update the full art image
     this.fullAvatar.setTexture(`avatar-${avatarNames[this.selectedAvatar]}Full`)
@@ -213,26 +169,16 @@ export default class CharacterProfileScene extends BaseScene {
     this.updateCharacterText()
 
     // Update progress bar
-    this.updateProgressBar()
+    this.expBar.setExp(0)
+    // this.expBar.setExp(
+    //   UserSettings._get('avatarExperience')[this.selectedAvatar],
+    // )
   }
 
   private updateCharacterText() {
     this.txtCharacterName.setText(avatarNames[this.selectedAvatar])
     this.txtCharacterDescription.setText(
       avatarDescriptions[this.selectedAvatar],
-    )
-  }
-
-  private updateProgressBar() {
-    const level = getCharacterLevel(this.selectedAvatar).level
-    const progress = getCharacterLevelProgress(this.selectedAvatar)
-    const expToNext = getCharacterExpToNextLevel(this.selectedAvatar)
-
-    this.expBar.setValue(progress)
-    this.expLabel.setText(
-      level === MAX_LEVEL
-        ? `Level ${level} (MAX)`
-        : `Level ${level} - ${expToNext} EXP to next`,
     )
   }
 }

@@ -1,10 +1,10 @@
 const avatarDescriptions = [
-  'Jules bio todo.',
-  'Adonis bio todo.',
-  'Mia bio todo.',
-  'Kitz bio todo.',
-  'Imani bio todo.',
-  'Mitra bio todo.',
+  'Jules bio coming soon.',
+  'Adonis bio coming soon.',
+  'Mia bio coming soon.',
+  'Kitz bio coming soon.',
+  'Imani bio coming soon.',
+  'Mitra bio coming soon.',
 ]
 
 export default avatarDescriptions

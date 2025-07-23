@@ -22,6 +22,7 @@ import {
 } from '../data/levelProgression'
 import Card from '../../../shared/state/card'
 import getUnlockedCards from '../data/journeyCardInventory'
+import { createExpBar } from '../lib/expBar'
 
 export default class JourneyScene extends BaseScene {
   // Mission details
@@ -112,7 +113,7 @@ export default class JourneyScene extends BaseScene {
       this.addShadow(image)
 
       // Exp bar
-      const expBarSizer = this.getExpBarSizer(avatarIndex)
+      const expBarSizer = createExpBar(this, avatarIndex)
 
       const text = this.add.text(
         0,
@@ -232,6 +233,7 @@ export default class JourneyScene extends BaseScene {
     // Contents
     const background = this.add.image(0, 0, 'background-Light').setInteractive()
     this.addShadow(background)
+
     const sizer = this.rexUI.add.sizer({
       orientation: 'vertical',
       space: {
@@ -240,15 +242,21 @@ export default class JourneyScene extends BaseScene {
         right: Space.pad,
       },
     })
+
     const title = this.add.text(0, 0, 'Story Complete!', Style.announcement)
+
     const txt = this.add.text(0, 0, postMatchText, Style.basic)
+
+    // Experience gained and associated info
     // TODO Progress bar / exp gained / unlocks unlocked
-    const txtExpGained = this.add.text(
-      0,
-      0,
-      `+${expGained} EXP Gained`,
-      Style.basic,
-    )
+    // const txtExpGained = this.add.text(
+    //   0,
+    //   0,
+    //   `+${expGained} EXP Gained`,
+    //   Style.basic,
+    // )
+    const expBarSizer = createExpBar(this, this.selectedAvatar, expGained)
+
     const btnContainer = new ContainerLite(
       this,
       0,
@@ -268,7 +276,8 @@ export default class JourneyScene extends BaseScene {
     sizer
       .add(title)
       .add(txt)
-      .add(txtExpGained)
+      // .add(txtExpGained)
+      .add(expBarSizer)
       .add(btnContainer)
       .addBackground(background)
       .layout()
@@ -602,44 +611,5 @@ export default class JourneyScene extends BaseScene {
 
     // We are guaranteeing 2 results in the above loop
     return results as [[JourneyMission, number], [JourneyMission, number]]
-  }
-
-  // Set the exp bar for the given avatar
-  private getExpBarSizer(avatarID: number): Sizer {
-    const level = getCharacterLevel(avatarID).level
-    const progress = getCharacterLevelProgress(avatarID)
-    const expToNext = getCharacterExpToNextLevel(avatarID)
-
-    const expBar = this.add
-      .rexLineProgress({
-        width: Space.avatarWidth - Space.pad * 2,
-        height: 10,
-        barColor: Color.progressBar,
-        trackColor: Color.progressBarTrack,
-        trackStrokeColor: Color.progressBarTrackStroke,
-        trackStrokeThickness: 4,
-        value: progress,
-        valuechangeCallback: () => {},
-      })
-      .setAlpha(0.4)
-
-    const expLabel = this.add.text(
-      0,
-      0,
-      level === MAX_LEVEL
-        ? `Level ${level} (MAX)`
-        : `Level ${level} - ${expToNext} EXP to next`,
-      {
-        ...Style.basic,
-        fontSize: '16px',
-      },
-    )
-
-    const sizer = this.rexUI.add.sizer({
-      orientation: 'vertical',
-    })
-    sizer.add(expBar).add(expLabel)
-
-    return sizer
   }
 }
