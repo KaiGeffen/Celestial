@@ -13,8 +13,7 @@ export const assetLists = {
       "JulesFull",
       "KitzFull",
       "MiaFull",
-      "MitraFull",
-      "old AdonisFull"
+      "MitraFull"
     ],
     "dimensions": {
       "Adonis": {

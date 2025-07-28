@@ -93,9 +93,9 @@ export default function getUnlockedCards(): Set<Card> {
   const unlockedCards = new Set<Card>()
 
   // Add starting cards
-  for (let i = 0; i < STARTING_CARDS.length; i++) {
-    unlockedCards.add(STARTING_CARDS[i])
-  }
+  STARTING_CARDS.forEach((card) => {
+    unlockedCards.add(card)
+  })
 
   // Add each card unlocked by level
   for (

@@ -112,8 +112,8 @@ export default class JourneyScene extends BaseScene {
       const image = this.add.image(0, 0, `avatar-${name}Full`)
       this.addShadow(image)
 
-      // Exp bar
-      const expBarSizer = createExpBar(this, avatarIndex)
+      // Experience bar
+      const expBar = createExpBar(this, avatarIndex)
 
       const text = this.add.text(
         0,
@@ -145,9 +145,9 @@ export default class JourneyScene extends BaseScene {
 
       const imageSizer = this.rexUI.add.sizer({
         orientation: 'vertical',
-        space: { item: -40 },
+        space: { item: -60 },
       })
-      imageSizer.add(image).add(expBarSizer)
+      imageSizer.add(image).add(expBar)
 
       sizer.add(imageSizer).add(text).add(btnContainer)
 
