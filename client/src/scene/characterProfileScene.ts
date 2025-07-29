@@ -1,6 +1,7 @@
 import 'phaser'
 import BaseScene from './baseScene'
 import { Style, Space, Color, UserSettings } from '../settings/settings'
+import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
@@ -11,6 +12,9 @@ import avatarDescriptions from '../data/avatarDescriptions'
 import { createExpBar } from '../lib/expBar'
 import ExpBar from 'phaser3-rex-plugins/templates/ui/expbar/ExpBar'
 import { getCharacterLevel } from '../data/levelProgression'
+import newScrollablePanel from '../lib/scrollablePanel'
+import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
+import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 
 export default class CharacterProfileScene extends BaseScene {
   // Character details
@@ -20,6 +24,8 @@ export default class CharacterProfileScene extends BaseScene {
   txtCharacterName: Phaser.GameObjects.Text
   txtCharacterDescription: Phaser.GameObjects.Text
   expBar: ExpBar
+  scrollablePanel: ScrollablePanel
+  storyButtons: Button[]
 
   // Views
   sizer: Sizer
@@ -32,6 +38,8 @@ export default class CharacterProfileScene extends BaseScene {
 
   create(): void {
     super.create()
+
+    this.storyButtons = []
 
     // Main sizer that takes up full page
     this.sizer = this.rexUI.add.sizer({
@@ -60,6 +68,9 @@ export default class CharacterProfileScene extends BaseScene {
       text: 'Back',
       f: () => this.scene.start('HomeScene'),
     })
+
+    // Set the starting info
+    this.updateCharacterView()
   }
 
   private createLeftSide(): Phaser.GameObjects.Image {
@@ -89,8 +100,11 @@ export default class CharacterProfileScene extends BaseScene {
     // Create exp bar
     this.expBar = createExpBar(this, this.selectedAvatar)
 
+    // Create slider
+    const slider = this.createSlider()
+
     // Add all elements to the right sizer
-    sizer.add(avatarSizer).add(descriptionSizer).add(this.expBar)
+    sizer.add(avatarSizer).add(descriptionSizer).add(this.expBar).add(slider)
 
     return sizer
   }
@@ -172,6 +186,16 @@ export default class CharacterProfileScene extends BaseScene {
     this.expBar.resetExp(
       UserSettings._get('avatarExperience')[this.selectedAvatar] || 0,
     )
+
+    // TODO Scroll to the right position to center the current level
+    // Update which buttons disabled
+    for (let i = 0; i < this.storyButtons.length; i++) {
+      if (i < this.expBar.level) {
+        this.storyButtons[i].enable()
+      } else {
+        this.storyButtons[i].disable()
+      }
+    }
   }
 
   private updateCharacterText() {
@@ -179,5 +203,63 @@ export default class CharacterProfileScene extends BaseScene {
     this.txtCharacterDescription.setText(
       avatarDescriptions[this.selectedAvatar],
     )
+  }
+
+  private createSlider() {
+    // Create a horizontal scrollable panel
+    const panel = this.rexUI.add.sizer({
+      space: {
+        left: Space.pad,
+        right: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+        item: Space.pad,
+      },
+    })
+
+    const scrollablePanel = newScrollablePanel(this, {
+      width: Space.windowWidth * (2 / 3),
+      height: 80,
+      panel: {
+        child: panel,
+      },
+      scrollMode: 'x',
+    })
+
+    // Add colored rectangles as mock content
+    this.addSizersToPanel(panel)
+
+    scrollablePanel.layout()
+
+    return scrollablePanel
+  }
+
+  private addSizersToPanel(panel: Sizer): void {
+    for (let i = 1; i < 10; i++) {
+      const cont = new ContainerLite(
+        this,
+        0,
+        0,
+        Space.buttonWidth,
+        Space.buttonHeight,
+      )
+      this.storyButtons.push(
+        new Buttons.Basic({
+          text: `Level ${i}`,
+          muteClick: true,
+          within: cont,
+          f: () => {
+            console.log('Level', i)
+            this.scene.launch('MenuScene', {
+              menu: 'message',
+              title: `${avatarNames[this.selectedAvatar]} Level ${i}`,
+              s: `You have reached level ${i}!`,
+            })
+          },
+        }),
+      )
+
+      panel.add(cont)
+    }
   }
 }

@@ -21,7 +21,8 @@ export default function newScrollablePanel(
     enableMobileScroll(panel, childPanel)
   } else {
     // Update this panel's scroll on mouse-wheel
-    updateOnScroll(panel, childPanel)
+    const isHorizontalScroll = config?.scrollMode !== 'x'
+    updateOnScroll(panel, childPanel, isHorizontalScroll)
   }
 
   // Add a shadow effect to the background if present
@@ -45,6 +46,7 @@ export default function newScrollablePanel(
 function updateOnScroll(
   panel: ScrollablePanel,
   childPanel: FixWidthSizer,
+  isHorizontalScroll: boolean,
 ): void {
   panel.scene.input.on(
     'wheel',
@@ -55,7 +57,7 @@ function updateOnScroll(
       }
 
       // Scroll panel down by amount wheel moved
-      panel.childOY -= dy
+      panel.childOY -= dx + dy
 
       // Ensure that panel isn't out bounds (Below 0% or above 100% scroll)
       panel.t = Math.max(0, panel.t)
