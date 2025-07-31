@@ -14,7 +14,7 @@ import ExpBar from 'phaser3-rex-plugins/templates/ui/expbar/ExpBar'
 import { getCharacterLevel } from '../data/levelProgression'
 import newScrollablePanel from '../lib/scrollablePanel'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
-import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
+import avatarStories from '../data/avatarStories'
 
 export default class CharacterProfileScene extends BaseScene {
   // Character details
@@ -190,7 +190,7 @@ export default class CharacterProfileScene extends BaseScene {
     // TODO Scroll to the right position to center the current level
     // Update which buttons disabled
     for (let i = 0; i < this.storyButtons.length; i++) {
-      if (i < this.expBar.level) {
+      if (i < this.expBar.level - 1) {
         this.storyButtons[i].enable()
       } else {
         this.storyButtons[i].disable()
@@ -249,11 +249,10 @@ export default class CharacterProfileScene extends BaseScene {
           muteClick: true,
           within: cont,
           f: () => {
-            console.log('Level', i)
             this.scene.launch('MenuScene', {
               menu: 'message',
-              title: `${avatarNames[this.selectedAvatar]} Level ${i}`,
-              s: `You have reached level ${i}!`,
+              title: `${avatarNames[this.selectedAvatar]} ${i}`,
+              s: avatarStories[this.selectedAvatar]?.[i - 1] || 'Coming soon',
             })
           },
         }),
