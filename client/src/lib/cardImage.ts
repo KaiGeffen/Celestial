@@ -11,6 +11,9 @@ import { Keywords } from '../../../shared/state/keyword'
 const statOffset1 = 26
 const statOffset2 = 77
 
+const COLOR_BETTER = '#55dd55'
+const COLOR_WORSE = '#e45555'
+
 export class CardImage {
   scene: BaseScene
 
@@ -170,11 +173,18 @@ export class CardImage {
 
   // Set the displayed cost of this card, don't change the cost if cost is null
   setCost(cost: number): this {
+    this.cost = cost
+
     if (cost !== null) {
-      this.cost = cost
-      this.txtCost.setText(
-        `[b][stroke=${Color.cardStatChanged}]${cost}[/stroke][/b]`,
-      )
+      this.txtCost.setText(cost)
+
+      if (this.card.cost > cost) {
+        this.txtCost.setColor(COLOR_BETTER)
+      } else if (this.card.cost < cost) {
+        this.txtCost.setColor(COLOR_WORSE)
+      } else {
+        this.txtCost.setColor(Color.cardText)
+      }
     }
     return this
   }
@@ -205,11 +215,17 @@ export class CardImage {
   }
 
   setPoints(amt: number): this {
-    if (this.card.points !== this.card.basePoints || this.card.beta) {
-      this.txtPoints.setText(
-        `[b][stroke=${Color.cardStatChanged}]${amt}[/stroke][/b]`,
-      )
+    this.txtPoints.setText(amt)
+
+    // Use the correct color
+    if (amt < this.card.basePoints) {
+      this.txtPoints.setColor(COLOR_WORSE)
+    } else if (amt > this.card.basePoints) {
+      this.txtPoints.setColor(COLOR_BETTER)
+    } else {
+      this.txtPoints.setColor(Color.cardText)
     }
+
     return this
   }
 
@@ -261,9 +277,13 @@ export class CardImage {
       )
       .setVisible(this.card.id !== Catalog.cardback.id)
       .setOrigin(0.5)
-      .on('pointerover', () =>
-        hint.showText(`This card costs ${this.txtCost.text} breath to play.`),
-      )
+      .on('pointerover', () => {
+        let s = `This card costs ${this.txtCost.text} breath to play.`
+        if (this.cost !== this.card.cost) {
+          s += `\nIt has base-cost ${this.card.cost}.`
+        }
+        hint.showText(s)
+      })
       .on('pointerout', () => {
         this.onHoverExit()()
         hint.hide()

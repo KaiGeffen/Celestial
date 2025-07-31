@@ -271,8 +271,8 @@ class Sensualist extends Card {
 const sensualist = new Sensualist({
   name: 'Sensualist',
   id: 81,
-  cost: 4,
-  points: 4,
+  cost: 5,
+  points: 5,
   text: 'Costs 1 less for each of the following statuses you have: Nourish, Inspired, Sight.',
 })
 
