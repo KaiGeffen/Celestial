@@ -184,7 +184,7 @@ export default class CharacterProfileScene extends BaseScene {
 
     // Update progress bar
     this.expBar.resetExp(
-      UserSettings._get('avatarExperience')[this.selectedAvatar] || 0,
+      UserSettings._get('avatar_experience')[this.selectedAvatar] || 0,
     )
 
     // TODO Scroll to the right position to center the current level

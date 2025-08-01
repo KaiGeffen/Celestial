@@ -57,7 +57,7 @@ export const players = pgTable(
     pve_losses: integer('pve_losses').notNull(),
     inventory: varchar('inventory', { length: 1000 }).notNull(),
     completedmissions: varchar('completedmissions', { length: 1000 }).notNull(),
-    avatarExperience: integer('avatarExperience').array().notNull(),
+    avatar_experience: integer('avatar_experience').array().notNull(),
 
     // Currency
     gems: integer('gems').notNull(),

@@ -42,7 +42,7 @@ export interface UserDataServerMessages {
   sendUserData: {
     inventory: string
     completedMissions: string
-    avatarExperience: number[]
+    avatar_experience: number[]
     decks: Deck[]
     username: string
     elo: number

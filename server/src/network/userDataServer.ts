@@ -103,7 +103,7 @@ export default function createUserDataServer() {
           if (!id) return
           await db
             .update(players)
-            .set({ avatarExperience: experience })
+            .set({ avatar_experience: experience })
             .where(eq(players.id, id))
         })
         .on(
@@ -138,7 +138,7 @@ export default function createUserDataServer() {
               pve_losses: 0,
               inventory: inventory,
               completedmissions: missions,
-              avatarExperience: [0, 0, 0, 0, 0, 0],
+              avatar_experience: [0, 0, 0, 0, 0, 0],
               lastactive: new Date().toISOString(),
               gems: 0,
               coins: 0,
@@ -237,7 +237,7 @@ async function sendUserData(
   data: {
     inventory: string
     completedmissions: string
-    avatarExperience: number[]
+    avatar_experience: number[]
     decks: string[]
     username: string
     elo: number
@@ -271,7 +271,7 @@ async function sendUserData(
     type: 'sendUserData',
     inventory: data.inventory,
     completedMissions: data.completedmissions,
-    avatarExperience: data.avatarExperience,
+    avatar_experience: data.avatar_experience,
     decks,
     username: data.username,
     elo: data.elo,

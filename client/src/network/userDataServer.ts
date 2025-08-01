@@ -123,7 +123,7 @@ export default class UserDataServer {
         (data: {
           inventory: string
           completedMissions: string
-          avatarExperience: number[]
+          avatar_experience: number[]
           decks: Deck[]
           username: string
           elo: number
@@ -335,7 +335,7 @@ export default class UserDataServer {
   private static loadUserData(data: {
     inventory: string
     completedMissions: string
-    avatarExperience: number[]
+    avatar_experience: number[]
     decks: Deck[]
     username: string
     elo: number
@@ -364,8 +364,8 @@ export default class UserDataServer {
 
     sessionStorage.setItem('decks', JSON.stringify(data.decks))
     sessionStorage.setItem(
-      'avatarExperience',
-      JSON.stringify(data.avatarExperience),
+      'avatar_experience',
+      JSON.stringify(data.avatar_experience),
     )
   }
 

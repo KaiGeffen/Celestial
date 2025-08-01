@@ -41,7 +41,7 @@ export class UserSettings {
       },
 
       // The experience with each avatar
-      avatarExperience: [0, 0, 0, 0, 0, 0],
+      avatar_experience: [0, 0, 0, 0, 0, 0],
     }
 
     for (var key in defaultSettings) {
@@ -85,7 +85,7 @@ export class UserSettings {
         Server.sendInventory(value)
       } else if (key === 'completedMissions') {
         Server.sendCompletedMissions(value)
-      } else if (key === 'avatarExperience') {
+      } else if (key === 'avatar_experience') {
         Server.sendAvatarExperience(value)
       }
     } else {

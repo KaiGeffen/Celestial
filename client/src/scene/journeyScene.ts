@@ -591,7 +591,7 @@ export default class JourneyScene extends BaseScene {
     [JourneyMission, number],
   ] {
     // Total exp with all avatars
-    const totalExp = UserSettings._get('avatarExperience').reduce(
+    const totalExp = UserSettings._get('avatar_experience').reduce(
       (acc, curr) => acc + curr,
       0,
     )

@@ -8,7 +8,7 @@ export function createExpBar(
   avatarID: number,
   expGained = 0,
 ): ExpBar {
-  const currentExp = UserSettings._get('avatarExperience')[avatarID] || 0
+  const currentExp = UserSettings._get('avatar_experience')[avatarID] || 0
 
   let expBar: ExpBar
   expBar = scene.rexUI.add.expBar({

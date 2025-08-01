@@ -25,7 +25,7 @@ export const LEVEL_PROGRESSION: LevelData[] = [
  * @returns The level data for the given character
  */
 export function getCharacterLevel(id: number): LevelData {
-  const exp = UserSettings._get('avatarExperience')[id] || 0
+  const exp = UserSettings._get('avatar_experience')[id] || 0
 
   // Find the highest level where totalExp <= exp
   for (let i = LEVEL_PROGRESSION.length - 1; i >= 0; i--) {
@@ -53,7 +53,7 @@ export function getCharacterLevelProgress(id: number): number {
     return 1 // Max level or no next level
   }
 
-  const exp = UserSettings._get('avatarExperience')[id] || 0
+  const exp = UserSettings._get('avatar_experience')[id] || 0
   const expInCurrentLevel = exp - currentLevel.totalExp
   const expNeededForNextLevel = nextLevel.totalExp - currentLevel.totalExp
 
@@ -75,7 +75,7 @@ export function getCharacterExpToNextLevel(id: number): number {
     return 0 // Max level or no next level
   }
 
-  const exp = UserSettings._get('avatarExperience')[id] || 0
+  const exp = UserSettings._get('avatar_experience')[id] || 0
   return nextLevel.totalExp - exp
 }
 

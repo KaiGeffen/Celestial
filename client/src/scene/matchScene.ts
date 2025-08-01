@@ -669,6 +669,6 @@ export class JourneyMatchScene extends MatchScene {
 
   // Grant the given amount of experience to the user
   private grantExp(exp: number): void {
-    UserSettings._increment('avatarExperience', this.avatar, exp)
+    UserSettings._increment('avatar_experience', this.avatar, exp)
   }
 }
