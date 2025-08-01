@@ -106,15 +106,37 @@ export default class JourneyScene extends BaseScene {
       // Form a sizer for this character
       const sizer = this.rexUI.add.sizer({
         orientation: 'vertical',
-        space: { item: Space.pad },
+        space: {
+          item: Space.pad,
+          left: Space.pad,
+          right: Space.pad,
+          top: Space.pad,
+          bottom: Space.pad,
+        },
       })
 
-      const image = this.add.image(0, 0, `avatar-${name}Full`)
-      this.addShadow(image)
+      // Background
+      const background = this.add
+        .image(0, 0, 'background-Light')
+        .setInteractive()
+      this.addShadow(background)
+
+      // Avatar
+      const avatarFull = this.add.image(0, 0, `avatar-${name}Full`)
 
       // Experience bar
-      const expBar = createExpBar(this, avatarIndex)
+      // const expBarBackground = this.add.rectangle(
+      //   0,
+      //   0,
+      //   1,
+      //   1,
+      //   Color.backgroundLight,
+      //   0.5,
+      // )
+      // const expBar = createExpBar(this, avatarIndex)
+      // expBar.addBackground(expBarBackground)
 
+      // Mission title
       const text = this.add.text(
         0,
         0,
@@ -143,13 +165,12 @@ export default class JourneyScene extends BaseScene {
         },
       })
 
-      const imageSizer = this.rexUI.add.sizer({
-        orientation: 'vertical',
-        space: { item: -60 },
-      })
-      imageSizer.add(image).add(expBar)
-
-      sizer.add(imageSizer).add(text).add(btnContainer)
+      sizer
+        .addBackground(background)
+        .add(avatarFull)
+        // .add(expBar, { padding: { top: -80 } })
+        .add(text)
+        .add(btnContainer)
 
       return sizer.layout()
     })
