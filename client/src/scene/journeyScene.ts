@@ -563,7 +563,7 @@ export default class JourneyScene extends BaseScene {
 
     // Update the text / avatar
     this.txtMissionTitle.setText(`${avatarNames[avatarIndex]}'s Story`)
-    this.txtMissionDescription.setText(mission.missionText)
+    this.txtMissionDescription.setText('Mission text coming soon')
     this.avatar.setAvatar(avatarIndex)
 
     // Update the decklist
