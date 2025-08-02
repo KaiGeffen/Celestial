@@ -58,7 +58,17 @@ export default class Cutout extends Button {
           : () => {},
         // When hovered, show the given cards
         hover: () => {
-          hint.leftPin = this.icon.getRightCenter().x
+          const pointer = this.txt.scene.game.input.activePointer
+
+          // If on the left half of the screen, left pin
+          if (pointer.position.x < Space.windowWidth / 2) {
+            hint.leftPin = this.icon.getRightCenter().x
+            hint.rightPin = undefined
+          } else {
+            hint.rightPin = this.icon.getLeftCenter().x
+            hint.leftPin = undefined
+          }
+
           hint.showCard(card)
           this.icon.setTint(Color.buttonSelected)
         },

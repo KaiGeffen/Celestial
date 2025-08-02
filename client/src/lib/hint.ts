@@ -15,6 +15,7 @@ export default class Hint {
 
   // The X position to position flush to, or undefined if no pin
   leftPin: number
+  rightPin: number
 
   // The card images shown in the hint
   private mainCard: CardImage
@@ -50,6 +51,7 @@ export default class Hint {
 
     // Reset the pin, since the next hovered item might not pin
     this.leftPin = undefined
+    this.rightPin = undefined
 
     return this
   }
@@ -138,7 +140,7 @@ export default class Hint {
     // Unless there is a left pin, center and hover above the mouse position
     let x: number
     let y: number
-    if (this.leftPin === undefined) {
+    if (this.leftPin === undefined && this.rightPin === undefined) {
       x = pointer.position.x
       y = pointer.position.y - Space.pad
       this.txt.setX(x).setOrigin(0.5, 1).setY(y)
@@ -147,13 +149,21 @@ export default class Hint {
       y = y - this.txt.height + Space.cardHeight / 2 + Space.padSmall
     }
     // If there is a pin, go just to the right of that
-    else {
+    else if (this.leftPin !== undefined) {
       x = this.leftPin + Space.pad
       y = pointer.position.y
       this.txt.setX(x).setOrigin(0, 0.5).setY(y)
 
       // Adjust x,y for the cards
       x += this.txt.width / 2
+      y = y - this.txt.height / 2 + Space.padSmall + Space.cardHeight / 2
+    } else if (this.rightPin !== undefined) {
+      x = this.rightPin - Space.pad
+      y = pointer.position.y
+      this.txt.setX(x).setOrigin(1, 0.5).setY(y)
+
+      // Adjust x,y for the cards
+      x -= this.txt.width / 2
       y = y - this.txt.height / 2 + Space.padSmall + Space.cardHeight / 2
     }
 
