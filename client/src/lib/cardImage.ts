@@ -279,7 +279,7 @@ export class CardImage {
       .setOrigin(0.5)
       .on('pointerover', () => {
         let s = `This card costs ${this.txtCost.text} breath to play.`
-        if (this.cost !== this.card.cost) {
+        if (this.cost !== undefined && this.cost !== this.card.cost) {
           s += `\nIt has base-cost ${this.card.cost}.`
         }
         hint.showText(s)
