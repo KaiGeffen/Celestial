@@ -59,11 +59,11 @@ export default class Cutout extends Button {
         // When hovered, show the given cards
         hover: () => {
           hint.leftPin = this.icon.getRightCenter().x
-          hint.showCard(card).disableWaitTime()
+          hint.showCard(card)
           this.icon.setTint(Color.buttonSelected)
         },
         exit: () => {
-          hint.hide().enableWaitTime()
+          hint.hide()
           this.icon.clearTint()
         },
       },
