@@ -8,7 +8,8 @@ export function createExpBar(
   avatarID: number,
   expGained = 0,
 ): ExpBar {
-  const currentExp = UserSettings._get('avatar_experience')[avatarID] || 0
+  const currentExp =
+    UserSettings._get('avatar_experience')[avatarID] - expGained || 0
 
   let expBar: ExpBar
   expBar = scene.rexUI.add.expBar({
@@ -17,9 +18,6 @@ export function createExpBar(
     nameText: scene.add.text(0, 0, 'EXP', Style.basic),
     valueText: scene.add.text(0, 0, '', Style.basic),
     valueTextFormatCallback: function (value, min, max) {
-      // Also set the level
-      if (expBar) expBar.setNameText(`Level ${expBar.level}`)
-
       value = Math.floor(value)
       return `${value - min}/${max - min}`
     },
@@ -31,7 +29,6 @@ export function createExpBar(
     },
     levelCounter: {
       table: function (level) {
-        if (level <= 0) return 0
         if (level > LEVEL_PROGRESSION.length)
           return LEVEL_PROGRESSION[LEVEL_PROGRESSION.length - 1].totalExp
         return LEVEL_PROGRESSION[level - 1].totalExp
@@ -44,6 +41,11 @@ export function createExpBar(
 
   // Set starting level
   expBar.setNameText(`Level ${expBar.level}`)
+
+  // Set the level when it changes
+  expBar.on('levelup.start', () => {
+    expBar.setNameText(`Level ${expBar.level}`)
+  })
 
   // Gain the exp
   expBar.gainExp(expGained)

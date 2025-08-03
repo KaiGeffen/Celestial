@@ -21,8 +21,11 @@ import {
   MAX_LEVEL,
 } from '../data/levelProgression'
 import Card from '../../../shared/state/card'
-import getUnlockedCards from '../data/journeyCardInventory'
+import getUnlockedCards, {
+  getUnlockAtLevel,
+} from '../data/journeyCardInventory'
 import { createExpBar } from '../lib/expBar'
+import { CardImage } from '../lib/cardImage'
 
 export default class JourneyScene extends BaseScene {
   // Mission details
@@ -80,7 +83,7 @@ export default class JourneyScene extends BaseScene {
     this.createMissionDetails()
 
     // Create post match screen
-    this.createPostMatch(params.expGained ?? 10, params.postMatchText ?? '')
+    this.createPostMatch(params.expGained ?? 0, params.postMatchText ?? '')
 
     // Create waiting notice
     this.createWaitingNotice()
@@ -270,13 +273,33 @@ export default class JourneyScene extends BaseScene {
 
     // Experience gained and associated info
     // TODO Progress bar / exp gained / unlocks unlocked
-    // const txtExpGained = this.add.text(
-    //   0,
-    //   0,
-    //   `+${expGained} EXP Gained`,
-    //   Style.basic,
-    // )
-    const expBarSizer = createExpBar(this, this.selectedAvatar, expGained)
+    const expBarSizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: { item: Space.pad },
+    })
+    const expBar = createExpBar(this, this.selectedAvatar, expGained)
+    expBarSizer.add(expBar)
+
+    // Reveal the card when exp bar is full
+    let card: CardImage
+    expBar.on('levelup.start', () => {
+      const cont = new ContainerLite(
+        this,
+        0,
+        0,
+        Space.cardWidth,
+        Space.cardHeight,
+      )
+      console.log(expBar.level)
+      card = new CardImage(
+        getUnlockAtLevel(this.selectedAvatar, expBar.level),
+        cont,
+      )
+
+      // Add card above exp bar
+      expBarSizer.add(cont, { index: 0 })
+      sizer.layout()
+    })
 
     const btnContainer = new ContainerLite(
       this,
@@ -289,6 +312,8 @@ export default class JourneyScene extends BaseScene {
       within: btnContainer,
       text: 'Next',
       f: () => {
+        // NOTE CardImage deleted because bug with containerlite in sizers
+        if (card) card.destroy()
         this.postMatchView.setAlpha(0)
         this.waitingView.show()
       },
@@ -297,7 +322,6 @@ export default class JourneyScene extends BaseScene {
     sizer
       .add(title)
       .add(txt)
-      // .add(txtExpGained)
       .add(expBarSizer)
       .add(btnContainer)
       .addBackground(background)

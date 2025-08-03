@@ -116,3 +116,7 @@ export default function getUnlockedCards(): Set<Card> {
 
   return unlockedCards
 }
+
+export function getUnlockAtLevel(character: number, level: number): Card {
+  return UNLOCKS_PER_CHARACTER[character][level][0]
+}

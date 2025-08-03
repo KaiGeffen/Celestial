@@ -50,7 +50,7 @@ class ServerController {
         )
       }
     }
-    // this.model.winner = 0
+    this.model.winner = 0
   }
 
   doSetup(): void {
