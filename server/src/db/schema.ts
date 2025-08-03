@@ -168,9 +168,9 @@ export const analytics = pgTable(
   'analytics',
   {
     id: serial('id').primaryKey(),
-    player_id: uuid('player_id')
-      .notNull()
-      .references(() => players.id, { onDelete: 'cascade' }),
+    player_id: uuid('player_id').references(() => players.id, {
+      onDelete: 'cascade',
+    }),
     time: timestamp('time').notNull().defaultNow(),
     event_type: varchar('event_type', { length: 64 }).notNull(), // e.g., 'register', 'tutorial_progress', 'play_click', etc.
     funnel_step: varchar('funnel_step', { length: 64 }).notNull(), // e.g., 'register', 'tutorial1_start', etc.

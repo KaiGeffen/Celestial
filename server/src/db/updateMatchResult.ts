@@ -11,6 +11,7 @@ const DEFAULT_PLAYER_DATA = {
   elo: BASE_ELO,
   username: 'Guest',
   last_daily_reward: null,
+  id: null,
 }
 
 const DAILY_COIN_REWARD = 10
@@ -157,8 +158,8 @@ export async function updateMatchResultPVE(
 
 // Insert this match into the match history table
 async function insertMatchHistory(
-  winnerId: string | null,
-  loserId: string | null,
+  winnerId: string,
+  loserId: string,
   winnerData,
   loserData,
   winnerDeck: Deck,

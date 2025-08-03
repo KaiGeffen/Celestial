@@ -20,8 +20,6 @@ class TutorialMatch extends PveMatch {
     this.game = new TutorialController(num)
     this.game.start()
 
-    console.log(this.uuid1, this.uuid2)
-
     // Log tutorial start progress
     logTutorialProgress(this.uuid1, `tutorial_${num + 1}`, 0)
   }

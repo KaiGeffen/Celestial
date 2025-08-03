@@ -108,7 +108,7 @@ export class MatchTutorialWS extends MatchWS {
       this.socket.send({
         type: 'initTutorial',
         num: num,
-        uuid: UserDataServer.getUserData().uuid || '',
+        uuid: UserDataServer.getUserData().uuid,
       })
     })
   }
@@ -121,7 +121,7 @@ export class MatchPveWS extends MatchWS {
     this.socket.onOpen(() => {
       this.socket.send({
         type: 'initPve',
-        uuid: UserDataServer.getUserData().uuid || '',
+        uuid: UserDataServer.getUserData().uuid,
         deck: deck,
         aiDeck: aiDeck,
       })
