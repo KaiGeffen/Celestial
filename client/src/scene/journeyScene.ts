@@ -22,7 +22,7 @@ import {
 } from '../data/levelProgression'
 import Card from '../../../shared/state/card'
 import getUnlockedCards, {
-  getUnlockAtLevel,
+  getUnlocksAtLevel,
 } from '../data/journeyCardInventory'
 import { createExpBar } from '../lib/expBar'
 import { CardImage } from '../lib/cardImage'
@@ -258,49 +258,44 @@ export default class JourneyScene extends BaseScene {
     const background = this.add.image(0, 0, 'background-Light').setInteractive()
     this.addShadow(background)
 
-    const sizer = this.rexUI.add.sizer({
-      orientation: 'vertical',
-      space: {
-        item: Space.pad,
-        left: Space.pad,
-        right: Space.pad,
-      },
-    })
+    const sizer = this.rexUI.add
+      .sizer({
+        orientation: 'vertical',
+        space: {
+          item: Space.pad,
+          left: Space.pad,
+          right: Space.pad,
+        },
+      })
+      .setOrigin(1, 0.5)
 
     const title = this.add.text(0, 0, 'Story Complete!', Style.announcement)
 
     const txt = this.add.text(0, 0, postMatchText, Style.basic)
 
     // Experience gained and associated info
-    // TODO Progress bar / exp gained / unlocks unlocked
-    const expBarSizer = this.rexUI.add.sizer({
-      orientation: 'vertical',
+    const expBar = createExpBar(this, this.selectedAvatar, expGained)
+
+    // Any unlocked cards, revealed when exp bar levels up
+    let cardsSizer: Sizer = this.rexUI.add.sizer({
       space: { item: Space.pad },
     })
-    const expBar = createExpBar(this, this.selectedAvatar, expGained)
-    expBarSizer.add(expBar)
-
-    // Reveal the card when exp bar is full
-    let card: CardImage
     expBar.on('levelup.start', () => {
-      const cont = new ContainerLite(
-        this,
-        0,
-        0,
-        Space.cardWidth,
-        Space.cardHeight,
-      )
-      console.log(expBar.level)
-      card = new CardImage(
-        getUnlockAtLevel(this.selectedAvatar, expBar.level),
-        cont,
-      )
-
-      // Add card above exp bar
-      expBarSizer.add(cont, { index: 0 })
+      getUnlocksAtLevel(this.selectedAvatar, expBar.level).forEach((card) => {
+        const cont = new ContainerLite(
+          this,
+          0,
+          0,
+          Space.cardWidth,
+          Space.cardHeight,
+        )
+        const cardImage = new CardImage(card, cont)
+        cardsSizer.add(cont)
+      })
       sizer.layout()
     })
 
+    // Buttons
     const btnContainer = new ContainerLite(
       this,
       0,
@@ -313,7 +308,7 @@ export default class JourneyScene extends BaseScene {
       text: 'Next',
       f: () => {
         // NOTE CardImage deleted because bug with containerlite in sizers
-        if (card) card.destroy()
+        cardsSizer.destroy()
         this.postMatchView.setAlpha(0)
         this.waitingView.show()
       },
@@ -322,7 +317,8 @@ export default class JourneyScene extends BaseScene {
     sizer
       .add(title)
       .add(txt)
-      .add(expBarSizer)
+      .add(cardsSizer)
+      .add(expBar)
       .add(btnContainer)
       .addBackground(background)
       .layout()
