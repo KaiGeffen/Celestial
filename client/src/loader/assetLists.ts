@@ -9,6 +9,7 @@ export const assetLists = {
       "Mia",
       "Mitra",
       "AdonisFull",
+      "AdonisFull",
       "ImaniFull",
       "JulesFull",
       "KitzFull",
