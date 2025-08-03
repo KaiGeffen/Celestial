@@ -18,6 +18,11 @@ export function createExpBar(
     nameText: scene.add.text(0, 0, 'EXP', Style.basic),
     valueText: scene.add.text(0, 0, '', Style.basic),
     valueTextFormatCallback: function (value, min, max) {
+      // This is a janky way to ensure bar shows right amount when reset, but not when exp is being gained
+      if (expBar && !expGained) {
+        expBar.setNameText(`Level ${expBar.level}`)
+      }
+
       value = Math.floor(value)
       return `${value - min}/${max - min}`
     },
