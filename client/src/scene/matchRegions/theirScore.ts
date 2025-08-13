@@ -166,17 +166,6 @@ export default class TheirScoreRegion extends Region {
     // this.btnSpeed.icon.setFrame(this.getSpeedFrame(baseSpeed))
   }
 
-  // Helper method to determine which frame to use based on speed
-  private getSpeedFrame(speed: number): number {
-    if (speed < 0.3)
-      return 0 // Slowest
-    else if (speed < 0.7)
-      return 1 // Slow
-    else if (speed < 1.5)
-      return 2 // Normal
-    else return 3 // Fast
-  }
-
   private createWins(): void {
     // Create a vertical sizer
     const winsSizer = new Sizer(this.scene, {
