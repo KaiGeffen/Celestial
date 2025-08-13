@@ -31,7 +31,7 @@ export default function createLeaderboardServer() {
         .from(players)
         // TODO Remove once those old accounts have been deleted
         .where(
-          sql`${players.username} != 'Player' AND NOT (${players.wins} = 0 AND ${players.losses} = 0)`,
+          sql`${players.username} != 'Player' AND (${players.wins} + ${players.losses}) > 0`,
         )
         .orderBy(desc(players.elo))
         .limit(100)
