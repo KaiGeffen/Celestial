@@ -96,33 +96,45 @@ export default class Card {
   }
 
   birth(amt: number, game: GameModel, player: number) {
+    // Create a Child in hand if there is none
+    let isChildInHand =
+      game.hand[player].find((card) => card.name === 'Child') !== undefined
+
+    // If there is no Child, create one if possible
+    if (!isChildInHand) {
+      const card = new Card({
+        name: 'Child',
+        id: 1003,
+        points: 0,
+        basePoints: 0,
+        text: 'Fleeting',
+        qualities: [Quality.FLEETING],
+      })
+      game.create(player, card)
+    }
+
+    // Increase the points of each Child in hand by amt
     for (let i = 0; i < game.hand[player].length; i++) {
       const card = game.hand[player][i]
       if (card.name === 'Child') {
         // NOTE This replacement is done so that the replay doesn't show the eventual point value before it's achieved
         const newCard = new Card({
-          name: 'Child',
-          id: 1003,
+          ...card,
           points: amt + card.points,
-          basePoints: 0,
-          text: 'Fleeting',
-          qualities: [Quality.FLEETING],
         })
         game.hand[player][i] = newCard
-        return
+
+        // TODO: Support animating this for cards we can see
+        // game.animations[player].push(
+        //   new Animation({
+        //     from: Zone.Hand,
+        //     to: Zone.Hand,
+        //     index: i,
+        //     card: card,
+        //   }),
+        // )
       }
     }
-
-    // If no Child card, create one
-    const card = new Card({
-      name: 'Child',
-      id: 1003,
-      points: amt,
-      basePoints: 0,
-      text: 'Fleeting',
-      qualities: [Quality.FLEETING],
-    })
-    game.create(player, card)
   }
 
   transform(index: number, card: Card, game: GameModel) {
@@ -175,6 +187,7 @@ export default class Card {
     game.animations[player].push(
       new Animation({
         from: Zone.Status,
+        index: 0,
       }),
     )
     game.status[player].inspire += amt
@@ -184,6 +197,7 @@ export default class Card {
     game.animations[player].push(
       new Animation({
         from: Zone.Status,
+        index: 1,
       }),
     )
     game.status[player].nourish += amt
@@ -193,6 +207,7 @@ export default class Card {
     game.animations[player].push(
       new Animation({
         from: Zone.Status,
+        index: -1,
       }),
     )
     game.status[player].nourish -= amt

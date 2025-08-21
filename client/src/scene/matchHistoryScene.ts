@@ -5,11 +5,11 @@ import UserDataServer from '../network/userDataServer'
 import Buttons from '../lib/buttons/buttons'
 import { MatchHistoryEntry } from '../../../shared/types/matchHistory'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import Cutout from '../lib/buttons/cutout'
 import Catalog from '../../../shared/state/catalog'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { encodeShareableDeckCode } from '../../../shared/codec'
+import Decklist from '../lib/decklist'
 
 const headerHeight = Space.iconSize + Space.pad * 2
 const width = Space.windowWidth - Space.sliderWidth
@@ -767,65 +767,11 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
   }
 
   private getCardList(cards: number[]) {
-    const sizer = this.rexUI.add.fixWidthSizer({
-      width: Space.deckPanelWidth,
-    })
-
-    // Sort cards before adding to the list
-    cards.sort((id1, id2) => {
-      const card1 = Catalog.getCardById(id1)
-      const card2 = Catalog.getCardById(id2)
-
-      // TODO In prod shouldn't happen
-      if (!card1 || !card2) {
-        return 0
-      }
-
-      // Sort by cost
-      if (card1.cost > card2.cost) {
-        return 1
-      }
-      if (card1.cost < card2.cost) {
-        return -1
-      }
-
-      // Sort by name
-      if (card1.name > card2.name) {
-        return 1
-      }
-      if (card1.name < card2.name) {
-        return -1
-      }
-
-      return 0
-    })
-    const cutouts: { [key: number]: Cutout } = {}
-    for (const cardId of cards) {
-      // If cutout present, increment it
-      if (cutouts[cardId]) {
-        cutouts[cardId].increment()
-      } else {
-        // If it isn't, create a new cutout
-        const card = Catalog.getCardById(cardId)
-        // TODO This shouldn't happen, consider throwing an error
-        if (!card) {
-          continue
-        }
-
-        const container = new ContainerLite(
-          this,
-          0,
-          0,
-          Space.deckPanelWidth,
-          Space.cutoutHeight,
-        )
-        const cutout = new Cutout(container, card)
-        sizer.add(container)
-        cutouts[cardId] = cutout
-      }
-    }
-
-    return sizer
+    // Use Decklist class for rendering decklists
+    const decklist = new Decklist(this, () => () => {})
+    const cardObjs = cards.map((id) => Catalog.getCardById(id)).filter(Boolean)
+    decklist.setDeck(cardObjs)
+    return decklist.sizer
   }
 
   private getShareButton(cards: number[]): ContainerLite {

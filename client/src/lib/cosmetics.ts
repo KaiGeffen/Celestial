@@ -23,6 +23,11 @@ export function getUnlockedAvatars(): number[] {
     }
   })
 
+  // TODO Decide how to handle avatar unlocks, for now just have them all unlocked
+  for (let i = 0; i < 6; i++) {
+    unlockedAvatars.add(i)
+  }
+
   // Return a sorted array
   return Array.from(unlockedAvatars).sort((a, b) => a - b)
 }

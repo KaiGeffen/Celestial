@@ -15,11 +15,6 @@ export async function logTutorialProgress(
   funnel_step: string,
   turn_reached: number,
 ) {
-  if (!player_id) {
-    console.log('Error: player_id is undefined when logging tutorial progress')
-    return
-  }
-
   // Check if there's already a record for this player and funnel_step
   const existing = await db
     .select()
@@ -66,15 +61,12 @@ export async function logTutorialProgress(
 
 // Log a generic funnel event
 export async function logFunnelEvent(
-  player_id: string,
+  player_id: string | null,
   event_type: string,
   funnel_step: string,
   metadata?: number,
 ) {
-  if (!player_id) {
-    console.log('Error: player_id is undefined when logging funnel event')
-    return
-  }
+  if (!player_id) player_id = null
 
   await db.insert(analytics).values(
     clean({

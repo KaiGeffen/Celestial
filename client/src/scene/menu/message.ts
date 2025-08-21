@@ -5,9 +5,10 @@ import Card from '../../../../shared/state/card'
 import { CardImage } from '../../lib/cardImage'
 import { Style, Space } from '../../settings/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
+import newScrollablePanel from '../../lib/scrollablePanel'
 
 // A message to the user
-const width = 700
+const width = 900
 
 export default class ConfirmMenu extends Menu {
   constructor(scene: MenuScene, params) {
@@ -43,12 +44,20 @@ export default class ConfirmMenu extends Menu {
     )
     let cardImage = new CardImage(card, container, true)
 
-    // Text
-    let txt = this.scene.add
-      .text(0, 0, s, Style.basic)
-      .setWordWrapWidth(width - Space.cardWidth - Space.pad * 3)
+    // Create scrollable text panel
+    const textPanel = this.scene.rexUI.add.sizer()
 
-    sizer.add(container).add(txt)
+    const text = this.scene.add.text(0, 0, s, Style.basic)
+    textPanel.add(text)
+
+    const scrollableText = newScrollablePanel(this.scene, {
+      panel: {
+        child: textPanel,
+      },
+      scrollMode: 'y',
+    })
+
+    sizer.add(container).add(scrollableText)
 
     // Add this new sizer to the main sizer
     const padding = {
@@ -59,5 +68,38 @@ export default class ConfirmMenu extends Menu {
     }
 
     this.sizer.add(sizer, padding).addNewLine()
+  }
+
+  protected createText(s: string): void {
+    const width = this.width - Space.pad * 2
+
+    // Create scrollable text panel
+    const textPanel = this.scene.rexUI.add.sizer({
+      width: width,
+    })
+
+    const text = this.scene.add
+      .text(0, 0, s, Style.basic)
+      .setWordWrapWidth(width)
+    textPanel.add(text)
+
+    const scrollableText = newScrollablePanel(this.scene, {
+      width: width,
+      height: Space.windowHeight - 200,
+      panel: {
+        child: textPanel,
+      },
+      scrollMode: 'y',
+    })
+
+    // Add this new sizer to the main sizer
+    const padding = {
+      padding: {
+        left: Space.pad,
+        right: Space.pad,
+      },
+    }
+
+    this.sizer.add(scrollableText, padding).addNewLine()
   }
 }

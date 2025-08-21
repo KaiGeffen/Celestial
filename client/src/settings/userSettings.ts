@@ -39,6 +39,9 @@ export class UserSettings {
         x: 4650 - Space.windowWidth / 2,
         y: 700 - Space.windowHeight / 2,
       },
+
+      // The experience with each avatar
+      avatar_experience: [0, 0, 0, 0, 0, 0],
     }
 
     for (var key in defaultSettings) {
@@ -58,8 +61,11 @@ export class UserSettings {
 
     if (key in sessionStorage) {
       return JSON.parse(sessionStorage.getItem(key))
-    } else {
+    } else if (key in localStorage) {
       return JSON.parse(localStorage.getItem(key))
+    } else {
+      console.log('key not found', key)
+      return null
     }
   }
 
@@ -79,6 +85,8 @@ export class UserSettings {
         Server.sendInventory(value)
       } else if (key === 'completedMissions') {
         Server.sendCompletedMissions(value)
+      } else if (key === 'avatar_experience') {
+        Server.sendAvatarExperience(value)
       }
     } else {
       localStorage.setItem(key, JSON.stringify(value))
@@ -124,6 +132,13 @@ export class UserSettings {
     this._set(key, ary)
 
     return result
+  }
+
+  // Increment the given index of array by given amount
+  static _increment(key: string, index: number, amt: number): void {
+    let ary = this._get(key)
+    ary[index] += amt
+    this._set(key, ary)
   }
 
   // Get the quantity of a given card in inventory

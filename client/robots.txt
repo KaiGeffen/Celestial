@@ -1,4 +1,4 @@
-# about.celestialdecks.gg
+# about.celestialtcg.com
 User-agent: *
 Allow: /
 

@@ -1,30 +1,58 @@
 import 'phaser'
 import BaseScene from './baseScene'
-import {
-  Style,
-  Space,
-  Color,
-  UserSettings,
-  Time,
-  Ease,
-} from '../settings/settings'
+import { Style, Space, Color, UserSettings, Flags } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
-import Button from '../lib/buttons/button'
-
 import Catalog from '../../../shared/state/catalog'
-import { journeyNode, journeyData } from '../journey/journey'
+import Cutout from '../lib/buttons/cutout'
+import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
+import { JOURNEY_MISSIONS, JourneyMission } from '../data/journeyMissions'
+import Decklist from '../lib/decklist'
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
+import { Deck } from '../../../shared/types/deck'
+import avatarNames from '../lib/avatarNames'
+import AvatarButton from '../lib/buttons/avatar'
+import newScrollablePanel from '../lib/scrollablePanel'
+import { MechanicsSettings } from '../../../shared/settings'
+import Button from '../lib/buttons/button'
+import {
+  getCharacterLevel,
+  getCharacterLevelProgress,
+  getCharacterExpToNextLevel,
+  MAX_LEVEL,
+} from '../data/levelProgression'
+import Card from '../../../shared/state/card'
+import getUnlockedCards, {
+  getUnlocksAtLevel,
+} from '../data/journeyCardInventory'
+import { createExpBar } from '../lib/expBar'
+import { CardImage } from '../lib/cardImage'
 
-// TODO Make consistent with Journey (Change journey to journey or vice verca)
 export default class JourneyScene extends BaseScene {
-  panDirection
+  // Mission details
+  selectedMission: JourneyMission
+  selectedAvatar: number
+  txtMissionTitle: Phaser.GameObjects.Text
+  txtMissionDescription: Phaser.GameObjects.Text
+  avatar: AvatarButton
+  decklist: Decklist
+  // The decklist with all collectible cards
+  cardPool: Decklist
+  startBtn: Button
 
-  map: Phaser.GameObjects.Image
+  // Timer until next journey available
+  txtTimer: Phaser.GameObjects.Text
 
-  animatedBtns: Button[]
+  // Views
+  characterSelectView: Phaser.GameObjects.Container
+  missionDetailsView: Sizer
+  postMatchView: Phaser.GameObjects.Container
+  waitingView: Sizer
 
-  incompleteIndicators: Button[] = []
+  // Card pool sizer
+  cardPoolSizer: Sizer
 
-  isDragging = false
+  // Card pool text reference
+  cardPoolText: Phaser.GameObjects.Text
 
   constructor() {
     super({
@@ -35,423 +63,604 @@ export default class JourneyScene extends BaseScene {
   create(params): void {
     super.create()
 
-    // Create the background
-    this.map = this.add.image(0, 0, 'journey-Map').setOrigin(0).setInteractive()
-    this.enableDrag()
+    // TODO Temporary
+    // this.selectedAvatar = 0
+    // params = {
+    //   ...params,
+    //   postMatch: true,
+    //   expGained: 100,
+    //   postMatchText: 'Test',
+    // }
 
-    // Bound camera on this map
-    this.cameras.main.setBounds(0, 0, this.map.width, this.map.height)
+    // Launch map behind this scene
+    this.scene.launch('MapScene')
+    this.scene.sendToBack('MapScene')
 
-    // Add button for help menu
-    this.createHelpButton()
+    // Create the first screen
+    this.createCharacterSelect()
 
-    // Add all of the available nodes
-    this.addJourneyData()
+    // Create the mission screen
+    this.createMissionDetails()
 
-    if (params.stillframe !== undefined) {
-      this.createStillframe(params)
+    // Create post match screen
+    this.createPostMatch(params.expGained ?? 0, params.postMatchText ?? '')
+
+    // Create waiting notice
+    this.createWaitingNotice()
+
+    // Show view depending on context
+    if (params.postMatch) {
+      this.postMatchView.setAlpha(1)
     } else {
-      // Add scroll functionality by default if not showing a stillframe
-      this.enableScrolling()
+      this.characterSelectView.setAlpha(1)
     }
-
-    // Make up pop-up for the card you just received, if there is one
-    if (params.card) {
-      this.createCardPopup(params)
-    } else if (params.txt) {
-      this.createTipPopup(params)
-    }
-
-    // Scroll to the given position
-    const coords = UserSettings._get('journeyCoordinates')
-    this.cameras.main.scrollX = coords.x
-    this.cameras.main.scrollY = coords.y
-
-    // Create indicators for where incomplete missions are
-    this.createIncompleteIndicators()
   }
 
-  update(time, delta): void {
-    // If pointer is released, stop panning
-    if (!this.input.activePointer.isDown) {
-      this.panDirection = undefined
-    }
+  private createCharacterSelect() {
+    this.characterSelectView = this.add.container().setAlpha(0)
 
-    if (this.panDirection !== undefined) {
-      JourneyScene.moveCamera(
-        this.cameras.main,
-        this.panDirection[0],
-        this.panDirection[1],
-      )
-    }
+    // Get the 2 characters that appear this time
+    const missionTracks = this.getMissionChoices()
 
-    // Dragging
-    if (this.isDragging && this.panDirection === undefined) {
-      const camera = this.cameras.main
-      const pointer = this.input.activePointer
+    // For each character, add the avatar, text, button
+    const sizers = missionTracks.map(([mission, avatarIndex]) => {
+      const name = avatarNames[avatarIndex]
 
-      const dx = ((pointer.x - pointer.downX) * delta) / 100
-      const dy = ((pointer.y - pointer.downY) * delta) / 100
-
-      JourneyScene.moveCamera(camera, dx, dy)
-    }
-
-    // Switch the frame of the animated elements every frame
-    // Go back and forth from frame 0 to 1
-    ;[...this.animatedBtns, ...this.incompleteIndicators].forEach((btn) => {
-      // Switch every half second, roughly
-      let frame = Math.floor((2 * time) / 1000) % 2 === 0 ? 0 : 1
-      btn.setFrame(frame)
-    })
-
-    // Adjust alpha/location of each indicator
-    this.adjustIndicators()
-  }
-
-  private createHelpButton(): void {
-    const container = this.add.container().setDepth(10)
-    new Buttons.Basic({
-      within: container,
-      text: 'Help',
-      f: () => {
-        this.scene.launch('MenuScene', {
-          menu: 'help',
-          callback: () => {
-            this.scene.start('TutorialMatchScene', { missionID: 0 })
-          },
-        })
-      },
-      muteClick: true,
-    }).setNoScroll()
-
-    // Anchor in top right
-    const dx = Space.buttonWidth / 2 + Space.iconSize + Space.pad * 2
-    const dy = Space.buttonHeight / 2 + Space.pad
-    this.plugins.get('rexAnchor')['add'](container, {
-      x: `100%-${dx}`,
-      y: `0%+${dy}`,
-    })
-  }
-
-  // Create a popup for the card specified in params
-  private createCardPopup(params): void {
-    this.scene.launch('MenuScene', {
-      menu: 'message',
-      title: 'Card Unlocked!',
-      s: params.txt,
-      card: params.card,
-    })
-
-    // Clear params
-    params.txt = ''
-    params.card = undefined
-  }
-
-  // Create a popup for the tip
-  private createTipPopup(params): void {
-    this.scene.launch('MenuScene', {
-      menu: 'message',
-      title: 'Tip',
-      s: params.txt,
-    })
-
-    // Clear params
-    params.txt = ''
-    params.card = undefined
-  }
-
-  // Create indicators for any incomplete nodes on the map out of the camera's view
-  private createIncompleteIndicators(): void {
-    this.incompleteIndicators = []
-    this.animatedBtns.forEach((btn) => {
-      const indicator = new Buttons.Mission(
-        this,
-        0,
-        0,
-        () => {
-          const camera = this.cameras.main
-          camera.centerOn(btn.icon.x, btn.icon.y)
-          JourneyScene.rememberCoordinates(camera)
-        },
-        'mission',
-        true,
-      ).setNoScroll()
-
-      this.incompleteIndicators.push(indicator)
-    })
-  }
-
-  // Create a stillframe animation specified in params
-  private createStillframe(params): void {
-    // TODO Make dry with the searching tutorial class implementation
-
-    // Height of the tutorial text
-    const TEXT_HEIGHT = 225
-
-    let container = this.add.container().setDepth(11)
-
-    let img = this.add
-      .image(Space.windowWidth / 2, 0, `journey-Story 4`)
-      .setOrigin(0.5, 0)
-      .setInteractive()
-
-    // Ensure that image fits perfectly in window
-    const scale = Space.windowWidth / img.displayWidth
-    img.setScale(scale)
-
-    // Text background
-    let background = this.add
-      .rectangle(
-        0,
-        Space.windowHeight - TEXT_HEIGHT,
-        Space.windowWidth,
-        TEXT_HEIGHT,
-        Color.backgroundLight,
-      )
-      .setOrigin(0)
-      .setAlpha(0.8)
-    this.plugins.get('rexDropShadowPipeline')['add'](background, {
-      distance: 3,
-      shadowColor: 0x000000,
-    })
-
-    // Add text
-    let txt = this.add
-      .text(0, 0, '', Style.stillframe)
-      .setWordWrapWidth(Space.stillframeTextWidth)
-
-    const s =
-      "Impressive, all that life, all that wonder. You are welcomed in of course. But if I might share one thing that I've learned in my time here... It's that someday, everything blows away."
-
-    let textbox = this.rexUI.add
-      .textBox({
-        text: txt,
-        x: Space.pad,
-        y: background.y,
+      // Form a sizer for this character
+      const sizer = this.rexUI.add.sizer({
+        orientation: 'vertical',
         space: {
+          item: Space.pad,
           left: Space.pad,
           right: Space.pad,
           top: Space.pad,
           bottom: Space.pad,
         },
-        page: {
-          maxLines: 0, // 0 = unlimited lines
+      })
+
+      // Background
+      const background = this.add
+        .image(0, 0, 'background-Light')
+        .setInteractive()
+      this.addShadow(background)
+
+      // Avatar
+      const avatarFull = this.add.image(0, 0, `avatar-${name}Full`)
+
+      // Experience bar
+      // const expBarBackground = this.add.rectangle(
+      //   0,
+      //   0,
+      //   1,
+      //   1,
+      //   Color.backgroundLight,
+      //   0.5,
+      // )
+      // const expBar = createExpBar(this, avatarIndex)
+      // expBar.addBackground(expBarBackground)
+
+      // Mission title
+      const text = this.add.text(
+        0,
+        0,
+        mission.selectText,
+        Style.todoJourneyTitle,
+      )
+
+      // Select button
+      const btnContainer = new ContainerLite(
+        this,
+        0,
+        0,
+        Space.buttonWidth,
+        Space.buttonHeight,
+      )
+      new Buttons.Basic({
+        within: btnContainer,
+        text: 'Select',
+        f: () => {
+          // Set mission info
+          this.setMissionInfo(mission, avatarIndex)
+
+          // Set the right views visible/invisible
+          this.characterSelectView.setAlpha(0)
+          this.missionDetailsView.show().layout()
         },
       })
-      .start(s, 50)
+
+      sizer
+        .addBackground(background)
+        .add(avatarFull)
+        // .add(expBar, { padding: { top: -80 } })
+        .add(text)
+        .add(btnContainer)
+
+      return sizer.layout()
+    })
+
+    // Anchor the sizers to each side of the screen
+    this.plugins.get('rexAnchor')['add'](sizers[0], {
+      y: `50%`,
+      left: `0%+${Space.pad}`,
+    })
+    this.plugins.get('rexAnchor')['add'](sizers[1], {
+      y: `50%`,
+      right: `100%-${Space.pad}`,
+    })
+
+    this.characterSelectView.add(sizers[0]).add(sizers[1])
+  }
+
+  private createMissionDetails() {
+    // Create a sizer for the mission details
+    this.missionDetailsView = this.rexUI.add
+      .sizer({
+        space: {
+          top: Space.pad,
+          bottom: Space.pad,
+          left: Space.pad,
+          right: Space.pad,
+        },
+      })
       .setOrigin(0)
 
-    container.add([img, background, txt, textbox])
+    const background = this.add.image(0, 0, 'background-Light').setInteractive()
+    this.addShadow(background)
 
-    // Add an okay button
-    let btn = new Buttons.Basic({
-      within: container,
-      text: 'Continue',
-      x: Space.windowWidth - Space.pad - Space.buttonWidth / 2,
-      y: Space.windowHeight - Space.pad - Space.buttonHeight / 2,
-      f: () => {
-        // If typing isn't complete, complete it
-        if (textbox.isTyping) {
-          textbox.stop(true)
-        }
-        // Otherwise move on to the next frame
-        else {
-          this.tweens.add({
-            targets: container,
-            alpha: 0,
-            duration: Time.stillframeFade,
-            onComplete: () => {
-              container.setVisible(false)
-              container.alpha = 1
-            },
-          })
-
-          // Allow scrolling once the stillframe is gone
-          this.enableScrolling()
-
-          this.scene.start('PlaceholderScene')
-        }
-      },
+    // Left side sizer
+    const leftSizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: { item: Space.pad },
     })
 
-    // Scroll the image going down
-    this.add.tween({
-      targets: img,
-      duration: 6000,
-      ease: Ease.stillframe,
-      y: Space.windowHeight - img.displayHeight,
-      onStart: () => {
-        img.y = 0
-      },
+    this.txtMissionTitle = this.add.text(0, 0, '', Style.announcement)
+    const headerSizer = this.createHeader()
+    const decklistSizer = this.createDecklist()
+    const btnSizer = this.createButtons()
+
+    leftSizer
+      .add(this.txtMissionTitle)
+      .add(headerSizer)
+      .add(decklistSizer)
+      .add(btnSizer)
+
+    // Create card pool sizer
+    this.cardPoolSizer = this.rexUI.add.sizer()
+
+    // Add card pool to its own sizer
+    this.cardPoolSizer = this.createCardPool()
+
+    this.missionDetailsView
+      .add(leftSizer, { expand: true })
+      .add(this.cardPoolSizer, { expand: true })
+      .addBackground(background)
+      .layout()
+
+    // Add an anchor for the sizer
+    this.plugins.get('rexAnchor')['add'](this.missionDetailsView, {
+      left: `0%+${Space.pad}`,
+      top: `0%+${Space.pad}`,
     })
 
-    // Set the param to undefined so it doesn't persist
-    params.stillframe = undefined
-
-    // Reposition the stillframe to be visible to the camera
-    const coords = UserSettings._get('journeyCoordinates')
-    container.setPosition(coords.x, coords.y)
+    this.missionDetailsView.hide()
   }
 
-  // Add all of the missions to the panel
-  private addJourneyData(): void {
-    let completed: boolean[] = UserSettings._get('completedMissions')
+  private createPostMatch(expGained: number, postMatchText: string) {
+    this.postMatchView = this.add.container().setAlpha(0)
 
-    let unlockedMissions = journeyData.filter(function (mission) {
-      // Return whether any of the necessary conditions have been met
-      // Prereqs are in CNF (Or of sets of Ands)
-      return mission.prereq.some(function (prereqs, _) {
-        return prereqs.every(function (id, _) {
-          return completed[id]
-        })
+    // Avatar image
+    const image = this.add
+      .image(0, 0, `avatar-${avatarNames[this.selectedAvatar]}Full`)
+      .setInteractive()
+    this.addShadow(image)
+
+    // Contents
+    const background = this.add.image(0, 0, 'background-Light').setInteractive()
+    this.addShadow(background)
+
+    const sizer = this.rexUI.add
+      .sizer({
+        orientation: 'vertical',
+        space: {
+          item: Space.pad,
+          left: Space.pad,
+          right: Space.pad,
+        },
       })
+      .setOrigin(1, 0.5)
+
+    const title = this.add.text(0, 0, 'Story Complete!', Style.announcement)
+
+    const txt = this.add.text(0, 0, postMatchText, Style.basic)
+
+    // Experience gained and associated info
+    const expBar = createExpBar(this, this.selectedAvatar, expGained)
+
+    // Any unlocked cards, revealed when exp bar levels up
+    let cardsSizer: Sizer = this.rexUI.add.sizer({
+      space: { item: Space.pad },
     })
-
-    // Add each of the journeys as its own line
-    this.animatedBtns = []
-    unlockedMissions.forEach((mission: journeyNode) => {
-      // For now, it's all either the waving figure or ? icon
-      const nodeType = 'deck' in mission ? 'Mission' : 'QuestionMark'
-      let btn = new Buttons.Mission(
-        this,
-        mission.x,
-        mission.y,
-        this.missionOnClick(mission),
-        nodeType,
-      )
-
-      // If user hasn't completed this mission, animate it
-      if (!completed[mission.id]) {
-        this.animatedBtns.push(btn)
-      } else {
-        btn.setAlpha(0.5)
-      }
-    })
-  }
-
-  // Return the function for what happens when the given mission node is clicked on
-  private missionOnClick(mission: journeyNode): () => void {
-    return () => {
-      if ('deck' in mission) {
-        this.scene.start('JourneyBuilderScene', mission)
-      } else {
-        // Complete the mission
-        UserSettings._setIndex('completedMissions', mission.id, true)
-
-        // Show tip
-        if ('tip' in mission) {
-          this.scene.start('JourneyScene', { txt: mission.tip })
-        }
-        // Unlock the card
-        else if ('card' in mission) {
-          UserSettings._setIndex('inventory', mission.card, true)
-
-          const card = Catalog.getCardById(mission.card)
-          if (card === undefined) {
-            this.scene.start('JourneyScene', { txt: 'Error, card undefined' })
-          } else {
-            this.scene.start('JourneyScene', {
-              txt: card.story,
-              card: card,
-            })
-          }
-        }
-      }
-    }
-  }
-
-  private enableScrolling(): void {
-    let camera = this.cameras.main
-
-    this.input.on(
-      'gameobjectwheel',
-      (pointer, gameObject, dx, dy, dz, event) => {
-        JourneyScene.moveCamera(camera, dx, dy)
-      },
-    )
-  }
-
-  private enableDrag(): void {
-    // Arrow pointing from the start of the drag to current position
-    const arrow = this.scene.scene.add
-      .image(0, 0, 'icon-Arrow')
-      .setAlpha(0)
-      .setScrollFactor(0)
-
-    // Map can be dragged
-    this.input
-      .setDraggable(this.map)
-      .on('dragstart', (event) => {
-        this.isDragging = true
-      })
-      .on('drag', (event) => {
-        const angle = Phaser.Math.Angle.Between(
-          event.downX,
-          event.downY,
-          event.x,
-          event.y,
+    expBar.on('levelup.start', () => {
+      getUnlocksAtLevel(this.selectedAvatar, expBar.level).forEach((card) => {
+        const cont = new ContainerLite(
+          this,
+          0,
+          0,
+          Space.cardWidth,
+          Space.cardHeight,
         )
-        arrow
-          .setPosition(event.downX, event.downY)
-          .setRotation(angle + Phaser.Math.DegToRad(90))
-          .setAlpha(1)
+        const cardImage = new CardImage(card, cont)
+        cardsSizer.add(cont)
       })
-      .on('dragend', () => {
-        this.isDragging = false
-        arrow.setAlpha(0)
-      })
+      sizer.layout()
+    })
+
+    // Buttons
+    const btnContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.avatarSize,
+      Space.avatarSize,
+    )
+    new Buttons.Basic({
+      within: btnContainer,
+      text: 'Next',
+      f: () => {
+        // NOTE CardImage deleted because bug with containerlite in sizers
+        cardsSizer.destroy()
+        this.postMatchView.setAlpha(0)
+        this.waitingView.show()
+      },
+    })
+
+    sizer
+      .add(title)
+      .add(txt)
+      .add(cardsSizer)
+      .add(expBar)
+      .add(btnContainer)
+      .addBackground(background)
+      .layout()
+    this.postMatchView.add(sizer)
+
+    // Anchors
+    this.plugins.get('rexAnchor')['add'](image, {
+      y: `50%`,
+      left: `0%+${Space.pad}`,
+    })
+    this.plugins.get('rexAnchor')['add'](sizer, {
+      y: `50%`,
+      right: `100%-${Space.pad}`,
+    })
+
+    // Add everything to the container
+    this.postMatchView.add(image).add(sizer)
   }
 
-  private adjustIndicators(): void {
-    // Find the intersection between a line from the btn to camer's center
-    const camera = this.cameras.main
-    const rect = camera.worldView
+  private createWaitingNotice() {
+    this.waitingView = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: {
+        item: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+      },
+    })
 
-    // Adjust each indicator
-    for (let i = 0; i < this.animatedBtns.length; i++) {
-      const btn = this.animatedBtns[i]
+    const background = this.add.image(0, 0, 'background-Light').setInteractive()
+    this.addShadow(background)
 
-      // TODO Use set bounds of camera to lock it to the map image instead of math
-      const line = new Phaser.Geom.Line(
-        btn.icon.x,
-        btn.icon.y,
-        camera.scrollX + camera.centerX,
-        camera.scrollY + camera.centerY,
-      )
+    const txtNotice = this.add.text(
+      0,
+      0,
+      'Daily journey complete',
+      Style.announcement,
+    )
+    const txtHint = this.add.text(0, 0, 'You can start again!', Style.basic)
+    // this.txtTimer = this.add.text(0, 0, '00:00:00', Style.basic)
+    const btnContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: btnContainer,
+      text: 'Exit',
+      f: () => {
+        this.waitingView.hide()
+        this.characterSelectView.setAlpha(1)
+      },
+    })
 
-      const intersects = Phaser.Geom.Intersects.GetLineToRectangle(line, rect)
+    this.waitingView
+      .add(txtNotice)
+      .add(txtHint)
+      // .add(this.txtTimer)
+      .add(btnContainer)
+      .addBackground(background)
+      .layout()
+      .hide()
 
-      // If btn is on screen, hide this button's indicator indicator
-      if (intersects.length === 0) {
-        this.incompleteIndicators[i].setAlpha(0)
-      }
-      // Otherwise, place the indicator at the intersection of worldview and line to camera's center
-      else {
-        const intersect = intersects[0]
+    this.plugins.get('rexAnchor')['add'](this.waitingView, {
+      x: `50%`,
+      y: `50%`,
+    })
+  }
 
-        this.incompleteIndicators[i]
-          .setAlpha(1)
-          .setPosition(
-            intersect.x - camera.scrollX,
-            intersect.y - camera.scrollY,
-          )
+  private createHeader() {
+    const headerSizer = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      space: { item: Space.pad },
+    })
+
+    const container = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.avatarSize,
+      Space.avatarSize,
+    )
+    this.avatar = new AvatarButton({
+      within: container,
+    })
+    this.txtMissionDescription = this.add.text(0, 0, '', {
+      ...Style.basic,
+      wordWrap: { width: Space.cutoutWidth },
+      fixedWidth: Space.cutoutWidth,
+      maxLines: 10,
+    })
+    headerSizer.add(container).add(this.txtMissionDescription)
+
+    return headerSizer
+  }
+
+  private createDecklist() {
+    this.decklist = new Decklist(this, this.onClickCutout())
+
+    // Create a scrollable panel for the main decklist
+    const panel = newScrollablePanel(this, {
+      width: Space.cutoutWidth,
+      height: Space.windowHeight - 420,
+      scrollMode: 'vertical',
+      panel: {
+        child: this.decklist.sizer,
+      },
+    })
+
+    return panel
+  }
+
+  private createCardPool(): Sizer {
+    const sizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+    })
+
+    // Add text explaining the card pool
+    this.cardPoolText = this.add.text(0, 0, '', Style.basic)
+    this.cardPoolText.setOrigin(0.5, 0)
+
+    // Create the decklist with each card you can add
+    this.cardPool = new Decklist(this, this.onClickCardPool())
+
+    // Create a scrollable panel
+    const panel = newScrollablePanel(this, {
+      width: Space.cutoutWidth,
+      height: Space.windowHeight - Space.pad * 6,
+      scrollMode: 'vertical',
+      panel: {
+        child: this.cardPool.sizer,
+      },
+    })
+
+    sizer.add(this.cardPoolText).add(panel)
+
+    return sizer
+  }
+
+  private createButtons() {
+    const btnSizer = this.rexUI.add.sizer({
+      space: { item: Space.pad },
+    })
+
+    // TODO Buttons should have option to return a containerLite
+    const cont1 = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: cont1,
+      text: 'Back',
+      f: () => {
+        this.characterSelectView.setAlpha(1)
+        this.missionDetailsView.hide()
+      },
+    })
+
+    const cont3 = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    this.startBtn = new Buttons.Basic({
+      within: cont3,
+      text: 'Start',
+      f: () => {
+        // Start journey
+        const deck: Deck = {
+          name: 'Journey deck',
+          cards: this.decklist.getDeckCode(),
+          cosmeticSet: { avatar: this.selectedAvatar, border: 0 },
+        }
+        const opponentDeck: Deck = {
+          name: 'todo name me',
+          cards: this.selectedMission.opponentDeck,
+          cosmeticSet: { avatar: 0, border: 0 },
+        }
+
+        this.scene.start('JourneyMatchScene', {
+          deck: deck,
+          aiDeck: opponentDeck,
+          avatar: this.selectedAvatar,
+          uponRoundWinText: this.selectedMission.uponRoundWinText,
+          winText: this.selectedMission.winText,
+          loseText: this.selectedMission.loseText,
+        })
+      },
+    })
+
+    this.startBtn.enabled = false
+    btnSizer.add(cont1).add(cont3)
+
+    return btnSizer
+  }
+
+  private onClickCutout(): (cutout: Cutout) => () => void {
+    return (cutout: Cutout) => {
+      return () => {
+        this.decklist.removeCard(cutout.card)
+        this.missionDetailsView.layout()
+        this.updateDeckState()
       }
     }
   }
 
-  private static moveCamera(camera, dx, dy): void {
-    camera.scrollX = Math.max(0, camera.scrollX + dx)
-    camera.scrollY = Math.max(0, camera.scrollY + dy)
-
-    // Remember the camera position
-    JourneyScene.rememberCoordinates(camera)
+  private onClickCardPool(): (cutout: Cutout) => () => void {
+    return (cutout: Cutout) => {
+      return () => {
+        this.decklist.addCard(cutout.card)
+        this.missionDetailsView.layout()
+        this.updateDeckState()
+      }
+    }
   }
 
-  // Remember the position of the camera so the next time this scene launches it's in the same place
-  private static rememberCoordinates(camera): void {
-    UserSettings._set('journeyCoordinates', {
-      x: camera.scrollX,
-      y: camera.scrollY,
-    })
+  private updateDeckState() {
+    const deckSize = this.decklist.getDeckCode().length
+    const remainingCards = MechanicsSettings.DECK_SIZE - deckSize
+
+    // Update card pool text
+    this.cardPoolText.setText(
+      `Select ${remainingCards} more cards for your deck`,
+    )
+
+    if (deckSize === MechanicsSettings.DECK_SIZE) {
+      this.cardPoolSizer.hide()
+      this.startBtn.enable()
+    } else {
+      this.cardPoolSizer.show()
+      this.startBtn.disable()
+    }
+    this.missionDetailsView.layout()
+  }
+
+  private refreshCardPool() {
+    const cardSet: Set<Card> = getUnlockedCards()
+
+    // Enable dev flag to have all cards
+    if (Flags.devCardsEnabled) {
+      Catalog.collectibleCards.forEach((card) => {
+        cardSet.add(card)
+      })
+    }
+
+    // Set the decklist element to have this set of cards
+    this.cardPool.setDeck(Array.from(cardSet))
+  }
+
+  private setMissionInfo(mission: JourneyMission, avatarIndex: number) {
+    this.selectedMission = mission
+    this.selectedAvatar = avatarIndex
+
+    // Update the text / avatar
+    this.txtMissionTitle.setText(`${avatarNames[avatarIndex]}'s Story`)
+    this.txtMissionDescription.setText('Mission text coming soon')
+    this.avatar.setAvatar(avatarIndex)
+
+    // Update the decklist
+    this.decklist.setJourneyDeck(
+      mission.deck.map((id) => Catalog.getCardById(id)),
+    )
+
+    // Refresh the card pool to include optional cards from this mission
+    this.refreshCardPool()
+
+    // Update deck state after setting initial deck
+    this.updateDeckState()
+  }
+
+  beforeExit() {
+    // Stop the map scene when exiting journey
+    if (this.scene.isActive('MapScene')) {
+      this.scene.stop('MapScene')
+    }
+  }
+
+  // Get the missions that appear this time
+  private getMissionChoices(): [
+    [JourneyMission, number],
+    [JourneyMission, number],
+  ] {
+    // Total exp with all avatars
+    const totalExp = UserSettings._get('avatar_experience').reduce(
+      (acc, curr) => acc + curr,
+      0,
+    )
+
+    // 1. Determine which characters might appear
+    let maxIdx = 5
+    if (totalExp < 2200) maxIdx = 4
+    if (totalExp < 1200) maxIdx = 3
+    if (totalExp < 600) maxIdx = 2
+    if (totalExp < 200) maxIdx = 1
+    const allowed = Array.from({ length: maxIdx + 1 }, (_, i) => i)
+
+    // 2. Deterministic seed from UTC date
+    const now = new Date()
+    const seedStr = `${now.getUTCFullYear()}-${now.getUTCMonth()}-${now.getUTCDate()}`
+    let seed = 0
+    for (let i = 0; i < seedStr.length; i++)
+      seed = (seed * 31 + seedStr.charCodeAt(i)) & 0xffffffff
+
+    // Simple deterministic RNG (mulberry32)
+    function mulberry32(a: number) {
+      return function () {
+        let t = (a += 0x6d2b79f5)
+        t = Math.imul(t ^ (t >>> 15), t | 1)
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+      }
+    }
+    const rand = mulberry32(seed)
+
+    // 3. Randomly pick 2 unique characters
+    const results: [JourneyMission, number][] = []
+    while (results.length < 2) {
+      const idx = allowed[Math.floor(rand() * allowed.length)]
+      if (results.find((result) => result[1] === idx)) continue
+
+      // Get the right mission based off this avatar's exp
+      const level = getCharacterLevel(idx).level
+      const avatarMissionTrack = JOURNEY_MISSIONS[idx]
+
+      // Use level to determine mission index (level 1 = index 0, etc.)
+      // Clamp to available missions
+      const missionIndex = Math.min(level - 1, avatarMissionTrack.length - 1)
+      const mission = avatarMissionTrack[missionIndex]
+
+      results.push([mission, idx])
+    }
+
+    // We are guaranteeing 2 results in the above loop
+    return results as [[JourneyMission, number], [JourneyMission, number]]
   }
 }

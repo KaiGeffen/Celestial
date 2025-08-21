@@ -55,12 +55,6 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     fontSize: Flags.mobile ? '40px' : '60px',
     color: Color.passText,
   },
-  // Text on cards that references other cards
-  reference: {
-    fontFamily: mainFont,
-    fontSize: '14px',
-    color: '#11223300',
-  },
   // Surname for characters in premade deck
   surname: {
     fontFamily: mainFont,
@@ -176,6 +170,13 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     stroke: Color.blackS,
     strokeThickness: 3,
   },
+  todoJourneyTitle: {
+    fontFamily: mainFont,
+    fontSize: '26px',
+    color: Color.basicText,
+    stroke: Color.whiteS,
+    strokeThickness: 2,
+  },
 }
 
 // The styling for BBCode objects, from the rexui module
@@ -196,12 +197,12 @@ export const BBStyle: Record<string, any> = {
       width: Space.maxTextWidth,
     },
   },
-  // TODO This could be moved above, a BB can be instantiated with a normal style dictionary
   // Cost / Points shown above each card
   cardStats: {
     fontFamily: mainFont,
     fontSize: '30px',
     color: Color.cardText,
+    // TODO Add letter spacing after at least Phaser 3.6.0
   },
   // The textbox for the card
   cardText: {

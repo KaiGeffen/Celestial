@@ -58,12 +58,20 @@ export default class Cutout extends Button {
           : () => {},
         // When hovered, show the given cards
         hover: () => {
-          hint.leftPin = this.icon.getRightCenter().x
-          hint.showCard(card).disableWaitTime()
+          // If on the left half of the screen, left pin
+          if (this.icon.getCenter().x < Space.windowWidth / 2) {
+            hint.leftPin = this.icon.getRightCenter().x
+            hint.rightPin = undefined
+          } else {
+            hint.rightPin = this.icon.getLeftCenter().x
+            hint.leftPin = undefined
+          }
+
+          hint.showCard(card)
           this.icon.setTint(Color.buttonSelected)
         },
         exit: () => {
-          hint.hide().enableWaitTime()
+          hint.hide()
           this.icon.clearTint()
         },
       },
@@ -171,34 +179,7 @@ export default class Cutout extends Button {
       this.scene['signalError']("Can't remove a required card.")
     }
 
-    return this
-  }
-
-  // Set that this card is a part of a premade deck
-  setPremade(): Cutout {
-    const signalError = () => {
-      this.scene['signalError']("Can't make changes to premade decks.")
-    }
-
-    if (Flags.mobile) {
-      this.onClick = () => {
-        this.scene.scene.launch('MenuScene', {
-          menu: 'focus',
-          card: this.card,
-          cost: undefined,
-          getCount: () => {
-            return this.count
-          },
-          btnString: 'Remove',
-          closeOnClick: () => {
-            return true
-          },
-          callback: signalError,
-        })
-      }
-    } else {
-      this.onClick = signalError
-    }
+    this.updateText()
 
     return this
   }
@@ -211,7 +192,7 @@ export default class Cutout extends Button {
   }
 
   private updateText(): Cutout {
-    const char = 'x'
+    const char = this.required ? '🔒' : 'x'
 
     this.setText(`${char}${this.count}`)
 

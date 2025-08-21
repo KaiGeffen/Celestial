@@ -38,6 +38,7 @@ const NON_PIXEL_ART_DIRS = [
   'roundResult',
   'background',
   'chrome',
+  'icon',
 ]
 
 // Function to convert PNG to WebP using Sharp

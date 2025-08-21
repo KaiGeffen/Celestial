@@ -83,7 +83,7 @@ export const Color: Record<string, any> = {
   cardGreyed: CoreColors.lightGrey,
   // The color of either stat if it has been changed
   cardText: CoreColors.goldS,
-  cardStatChanged: CoreColors.blueS,
+  cardStatChanged: '#00aa00',
   cardTextBackground: 0x000000,
 
   // Charts
@@ -118,4 +118,9 @@ export const Color: Record<string, any> = {
   todoSubtext: CoreColors.blackS,
 
   rowHighlight: CoreColors.gold,
+
+  // Progress bar
+  progressBar: 0x4e342e,
+  progressBarTrack: 0x7b5e57,
+  progressBarTrackStroke: 0x260e04,
 }

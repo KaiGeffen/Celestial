@@ -1,7 +1,7 @@
 import 'phaser'
 
 import Card from '../../../shared/state/card'
-import { Flags, UserSettings } from '../settings/settings'
+import { Flags, Url, UserSettings } from '../settings/settings'
 import BaseScene from '../scene/baseScene'
 import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 import {
@@ -123,6 +123,7 @@ export default class UserDataServer {
         (data: {
           inventory: string
           completedMissions: string
+          avatar_experience: number[]
           decks: Deck[]
           username: string
           elo: number
@@ -172,7 +173,7 @@ export default class UserDataServer {
     console.log('Logging out')
 
     // Clear the sign-in token
-    localStorage.removeItem('gsi_token')
+    localStorage.removeItem(Url.gsi_token)
 
     if (UserDataServer.isLoggedIn()) {
       console.log('server was logged in and now its logging out...')
@@ -228,6 +229,17 @@ export default class UserDataServer {
     wsServer.send({
       type: 'sendCompletedMissions',
       missions: this.convertBoolArrayToBitString(missions),
+    })
+  }
+
+  // Send server user's experience with each avatar
+  static sendAvatarExperience(experience: number[]): void {
+    if (wsServer === undefined) {
+      throw 'Sending avatar experience when server ws doesnt exist.'
+    }
+    wsServer.send({
+      type: 'sendAvatarExperience',
+      experience: experience,
     })
   }
 
@@ -323,6 +335,7 @@ export default class UserDataServer {
   private static loadUserData(data: {
     inventory: string
     completedMissions: string
+    avatar_experience: number[]
     decks: Deck[]
     username: string
     elo: number
@@ -350,6 +363,10 @@ export default class UserDataServer {
     )
 
     sessionStorage.setItem('decks', JSON.stringify(data.decks))
+    sessionStorage.setItem(
+      'avatar_experience',
+      JSON.stringify(data.avatar_experience),
+    )
   }
 
   // TODO Clarify if we reuse a UserSessionWS or create a new ws even for signed in users

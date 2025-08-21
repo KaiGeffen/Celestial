@@ -74,7 +74,7 @@ export class Keywords {
   )
   static birth = new Keyword(
     'Birth',
-    '[color=#FABD5D]Birth X[/color]: If you have a Child in hand, increase its points by X. Otherwise create a 0:X [color=#FABD5D]Fleeting[/color] Child in hand.',
+    '[color=#FABD5D]Birth X[/color]: Create a Child (0:0, Fleeting) in hand if there is none. Then increase the points of each Child in hand by X.',
     true,
   )
   static exhale = new Keyword(

@@ -9,6 +9,7 @@ export const assetLists = {
       "Mia",
       "Mitra",
       "AdonisFull",
+      "AdonisFull",
       "ImaniFull",
       "JulesFull",
       "KitzFull",
@@ -323,7 +324,7 @@ export const assetLists = {
         "height": 80
       }
     },
-    "pixelArt": true
+    "pixelArt": false
   },
   "store": {
     "files": [
@@ -452,8 +453,6 @@ export const assetLists = {
       "resolve 4",
       "resolve 5",
       "shuffle",
-      "starve",
-      "success",
       "tie",
       "win"
     ]

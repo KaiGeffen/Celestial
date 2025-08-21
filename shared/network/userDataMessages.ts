@@ -16,6 +16,9 @@ export interface UserDataClientMessages {
   sendCompletedMissions: {
     missions: string
   }
+  sendAvatarExperience: {
+    experience: number[]
+  }
   refreshUserData: {}
   sendInitialUserData: {
     username: string
@@ -39,6 +42,7 @@ export interface UserDataServerMessages {
   sendUserData: {
     inventory: string
     completedMissions: string
+    avatar_experience: number[]
     decks: Deck[]
     username: string
     elo: number

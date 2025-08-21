@@ -68,7 +68,6 @@ class Pet extends Card {
     game.pile[player].push(pet)
 
     super.play(player, game, index, bonus)
-    // game.soundEffect = SoundEffect.Meow;
   }
 }
 const pet = new Pet(1)
@@ -108,7 +107,7 @@ const holdTight = new HoldTight({
   id: 33,
   cost: 2,
   points: 2,
-  text: 'Put the top card of your discard pile on on top of your deck.',
+  text: 'Put the top card of your discard pile on top of your deck.',
 })
 
 // BETA TODO
@@ -198,7 +197,7 @@ class Parade extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    if (super.exhale(5, game, player)) {
+    if (super.exhale(4, game, player)) {
       let amtAdded = 0
       for (let iHand = 0; iHand < game.hand[player].length; iHand++) {
         // If the card costs 3 or less
@@ -234,7 +233,7 @@ const parade = new Parade({
   id: 79,
   cost: 3,
   points: 3,
-  text: 'Exhale 5: Add each card with base-cost 3 or less from your hand to the story after this.',
+  text: 'Exhale 4: Add each card with base-cost 3 or less from your hand to the story after this.',
 })
 
 class MeAndHer extends Card {
@@ -272,8 +271,8 @@ class Sensualist extends Card {
 const sensualist = new Sensualist({
   name: 'Sensualist',
   id: 81,
-  cost: 4,
-  points: 4,
+  cost: 5,
+  points: 5,
   text: 'Costs 1 less for each of the following statuses you have: Nourish, Inspired, Sight.',
 })
 

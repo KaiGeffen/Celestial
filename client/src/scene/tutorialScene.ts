@@ -2,8 +2,16 @@ import 'phaser'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
 import { JourneyMatchScene } from './matchScene'
-import data from '../catalog/tutorial.json'
-import { Space, Color, BBStyle, Time, Depth, Flags } from '../settings/settings'
+import data from '../data/tutorial.json'
+import {
+  Space,
+  Color,
+  BBStyle,
+  Time,
+  Depth,
+  Flags,
+  UserSettings,
+} from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 import { CardImage } from '../lib/cardImage'
@@ -32,7 +40,7 @@ export default class TutorialMatchScene extends JourneyMatchScene {
 
   isTutorial = true
 
-  constructor(args = { key: 'TutorialMatchScene', lastScene: 'JourneyScene' }) {
+  constructor(args = { key: 'TutorialMatchScene', lastScene: 'HomeScene' }) {
     super(args)
   }
 
@@ -42,7 +50,6 @@ export default class TutorialMatchScene extends JourneyMatchScene {
     // Replace the results screen with tutorial results
     this.view.results = new ResultsRegionTutorial().create(this)
     this.view.results['missionID'] = this.params.missionID + 1
-    this.view.results.hide()
 
     // Replace the searching screen with still frames
     this.view.searching.hide()
@@ -122,9 +129,10 @@ export default class TutorialMatchScene extends JourneyMatchScene {
       )
     }
 
-    // If player has won/lost, ensure pass button is enabled
+    // If player has won/lost, ensure pass button is enabled, and set the tutorial as completed
     if (state.winner !== null) {
       this.view.pass.tutorialSimplifyPass(false)
+      UserSettings._setIndex('completedMissions', this.params.missionID, true)
     }
 
     let result = super.displayState(state)
@@ -444,5 +452,12 @@ export default class TutorialMatchScene extends JourneyMatchScene {
     this.card = new CardImage(Catalog.getCard(name), this.add.container(x, y))
 
     return this.card
+  }
+
+  doExit(): () => void {
+    return () => {
+      this.beforeExit()
+      this.scene.start('SigninScene')
+    }
   }
 }

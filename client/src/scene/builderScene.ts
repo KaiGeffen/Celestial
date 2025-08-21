@@ -31,8 +31,8 @@ export class BuilderBase extends BaseScene {
     this.params = params
   }
 
-  addCardToDeck(card: Card): string {
-    return this.deckRegion.addCardToDeck(card)
+  addCardToDeck(card: Card): void {
+    this.deckRegion.addCardToDeck(card)
   }
 
   // Filter which cards are visible and selectable in the catalog
@@ -115,11 +115,11 @@ export class JourneyBuilderScene extends BuilderBase {
 
   onWindowResize(): void {
     this.journeyRegion.onWindowResize()
-    this.catalogRegion.resize(Space.deckPanelWidth)
+    this.catalogRegion.resize(Space.cutoutWidth)
   }
 
-  addCardToDeck(card: Card): string {
-    return this.journeyRegion.addCardToDeck(card)
+  addCardToDeck(card: Card): void {
+    this.journeyRegion.addCardToDeck(card)
   }
 
   getDeckCode(): number[] {
@@ -241,22 +241,21 @@ export class BuilderScene extends BuilderBase {
     this.catalogRegion.resize(this.sizer.width)
   }
 
-  addCardToDeck(card: Card): string {
+  addCardToDeck(card: Card): void {
     // If no deck is selected, make a new deck and add this card
     if (this.decklistsRegion.savedDeckIndex === undefined) {
       // If creating an empty deck failed, return an error string
       if (!this.decklistsRegion.createEmptyDeck()) {
-        return `Reached max number of decks (${DecklistSettings.MAX_DECKS}).`
+        return
+        // `Reached max number of decks (${DecklistSettings.MAX_DECKS}).`
       }
 
       // NOTE Card gets added below (Deck starts empty)
     }
 
-    let result = this.deckRegion.addCardToDeck(card)
+    this.deckRegion.addCardToDeck(card)
 
     this.updateSavedDeck(this.getDeckCode())
-
-    return result
   }
 
   updateSavedDeck(

@@ -91,6 +91,14 @@ class SharedBaseScene extends Phaser.Scene {
     }
   }
 
+  addShadow(obj: Phaser.GameObjects.GameObject, angle = 45): void {
+    this.plugins.get('rexDropShadowPipeline')['add'](obj, {
+      distance: 3,
+      shadowColor: 0x000000,
+      angle,
+    })
+  }
+
   // Get a random number from 1 to max, inclusive
   private getRandomInRange(max: number): number {
     return 1 + Math.floor(Math.random() * max)
@@ -214,12 +222,7 @@ export class BaseSceneWithHeader extends BaseScene {
         Color.backgroundLight,
       )
       .setOrigin(0)
-
-    this.plugins.get('rexDropShadowPipeline')['add'](background, {
-      distance: 3,
-      angle: -90,
-      shadowColor: 0x000000,
-    })
+    this.addShadow(background)
 
     // Create back button
     new Buttons.Basic({

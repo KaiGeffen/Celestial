@@ -50,6 +50,7 @@ class ServerController {
         )
       }
     }
+    // this.model.winner = 0
   }
 
   doSetup(): void {
@@ -211,13 +212,10 @@ class ServerController {
     // Determine order of player triggers
     const players = this.model.priority === 1 ? [1, 0] : [0, 1]
 
-    // Increase max breath by 1, up to a cap
+    // Increase max breath by 1 for the first 10 rounds
     for (const player of players) {
-      if (this.model.maxBreath[player] < MechanicsSettings.BREATH_CAP) {
-        this.model.maxBreath[player] = Math.min(
-          this.model.maxBreath[player] + MechanicsSettings.BREATH_GAIN_PER_TURN,
-          MechanicsSettings.BREATH_CAP,
-        )
+      if (this.model.roundCount < MechanicsSettings.BREATH_CAP) {
+        this.model.maxBreath[player]++
       }
       this.model.breath[player] = this.model.maxBreath[player]
     }

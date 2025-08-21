@@ -2,14 +2,7 @@ import 'phaser'
 
 import Region from './baseRegion'
 
-import {
-  Space,
-  Color,
-  Style,
-  BBStyle,
-  Depth,
-  Flags,
-} from '../../settings/settings'
+import { Space, Color, Style, BBStyle, Depth } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import GameModel from '../../../../shared/state/gameModel'
 import avatarNames from '../../lib/avatarNames'
@@ -50,6 +43,9 @@ export default class MatchResultsRegion extends Region {
     this.createBackground()
     this.createContent()
     this.createButtons()
+
+    // Start hidden
+    this.hide()
 
     return this
   }
@@ -129,12 +125,12 @@ export default class MatchResultsRegion extends Region {
       y: `50%-${Space.pad + Space.buttonHeight / 2}`,
     })
 
-    // Exit
+    // Review
     new Buttons.Basic({
       within: container,
-      text: 'Exit Match',
-      x: Space.pad + Space.buttonWidth,
-      f: this.exitCallback(),
+      text: 'Hide',
+      x: -(Space.pad + Space.buttonWidth),
+      f: this.reviewCallback(),
     })
 
     // Replay
@@ -144,12 +140,12 @@ export default class MatchResultsRegion extends Region {
       f: this.newMatchCallback(),
     })
 
-    // Review
+    // Exit
     new Buttons.Basic({
       within: container,
-      text: 'Hide',
-      x: -Space.pad - Space.buttonWidth,
-      f: this.reviewCallback(),
+      text: 'Exit Match',
+      x: Space.pad + Space.buttonWidth,
+      f: this.scene.doExit(),
     })
   }
 
@@ -226,11 +222,7 @@ export default class MatchResultsRegion extends Region {
     const background = this.scene.add
       .rectangle(0, 0, 1, 1, Color.backgroundLight)
       .setInteractive()
-    this.scene.plugins.get('rexDropShadowPipeline')['add'](background, {
-      distance: 3,
-      angle: -90,
-      shadowColor: 0x000000,
-    })
+    this.scene.addShadow(background, -90)
 
     let sizer = this.scene.rexUI.add
       .fixWidthSizer({
@@ -269,12 +261,6 @@ export default class MatchResultsRegion extends Region {
     return this.scrollablePanel
   }
 
-  private exitCallback(): () => void {
-    return () => {
-      this.scene.doBack()
-    }
-  }
-
   private newMatchCallback(): () => void {
     return () => {
       // Restarts the game scene with same arguments (Deck, matchmaking, etc)
@@ -282,7 +268,7 @@ export default class MatchResultsRegion extends Region {
     }
   }
 
-  private reviewCallback(): () => void {
+  protected reviewCallback(): () => void {
     return () => {
       this.hide()
     }
@@ -369,5 +355,31 @@ export class ResultsRegionTutorial extends MatchResultsRegion {
         })
       }
     }
+  }
+}
+
+export class ResultsRegionJourney extends MatchResultsRegion {
+  protected createButtons() {
+    const container = this.scene.add.container()
+    this.container.add(container)
+    this.scene.plugins.get('rexAnchor')['add'](container, {
+      y: `50%-${Space.pad + Space.buttonHeight / 2}`,
+    })
+
+    // Review
+    new Buttons.Basic({
+      within: container,
+      text: 'Hide',
+      x: -(Space.pad + Space.buttonWidth) / 2,
+      f: this.reviewCallback(),
+    })
+
+    // Exit
+    new Buttons.Basic({
+      within: container,
+      text: 'Exit Match',
+      x: (Space.pad + Space.buttonWidth) / 2,
+      f: this.scene.doExit(),
+    })
   }
 }

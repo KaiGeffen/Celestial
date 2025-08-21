@@ -1,7 +1,7 @@
 import 'phaser'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
-import { BBStyle, Time, Space } from '../settings/settings'
+import { BBStyle, Space } from '../settings/settings'
 import Card from '../../../shared/state/card'
 import Catalog from '../../../shared/state/catalog'
 import { Keyword, Keywords } from '../../../shared/state/keyword'
@@ -15,10 +15,7 @@ export default class Hint {
 
   // The X position to position flush to, or undefined if no pin
   leftPin: number
-
-  // Time in milliseconds that user has waited without moving cursor
-  private waitTime = 0
-  private skipWait = false
+  rightPin: number
 
   // The card images shown in the hint
   private mainCard: CardImage
@@ -43,22 +40,9 @@ export default class Hint {
     this.mainCard = new CardImage(null, this.container, false).hide()
     this.referencedCard = new CardImage(null, this.container, false).hide()
 
-    // Copy mouse position and show a hint when over a hinted object
-    scene.input.on('pointermove', () => {
-      if (!this.skipWait) {
-        this.container.setAlpha(0)
-        this.waitTime = 0
-      }
-    })
-    scene.events.on('update', (time, delta) => {
+    scene.events.on('update', () => {
       if (!this.txt.scene) return
-      else if (this.waitTime < Time.hint && !this.skipWait) {
-        this.waitTime += delta
-        // Could also check that moving has happened, so not orienting every frame after timer runs out
-      } else {
-        this.orientText()
-        this.container.setAlpha(1)
-      }
+      this.orientText()
     })
   }
 
@@ -67,6 +51,7 @@ export default class Hint {
 
     // Reset the pin, since the next hovered item might not pin
     this.leftPin = undefined
+    this.rightPin = undefined
 
     return this
   }
@@ -76,14 +61,6 @@ export default class Hint {
     this.container.setVisible(true)
 
     return this
-  }
-
-  enableWaitTime(): void {
-    this.skipWait = false
-  }
-
-  disableWaitTime(): void {
-    this.skipWait = true
   }
 
   // Show the given hint text, or hide if empty
@@ -163,7 +140,7 @@ export default class Hint {
     // Unless there is a left pin, center and hover above the mouse position
     let x: number
     let y: number
-    if (this.leftPin === undefined) {
+    if (this.leftPin === undefined && this.rightPin === undefined) {
       x = pointer.position.x
       y = pointer.position.y - Space.pad
       this.txt.setX(x).setOrigin(0.5, 1).setY(y)
@@ -172,13 +149,21 @@ export default class Hint {
       y = y - this.txt.height + Space.cardHeight / 2 + Space.padSmall
     }
     // If there is a pin, go just to the right of that
-    else {
+    else if (this.leftPin !== undefined) {
       x = this.leftPin + Space.pad
       y = pointer.position.y
       this.txt.setX(x).setOrigin(0, 0.5).setY(y)
 
       // Adjust x,y for the cards
       x += this.txt.width / 2
+      y = y - this.txt.height / 2 + Space.padSmall + Space.cardHeight / 2
+    } else if (this.rightPin !== undefined) {
+      x = this.rightPin - Space.pad
+      y = pointer.position.y
+      this.txt.setX(x).setOrigin(1, 0.5).setY(y)
+
+      // Adjust x,y for the cards
+      x -= this.txt.width / 2
       y = y - this.txt.height / 2 + Space.padSmall + Space.cardHeight / 2
     }
 
