@@ -14,6 +14,7 @@ import {
   UserSettings,
   Time,
   Flags,
+  Url,
 } from '../../settings/settings'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
@@ -176,6 +177,9 @@ export default class OptionsMenu extends Menu {
     new Buttons.Icon({
       name: 'Discord',
       within: container,
+      f: () => {
+        window.open(Url.discord, '_blank')
+      },
     })
     tabsSizer.add(container)
 
