@@ -147,7 +147,7 @@ const timid = new Timid(3, {
 
 class Balance extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    if (game.story.resolvedActs.length === game.story.acts.length) {
+    if ((game.story.acts.length - 1) / 2 === index) {
       bonus += 3
     }
     super.play(player, game, index, bonus)

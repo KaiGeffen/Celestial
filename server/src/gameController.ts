@@ -287,7 +287,6 @@ class ServerController {
 
   // The resolution phase, after both players have passed. Points and effects happen as cards resolve
   private doResolvePhase(): void {
-    this.model.score = [0, 0]
     const wins: [number, number] = [0, 0]
 
     // this.model.recap.reset()

@@ -72,9 +72,6 @@ function reverseAttributes(model: GameModel): void {
   for (const act of model.story.acts) {
     act.owner = act.owner === 1 ? 0 : 1
   }
-  for (const act of model.story.resolvedActs) {
-    act.owner = act.owner === 1 ? 0 : 1
-  }
 }
 
 function hideHiddenInformation(model: GameModel) {

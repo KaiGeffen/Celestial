@@ -1,14 +1,15 @@
 import Card from '../../shared/state/card'
 
 import { SoundEffect } from './soundEffect'
-import { Quality } from './quality'
 import type GameModel from './gameModel'
 import getClientGameModel from './clientGameModel'
 import Act from './act'
 
 class Story {
   acts: Act[] = []
-  resolvedActs: Act[] = []
+
+  // The index in the story of the current act
+  currentIndex: number = 0
 
   // Add a card to the story with given owner and at given position
   addAct(card: Card, owner: number, i?: number) {
@@ -24,35 +25,27 @@ class Story {
   run(game: GameModel) {
     game.score = [0, 0]
     game.recentModels = [[], []]
-    this.resolvedActs = []
 
     // Add a model at the start
     game.versionIncr()
     addRecentModels(game)
 
-    let index = 0
     const roundEndEffects: [Function, number][] = []
-    while (this.acts.length > 0) {
-      const act = this.acts.shift()!
+    for (
+      this.currentIndex = 0;
+      this.currentIndex < this.acts.length;
+      this.currentIndex++
+    ) {
+      const act = this.acts[this.currentIndex]
 
+      // Reset the sound, changed if the card sets it
       game.sound = SoundEffect.Resolve
+      act.card.play(act.owner, game, this.currentIndex, 0)
 
-      act.card.play(act.owner, game, index, 0)
+      // Add any card end effects the card may have
+      // TODO Just scan at the end before discarding the card
       roundEndEffects.push([act.card.onRoundEndIfThisResolved, act.owner])
 
-      // Put in pile or remove from game if Fleeting
-      if (act.card.name === 'Pet') {
-        // Pet creates a new pet, so don't add to either pile
-      } else if (!act.card.qualities.includes(Quality.FLEETING)) {
-        game.pile[act.owner].push(act.card)
-      } else {
-        game.expended[act.owner].push(act.card)
-      }
-
-      // Add to the list of resolved acts
-      this.resolvedActs.push(act)
-
-      index++
       addRecentModels(game)
     }
 
@@ -65,8 +58,6 @@ class Story {
   // Save the final state of the story resolving, and clear the story
   saveFinalStateAndClear(game: GameModel) {
     addRecentModels(game)
-
-    this.resolvedActs = []
 
     // Set winner/loser/tie sfx
     if (game.score[0] > game.score[1]) {
@@ -88,7 +79,6 @@ class Story {
 
     // Clear the story
     this.acts = []
-    this.resolvedActs = []
   }
 
   // Remove the act at the given index
@@ -121,9 +111,7 @@ class Story {
       copy.acts.push({ ...act })
     })
 
-    this.resolvedActs.forEach((act) => {
-      copy.resolvedActs.push({ ...act })
-    })
+    copy.currentIndex = this.currentIndex
 
     return copy
   }

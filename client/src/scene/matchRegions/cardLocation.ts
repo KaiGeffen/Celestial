@@ -84,14 +84,7 @@ export default class CardLocation {
     if (state !== undefined) {
       // Find the amount that we must scale down by
       // This may be multiplied by a constant to fit within the max
-      // Length of cards displayed in the story
-      let length = state.story.acts.length
-      if (state.isRecap) {
-        // TODO Greyed cards
-        length += state.story.resolvedActs.length
-      }
-
-      const lastCardOffset = dx * (length - 1)
+      const lastCardOffset = dx * (state.story.acts.length - 1)
       if (lastCardOffset > maxOffset) {
         dx *= maxOffset / lastCardOffset
       }

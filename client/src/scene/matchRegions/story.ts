@@ -35,30 +35,13 @@ export default class StoryRegion extends Region {
       state.isRecap ? Depth.storyAtNight : Depth.storyAtDay,
     )
 
-    // If this is a recap, add the already played cards greyed out
-    // TODO: Either enable the onClick callback or remove its api
-    let resolvedI = 0
-    for (; resolvedI < state.story.resolvedActs.length; resolvedI++) {
-      const act: Act = state.story.resolvedActs[resolvedI]
-
-      let card = this.addCard(
-        act.card,
-        CardLocation.story(state, resolvedI, this.container, act.owner),
-      )
-        .setResolved()
-        .moveToTopOnHover()
-      // .setOnClick(this.callback(resolvedI))
-
-      this.temp.push(card)
-    }
-
     let cards = []
     for (let i = 0; i < state.story.acts.length; i++) {
       const act = state.story.acts[i]
 
       let card = this.addCard(
         act.card,
-        CardLocation.story(state, resolvedI + i, this.container, act.owner),
+        CardLocation.story(state, i, this.container, act.owner),
       ).moveToTopOnHover()
 
       // Only allow jumping around in the recap if we are playing a recap
@@ -87,7 +70,7 @@ export default class StoryRegion extends Region {
 
   // Display the current score totals and change in scores
   private displayScores(state: GameModel): void {
-    let index = state.story.resolvedActs.length - 1
+    let index = state.story.currentIndex
     if (index >= 0) {
       this.animateScoreGains(index, state.score, state)
     }
