@@ -91,6 +91,8 @@ class Story {
             index2: 0,
           }),
         )
+
+        game.sound = SoundEffect.Discard
       }
       // Fleeting cards are removed from the game
       else {
@@ -103,6 +105,9 @@ class Story {
             index: 0,
           }),
         )
+
+        // TODO: Sound effect for fleeting cards
+        game.sound = null
       }
 
       addRecentModels(game)
