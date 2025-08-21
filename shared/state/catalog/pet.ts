@@ -62,10 +62,11 @@ class Pet extends Card {
   }
 
   play(player: number, game: GameModel, index: number, bonus: number) {
-    let points = this.points + bonus
-    points += game.status[player].nourish
-    const pet = new Pet(points)
-    game.pile[player].push(pet)
+    // The points of the new pet
+    const points = this.points + bonus + game.status[player].nourish
+
+    // Replace pet in the story with the new pet
+    game.story.replaceAct(index, new Act(new Pet(points), player))
 
     super.play(player, game, index, bonus)
   }
