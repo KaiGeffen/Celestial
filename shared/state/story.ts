@@ -4,6 +4,9 @@ import { SoundEffect } from './soundEffect'
 import type GameModel from './gameModel'
 import getClientGameModel from './clientGameModel'
 import Act from './act'
+import { Quality } from './quality'
+import { Zone } from './zone'
+import { Animation } from '../animation'
 
 class Story {
   acts: Act[] = []
@@ -30,7 +33,6 @@ class Story {
     game.versionIncr()
     addRecentModels(game)
 
-    const roundEndEffects: [Function, number][] = []
     for (
       this.currentIndex = 0;
       this.currentIndex < this.acts.length;
@@ -42,21 +44,12 @@ class Story {
       game.sound = SoundEffect.Resolve
       act.card.play(act.owner, game, this.currentIndex, 0)
 
-      // Add any card end effects the card may have
-      // TODO Just scan at the end before discarding the card
-      roundEndEffects.push([act.card.onRoundEndIfThisResolved, act.owner])
-
       addRecentModels(game)
-    }
-
-    // Do all round end effects
-    for (const [callback, player] of roundEndEffects) {
-      callback(player, game)
     }
   }
 
   // Save the final state of the story resolving, and clear the story
-  saveFinalStateAndClear(game: GameModel) {
+  saveFinalState(game: GameModel) {
     addRecentModels(game)
 
     // Set winner/loser/tie sfx
@@ -76,9 +69,44 @@ class Story {
       game.recentModels[1][game.recentModels[1].length - 1].sound =
         SoundEffect.Tie
     }
+  }
 
-    // Clear the story
-    this.acts = []
+  // Do the cleanup phase
+  doCleanup(game: GameModel) {
+    while (this.acts.length > 0) {
+      const act = this.acts.shift()!
+
+      // Trigger the card's round end effect
+      act.card.onRoundEndIfThisResolved(act.owner, game)
+
+      // Normal cards go to discard pile
+      if (!act.card.qualities.includes(Quality.FLEETING)) {
+        game.pile[act.owner].push(act.card)
+        game.animations[act.owner].push(
+          new Animation({
+            from: Zone.Story,
+            to: Zone.Discard,
+            card: act.card,
+            index: 0,
+            index2: 0,
+          }),
+        )
+      }
+      // Fleeting cards are removed from the game
+      else {
+        game.expended[act.owner].push(act.card)
+        game.animations[act.owner].push(
+          new Animation({
+            from: Zone.Story,
+            to: Zone.Gone,
+            card: act.card,
+            index: 0,
+          }),
+        )
+      }
+
+      addRecentModels(game)
+    }
   }
 
   // Remove the act at the given index
