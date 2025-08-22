@@ -22,10 +22,9 @@ const dove = new Dove({
 
 class Starling extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    if (game.story.acts.length > 0) {
-      if (game.story.acts[0].card.cost === 1) {
-        bonus += 1
-      }
+    const nextAct = game.story.acts[index + 1]
+    if (nextAct && nextAct.card.cost === 1) {
+      bonus += 1
     }
     super.play(player, game, index, bonus)
   }
@@ -206,9 +205,11 @@ class LayBare extends Card {
     super.play(player, game, index, bonus)
 
     if (this.exhale(1, game, player)) {
+      const nextAct = game.story.acts[index + 1]
+
       // If there are more cards, transform the first one into a version with no text/qualities
-      if (game.story.acts.length > 0) {
-        const oldCard = game.story.acts[0].card
+      if (nextAct) {
+        const oldCard = nextAct.card
 
         const newCard = new Card({
           name: oldCard.name,
@@ -217,7 +218,7 @@ class LayBare extends Card {
           points: oldCard.points,
         })
 
-        this.transform(0, newCard, game)
+        this.transform(index + 1, newCard, game)
       }
     }
   }

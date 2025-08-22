@@ -21,7 +21,7 @@ const stars = new Stars({
 class Cosmos extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     let amt = 1
-    for (const act of game.story.acts) {
+    for (const act of game.story.acts.slice(index + 1)) {
       if (act.owner === player) {
         amt += 1
       }
@@ -169,7 +169,7 @@ class Hero extends Card {
 
     // Initiation
     if (super.exhale(3, game, player)) {
-      game.removeAct(0)
+      game.removeAct(index + 1)
     }
 
     // Return

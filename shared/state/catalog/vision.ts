@@ -125,7 +125,7 @@ class Timid extends SightCard {
     super.play(player, game, index, bonus)
 
     if (super.exhale(1, game, player)) {
-      let i = 0
+      let i = index + 1
       while (i < game.story.acts.length) {
         const act = game.story.acts[i]
         if (act.owner === player) {
@@ -209,7 +209,7 @@ class Lantern extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    if (game.story.acts.length === 0) {
+    if (game.story.acts.length === index) {
       const card = game.hand[player].splice(0, 1)[0]
       if (card !== undefined) {
         // Create a new copy of the card, but with 1 more point

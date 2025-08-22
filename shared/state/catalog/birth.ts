@@ -32,8 +32,10 @@ const birth = new Birth({
 
 class Ancestry extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    const amt = game.story.acts.length
+    const amt = game.story.acts.length - index
+
     super.play(player, game, index, bonus)
+
     if (amt >= 1) {
       this.birth(amt, game, player)
     }
@@ -88,16 +90,16 @@ class Rebirth extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    let idx = 0
-    for (const act of game.story.acts) {
+    for (let i = index + 1; i < game.story.acts.length; i++) {
+      const act = game.story.acts[i]
+
       if (act.owner === player) {
         const card = child.copy()
         card.points = act.card.cost
 
         // Transform original card into child
-        this.transform(idx, card, game)
+        this.transform(i, card, game)
       }
-      idx += 1
     }
   }
 }
@@ -146,7 +148,7 @@ class Storytime extends Card {
     super.play(player, game, index, bonus)
 
     // Create a copy in hand of each card later in the 	story that costs 0.
-    for (const act of game.story.acts) {
+    for (const act of game.story.acts.slice(index + 1)) {
       if (act.card.cost === 0) {
         game.create(player, act.card)
       }
@@ -219,7 +221,8 @@ const justLikeDad = new JustLikeDad({
 
 class Hug extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    if (game.story.acts.length > 0 && game.story.acts[0].owner === player) {
+    const nextAct = game.story.acts[index + 1]
+    if (nextAct && nextAct.owner === player) {
       bonus += 2
     }
     super.play(player, game, index, bonus)

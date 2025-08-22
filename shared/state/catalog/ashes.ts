@@ -83,7 +83,8 @@ const arsonist = new Arsonist({
 
 class Parch extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    for (const act of game.story.acts) {
+    const laterActs = game.story.acts.slice(index + 1)
+    for (const act of laterActs) {
       if (act.owner === player) {
         bonus += 1
       }
@@ -93,8 +94,8 @@ class Parch extends Card {
 
     // NOTE This is done because some cards add themselves to the story when they are discarded
     // Check this many cards (Discarding yours, ignoring theirs)
-    const maxCount = game.story.acts.length
-    for (let count = 0, i = 0; count < maxCount; count++) {
+    const maxCount = laterActs.length
+    for (let count = 0, i = index + 1; count < maxCount; count++) {
       const act = game.story.acts[i]
       if (act.owner === player) {
         game.removeAct(i)
@@ -248,7 +249,7 @@ class Goliath extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    game.removeAct(0)
+    game.removeAct(index + 1)
     game.mill(player, 2)
   }
 }
@@ -302,7 +303,7 @@ class Spark extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    for (let i = 0; i < game.story.acts.length; i++) {
+    for (let i = index + 1; i < game.story.acts.length; i++) {
       if (game.story.acts[i].owner === player) {
         game.removeAct(i)
         break

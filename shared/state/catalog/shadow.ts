@@ -225,7 +225,7 @@ const lostInShadow = new LostInShadow({
   id: 47,
   cost: 2,
   points: 4,
-  text: 'Discard your hand unless you have a card with base-cost 6 or more later in the story.',
+  text: 'Discard your hand unless you have a card with base-cost 6 or more in the story.',
 })
 
 class Vampire extends Card {
