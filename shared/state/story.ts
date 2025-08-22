@@ -28,16 +28,13 @@ class Story {
   run(game: GameModel) {
     game.score = [0, 0]
     game.recentModels = [[], []]
+    this.currentIndex = 0
 
     // Add a model at the start
     game.versionIncr()
     addRecentModels(game)
 
-    for (
-      this.currentIndex = 0;
-      this.currentIndex < this.acts.length;
-      this.currentIndex++
-    ) {
+    for (; this.currentIndex < this.acts.length; this.currentIndex++) {
       const act = this.acts[this.currentIndex]
 
       // Reset the sound, changed if the card sets it
