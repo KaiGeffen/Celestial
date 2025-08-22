@@ -154,7 +154,7 @@ export default class TheirScoreRegion extends Region {
         // speedButton.icon.setFrame(this.getSpeedFrame(newSpeed))
 
         // Show a message about the speed change
-        this.scene.signalError(`YOUR SPEED: ${newSpeed}x`)
+        this.scene.signalError(`YOUR SPEED: ${newSpeed * 10}x`)
       },
     })
 
