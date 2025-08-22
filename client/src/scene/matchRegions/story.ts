@@ -44,6 +44,11 @@ export default class StoryRegion extends Region {
         CardLocation.story(state, i, this.container, act.owner),
       ).moveToTopOnHover()
 
+      // Cards before the current act are greyed out
+      if (i < state.story.currentIndex) {
+        card.setResolved()
+      }
+
       // Only allow jumping around in the recap if we are playing a recap
       if (state.isRecap && !Flags.mobile) {
         // card.setOnClick(this.callback(resolvedI + i))
@@ -56,6 +61,8 @@ export default class StoryRegion extends Region {
     // Show changes in score
     if (state.isRecap) {
       this.displayScores(state)
+    } else {
+      this.lastScores = [0, 0]
     }
 
     this.animate(state, cards)
