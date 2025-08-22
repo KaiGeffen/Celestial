@@ -45,7 +45,7 @@ export default class StoryRegion extends Region {
       ).moveToTopOnHover()
 
       // Cards before the current act are greyed out
-      if (i < state.story.currentIndex) {
+      if (state.isRecap && i < state.story.currentIndex) {
         card.setResolved()
       }
 
