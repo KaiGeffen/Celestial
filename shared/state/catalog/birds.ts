@@ -84,10 +84,11 @@ class Phoenix extends Card {
 
     const deck = game.deck[player]
     const discardPile = game.pile[player]
-    ;[deck, discardPile].forEach((zone) => {
+    const hand = game.hand[player]
+    ;[deck, discardPile, hand].forEach((zone) => {
       // For each index in the zone
       for (let i = 0; i < zone.length; i++) {
-        let card = zone[i]
+        let card = zone[i] as Card
         if (card.qualities.includes(Quality.FLEETING)) {
           const cardCopy = card.copy()
           cardCopy.points += 1
@@ -97,15 +98,29 @@ class Phoenix extends Card {
         }
       }
     })
+
+    // Replace acts in the story
+    game.story.acts.forEach((act, i) => {
+      const card = act.card
+      if (
+        i !== index &&
+        act.owner === player &&
+        card.qualities.includes(Quality.FLEETING)
+      ) {
+        const cardCopy = card.copy()
+        cardCopy.points += 1
+        act.card = cardCopy
+      }
+    })
   }
 }
 const phoenix = new Phoenix({
   name: 'Phoenix',
   id: 51,
   cost: 5,
-  points: 5,
+  points: 4,
   qualities: [Quality.VISIBLE, Quality.FLEETING],
-  text: 'Visible\nFleeting\nGive each card with Fleeting in your deck or discard pile +1 point.',
+  text: 'Visible\nFleeting\nGive your other Fleeting cards everywhere +1 point.',
   story:
     'Cracks in the shell\nShell falls away\nI stretch into wide possibilities',
 })
@@ -162,7 +177,7 @@ const nest = new Nest({
   name: 'Nest',
   id: 24,
   cost: 2,
-  points: 0,
+  points: 1,
   text: 'Morning: Create a Dove in the story.',
 })
 
