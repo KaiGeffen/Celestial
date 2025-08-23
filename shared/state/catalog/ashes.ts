@@ -276,19 +276,21 @@ const firebug = new Firebug({
 
 class Immolant extends Card {
   onDiscard(player: number, game: GameModel) {
+    const index = game.story.currentIndex + 1
+
     game.animations[player].push(
       new Animation({
         from: Zone.Discard,
         to: Zone.Story,
         index: game.pile[player].length - 1,
-        index2: 0, // TODO
+        index2: index,
       }),
     )
 
     // Remove this from the discard pile
     game.pile[player].pop()
 
-    game.story.addAct(this, player, 0)
+    game.story.addAct(this, player, index)
   }
 }
 const immolant = new Immolant({

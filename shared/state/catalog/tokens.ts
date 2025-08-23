@@ -57,30 +57,32 @@ const predator = new Predator({
   text: "Fleeting\nWorth +2 for each Prey in your opponent's discard pile.",
 })
 
-// class Wound extends Card {
-//   onDiscard(player: number, game: GameModel) {
-//     game.animations[player].push(
-//       new Animation({
-//         from: Zone.Discard,
-//         to: Zone.Story,
-//         index: game.pile[player].length - 1,
-//         index2: game.story.resolvedActs.length + 1,
-//       }),
-//     )
+class Wound extends Card {
+  onDiscard(player: number, game: GameModel) {
+    const index = game.story.currentIndex + 1
 
-//     // Remove this from the discard pile
-//     game.pile[player].pop()
+    game.animations[player].push(
+      new Animation({
+        from: Zone.Discard,
+        to: Zone.Story,
+        index: game.pile[player].length - 1,
+        index2: index,
+      }),
+    )
 
-//     game.story.addAct(this, player, 0)
-//   }
-// }
-// const wound = new Wound({
-//   name: 'Wound',
-//   id: 1005,
-//   points: -3,
-//   qualities: [Quality.FLEETING],
-//   text: 'Fleeting\nWhen this is discarded, add it next in the story.',
-// })
+    // Remove this from the discard pile
+    game.pile[player].pop()
+
+    game.story.addAct(this, player, index)
+  }
+}
+const wound = new Wound({
+  name: 'Wound',
+  id: 1005,
+  points: -3,
+  qualities: [Quality.FLEETING],
+  text: 'Fleeting\nWhen this is discarded, add it next in the story.',
+})
 
 const heirloom = new Card({
   name: 'Heirloom',
