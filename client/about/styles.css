@@ -218,6 +218,7 @@ p {
 /* Discord button - uses button2.png */
 .newsletter-section .signup-button {
   background-image: url('assets/button2.png');
+  color: #4b7962;
 }
 
 .newsletter-section a {
