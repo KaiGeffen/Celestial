@@ -117,7 +117,7 @@ p {
 .about-title {
   font-family: 'Recoleta', serif;
   font-size: 64px;
-  color: var(--color-black);
+  color: #bc6c31;
   margin-bottom: 20px;
 }
 
@@ -146,7 +146,7 @@ p {
 
 .newsletter-section {
   position: relative;
-  background: rgba(44, 52, 62, 0.9);
+  background: rgba(75, 121, 98);
   padding: 5% 10%;
   display: flex;
   flex-direction: column;
@@ -157,7 +157,7 @@ p {
 .newsletter-title {
   font-family: 'Recoleta', serif;
   font-size: 48px;
-  color: var(--color-gold);
+  color: #f0e3ca;
   margin-bottom: 20px;
 }
 
@@ -165,7 +165,7 @@ p {
   font-family: 'Josefin Sans', sans-serif;
   font-size: 24px;
   font-weight: 300;
-  color: var(--color-gold);
+  color: #f0e3ca;
   max-width: 600px;
   margin-bottom: 30px;
 }
@@ -192,13 +192,12 @@ p {
 .signup-button {
   color: var(--color-navy);
   font-family: 'Josefin Sans', sans-serif;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 400;
   cursor: pointer;
   width: auto;
   position: relative;
   display: inline-block;
-  background-image: url('assets/button.png');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -210,7 +209,22 @@ p {
   text-decoration: none;
 }
 
+/* Play Free button - uses button1.png */
+#play-free-container .signup-button {
+  background-image: url('assets/button1.png');
+  color: #f0e3ca;
+}
+
+/* Discord button - uses button2.png */
+.newsletter-section .signup-button {
+  background-image: url('assets/button2.png');
+}
+
 .newsletter-section a {
+  text-decoration: none;
+}
+
+#play-free-container a {
   text-decoration: none;
 }
 
@@ -265,7 +279,7 @@ p {
   font-family: 'Josefin Sans', sans-serif;
   font-size: 32px;
   font-weight: 300;
-  color: var(--color-gold);
+  color: #f0e3ca;
   text-decoration: none;
   transition: transform 0.2s;
 }
