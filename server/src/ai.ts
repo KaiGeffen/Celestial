@@ -98,7 +98,7 @@ function rateTurn(turn: number[], model: GameModel): number {
     result += card.ratePlay(predictedModel)
 
     // Speculate about adding this act
-    predictedModel.story.addAct(card, 0)
+    predictedModel.story.addActToEnd(card, 0)
   }
 
   return result

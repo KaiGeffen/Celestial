@@ -298,8 +298,8 @@ export default class GameModel {
     this.deck[player].push(card)
   }
 
-  createInStory(player: number, card: Card) {
-    this.story.addAct(card, player)
+  createAtStoryEnd(player: number, card: Card) {
+    this.story.addActToEnd(card, player)
   }
 
   dig(player: number, amt: number) {

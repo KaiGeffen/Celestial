@@ -124,14 +124,14 @@ class Yearn extends Card {
           const card = game.pile[player].pop()
 
           // Add the card as a new act
-          game.story.addAct(card, player, 0)
+          game.story.addActNext(card, player)
 
           // Animate the movement
           game.animations[player].push(
             new Animation({
               from: Zone.Discard,
               to: Zone.Story,
-              index2: 0,
+              index2: index + 1,
             }),
           )
         }
@@ -207,7 +207,7 @@ class Parade extends Card {
           const card = game.hand[player].splice(iHand, 1)[0]
 
           // Add the card as a new act
-          game.story.addAct(card, player, amtAdded)
+          game.story.addActNext(card, player, amtAdded)
 
           // Animate the movement
           game.animations[player].push(
@@ -215,7 +215,7 @@ class Parade extends Card {
               from: Zone.Hand,
               to: Zone.Story,
               index: iHand,
-              index2: index + amtAdded,
+              index2: index + amtAdded + 1,
             }),
           )
 

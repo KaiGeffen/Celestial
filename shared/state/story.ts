@@ -14,14 +14,16 @@ class Story {
   // The index in the story of the current act
   currentIndex: number = 0
 
-  // Add a card to the story with given owner and at given position
-  addAct(card: Card, owner: number, i?: number) {
+  // Add a card to the end of the story
+  addActToEnd(card: Card, owner: number) {
     const act = new Act(card, owner)
-    if (i === undefined) {
-      this.acts.push(act)
-    } else {
-      this.acts.splice(i, 0, act)
-    }
+    this.acts.push(act)
+  }
+
+  // Add a card next in the story with optional offset
+  addActNext(card: Card, owner: number, offset: number = 0) {
+    const act = new Act(card, owner)
+    this.acts.splice(this.currentIndex + 1 + offset, 0, act)
   }
 
   // Run the current story

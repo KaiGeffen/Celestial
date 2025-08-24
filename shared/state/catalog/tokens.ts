@@ -73,7 +73,7 @@ class Wound extends Card {
     // Remove this from the discard pile
     game.pile[player].pop()
 
-    game.story.addAct(this, player, index)
+    game.story.addActNext(this, player)
   }
 }
 const wound = new Wound({

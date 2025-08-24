@@ -244,7 +244,7 @@ class Pride extends Card {
   onMorning(player: number, game: GameModel, index: number) {
     if (super.exhale(2, game, player)) {
       game.pile[player].splice(index, 1)
-      game.createInStory(player, this)
+      game.createAtStoryEnd(player, this)
       game.discard(player)
     }
     return true

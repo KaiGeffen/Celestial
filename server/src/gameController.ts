@@ -132,7 +132,7 @@ class ServerController {
     const card = this.model.hand[player].splice(cardNum, 1)[0]
 
     // Add the card to the story
-    this.model.story.addAct(card, player)
+    this.model.story.addActToEnd(card, player)
 
     // Trigger on-play effects
     card.onPlay(player, this.model)

@@ -290,7 +290,7 @@ class Immolant extends Card {
     // Remove this from the discard pile
     game.pile[player].pop()
 
-    game.story.addAct(this, player, index)
+    game.story.addActNext(this, player)
   }
 }
 const immolant = new Immolant({

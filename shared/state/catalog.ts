@@ -12,24 +12,27 @@ import * as tokensCatalog from './catalog/tokens'
 import { Animation } from '../animation'
 import { Zone } from './zone'
 import { Keyword, Keywords } from './keyword'
+import GameModel from './gameModel'
 
 // TODO Break out, make settings, and make dry this behavior
 class Paramountcy extends Card {
-  play(player, game, index, bonus) {
+  play(player, game: GameModel, index, bonus) {
     super.play(player, game, index, bonus)
-    const space = 99 - (index + 1 + game.story.acts.length)
-    for (let i = 0; i < Math.min(space, 5); i++) {
-      if (game.pile[player].length > 0) {
-        const card = game.pile[player].pop()
-        game.story.addAct(card, player, i)
-        game.animations[player].push(
-          new Animation({
-            from: Zone.Discard,
-            to: Zone.Story,
-            index2: i,
-          }),
-        )
-      }
+
+    // At most 100 cards can be in the story in total
+    const amt = Math.min(5, game.pile[player].length, 99 - index)
+
+    // Add amt cards from discard pile to story
+    for (let i = 0; i < amt; i++) {
+      const card = game.pile[player].pop()
+      game.story.addActNext(card, player, i)
+      game.animations[player].push(
+        new Animation({
+          from: Zone.Discard,
+          to: Zone.Story,
+          index2: index + i + 1,
+        }),
+      )
     }
   }
 }
