@@ -117,7 +117,7 @@ p {
 .about-title {
   font-family: 'Recoleta', serif;
   font-size: 64px;
-  color: var(--color-black);
+  color: #bc6c31;
   margin-bottom: 20px;
 }
 
@@ -146,7 +146,7 @@ p {
 
 .newsletter-section {
   position: relative;
-  background: rgba(44, 52, 62, 0.9);
+  background: rgba(75, 121, 98);
   padding: 5% 10%;
   display: flex;
   flex-direction: column;
@@ -157,7 +157,7 @@ p {
 .newsletter-title {
   font-family: 'Recoleta', serif;
   font-size: 48px;
-  color: var(--color-gold);
+  color: #f0e3ca;
   margin-bottom: 20px;
 }
 
@@ -165,7 +165,7 @@ p {
   font-family: 'Josefin Sans', sans-serif;
   font-size: 24px;
   font-weight: 300;
-  color: var(--color-gold);
+  color: #f0e3ca;
   max-width: 600px;
   margin-bottom: 30px;
 }
@@ -190,10 +190,9 @@ p {
 }
 
 .signup-button {
-  background: var(--color-gold);
   color: var(--color-navy);
   font-family: 'Josefin Sans', sans-serif;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 400;
   cursor: pointer;
   width: auto;
@@ -229,10 +228,11 @@ p {
 #play-free-container a {
   text-decoration: none;
 }
-}
 
 .signup-button:hover {
-  transform: scale(1.05);
+  /* text-shadow: 0 0 20px rgba(250, 189, 93, 0.8); */
+  filter: brightness(1.2) contrast(1.1);
+  transition: all 0.2s ease;
 }
 
 /* Remove hover effect from the link wrapper */
@@ -298,13 +298,9 @@ p {
   font-family: 'Josefin Sans', sans-serif;
   font-size: 32px;
   font-weight: 300;
-  color: var(--color-gold);
+  color: #f0e3ca;
   text-decoration: none;
   transition: transform 0.2s;
-}
-
-.social-link:hover {
-  transform: scale(1.05);
 }
 
 .signup-message {
