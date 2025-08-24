@@ -195,13 +195,40 @@ p {
   font-family: 'Josefin Sans', sans-serif;
   font-size: 24px;
   font-weight: 400;
-  padding: 12px 40px;
-  border: none;
-  border-radius: 8px;
   cursor: pointer;
-  transition: transform 0.2s;
-  width: 100%;
-  max-width: 200px;
+  width: auto;
+  position: relative;
+  display: inline-block;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 60px;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+/* Play Free button - uses button1.png */
+#play-free-container .signup-button {
+  background-image: url('assets/button1.png');
+  color: #f0e3ca;
+}
+
+/* Discord button - uses button2.png */
+.newsletter-section .signup-button {
+  background-image: url('assets/button2.png');
+  color: #4b7962;
+}
+
+.newsletter-section a {
+  text-decoration: none;
+}
+
+#play-free-container a {
+  text-decoration: none;
+}
 }
 
 .signup-button:hover {
