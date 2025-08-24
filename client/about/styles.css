@@ -208,6 +208,22 @@ p {
   transform: scale(1.05);
 }
 
+/* Remove hover effect from the link wrapper */
+#play-free-container a:hover,
+.newsletter-section a:hover {
+  transform: none;
+}
+
+/* Ensure first button only hovers over the button itself */
+#play-free-container a {
+  display: inline-block;
+  pointer-events: none;
+}
+
+#play-free-container a .signup-button {
+  pointer-events: auto;
+}
+
 .features-section {
   position: relative;
   padding: 5% 10%;
