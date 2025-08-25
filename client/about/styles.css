@@ -230,7 +230,9 @@ p {
 }
 
 .signup-button:hover {
-  transform: scale(1.05);
+  /* text-shadow: 0 0 20px rgba(250, 189, 93, 0.8); */
+  filter: brightness(1.2) contrast(1.1);
+  transition: all 0.2s ease;
 }
 
 /* Remove hover effect from the link wrapper */
@@ -299,10 +301,6 @@ p {
   color: #f0e3ca;
   text-decoration: none;
   transition: transform 0.2s;
-}
-
-.social-link:hover {
-  transform: scale(1.05);
 }
 
 .signup-message {
