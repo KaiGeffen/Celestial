@@ -22,7 +22,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
   // Jules
   [
     {
-      selectText: 'Help me find my truth!',
+      selectText: '"Help me find my truth."',
       missionText: `This is placeholder text. For the first mission, your entire deck is decided for you.`,
       uponRoundWinText: [
         `I won't stop until I know the truth.`,
@@ -45,7 +45,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'You are a true friend, but I did lose :/',
     },
     {
-      selectText: 'Blank Canvas',
+      selectText: '"I let go of something, what do I do now?"',
       missionText: `Now you select more cards for the deck.`,
       uponRoundWinText: [
         `The blank canvas remains...`,
@@ -66,8 +66,8 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The blank canvas is still there, waiting.',
     },
     {
-      selectText: 'Rebirth',
-      missionText: `When I turned 16, I remember my routine of keeping my head down and shutting up, was starting to break apart. I didn't know why, but I couldn't help but cry, or yell at my teachers. Seeing myself so out of control was a new kind of scary, and it didn't go away until I moved out from my parents. In every way you could see things were worse: I was a high-school dropout, living on people's couches, I ate much less, but inside I felt reborn. Light for the first time in years. That was the first time I started going by 'Jules'.`,
+      selectText: '"Ugh! All these clothes aren\'t me!"',
+      missionText: `Placeholder text`,
       uponRoundWinText: [
         `The old routine is breaking apart.`,
         `I can't keep my head down anymore.`,
@@ -82,7 +82,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The rebirth is still happening, even in loss.',
     },
     {
-      selectText: 'Phoenix time',
+      selectText: '"Why are they being so mean to me?"',
       missionText: `hmmmm some writing goes here....`,
       uponRoundWinText: [
         `I am Jules, no reservations.`,
@@ -103,7 +103,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: "The journey continues, and that's okay.",
     },
     {
-      selectText: 'Vulture',
+      selectText: '',
       missionText: `Sometimes the light is so bright it hurts. But that's how you know it's real.`,
       uponRoundWinText: [
         `The sun is rising.`,
@@ -120,7 +120,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'Even the sun sets, but it always rises again.',
     },
     {
-      selectText: 'Bonus: Morning Dew',
+      selectText: '',
       missionText: `The morning dew catches the light in ways that make everything new again.`,
       uponRoundWinText: [
         `Fresh as morning dew.`,
@@ -136,7 +136,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The dew will return with the next morning.',
     },
     {
-      selectText: 'Bonus: Gamecock',
+      selectText: '',
       missionText: `Sometimes you have to fight for what you believe in, even when the odds are against you.`,
       uponRoundWinText: [
         `I will not back down.`,
@@ -152,7 +152,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The gamecock never gives up, even in defeat.',
     },
     {
-      selectText: 'Bonus: Ecology',
+      selectText: '',
       missionText: `Everything is connected. Every choice affects the whole. I am part of something bigger than myself.`,
       uponRoundWinText: [
         `I am connected to everything.`,
