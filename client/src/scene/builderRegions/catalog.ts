@@ -228,6 +228,6 @@ export class CatalogRegionJourney extends CatalogRegion {
       .setMinSize(Space.windowWidth - Space.cutoutWidth, Space.windowHeight)
       .layout()
 
-    return this
+    return this.panel
   }
 }

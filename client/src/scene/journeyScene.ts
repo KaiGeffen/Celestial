@@ -14,6 +14,7 @@ import AvatarButton from '../lib/buttons/avatar'
 import newScrollablePanel from '../lib/scrollablePanel'
 import { MechanicsSettings } from '../../../shared/settings'
 import Button from '../lib/buttons/button'
+import { CatalogRegionJourney } from './builderRegions/catalog'
 import {
   getCharacterLevel,
   getCharacterLevelProgress,
@@ -35,8 +36,8 @@ export default class JourneyScene extends BaseScene {
   txtMissionDescription: Phaser.GameObjects.Text
   avatar: AvatarButton
   decklist: Decklist
-  // The decklist with all collectible cards
-  cardPool: Decklist
+  // The catalog region with all collectible cards
+  catalogRegion: CatalogRegionJourney
   startBtn: Button
 
   // Timer until next journey available
@@ -224,15 +225,13 @@ export default class JourneyScene extends BaseScene {
       .add(decklistSizer)
       .add(btnSizer)
 
-    // Create card pool sizer
-    this.cardPoolSizer = this.rexUI.add.sizer()
-
-    // Add card pool to its own sizer
-    this.cardPoolSizer = this.createCardPool()
+    // Create catalog region
+    this.catalogRegion = new CatalogRegionJourney()
+    const catalogPanel = this.catalogRegion.create(this as any) // Cast to BuilderBase type
 
     this.missionDetailsView
       .add(leftSizer, { expand: true })
-      .add(this.cardPoolSizer, { expand: true })
+      .add(catalogPanel, { expand: true })
       .addBackground(background)
       .layout()
 
@@ -435,33 +434,6 @@ export default class JourneyScene extends BaseScene {
     return panel
   }
 
-  private createCardPool(): Sizer {
-    const sizer = this.rexUI.add.sizer({
-      orientation: 'vertical',
-    })
-
-    // Add text explaining the card pool
-    this.cardPoolText = this.add.text(0, 0, '', Style.basic)
-    this.cardPoolText.setOrigin(0.5, 0)
-
-    // Create the decklist with each card you can add
-    this.cardPool = new Decklist(this, this.onClickCardPool())
-
-    // Create a scrollable panel
-    const panel = newScrollablePanel(this, {
-      width: Space.cutoutWidth,
-      height: Space.windowHeight - Space.pad * 6,
-      scrollMode: 'vertical',
-      panel: {
-        child: this.cardPool.sizer,
-      },
-    })
-
-    sizer.add(this.cardPoolText).add(panel)
-
-    return sizer
-  }
-
   private createButtons() {
     const btnSizer = this.rexUI.add.sizer({
       space: { item: Space.pad },
@@ -534,30 +506,12 @@ export default class JourneyScene extends BaseScene {
     }
   }
 
-  private onClickCardPool(): (cutout: Cutout) => () => void {
-    return (cutout: Cutout) => {
-      return () => {
-        this.decklist.addCard(cutout.card)
-        this.missionDetailsView.layout()
-        this.updateDeckState()
-      }
-    }
-  }
-
   private updateDeckState() {
     const deckSize = this.decklist.getDeckCode().length
-    const remainingCards = MechanicsSettings.DECK_SIZE - deckSize
-
-    // Update card pool text
-    this.cardPoolText.setText(
-      `Select ${remainingCards} more cards for your deck`,
-    )
 
     if (deckSize === MechanicsSettings.DECK_SIZE) {
-      this.cardPoolSizer.hide()
       this.startBtn.enable()
     } else {
-      this.cardPoolSizer.show()
       this.startBtn.disable()
     }
     this.missionDetailsView.layout()
@@ -573,8 +527,8 @@ export default class JourneyScene extends BaseScene {
       })
     }
 
-    // Set the decklist element to have this set of cards
-    this.cardPool.setDeck(Array.from(cardSet))
+    // Filter the catalog to show only available cards
+    this.catalogRegion.filter((card: Card) => cardSet.has(card))
   }
 
   private setMissionInfo(mission: JourneyMission, avatarIndex: number) {
@@ -603,6 +557,21 @@ export default class JourneyScene extends BaseScene {
     if (this.scene.isActive('MapScene')) {
       this.scene.stop('MapScene')
     }
+  }
+
+  // Methods required by CatalogRegion
+  addCardToDeck(card: Card) {
+    this.decklist.addCard(card)
+    this.missionDetailsView.layout()
+    this.updateDeckState()
+  }
+
+  isOverfull(): boolean {
+    return this.decklist.getDeckCode().length >= MechanicsSettings.DECK_SIZE
+  }
+
+  getCount(card: Card): number {
+    return this.decklist.getCards().filter((id) => id === card.id).length
   }
 
   // Get the missions that appear this time
