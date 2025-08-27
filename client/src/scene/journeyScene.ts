@@ -219,10 +219,14 @@ export default class JourneyScene extends BaseScene {
     const decklistSizer = this.createDecklist()
     const btnSizer = this.createButtons()
 
+    // Add text explaining the card selection
+    this.cardPoolText = this.add.text(0, 0, '', Style.basic)
+
     leftSizer
       .add(this.txtMissionTitle)
       .add(headerSizer)
       .add(decklistSizer)
+      .add(this.cardPoolText)
       .add(btnSizer)
 
     // Create catalog region
@@ -508,8 +512,25 @@ export default class JourneyScene extends BaseScene {
 
   private updateDeckState() {
     const deckSize = this.decklist.getDeckCode().length
+    const targetSize = MechanicsSettings.DECK_SIZE
 
-    if (deckSize === MechanicsSettings.DECK_SIZE) {
+    // Update the instruction text - hide it when deck is ready
+    if (deckSize < targetSize) {
+      const remainingCards = targetSize - deckSize
+      this.cardPoolText.setText(
+        `Select ${remainingCards} more cards for your deck`,
+      )
+      this.cardPoolText.setVisible(true)
+    } else if (deckSize > targetSize) {
+      const excessCards = deckSize - targetSize
+      this.cardPoolText.setText(`Remove ${excessCards} cards from your deck`)
+      this.cardPoolText.setVisible(true)
+    } else {
+      // Hide the text when deck is ready (exactly 15 cards)
+      this.cardPoolText.setVisible(false)
+    }
+
+    if (deckSize === targetSize) {
       this.startBtn.enable()
     } else {
       this.startBtn.disable()
@@ -561,13 +582,18 @@ export default class JourneyScene extends BaseScene {
 
   // Methods required by CatalogRegion
   addCardToDeck(card: Card) {
+    // Don't add if deck is already at maximum size (30 cards)
+    if (this.decklist.getDeckCode().length >= 30) {
+      return
+    }
+
     this.decklist.addCard(card)
     this.missionDetailsView.layout()
     this.updateDeckState()
   }
 
   isOverfull(): boolean {
-    return this.decklist.getDeckCode().length >= MechanicsSettings.DECK_SIZE
+    return this.decklist.getDeckCode().length >= 30
   }
 
   getCount(card: Card): number {
