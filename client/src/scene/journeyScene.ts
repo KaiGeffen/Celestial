@@ -129,16 +129,7 @@ export default class JourneyScene extends BaseScene {
       const avatarFull = this.add.image(0, 0, `avatar-${name}Full`)
 
       // Experience bar
-      // const expBarBackground = this.add.rectangle(
-      //   0,
-      //   0,
-      //   1,
-      //   1,
-      //   Color.backgroundLight,
-      //   0.5,
-      // )
-      // const expBar = createExpBar(this, avatarIndex)
-      // expBar.addBackground(expBarBackground)
+      const expBar = createExpBar(this, avatarIndex)
 
       // Mission title
       const text = this.add.text(
@@ -172,7 +163,7 @@ export default class JourneyScene extends BaseScene {
       sizer
         .addBackground(background)
         .add(avatarFull)
-        // .add(expBar, { padding: { top: -80 } })
+        .add(expBar, { padding: { top: -80 } })
         .add(text)
         .add(btnContainer)
 
