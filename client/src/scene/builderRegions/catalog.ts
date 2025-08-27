@@ -15,9 +15,6 @@ export default class CatalogRegion {
   // The scrollable panel on which the catalog exists
   protected panel
 
-  // Whether the catalog has been shifted to the right
-  private shifted = false
-
   // Full list of all cards in the catalog (Even those invisible)
   cardCatalog: CardImage[]
 
@@ -163,8 +160,6 @@ export default class CatalogRegion {
 
   // Shift the catalog to the right to make room for the deck panel
   shiftRight(): void {
-    this.shifted = true
-
     const x = Flags.mobile
       ? Space.cutoutWidth
       : Space.decklistPanelWidth + Space.cutoutWidth
@@ -190,8 +185,6 @@ export default class CatalogRegion {
 
   // Shift the catalog to the left to fill the absence of deck panel
   shiftLeft(): void {
-    this.shifted = false
-
     const x = Space.decklistPanelWidth
     const width = Space.windowWidth - x
 
