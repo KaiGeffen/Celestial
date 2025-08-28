@@ -27,3 +27,5 @@ export class DecklistSettings {
 export type Mulligan = [boolean, boolean, boolean]
 
 export const TUTORIAL_LENGTH = 3
+
+export const MAX_STORY_ACTS = 99
