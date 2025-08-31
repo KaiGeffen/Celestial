@@ -23,7 +23,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
   [
     {
       selectText: '"Help me find my truth."',
-      missionText: `This is placeholder text. For the first mission, your entire deck is decided for you.`,
+      missionText: `By high school, I knew with certainty that I couldn’t live comfortably as in my own skin. It was a reality that I could never say aloud or make too obvious. I tried to make do with small freedoms, but even that became a source of conflict.`,
       uponRoundWinText: [
         `I won't stop until I know the truth.`,
         '1',

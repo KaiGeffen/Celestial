@@ -27,6 +27,7 @@ import getUnlockedCards, {
 } from '../data/journeyCardInventory'
 import { createExpBar } from '../lib/expBar'
 import { CardImage } from '../lib/cardImage'
+import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
 export default class JourneyScene extends BaseScene {
   // Mission details
@@ -192,6 +193,11 @@ export default class JourneyScene extends BaseScene {
           left: Space.pad,
           right: Space.pad,
         },
+        anchor: {
+          left: `0%+${Space.pad}`,
+          top: `0%+${Space.pad}`,
+          height: `100%-${Space.pad * 2}`,
+        },
       })
       .setOrigin(0)
 
@@ -204,36 +210,57 @@ export default class JourneyScene extends BaseScene {
       space: { item: Space.pad },
     })
 
+    // Add the scrollable section of the left
+    const leftScrolledContentSizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: { item: Space.pad },
+    })
+    const leftScrollableSizer = newScrollablePanel(this, {
+      width: Space.cutoutWidth,
+      anchor: {
+        height: `100%-${270}`,
+      },
+      scrollMode: 'vertical',
+      panel: {
+        child: leftScrolledContentSizer,
+      },
+    })
+
+    // Each item on the left
     this.txtMissionTitle = this.add.text(0, 0, '', Style.announcement)
-    const headerSizer = this.createHeader()
-    const decklistSizer = this.createDecklist()
+    this.txtMissionDescription = this.add.text(0, 0, '', {
+      ...Style.basic,
+      wordWrap: { width: Space.cutoutWidth },
+      fixedWidth: Space.cutoutWidth,
+      maxLines: 10,
+    })
+    this.decklist = new Decklist(this, this.onClickCutout())
+    // Hint telling how many cards to add/remove
+    this.cardPoolText = this.add.text(0, 0, '', Style.basic)
     const btnSizer = this.createButtons()
 
-    // Add text explaining the card selection
-    this.cardPoolText = this.add.text(0, 0, '', Style.basic)
+    // Scrollable section is text, decklist
+    leftScrolledContentSizer
+      .add(this.txtMissionDescription)
+      .add(this.decklist.sizer)
 
+    // Sizer is title, scrollable, hint, buttons
     leftSizer
       .add(this.txtMissionTitle)
-      .add(headerSizer)
-      .add(decklistSizer)
+      .add(leftScrollableSizer, { expand: true })
       .add(this.cardPoolText)
       .add(btnSizer)
 
     // Create catalog region
     this.catalogRegion = new CatalogRegionJourney()
     const catalogPanel = this.catalogRegion.create(this as any) // Cast to BuilderBase type
+    // TODO Fix the cast >n<
 
     this.missionDetailsView
       .add(leftSizer, { expand: true })
       .add(catalogPanel, { expand: true })
       .addBackground(background)
       .layout()
-
-    // Add an anchor for the sizer
-    this.plugins.get('rexAnchor')['add'](this.missionDetailsView, {
-      left: `0%+${Space.pad}`,
-      top: `0%+${Space.pad}`,
-    })
 
     this.missionDetailsView.hide()
   }
@@ -385,38 +412,6 @@ export default class JourneyScene extends BaseScene {
     })
   }
 
-  private createHeader() {
-    const headerSizer = this.rexUI.add.sizer({
-      orientation: 'horizontal',
-      space: { item: Space.pad },
-    })
-    this.txtMissionDescription = this.add.text(0, 0, '', {
-      ...Style.basic,
-      wordWrap: { width: Space.cutoutWidth },
-      fixedWidth: Space.cutoutWidth,
-      maxLines: 10,
-    })
-    headerSizer.add(this.txtMissionDescription)
-
-    return headerSizer
-  }
-
-  private createDecklist() {
-    this.decklist = new Decklist(this, this.onClickCutout())
-
-    // Create a scrollable panel for the main decklist
-    const panel = newScrollablePanel(this, {
-      width: Space.cutoutWidth,
-      height: Space.windowHeight - 420,
-      scrollMode: 'vertical',
-      panel: {
-        child: this.decklist.sizer,
-      },
-    })
-
-    return panel
-  }
-
   private createButtons() {
     const btnSizer = this.rexUI.add.sizer({
       space: { item: Space.pad },
@@ -537,7 +532,7 @@ export default class JourneyScene extends BaseScene {
 
     // Update the text / avatar
     this.txtMissionTitle.setText(`${avatarNames[avatarIndex]}'s Story`)
-    this.txtMissionDescription.setText('Mission text coming soon')
+    this.txtMissionDescription.setText(mission.missionText)
 
     // Update the decklist
     this.decklist.setJourneyDeck(
