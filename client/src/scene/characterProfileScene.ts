@@ -161,7 +161,7 @@ export default class CharacterProfileScene extends BaseScene {
       space: { item: Space.pad },
     })
 
-    this.txtCharacterName = this.add.text(0, 0, '', Style.announcement)
+    // this.txtCharacterName = this.add.text(0, 0, '', Style.announcement)
     this.txtCharacterDescription = this.add.text(0, 0, '', {
       ...Style.basic,
       wordWrap: { width: (Space.avatarSize + Space.pad) * 6 },
@@ -178,7 +178,7 @@ export default class CharacterProfileScene extends BaseScene {
       },
     })
 
-    sizer.add(this.txtCharacterName).add(descriptionScrollablePanel)
+    sizer.add(descriptionScrollablePanel)
 
     // Update text with initial values
     this.updateCharacterText()
@@ -210,7 +210,7 @@ export default class CharacterProfileScene extends BaseScene {
   }
 
   private updateCharacterText() {
-    this.txtCharacterName.setText(avatarNames[this.selectedAvatar])
+    // this.txtCharacterName.setText(avatarNames[this.selectedAvatar])
     this.txtCharacterDescription.setText(
       avatarDescriptions[this.selectedAvatar],
     )
