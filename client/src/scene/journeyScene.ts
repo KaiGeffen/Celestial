@@ -34,7 +34,6 @@ export default class JourneyScene extends BaseScene {
   selectedAvatar: number
   txtMissionTitle: Phaser.GameObjects.Text
   txtMissionDescription: Phaser.GameObjects.Text
-  avatar: AvatarButton
   decklist: Decklist
   // The catalog region with all collectible cards
   catalogRegion: CatalogRegionJourney
@@ -391,24 +390,13 @@ export default class JourneyScene extends BaseScene {
       orientation: 'horizontal',
       space: { item: Space.pad },
     })
-
-    const container = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.avatarSize,
-      Space.avatarSize,
-    )
-    this.avatar = new AvatarButton({
-      within: container,
-    })
     this.txtMissionDescription = this.add.text(0, 0, '', {
       ...Style.basic,
       wordWrap: { width: Space.cutoutWidth },
       fixedWidth: Space.cutoutWidth,
       maxLines: 10,
     })
-    headerSizer.add(container).add(this.txtMissionDescription)
+    headerSizer.add(this.txtMissionDescription)
 
     return headerSizer
   }
@@ -550,7 +538,6 @@ export default class JourneyScene extends BaseScene {
     // Update the text / avatar
     this.txtMissionTitle.setText(`${avatarNames[avatarIndex]}'s Story`)
     this.txtMissionDescription.setText('Mission text coming soon')
-    this.avatar.setAvatar(avatarIndex)
 
     // Update the decklist
     this.decklist.setJourneyDeck(
