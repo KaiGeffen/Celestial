@@ -88,7 +88,7 @@ export default class CharacterProfileScene extends BaseScene {
     // Create the right side content - vertically divided into 3 parts
     const sizer = this.rexUI.add.sizer({
       orientation: 'vertical',
-      space: { item: Space.pad * 2 },
+      space: { item: Space.pad },
     })
 
     // Create avatar selection row
@@ -164,10 +164,21 @@ export default class CharacterProfileScene extends BaseScene {
     this.txtCharacterName = this.add.text(0, 0, '', Style.announcement)
     this.txtCharacterDescription = this.add.text(0, 0, '', {
       ...Style.basic,
-      wordWrap: { width: 400 },
+      wordWrap: { width: (Space.avatarSize + Space.pad) * 6 },
     })
 
-    sizer.add(this.txtCharacterName).add(this.txtCharacterDescription)
+    // Create scrollable panel for the description text
+    const descriptionScrollablePanel = newScrollablePanel(this, {
+      anchor: {
+        height: `100%-${500}`,
+      },
+      scrollMode: 'vertical',
+      panel: {
+        child: this.txtCharacterDescription,
+      },
+    })
+
+    sizer.add(this.txtCharacterName).add(descriptionScrollablePanel)
 
     // Update text with initial values
     this.updateCharacterText()
