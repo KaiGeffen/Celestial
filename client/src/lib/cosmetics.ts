@@ -32,7 +32,7 @@ export function getUnlockedAvatars(): number[] {
   return Array.from(unlockedAvatars).sort((a, b) => a - b)
 }
 
-export function getUnlockedBorders(): Set<number> {
+export function getUnlockedBorders(): number[] {
   const userData = UserDataServer.getUserData()
   const unlockedBorders = new Set<number>()
 
@@ -53,5 +53,6 @@ export function getUnlockedBorders(): Set<number> {
     }
   })
 
-  return unlockedBorders
+  // Sort and return
+  return Array.from(unlockedBorders).sort((a, b) => a - b)
 }

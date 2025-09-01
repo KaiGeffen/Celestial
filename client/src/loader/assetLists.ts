@@ -9,7 +9,6 @@ export const assetLists = {
       "Mia",
       "Mitra",
       "AdonisFull",
-      "AdonisFull",
       "ImaniFull",
       "JulesFull",
       "KitzFull",
@@ -364,7 +363,9 @@ export const assetLists = {
   },
   "border": {
     "files": [
+      "Grape",
       "None",
+      "Shadow",
       "Thorns"
     ],
     "pixelArt": true
