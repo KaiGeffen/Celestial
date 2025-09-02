@@ -170,7 +170,7 @@ p {
   z-index: 1;
 }
 
-.newsletter-section {
+.discord-section {
   position: relative;
   background:
     url('assets/background2.webp') center/cover no-repeat,
@@ -183,14 +183,14 @@ p {
   text-align: center;
 }
 
-.newsletter-title {
+.discord-title {
   font-family: 'Recoleta', serif;
   font-size: 48px;
   color: #f0e3ca;
   margin-bottom: 20px;
 }
 
-.newsletter-text {
+.discord-text {
   font-family: 'Josefin Sans', sans-serif;
   font-size: 24px;
   font-weight: 300;
@@ -245,12 +245,12 @@ p {
 }
 
 /* Discord button - uses button2.png */
-.newsletter-section .signup-button {
+.discord-section .signup-button {
   background-image: url('assets/button2.png');
   color: #4b7962;
 }
 
-.newsletter-section a {
+.discord-section a {
   text-decoration: none;
 }
 
@@ -395,15 +395,15 @@ p {
     height: 100%;
   }
 
-  .newsletter-section {
+  .discord-section {
     padding: 2rem 1rem;
   }
 
-  .newsletter-title {
+  .discord-title {
     font-size: 1.8rem;
   }
 
-  .newsletter-text {
+  .discord-text {
     font-size: 1rem;
     margin: 1rem 0;
   }
