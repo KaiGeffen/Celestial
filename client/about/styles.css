@@ -319,8 +319,7 @@ p {
   }
 
   .logo {
-    width: 80%;
-    max-width: 300px;
+    width: 90vw !important;
   }
 
   .landing-p {
