@@ -104,15 +104,15 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
     title: 'In Awe',
     description: 'Have 15 or more breath.',
   },
-  20: {
-    title: 'Secret!!!',
-    description: 'Coming soon...',
+  1001: {
+    title: 'Secret Garden',
+    description: 'A special prize for those who seek it...',
     image: 'border-Grape',
     borderUnlock: 2,
   },
-  21: {
-    title: 'Also a secret',
-    description: 'Coming soon...',
+  1002: {
+    title: 'Grasping Shadows',
+    description: 'Terrifying. Who knows where it comes from?',
     image: 'border-Shadow',
     borderUnlock: 3,
   },
