@@ -134,6 +134,7 @@ p {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 .video-container iframe {
@@ -142,6 +143,18 @@ p {
   max-width: 640px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.video-border {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-48%, -50%) scale(1.21);
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 16/9;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .newsletter-section {
