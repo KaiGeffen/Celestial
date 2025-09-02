@@ -48,6 +48,16 @@
       content="https://celestialdecks.gg/about/assets/social-preview.png"
     />
 
+    <!-- Preload critical assets -->
+    <link rel="preload" href="assets/background.webp" as="image" />
+    <link rel="preload" href="assets/logo.svg" as="image" />
+    <link
+      rel="preload"
+      href="assets/Animation.mp4"
+      as="video"
+      type="video/mp4"
+    />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -92,7 +102,15 @@
   </head>
   <body>
     <section class="hero">
-      <video id="animation" autoplay loop muted playsinline>
+      <video
+        id="animation"
+        autoplay
+        loop
+        muted
+        playsinline
+        preload="metadata"
+        poster="assets/video-poster.webp"
+      >
         <source src="assets/Animation.mp4" type="video/mp4" />
       </video>
 
