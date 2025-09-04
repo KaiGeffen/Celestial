@@ -160,7 +160,7 @@ p {
 .discord-section {
   position: relative;
   background:
-    url('assets/background2.webp') center/cover no-repeat,
+    url('assets/background-sub.webp') center/cover no-repeat,
     rgba(75, 121, 98);
   background-blend-mode: multiply;
   padding: 5% 10%;
