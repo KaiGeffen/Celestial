@@ -321,6 +321,37 @@ const spark = new Spark({
   text: 'When played, gain 3 breath.\nDiscard your next card in the story.',
 })
 
+class Initiative extends Card {
+  onPlay(player: number, game: GameModel) {
+    game.switchPriority()
+  }
+}
+const initiative = new Initiative({
+  name: 'Initiative',
+  id: 2071,
+  cost: 1,
+  points: 1,
+  qualities: [Quality.VISIBLE],
+  text: 'Visible\nWhen you play this, keep priority.',
+})
+
+class Wildfire extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    if (super.exhale(2, game, player)) {
+      game.createInStory(player, wildfire, 0)
+    }
+  }
+}
+const wildfire = new Wildfire({
+  name: 'Wildfire',
+  id: 2072,
+  cost: 2,
+  points: 2,
+  text: 'Exhale 2: Add a Wildfire to the story after this.',
+})
+
 export {
   dash,
   impulse,
@@ -336,4 +367,6 @@ export {
   firebug,
   immolant,
   spark,
+  initiative,
+  wildfire,
 }

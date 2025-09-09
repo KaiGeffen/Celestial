@@ -276,6 +276,29 @@ const sensualist = new Sensualist({
   text: 'Costs 1 less for each of the following statuses you have: Nourish, Inspired, Sight.',
 })
 
+class Doll extends Card {
+  onMorning(player: number, game: GameModel, index: number) {
+    const length = game.roundResults[player].length
+    const previousRoundResults =
+      game.roundResults[player][length - 1] -
+      game.roundResults[player ^ 1][length - 1]
+
+    // Replace this with a copy with points equal to the previous round results
+    const copy = this.copy()
+    copy.points = Math.max(0, previousRoundResults)
+    game.pile[player][index] = copy
+
+    return true
+  }
+}
+const doll = new Doll({
+  name: 'Doll',
+  id: 482,
+  cost: 1,
+  points: 1,
+  text: 'Morning: Worth X permanently, where X is how many points you won the last round by.',
+})
+
 export {
   fruit,
   oak,
@@ -291,4 +314,5 @@ export {
   parade,
   meAndHer,
   sensualist,
+  doll,
 }

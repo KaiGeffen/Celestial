@@ -65,7 +65,8 @@ const imprison = new Imprison({
 class Nightmare extends Card {
   onMorning(player: number, game: GameModel, index: number) {
     if (game.hand[player ^ 1].length < game.hand[player].length) {
-      game.create(player, shadow)
+      game.pile[player].splice(index, 1)
+      game.createInStory(player, this)
       return true
     }
     return false
@@ -76,7 +77,7 @@ const nightmare = new Nightmare({
   id: 68,
   cost: 2,
   points: 2,
-  text: 'Morning: If you have more cards in hand than your opponent, create a Shadow in hand.',
+  text: 'Morning: If you have more cards in hand than your opponent, add this to the story.',
   story:
     'I struggle to find myself\nBetween the claws and biting words\nShearing my mind away',
 })
@@ -246,6 +247,34 @@ const vampire = new Vampire({
   text: "Worth -X where X is your opponent's points.\nCosts 1 less for each card in the story.",
 })
 
+class DevilWhisper extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    // Initiation
+    if (super.exhale(3, game, player)) {
+      // Opponent adds first
+      if (game.hand[player ^ 1].length > 0) {
+        const card = game.hand[player ^ 1].shift()
+        game.story.addAct(card, player ^ 1, 0)
+      }
+
+      // Player adds second
+      if (game.hand[player].length > 0) {
+        const card = game.hand[player].shift()
+        game.story.addAct(card, player, 1)
+      }
+    }
+  }
+}
+const devilWhisper = new DevilWhisper({
+  name: 'Devil Whisper',
+  id: 483,
+  cost: 2,
+  points: 2,
+  text: 'Exhale 3: Your opponent adds a card from their hand to the story, then you do the same.',
+})
+
 export {
   dagger,
   shadow,
@@ -260,4 +289,5 @@ export {
   // rupture,
   lostInShadow,
   vampire,
+  devilWhisper,
 }
