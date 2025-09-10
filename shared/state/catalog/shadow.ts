@@ -275,6 +275,28 @@ const devilWhisper = new DevilWhisper({
   text: 'Exhale 3: Your opponent adds a card from their hand to the story, then you do the same.',
 })
 
+class Isolation extends Card {
+  getCost(player: number, game: GameModel): number {
+    const length = game.roundResults[player].length
+    const wonPreviousRound =
+      game.roundResults[player][length - 1] >
+      game.roundResults[player ^ 1][length - 1]
+
+    if (wonPreviousRound && !game.playedACardLastRound[player]) {
+      return 0
+    }
+
+    return this.cost
+  }
+}
+const isolation = new Isolation({
+  name: 'Isolation',
+  id: 484,
+  cost: 7,
+  points: 7,
+  text: 'Costs 0 if you won last round without playing any cards.',
+})
+
 export {
   dagger,
   shadow,
@@ -290,4 +312,5 @@ export {
   lostInShadow,
   vampire,
   devilWhisper,
+  isolation,
 }

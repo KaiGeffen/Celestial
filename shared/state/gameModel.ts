@@ -65,6 +65,10 @@ export default class GameModel {
   // Other (For weird cards)
   amtPasses: number[] = [0, 0]
   amtDrawn: number[] = [0, 0]
+  playedACardLastRound: [boolean, boolean] = [false, false]
+  playedACardThisRound: [boolean, boolean] = [false, false]
+
+  // The cosmetics used in this match
   cosmeticSets: CosmeticSet[]
 
   constructor(
