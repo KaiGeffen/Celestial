@@ -201,7 +201,7 @@ const cling = new Cling({
   name: 'Cling',
   id: 20,
   cost: 6,
-  text: 'Worth +X, where X is the highest base cost in your discard pile. Put that card on top of your deck.',
+  text: 'Worth +X, where X is the highest base-cost in your discard pile. Put that card on top of your deck.',
   story:
     'Reaching back with the back of the eyes\nTo that moment when\nI see myself – not as I am – but as I was - clearly',
 })

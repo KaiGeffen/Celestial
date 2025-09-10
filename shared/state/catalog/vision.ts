@@ -244,6 +244,19 @@ const beggingBowl = new BeggingBowl({
   text: "This consumes your opponent's Nourish.",
 })
 
+class SuddenInsight extends Card {
+  onDraw(player: number, game: GameModel): void {
+    game.status[player].vision += 2
+  }
+}
+const suddenInsight = new SuddenInsight({
+  name: 'Sudden Insight',
+  id: 101,
+  cost: 4,
+  points: 4,
+  text: 'When drawn, gain Sight 2.\nExhale 1: Inspire 1.',
+})
+
 export {
   dawn,
   nectar,
@@ -259,4 +272,5 @@ export {
   bull,
   lantern,
   beggingBowl,
+  suddenInsight,
 }
