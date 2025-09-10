@@ -62,11 +62,11 @@ export default class GameModel {
   // For client side visualization
   cardCosts: number[]
 
-  // Other (For weird cards)
+  // Other (For specific cards)
   amtPasses: number[] = [0, 0]
   amtDrawn: number[] = [0, 0]
-  playedACardLastRound: [boolean, boolean] = [false, false]
-  playedACardThisRound: [boolean, boolean] = [false, false]
+  amtCardsPlayedLastRound: [number, number] = [0, 0]
+  amtCardsPlayedThisRound: [number, number] = [0, 0]
 
   // The cosmetics used in this match
   cosmeticSets: CosmeticSet[]

@@ -282,7 +282,7 @@ class Isolation extends Card {
       game.roundResults[player][length - 1] >
       game.roundResults[player ^ 1][length - 1]
 
-    if (wonPreviousRound && !game.playedACardLastRound[player]) {
+    if (wonPreviousRound && game.amtCardsPlayedLastRound[player] === 0) {
       return 0
     }
 

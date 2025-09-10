@@ -233,6 +233,21 @@ const hug = new Hug({
   text: 'Worth +2 if the next card in the story is yours.',
 })
 
+class LittleMischief extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    bonus += game.amtCardsPlayedLastRound[player]
+
+    super.play(player, game, index, bonus)
+  }
+}
+const littleMischief = new LittleMischief({
+  name: 'Little Mischief',
+  id: 5086,
+  cost: 5,
+  points: 3,
+  text: 'Worth +1 for each card you played last round.',
+})
+
 export {
   nascence,
   birth,
@@ -248,4 +263,5 @@ export {
   passOn,
   justLikeDad,
   hug,
+  littleMischief,
 }

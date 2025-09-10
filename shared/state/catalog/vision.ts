@@ -248,6 +248,14 @@ class SuddenInsight extends Card {
   onDraw(player: number, game: GameModel): void {
     game.status[player].vision += 2
   }
+
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    if (super.exhale(1, game, player)) {
+      super.inspire(1, game, player)
+    }
+
+    super.play(player, game, index, bonus)
+  }
 }
 const suddenInsight = new SuddenInsight({
   name: 'Sudden Insight',

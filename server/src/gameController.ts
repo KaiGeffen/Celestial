@@ -137,8 +137,8 @@ class ServerController {
     // Trigger on-play effects
     card.onPlay(player, this.model)
 
-    // Remember player has played a card this round
-    this.model.playedACardThisRound[player] = true
+    // Increment count of player's played cards
+    this.model.amtCardsPlayedThisRound[player] += 1
   }
 
   doMulligan(player: number, mulligans: Mulligan): void {
@@ -210,8 +210,8 @@ class ServerController {
     this.model.amtDrawn = [0, 0]
 
     // Set cards played this round / last round
-    this.model.playedACardLastRound = this.model.playedACardThisRound
-    this.model.playedACardThisRound = [false, false]
+    this.model.amtCardsPlayedLastRound = this.model.amtCardsPlayedThisRound
+    this.model.amtCardsPlayedThisRound = [0, 0]
 
     // Set priority
     this.model.priority = this.model.lastPlayerWhoPlayed
