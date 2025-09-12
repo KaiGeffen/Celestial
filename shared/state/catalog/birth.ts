@@ -242,7 +242,6 @@ export {
   rebirth,
   cradle,
   uprising,
-  // BETA
   storytime,
   pregnant,
   passOn,

@@ -331,7 +331,6 @@ export {
   cling,
   death,
   fromAshes,
-  // Expansion
   goliath,
   firebug,
   immolant,

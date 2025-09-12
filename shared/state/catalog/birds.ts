@@ -306,13 +306,25 @@ const letGo = new LetGo({
   text: 'Remove from the game the top four cards of your discard pile.',
 })
 
+class Ending extends Card {
+  onPlay(player: number, game: GameModel): void {
+    this.starve(2, game, player)
+  }
+}
+const ending = new Ending({
+  name: 'Ending',
+  id: 36,
+  cost: 5,
+  qualities: [Quality.VISIBLE, Quality.FLEETING],
+  text: 'Visible\nFleeting\nWhen played, add 5 Doves to the story.',
+})
+
 export {
   dove,
   starling,
   secretaryBird,
   phoenix,
   heron,
-  // NEW
   fledgling,
   nest,
   truth,
