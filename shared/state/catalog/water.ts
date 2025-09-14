@@ -1,6 +1,8 @@
 import Card, { RefreshCard } from '../card'
 import GameModel from '../gameModel'
 import { Keywords } from '../keyword'
+import { Animation } from '../../animation'
+import { Zone } from '../zone'
 
 class Mercy extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -237,6 +239,24 @@ const damBreaks = new DamBreaks({
   text: 'Exhale 1: Discard 3 cards. Add your hand to the story after this.',
 })
 
+class Foo extends Card {
+  onDraw(player: number, game: GameModel): void {
+    // Remove from hand
+    game.hand[player].splice(game.hand[player].length - 1, 1)
+
+    game.story.addAct(this, player, 0)
+
+    // TODO Add animation
+  }
+}
+const foo = new Foo({
+  name: 'Foo',
+  id: 8005,
+  cost: 1,
+  points: 1,
+  text: 'When drawn, add this to the story.',
+})
+
 export {
   mercy,
   excess,
@@ -249,7 +269,8 @@ export {
   refresh,
   fish,
   cloud,
-  gainAndLoss as precious,
+  gainAndLoss,
   damBreaks,
   overflow,
+  foo,
 }

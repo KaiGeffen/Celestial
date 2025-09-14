@@ -332,7 +332,7 @@ const initiative = new Initiative({
   cost: 1,
   points: 1,
   qualities: [Quality.VISIBLE],
-  text: 'Visible\nWhen you play this, keep priority.',
+  text: 'Visible\nWhen played, keep priority.',
 })
 
 class Wildfire extends Card {

@@ -250,19 +250,23 @@ class SuddenInsight extends Card {
   }
 
   play(player: number, game: GameModel, index: number, bonus: number) {
-    if (super.exhale(1, game, player)) {
-      super.inspire(1, game, player)
-    }
-
     super.play(player, game, index, bonus)
+
+    for (let i = 0; i < game.story.acts.length; i++) {
+      const act = game.story.acts[i]
+      if (act.owner === player) {
+        game.returnActToHand(i)
+        return
+      }
+    }
   }
 }
 const suddenInsight = new SuddenInsight({
   name: 'Sudden Insight',
-  id: 101,
+  id: 6001,
   cost: 4,
   points: 4,
-  text: 'When drawn, gain Sight 2.\nExhale 1: Inspire 1.',
+  text: 'When drawn, gain Sight 2.\nReturn your next card in the story to your hand.',
 })
 
 export {
