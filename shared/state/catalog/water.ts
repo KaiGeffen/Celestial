@@ -3,6 +3,7 @@ import GameModel from '../gameModel'
 import { Keywords } from '../keyword'
 import { Animation } from '../../animation'
 import { Zone } from '../zone'
+import { Quality } from '../quality'
 
 class Mercy extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -244,7 +245,11 @@ class Foo extends Card {
     // Remove from hand
     game.hand[player].splice(game.hand[player].length - 1, 1)
 
-    game.story.addAct(this, player, 0)
+    // At night, add to the beginning of the story. During the day, add to the end.
+    console.log('isRecap', game.isRecap)
+    // TODO Make this work
+    const index = game.isRecap ? 0 : game.story.acts.length
+    game.story.addAct(this, player, index)
 
     // TODO Add animation
   }
@@ -254,7 +259,8 @@ const foo = new Foo({
   id: 8005,
   cost: 1,
   points: 1,
-  text: 'When drawn, add this to the story.',
+  qualities: [Quality.VISIBLE],
+  text: 'Visible\nWhen drawn, add this to the story.',
 })
 
 export {
