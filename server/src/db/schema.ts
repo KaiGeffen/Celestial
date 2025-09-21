@@ -134,12 +134,6 @@ export const cosmeticsTransactions = pgTable(
   }),
 )
 
-export const newsletter_signups = pgTable('newsletter_signups', {
-  id: serial('id').primaryKey(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  created_at: timestamp('created_at').notNull().defaultNow(),
-})
-
 export const achievements = pgTable(
   'achievements',
   {

@@ -186,15 +186,6 @@ p {
   margin-bottom: 30px;
 }
 
-.newsletter-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  width: 100%;
-  max-width: 400px;
-}
-
 #email-input {
   width: 100%;
   padding: 12px;
@@ -255,12 +246,6 @@ p {
 .discord-section .signup-button:hover {
   filter: brightness(0.9) saturate(1.2);
   transition: all 0.2s ease;
-}
-
-/* Remove hover effect from the link wrapper */
-#play-free-container a:hover,
-.newsletter-section a:hover {
-  transform: none;
 }
 
 /* Ensure first button only hovers over the button itself */
@@ -401,10 +386,6 @@ p {
     margin: 1rem 0;
   }
 
-  .newsletter-form {
-    width: 100%;
-  }
-
   #email-input {
     width: 100%;
     margin-bottom: 1rem;
@@ -449,10 +430,6 @@ p {
 /* Additional fixes for very small screens */
 @media screen and (max-width: 480px) {
   .about-title {
-    font-size: 1.5rem;
-  }
-
-  .newsletter-title {
     font-size: 1.5rem;
   }
 
