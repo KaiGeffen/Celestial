@@ -258,6 +258,33 @@ const pride = new Pride({
   text: 'Morning: Exhale 2: Add this to the story. Discard a card.',
 })
 
+class Rocketship extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    bonus += game.hand[player].filter((card) => card.cost >= 6).length
+
+    super.play(player, game, index, bonus)
+
+    for (let i = 0; i < game.hand[player].length; ) {
+      const card = game.hand[player][i]
+
+      // Either remove a card or increment i
+      if (card.cost >= 6) {
+        game.hand[player].splice(i, 1)
+        game.deck[player].push(card)
+      } else {
+        i++
+      }
+    }
+  }
+}
+const rocketship = new Rocketship({
+  name: 'Rocketship',
+  id: 8094,
+  cost: 2,
+  points: 2,
+  text: 'Worth +1 for each card in your hand with base cost 6 or more. Put those cards on the bottom of your deck.',
+})
+
 export {
   stars,
   cosmos,
@@ -273,4 +300,5 @@ export {
   cloakOfStars,
   dreamer,
   pride,
+  rocketship,
 }
