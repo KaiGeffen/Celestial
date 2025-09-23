@@ -201,10 +201,10 @@ export default class GameModel {
     return card
   }
 
-  discard(player: number, amt = 1) {
+  discard(player: number, amt = 1, index = 0) {
     for (let i = 0; i < amt; i++) {
-      if (this.hand[player].length > 0) {
-        const card = this.hand[player].splice(0, 1)[0]
+      if (this.hand[player].length > index) {
+        const card = this.hand[player].splice(index, 1)[0]
         this.pile[player].push(card)
 
         const discardPileIndex = this.pile[player].length - 1
@@ -393,6 +393,15 @@ export default class GameModel {
         index2: this.hand[act.owner].length - 1,
         visibility: Visibility.KnowAllDetails,
       }),
+    )
+  }
+
+  // Return whether the given player won the previous round
+  checkPlayerWonPreviousRound(player: number): boolean {
+    const length = this.roundResults[0].length
+    return (
+      this.roundResults[player][length - 1] >
+      this.roundResults[player ^ 1][length - 1]
     )
   }
 }

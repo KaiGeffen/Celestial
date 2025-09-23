@@ -376,43 +376,39 @@ const eternalFlame = new EternalFlame({
 })
 
 class DyingLight extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
-
-    game.createInPile(player, ashes)
-  }
-
-  onMorning(player: number, game: GameModel, index: number): boolean {
-    game.pile[player].splice(index, 1)
-    game.create(player, this)
-    game.discard(player)
-    return true
+  onPlay(player: number, game: GameModel) {
+    game.breath[player] += Math.floor(game.pile[player].length / 3)
   }
 }
 const dyingLight = new DyingLight({
   name: 'Dying Light',
   id: 2053,
   cost: 6,
-  text: 'When played, gain 1 breath for each card in your discard pile.',
+  points: 6,
+  text: 'When played, gain 1 breath for every 3 cards in your discard pile.',
 })
 
 class Momentum extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    bonus += game.discard[player].length
+  onUpkeepInHand(
+    player: number,
+    game: GameModel,
+    index: number,
+  ): [boolean, boolean] {
+    const oppWonPreviousRound = game.checkPlayerWonPreviousRound(player ^ 1)
 
-    super.play(player, game, index, bonus)
-  }
-
-  getCost(player: number, game: GameModel): number {
-    return this.cost + game.pile[player].length
+    if (oppWonPreviousRound) {
+      game.discard(player, 1, index)
+      return [true, true]
+    }
+    return [false, false]
   }
 }
 const momentum = new Momentum({
   name: 'Momentum',
   id: 2054,
-  cost: 1,
-  points: 0,
-  text: 'Costs 1 more for each card in your discard pile.\nWorth +1 for each card in your discard pile.',
+  cost: 6,
+  points: 8,
+  text: 'When you lose a round while this is in hand, discard it.',
 })
 
 export {

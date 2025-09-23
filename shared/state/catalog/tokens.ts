@@ -5,9 +5,13 @@ import { Zone } from '../zone'
 import { Animation } from '../../animation'
 
 class Seen extends Card {
-  onUpkeepInHand(player: number, game: GameModel, index: number): boolean {
+  onUpkeepInHand(
+    player: number,
+    game: GameModel,
+    index: number,
+  ): [boolean, boolean] {
     game.status[player ^ 1].vision += 4
-    return true
+    return [true, false]
   }
 }
 const seen = new Seen({

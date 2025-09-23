@@ -277,10 +277,7 @@ const devilWhisper = new DevilWhisper({
 
 class Isolation extends Card {
   getCost(player: number, game: GameModel): number {
-    const length = game.roundResults[player].length
-    const wonPreviousRound =
-      game.roundResults[player][length - 1] >
-      game.roundResults[player ^ 1][length - 1]
+    const wonPreviousRound = game.checkPlayerWonPreviousRound(player)
 
     if (wonPreviousRound && game.amtCardsPlayedLastRound[player] === 0) {
       return 0

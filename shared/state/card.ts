@@ -156,8 +156,13 @@ export default class Card {
   }
 
   /* Triggers */
-  onUpkeepInHand(player: number, game: GameModel, index: number): boolean {
-    return false
+  // Return whether something activated, and whether the card left hand
+  onUpkeepInHand(
+    player: number,
+    game: GameModel,
+    index: number,
+  ): [boolean, boolean] {
+    return [false, false]
   }
 
   onMorning(player: number, game: GameModel, index: number): boolean {

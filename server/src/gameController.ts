@@ -239,7 +239,7 @@ class ServerController {
       let index = 0
       while (index < this.model.hand[player].length) {
         const card = this.model.hand[player][index]
-        const somethingActivated = card.onUpkeepInHand(
+        const [somethingActivated, cardLeftHand] = card.onUpkeepInHand(
           player,
           this.model,
           index,
@@ -257,7 +257,9 @@ class ServerController {
           )
         }
 
-        index += 1
+        if (!cardLeftHand) {
+          index += 1
+        }
       }
     }
 
