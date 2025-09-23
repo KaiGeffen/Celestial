@@ -339,7 +339,8 @@ class Wildfire extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    if (super.exhale(2, game, player)) {
+    if (super.exhale(2, game, player) && game.hand[player].length > 0) {
+      game.discard(player)
       game.createInStory(player, wildfire, 0)
     }
   }
@@ -349,7 +350,69 @@ const wildfire = new Wildfire({
   id: 2072,
   cost: 2,
   points: 2,
-  text: 'Exhale 2: Add a Wildfire to the story after this.',
+  text: 'Exhale 2, discard a card: Add a Wildfire to the story after this.',
+})
+
+class EternalFlame extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    game.createInPile(player, ashes)
+  }
+
+  onMorning(player: number, game: GameModel, index: number): boolean {
+    game.pile[player].splice(index, 1)
+    game.create(player, this)
+    game.discard(player)
+    return true
+  }
+}
+const eternalFlame = new EternalFlame({
+  name: 'Eternal Flame',
+  id: 2050,
+  cost: 2,
+  points: 2,
+  text: 'Add an Ashes to your discard pile.\nMorning: Return this to hand. Discard a card.',
+})
+
+class DyingLight extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    game.createInPile(player, ashes)
+  }
+
+  onMorning(player: number, game: GameModel, index: number): boolean {
+    game.pile[player].splice(index, 1)
+    game.create(player, this)
+    game.discard(player)
+    return true
+  }
+}
+const dyingLight = new DyingLight({
+  name: 'Dying Light',
+  id: 2053,
+  cost: 6,
+  text: 'When played, gain 1 breath for each card in your discard pile.',
+})
+
+class Momentum extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    bonus += game.discard[player].length
+
+    super.play(player, game, index, bonus)
+  }
+
+  getCost(player: number, game: GameModel): number {
+    return this.cost + game.pile[player].length
+  }
+}
+const momentum = new Momentum({
+  name: 'Momentum',
+  id: 2054,
+  cost: 1,
+  points: 0,
+  text: 'Costs 1 more for each card in your discard pile.\nWorth +1 for each card in your discard pile.',
 })
 
 export {
@@ -369,4 +432,7 @@ export {
   spark,
   initiative,
   wildfire,
+  eternalFlame,
+  dyingLight,
+  momentum,
 }
