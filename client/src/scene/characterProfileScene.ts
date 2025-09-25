@@ -11,10 +11,10 @@ import { getUnlockedAvatars } from '../lib/cosmetics'
 import avatarDescriptions from '../data/avatarDescriptions'
 import { createExpBar } from '../lib/expBar'
 import ExpBar from 'phaser3-rex-plugins/templates/ui/expbar/ExpBar'
-import { getCharacterLevel } from '../data/levelProgression'
+import { getCharacterLevel } from '../journey/levelProgression'
 import newScrollablePanel from '../lib/scrollablePanel'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
-import avatarStories from '../data/avatarStories'
+import avatarStories from '../journey/avatarStories'
 
 export default class CharacterProfileScene extends BaseScene {
   // Character details

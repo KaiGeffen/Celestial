@@ -5,7 +5,10 @@ import Buttons from '../lib/buttons/buttons'
 import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import { JOURNEY_MISSIONS, JourneyMission } from '../data/journeyMissions'
+import {
+  JOURNEY_MISSIONS,
+  JourneyMission,
+} from '../journey/missions/journeyMissions'
 import Decklist from '../lib/decklist'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { Deck } from '../../../shared/types/deck'
@@ -20,11 +23,11 @@ import {
   getCharacterLevelProgress,
   getCharacterExpToNextLevel,
   MAX_LEVEL,
-} from '../data/levelProgression'
+} from '../journey/levelProgression'
 import Card from '../../../shared/state/card'
 import getUnlockedCards, {
   getUnlocksAtLevel,
-} from '../data/journeyCardInventory'
+} from '../journey/journeyCardInventory'
 import { createExpBar } from '../lib/expBar'
 import { CardImage } from '../lib/cardImage'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'

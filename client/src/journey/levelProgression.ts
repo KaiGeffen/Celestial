@@ -1,3 +1,4 @@
+import { MAX } from 'uuid'
 import { UserSettings } from '../settings/settings'
 
 export interface LevelData {
@@ -5,6 +6,10 @@ export interface LevelData {
   expToNext: number
   totalExp: number
 }
+
+export const MAX_LEVEL = 10
+
+export const MAX_EXP = 10900
 
 export const LEVEL_PROGRESSION: LevelData[] = [
   { level: 1, expToNext: 100, totalExp: 0 },
@@ -16,7 +21,7 @@ export const LEVEL_PROGRESSION: LevelData[] = [
   { level: 7, expToNext: 1800, totalExp: 3100 },
   { level: 8, expToNext: 2500, totalExp: 4900 },
   { level: 9, expToNext: 3500, totalExp: 7400 },
-  { level: 10, expToNext: 0, totalExp: 10900 }, // MAX level
+  { level: 10, expToNext: 0, totalExp: MAX_EXP }, // MAX level
 ]
 
 /**
@@ -78,13 +83,3 @@ export function getCharacterExpToNextLevel(id: number): number {
   const exp = UserSettings._get('avatar_experience')[id] || 0
   return nextLevel.totalExp - exp
 }
-
-/**
- * Get the maximum level
- */
-export const MAX_LEVEL = 10
-
-/**
- * Get the maximum experience needed to reach max level
- */
-export const MAX_EXP = 10900

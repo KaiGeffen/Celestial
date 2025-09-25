@@ -1,6 +1,6 @@
-import Catalog from '../../../shared/state/catalog'
+import Catalog from '../../../../shared/state/catalog'
 
-// TODO Move this and other journey data into its own folder and break into files
+// TODO Split into files
 
 // Helper function to create arrays of card IDs
 const x = (cardName: string, count: number): number[] => {

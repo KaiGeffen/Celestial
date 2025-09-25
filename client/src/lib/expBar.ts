@@ -1,5 +1,5 @@
 import { Style, UserSettings } from '../settings/settings'
-import { MAX_LEVEL, LEVEL_PROGRESSION } from '../data/levelProgression'
+import { MAX_LEVEL, LEVEL_PROGRESSION } from '../journey/levelProgression'
 import BaseScene from '../scene/baseScene'
 import ExpBar from 'phaser3-rex-plugins/templates/ui/expbar/ExpBar'
 
