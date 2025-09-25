@@ -1,8 +1,15 @@
 import Catalog from '../../../shared/state/catalog'
 
+// TODO Move this and other journey data into its own folder and break into files
+
 // Helper function to create arrays of card IDs
 const x = (cardName: string, count: number): number[] => {
   const card = Catalog.getCard(cardName)
+
+  if (card === undefined) {
+    console.log(`When making a journey mission, card ${cardName} not found`)
+  }
+
   return card ? Array(count).fill(card.id) : []
 }
 
@@ -22,8 +29,8 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
   // Jules
   [
     {
-      selectText: '"Help me find my truth."',
-      missionText: `By high school, I knew with certainty that I couldn’t live comfortably as in my own skin. It was a reality that I could never say aloud or make too obvious. I tried to make do with small freedoms, but even that became a source of conflict.`,
+      selectText: `It's nice to meet you.`,
+      missionText: `It’s a pleasure to meet you, [player name?]. I hope you’re not feeling too disoriented. If you’d like, I could show you around this [term for neighborhood]. But if you do join me, you’ll have to lend me your ear while I reminisce a little. The great tree in this courtyard reminds me of a place of respite in my youth…`,
       uponRoundWinText: [
         `I won't stop until I know the truth.`,
         '1',
@@ -41,12 +48,12 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
         ...x('Uprising', 2),
       ],
       opponentDeck: [3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 11, 11, 14, 14, 17],
-      winText: 'You are a true friend.',
-      loseText: 'You are a true friend, but I did lose :/',
+      winText: 'Thanks for your help.',
+      loseText: 'Oh well, maybe next time.',
     },
     {
       selectText: '"I let go of something, what do I do now?"',
-      missionText: `Now you select more cards for the deck.`,
+      missionText: `Isn’t the landscaping here just beautiful? It’s all the work of the Umbra. They get inspired from all that they hear and shape their surroundings accordingly. I think there is peace to be found in the everchanging. I used to be too afraid, too troubled to see that.`,
       uponRoundWinText: [
         `The blank canvas remains...`,
         `Maybe there's something worth painting.`,
@@ -67,7 +74,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
     },
     {
       selectText: '"Ugh! All these clothes aren\'t me!"',
-      missionText: `Placeholder text`,
+      missionText: `You’ve adjusted so quickly, [player name]! You know, I think you’re a rather interesting Umbra. There is something refreshing about telling stories with you. It makes me want to reveal parts of myself I’ve kept under wraps. There was a time when my routine of keeping my head down and shutting up began to break apart…`,
       uponRoundWinText: [
         `The old routine is breaking apart.`,
         `I can't keep my head down anymore.`,
@@ -172,8 +179,8 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
   // Adonis
   [
     {
-      selectText: `Let's do this!`,
-      missionText: `I have to win fast! The ashes I left behind will find me soon.`,
+      selectText: `You can tag along if you want.`,
+      missionText: `So, you say you’re here to help me… I don’t know if that’s possible. I’m gonna be checking in on some projects around the [name for neighborhood], and the Umbras will bug me for my story again. I guess you could try your thing, I won’t stop you. Before we start, you should know my family struggled from day one…`,
       uponRoundWinText: [
         `Fire begins`,
         ``,
@@ -195,7 +202,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
     },
     {
       selectText: 'Ashes 1 - The Spark',
-      missionText: `The fire starts small. Just an impulse, a spark in the darkness. But once it catches, there's no stopping it. I've learned that the hard way.`,
+      missionText: `Not bad, [player name]. I promised to tell some Umbra down by the bonfire about my first love, want to join us? I could use your help. You see, I was desperate for opportunity as soon as I could work. People often told me to slow down, but I knew I still wasn’t fast enough. Some understood that better than others. `,
       uponRoundWinText: [
         `The spark ignites.`,
         `The fire grows stronger.`,
@@ -217,7 +224,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
     },
     {
       selectText: 'Ashes 2 - The Inferno',
-      missionText: `Death follows in the wake of destruction. I've seen it too many times. The fire burns everything to ash, leaving nothing but memories and regret.`,
+      missionText: `This next part is always the hardest to retell. At least I have you here with me this time. Mom babysat all over the city, sometimes even overnight, and Dad took a bus out to the edge of the suburbs to work 12 hour shifts at a factory. Knowing that, I shouldn’t have taken the downtown job that kept me out until the late evening…`,
       uponRoundWinText: [
         `The inferno rages on.`,
         `Death walks with me.`,

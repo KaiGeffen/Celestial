@@ -232,7 +232,6 @@ export default class JourneyScene extends BaseScene {
       ...Style.basic,
       wordWrap: { width: Space.cutoutWidth },
       fixedWidth: Space.cutoutWidth,
-      maxLines: 10,
     })
     this.decklist = new Decklist(this, this.onClickCutout())
     // Hint telling how many cards to add/remove
@@ -494,14 +493,12 @@ export default class JourneyScene extends BaseScene {
       this.cardPoolText.setText(
         `Select ${remainingCards} more cards for your deck`,
       )
-      this.cardPoolText.setVisible(true)
     } else if (deckSize > targetSize) {
       const excessCards = deckSize - targetSize
       this.cardPoolText.setText(`Remove ${excessCards} cards from your deck`)
-      this.cardPoolText.setVisible(true)
     } else {
-      // Hide the text when deck is ready (exactly 15 cards)
-      this.cardPoolText.setVisible(false)
+      // No text when deck is ready (exactly 15 cards)
+      this.cardPoolText.setText('')
     }
 
     if (deckSize === targetSize) {
@@ -510,20 +507,6 @@ export default class JourneyScene extends BaseScene {
       this.startBtn.disable()
     }
     this.missionDetailsView.layout()
-  }
-
-  private refreshCardPool() {
-    const cardSet: Set<Card> = getUnlockedCards()
-
-    // Enable dev flag to have all cards
-    if (Flags.devCardsEnabled) {
-      Catalog.collectibleCards.forEach((card) => {
-        cardSet.add(card)
-      })
-    }
-
-    // Filter the catalog to show only available cards
-    this.catalogRegion.filter((card: Card) => cardSet.has(card))
   }
 
   private setMissionInfo(mission: JourneyMission, avatarIndex: number) {
@@ -538,9 +521,6 @@ export default class JourneyScene extends BaseScene {
     this.decklist.setJourneyDeck(
       mission.deck.map((id) => Catalog.getCardById(id)),
     )
-
-    // Refresh the card pool to include optional cards from this mission
-    this.refreshCardPool()
 
     // Update deck state after setting initial deck
     this.updateDeckState()
