@@ -411,6 +411,25 @@ const momentum = new Momentum({
   text: 'When you lose a round while this is in hand, discard it.',
 })
 
+class Finale extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    bonus += Math.floor(game.pile[player].length / 3)
+    super.play(player, game, index, bonus)
+
+    for (let i = 0; i < 6; i++) {
+      game.createOnDeck(player, ashes)
+    }
+    game.draw(player, 6)
+  }
+}
+const finale = new Finale({
+  name: 'finale',
+  id: 2055,
+  cost: 7,
+  points: 5,
+  text: 'Worth +1 for every 3 cards in your discard pile. Create 6 Ashes on top of your deck, draw 6.',
+})
+
 export {
   dash,
   impulse,
@@ -431,4 +450,5 @@ export {
   eternalFlame,
   dyingLight,
   momentum,
+  finale,
 }
