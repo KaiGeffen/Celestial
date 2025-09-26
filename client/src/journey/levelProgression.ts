@@ -9,19 +9,16 @@ export interface LevelData {
 
 export const MAX_LEVEL = 10
 
-export const MAX_EXP = 10900
-
 export const LEVEL_PROGRESSION: LevelData[] = [
   { level: 1, expToNext: 100, totalExp: 0 },
   { level: 2, expToNext: 200, totalExp: 100 },
   { level: 3, expToNext: 300, totalExp: 300 },
   { level: 4, expToNext: 500, totalExp: 600 },
-  { level: 5, expToNext: 800, totalExp: 1100 },
-  { level: 6, expToNext: 1200, totalExp: 1900 },
-  { level: 7, expToNext: 1800, totalExp: 3100 },
-  { level: 8, expToNext: 2500, totalExp: 4900 },
-  { level: 9, expToNext: 3500, totalExp: 7400 },
-  { level: 10, expToNext: 0, totalExp: MAX_EXP }, // MAX level
+  { level: 5, expToNext: 700, totalExp: 1100 },
+  { level: 6, expToNext: 1000, totalExp: 1800 },
+  { level: 7, expToNext: 1300, totalExp: 2800 },
+  { level: 8, expToNext: 1800, totalExp: 4100 },
+  { level: 9, expToNext: 2500, totalExp: 5900 },
 ]
 
 /**
