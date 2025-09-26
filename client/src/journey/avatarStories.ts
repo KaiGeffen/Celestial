@@ -43,7 +43,108 @@ The two got up and swayed in each other's arms to the rhythm of the lapping wave
   `TODO`,
 ]
 
-const adonisStories = [``, ``, ``, ``, ``, ``, ``, ``, ``]
+const adonisStories = [
+  `I check the sticky note to make sure we’re at the right house: 153 Oak street. I look back at the brownstone, the bronze plaque reads “153”. The door swings open only a split second after I ring the doorbell.
+	“Andy!”
+Mom must be really surprised, she always calls me Junior, never Andy, since that’s also my dad’s name. 
+	“Are you okay? You even brought the twins!” She gasps, noticing Gavin and Kierra at my side. 
+	“Yea, we’re fine. We just wanted to surprise you at work” I explain.
+	She puts her fingers to her brow- not a good sign.
+	“Junior, are you crazy? I gave you the address for emergencies. And you even dragged the twins all the way here on foot. They can’t be outside like this during allergy season, you know that.”
+	“But we wanted to see you too!” Gavin pipes up.
+	“I know, baby. This is on your big brother.” Mom sighs. On me? I feel my stomach drop.
+	“I’m sorry Mom, I thought it’d be fun, the twins were all upset and crying and-” 
+	“You meant no harm, I get it. Relax.” She shakes her head. Children’s laughter rings out from further inside the house. “I’ve got to go now, these kids are young I can’t keep my eyes off them for long. But here, take this and get a cab home.” She takes some folded up cash from her back pocket and hands it to me. She starts to shut the door, but steps back onto the stoops and plants a kiss on my forehead. I make a face, I’m 13- too old for that mushy stuff, but it does make me feel lighter inside. 
+	In the cab home the twins sit on either side of me, both seem on the verge of falling asleep. I didn’t realize how quickly young kids wear out. Kierra is the first to doze off, laying her head in my lap. I keep my eyes locked on the window, unable to look away from this unfamiliar side of the city: street planter boxes with color flower arrangements, curly fur dogs groomed like hedges, and an unbelievable amount of cafes and restaurants.
+`,
+  `“Here, breakfast.” I hand Jas the coffee and chocolate donut I picked up on the way to her house. She lifts off the lid and brings the cup up to her nose. Her eyes close like she’s savoring the smell of premium espresso, not Deli drip coffee. 
+“Thanks babe.” 
+As we start walking to the bus stop I take out a greasy paper bag and tear off a chunk of cruller, popping it into my mouth.
+“So, how come I didn’t see you in Spanish yesterday? Again.” Jas asks.
+I try to prematurely swallow the bite of cruller, which sends me into a coughing fit. Jas laughs and slaps my back a few times, with almost too much force. 
+“It’s the last class of the day so I beat the rush home if I skip. And yesterday I actually really had to, I had an interview downtown.”
+“Downtown? You didn’t tell me about that.” She scrunches her nose in disgust.
+“I know you think it’s all gentrified and shit down there, but if I can get a gentrified paycheck out of it, maybe it’s not too bad.” I joke. “I interviewed to be a doorman at a commercial building. I didn’t tell you since I thought I’d get turned down, but yesterday it went kinda well. I think I have a good chance.”
+“Congrats, I guess. But that was like the fifth time you’ve missed Spanish.”
+“Good thing it’s the least important subject.”
+Jas looks frustrated. “That’s not the point. It’ll still look bad on paper. Real bad for college apps.” 
+“College?” I scoff. Then I remember she’s my girl, my girl with that light in her honey colored eyes. She’s my girl who wants to walk the straight path after losing her big brother, and she wants to take me with her. “I’m still thinking about it.” I add.
+Jas sips her coffee silently for a moment. The ends of her scarf flutter in the crisp morning breeze. “You’ve been plotting with Ty and Noah, still? About turning this place around?”
+The bus screeches to a slow halt in front of us and the door pops open with a mechanical hiss. 
+I’ve known Ty and Noah my whole life, we’re each other’s closest friends. We all have family here, people we can’t bring ourselves to leave behind. Noah is a few years older, he hasn’t gone to college but he’s set on joining the city council. Honestly, it’s possible. He knows everyone, has connections in both the brightest and darkest ends of this community, including the people that Jas can never forgive. 
+As I sit down with her, I answer carefully, “We’ve been talking. It’s just talk, as always.”
+	Jas doesn’t respond. She leans her head against the window and closes her eyes.
+`,
+  `I’m probably going to be fired for randomly dipping mid-shift, but for now I don’t care. The only thing on my mind is that phone call from Gavin- his trembling voice begging for help. He follows close as I pick up Kierra’s limp body and stow her in the cab. I can hear her wheezing and Gavin’s faint sniffles as we speed to the ER.
+	“What do you mean wait? She can’t breathe, look at her!” I shout at reception.
+	“Everyone is here for an emergency and tonight, like most nights, we’re backed up, there’s nothing we can do.”
+	I curse under my breath. “How far is the next closest ER?”
+	“At least a half an hour, and they’re also always busy. You’re better off waiting here.”
+	We sit in that crowded waiting room, surrounded by coughing and groaning and the stench of blood. Keirra leans on my shoulder, wheezing heavier than before.
+	“What happened to Kierra?” I ask Gavin, who sits on the other side of her. 
+	“She has hay fever, it started yesterday. Mom and Dad both work tonight so I was looking after her. She was just sleeping when she suddenly had a coughing fit, and after that she’s been struggling to breathe.”
+	“Did you give her the inhaler?”
+	“The one we had expired, Mom and Dad were trying to get a new one but there were some issues with insurance or something, I don’t know, it was taking a while to get.”
+	I feel frustration heat up my skin, but all I can do is close my eyes. 
+	“Sorry for making you leave work. You’re the only one who could make it in time.”
+	I reach over Kierra to place a hand on Gavin’s shoulder. “You did the right thing, and that’s not what I’m pissed about.”
+	My anger was for my namesake, a man who didn’t know how to hustle. Mom, who doesn’t even have a work Visa, has a better work ethic than him and is always finding better paying families to work for. Dad, a citizen, has just maintained his mid-level position at a factory with a 2 hour commute for the past decade. Whenever he’s around he smiles like we’re rich and acts like a caring father, but he can’t even get the twins their life-saving medicine. 
+	“Andy? Andy that kinda… hurts.” Gavin’s voice pulls me back and I release the grip I unconsciously tightened.
+	“Sorry Gav, I got distracted.”
+
+	When they finally took Kierra in after two hours of waiting, a nurse emerged just fifteen minutes later to tell us our sister was dead.
+`,
+  `Mitchel, Duke, and I sit in the back of the Humvee as it rumbles along, stirring up clouds of sand as we travel back to base. It’s another uneventful day of re-scouting areas of the empty desert. We rehash old stories of rare enemy encounters, further exaggerating the moments of action with each retelling. Always an even closer encounter, an even cleaner shot, an even more terrified expression on the target’s face, etc. I know from Gavin’s letters that it’s the type of talk that would horrify a college discussion circle and spark a lecture on humanity, violence, and the evils of Western conquest. Sometimes a lingering sentiment in line with that criticism shoots through me, but I ignore it every time. I’m here to provide for myself, for my family, for our future. 
+	“And that’s when I realize I only have half a mag left…” Duke says, a grin creeping across his sun-burnt face.
+	The Humvee drives over something and I hear, or feel, an almost imperceptible whistle of a ‘click’. There’s a flash of white light and the next thing my vision captures is a ball of flames. A force hits me like a punch and I’m slammed through the side door I’d been leaning against while an enormous bang registers to my ears. I feel a pop deep in both my ears as a second wave of wind sends me flying away from the vehicle. 
+	At first I can’t sense any pain in my body, just the ringing in my ears while I try to orient myself in the plume of dust. Then I see the Humvee several yards from me, flipped upside down and engulfed in flames. Suddenly sensation returns to me, searing pain spreads across my skin. I open my mouth to scream, but the pang of stabbing pain from my right thigh rips my voice from me. I look down and see the piece of shrapnel lodged in my leg, and I feel my consciousness flicker. A scorching heat inside of me keeps me awake, the heat of indignation and resentment for everything I haven’t yet seen achieved. 
+	I roll onto my side, keeping my uninjured leg on the ground as I pull myself forward, crawling, no, dragging myself away from the blazing wreckage.
+`,
+  `The parts of my 5am jog that typically ground me- the steady rhythm of my breath, the familiar storefronts, the soles of my sneakers hitting the pavement- fade into the background as my thoughts take over.
+	Gavin turned down my invitation to this jog, as usual, but this time he added that he’d join me this weekend. Why did he give in? He hates early mornings. I know he must’ve sensed my growing restlessness. 
+	I pass by yet another abandoned lot. Like all the others it’s got barriers up but no signage or scaffolding, no hint of a future beyond an eyesore that keeps rent down. Then, in the pale darkness of dim streetlights, I glimpse someone in my periphery. It happens some mornings, but today I’m on edge. I turn left at the corner and the figure mirrors me. 
+	Was Mom right? Has giving back to my community- what she calls “flaunting wealth”- put a target on my back? When I hear the stranger’s footsteps fall faster, my legs react before I do, attempting to break into a sprint. That old ache shoots through my right leg and my knee nearly buckles. I bite back a groan and duck into the stairway entrance of a home. I keep my back against the wall and wait. Right as my pursuer turns into the entryway, I move to lunge, but first I catch a glimpse of his face and stop.
+	“Jesus, Andy!” Noah exclaims. “I just wanted to say hello. Didn’t you hear me calling out to you?”
+	“No… sorry, I don’t know what just happened. You okay?” 
+	“Yea, I’m good. What about you? How’s it to be home again? I wanted to drop by some time, but I didn’t know if you’d be cool with that since you stopped writing back a while ago.”
+	“Oh. That was just, that was on me. It wasn’t personal. But what are you doing out here so early?” I clumsily change the subject, but Noah lets it slide. He picks up the clipboard that he dropped in surprise.
+	“Just some city council business. Ty’s company- MetroLine- is interested in making a concrete plant in the area. It would hopefully spark some development, or at least make it easier.” Noah replies.
+	In that moment, I feel transported back to our juvenile meetings at Noah’s tiny apartment. The adrenaline lingering inside me with nowhere to go finally dissipates. “Tell me more.”
+`,
+  `A few months ago, when my father was let go from the factory, I offered him a job at my start-up as well as one at MetroLine. He turned both down, and wouldn’t explain why no matter how many times I asked. I couldn’t handle seeing him for a while. That stubborn silence of his only confirmed the underlying resistance he’s held towards me ever since I returned. 
+Now I’ve gotten over it. Gavin and Mom have started getting concerned, so I take initiative to extend an olive branch.
+	
+“Oh, I don’t know Junior, I can’t accept this.” Senior says, his glasses perched on the tip of his nose as he examines the new watch I bought him like it’s a precious artifact. “This one’s holding up just fine.” He pats the scratched up watch on his wrist, the only one I’ve seen him wear my whole life.
+	“I got this for you, though. Like the new tote for Mom.”
+	“Nah, you should keep it son. Don’t worry about providing these things, you’re young.”
+	I can tell by the way Senior purses his lips that he’s holding back from nagging me about saving my money. No matter how many times I’ve explained my investments, portfolio, and plans for the future, my father can’t let go of his conservative instincts. By now, he’s had to accept my success, but the refusal of my gift means he still has deeper doubts.
+	“Well, if you’re still uncomfortable I guess I’ll keep it.” I say, trying to sound calm. 
+	“It’s not like that- I just think it suits you better. Won’t it impress those high schoolers you do those financial lessons for? That’ll make them pay attention.” Senior laughs, attempting to smooth things over.
+	“That’s right.” I push aside my frustration and smile. I can’t force him to understand. I just have to show him, eventually, that I’ve made the right choices- for us and for this community. I take the brand new watch and fasten it around my wrist. When I look up, Senior is watching me with soft eyes, like I’m still a child. What’s with that?
+	“It looks perfect on you, Junior.”
+`,
+  `Jas stands at the podium alone, gripping a folder of papers. Myself and the council sit facing her from elevated tables arranged in an arc, as if we plan to encircle her, trapping her in the center. Her eyes don’t waver or pause when she sees me, she probably already knew I’d be here. 
+	“I am Jasmine Waters, and I own and run the daycare located on Beacon street. I’m here to inform you, the council, that you are making a terrible mistake. This plant will pollute the air where young children play, sleep, eat, and live. Your grand plans are not worth the cost of the long-term health of our future generations. These developing children deserve to breathe clean air, their hardworking parents deserve peace of mind.”
+
+	A brief back and forth takes place, but I don’t say a word. Neither does Noah. The next concerned member of the public is called to the stand. I watch Jas exit the room and quickly excuse myself to follow her.
+	“Jas, wait.” I call to her in the hallway. She stops, but doesn’t say anything. I continue in an unsteady fervor, “This project, it’s not meant to be like this- I mean, it’s really an opportunity to bring so much to the community. The location… It can't be changed now, it’s too ideal. It’s not near any schools or hospitals, and it's close to port and highway access.” Jas looks ready to turn around, so I blabber on. “The daycare, I’ll relocate it. Just wait, once the plant is in operation for a bit and I’ve earned from my investment, I can completely cover moving your daycare anywhere in the city- even downtown-”
+	“Don’t even think of touching what I own.” Jas cuts me off with a certain sharpness in her even toned voice. “Do you even know just how hard we all fought while you were off bloodying your hand? We had to pull out all the stops to prevent MetroLine from taking away one of our only local public schools. Now you’re inviting them back with open arms and that dirty money. You’ve really made such great opportunities, just for you and a select few people. Not for all of us. Don’t delude yourself.” She walks off before I can respond, but I’m left without words anyway. No defense makes it way to my mind, let alone my lips.
+`,
+  `I decide to take the bus to the cemetery. The crowd on board resembles what I can recall from my high school commute, all appearing to be locals. I turn my focus to the window for the rest of the ride. A sudden spring shower starts, dotting my view with rolling droplets. There aren’t any landscaped planter boxes, but the sidewalks look a bit cleaner, brighter somehow. Though, that could just be a projection of what I want to see.
+Scaffolding surrounds what used to be an empty lot. There is a sign, it says commercial, but it blurs into the distance before I can catch what business will be moving in.
+	
+	When I arrive the drizzle fades and Gavin is already there, without him it probably would’ve taken me a while to find the right plot. The stone has smooth edges, a glossy shine, and defined engravings with “Kierra” in a cursive font. It looks surprisingly new, she must’ve been well cared for by the others all these years. 
+	“I’m sorry it took so long for me to visit.” I say aloud, to both of the twins.
+	“It’s alright, you were preoccupied for a long time.” Gavin reassures me.
+	“Uh-huh, I bet you’re busier now than I ever was, Doctor.”
+	Gavin sheepishly rubs the back of his neck, still awkwardly humble about the title he’s earned. 
+	“She’d be so proud.” I add. I mean it, but those words sting. Could I say the same about me? The brother that couldn’t even face her resting place for years after the funeral.
+	“And it wouldn’t have been possible without you.” Says Gavin. I look away from him. I don’t want to search his face for traces of obligation and hidden resentment. I want to believe him. But facing Kierra leaves me wondering what she’d think of me, of everything I’ve done. 
+	“You good?” my brother asks. 
+I nod and take out a crystalline bead with a purple hyacinth blossom inside the center, placing it at the base of the stone. 
+`,
+  `TODO`,
+]
 const miaStories = [``, ``, ``, ``, ``, ``, ``, ``, ``]
 const kitzStories = [``, ``, ``, ``, ``, ``, ``, ``, ``]
 const imaniStories = [``, ``, ``, ``, ``, ``, ``, ``, ``]

@@ -8,10 +8,9 @@ import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import avatarNames from '../lib/avatarNames'
 import AvatarButton from '../lib/buttons/avatar'
 import { getUnlockedAvatars } from '../lib/cosmetics'
-import avatarDescriptions from '../journey/avatarDescriptions'
+import avatarBios from '../journey/avatarBios'
 import { createExpBar } from '../lib/expBar'
 import ExpBar from 'phaser3-rex-plugins/templates/ui/expbar/ExpBar'
-import { getCharacterLevel } from '../journey/levelProgression'
 import newScrollablePanel from '../lib/scrollablePanel'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import avatarStories from '../journey/avatarStories'
@@ -211,9 +210,7 @@ export default class CharacterProfileScene extends BaseScene {
 
   private updateCharacterText() {
     // this.txtCharacterName.setText(avatarNames[this.selectedAvatar])
-    this.txtCharacterDescription.setText(
-      avatarDescriptions[this.selectedAvatar],
-    )
+    this.txtCharacterDescription.setText(avatarBios[this.selectedAvatar])
   }
 
   private createSlider() {

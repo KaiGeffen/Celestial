@@ -192,16 +192,17 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       deck: [
         ...x('Stars', 3),
         ...x('Impulse', 5),
-        ...x('Dash', 1),
+        ...x('Dash', 2),
+        ...x('Fruit', 1),
         ...x('Mercy', 2),
         ...x('Veteran', 2),
       ],
       opponentDeck: [11, 11, 11, 11, 7, 7, 7, 4, 4, 4, 4, 4, 4, 0, 0],
-      winText: 'Fire stuff idk...',
-      loseText: 'I have burned too bright!',
+      winText: 'Adonis win text heehee',
+      loseText: 'Adonis lose text heehee',
     },
     {
-      selectText: 'Ashes 1 - The Spark',
+      selectText: `You coming? I've got a job to do.`,
       missionText: `Not bad, [player name]. I promised to tell some Umbra down by the bonfire about my first love, want to join us? I could use your help. You see, I was desperate for opportunity as soon as I could work. People often told me to slow down, but I knew I still wasn’t fast enough. Some understood that better than others. `,
       uponRoundWinText: [
         `The spark ignites.`,
@@ -223,7 +224,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The spark still smolders.',
     },
     {
-      selectText: 'Ashes 2 - The Inferno',
+      selectText: 'Placeholder',
       missionText: `This next part is always the hardest to retell. At least I have you here with me this time. Mom babysat all over the city, sometimes even overnight, and Dad took a bus out to the edge of the suburbs to work 12 hour shifts at a factory. Knowing that, I shouldn’t have taken the downtown job that kept me out until the late evening…`,
       uponRoundWinText: [
         `The inferno rages on.`,
