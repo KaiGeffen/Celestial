@@ -7,9 +7,14 @@ export function createExpBar(
   scene: BaseScene,
   avatarID: number,
   expGained = 0,
+  hasBackground = false,
 ): ExpBar {
   const currentExp =
     UserSettings._get('avatar_experience')[avatarID] - expGained || 0
+
+  const background = hasBackground
+    ? scene.add.image(0, 0, 'background-Light')
+    : null
 
   let expBar: ExpBar
   expBar = scene.rexUI.add.expBar({
@@ -26,6 +31,7 @@ export function createExpBar(
       value = Math.floor(value)
       return `${value - min}/${max - min}`
     },
+    background: background,
     bar: {
       height: 10,
       barColor: 0xfabd5d,
