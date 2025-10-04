@@ -7,6 +7,7 @@ import MenuScene from '../menuScene'
 import UserDataServer from '../../network/userDataServer'
 import Button from '../../lib/buttons/button'
 import { openDiscord } from '../../externalLinks'
+import logEvent from '../../analytics'
 
 const width = 700
 const inputTextWidth = 200
@@ -168,6 +169,8 @@ export class RegisterUsernameMenu extends Menu {
 
         // Send username to server
         UserDataServer.sendInitialUserData(this.username)
+
+        logEvent('registered')
       },
       returnHotkey: true,
     }).disable()
