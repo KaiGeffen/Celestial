@@ -87,6 +87,8 @@ export default class HomeScene extends BaseScene {
           activeScene: this,
           outerAvatar: avatar,
         })
+
+        logEvent('view_user_profile')
       },
       muteClick: true,
     })
@@ -164,10 +166,13 @@ export default class HomeScene extends BaseScene {
       y: Space.pad + Space.iconSize * 0.5,
       f: () => {
         if (UserDataServer.isLoggedIn()) {
+          // TODO Standardize this - either quests or achievements
           this.scene.launch('MenuScene', {
             menu: 'achievements',
             activeScene: this,
           })
+
+          logEvent('view_quests')
         } else {
           this.signalError('Must be signed in.')
         }
@@ -211,6 +216,8 @@ export default class HomeScene extends BaseScene {
       f: () => {
         if (UserDataServer.isLoggedIn()) {
           this.scene.start('MatchHistoryScene')
+
+          logEvent('view_match_history')
         } else {
           this.signalError('Must be signed in.')
         }
@@ -229,6 +236,8 @@ export default class HomeScene extends BaseScene {
           hint: 'leaderboard',
           activeScene: this,
         })
+
+        logEvent('view_leaderboard')
       },
       hint: 'Leaderboard',
       muteClick: true,
@@ -245,7 +254,11 @@ export default class HomeScene extends BaseScene {
     new Buttons.HomeScene({
       within: journeyContainer,
       text: 'Journey',
-      f: () => this.scene.start('JourneyScene', { postMatch: false }),
+      f: () => {
+        this.scene.start('JourneyScene', { postMatch: false })
+
+        logEvent('view_journey')
+      },
     })
     this.plugins.get('rexAnchor')['add'](journeyContainer, {
       x: `0%+${buttonWidth / 2 + Space.pad}`,
@@ -269,7 +282,11 @@ export default class HomeScene extends BaseScene {
     new Buttons.HomeScene({
       within: playContainer,
       text: 'Play',
-      f: () => this.scene.start('BuilderScene', { isTutorial: false }),
+      f: () => {
+        this.scene.start('BuilderScene', { isTutorial: false })
+
+        logEvent('view_play')
+      },
     })
     this.plugins.get('rexAnchor')['add'](playContainer, {
       x: `100%-${buttonWidth / 2 + Space.pad}`,

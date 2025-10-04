@@ -21,6 +21,7 @@ import Catalog from '../../../../shared/state/catalog'
 import { BuilderBase, BuilderScene } from '../builderScene'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import UserDataServer from '../../network/userDataServer'
+import logEvent from '../../analytics'
 
 const width = Space.decklistPanelWidth
 
@@ -278,6 +279,8 @@ export default class DecklistsRegion {
             callback: this.premadeCallback(),
             exitCallback: () => this.scene.setSearchVisible(true),
           })
+
+          logEvent('view_premade')
         }
       },
       muteClick: true,
