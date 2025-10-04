@@ -6,7 +6,7 @@ import Menu from './menu'
 import MenuScene from '../menuScene'
 import UserDataServer from '../../network/userDataServer'
 import Button from '../../lib/buttons/button'
-import openDiscord from '../../discord'
+import { openDiscord } from '../../externalLinks'
 
 const width = 700
 const inputTextWidth = 200

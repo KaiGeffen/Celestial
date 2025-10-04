@@ -22,7 +22,7 @@ import MenuScene from '../menuScene'
 import { rulebookString } from '../../data/rulebook'
 import { creditsString } from '../../data/credits'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
-import openDiscord from '../../discord'
+import { openDiscord } from '../../externalLinks'
 
 // TODO Use a non-mock color for the menu background
 const COLOR = Color.backgroundLight

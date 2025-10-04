@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Color, Space, Url } from '../settings/settings'
+import { Style, Color, Space } from '../settings/settings'
 import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import UserDataServer from '../network/userDataServer'
@@ -8,7 +8,8 @@ import {
   getTimeUntilNextQuest,
   isDailyQuestAvailable,
 } from '../utils/dailyQuestUtils'
-import openDiscord from '../discord'
+import { openDiscord, openFeedbackForm } from '../externalLinks'
+import logEvent from '../analytics'
 
 const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
@@ -281,7 +282,7 @@ export default class HomeScene extends BaseScene {
     new Buttons.Basic({
       within: container,
       text: 'Feedback',
-      f: () => window.open(Url.feedback, '_blank'),
+      f: openFeedbackForm,
     })
 
     // Anchor to right
