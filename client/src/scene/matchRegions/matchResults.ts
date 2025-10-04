@@ -7,6 +7,7 @@ import Buttons from '../../lib/buttons/buttons'
 import GameModel from '../../../../shared/state/gameModel'
 import avatarNames from '../../lib/avatarNames'
 import newScrollablePanel from '../../lib/scrollablePanel'
+import logEvent from '../../analytics'
 
 export default class MatchResultsRegion extends Region {
   // Whether the results have been seen already
@@ -346,6 +347,8 @@ export class ResultsRegionTutorial extends MatchResultsRegion {
 
   private continueCallback(): () => void {
     return () => {
+      logEvent(`tutorial_complete_${this.missionID}`)
+
       // If we are done with tutorials,
       if (this.missionID >= TUTORIAL_LENGTH) {
         this.scene.scene.start('HomeScene')
