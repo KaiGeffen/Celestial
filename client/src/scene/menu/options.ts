@@ -22,6 +22,7 @@ import MenuScene from '../menuScene'
 import { rulebookString } from '../../data/rulebook'
 import { creditsString } from '../../data/credits'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
+import openDiscord from '../../discord'
 
 // TODO Use a non-mock color for the menu background
 const COLOR = Color.backgroundLight
@@ -177,9 +178,7 @@ export default class OptionsMenu extends Menu {
     new Buttons.Icon({
       name: 'Discord',
       within: container,
-      f: () => {
-        window.open(Url.discord, '_blank')
-      },
+      f: openDiscord,
     })
     tabsSizer.add(container)
 

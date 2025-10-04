@@ -8,6 +8,7 @@ import {
   getTimeUntilNextQuest,
   isDailyQuestAvailable,
 } from '../utils/dailyQuestUtils'
+import openDiscord from '../discord'
 
 const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
@@ -255,7 +256,7 @@ export default class HomeScene extends BaseScene {
     new Buttons.HomeScene({
       within: discordContainer,
       text: 'Discord',
-      f: () => window.open(Url.discord, '_blank'),
+      f: openDiscord,
     })
     this.plugins.get('rexAnchor')['add'](discordContainer, {
       x: `50%`,
