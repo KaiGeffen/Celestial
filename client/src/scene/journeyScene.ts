@@ -28,6 +28,7 @@ import getUnlockedCards, {
 import { createExpBar } from '../lib/expBar'
 import { CardImage } from '../lib/cardImage'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
+import logEvent from '../analytics'
 
 export default class JourneyScene extends BaseScene {
   // Mission details
@@ -464,6 +465,8 @@ export default class JourneyScene extends BaseScene {
           winText: this.selectedMission.winText,
           loseText: this.selectedMission.loseText,
         })
+
+        logEvent('queue_journey')
       },
     })
 

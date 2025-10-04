@@ -7,6 +7,7 @@ import Menu from './menu'
 import MenuScene from '../menuScene'
 import getRandomAiDeck from '../../data/aiDecks'
 import { Deck } from '../../../../shared/types/deck'
+import logEvent from '../../analytics'
 
 const width = 550
 
@@ -93,6 +94,8 @@ export default class ModeMenu extends Menu {
           deck: deck,
           aiDeck: getRandomAiDeck(),
         })
+
+        logEvent('queue_pve')
       },
     })
 
@@ -117,6 +120,8 @@ export default class ModeMenu extends Menu {
           deck: deck,
           password: '',
         })
+
+        logEvent('queue_pvp')
       },
     })
 
@@ -141,6 +146,8 @@ export default class ModeMenu extends Menu {
           deck: deck,
           password: this.password,
         })
+
+        logEvent('queue_pwd')
       },
     }).disable()
 
