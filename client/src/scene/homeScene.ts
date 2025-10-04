@@ -188,6 +188,8 @@ export default class HomeScene extends BaseScene {
       y: Space.pad + Space.iconSize * 0.5,
       f: () => {
         this.scene.start('CharacterProfileScene')
+
+        logEvent('view_character_profile')
       },
       hint: 'Characters',
     })
@@ -201,6 +203,8 @@ export default class HomeScene extends BaseScene {
       f: () => {
         if (UserDataServer.isLoggedIn()) {
           this.scene.start('StoreScene')
+
+          logEvent('view_store')
         } else {
           this.signalError('Must be signed in.')
         }
