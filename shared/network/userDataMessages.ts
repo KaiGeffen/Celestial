@@ -48,7 +48,6 @@ export interface UserDataServerMessages {
     elo: number
     gems: number
     coins: number
-    lastDailyReward: Date
     ownedItems: number[]
     cosmeticSet: CosmeticSet
     achievements: Achievement[]

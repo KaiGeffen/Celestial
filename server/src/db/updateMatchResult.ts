@@ -3,6 +3,7 @@ import { eq, sql, lt } from 'drizzle-orm'
 import { db } from './db'
 import { matchHistory, players } from './schema'
 import { Deck } from '../../../shared/types/deck'
+import Garden from './garden'
 
 const K_FACTOR = 32 // Standard K-factor used in chess
 const elo = new EloRank(K_FACTOR)
@@ -113,6 +114,10 @@ export async function updateMatchResultPVE(
     loserDeck,
     roundsWLT,
   )
+
+  // Plant in the garden
+  // winnerID has a seed planted
+  await Garden.plantSeed(playerId)
 
   // Update the number of pve wins and losses
   if (wasPlayerWin) {
