@@ -29,7 +29,6 @@ type UserData = null | {
   elo: number
   gems: number
   coins: number
-  lastDailyReward: Date
   ownedItems: number[]
   cosmeticSet: CosmeticSet
   achievements: Achievement[]
@@ -129,7 +128,6 @@ export default class UserDataServer {
           elo: number
           gems: number
           coins: number
-          lastDailyReward: Date
           ownedItems: number[]
           cosmeticSet: CosmeticSet
           achievements: Achievement[]
@@ -299,7 +297,6 @@ export default class UserDataServer {
         elo: null,
         gems: null,
         coins: null,
-        lastDailyReward: null,
         ownedItems: [],
         cosmeticSet: {
           avatar: 0,

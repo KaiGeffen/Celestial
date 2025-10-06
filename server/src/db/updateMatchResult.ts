@@ -10,11 +10,8 @@ const BASE_ELO = 1000
 const DEFAULT_PLAYER_DATA = {
   elo: BASE_ELO,
   username: 'Guest',
-  last_daily_reward: null,
   id: null,
 }
-
-const DAILY_COIN_REWARD = 10
 
 async function getPlayerData(playerId: string | null) {
   if (playerId === null) return DEFAULT_PLAYER_DATA
@@ -39,6 +36,7 @@ export async function updateMatchResultPVP(
   const winnerData = await getPlayerData(winnerId)
   const loserData = await getPlayerData(loserId)
 
+  // Remember the match
   await insertMatchHistory(
     winnerId,
     loserId,
@@ -49,6 +47,7 @@ export async function updateMatchResultPVP(
     roundsWLT,
   )
 
+  // Calculate new ELO
   // Calculate expected scores
   const expectedScoreWinner = elo.getExpected(winnerData.elo, loserData.elo)
   const expectedScoreLoser = elo.getExpected(loserData.elo, winnerData.elo)
@@ -61,50 +60,26 @@ export async function updateMatchResultPVP(
   )
   const newLoserRating = elo.updateRating(expectedScoreLoser, 0, loserData.elo)
 
-  // Check if players are eligible for daily rewards
-  const now = new Date()
-  const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-
-  // Update elo and daily rewards for each registered player
-  if (winnerData.last_daily_reward !== null) {
-    // Check if winner qualifies for daily reward
-    const winnerDailyReward =
-      winnerData && new Date(winnerData.last_daily_reward) < oneDayAgo
-        ? {
-            coins: sql`${players.coins} + ${DAILY_COIN_REWARD}`,
-            last_daily_reward: sql`now()`,
-          }
-        : {}
-
-    await db
+  // Update the database with new ELO for winner and loser
+  await db.transaction(async (tx) => {
+    await tx
       .update(players)
       .set({
         elo: newWinnerRating,
         wins: sql`${players.wins} + 1`,
-        ...winnerDailyReward,
+        ...winnerData,
       })
       .where(eq(players.id, winnerId))
-  }
 
-  if (loserData.last_daily_reward !== null) {
-    // Check if loser qualifies for daily reward
-    const loserDailyReward =
-      loserData && new Date(loserData.last_daily_reward) < oneDayAgo
-        ? {
-            coins: sql`${players.coins} + ${DAILY_COIN_REWARD}`,
-            last_daily_reward: sql`now()`,
-          }
-        : {}
-
-    await db
+    await tx
       .update(players)
       .set({
         elo: newLoserRating,
         losses: sql`${players.losses} + 1`,
-        ...loserDailyReward,
+        ...loserData,
       })
       .where(eq(players.id, loserId))
-  }
+  })
 }
 
 export async function updateMatchResultPVE(
@@ -128,6 +103,7 @@ export async function updateMatchResultPVE(
   const winnerDeck = wasPlayerWin ? playerDeck : aiDeck
   const loserDeck = wasPlayerWin ? aiDeck : playerDeck
 
+  // Add the match to the match history
   await insertMatchHistory(
     winnerId,
     loserId,

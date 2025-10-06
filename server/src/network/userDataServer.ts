@@ -142,7 +142,6 @@ export default function createUserDataServer() {
               lastactive: new Date().toISOString(),
               gems: 0,
               coins: 0,
-              last_daily_reward: new Date(),
               cosmetic_set: JSON.stringify({
                 avatar: 0,
                 border: 0,
@@ -243,7 +242,6 @@ async function sendUserData(
     elo: number
     gems: number
     coins: number
-    last_daily_reward: Date
     cosmetic_set: string
   },
 ) {
@@ -277,7 +275,6 @@ async function sendUserData(
     elo: data.elo,
     gems: data.gems,
     coins: data.coins,
-    lastDailyReward: data.last_daily_reward,
     ownedItems,
     cosmeticSet: JSON.parse(data.cosmetic_set),
     achievements,

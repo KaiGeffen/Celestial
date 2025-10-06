@@ -4,10 +4,6 @@ import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import UserDataServer from '../network/userDataServer'
 import Cinematic from '../lib/cinematic'
-import {
-  getTimeUntilNextQuest,
-  isDailyQuestAvailable,
-} from '../utils/dailyQuestUtils'
 import { openDiscord, openFeedbackForm } from '../externalLinks'
 import logEvent from '../analytics'
 
@@ -15,9 +11,6 @@ const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
 
 export default class HomeScene extends BaseScene {
-  // Add this property to the class
-  private questTimer: Phaser.Time.TimerEvent = null
-
   constructor() {
     super({
       key: 'HomeScene',
@@ -44,11 +37,6 @@ export default class HomeScene extends BaseScene {
 
     // Normal buttons
     this.createFeedbackButton()
-
-    // Quest text
-    if (UserDataServer.isLoggedIn()) {
-      this.createQuestText()
-    }
 
     // Check if there are any unseen achievements and show achievements menu if so
     this.checkAndShowUnseenAchievements()
@@ -313,84 +301,6 @@ export default class HomeScene extends BaseScene {
     })
   }
 
-  private createQuestText(): void {
-    const container = this.add.container()
-    this.plugins.get('rexAnchor')['add'](container, {
-      x: `100%-${Space.pad}`,
-      y: `100%-${Space.pad * 2 + 120}`,
-    })
-
-    // Check if daily quest is available
-    const isQuestAvailable = isDailyQuestAvailable()
-
-    // Create background rectangle for the quest text
-    const padding = Space.padSmall
-    const bgColor = Color.backgroundLight
-
-    // Create text with initial value
-    const questText = this.add
-      .text(
-        0,
-        0,
-        isQuestAvailable
-          ? 'Daily Quest Available!'
-          : `Next Quest: ${getTimeUntilNextQuest()}`,
-        Style.basic,
-      )
-      .setOrigin(1, 1)
-      .setDepth(10)
-
-    // Create background based on text dimensions
-    const bg = this.add
-      .rectangle(
-        padding,
-        padding,
-        questText.width + padding * 2,
-        questText.height + padding * 2,
-        bgColor,
-        0.85,
-      )
-      .setStrokeStyle(2, isQuestAvailable ? Color.gold : Color.backgroundDark)
-      .setOrigin(1, 1)
-      .setDepth(9)
-
-    container.add([bg, questText])
-
-    // If quest is not available, set up timer to update every second
-    if (!isQuestAvailable) {
-      // Function to update the text
-      const updateQuestTime = () => {
-        // Check if quest has become available
-        if (isDailyQuestAvailable()) {
-          // Update text and styling for available quest
-          questText.setText('Daily Quest Available!')
-          bg.setStrokeStyle(2, Color.gold)
-
-          // Clear the timer as quest is now available
-          if (this.questTimer) {
-            this.questTimer.remove()
-            this.questTimer = null
-          }
-        } else {
-          // Update countdown text
-          const newTimeText = `Next Quest: ${getTimeUntilNextQuest()}`
-          questText.setText(newTimeText)
-
-          // Adjust background width based on new text width
-          bg.width = questText.width + padding * 2
-        }
-      }
-
-      // Create a timer that fires every second
-      this.questTimer = this.time.addEvent({
-        delay: 1000,
-        callback: updateQuestTime,
-        callbackScope: this,
-        loop: true,
-      })
-    }
-  }
-
   private checkAndShowUnseenAchievements(): void {
     const userAchievements = UserDataServer.getUserData()?.achievements || []
 
@@ -407,11 +317,6 @@ export default class HomeScene extends BaseScene {
 
   beforeExit(): void {
     Cinematic.hide()
-
-    if (this.questTimer) {
-      this.questTimer.remove()
-      this.questTimer = null
-    }
 
     super.beforeExit()
   }
