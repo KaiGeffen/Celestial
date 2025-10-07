@@ -17,7 +17,7 @@ export default class Garden {
 
     const gardenState = [...player[0].garden]
 
-    // Check if there are less than max plants (can plant more)
+    // Don't plant if the garden is full
     if (gardenState.length >= GardenSettings.MAX_PLANTS) {
       return false
     }
@@ -43,10 +43,7 @@ export default class Garden {
     newGarden?: Date[]
     reward?: number
   }> {
-    if (plotNumber < 0 || plotNumber >= GardenSettings.MAX_PLANTS) {
-      return { success: false }
-    }
-
+    // Get the player's garden
     const player = await db
       .select({ garden: players.garden })
       .from(players)
@@ -59,8 +56,8 @@ export default class Garden {
 
     const gardenState = [...player[0].garden]
 
-    if (plotNumber >= gardenState.length) {
-      // Nothing to harvest at this plot
+    // Ensure plot number is valid
+    if (plotNumber < 0 || plotNumber >= gardenState.length) {
       return { success: false }
     }
 
@@ -70,8 +67,8 @@ export default class Garden {
     const hoursElapsed =
       (now.getTime() - plantedTime.getTime()) / (1000 * 60 * 60)
 
+    // Plant is not ready to harvest yet
     if (hoursElapsed < GardenSettings.GROWTH_TIME_HOURS) {
-      // Plant is not ready to harvest yet
       console.log(
         `Plant not ready to harvest. ${hoursElapsed.toFixed(1)}h elapsed, need ${GardenSettings.GROWTH_TIME_HOURS}h`,
       )
@@ -81,6 +78,7 @@ export default class Garden {
     // Remove the plant at the specified plot
     gardenState.splice(plotNumber, 1)
 
+    // Update the database
     await db
       .update(players)
       .set({ garden: gardenState })

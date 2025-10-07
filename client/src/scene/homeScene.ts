@@ -389,7 +389,7 @@ export default class HomeScene extends BaseScene {
       const hoursElapsed =
         GardenSettings.GROWTH_TIME_HOURS - this.timeUntilFullyGrown(plantedTime)
 
-      // Linear growth from 0 to 5 over growth time
+      // Linear growth across growth stages
       const growthStage = Math.min(
         Math.floor(
           (hoursElapsed / GardenSettings.GROWTH_TIME_HOURS) *
@@ -414,7 +414,6 @@ export default class HomeScene extends BaseScene {
     success: boolean
     newGarden?: Date[]
     reward?: any
-    error?: string
   }): void {
     if (data.success) {
       // Update the garden data
@@ -449,7 +448,15 @@ export default class HomeScene extends BaseScene {
     this.createGarden()
   }
 
-  // TODO Update every minute or so to see plant growth
+  // Update garden display every minute to show plant growth
+  lastUpdate = 0
+  update(): void {
+    const now = Date.now()
+    if (now - this.lastUpdate > 60000) {
+      this.updateGarden()
+      this.lastUpdate = now
+    }
+  }
 
   beforeExit(): void {
     Cinematic.hide()
