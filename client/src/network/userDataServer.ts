@@ -149,6 +149,19 @@ export default class UserDataServer {
           }
         },
       )
+      .on('harvestGardenResult', ({ success, newGarden, reward }) => {
+        // Only update the stored garden if the harvest was successful
+        if (success) {
+          this.userData.garden = newGarden.map((dateStr) => new Date(dateStr))
+        }
+
+        // Emit global event that HomeScene can listen to regardless of success
+        game.events.emit('gardenHarvested', {
+          success: success,
+          newGarden: this.userData.garden,
+          reward: reward,
+        })
+      })
 
     // If the connection closes, login again with same args
     wsServer.ws.onclose = (event) => {
@@ -325,6 +338,16 @@ export default class UserDataServer {
 
     wsServer.send({
       type: 'setAchievementsSeen',
+    })
+  }
+
+  static harvestGarden(plotNumber: number): void {
+    if (wsServer === undefined) {
+      throw 'Harvesting garden when server ws doesnt exist.'
+    }
+    wsServer.send({
+      type: 'harvestGarden',
+      index: plotNumber,
     })
   }
 

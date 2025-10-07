@@ -33,6 +33,9 @@ export interface UserDataClientMessages {
     value: CosmeticSet
   }
   setAchievementsSeen: {}
+  harvestGarden: {
+    index: number
+  }
 }
 
 export interface UserDataServerMessages {
@@ -56,5 +59,10 @@ export interface UserDataServerMessages {
   purchaseItemSuccess: {
     itemId: number
     balance: number
+  }
+  harvestGardenResult: {
+    success: boolean
+    newGarden?: Date[]
+    reward?: number
   }
 }

@@ -11,6 +11,7 @@ import { Deck } from '../../../shared/types/deck'
 import { STORE_ITEMS } from '../../../shared/storeItems'
 import { cosmeticsTransactions } from '../db/schema'
 import { AchievementManager } from '../achievementManager'
+import Garden from '../db/garden'
 
 // Create the websocket server
 export default function createUserDataServer() {
@@ -140,6 +141,7 @@ export default function createUserDataServer() {
               completedmissions: missions,
               avatar_experience: [0, 0, 0, 0, 0, 0],
               lastactive: new Date().toISOString(),
+              garden: [],
               gems: 0,
               coins: 0,
               cosmetic_set: JSON.stringify({
@@ -220,6 +222,16 @@ export default function createUserDataServer() {
         .on('setAchievementsSeen', async () => {
           if (!id) return
           await AchievementManager.setAchievementsSeen(id)
+        })
+        .on('harvestGarden', async ({ index }) => {
+          if (!id) return
+          const harvestResult = await Garden.harvest(id, index)
+          ws.send({
+            type: 'harvestGardenResult',
+            success: harvestResult.success,
+            newGarden: harvestResult.newGarden,
+            reward: harvestResult.reward,
+          })
         })
     } catch (e) {
       console.error('Error in user data server:', e)

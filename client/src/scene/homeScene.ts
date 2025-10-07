@@ -47,6 +47,7 @@ export default class HomeScene extends BaseScene {
 
     // Show any plants in the garden
     this.createGarden()
+    this.game.events.on('gardenHarvested', this.onGardenHarvested, this)
   }
 
   private createUserDetails(): void {
@@ -341,6 +342,7 @@ export default class HomeScene extends BaseScene {
       const plant = this.add
         .image(0, 0, 'relic-Dandelion')
         .setInteractive()
+        // Hover behavior is to show a hint with how long until fully grown
         .on('pointerover', () => {
           const hoursRemaining = this.timeUntilFullyGrown(plantTime)
 
@@ -362,6 +364,15 @@ export default class HomeScene extends BaseScene {
         })
         .on('pointerout', () => {
           this.hint.hide()
+        })
+        // Clicking plant will harvest it if it's fully grown
+        .on('pointerdown', () => {
+          if (this.timeUntilFullyGrown(plantTime) <= 0) {
+            UserDataServer.harvestGarden(i)
+            // The result will be handled by the 'gardenHarvested' event
+          } else {
+            this.signalError('That plant is not ready to harvest.')
+          }
         })
 
       sizer.add(plant)
@@ -409,10 +420,51 @@ export default class HomeScene extends BaseScene {
     return Math.max(GardenSettings.GROWTH_TIME_HOURS - hoursElapsed, 0)
   }
 
+  // Handle garden harvest results from the server
+  private onGardenHarvested(data: {
+    success: boolean
+    newGarden?: Date[]
+    reward?: any
+    error?: string
+  }): void {
+    if (data.success) {
+      // Update the garden data
+      this.gardenTimes = data.newGarden
+
+      // Recreate the garden display with updated data
+      this.refreshGardenDisplay()
+
+      // Show success message and reward
+      this.scene.launch('MenuScene', {
+        menu: 'message',
+        title: 'Garden Harvested',
+        s: `Garden harvested! Received: ${JSON.stringify(data.reward)}`,
+      })
+    } else {
+      // Show error message
+      this.signalError('Failed to harvest garden.')
+    }
+  }
+
+  // Refresh the garden display after harvest
+  private refreshGardenDisplay(): void {
+    // Remove existing garden plants
+    if (this.gardenPlants) {
+      this.gardenPlants.forEach((plant) => plant.destroy())
+      this.gardenPlants = []
+    }
+
+    // Recreate the garden with updated data
+    this.createGarden()
+  }
+
   // TODO Update every minute or so to see plant growth
 
   beforeExit(): void {
     Cinematic.hide()
+
+    // Clean up event listeners
+    this.game.events.off('gardenHarvested', this.onGardenHarvested, this)
 
     super.beforeExit()
   }

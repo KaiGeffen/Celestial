@@ -37,8 +37,18 @@ export default class Garden {
     return true
   }
 
-  static async harvest(playerId: string, plotNumber: number): Promise<boolean> {
-    if (plotNumber < 0 || plotNumber >= GardenSettings.MAX_PLANTS) return false
+  // Harvest a plant from a given plot in a player's garden
+  static async harvest(
+    playerId: string,
+    plotNumber: number,
+  ): Promise<{
+    success: boolean
+    newGarden?: Date[]
+    reward?: number
+  }> {
+    if (plotNumber < 0 || plotNumber >= GardenSettings.MAX_PLANTS) {
+      return { success: false }
+    }
 
     const player = await db
       .select({ garden: players.garden })
@@ -46,13 +56,29 @@ export default class Garden {
       .where(eq(players.id, playerId))
       .limit(1)
 
-    if (!player[0]) return false
+    if (!player[0]) {
+      return { success: false }
+    }
 
     const gardenState = [...player[0].garden]
 
     if (plotNumber >= gardenState.length) {
       // Nothing to harvest at this plot
-      return false
+      return { success: false }
+    }
+
+    // Check if the plant has been growing for at least the required time
+    const plantedTime = gardenState[plotNumber]
+    const now = new Date()
+    const hoursElapsed =
+      (now.getTime() - plantedTime.getTime()) / (1000 * 60 * 60)
+
+    if (hoursElapsed < GardenSettings.GROWTH_TIME_HOURS) {
+      // Plant is not ready to harvest yet
+      console.log(
+        `Plant not ready to harvest. ${hoursElapsed.toFixed(1)}h elapsed, need ${GardenSettings.GROWTH_TIME_HOURS}h`,
+      )
+      return { success: false }
     }
 
     // Remove the plant at the specified plot
@@ -63,6 +89,10 @@ export default class Garden {
       .set({ garden: gardenState })
       .where(eq(players.id, playerId))
 
-    return true // Successfully harvested
+    return {
+      success: true,
+      newGarden: gardenState,
+      reward: 108,
+    }
   }
 }
