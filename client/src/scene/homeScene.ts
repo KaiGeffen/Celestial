@@ -328,10 +328,10 @@ export default class HomeScene extends BaseScene {
     this.gardenPlants = []
     for (let i = 0; i < this.gardenTimes.length; i++) {
       const plantTime = this.gardenTimes[i]
-      const plant = this.add
-        .image(0, 0, 'relic-Dandelion')
-        .setInteractive()
-        // Hover behavior is to show a hint with how long until fully grown
+      const plant = this.add.image(0, 0, 'relic-Dandelion').setInteractive()
+
+      // Hover behavior is to show a hint with how long until fully grown
+      plant
         .on('pointerover', () => {
           const hoursRemaining = this.timeUntilFullyGrown(plantTime)
 
@@ -349,9 +349,21 @@ export default class HomeScene extends BaseScene {
             }
           }
 
+          // Add outline effect to pipeline
+          const plugin: any = this.plugins.get('rexOutlinePipeline')
+          plugin.add(plant, {
+            thickness: Space.highlightWidth,
+            outlineColor: Color.outline,
+            quality: 0.3,
+          })
+
           this.hint.showText(hintText)
         })
         .on('pointerout', () => {
+          // Remove outline effect from pipeline
+          const plugin: any = this.plugins.get('rexOutlinePipeline')
+          plugin.remove(plant)
+
           this.hint.hide()
         })
         // Clicking plant will harvest it if it's fully grown
