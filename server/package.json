@@ -3,6 +3,7 @@
     "build": "webpack",
     "start": "node dist/index.js",
     "dev": "webpack --watch & nodemon --quiet dist/index.js",
+    "dev:force-win": "webpack --watch & nodemon --quiet dist/index.js --force-win",
     "migrate": "drizzle-kit push:pg"
   },
   "devDependencies": {

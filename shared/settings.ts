@@ -29,3 +29,10 @@ export type Mulligan = [boolean, boolean, boolean]
 export const TUTORIAL_LENGTH = 3
 
 export const MAX_STORY_ACTS = 99
+
+// Garden configuration settings
+export class GardenSettings {
+  static readonly GROWTH_TIME_HOURS = 1
+  static readonly MAX_PLANTS = 4
+  static readonly GROWTH_STAGES = 6 // 0-5 frames
+}

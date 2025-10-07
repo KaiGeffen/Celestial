@@ -4,19 +4,17 @@ import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import UserDataServer from '../network/userDataServer'
 import Cinematic from '../lib/cinematic'
-import {
-  getTimeUntilNextQuest,
-  isDailyQuestAvailable,
-} from '../utils/dailyQuestUtils'
-import { openDiscord, openFeedbackForm } from '../externalLinks'
+import { openFeedbackForm } from '../externalLinks'
 import logEvent from '../analytics'
+import { GardenSettings } from '../../../shared/settings'
+import Catalog from '../../../shared/state/catalog'
 
 const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
 
 export default class HomeScene extends BaseScene {
-  // Add this property to the class
-  private questTimer: Phaser.Time.TimerEvent = null
+  gardenTimes: Date[]
+  gardenPlants: Phaser.GameObjects.Image[]
 
   constructor() {
     super({
@@ -45,13 +43,12 @@ export default class HomeScene extends BaseScene {
     // Normal buttons
     this.createFeedbackButton()
 
-    // Quest text
-    if (UserDataServer.isLoggedIn()) {
-      this.createQuestText()
-    }
-
     // Check if there are any unseen achievements and show achievements menu if so
     this.checkAndShowUnseenAchievements()
+
+    // Show any plants in the garden
+    this.createGarden()
+    this.game.events.on('gardenHarvested', this.onGardenHarvested, this)
   }
 
   private createUserDetails(): void {
@@ -269,18 +266,6 @@ export default class HomeScene extends BaseScene {
       y: `100%-${buttonHeight / 2 + Space.pad}`,
     })
 
-    // Discord
-    const discordContainer = this.add.container()
-    new Buttons.HomeScene({
-      within: discordContainer,
-      text: 'Discord',
-      f: openDiscord,
-    })
-    this.plugins.get('rexAnchor')['add'](discordContainer, {
-      x: `50%`,
-      y: `100%-${buttonHeight / 2 + Space.pad}`,
-    })
-
     // Play
     const playContainer = this.add.container()
     new Buttons.HomeScene({
@@ -313,84 +298,6 @@ export default class HomeScene extends BaseScene {
     })
   }
 
-  private createQuestText(): void {
-    const container = this.add.container()
-    this.plugins.get('rexAnchor')['add'](container, {
-      x: `100%-${Space.pad}`,
-      y: `100%-${Space.pad * 2 + 120}`,
-    })
-
-    // Check if daily quest is available
-    const isQuestAvailable = isDailyQuestAvailable()
-
-    // Create background rectangle for the quest text
-    const padding = Space.padSmall
-    const bgColor = Color.backgroundLight
-
-    // Create text with initial value
-    const questText = this.add
-      .text(
-        0,
-        0,
-        isQuestAvailable
-          ? 'Daily Quest Available!'
-          : `Next Quest: ${getTimeUntilNextQuest()}`,
-        Style.basic,
-      )
-      .setOrigin(1, 1)
-      .setDepth(10)
-
-    // Create background based on text dimensions
-    const bg = this.add
-      .rectangle(
-        padding,
-        padding,
-        questText.width + padding * 2,
-        questText.height + padding * 2,
-        bgColor,
-        0.85,
-      )
-      .setStrokeStyle(2, isQuestAvailable ? Color.gold : Color.backgroundDark)
-      .setOrigin(1, 1)
-      .setDepth(9)
-
-    container.add([bg, questText])
-
-    // If quest is not available, set up timer to update every second
-    if (!isQuestAvailable) {
-      // Function to update the text
-      const updateQuestTime = () => {
-        // Check if quest has become available
-        if (isDailyQuestAvailable()) {
-          // Update text and styling for available quest
-          questText.setText('Daily Quest Available!')
-          bg.setStrokeStyle(2, Color.gold)
-
-          // Clear the timer as quest is now available
-          if (this.questTimer) {
-            this.questTimer.remove()
-            this.questTimer = null
-          }
-        } else {
-          // Update countdown text
-          const newTimeText = `Next Quest: ${getTimeUntilNextQuest()}`
-          questText.setText(newTimeText)
-
-          // Adjust background width based on new text width
-          bg.width = questText.width + padding * 2
-        }
-      }
-
-      // Create a timer that fires every second
-      this.questTimer = this.time.addEvent({
-        delay: 1000,
-        callback: updateQuestTime,
-        callbackScope: this,
-        loop: true,
-      })
-    }
-  }
-
   private checkAndShowUnseenAchievements(): void {
     const userAchievements = UserDataServer.getUserData()?.achievements || []
 
@@ -405,13 +312,157 @@ export default class HomeScene extends BaseScene {
     }
   }
 
+  private createGarden(): void {
+    // Remember each plant's time
+    this.gardenTimes = UserDataServer.getUserData().garden
+
+    // Make a sizer for the garden
+    const sizer = this.rexUI.add
+      .sizer({
+        orientation: 'horizontal',
+        space: { item: Space.pad },
+      })
+      .setOrigin(0.5, 1)
+
+    // Create each plant
+    this.gardenPlants = []
+    for (let i = 0; i < this.gardenTimes.length; i++) {
+      const plantTime = this.gardenTimes[i]
+      const plant = this.add
+        .image(0, 0, 'relic-Dandelion')
+        .setInteractive()
+        // Hover behavior is to show a hint with how long until fully grown
+        .on('pointerover', () => {
+          const hoursRemaining = this.timeUntilFullyGrown(plantTime)
+
+          let hintText = ''
+          if (hoursRemaining <= 0) {
+            hintText = 'Fully grown! Ready to harvest.'
+          } else {
+            const hours = Math.floor(hoursRemaining)
+            const minutes = Math.floor((hoursRemaining - hours) * 60)
+
+            if (hours > 0) {
+              hintText = `${hours}h ${minutes}m until fully grown`
+            } else {
+              hintText = `${minutes}m until fully grown`
+            }
+          }
+
+          this.hint.showText(hintText)
+        })
+        .on('pointerout', () => {
+          this.hint.hide()
+        })
+        // Clicking plant will harvest it if it's fully grown
+        .on('pointerdown', () => {
+          if (this.timeUntilFullyGrown(plantTime) <= 0) {
+            UserDataServer.harvestGarden(i)
+            // The result will be handled by the 'gardenHarvested' event
+          } else {
+            this.signalError('That plant is not ready to harvest.')
+          }
+        })
+
+      sizer.add(plant)
+      this.gardenPlants.push(plant)
+    }
+    sizer.layout()
+
+    // Update the garden to reflect starting plant growth
+    this.updateGarden()
+
+    // Anchor to the bottom center
+    this.plugins.get('rexAnchor')['add'](sizer, {
+      x: `50%`,
+      y: `100%`,
+    })
+  }
+
+  // Update the garden to reflect plant growth
+  private updateGarden(): void {
+    for (let i = 0; i < this.gardenPlants.length; i++) {
+      const plant = this.gardenPlants[i]
+      const plantedTime = this.gardenTimes[i]
+
+      // Calculate growth stage based on time remaining
+      const hoursElapsed =
+        GardenSettings.GROWTH_TIME_HOURS - this.timeUntilFullyGrown(plantedTime)
+
+      // Linear growth across growth stages
+      const growthStage = Math.min(
+        Math.floor(
+          (hoursElapsed / GardenSettings.GROWTH_TIME_HOURS) *
+            (GardenSettings.GROWTH_STAGES - 1),
+        ),
+        GardenSettings.GROWTH_STAGES - 1,
+      )
+
+      plant.setFrame(growthStage)
+    }
+  }
+
+  private timeUntilFullyGrown(plantedTime: Date): number {
+    const now = new Date()
+    const hoursElapsed =
+      (now.getTime() - plantedTime.getTime()) / (1000 * 60 * 60)
+    return Math.max(GardenSettings.GROWTH_TIME_HOURS - hoursElapsed, 0)
+  }
+
+  // Handle garden harvest results from the server
+  private onGardenHarvested(data: {
+    success: boolean
+    newGarden?: Date[]
+    reward?: any
+  }): void {
+    if (data.success) {
+      // Update the garden data
+      this.gardenTimes = data.newGarden
+
+      // Recreate the garden display with updated data
+      this.refreshGardenDisplay()
+
+      // Show success message and reward
+      const card = Catalog.getCardById(data.reward)
+      this.scene.launch('MenuScene', {
+        menu: 'message',
+        title: 'Garden Harvested',
+        s: card.story || `${card.name} was in your garden...`,
+        card: card,
+      })
+    } else {
+      // Show error message
+      this.signalError('Failed to harvest garden.')
+    }
+  }
+
+  // Refresh the garden display after harvest
+  private refreshGardenDisplay(): void {
+    // Remove existing garden plants
+    if (this.gardenPlants) {
+      this.gardenPlants.forEach((plant) => plant.destroy())
+      this.gardenPlants = []
+    }
+
+    // Recreate the garden with updated data
+    this.createGarden()
+  }
+
+  // Update garden display every minute to show plant growth
+  lastUpdate = 0
+  update(): void {
+    const now = Date.now()
+    if (now - this.lastUpdate > 60000) {
+      this.updateGarden()
+      this.lastUpdate = now
+    }
+  }
+
   beforeExit(): void {
     Cinematic.hide()
 
-    if (this.questTimer) {
-      this.questTimer.remove()
-      this.questTimer = null
-    }
+    // Clean up event listeners
+    this.game.events.off('gardenHarvested', this.onGardenHarvested, this)
 
     super.beforeExit()
   }

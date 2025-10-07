@@ -27,9 +27,9 @@ type UserData = null | {
   uuid: string
   username: string
   elo: number
+  garden: Date[]
   gems: number
   coins: number
-  lastDailyReward: Date
   ownedItems: number[]
   cosmeticSet: CosmeticSet
   achievements: Achievement[]
@@ -127,9 +127,9 @@ export default class UserDataServer {
           decks: Deck[]
           username: string
           elo: number
+          garden: Date[]
           gems: number
           coins: number
-          lastDailyReward: Date
           ownedItems: number[]
           cosmeticSet: CosmeticSet
           achievements: Achievement[]
@@ -138,6 +138,7 @@ export default class UserDataServer {
           this.userData = {
             uuid,
             ...data,
+            garden: data.garden.map((dateStr) => new Date(dateStr)),
           }
 
           this.loadUserData(data)
@@ -148,6 +149,19 @@ export default class UserDataServer {
           }
         },
       )
+      .on('harvestGardenResult', ({ success, newGarden, reward }) => {
+        // Only update the stored garden if the harvest was successful
+        if (success) {
+          this.userData.garden = newGarden.map((dateStr) => new Date(dateStr))
+        }
+
+        // Emit global event that HomeScene can listen to regardless of success
+        game.events.emit('gardenHarvested', {
+          success: success,
+          newGarden: this.userData.garden,
+          reward: reward,
+        })
+      })
 
     // If the connection closes, login again with same args
     wsServer.ws.onclose = (event) => {
@@ -297,9 +311,9 @@ export default class UserDataServer {
         uuid: null,
         username: null,
         elo: null,
+        garden: [],
         gems: null,
         coins: null,
-        lastDailyReward: null,
         ownedItems: [],
         cosmeticSet: {
           avatar: 0,
@@ -324,6 +338,16 @@ export default class UserDataServer {
 
     wsServer.send({
       type: 'setAchievementsSeen',
+    })
+  }
+
+  static harvestGarden(plotNumber: number): void {
+    if (wsServer === undefined) {
+      throw 'Harvesting garden when server ws doesnt exist.'
+    }
+    wsServer.send({
+      type: 'harvestGarden',
+      index: plotNumber,
     })
   }
 

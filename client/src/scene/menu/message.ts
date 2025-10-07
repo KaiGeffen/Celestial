@@ -51,6 +51,7 @@ export default class ConfirmMenu extends Menu {
     textPanel.add(text)
 
     const scrollableText = newScrollablePanel(this.scene, {
+      height: Space.cardHeight,
       panel: {
         child: textPanel,
       },
