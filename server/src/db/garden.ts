@@ -89,10 +89,13 @@ export default class Garden {
       .set({ garden: gardenState })
       .where(eq(players.id, playerId))
 
+    // Randomly select a reward from the distribution
+    const reward = Math.floor(100 * Math.random())
+
     return {
       success: true,
       newGarden: gardenState,
-      reward: 108,
+      reward: reward,
     }
   }
 }

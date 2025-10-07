@@ -119,7 +119,7 @@ export async function updateMatchResultPVE(
   )
 
   // Plant a seed for the winner
-  if (winnerId) await Garden.plantSeed(winnerId)
+  if (wasPlayerWin && playerId) await Garden.plantSeed(winnerId)
 
   // Update the number of pve wins and losses
   if (wasPlayerWin) {

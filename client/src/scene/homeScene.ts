@@ -7,6 +7,7 @@ import Cinematic from '../lib/cinematic'
 import { openDiscord, openFeedbackForm } from '../externalLinks'
 import logEvent from '../analytics'
 import { GardenSettings } from '../../../shared/settings'
+import Catalog from '../../../shared/state/catalog'
 
 const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
@@ -435,10 +436,12 @@ export default class HomeScene extends BaseScene {
       this.refreshGardenDisplay()
 
       // Show success message and reward
+      const card = Catalog.getCardById(data.reward)
       this.scene.launch('MenuScene', {
         menu: 'message',
         title: 'Garden Harvested',
-        s: `Garden harvested! Received: ${JSON.stringify(data.reward)}`,
+        s: card.story || `${card.name} was in your garden...`,
+        card: card,
       })
     } else {
       // Show error message
