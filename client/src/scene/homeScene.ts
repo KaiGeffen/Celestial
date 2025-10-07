@@ -6,6 +6,7 @@ import UserDataServer from '../network/userDataServer'
 import Cinematic from '../lib/cinematic'
 import { openDiscord, openFeedbackForm } from '../externalLinks'
 import logEvent from '../analytics'
+import { GardenSettings } from '../../../shared/settings'
 
 const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
@@ -335,8 +336,34 @@ export default class HomeScene extends BaseScene {
 
     // Create each plant
     this.gardenPlants = []
-    for (const plant of this.gardenTimes) {
-      const plant = this.add.image(0, 0, 'relic-Dandelion')
+    for (let i = 0; i < this.gardenTimes.length; i++) {
+      const plantTime = this.gardenTimes[i]
+      const plant = this.add
+        .image(0, 0, 'relic-Dandelion')
+        .setInteractive()
+        .on('pointerover', () => {
+          const hoursRemaining = this.timeUntilFullyGrown(plantTime)
+
+          let hintText = ''
+          if (hoursRemaining <= 0) {
+            hintText = 'Fully grown! Ready to harvest.'
+          } else {
+            const hours = Math.floor(hoursRemaining)
+            const minutes = Math.floor((hoursRemaining - hours) * 60)
+
+            if (hours > 0) {
+              hintText = `${hours}h ${minutes}m until fully grown`
+            } else {
+              hintText = `${minutes}m until fully grown`
+            }
+          }
+
+          this.hint.showText(hintText)
+        })
+        .on('pointerout', () => {
+          this.hint.hide()
+        })
+
       sizer.add(plant)
       this.gardenPlants.push(plant)
     }
@@ -358,16 +385,28 @@ export default class HomeScene extends BaseScene {
       const plant = this.gardenPlants[i]
       const plantedTime = this.gardenTimes[i]
 
-      // Calculate hours since planted
-      const now = new Date()
+      // Calculate growth stage based on time remaining
       const hoursElapsed =
-        (now.getTime() - plantedTime.getTime()) / (1000 * 60 * 60)
+        GardenSettings.GROWTH_TIME_HOURS - this.timeUntilFullyGrown(plantedTime)
 
-      // Linear growth from 0 to 5 over 8 hours
-      const growthStage = Math.min(Math.floor((hoursElapsed / 8) * 5), 5)
+      // Linear growth from 0 to 5 over growth time
+      const growthStage = Math.min(
+        Math.floor(
+          (hoursElapsed / GardenSettings.GROWTH_TIME_HOURS) *
+            (GardenSettings.GROWTH_STAGES - 1),
+        ),
+        GardenSettings.GROWTH_STAGES - 1,
+      )
 
       plant.setFrame(growthStage)
     }
+  }
+
+  private timeUntilFullyGrown(plantedTime: Date): number {
+    const now = new Date()
+    const hoursElapsed =
+      (now.getTime() - plantedTime.getTime()) / (1000 * 60 * 60)
+    return Math.max(GardenSettings.GROWTH_TIME_HOURS - hoursElapsed, 0)
   }
 
   // TODO Update every minute or so to see plant growth

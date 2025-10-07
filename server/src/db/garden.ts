@@ -1,8 +1,7 @@
 import { db } from './db'
 import { players } from './schema'
 import { eq } from 'drizzle-orm'
-
-const MAX_PLANTS = 4
+import { GardenSettings } from '../../../shared/settings'
 
 export default class Garden {
   // Plant a seed in an open plot in given player's garden
@@ -18,8 +17,11 @@ export default class Garden {
 
     const gardenState = [...player[0].garden]
 
-    // Check if there are less than 4 plants (can plant more)
-    if (gardenState.length >= MAX_PLANTS) {
+    // Check if there are less than max plants (can plant more)
+    if (gardenState.length >= GardenSettings.MAX_PLANTS) {
+      console.log(
+        `Garden is full (${GardenSettings.MAX_PLANTS} plants already)`,
+      )
       return false
     }
 
@@ -36,7 +38,7 @@ export default class Garden {
   }
 
   static async harvest(playerId: string, plotNumber: number): Promise<boolean> {
-    if (plotNumber < 0 || plotNumber > 3) return false
+    if (plotNumber < 0 || plotNumber >= GardenSettings.MAX_PLANTS) return false
 
     const player = await db
       .select({ garden: players.garden })
