@@ -19,9 +19,6 @@ export default class Garden {
 
     // Check if there are less than max plants (can plant more)
     if (gardenState.length >= GardenSettings.MAX_PLANTS) {
-      console.log(
-        `Garden is full (${GardenSettings.MAX_PLANTS} plants already)`,
-      )
       return false
     }
 
