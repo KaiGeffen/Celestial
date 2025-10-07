@@ -240,6 +240,7 @@ async function sendUserData(
     decks: string[]
     username: string
     elo: number
+    garden: Date[]
     gems: number
     coins: number
     cosmetic_set: string
@@ -273,6 +274,7 @@ async function sendUserData(
     decks,
     username: data.username,
     elo: data.elo,
+    garden: data.garden,
     gems: data.gems,
     coins: data.coins,
     ownedItems,

@@ -11,6 +11,9 @@ const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
 
 export default class HomeScene extends BaseScene {
+  gardenTimes: Date[]
+  gardenPlants: Phaser.GameObjects.Image[]
+
   constructor() {
     super({
       key: 'HomeScene',
@@ -40,6 +43,9 @@ export default class HomeScene extends BaseScene {
 
     // Check if there are any unseen achievements and show achievements menu if so
     this.checkAndShowUnseenAchievements()
+
+    // Show any plants in the garden
+    this.createGarden()
   }
 
   private createUserDetails(): void {
@@ -257,17 +263,17 @@ export default class HomeScene extends BaseScene {
       y: `100%-${buttonHeight / 2 + Space.pad}`,
     })
 
-    // Discord
-    const discordContainer = this.add.container()
-    new Buttons.HomeScene({
-      within: discordContainer,
-      text: 'Discord',
-      f: openDiscord,
-    })
-    this.plugins.get('rexAnchor')['add'](discordContainer, {
-      x: `50%`,
-      y: `100%-${buttonHeight / 2 + Space.pad}`,
-    })
+    // // Discord
+    // const discordContainer = this.add.container()
+    // new Buttons.HomeScene({
+    //   within: discordContainer,
+    //   text: 'Discord',
+    //   f: openDiscord,
+    // })
+    // this.plugins.get('rexAnchor')['add'](discordContainer, {
+    //   x: `50%`,
+    //   y: `100%-${buttonHeight / 2 + Space.pad}`,
+    // })
 
     // Play
     const playContainer = this.add.container()
@@ -314,6 +320,57 @@ export default class HomeScene extends BaseScene {
       })
     }
   }
+
+  private createGarden(): void {
+    // Remember each plant's time
+    this.gardenTimes = UserDataServer.getUserData().garden
+
+    // Make a sizer for the garden
+    const sizer = this.rexUI.add
+      .sizer({
+        orientation: 'horizontal',
+        space: { item: Space.pad },
+      })
+      .setOrigin(0.5, 1)
+
+    // Create each plant
+    this.gardenPlants = []
+    for (const plant of this.gardenTimes) {
+      const plant = this.add.image(0, 0, 'relic-Dandelion')
+      sizer.add(plant)
+      this.gardenPlants.push(plant)
+    }
+    sizer.layout()
+
+    // Update the garden to reflect starting plant growth
+    this.updateGarden()
+
+    // Anchor to the bottom center
+    this.plugins.get('rexAnchor')['add'](sizer, {
+      x: `50%`,
+      y: `100%`,
+    })
+  }
+
+  // Update the garden to reflect plant growth
+  private updateGarden(): void {
+    for (let i = 0; i < this.gardenPlants.length; i++) {
+      const plant = this.gardenPlants[i]
+      const plantedTime = this.gardenTimes[i]
+
+      // Calculate hours since planted
+      const now = new Date()
+      const hoursElapsed =
+        (now.getTime() - plantedTime.getTime()) / (1000 * 60 * 60)
+
+      // Linear growth from 0 to 5 over 8 hours
+      const growthStage = Math.min(Math.floor((hoursElapsed / 8) * 5), 5)
+
+      plant.setFrame(growthStage)
+    }
+  }
+
+  // TODO Update every minute or so to see plant growth
 
   beforeExit(): void {
     Cinematic.hide()

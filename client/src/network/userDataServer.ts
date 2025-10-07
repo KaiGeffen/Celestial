@@ -27,6 +27,7 @@ type UserData = null | {
   uuid: string
   username: string
   elo: number
+  garden: Date[]
   gems: number
   coins: number
   ownedItems: number[]
@@ -126,6 +127,7 @@ export default class UserDataServer {
           decks: Deck[]
           username: string
           elo: number
+          garden: Date[]
           gems: number
           coins: number
           ownedItems: number[]
@@ -136,6 +138,7 @@ export default class UserDataServer {
           this.userData = {
             uuid,
             ...data,
+            garden: data.garden.map((dateStr) => new Date(dateStr)),
           }
 
           this.loadUserData(data)
@@ -295,6 +298,7 @@ export default class UserDataServer {
         uuid: null,
         username: null,
         elo: null,
+        garden: [],
         gems: null,
         coins: null,
         ownedItems: [],

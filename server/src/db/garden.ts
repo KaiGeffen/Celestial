@@ -2,6 +2,8 @@ import { db } from './db'
 import { players } from './schema'
 import { eq } from 'drizzle-orm'
 
+const MAX_PLANTS = 4
+
 export default class Garden {
   // Plant a seed in an open plot in given player's garden
   static async plantSeed(playerId: string): Promise<boolean> {
@@ -14,10 +16,10 @@ export default class Garden {
 
     if (!player[0]) return false
 
-    const gardenState = [...player[0].garden] // Copy the array
+    const gardenState = [...player[0].garden]
 
     // Check if there are less than 4 plants (can plant more)
-    if (gardenState.length >= 4) {
+    if (gardenState.length >= MAX_PLANTS) {
       return false
     }
 

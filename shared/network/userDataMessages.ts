@@ -46,6 +46,7 @@ export interface UserDataServerMessages {
     decks: Deck[]
     username: string
     elo: number
+    garden: Date[]
     gems: number
     coins: number
     ownedItems: number[]
