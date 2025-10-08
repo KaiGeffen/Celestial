@@ -52,7 +52,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'Oh well, maybe next time.',
     },
     {
-      selectText: '"I let go of something, what do I do now?"',
+      selectText: `I used to dance, before the accident.`,
       missionText: `Isn’t the landscaping here just beautiful? It’s all the work of the Umbra. They get inspired from all that they hear and shape their surroundings accordingly. I think there is peace to be found in the everchanging. I used to be too afraid, too troubled to see that.`,
       uponRoundWinText: [
         `The blank canvas remains...`,
@@ -73,7 +73,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The blank canvas is still there, waiting.',
     },
     {
-      selectText: '"Ugh! All these clothes aren\'t me!"',
+      selectText: `Dresses aren't really my thing.`,
       missionText: `You’ve adjusted so quickly, [player name]! You know, I think you’re a rather interesting Umbra. There is something refreshing about telling stories with you. It makes me want to reveal parts of myself I’ve kept under wraps. There was a time when my routine of keeping my head down and shutting up began to break apart…`,
       uponRoundWinText: [
         `The old routine is breaking apart.`,
@@ -89,7 +89,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The rebirth is still happening, even in loss.',
     },
     {
-      selectText: '"Why are they being so mean to me?"',
+      selectText: `It felt right to leave home.`,
       missionText: `hmmmm some writing goes here....`,
       uponRoundWinText: [
         `I am Jules, no reservations.`,
@@ -110,7 +110,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: "The journey continues, and that's okay.",
     },
     {
-      selectText: '',
+      selectText: `Want to see what I've been sketching?`,
       missionText: `Sometimes the light is so bright it hurts. But that's how you know it's real.`,
       uponRoundWinText: [
         `The sun is rising.`,
@@ -127,7 +127,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'Even the sun sets, but it always rises again.',
     },
     {
-      selectText: '',
+      selectText: `Drawing saved me when I had lost everything.`,
       missionText: `The morning dew catches the light in ways that make everything new again.`,
       uponRoundWinText: [
         `Fresh as morning dew.`,
@@ -143,7 +143,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The dew will return with the next morning.',
     },
     {
-      selectText: '',
+      selectText: `Bought a van and hit the road alone.`,
       missionText: `Sometimes you have to fight for what you believe in, even when the odds are against you.`,
       uponRoundWinText: [
         `I will not back down.`,
@@ -159,7 +159,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The gamecock never gives up, even in defeat.',
     },
     {
-      selectText: '',
+      selectText: `Getting older, but still feel that freedom.`,
       missionText: `Everything is connected. Every choice affects the whole. I am part of something bigger than myself.`,
       uponRoundWinText: [
         `I am connected to everything.`,
@@ -202,7 +202,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'Adonis lose text heehee',
     },
     {
-      selectText: `You coming? I've got a job to do.`,
+      selectText: `You coming? I've got work to do.`,
       missionText: `Not bad, [player name]. I promised to tell some Umbra down by the bonfire about my first love, want to join us? I could use your help. You see, I was desperate for opportunity as soon as I could work. People often told me to slow down, but I knew I still wasn’t fast enough. Some understood that better than others. `,
       uponRoundWinText: [
         `The spark ignites.`,
@@ -224,7 +224,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The spark still smolders.',
     },
     {
-      selectText: 'Placeholder',
+      selectText: `I take care of my siblings - it's what I do.`,
       missionText: `This next part is always the hardest to retell. At least I have you here with me this time. Mom babysat all over the city, sometimes even overnight, and Dad took a bus out to the edge of the suburbs to work 12 hour shifts at a factory. Knowing that, I shouldn’t have taken the downtown job that kept me out until the late evening…`,
       uponRoundWinText: [
         `The inferno rages on.`,
@@ -246,7 +246,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The fire still burns within.',
     },
     {
-      selectText: 'Ashes 3 - The Cling',
+      selectText: `Had to grow up fast after we lost Kierra.`,
       missionText: `Even in the aftermath, something clings to life. The fire may have burned everything to the ground, but from the ashes, new possibilities emerge.`,
       uponRoundWinText: [
         `Something survives the flames.`,
@@ -268,7 +268,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The ashes still hold potential.',
     },
     {
-      selectText: 'Mine',
+      selectText: `Got hurt overseas, but I made it back.`,
       missionText: `Sometimes the fire meets water, and everything drowns in the conflict. The heat and the cold battle for dominance, and I am caught in the middle.`,
       uponRoundWinText: [
         `The fire meets water.`,
@@ -290,7 +290,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The water has claimed me.',
     },
     {
-      selectText: 'Bonus: Mine',
+      selectText: `I'm trying to make things right with old friends.`,
       missionText: `What is mine, I will defend. What I have lost, I will reclaim. The fire has taken much from me, but I will take back what belongs to me.`,
       uponRoundWinText: [
         `This is mine.`,
@@ -306,7 +306,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'I have lost my claim.',
     },
     {
-      selectText: 'Bonus: Parch',
+      selectText: `Visit my sister's grave when I need to remember.`,
       missionText: `The fire has left everything parched and dry. The land thirsts for water, but I have learned to thrive in the heat. I am the drought, I am the thirst.`,
       uponRoundWinText: [
         `The land is parched.`,
@@ -322,7 +322,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The drought continues.',
     },
     {
-      selectText: 'Bonus: Sprout from Ashes',
+      selectText: `Want to build something that helps everyone.`,
       missionText: `From the ashes of destruction, new life emerges. The cycle of death and rebirth continues. I have burned everything down, but now I will help it grow back stronger.`,
       uponRoundWinText: [
         `New life emerges.`,
@@ -342,7 +342,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
   // Mia
   [
     {
-      selectText: 'Shadow 1 - The Dagger',
+      selectText: `Shadow 1 - The Dagger`,
       missionText: `gotta go shadow or something`,
       uponRoundWinText: [
         `0 I am afraid of the dark`,
@@ -365,7 +365,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'I lost oh nooooo',
     },
     {
-      selectText: 'Shadow 2 - Hungy Mungy',
+      selectText: `Shadow 2 - Hungy Mungy`,
       missionText: `The shadows hold secrets, and sometimes they hold weapons. I've learned to navigate the darkness, to find the sharp edges that others miss. The dagger is my companion in the night.`,
       uponRoundWinText: [
         `The shadows whisper secrets.`,
@@ -387,7 +387,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The darkness still calls.',
     },
     {
-      selectText: 'Victim',
+      selectText: `Victim`,
       missionText: `Nightmares are just shadows given form. I've learned to face them, to understand that fear is just another tool. The darkness can be terrifying, but it can also be a weapon.`,
       uponRoundWinText: [
         `The nightmare takes shape.`,
@@ -409,7 +409,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The nightmare still lingers.',
     },
     {
-      selectText: 'Shadow 3 - The Imprisonment',
+      selectText: `Shadow 3 - The Imprisonment`,
       missionText: `Sometimes the shadows become a prison, trapping us in our own darkness. But I've learned that every prison has a key, and sometimes the key is understanding that the shadows are part of who I am.`,
       uponRoundWinText: [
         `The shadows close in.`,
@@ -425,7 +425,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The shadows still surround me.',
     },
     {
-      selectText: 'Bonus: Wing Clipping',
+      selectText: `Bonus: Wing Clipping`,
       missionText: `Sometimes you have to clip your own wings to survive in the shadows. The light can be blinding, and sometimes it's better to stay grounded in the darkness where I can see clearly.`,
       uponRoundWinText: [
         `I clip my own wings.`,
@@ -441,7 +441,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The shadows still call me down.',
     },
     {
-      selectText: 'Bonus: Hungry Ghost',
+      selectText: `Bonus: Hungry Ghost`,
       missionText: `The shadows are hungry, always wanting more. I've learned to feed them, to understand their hunger. Sometimes the darkness consumes, but I've learned to consume it back.`,
       uponRoundWinText: [
         `The shadows hunger.`,
@@ -457,7 +457,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The shadows still hunger.',
     },
     {
-      selectText: 'Bonus: Sickness',
+      selectText: `Bonus: Sickness`,
       missionText: `The shadows can make you sick, but I've learned that sickness can also be a teacher. Sometimes the darkness shows you things that the light cannot. I embrace the sickness of the shadows.`,
       uponRoundWinText: [
         `The shadows make me sick.`,
@@ -473,7 +473,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The shadows still make me ill.',
     },
     {
-      selectText: 'Bonus: Boa',
+      selectText: `Bonus: Boa`,
       missionText: `The shadows coil around me like a boa, constricting and suffocating. But I've learned to breathe in the darkness, to find strength in the constriction. The shadows are my embrace.`,
       uponRoundWinText: [
         `The shadows coil around me.`,
@@ -493,7 +493,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
   // Kitz
   [
     {
-      selectText: 'I am a cat',
+      selectText: `I am a cat`,
       missionText: `I am a cat and this is my mission`,
       uponRoundWinText: [
         `0 I am afraid of the cat`,
@@ -509,7 +509,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'I lost :/',
     },
     {
-      selectText: 'Pet 1 - The Companion',
+      selectText: `Pet 1 - The Companion`,
       missionText: `Every cat needs a companion, someone to hold tight to in the darkness. I've learned that even the most independent creatures need connection. The pet becomes part of the family.`,
       uponRoundWinText: [
         `I find my companion.`,
@@ -533,7 +533,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The bond still holds us together.',
     },
     {
-      selectText: 'Rose time',
+      selectText: `Rose time`,
       missionText: `Like an oak tree, I must be strong and steady for those who depend on me. The pet needs shelter, and I provide it. We grow together, becoming stronger with each passing day.`,
       uponRoundWinText: [
         `I stand strong like an oak.`,
@@ -556,7 +556,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The oak still provides shelter.',
     },
     {
-      selectText: 'Sunflower time',
+      selectText: `Sunflower time`,
       missionText: `Sometimes the gentlest touch is the most powerful. Like gentle rain nurturing the earth, I nurture my companion with patience and care. The softest approach often works best.`,
       uponRoundWinText: [
         `The gentle rain falls.`,
@@ -578,7 +578,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The gentle rain still falls.',
     },
     {
-      selectText: 'Hollow baybeeeee',
+      selectText: `Hollow baybeeeee`,
       missionText: `I am hollow and this is my mission`,
       uponRoundWinText: [
         `The bounty is plentiful.`,
@@ -594,7 +594,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The bounty still awaits us.',
     },
     {
-      selectText: 'Yearning',
+      selectText: `Yearning`,
       missionText: `Sometimes the hollow places in our hearts can be filled by the love of a companion. The emptiness becomes a space for connection, for warmth, for belonging.`,
       uponRoundWinText: [
         `The hollow space calls.`,
@@ -615,7 +615,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The hollow still echoes.',
     },
     {
-      selectText: 'Sensualist',
+      selectText: `Sensualist`,
       missionText: `With my companion by my side, I can see clearly even in the darkest nights. Together we navigate the shadows, finding our way when others would be lost.`,
       uponRoundWinText: [
         `My night vision is clear.`,
@@ -631,7 +631,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The night vision still guides us.',
     },
     {
-      selectText: 'Finale - bounty?',
+      selectText: `Finale - bounty?`,
       missionText: `Like a sunflower turning toward the light, my companion and I turn toward each other. We grow together, always seeking the warmth and light of our bond.`,
       uponRoundWinText: [
         `We turn toward the light.`,
@@ -651,7 +651,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
   // Imani
   [
     {
-      selectText: 'I am a doula',
+      selectText: `I am a doula`,
       missionText: `I am a doula and this is my mission`,
       uponRoundWinText: [
         `0 I am afraid of the doula`,
@@ -673,7 +673,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'I lost and I am a doula.',
     },
     {
-      selectText: 'Birth 1 - BIRTH',
+      selectText: `Birth 1 - BIRTH`,
       missionText: `Every birth begins with nascence, the first stirrings of new life. As a doula, I witness the miracle of creation, the moment when potential becomes reality. I guide the journey from possibility to existence.`,
       uponRoundWinText: [
         `The first stirrings begin.`,
@@ -694,7 +694,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The journey of birth continues.',
     },
     {
-      selectText: 'Birth 2 - The Future',
+      selectText: `Birth 2 - The Future`,
       missionText: `Posterity is the legacy we leave behind, the future generations that will carry our stories forward. As a doula, I help create the foundation for what will come, ensuring that each birth contributes to the ongoing story of humanity.`,
       uponRoundWinText: [
         `The legacy takes shape.`,
@@ -710,7 +710,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The future still awaits.',
     },
     {
-      selectText: 'Birth 3 - Posterity',
+      selectText: `Birth 3 - Posterity`,
       missionText: `Birth itself is the sacred moment when the impossible becomes possible. I am there to support, to guide, to witness the transformation from darkness to light, from potential to actuality. Every birth is a miracle.`,
       uponRoundWinText: [
         `The sacred moment arrives.`,
@@ -726,7 +726,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The miracle still awaits.',
     },
     {
-      selectText: 'Birth 4 - Ancestry',
+      selectText: `Birth 4 - Ancestry`,
       missionText: `The cradle holds the promise of the future, a safe space where new life can grow and flourish. As a doula, I help create this sanctuary, ensuring that every child has the foundation they need to thrive.`,
       uponRoundWinText: [
         `The cradle provides safety.`,
@@ -748,7 +748,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The cradle still provides protection.',
     },
     {
-      selectText: 'Birth 5 - Pregnant',
+      selectText: `Birth 5 - Pregnant`,
       missionText: `The future is built on every birth, every child, every new beginning. As a doula, I am part of creating that future, helping to bring forth the next generation that will shape the world to come.`,
       uponRoundWinText: [
         `The future takes shape.`,
@@ -771,7 +771,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The future still beckons.',
     },
     {
-      selectText: 'Birth 6 - Cradle',
+      selectText: `Birth 6 - Cradle`,
       missionText: `Every birth connects us to our ancestry, to the long line of mothers and fathers who came before. As a doula, I honor this connection, understanding that each birth is part of a greater story that stretches back through time.`,
       uponRoundWinText: [
         `I honor my ancestry.`,
@@ -792,7 +792,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The ancestral line continues.',
     },
     {
-      selectText: 'Bonus: Rebirth',
+      selectText: `Bonus: Rebirth`,
       missionText: `Sometimes birth is not just about new life, but about rebirth - the transformation of what already exists into something new and beautiful. As a doula, I witness these transformations, helping to guide the process of becoming.`,
       uponRoundWinText: [
         `The transformation begins.`,
@@ -812,7 +812,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
   // Mitra
   [
     {
-      selectText: 'I am a seeker',
+      selectText: `I am a seeker`,
       missionText: `I am a seeker and this is my mission`,
       uponRoundWinText: [
         `0 I am afraid of the seeker`,
@@ -828,7 +828,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'I lost and I am a seeker.',
     },
     {
-      selectText: 'Vision 1 - Clear View',
+      selectText: `Vision 1 - Clear View`,
       missionText: `As a seeker, I must have clear vision to find what I'm looking for. The path ahead must be unobstructed, the truth must be visible. I seek clarity in a world of confusion and doubt.`,
       uponRoundWinText: [
         `My vision becomes clear.`,
@@ -844,7 +844,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The path to clarity continues.',
     },
     {
-      selectText: 'Vision 2 - Enlightenment',
+      selectText: `Vision 2 - Enlightenment`,
       missionText: `Enlightenment is the moment when understanding dawns, when the pieces of the puzzle fall into place. As a seeker, I pursue this moment of revelation, when knowledge becomes wisdom.`,
       uponRoundWinText: [
         `Understanding dawns.`,
@@ -860,7 +860,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The path to enlightenment continues.',
     },
     {
-      selectText: 'Vision 3 - Awakening',
+      selectText: `Vision 3 - Awakening`,
       missionText: `Awakening is the moment when consciousness expands, when we see beyond the surface of things. As a seeker, I experience this awakening, becoming aware of deeper truths and hidden realities.`,
       uponRoundWinText: [
         `Consciousness expands.`,
@@ -876,7 +876,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The awakening continues.',
     },
     {
-      selectText: 'Vision 4 - Nectar',
+      selectText: `Vision 4 - Nectar`,
       missionText: `Nectar is the sweet essence of truth, the reward for the seeker's journey. It is the knowledge that nourishes the soul, the understanding that sustains the spirit. I seek this nectar of wisdom.`,
       uponRoundWinText: [
         `The nectar flows.`,
@@ -892,7 +892,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The nectar still flows.',
     },
     {
-      selectText: 'Vision 5 - Conquer',
+      selectText: `Vision 5 - Conquer`,
       missionText: `To conquer is to master the challenges of the seeker's path, to overcome the obstacles that stand between me and truth. I conquer not through force, but through understanding and perseverance.`,
       uponRoundWinText: [
         `I master the challenges.`,
@@ -908,7 +908,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The conquest continues.',
     },
     {
-      selectText: 'Vision Alt 1 - Prey',
+      selectText: `Vision Alt 1 - Prey`,
       missionText: `Sometimes the seeker becomes the prey, hunted by the very truths they pursue. But in being hunted, I learn to move differently, to see the world from a new perspective. The prey teaches the hunter.`,
       uponRoundWinText: [
         `I become the prey.`,
@@ -924,7 +924,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
       loseText: 'The hunt continues.',
     },
     {
-      selectText: 'Vision Alt 2 - Dawn',
+      selectText: `Vision Alt 2 - Dawn`,
       missionText: `Dawn is the moment when light breaks through darkness, when new possibilities emerge. As a seeker, I witness this dawn, understanding that every ending is also a beginning, every darkness gives way to light.`,
       uponRoundWinText: [
         `Light breaks through darkness.`,
