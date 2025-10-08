@@ -14,6 +14,7 @@ import Catalog from '../../../shared/state/catalog'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import Buttons from '../lib/buttons/buttons'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
+import showTooltip from '../utils/tooltips'
 
 // Features common between all builders
 export class BuilderBase extends BaseScene {
@@ -210,6 +211,9 @@ export class BuilderScene extends BuilderBase {
     if (this.lastDecklist !== undefined) {
       this.decklistsRegion.selectDeck(this.lastDecklist)
     }
+
+    // Show tooltip for new users
+    showTooltip(this)
   }
 
   private addPinButton() {

@@ -290,15 +290,24 @@ p {
 
 .social-section {
   position: relative;
-  background: rgba(44, 52, 62, 0.9);
+  background: url('assets/footer.webp') center bottom/100% auto no-repeat;
   padding: 32px 10%;
   text-align: center;
+  width: 100%;
+  aspect-ratio: 360/125;
+  min-height: 200px;
+  margin-top: calc(-40% * 125 / 360);
 }
 
 .social-links {
   display: flex;
   justify-content: center;
   gap: 64px;
+  position: absolute;
+  top: 68%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
 }
 
 .social-link {
@@ -437,9 +446,22 @@ p {
     font-size: 1.3rem;
   }
 
+  .social-section {
+    background: none;
+    aspect-ratio: auto;
+    min-height: auto;
+    margin-top: 20px;
+    padding: 20px 10%;
+  }
+
   .social-links {
     flex-direction: column;
     align-items: center;
     gap: 1rem;
+    background: #b5627b;
+    padding: 20px 30px;
+    /* border-radius: 8px; */
+    display: inline-flex;
+    margin: 0 auto;
   }
 }

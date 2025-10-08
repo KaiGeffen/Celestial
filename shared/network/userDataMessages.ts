@@ -33,6 +33,9 @@ export interface UserDataClientMessages {
     value: CosmeticSet
   }
   setAchievementsSeen: {}
+  harvestGarden: {
+    index: number
+  }
 }
 
 export interface UserDataServerMessages {
@@ -46,9 +49,9 @@ export interface UserDataServerMessages {
     decks: Deck[]
     username: string
     elo: number
+    garden: Date[]
     gems: number
     coins: number
-    lastDailyReward: Date
     ownedItems: number[]
     cosmeticSet: CosmeticSet
     achievements: Achievement[]
@@ -56,5 +59,10 @@ export interface UserDataServerMessages {
   purchaseItemSuccess: {
     itemId: number
     balance: number
+  }
+  harvestGardenResult: {
+    success: boolean
+    newGarden?: Date[]
+    reward?: number
   }
 }

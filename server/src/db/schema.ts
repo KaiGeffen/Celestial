@@ -59,12 +59,12 @@ export const players = pgTable(
     completedmissions: varchar('completedmissions', { length: 1000 }).notNull(),
     avatar_experience: integer('avatar_experience').array().notNull(),
 
+    // Garden
+    garden: timestamp('garden', { mode: 'date' }).array(),
+
     // Currency
     gems: integer('gems').notNull(),
     coins: integer('coins').notNull(),
-
-    // Track last daily reward time
-    last_daily_reward: timestamp('last_daily_reward').notNull(),
 
     // Cosmetic set
     cosmetic_set: varchar('cosmetic_set', { length: 1000 }).notNull(),

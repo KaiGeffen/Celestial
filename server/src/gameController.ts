@@ -50,7 +50,11 @@ class ServerController {
         )
       }
     }
-    // this.model.winner = 0
+
+    // Win the game automically if flag is present
+    if (process.argv.includes('--force-win')) {
+      this.model.winner = 0
+    }
   }
 
   doSetup(): void {

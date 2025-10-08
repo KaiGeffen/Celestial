@@ -49,17 +49,19 @@
 
   <!-- Optimize Google Analytics loading -->
   <script>
+    // Initialize dataLayer and gtag stub immediately
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function(){window.dataLayer.push(arguments);};
+    window.gtag('js', new Date());
+    window.gtag('config', 'G-7E0LP0X7Y9');
+    
+    // Load the actual GA script
     window.addEventListener('load', function() {
       setTimeout(function() {
         const script = document.createElement('script');
         script.src = 'https://www.googletagmanager.com/gtag/js?id=G-7E0LP0X7Y9';
         script.async = true;
         document.body.appendChild(script);
-        
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-7E0LP0X7Y9');
       }, 2000); // Delay by 2 seconds after page load
     });
   </script>

@@ -1,6 +1,6 @@
 import 'phaser'
 import Button from './button'
-import avatarNames from '../../lib/avatarNames'
+import avatarNames from '../../data/avatarNames'
 import { Color, Time } from '../../settings/settings'
 
 // TODO As this grows move it to another file

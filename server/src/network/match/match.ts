@@ -81,6 +81,7 @@ class Match implements Match {
   async notifyState() {
     if (this.game === null) return
 
+    // TODO This is bugged for the Torrent quest because it doesn't check each slice of the recap
     AchievementManager.onStateUpdate(this.uuid1, this.uuid2, this.game.model)
 
     /*
