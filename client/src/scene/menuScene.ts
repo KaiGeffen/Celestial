@@ -32,10 +32,12 @@ export default class MenuScene extends BaseMenuScene {
   create(params): void {
     super.create(params)
 
-    // Hide any hint on the originating scene
-    if (params?.activeScene?.hint) {
-      params.activeScene.hint.hide()
-    }
+    // Hide hint on all active scenes
+    this.scene.manager.scenes.forEach((scene) => {
+      if (scene.scene.isActive() && scene['hint']) {
+        scene['hint'].hide()
+      }
+    })
 
     this.sceneEnding = false
 
