@@ -11,6 +11,7 @@ import {
   serial,
   boolean,
 } from 'drizzle-orm/pg-core'
+import { JourneySettings } from '../../../shared/settings'
 
 /*
                                        Table "public.players"
@@ -58,6 +59,7 @@ export const players = pgTable(
     inventory: varchar('inventory', { length: 1000 }).notNull(),
     completedmissions: varchar('completedmissions', { length: 1000 }).notNull(),
     avatar_experience: integer('avatar_experience').array().notNull(),
+    energy: integer('energy').notNull().default(JourneySettings.ENERGY_MAX),
 
     // Garden
     garden: timestamp('garden', { mode: 'date' }).array(),

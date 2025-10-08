@@ -28,6 +28,7 @@ type UserData = null | {
   username: string
   elo: number
   garden: Date[]
+  energy: number
   gems: number
   coins: number
   ownedItems: number[]
@@ -124,6 +125,7 @@ export default class UserDataServer {
           inventory: string
           completedMissions: string
           avatar_experience: number[]
+          energy: number
           decks: Deck[]
           username: string
           elo: number
@@ -312,6 +314,7 @@ export default class UserDataServer {
         username: null,
         elo: null,
         garden: [],
+        energy: 3,
         gems: null,
         coins: null,
         ownedItems: [],

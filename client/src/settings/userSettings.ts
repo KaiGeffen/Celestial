@@ -2,6 +2,7 @@ import Server from '../network/userDataServer'
 import Catalog from '../../../shared/state/catalog'
 import { Space } from './settings'
 import { Flags } from './flags'
+import { JourneySettings } from '../../../shared/settings'
 
 // User settings will first look to see if the user is logged in
 // If they are, it will prioritize the account data for that user (in session storage) over local storage
@@ -45,6 +46,9 @@ export class UserSettings {
 
       // A list of all new user tooltips that have been seen
       tooltipsSeen: [],
+
+      // The player's current energy
+      energy: JourneySettings.ENERGY_MAX,
     }
 
     for (var key in defaultSettings) {

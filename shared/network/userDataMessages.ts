@@ -46,6 +46,7 @@ export interface UserDataServerMessages {
     inventory: string
     completedMissions: string
     avatar_experience: number[]
+    energy: number
     decks: Deck[]
     username: string
     elo: number

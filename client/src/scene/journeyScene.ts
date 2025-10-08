@@ -1,13 +1,6 @@
 import 'phaser'
 import BaseScene from './baseScene'
-import {
-  Style,
-  Space,
-  Color,
-  UserSettings,
-  Flags,
-  Ease,
-} from '../settings/settings'
+import { Style, Space, UserSettings, Ease } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
 import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
@@ -20,25 +13,17 @@ import Decklist from '../lib/decklist'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { Deck } from '../../../shared/types/deck'
 import avatarNames from '../data/avatarNames'
-import AvatarButton from '../lib/buttons/avatar'
 import newScrollablePanel from '../lib/scrollablePanel'
-import { MechanicsSettings } from '../../../shared/settings'
+import { JourneySettings, MechanicsSettings } from '../../../shared/settings'
 import Button from '../lib/buttons/button'
 import { CatalogRegionJourney } from './builderRegions/catalog'
-import {
-  getCharacterLevel,
-  getCharacterLevelProgress,
-  getCharacterExpToNextLevel,
-  MAX_LEVEL,
-} from '../journey/levelProgression'
+import { getCharacterLevel } from '../journey/levelProgression'
 import Card from '../../../shared/state/card'
-import getUnlockedCards, {
-  getUnlocksAtLevel,
-} from '../journey/unlockedInventories'
+import { getUnlocksAtLevel } from '../journey/unlockedInventories'
 import { createExpBar } from '../lib/expBar'
 import { CardImage } from '../lib/cardImage'
-import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import logEvent from '../utils/analytics'
+import UserDataServer from '../network/userDataServer'
 
 export default class JourneyScene extends BaseScene {
   // Mission details
@@ -191,7 +176,10 @@ export default class JourneyScene extends BaseScene {
       right: `100%-${Space.pad}`,
     })
 
-    this.characterSelectView.add(sizers[0]).add(sizers[1])
+    this.characterSelectView
+      .add(sizers[0])
+      .add(sizers[1])
+      .add(this.createEnergyDisplay())
   }
 
   private createMissionDetails() {
@@ -550,6 +538,30 @@ export default class JourneyScene extends BaseScene {
 
     // Update deck state after setting initial deck
     this.updateDeckState()
+  }
+
+  // Create a sizer showing the player's current energy
+  private createEnergyDisplay() {
+    const background = this.add.image(0, 0, 'background-Light')
+    this.addShadow(background)
+
+    const energyText = this.add.text(
+      0,
+      0,
+      `Energy: ${UserDataServer.getUserData().energy}/${JourneySettings.ENERGY_MAX}`,
+      Style.announcement,
+    )
+    const energySizer = this.rexUI.add
+      .sizer({ space: { left: Space.pad, right: Space.pad } })
+      .addBackground(background)
+      .add(energyText)
+    this.plugins.get('rexAnchor')['add'](energySizer, {
+      x: `50%`,
+      y: `5%`,
+    })
+    energySizer.layout()
+
+    return energySizer
   }
 
   beforeExit() {

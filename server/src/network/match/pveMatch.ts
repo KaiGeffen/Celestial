@@ -5,10 +5,14 @@ import { MatchServerWS } from '../../../../shared/network/matchWS'
 import { Deck } from '../../../../shared/types/deck'
 import { updateMatchResultPVE } from '../../db/updateMatchResult'
 import { AchievementManager } from '../../achievementManager'
+import { players } from '../../db/schema'
 
 class PveMatch extends Match {
   constructor(ws: MatchServerWS, uuid: string, deck: Deck, aiDeck: Deck) {
     super(ws, uuid, deck, null, null, aiDeck)
+
+    // TODO If journey mode, ensure that user has the energy, and if so deduct energy
+    // TODO Represent energy as the time when it was last consumed (3 times, the first is 1x refresh time, second is 2x refresh time, third is 3x refresh time)
   }
 
   // Given ws is disconnecting

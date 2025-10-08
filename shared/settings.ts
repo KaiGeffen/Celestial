@@ -36,3 +36,7 @@ export class GardenSettings {
   static readonly MAX_PLANTS = 4
   static readonly GROWTH_STAGES = 6 // 0-5 frames
 }
+
+export class JourneySettings {
+  static readonly ENERGY_MAX = 3
+}

@@ -12,6 +12,7 @@ import { STORE_ITEMS } from '../../../shared/storeItems'
 import { cosmeticsTransactions } from '../db/schema'
 import { AchievementManager } from '../achievementManager'
 import Garden from '../db/garden'
+import { JourneySettings } from '../../../shared/settings'
 
 // Create the websocket server
 export default function createUserDataServer() {
@@ -140,6 +141,7 @@ export default function createUserDataServer() {
               inventory: inventory,
               completedmissions: missions,
               avatar_experience: [0, 0, 0, 0, 0, 0],
+              energy: JourneySettings.ENERGY_MAX,
               lastactive: new Date().toISOString(),
               garden: [],
               gems: 0,
@@ -249,6 +251,7 @@ async function sendUserData(
     inventory: string
     completedmissions: string
     avatar_experience: number[]
+    energy: number
     decks: string[]
     username: string
     elo: number
@@ -283,6 +286,7 @@ async function sendUserData(
     inventory: data.inventory,
     completedMissions: data.completedmissions,
     avatar_experience: data.avatar_experience,
+    energy: data.energy,
     decks,
     username: data.username,
     elo: data.elo,
