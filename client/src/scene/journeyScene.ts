@@ -9,7 +9,7 @@ import { JOURNEY_MISSIONS, JourneyMission } from '../data/journeyMissions'
 import Decklist from '../lib/decklist'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { Deck } from '../../../shared/types/deck'
-import avatarNames from '../lib/avatarNames'
+import avatarNames from '../data/avatarNames'
 import AvatarButton from '../lib/buttons/avatar'
 import newScrollablePanel from '../lib/scrollablePanel'
 import { MechanicsSettings } from '../../../shared/settings'
@@ -28,7 +28,7 @@ import getUnlockedCards, {
 import { createExpBar } from '../lib/expBar'
 import { CardImage } from '../lib/cardImage'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
-import logEvent from '../analytics'
+import logEvent from '../utils/analytics'
 
 export default class JourneyScene extends BaseScene {
   // Mission details

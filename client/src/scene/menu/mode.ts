@@ -7,7 +7,7 @@ import Menu from './menu'
 import MenuScene from '../menuScene'
 import getRandomAiDeck from '../../data/aiDecks'
 import { Deck } from '../../../../shared/types/deck'
-import logEvent from '../../analytics'
+import logEvent from '../../utils/analytics'
 
 const width = 550
 

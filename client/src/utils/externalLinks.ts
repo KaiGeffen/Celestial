@@ -1,5 +1,5 @@
 import logEvent from './analytics'
-import { Url } from './settings/url'
+import { Url } from '../settings/url'
 
 export function openDiscord() {
   window.open(Url.discord, '_blank')

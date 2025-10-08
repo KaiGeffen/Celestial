@@ -6,8 +6,8 @@ import Menu from './menu'
 import MenuScene from '../menuScene'
 import UserDataServer from '../../network/userDataServer'
 import Button from '../../lib/buttons/button'
-import { openDiscord } from '../../externalLinks'
-import logEvent from '../../analytics'
+import { openDiscord } from '../../utils/externalLinks'
+import logEvent from '../../utils/analytics'
 
 const width = 700
 const inputTextWidth = 200

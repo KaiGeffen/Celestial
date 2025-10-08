@@ -4,7 +4,7 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
 import premadeDecklists from '../../data/premadeDecklists'
-import avatarNames from '../../lib/avatarNames'
+import avatarNames from '../../data/avatarNames'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import Cutout from '../../lib/buttons/cutout'

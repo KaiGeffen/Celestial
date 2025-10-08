@@ -4,8 +4,9 @@ import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import UserDataServer from '../network/userDataServer'
 import Cinematic from '../lib/cinematic'
-import { openFeedbackForm } from '../externalLinks'
-import logEvent from '../analytics'
+import { openFeedbackForm } from '../utils/externalLinks'
+import logEvent from '../utils/analytics'
+import showTooltip from '../utils/tooltips'
 import { GardenSettings } from '../../../shared/settings'
 import Catalog from '../../../shared/state/catalog'
 
@@ -49,6 +50,9 @@ export default class HomeScene extends BaseScene {
     // Show any plants in the garden
     this.createGarden()
     this.game.events.on('gardenHarvested', this.onGardenHarvested, this)
+
+    // Show tooltip for new users
+    showTooltip(this)
   }
 
   private createUserDetails(): void {

@@ -10,7 +10,7 @@ import BaseScene from '../baseScene'
 import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import { achievementsMeta } from '../../../../shared/achievementsData'
-import { getUnlockedAvatars, getUnlockedBorders } from '../../lib/cosmetics'
+import { getUnlockedAvatars, getUnlockedBorders } from '../../utils/cosmetics'
 
 export default class UserProfileMenu extends Menu {
   // The avatar on the homeScene

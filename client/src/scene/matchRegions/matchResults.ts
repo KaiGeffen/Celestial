@@ -5,9 +5,9 @@ import Region from './baseRegion'
 import { Space, Color, Style, BBStyle, Depth } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import GameModel from '../../../../shared/state/gameModel'
-import avatarNames from '../../lib/avatarNames'
+import avatarNames from '../../data/avatarNames'
 import newScrollablePanel from '../../lib/scrollablePanel'
-import logEvent from '../../analytics'
+import logEvent from '../../utils/analytics'
 
 export default class MatchResultsRegion extends Region {
   // Whether the results have been seen already
