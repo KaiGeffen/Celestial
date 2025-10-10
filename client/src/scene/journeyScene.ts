@@ -1,15 +1,25 @@
 import 'phaser'
 import BaseScene from './baseScene'
-import { Style, Space, Color, UserSettings, Flags } from '../settings/settings'
+import {
+  Style,
+  Space,
+  Color,
+  UserSettings,
+  Flags,
+  Ease,
+} from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
 import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import { JOURNEY_MISSIONS, JourneyMission } from '../data/journeyMissions'
+import {
+  JOURNEY_MISSIONS,
+  JourneyMission,
+} from '../journey/missions/journeyMissions'
 import Decklist from '../lib/decklist'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { Deck } from '../../../shared/types/deck'
-import avatarNames from '../lib/avatarNames'
+import avatarNames from '../data/avatarNames'
 import AvatarButton from '../lib/buttons/avatar'
 import newScrollablePanel from '../lib/scrollablePanel'
 import { MechanicsSettings } from '../../../shared/settings'
@@ -20,14 +30,15 @@ import {
   getCharacterLevelProgress,
   getCharacterExpToNextLevel,
   MAX_LEVEL,
-} from '../data/levelProgression'
+} from '../journey/levelProgression'
 import Card from '../../../shared/state/card'
 import getUnlockedCards, {
   getUnlocksAtLevel,
-} from '../data/journeyCardInventory'
+} from '../journey/unlockedInventories'
 import { createExpBar } from '../lib/expBar'
 import { CardImage } from '../lib/cardImage'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
+import logEvent from '../utils/analytics'
 
 export default class JourneyScene extends BaseScene {
   // Mission details
@@ -64,8 +75,8 @@ export default class JourneyScene extends BaseScene {
   create(params): void {
     super.create()
 
-    // TODO Temporary
-    // this.selectedAvatar = 0
+    // TODO Temporary for testing
+    // this.selectedAvatar = 1
     // params = {
     //   ...params,
     //   postMatch: true,
@@ -129,15 +140,13 @@ export default class JourneyScene extends BaseScene {
       const avatarFull = this.add.image(0, 0, `avatar-${name}Full`)
 
       // Experience bar
-      const expBar = createExpBar(this, avatarIndex)
+      const expBar = createExpBar(this, avatarIndex, 0, true)
 
       // Mission title
-      const text = this.add.text(
-        0,
-        0,
-        mission.selectText,
-        Style.todoJourneyTitle,
-      )
+      const text = this.add.text(0, 0, mission.selectText, {
+        ...Style.todoJourneyTitle,
+        wordWrap: { width: Space.avatarWidth },
+      })
 
       // Select button
       const btnContainer = new ContainerLite(
@@ -232,7 +241,6 @@ export default class JourneyScene extends BaseScene {
       ...Style.basic,
       wordWrap: { width: Space.cutoutWidth },
       fixedWidth: Space.cutoutWidth,
-      maxLines: 10,
     })
     this.decklist = new Decklist(this, this.onClickCutout())
     // Hint telling how many cards to add/remove
@@ -281,6 +289,7 @@ export default class JourneyScene extends BaseScene {
     const sizer = this.rexUI.add
       .sizer({
         orientation: 'vertical',
+        width: Space.cardWidth * 2 + Space.pad * 3,
         space: {
           item: Space.pad,
           left: Space.pad,
@@ -312,7 +321,19 @@ export default class JourneyScene extends BaseScene {
         const cardImage = new CardImage(card, cont)
         cardsSizer.add(cont)
       })
-      sizer.layout()
+      // sizer.layout()
+
+      // Scale up the contianer and cards
+      cardsSizer.setScale(0)
+      this.tweens.add({
+        targets: cardsSizer,
+        scale: 1,
+        duration: 600,
+        ease: Ease.basic,
+        onUpdate: () => {
+          sizer.layout()
+        },
+      })
     })
 
     // Buttons
@@ -465,6 +486,8 @@ export default class JourneyScene extends BaseScene {
           winText: this.selectedMission.winText,
           loseText: this.selectedMission.loseText,
         })
+
+        logEvent('queue_journey')
       },
     })
 
@@ -494,14 +517,12 @@ export default class JourneyScene extends BaseScene {
       this.cardPoolText.setText(
         `Select ${remainingCards} more cards for your deck`,
       )
-      this.cardPoolText.setVisible(true)
     } else if (deckSize > targetSize) {
       const excessCards = deckSize - targetSize
       this.cardPoolText.setText(`Remove ${excessCards} cards from your deck`)
-      this.cardPoolText.setVisible(true)
     } else {
-      // Hide the text when deck is ready (exactly 15 cards)
-      this.cardPoolText.setVisible(false)
+      // No text when deck is ready (exactly 15 cards)
+      this.cardPoolText.setText('')
     }
 
     if (deckSize === targetSize) {
@@ -510,20 +531,6 @@ export default class JourneyScene extends BaseScene {
       this.startBtn.disable()
     }
     this.missionDetailsView.layout()
-  }
-
-  private refreshCardPool() {
-    const cardSet: Set<Card> = getUnlockedCards()
-
-    // Enable dev flag to have all cards
-    if (Flags.devCardsEnabled) {
-      Catalog.collectibleCards.forEach((card) => {
-        cardSet.add(card)
-      })
-    }
-
-    // Filter the catalog to show only available cards
-    this.catalogRegion.filter((card: Card) => cardSet.has(card))
   }
 
   private setMissionInfo(mission: JourneyMission, avatarIndex: number) {
@@ -538,9 +545,6 @@ export default class JourneyScene extends BaseScene {
     this.decklist.setJourneyDeck(
       mission.deck.map((id) => Catalog.getCardById(id)),
     )
-
-    // Refresh the card pool to include optional cards from this mission
-    this.refreshCardPool()
 
     // Update deck state after setting initial deck
     this.updateDeckState()

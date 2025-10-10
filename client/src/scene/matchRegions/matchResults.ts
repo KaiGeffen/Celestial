@@ -5,8 +5,9 @@ import Region from './baseRegion'
 import { Space, Color, Style, BBStyle, Depth } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import GameModel from '../../../../shared/state/gameModel'
-import avatarNames from '../../lib/avatarNames'
+import avatarNames from '../../data/avatarNames'
 import newScrollablePanel from '../../lib/scrollablePanel'
+import logEvent from '../../utils/analytics'
 
 export default class MatchResultsRegion extends Region {
   // Whether the results have been seen already
@@ -346,9 +347,11 @@ export class ResultsRegionTutorial extends MatchResultsRegion {
 
   private continueCallback(): () => void {
     return () => {
+      logEvent(`tutorial_complete_${this.missionID}`)
+
       // If we are done with tutorials,
       if (this.missionID >= TUTORIAL_LENGTH) {
-        this.scene.scene.start('JourneyScene', { stillframe: 4 })
+        this.scene.scene.start('HomeScene')
       } else {
         this.scene.scene.start('TutorialMatchScene', {
           missionID: this.missionID,

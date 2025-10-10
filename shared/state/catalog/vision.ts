@@ -277,7 +277,6 @@ export {
   enlightenment,
   prey,
   conquer,
-  // BETA
   timid,
   balance,
   riddle,

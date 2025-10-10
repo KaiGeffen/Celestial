@@ -115,7 +115,6 @@ export default class Decklist {
         result.push(cutout.card.id)
       }
     })
-    console.log(`[${result.join(',')}]`)
     return result
   }
 

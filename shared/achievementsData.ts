@@ -104,6 +104,8 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
     title: 'In Awe',
     description: 'Have 15 or more breath.',
   },
+
+  // Manually unlocked
   1001: {
     title: 'Secret Garden',
     description: 'A special prize for those who seek it...',

@@ -9,7 +9,7 @@ const STARTING_CARDS = [
   Catalog.getCard('Hurricane'),
   Catalog.getCard('Fruit'),
   Catalog.getCard('Uprising'),
-  // Not from the character's
+  // Not from the characters
   Catalog.getCard('Stars'),
   Catalog.getCard('Cosmos'),
   Catalog.getCard('Mercy'),

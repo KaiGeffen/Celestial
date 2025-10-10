@@ -306,7 +306,6 @@ export {
   pet,
   hollow,
   holdTight,
-  // NEW
   yearn,
   pomegranate,
   abundance,

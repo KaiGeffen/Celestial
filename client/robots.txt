@@ -1,7 +1,3 @@
-# about.celestialtcg.com
-User-agent: *
-Allow: /
-
 # celestialdecks.gg
 User-agent: *
 Allow: /

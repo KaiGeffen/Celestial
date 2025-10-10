@@ -16,7 +16,7 @@ import {
 } from '../../../../shared/settings'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import UserDataServer from '../../network/userDataServer'
-import { getUnlockedAvatars, getUnlockedBorders } from '../../lib/cosmetics'
+import { getUnlockedAvatars, getUnlockedBorders } from '../../utils/cosmetics'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 const width = 900

@@ -4,7 +4,6 @@ import createLeaderboardServer from './network/leaderboardServer'
 import createMatchHistoryServer from './network/matchHistoryServer'
 import createUsernameAvailabilityServer from './network/usernameAvailabilityServer'
 import createPaymentServer from './network/paymentServer'
-import createNewsletterServer from './network/newsletterServer'
 
 console.log('Starting server')
 
@@ -22,6 +21,3 @@ createLeaderboardServer()
 createMatchHistoryServer()
 createUsernameAvailabilityServer()
 createPaymentServer()
-
-// Related to the about page
-createNewsletterServer()

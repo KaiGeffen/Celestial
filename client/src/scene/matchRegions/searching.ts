@@ -4,7 +4,7 @@ import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
-import avatarNames from '../../lib/avatarNames'
+import avatarNames from '../../data/avatarNames'
 import GameModel from '../../../../shared/state/gameModel'
 
 export default class SearchingRegion extends Region {

@@ -42,6 +42,9 @@ export class UserSettings {
 
       // The experience with each avatar
       avatar_experience: [0, 0, 0, 0, 0, 0],
+
+      // A list of all new user tooltips that have been seen
+      tooltipsSeen: [],
     }
 
     for (var key in defaultSettings) {

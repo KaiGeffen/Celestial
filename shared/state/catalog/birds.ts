@@ -338,7 +338,6 @@ export {
   secretaryBird,
   phoenix,
   heron,
-  // NEW
   fledgling,
   nest,
   truth,

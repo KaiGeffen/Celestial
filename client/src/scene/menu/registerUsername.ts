@@ -6,7 +6,8 @@ import Menu from './menu'
 import MenuScene from '../menuScene'
 import UserDataServer from '../../network/userDataServer'
 import Button from '../../lib/buttons/button'
-import { USERNAME_AVAILABILITY_PORT } from '../../../../shared/network/settings'
+import { openDiscord } from '../../utils/externalLinks'
+import logEvent from '../../utils/analytics'
 
 const width = 700
 const inputTextWidth = 200
@@ -168,6 +169,8 @@ export class RegisterUsernameMenu extends Menu {
 
         // Send username to server
         UserDataServer.sendInitialUserData(this.username)
+
+        logEvent('registered')
       },
       returnHotkey: true,
     }).disable()
@@ -187,7 +190,7 @@ export class RegisterUsernameMenu extends Menu {
     new Buttons.Basic({
       within: container,
       text: 'Discord',
-      f: () => window.open(Url.discord, '_blank'),
+      f: openDiscord,
     })
 
     return container

@@ -1,4 +1,4 @@
-import avatarNames from '../lib/avatarNames'
+import avatarNames from '../data/avatarNames'
 import Catalog from '../../../shared/state/catalog'
 import { Space, Flags } from '../settings/settings'
 import { assetLists } from './assetLists'

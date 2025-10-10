@@ -293,7 +293,6 @@ export {
   sun,
   moon,
   sunflower,
-  // BETA
   fates,
   hero,
   possibility,

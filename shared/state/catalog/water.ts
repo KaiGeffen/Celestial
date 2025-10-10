@@ -271,7 +271,6 @@ export {
   iceberg,
   dew,
   gentleRain,
-  // BETA
   refresh,
   fish,
   cloud,
