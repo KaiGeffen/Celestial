@@ -1,11 +1,21 @@
 import 'phaser'
 import BaseScene from './baseScene'
-import { Style, Space, Color, UserSettings, Flags } from '../settings/settings'
+import {
+  Style,
+  Space,
+  Color,
+  UserSettings,
+  Flags,
+  Ease,
+} from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
 import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import { JOURNEY_MISSIONS, JourneyMission } from '../data/journeyMissions'
+import {
+  JOURNEY_MISSIONS,
+  JourneyMission,
+} from '../journey/missions/journeyMissions'
 import Decklist from '../lib/decklist'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { Deck } from '../../../shared/types/deck'
@@ -20,11 +30,11 @@ import {
   getCharacterLevelProgress,
   getCharacterExpToNextLevel,
   MAX_LEVEL,
-} from '../data/levelProgression'
+} from '../journey/levelProgression'
 import Card from '../../../shared/state/card'
 import getUnlockedCards, {
   getUnlocksAtLevel,
-} from '../data/journeyCardInventory'
+} from '../journey/unlockedInventories'
 import { createExpBar } from '../lib/expBar'
 import { CardImage } from '../lib/cardImage'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
@@ -65,8 +75,8 @@ export default class JourneyScene extends BaseScene {
   create(params): void {
     super.create()
 
-    // TODO Temporary
-    // this.selectedAvatar = 0
+    // TODO Temporary for testing
+    // this.selectedAvatar = 1
     // params = {
     //   ...params,
     //   postMatch: true,
@@ -130,15 +140,13 @@ export default class JourneyScene extends BaseScene {
       const avatarFull = this.add.image(0, 0, `avatar-${name}Full`)
 
       // Experience bar
-      const expBar = createExpBar(this, avatarIndex)
+      const expBar = createExpBar(this, avatarIndex, 0, true)
 
       // Mission title
-      const text = this.add.text(
-        0,
-        0,
-        mission.selectText,
-        Style.todoJourneyTitle,
-      )
+      const text = this.add.text(0, 0, mission.selectText, {
+        ...Style.todoJourneyTitle,
+        wordWrap: { width: Space.avatarWidth },
+      })
 
       // Select button
       const btnContainer = new ContainerLite(
@@ -281,6 +289,7 @@ export default class JourneyScene extends BaseScene {
     const sizer = this.rexUI.add
       .sizer({
         orientation: 'vertical',
+        width: Space.cardWidth * 2 + Space.pad * 3,
         space: {
           item: Space.pad,
           left: Space.pad,
@@ -312,7 +321,19 @@ export default class JourneyScene extends BaseScene {
         const cardImage = new CardImage(card, cont)
         cardsSizer.add(cont)
       })
-      sizer.layout()
+      // sizer.layout()
+
+      // Scale up the contianer and cards
+      cardsSizer.setScale(0)
+      this.tweens.add({
+        targets: cardsSizer,
+        scale: 1,
+        duration: 600,
+        ease: Ease.basic,
+        onUpdate: () => {
+          sizer.layout()
+        },
+      })
     })
 
     // Buttons

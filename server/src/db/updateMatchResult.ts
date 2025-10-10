@@ -15,7 +15,7 @@ const DEFAULT_PLAYER_DATA = {
 }
 
 async function getPlayerData(playerId: string | null) {
-  if (playerId === null) return DEFAULT_PLAYER_DATA
+  if (!playerId) return DEFAULT_PLAYER_DATA
 
   const result = await db
     .select()
@@ -39,8 +39,8 @@ export async function updateMatchResultPVP(
 
   // Remember the match
   await insertMatchHistory(
-    winnerId,
-    loserId,
+    winnerData.id,
+    loserData.id,
     winnerData,
     loserData,
     winnerDeck,
@@ -49,7 +49,7 @@ export async function updateMatchResultPVP(
   )
 
   // Plant a seed for the winner
-  if (winnerId) await Garden.plantSeed(winnerId)
+  if (winnerData.id) await Garden.plantSeed(winnerData.id)
 
   // Calculate new ELO
   // Calculate expected scores
@@ -73,7 +73,7 @@ export async function updateMatchResultPVP(
         wins: sql`${players.wins} + 1`,
         ...winnerData,
       })
-      .where(eq(players.id, winnerId))
+      .where(eq(players.id, winnerData.id))
 
     await tx
       .update(players)
@@ -82,7 +82,7 @@ export async function updateMatchResultPVP(
         losses: sql`${players.losses} + 1`,
         ...loserData,
       })
-      .where(eq(players.id, loserId))
+      .where(eq(players.id, loserData.id))
   })
 }
 

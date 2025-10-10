@@ -35,7 +35,7 @@ export class AchievementManager {
     isPvp: boolean,
     player: number,
   ) {
-    if (playerId === null) return
+    if (!playerId) return
 
     if (isPvp) {
       // 9: Won against another player
