@@ -294,6 +294,25 @@ const isolation = new Isolation({
   text: 'Costs 0 if you won last round without playing any cards.',
 })
 
+class Spider extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    if (super.exhale(2, game, player)) {
+      if (game.story.acts.length > 0) {
+        game.returnActToHand(0)
+      }
+    }
+  }
+}
+const spider = new Spider({
+  name: 'Spider',
+  id: 485,
+  cost: 3,
+  points: 3,
+  text: "Exhale 2: Return the next card in the story to its owner's hand.",
+})
+
 export {
   dagger,
   shadow,
@@ -309,4 +328,5 @@ export {
   vampire,
   devilWhisper,
   isolation,
+  spider,
 }
