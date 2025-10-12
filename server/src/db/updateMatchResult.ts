@@ -64,26 +64,31 @@ export async function updateMatchResultPVP(
   )
   const newLoserRating = elo.updateRating(expectedScoreLoser, 0, loserData.elo)
 
+  console.log('New winner rating:', newWinnerRating)
+  console.log('Winner data:', winnerData)
+  console.log('New loser rating:', newLoserRating)
+  console.log('Loser data:', loserData)
+
   // Update the database with new ELO for winner and loser
-  await db.transaction(async (tx) => {
-    await tx
+  if (winnerData.id) {
+    await db
       .update(players)
       .set({
         elo: newWinnerRating,
         wins: sql`${players.wins} + 1`,
-        ...winnerData,
       })
       .where(eq(players.id, winnerData.id))
+  }
 
-    await tx
+  if (loserData.id) {
+    await db
       .update(players)
       .set({
         elo: newLoserRating,
         losses: sql`${players.losses} + 1`,
-        ...loserData,
       })
       .where(eq(players.id, loserData.id))
-  })
+  }
 }
 
 export async function updateMatchResultPVE(
