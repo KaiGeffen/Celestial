@@ -301,6 +301,21 @@ const greatWheel = new GreatWheel({
   text: 'Fleeting\nEnd the current round.',
 })
 
+class Switcheroo extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    game.status[player].nourish += game.status[player].vision
+    game.status[player].vision = 0
+  }
+}
+const switcheroo = new Switcheroo({
+  name: 'Switcheroo',
+  id: 6103,
+  cost: 4,
+  points: 1,
+  text: 'Turn your Sight into Nourish.',
+})
+
 export {
   dawn,
   nectar,
@@ -319,4 +334,5 @@ export {
   suddenInsight,
   realms,
   greatWheel,
+  switcheroo,
 }
