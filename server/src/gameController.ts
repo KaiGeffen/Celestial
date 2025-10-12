@@ -330,7 +330,7 @@ class ServerController {
     this.model.endingBreath[0] = this.model.breath[0]
     this.model.endingBreath[1] = this.model.breath[1]
 
-    this.model.story.saveFinalStateAndClear(this.model)
+    this.model.story.saveFinalStateAndClearResolved(this.model)
 
     this.model.sound = null
   }

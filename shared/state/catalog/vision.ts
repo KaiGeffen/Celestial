@@ -252,12 +252,8 @@ class SuddenInsight extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    for (let i = 0; i < game.story.acts.length; i++) {
-      const act = game.story.acts[i]
-      if (act.owner === player) {
-        game.returnActToHand(i)
-        return
-      }
+    if (super.exhale(1, game, player)) {
+      super.inspire(1, game, player)
     }
   }
 }
@@ -266,7 +262,43 @@ const suddenInsight = new SuddenInsight({
   id: 6001,
   cost: 4,
   points: 4,
-  text: 'When drawn, gain Sight 2.\nReturn your next card in the story to your hand.',
+  text: 'When drawn, gain Sight 2.\nExhale 1: Inspire 1',
+})
+
+class Realms extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    const newDeck = [...game.pile[player]]
+    const newDiscard = [...game.deck[player]]
+    game.deck[player] = newDeck
+    game.pile[player] = newDiscard
+
+    // Shuffle the deck
+    game.shuffle(player, true, false)
+  }
+}
+const realms = new Realms({
+  name: 'Realms',
+  id: 6002,
+  cost: 0,
+  points: 6,
+  text: 'Switch your deck and discard pile.',
+})
+
+class GreatWheel extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    game.story.roundEndedForced = true
+  }
+}
+const greatWheel = new GreatWheel({
+  name: 'Great Wheel',
+  id: 6102,
+  cost: 8,
+  points: 8,
+  qualities: [Quality.FLEETING],
+  text: 'Fleeting\nEnd the current round.',
 })
 
 export {
@@ -283,5 +315,8 @@ export {
   bull,
   lantern,
   beggingBowl,
+  // NEW CARDS
   suddenInsight,
+  realms,
+  greatWheel,
 }

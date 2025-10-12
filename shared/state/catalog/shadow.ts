@@ -270,8 +270,6 @@ class DevilWhisper extends Card {
 const devilWhisper = new DevilWhisper({
   name: 'Devil Whisper',
   id: 483,
-  cost: 2,
-  points: 2,
   text: 'Exhale 3: Your opponent adds a card from their hand to the story, then you do the same.',
 })
 
@@ -313,6 +311,14 @@ const spider = new Spider({
   text: "Exhale 2: Return the next card in the story to its owner's hand.",
 })
 
+const whispers = new Card({
+  name: 'Whispers',
+  id: 486,
+  cost: 0,
+  points: 0,
+  text: "Visible\nWhile this is in the story, your opponent can't pass if they can play a card.",
+})
+
 export {
   dagger,
   shadow,
@@ -326,6 +332,7 @@ export {
   victim,
   lostInShadow,
   vampire,
+  // NEW CARDS
   devilWhisper,
   isolation,
   spider,
