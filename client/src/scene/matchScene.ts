@@ -673,17 +673,20 @@ export class JourneyMatchScene extends MatchScene {
   }
 }
 
-export class OldJourneyMatchScene extends MatchScene {
+// TODO This is the old map based journey match scene
+export class MapJourneyMatchScene extends MatchScene {
   winSeen: boolean
 
   constructor(
-    args = { key: 'OldJourneyMatchScene', lastScene: 'OldJourneyScene' },
+    args = { key: 'MapJourneyMatchScene', lastScene: 'MapJourneyScene' },
   ) {
     super(args)
   }
 
   create() {
     super.create()
+
+    console.log('MapJourneyMatchScene create', this.params)
 
     // Must be reset each time this scene is run
     this.winSeen = false
@@ -709,6 +712,12 @@ export class OldJourneyMatchScene extends MatchScene {
     // Set that user has completed the missions with this id
     if (this.params.missionID !== undefined) {
       UserSettings._setIndex('completedMissions', this.params.missionID, true)
+    }
+  }
+
+  doExit(): () => void {
+    return () => {
+      this.doBack()
     }
   }
 }

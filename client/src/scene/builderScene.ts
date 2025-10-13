@@ -85,11 +85,10 @@ export class BuilderBase extends BaseScene {
 export class JourneyBuilderScene extends BuilderBase {
   journeyRegion: JourneyRegion
 
-  constructor() {
-    super({
-      key: 'JourneyBuilderScene',
-      lastScene: 'MapJourneyScene',
-    })
+  constructor(
+    args = { key: 'JourneyBuilderScene', lastScene: 'MapJourneyScene' },
+  ) {
+    super(args)
   }
 
   create(params): void {
@@ -131,7 +130,7 @@ export class JourneyBuilderScene extends BuilderBase {
 
   updateSavedDeck(deck: string): void {}
 
-  private startCallback(): () => void {
+  protected startCallback(): () => void {
     return () => {
       // Create a proper deck object using the new type
       const aiDeck: Deck = {
@@ -146,7 +145,7 @@ export class JourneyBuilderScene extends BuilderBase {
       }
 
       // Start a match against an ai opponent with the specified deck
-      this.scene.start('OldJourneyMatchScene', {
+      this.scene.start('JourneyMatchScene', {
         deck: this.journeyRegion.getDeck(),
         aiDeck: aiDeck,
         missionID: this.params.id,
@@ -164,13 +163,87 @@ export class JourneyBuilderScene extends BuilderBase {
   }
 }
 
-export class OldJourneyBuilderScene extends BuilderBase {
-  startCallback(): () => void {
+export class MapJourneyBuilderScene extends BuilderBase {
+  journeyRegion: JourneyRegion
+
+  constructor() {
+    super({
+      key: 'MapJourneyBuilderScene',
+      lastScene: 'MapJourneyScene',
+    })
+  }
+
+  create(params): void {
+    super.create(params)
+
+    console.log('MapJourneyBuilderScene create', params)
+
+    this.catalogRegion = new CatalogRegion().create(this)
+
+    // TODO Not just the 100s digit number
+    const avatar = (Math.floor(params.id / 100) - 1) % 6
+    this.journeyRegion = new JourneyRegion().create(
+      this,
+      this.startCallback(),
+      avatar,
+      this.params.storyTitle,
+      this.params.storyText,
+    )
+    this.journeyRegion.addRequiredCards(params.deck)
+
+    this.filterRegion = new FilterRegion().create(this, true)
+
+    // Must filter out cards that you don't have access to
+    this.filter()
+
+    this.catalogRegion.resize(Space.cutoutWidth)
+  }
+
+  onWindowResize(): void {
+    this.journeyRegion.onWindowResize()
+    this.catalogRegion.resize(Space.cutoutWidth)
+  }
+
+  addCardToDeck(card: Card): void {
+    this.journeyRegion.addCardToDeck(card)
+  }
+
+  getDeckCode(): number[] {
+    return this.journeyRegion.getDeckCode()
+  }
+
+  updateSavedDeck(deck: string): void {}
+
+  protected startCallback(): () => void {
     return () => {
-      this.scene.start('JourneyScene', {
+      // Create a proper deck object using the new type
+      const aiDeck: Deck = {
+        name: 'AI Deck',
+        cards: this.params.opponent,
+        // TODO: Make this is specific to the mission
+        cosmeticSet: {
+          avatar: 0,
+          border: 0,
+          relic: 0,
+        },
+      }
+
+      // Start a match against an ai opponent with the specified deck
+      this.scene.start('MapJourneyMatchScene', {
+        deck: this.journeyRegion.getDeck(),
+        aiDeck: aiDeck,
         missionID: this.params.id,
       })
     }
+  }
+
+  isOverfull(): boolean {
+    return this.journeyRegion.isOverfull()
+  }
+
+  // Get the amt of a given card in the current deck
+  getCount(card: Card): number {
+    return this.journeyRegion.getCount(card)
   }
 }
 

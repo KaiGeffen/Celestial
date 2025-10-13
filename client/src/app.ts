@@ -6,10 +6,14 @@ import HomeScene from './scene/homeScene'
 import {
   StandardMatchScene,
   JourneyMatchScene,
-  OldJourneyMatchScene,
+  MapJourneyMatchScene,
 } from './scene/matchScene'
 import TutorialMatchScene from './scene/tutorialScene'
-import { BuilderScene, JourneyBuilderScene } from './scene/builderScene'
+import {
+  BuilderScene,
+  JourneyBuilderScene,
+  MapJourneyBuilderScene,
+} from './scene/builderScene'
 import MatchHistoryScene from './scene/matchHistoryScene'
 
 import JourneyScene from './scene/journeyScene'
@@ -65,9 +69,10 @@ const config: Phaser.Types.Core.GameConfig = {
     StoreScene,
     CharacterProfileScene,
 
-    // Allowing old journey mode
+    // Allowing old map based journey mode
     MapJourneyScene,
-    OldJourneyMatchScene,
+    MapJourneyMatchScene,
+    MapJourneyBuilderScene,
   ],
   plugins: {
     scene: [

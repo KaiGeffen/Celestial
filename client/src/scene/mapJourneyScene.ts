@@ -355,7 +355,7 @@ export default class MapJourneyScene extends BaseScene {
   private missionOnClick(mission: journeyNode): () => void {
     return () => {
       if ('deck' in mission) {
-        this.scene.start('JourneyBuilderScene', mission)
+        this.scene.start('MapJourneyBuilderScene', mission)
       } else {
         // Complete the mission
         UserSettings._setIndex('completedMissions', mission.id, true)
