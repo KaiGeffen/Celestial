@@ -13,7 +13,7 @@ export default class CatalogRegion {
   scene: BuilderBase
 
   // The scrollable panel on which the catalog exists
-  panel
+  protected panel
 
   // Full list of all cards in the catalog (Even those invisible)
   cardCatalog: CardImage[]
@@ -115,9 +115,9 @@ export default class CatalogRegion {
     }
 
     // Reset the scroll
-    sizer.t = 0
+    this.panel.t = 0
 
-    sizer.layout()
+    this.panel.layout()
   }
 
   private createCard(card: Card): void {
