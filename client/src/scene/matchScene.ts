@@ -672,3 +672,43 @@ export class JourneyMatchScene extends MatchScene {
     UserSettings._increment('avatar_experience', this.avatar, exp)
   }
 }
+
+export class OldJourneyMatchScene extends MatchScene {
+  winSeen: boolean
+
+  constructor(
+    args = { key: 'OldJourneyMatchScene', lastScene: 'OldJourneyScene' },
+  ) {
+    super(args)
+  }
+
+  create() {
+    super.create()
+
+    // Must be reset each time this scene is run
+    this.winSeen = false
+  }
+
+  // When the player wins for the first time, unlock appropriately
+  queueState(state: GameModel): void {
+    if (!this.winSeen && state.winner === 0) {
+      this.winSeen = true
+      this.unlockMissionRewards()
+    }
+    super.queueState(state)
+  }
+
+  signalMatchFound(
+    name1: string,
+    name2: string,
+    elo1: number,
+    elo2: number,
+  ): void {}
+
+  private unlockMissionRewards(): void {
+    // Set that user has completed the missions with this id
+    if (this.params.missionID !== undefined) {
+      UserSettings._setIndex('completedMissions', this.params.missionID, true)
+    }
+  }
+}

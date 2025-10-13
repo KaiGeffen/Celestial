@@ -3,7 +3,11 @@ import 'phaser'
 import MenuScene from './scene/menuScene'
 import { PreloadScene, SigninScene } from './scene/preloadScene'
 import HomeScene from './scene/homeScene'
-import { StandardMatchScene, JourneyMatchScene } from './scene/matchScene'
+import {
+  StandardMatchScene,
+  JourneyMatchScene,
+  OldJourneyMatchScene,
+} from './scene/matchScene'
 import TutorialMatchScene from './scene/tutorialScene'
 import { BuilderScene, JourneyBuilderScene } from './scene/builderScene'
 import MatchHistoryScene from './scene/matchHistoryScene'
@@ -53,7 +57,6 @@ const config: Phaser.Types.Core.GameConfig = {
     JourneyMatchScene,
     TutorialMatchScene,
     JourneyBuilderScene,
-    MapJourneyScene,
     PlaceholderScene,
     BuilderScene,
     MapScene,
@@ -61,6 +64,10 @@ const config: Phaser.Types.Core.GameConfig = {
     MatchHistoryScene,
     StoreScene,
     CharacterProfileScene,
+
+    // Allowing old journey mode
+    MapJourneyScene,
+    OldJourneyMatchScene,
   ],
   plugins: {
     scene: [

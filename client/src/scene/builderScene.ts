@@ -145,7 +145,7 @@ export class JourneyBuilderScene extends BuilderBase {
       }
 
       // Start a match against an ai opponent with the specified deck
-      this.scene.start('JourneyMatchScene', {
+      this.scene.start('OldJourneyMatchScene', {
         deck: this.journeyRegion.getDeck(),
         aiDeck: aiDeck,
         missionID: this.params.id,
@@ -160,6 +160,16 @@ export class JourneyBuilderScene extends BuilderBase {
   // Get the amt of a given card in the current deck
   getCount(card: Card): number {
     return this.journeyRegion.getCount(card)
+  }
+}
+
+export class OldJourneyBuilderScene extends BuilderBase {
+  startCallback(): () => void {
+    return () => {
+      this.scene.start('JourneyScene', {
+        missionID: this.params.id,
+      })
+    }
   }
 }
 
