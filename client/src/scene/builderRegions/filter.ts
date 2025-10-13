@@ -6,6 +6,7 @@ import { CardImage } from '../../lib/cardImage'
 import { Style, UserSettings, Space, Flags } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import UButton from '../../lib/buttons/underlined'
+import Catalog from '../../../../shared/state/catalog'
 
 import { BuilderBase } from '../builderScene'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite'
@@ -352,7 +353,7 @@ export default class FilterRegion {
     } else if (token.field === 'name') {
       matches = card.name.toLowerCase().includes(token.text.toLowerCase())
     } else if (token.field === 'text') {
-      matches = this.searchInText(card, token.text)
+      matches = card.text.toLowerCase().includes(token.text.toLowerCase())
     } else {
       // No field specified - search everywhere
       matches = this.searchEverywhere(card, token.text)
@@ -362,33 +363,31 @@ export default class FilterRegion {
     return token.negated ? !matches : matches
   }
 
-  // Search recursively in card text, including keywords and referenced cards
-  private searchInText(card: Card, query: string): boolean {
-    const lowerQuery = query.toLowerCase()
-
-    // Search in card text
-    if (card.text.toLowerCase().includes(lowerQuery)) {
-      return true
-    }
-
-    return false
-  }
-
-  // Search in all card fields (name, text, cost, points)
+  // Search in all card fields (name, text, cost, points, keywords, referenced cards)
   private searchEverywhere(card: Card, query: string): boolean {
     const lowerQuery = query.toLowerCase()
 
     // Build searchable string
-    const searchableText =
-      `${card.name} ${card.text} ${card.cost} ${card.points}`.toLowerCase()
+    let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points}`
 
-    if (searchableText.includes(lowerQuery)) {
-      return true
+    // Keyword reminder text
+    for (const [keyword, _] of Catalog.getReferencedKeywords(card)) {
+      searchableText += ` ${keyword.text}`
     }
 
-    // TODO: Search in keywords and referenced cards recursively
+    // Text from all referenced cards
+    for (const cardName of Catalog.getReferencedCardNames(card)) {
+      const referencedCard = Catalog.getCard(cardName)
+      if (referencedCard) {
+        searchableText += ` ${referencedCard.text}`
+      }
+    }
 
-    return false
+    // Convert to lowercase
+    searchableText = searchableText.toLowerCase()
+
+    // Check if the query is in the searchable text
+    return searchableText.includes(lowerQuery)
   }
 }
 
