@@ -45,6 +45,9 @@ export default class MapJourneyScene extends BaseScene {
     // Add button for help menu
     this.createHelpButton()
 
+    // Add button to switch back to new journey mode
+    this.createStoryModeButton()
+
     // Add all of the available nodes
     this.addJourneyData()
 
@@ -126,6 +129,27 @@ export default class MapJourneyScene extends BaseScene {
             this.scene.start('TutorialGameScene', { missionID: 0 })
           },
         })
+      },
+      depth: 10,
+    }).setNoScroll()
+  }
+
+  private createStoryModeButton(): void {
+    const x =
+      Space.windowWidth -
+      Space.buttonWidth / 2 -
+      (Space.iconSize + Space.pad * 2) -
+      Space.buttonWidth -
+      Space.pad
+    const y = Space.buttonHeight / 2 + Space.pad
+    new Buttons.Basic({
+      within: this,
+      text: 'Story Mode',
+      x,
+      y,
+      f: () => {
+        // Switch to new journey (story) mode
+        this.scene.start('JourneyScene')
       },
       depth: 10,
     }).setNoScroll()

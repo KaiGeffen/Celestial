@@ -189,7 +189,33 @@ export default class JourneyScene extends BaseScene {
       right: `100%-${Space.pad}`,
     })
 
-    this.characterSelectView.add(sizers[0]).add(sizers[1])
+    // Add center button to switch to old journey mode
+    const centerBtnContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: centerBtnContainer,
+      text: 'Map Mode',
+      f: () => {
+        // Switch to old journey (map) mode
+        this.beforeExit()
+        this.scene.start('MapJourneyScene')
+      },
+    })
+
+    this.plugins.get('rexAnchor')['add'](centerBtnContainer, {
+      x: `50%`,
+      y: `50%`,
+    })
+
+    this.characterSelectView
+      .add(sizers[0])
+      .add(sizers[1])
+      .add(centerBtnContainer)
   }
 
   private createMissionDetails() {
