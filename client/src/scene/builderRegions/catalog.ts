@@ -225,7 +225,7 @@ export class CatalogRegionJourney extends CatalogRegion {
     super.create(scene)
 
     // TODO Don't use this literal
-    // this.panel.setMinSize(850)
+    this.panel.setMinSize(850)
 
     return this
   }

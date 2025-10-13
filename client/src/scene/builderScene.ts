@@ -96,7 +96,6 @@ export class JourneyBuilderScene extends BuilderBase {
     super.create(params)
 
     this.catalogRegion = new CatalogRegion().create(this)
-    this.catalogRegion.shiftRight()
 
     // TODO Not just the 100s digit number
     const avatar = (Math.floor(params.id / 100) - 1) % 6
@@ -113,6 +112,8 @@ export class JourneyBuilderScene extends BuilderBase {
 
     // Must filter out cards that you don't have access to
     this.filter()
+
+    this.catalogRegion.resize(Space.cutoutWidth)
   }
 
   onWindowResize(): void {

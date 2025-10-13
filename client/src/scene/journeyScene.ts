@@ -37,7 +37,6 @@ import getUnlockedCards, {
 } from '../journey/unlockedInventories'
 import { createExpBar } from '../lib/expBar'
 import { CardImage } from '../lib/cardImage'
-import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import logEvent from '../utils/analytics'
 
 export default class JourneyScene extends BaseScene {
