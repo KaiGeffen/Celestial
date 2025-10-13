@@ -10,6 +10,7 @@ import MatchHistoryScene from './scene/matchHistoryScene'
 
 import JourneyScene from './scene/journeyScene'
 import PlaceholderScene from './scene/placeholderScene'
+import MapJourneyScene from './scene/mapJourneyScene'
 
 import { Space } from './settings/settings'
 import addResizeHandler from './loader/windowResizeManager'
@@ -52,6 +53,7 @@ const config: Phaser.Types.Core.GameConfig = {
     JourneyMatchScene,
     TutorialMatchScene,
     JourneyBuilderScene,
+    MapJourneyScene,
     PlaceholderScene,
     BuilderScene,
     MapScene,

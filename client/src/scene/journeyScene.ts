@@ -261,12 +261,12 @@ export default class JourneyScene extends BaseScene {
 
     // Create catalog region
     this.catalogRegion = new CatalogRegionJourney()
-    const catalogPanel = this.catalogRegion.create(this as any) // Cast to BuilderBase type
+    const catalogRegion = this.catalogRegion.create(this as any) // Cast to BuilderBase type
     // TODO Fix the cast >n<
 
     this.missionDetailsView
       .add(leftSizer, { expand: true })
-      .add(catalogPanel, { expand: true })
+      .add(catalogRegion.panel, { expand: true })
       .addBackground(background)
       .layout()
 

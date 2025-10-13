@@ -3,7 +3,7 @@ import Card from '../../../shared/state/card'
 import BaseScene from './baseScene'
 import { Deck } from '../../../shared/types/deck'
 
-import CatalogRegion, { CatalogRegionJourney } from './builderRegions/catalog'
+import CatalogRegion from './builderRegions/catalog'
 import DeckRegion from './builderRegions/deck'
 import DecklistsRegion from './builderRegions/decklists'
 import FilterRegion from './builderRegions/filter'
@@ -88,14 +88,15 @@ export class JourneyBuilderScene extends BuilderBase {
   constructor() {
     super({
       key: 'JourneyBuilderScene',
-      lastScene: 'JourneyScene',
+      lastScene: 'MapJourneyScene',
     })
   }
 
   create(params): void {
     super.create(params)
 
-    this.catalogRegion = new CatalogRegionJourney().create(this)
+    this.catalogRegion = new CatalogRegion().create(this)
+    this.catalogRegion.shiftRight()
 
     // TODO Not just the 100s digit number
     const avatar = (Math.floor(params.id / 100) - 1) % 6

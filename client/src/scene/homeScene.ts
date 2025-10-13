@@ -260,7 +260,7 @@ export default class HomeScene extends BaseScene {
       within: journeyContainer,
       text: 'Journey',
       f: () => {
-        this.scene.start('JourneyScene', { postMatch: false })
+        this.scene.start('MapJourneyScene', { postMatch: false })
 
         logEvent('view_journey')
       },
