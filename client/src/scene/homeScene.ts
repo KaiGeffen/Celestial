@@ -260,7 +260,25 @@ export default class HomeScene extends BaseScene {
       within: journeyContainer,
       text: 'Journey',
       f: () => {
-        this.scene.start('JourneyScene', { postMatch: false })
+        // A/B test: Route based on UUID parity if logged in
+
+        // Guest users get new JourneyScene
+        if (!UserDataServer.isLoggedIn()) {
+          this.scene.start('JourneyScene', { postMatch: false })
+        } else {
+          const uuid = UserDataServer.getUserData().uuid
+          console.log('uuid', uuid)
+          // Use the last character of UUID to determine parity
+          const lastChar = uuid.charAt(uuid.length - 1)
+          const numValue = parseInt(lastChar, 16) // Parse as hex
+
+          // Even UUID -> new JourneyScene, Odd UUID -> old MapJourneyScene
+          if (!isNaN(numValue) && numValue % 2 === 1) {
+            this.scene.start('MapJourneyScene', {})
+          } else {
+            this.scene.start('JourneyScene', { postMatch: false })
+          }
+        }
 
         logEvent('view_journey')
       },
