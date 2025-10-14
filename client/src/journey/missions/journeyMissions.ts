@@ -30,7 +30,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
   [
     {
       selectText: `It's nice to meet you.`,
-      missionText: `It’s a pleasure to meet you, [player name?]. I hope you’re not feeling too disoriented. If you’d like, I could show you around this [term for neighborhood]. But if you do join me, you’ll have to lend me your ear while I reminisce a little. The great tree in this courtyard reminds me of a place of respite in my youth…`,
+      missionText: `It’s a pleasure to meet you. I hope you’re not feeling too disoriented. If you’d like, I could show you around the City. But if you do join me, you’ll have to lend me your ear while I reminisce a little. The great tree in this courtyard reminds me of a place of respite in my youth…`,
       uponRoundWinText: [
         `I won't stop until I know the truth.`,
         '1',
@@ -74,7 +74,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
     },
     {
       selectText: `Dresses aren't really my thing.`,
-      missionText: `You’ve adjusted so quickly, [player name]! You know, I think you’re a rather interesting Umbra. There is something refreshing about telling stories with you. It makes me want to reveal parts of myself I’ve kept under wraps. There was a time when my routine of keeping my head down and shutting up began to break apart…`,
+      missionText: `You’ve adjusted so quickly! You know, I think you’re a rather interesting Umbra. There is something refreshing about telling stories with you. It makes me want to reveal parts of myself I’ve kept under wraps. There was a time when my routine of keeping my head down and shutting up began to break apart…`,
       uponRoundWinText: [
         `The old routine is breaking apart.`,
         `I can't keep my head down anymore.`,
@@ -180,7 +180,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
   [
     {
       selectText: `You can tag along if you want.`,
-      missionText: `So, you say you’re here to help me… I don’t know if that’s possible. I’m gonna be checking in on some projects around the [name for neighborhood], and the Umbras will bug me for my story again. I guess you could try your thing, I won’t stop you. Before we start, you should know my family struggled from day one…`,
+      missionText: `So, you say you’re here to help me… I don’t know if that’s possible. I’m gonna be checking in on some projects around the City, and the Umbras will bug me for my story again. I guess you could try your thing, I won’t stop you. Before we start, you should know my family struggled from day one…`,
       uponRoundWinText: [
         `Fire begins`,
         ``,
@@ -203,7 +203,7 @@ export const JOURNEY_MISSIONS: JourneyMissionTracks = [
     },
     {
       selectText: `You coming? I've got work to do.`,
-      missionText: `Not bad, [player name]. I promised to tell some Umbra down by the bonfire about my first love, want to join us? I could use your help. You see, I was desperate for opportunity as soon as I could work. People often told me to slow down, but I knew I still wasn’t fast enough. Some understood that better than others. `,
+      missionText: `Not bad. I promised to tell some Umbra down by the bonfire about my first love, want to join us? I could use your help. You see, I was desperate for opportunity as soon as I could work. People often told me to slow down, but I knew I still wasn’t fast enough. Some understood that better than others. `,
       uponRoundWinText: [
         `The spark ignites.`,
         `The fire grows stronger.`,
