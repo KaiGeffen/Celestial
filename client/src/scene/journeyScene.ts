@@ -288,6 +288,9 @@ export default class JourneyScene extends BaseScene {
     this.catalogRegion = new CatalogRegionJourney()
     const catalogRegion = this.catalogRegion.create(this as any) // Cast to BuilderBase type
     // TODO Fix the cast >n<
+    catalogRegion.filter((card) => {
+      return getUnlockedCards().has(card)
+    })
 
     this.missionDetailsView
       .add(leftSizer, { expand: true })

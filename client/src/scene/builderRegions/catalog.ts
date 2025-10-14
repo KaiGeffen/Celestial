@@ -13,7 +13,7 @@ export default class CatalogRegion {
   scene: BuilderBase
 
   // The scrollable panel on which the catalog exists
-  protected panel
+  panel
 
   // Full list of all cards in the catalog (Even those invisible)
   cardCatalog: CardImage[]
