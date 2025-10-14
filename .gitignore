@@ -21,3 +21,6 @@ dist/
 
 # Drizzle-kit files #
 drizzle/
+
+# Mobile builds
+ios/
