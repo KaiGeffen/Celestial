@@ -285,6 +285,14 @@ const rocketship = new Rocketship({
   text: 'Worth +1 for each card in your hand with base cost 6 or more. Put those cards on the bottom of your deck.',
 })
 
+const phi = new Card({
+  name: 'Phi',
+  id: 8105,
+  cost: 8,
+  points: 8,
+  text: 'If this is in hand at the end of a round, reduce its cost by 1 for each breath you have until you play it.',
+})
+
 export {
   stars,
   cosmos,
@@ -300,4 +308,5 @@ export {
   dreamer,
   pride,
   rocketship,
+  phi,
 }
