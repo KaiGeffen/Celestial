@@ -11,7 +11,7 @@ function clean<T>(obj: T): T {
 
 // Log or update tutorial progress (upsert by player_id + funnel_step)
 export async function logTutorialProgress(
-  player_id: string,
+  player_id: string | null,
   funnel_step: string,
   turn_reached: number,
 ) {

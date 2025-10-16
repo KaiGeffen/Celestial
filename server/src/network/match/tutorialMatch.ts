@@ -7,7 +7,7 @@ import { MatchServerWS } from '../../../../shared/network/matchWS'
 class TutorialMatch extends PveMatch {
   tutorialNum: number
 
-  constructor(ws: MatchServerWS, num: number, uuid: string) {
+  constructor(ws: MatchServerWS, num: number, uuid: string | null) {
     // TODO Weird to start a normal game, then erase it
     super(
       ws,
