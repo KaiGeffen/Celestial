@@ -64,11 +64,6 @@ export async function updateMatchResultPVP(
   )
   const newLoserRating = elo.updateRating(expectedScoreLoser, 0, loserData.elo)
 
-  console.log('New winner rating:', newWinnerRating)
-  console.log('Winner data:', winnerData)
-  console.log('New loser rating:', newLoserRating)
-  console.log('Loser data:', loserData)
-
   // Update the database with new ELO for winner and loser
   if (winnerData.id) {
     await db
