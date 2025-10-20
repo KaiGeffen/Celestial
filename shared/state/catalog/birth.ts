@@ -251,7 +251,7 @@ const littleMischief = new LittleMischief({
 class Bar extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     for (const act of game.story.acts) {
-      if (act.card.cost === 0 && act.owner === player) {
+      if (act.owner === player) {
         bonus += 1
       }
     }
@@ -261,7 +261,8 @@ class Bar extends Card {
 const bar = new Bar({
   name: 'Bar',
   id: 5087,
-  text: 'Worth +1 for each of your cards with base cost 0 later in the story.',
+  cost: 1,
+  text: 'Worth +1 for each of your cards later in the story.',
 })
 
 // Genesis, Beginner's Mind,

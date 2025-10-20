@@ -264,42 +264,25 @@ const foo = new Foo({
 })
 
 class Ouroboros extends Card {
-  onDiscard(player: number, game: GameModel) {
-    // Stop at 100 acts
-    if (game.story.resolvedActs.length >= 100) {
-      return
+  onUpkeepInHand(
+    player: number,
+    game: GameModel,
+    index: number,
+  ): [boolean, boolean] {
+    if (game.hand[player].length >= 5) {
+      game.discard(player, 1, index)
+      this.inspired(1, game, player)
+      return [true, true]
     }
-
-    game.animations[player].push(
-      new Animation({
-        from: Zone.Discard,
-        to: Zone.Story,
-        index: game.pile[player].length - 1,
-        index2: game.story.resolvedActs.length + 1,
-      }),
-    )
-
-    // Remove this from the discard pile
-    game.pile[player].pop()
-
-    game.story.addAct(this, player, 0)
-
-    game.score[player] -= 8
-  }
-
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
-
-    game.discard(player, 1)
-    game.draw(player, 1)
+    return [false, false]
   }
 }
 const ouroboros = new Ouroboros({
   name: 'Ouroboros',
   id: 8006,
-  // cost: 8,
-  points: 8,
-  text: 'When this is discarded, add it next in the story and lose 8 points.\nDiscard a card, draw a card.',
+  cost: 6,
+  points: 6,
+  text: 'At the start of turn, if you hand has at least 5 cards including this, discard this to Inspired 1.',
 })
 
 export {
