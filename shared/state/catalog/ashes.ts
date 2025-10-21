@@ -339,7 +339,9 @@ class Wildfire extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    if (super.exhale(2, game, player) && game.hand[player].length > 0) {
+    this.inspire(1, game, player)
+
+    if (super.exhale(1, game, player) && game.hand[player].length > 0) {
       game.discard(player)
       game.createInStory(player, wildfire, 0)
     }
@@ -349,8 +351,8 @@ const wildfire = new Wildfire({
   name: 'Wildfire',
   id: 2072,
   cost: 2,
-  points: 2,
-  text: 'Exhale 2, discard a card: Add a Wildfire to the story after this.',
+  points: 1,
+  text: 'Inspire 1\nExhale 1, discard a card: Create a Wildfire in the story.',
 })
 
 class EternalFlame extends Card {
