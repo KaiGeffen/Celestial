@@ -26,43 +26,15 @@ class ServerController {
     )
   }
 
+  // Start the game
   start(): void {
-    this.doSetup()
-
     for (const player of [0, 1]) {
-      // This is because animation of card going to hand shouldn't show (Goes to mulligan instead)
-      this.model.animations[player] = []
-      // At game start, cards count as drawn only after mulligan is complete
-      this.model.amtDrawn[player] = 0
-
-      for (
-        let i = 0;
-        i <
-        Math.min(MechanicsSettings.START_HAND, this.model.deck[player].length);
-        i++
-      ) {
-        const card = this.model.hand[player][i]
-        this.model.animations[player].push(
-          new Animation({
-            from: Zone.Deck,
-            to: Zone.Mulligan,
-            card: card,
-            index: i,
-            visibility: Visibility.FullyUnknown,
-          }),
-        )
-      }
+      this.model.draw(player, MechanicsSettings.START_HAND, true)
     }
 
     // Win the game automically if flag is present
     if (process.argv.includes('--force-win')) {
       this.model.winner = 0
-    }
-  }
-
-  doSetup(): void {
-    for (const player of [0, 1]) {
-      this.model.draw(player, MechanicsSettings.START_HAND, true)
     }
   }
 
@@ -103,6 +75,7 @@ class ServerController {
           this.doResolvePhase()
           this.doUpkeep()
         } else {
+          // TODO Move this outside the branch, and remove the last increment from resolve phase
           this.model.versionIncr()
         }
 
