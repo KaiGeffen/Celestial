@@ -2,7 +2,7 @@ import GameModel from '../../shared/state/gameModel'
 import Card from '../../shared/state/card'
 
 import { SoundEffect } from '../../shared/state/soundEffect'
-import { Animation } from '../../shared/animation'
+import { Animation, Visibility } from '../../shared/animation'
 import { Zone } from '../../shared/state/zone'
 import { MechanicsSettings, Mulligan } from '../../shared/settings'
 import { CosmeticSet } from '../../shared/types/cosmeticSet'
@@ -30,7 +30,9 @@ class ServerController {
     this.doSetup()
 
     for (const player of [0, 1]) {
+      // This is because animation of card going to hand shouldn't show (Goes to mulligan instead)
       this.model.animations[player] = []
+      // At game start, cards count as drawn only after mulligan is complete
       this.model.amtDrawn[player] = 0
 
       for (
@@ -46,6 +48,7 @@ class ServerController {
             to: Zone.Mulligan,
             card: card,
             index: i,
+            visibility: Visibility.FullyUnknown,
           }),
         )
       }
