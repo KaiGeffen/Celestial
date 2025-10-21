@@ -38,6 +38,12 @@ class ServerController {
     }
   }
 
+  /* TODO This function becomes
+  Take a given model, as well as existing params
+  Do the same thing on that model
+  If change occurred, save the model's new state
+  Otherwise do roughly the same thing
+  */
   onPlayerInput(player: number, choice: number, versionNo: number): boolean {
     // Game is over
     if (this.model.winner !== null) {
@@ -62,31 +68,28 @@ class ServerController {
     // Update the player's in-game timer
     this.updatePlayerTimer(player, true)
 
+    // Do action: Pass or play a card
     if (choice === MechanicsSettings.PASS) {
-      if (!this.canPass(player)) {
-        return false
+      // TODO Put in model logic
+      this.model.passes += 1
+      this.model.amtPasses[player] += 1
+      this.model.switchPriority()
+      this.model.sound = SoundEffect.Pass
+
+      if (this.model.passes === 2) {
+        this.doResolvePhase()
+        this.doUpkeep()
       } else {
-        this.model.passes += 1
-        this.model.amtPasses[player] += 1
-        this.model.switchPriority()
-        this.model.sound = SoundEffect.Pass
-
-        if (this.model.passes === 2) {
-          this.doResolvePhase()
-          this.doUpkeep()
-        } else {
-          // TODO Move this outside the branch, and remove the last increment from resolve phase
-          this.model.versionIncr()
-        }
-
-        return true
+        this.model.versionIncrClearAnimations()
       }
+
+      return true
     } else {
       if (this.attemptPlay(player, choice)) {
         this.model.passes = 0
         this.model.lastPlayerWhoPlayed = player
         this.model.switchPriority()
-        this.model.versionIncr()
+        this.model.versionIncrClearAnimations()
         return true
       } else {
         return false
@@ -118,8 +121,9 @@ class ServerController {
     card.onPlay(player, this.model)
   }
 
+  // TODO This is the only place where you have race conditions, since its valid for both to happen simultaneously
   doMulligan(player: number, mulligans: Mulligan): void {
-    this.model.versionIncr()
+    this.model.versionIncrClearAnimations()
 
     // Update the time of last played card only if mulligans are now complete (And player with priority is now on the clock)
     const updateLastPlayedTime = this.model.mulligansComplete[player ^ 1]
@@ -177,7 +181,7 @@ class ServerController {
   setWinnerViaDisconnect(winner: number): void {
     this.model.winner = winner
     this.model.mulligansComplete = [true, true]
-    this.model.versionIncr()
+    this.model.versionIncrClearAnimations()
   }
 
   protected doUpkeep(): void {
@@ -190,7 +194,7 @@ class ServerController {
     this.model.priority = this.model.lastPlayerWhoPlayed
 
     // Determine order of player triggers
-    const players = this.model.priority === 1 ? [1, 0] : [0, 1]
+    const players = this.model.priority === 0 ? [0, 1] : [1, 0]
 
     // Increase max breath by 1 for the first 10 rounds
     for (const player of players) {
@@ -268,21 +272,17 @@ class ServerController {
   // The resolution phase, after both players have passed. Points and effects happen as cards resolve
   private doResolvePhase(): void {
     this.model.score = [0, 0]
-    const wins: [number, number] = [0, 0]
 
-    // this.model.recap.reset()
     this.model.story.run(this.model)
 
     // If a player has more points, they win the round
     if (this.model.score[0] > this.model.score[1]) {
-      wins[0] += 1
+      this.model.wins[0] += 1
     } else if (this.model.score[1] > this.model.score[0]) {
-      wins[1] += 1
+      this.model.wins[1] += 1
     }
 
-    this.model.wins[0] += wins[0]
-    this.model.wins[1] += wins[1]
-    // Declare a game winner if a player has 5 wins
+    // Declare match winner if a player has 5 wins
     ;[0, 1].forEach((player) => {
       if (this.model.wins[player] >= 5) {
         this.model.winner = player

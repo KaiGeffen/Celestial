@@ -27,7 +27,7 @@ class Story {
     this.resolvedActs = []
 
     // Add a model at the start
-    game.versionIncr()
+    game.versionIncrClearAnimations()
     addRecentModels(game)
 
     let index = 0
@@ -143,7 +143,7 @@ function addRecentModels(model: GameModel): void {
   model.recentModels[1].push(model1)
 
   // Increment the version
-  model.versionIncr()
+  model.versionIncrClearAnimations()
 }
 
 export { Act, Story }

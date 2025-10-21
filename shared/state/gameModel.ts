@@ -88,7 +88,7 @@ export default class GameModel {
     this.status = [new Statuses(), new Statuses()]
   }
 
-  versionIncr() {
+  versionIncrClearAnimations() {
     this.versionNo++
     this.animations = [[], []]
   }
