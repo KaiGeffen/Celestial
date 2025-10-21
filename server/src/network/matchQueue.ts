@@ -123,7 +123,7 @@ class MatchQueue {
     })
 
     ws.on('initTutorial', async (data) => {
-      console.log('Tutorial: ', data.num)
+      console.log('Tutorial: ', data.num, 'for uuid: ', data.uuid)
 
       const match = new TutorialMatch(ws, data.num, data.uuid)
       registerEvents(ws, match, 0)

@@ -4,7 +4,7 @@ import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import UserDataServer from '../network/userDataServer'
 import Cinematic from '../lib/cinematic'
-import { openFeedbackForm } from '../utils/externalLinks'
+import { openDiscord, openFeedbackForm } from '../utils/externalLinks'
 import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
 import { GardenSettings } from '../../../shared/settings'
@@ -287,6 +287,23 @@ export default class HomeScene extends BaseScene {
       x: `0%+${buttonWidth / 2 + Space.pad}`,
       y: `100%-${buttonHeight / 2 + Space.pad}`,
     })
+
+    // Discord (If no Garden)
+    const garden = UserDataServer.getUserData()?.garden || []
+    const hasPlants = garden.some((plantTime) => plantTime !== null)
+
+    if (!hasPlants) {
+      const discordContainer = this.add.container()
+      new Buttons.HomeScene({
+        within: discordContainer,
+        text: 'Discord',
+        f: openDiscord,
+      })
+      this.plugins.get('rexAnchor')['add'](discordContainer, {
+        x: '50%',
+        y: `100%-${buttonHeight / 2 + Space.pad}`,
+      })
+    }
 
     // Play
     const playContainer = this.add.container()

@@ -21,7 +21,7 @@ export class MechanicsSettings {
 // Information about the decklists
 export class DecklistSettings {
   static readonly MAX_DECK_NAME_LENGTH = 20
-  static readonly MAX_DECKS = 50
+  static readonly MAX_DECKS = 200
 }
 
 export type Mulligan = [boolean, boolean, boolean]
