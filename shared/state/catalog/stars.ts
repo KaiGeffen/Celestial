@@ -293,6 +293,28 @@ const phi = new Card({
   text: 'If this is in hand at the end of a round, reduce its cost by 1 for each breath you have until you play it.',
 })
 
+class OuterSpace extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    game.breath[player] += 3
+  }
+
+  onMorning(player: number, game: GameModel, index: number) {
+    const amt = game.endingBreath[player]
+    super.inspired(amt, game, player)
+
+    return true
+  }
+}
+const outerSpace = new OuterSpace({
+  name: 'Outer Space',
+  id: 8097,
+  cost: 2,
+  points: 2,
+  text: 'Gain 1 breath for each card before this in the story.\nExhale 4: Set your points to 0.',
+})
+
 export {
   stars,
   cosmos,
@@ -309,4 +331,5 @@ export {
   pride,
   rocketship,
   phi,
+  outerSpace,
 }
