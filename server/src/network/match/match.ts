@@ -40,13 +40,13 @@ class Match implements Match {
     this.deck2 = deck2
 
     // Make a new game
-    this.game = new ServerController(
+    this.game = new ServerController()
+    this.game.startGame(
       deck1.cards.map((cardId) => Catalog.getCardById(cardId)),
       deck2.cards.map((cardId) => Catalog.getCardById(cardId)),
       deck1.cosmeticSet,
       deck2.cosmeticSet,
     )
-    this.game.start()
   }
 
   // Notify all connected players that the match has started

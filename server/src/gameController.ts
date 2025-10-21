@@ -10,13 +10,15 @@ import { CosmeticSet } from '../../shared/types/cosmeticSet'
 class ServerController {
   model: GameModel
 
-  constructor(
+  // Start the game
+  startGame(
     deck1: Card[],
     deck2: Card[],
     cosmeticSet1: CosmeticSet,
     cosmeticSet2: CosmeticSet,
     shuffle: boolean = true,
-  ) {
+  ): void {
+    // Create initial game model
     this.model = new GameModel(
       deck1,
       deck2,
@@ -24,13 +26,6 @@ class ServerController {
       cosmeticSet2,
       shuffle,
     )
-  }
-
-  // Start the game
-  start(): void {
-    for (const player of [0, 1]) {
-      this.model.draw(player, MechanicsSettings.START_HAND, true)
-    }
 
     // Win the game automically if flag is present
     if (process.argv.includes('--force-win')) {
@@ -70,7 +65,7 @@ class ServerController {
 
     // Do action: Pass or play a card
     if (choice === MechanicsSettings.PASS) {
-      // TODO Put in model logic
+      // NOTE This logic isn't put in model because handling phase change is controller's responsibility
       this.model.passes += 1
       this.model.amtPasses[player] += 1
       this.model.switchPriority()
@@ -324,22 +319,6 @@ class ServerController {
     }
 
     return true
-  }
-
-  private canPass(player: number): boolean {
-    return true
-    // if (
-    //   this.model.maxBreath[player] === BREATH_CAP &&
-    //   this.model.story.acts.length === 0
-    // ) {
-    //   for (let i = 0; i < this.model.hand[player].length; i++) {
-    //     if (this.canPlay(player, i)) {
-    //       return false
-    //     }
-    //   }
-    // }
-
-    // return true
   }
 
   // Update the given player's in-game timer

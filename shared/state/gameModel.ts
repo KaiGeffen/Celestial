@@ -86,6 +86,11 @@ export default class GameModel {
     // Starting priority is random
     this.priority = Math.floor(Math.random() * 2)
     this.status = [new Statuses(), new Statuses()]
+
+    // Draw starting hand
+    for (const player of [0, 1]) {
+      this.draw(player, MechanicsSettings.START_HAND, true)
+    }
   }
 
   versionIncrClearAnimations() {

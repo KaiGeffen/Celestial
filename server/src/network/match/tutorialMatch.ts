@@ -17,8 +17,8 @@ class TutorialMatch extends PveMatch {
     )
 
     this.tutorialNum = num
+    // TODO Turn this into a static call
     this.game = new TutorialController(num)
-    this.game.start()
 
     // Log tutorial start progress
     logTutorialProgress(this.uuid1, `tutorial_${num + 1}`, 0)
