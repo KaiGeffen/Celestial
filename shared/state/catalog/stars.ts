@@ -297,14 +297,11 @@ class OuterSpace extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    game.breath[player] += 3
-  }
+    game.breath[player] += index
 
-  onMorning(player: number, game: GameModel, index: number) {
-    const amt = game.endingBreath[player]
-    super.inspired(amt, game, player)
-
-    return true
+    if (super.exhale(4, game, player)) {
+      game.score[player] = 0
+    }
   }
 }
 const outerSpace = new OuterSpace({
