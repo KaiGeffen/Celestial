@@ -240,22 +240,31 @@ const damBreaks = new DamBreaks({
   text: 'Exhale 1: Discard 3 cards. Add your hand to the story after this.',
 })
 
-class Foo extends Card {
+class Drip extends Card {
   onDraw(player: number, game: GameModel): void {
     // Remove from hand
     game.hand[player].splice(game.hand[player].length - 1, 1)
 
     // At night, add to the beginning of the story. During the day, add to the end.
-    console.log('isRecap', game.isRecap)
-    // TODO Make this work
     const index = game.isRecap ? 0 : game.story.acts.length
     game.story.addAct(this, player, index)
 
     // TODO Add animation
+    game.animations[player].push(
+      new Animation({
+        from: Zone.Hand,
+        to: Zone.Story,
+        card: this,
+        // Not -1 because it has been removed by this point
+        index: game.hand[player].length,
+        // TODO This goes to where the triggering card is, not to where this ends up, and has bugs with multiple triggers (Fishing Boat)
+        index2: index,
+      }),
+    )
   }
 }
-const foo = new Foo({
-  name: 'Foo',
+const drip = new Drip({
+  name: 'Drip',
   id: 8005,
   cost: 1,
   points: 1,
@@ -263,6 +272,7 @@ const foo = new Foo({
   text: 'Visible\nWhen drawn, add this to the story.',
 })
 
+// TODO
 class Ouroboros extends Card {
   onUpkeepInHand(
     player: number,
@@ -300,6 +310,6 @@ export {
   damBreaks,
   overflow,
   // NEW
-  foo,
+  drip as foo,
   ouroboros,
 }

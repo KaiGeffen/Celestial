@@ -181,11 +181,6 @@ export default class GameModel {
       // Increment draw counter
       this.amtDrawn[player] += 1
 
-      // Trigger its on draw effects, except during setup phase
-      if (!isSetup) {
-        card.onDraw(player, this)
-      }
-
       amt -= 1
 
       // Animate this draw
@@ -197,6 +192,11 @@ export default class GameModel {
           index2: this.hand[player].length - 1,
         }),
       )
+
+      // Trigger its on draw effects, except during setup phase
+      if (!isSetup) {
+        card.onDraw(player, this)
+      }
     }
     return card
   }
@@ -250,6 +250,10 @@ export default class GameModel {
               index2: this.hand[player].length - 1,
             }),
           )
+
+          // Trigger its on draw effects
+          card.onDraw(player, this)
+
           return card
         }
       }
