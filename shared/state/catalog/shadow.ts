@@ -247,12 +247,13 @@ const vampire = new Vampire({
   text: "Worth -X where X is your opponent's points.\nCosts 1 less for each card in the story.",
 })
 
-class DevilWhisper extends Card {
+// NEW CARDS
+class Voices extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
     // Initiation
-    if (super.exhale(3, game, player)) {
+    if (super.exhale(4, game, player)) {
       // Opponent adds first
       if (game.hand[player ^ 1].length > 0) {
         const card = game.hand[player ^ 1].shift()
@@ -267,10 +268,12 @@ class DevilWhisper extends Card {
     }
   }
 }
-const devilWhisper = new DevilWhisper({
-  name: 'Devil Whisper',
+const voices = new Voices({
+  name: 'Voices',
   id: 483,
-  text: 'Exhale 3: Your opponent adds a card from their hand to the story, then you do the same.',
+  cost: 1,
+  points: 1,
+  text: 'Exhale 4: Your opponent adds a card from their hand to the story, then you do the same.',
 })
 
 class Isolation extends Card {
@@ -311,14 +314,6 @@ const spider = new Spider({
   text: "Exhale 2: Return the next card in the story to its owner's hand.",
 })
 
-const whispers = new Card({
-  name: 'Whispers',
-  id: 486,
-  cost: 0,
-  points: 0,
-  text: "Visible\nWhile this is in the story, your opponent can't pass if they can play a card.",
-})
-
 export {
   dagger,
   shadow,
@@ -333,7 +328,6 @@ export {
   lostInShadow,
   vampire,
   // NEW CARDS
-  devilWhisper,
-  isolation,
+  voices,
   spider,
 }

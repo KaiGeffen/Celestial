@@ -344,7 +344,7 @@ class Eclipse extends Card {
 const eclipse = new Eclipse({
   name: 'Eclipse',
   id: 8094,
-  // cost: 6,
+  cost: 6,
   points: 6,
   text: 'Morning: Remove all card text from a card in hand, set its cost to 3, and give it Fleeting.',
 })

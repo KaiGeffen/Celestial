@@ -276,6 +276,7 @@ const sensualist = new Sensualist({
   text: 'Costs 1 less for each of the following statuses you have: Nourish, Inspired, Sight.',
 })
 
+// NEW CARDS
 class Doll extends Card {
   onMorning(player: number, game: GameModel, index: number) {
     const length = game.roundResults[player].length
@@ -313,5 +314,6 @@ export {
   parade,
   meAndHer,
   sensualist,
+  // NEW CARDS
   doll,
 }

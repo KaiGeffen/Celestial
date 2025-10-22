@@ -60,14 +60,14 @@ const paramountcy = new Paramountcy({
 })
 
 const fullCatalog = [
-  ...Object.values(waterCatalog),
-  ...Object.values(birdsCatalog),
-  ...Object.values(ashesCatalog),
+  // ...Object.values(waterCatalog),
+  // ...Object.values(birdsCatalog),
+  // ...Object.values(ashesCatalog),
   ...Object.values(petCatalog),
-  ...Object.values(shadowCatalog),
-  ...Object.values(birthCatalog),
-  ...Object.values(visionCatalog),
-  ...Object.values(starsCatalog),
+  // ...Object.values(shadowCatalog),
+  // ...Object.values(birthCatalog),
+  // ...Object.values(visionCatalog),
+  // ...Object.values(starsCatalog),
   paramountcy,
 ]
 const nonCollectibles = [...Object.values(tokensCatalog)]
