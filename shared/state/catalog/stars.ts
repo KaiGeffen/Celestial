@@ -5,6 +5,7 @@ import { Keywords } from '../keyword'
 import { Animation } from '../../animation'
 import { Zone } from '../zone'
 import GameModel from '../gameModel'
+import { dove } from './birds'
 
 class Stars extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -131,7 +132,6 @@ const sunflower = new Sunflower({
   text: 'Inspire 1 for each point this is worth.',
 })
 
-// Beta
 class Fates extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
@@ -258,6 +258,7 @@ const pride = new Pride({
   text: 'Morning: Exhale 2: Add this to the story. Discard a card.',
 })
 
+// NEW
 class Rocketship extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     bonus += game.hand[player].filter((card) => card.cost >= 6).length
@@ -269,8 +270,7 @@ class Rocketship extends Card {
 
       // Either remove a card or increment i
       if (card.cost >= 6) {
-        game.hand[player].splice(i, 1)
-        game.deck[player].push(card)
+        game.bottom(player, 1, i)
       } else {
         i++
       }
@@ -283,6 +283,42 @@ const rocketship = new Rocketship({
   cost: 2,
   points: 2,
   text: 'Worth +1 for each card in your hand with base cost 6 or more. Put those cards on the bottom of your deck.',
+})
+
+class Fable extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    // Characters
+    if (super.exhale(1, game, player)) {
+      game.createInStory(player, dove)
+    }
+
+    // Conflict
+    if (super.exhale(3, game, player)) {
+      // Get the base cost of all cards in the story
+      const baseCosts = [1] //game.pile[player].map((card) => card.cost)
+
+      for (let i = 0; i < game.story.acts.length; ) {
+        // Discard the card if it shares a cost, otherwise move to next card
+        if (game.story.acts[i].card.cost in baseCosts) {
+          game.removeAct(i)
+        } else {
+          i++
+        }
+      }
+    }
+
+    // Moral
+    if (super.exhale(1, game, player)) {
+      game.draw(player, 1)
+    }
+  }
+}
+const fable = new Fable({
+  name: 'Fable',
+  id: 8093,
+  text: 'Exhale 5: Draw 3 cards.\nExhale 3: Create a Sickness in the story.\nExhale 1: Create a Dove in the story.',
 })
 
 const phi = new Card({
@@ -326,7 +362,7 @@ export {
   cloakOfStars,
   dreamer,
   pride,
+  // NEW
   rocketship,
-  phi,
-  outerSpace,
+  fable,
 }

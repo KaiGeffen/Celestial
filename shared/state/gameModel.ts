@@ -229,7 +229,17 @@ export default class GameModel {
     while (amt > 0 && this.hand[player].length > index) {
       card = this.hand[player].splice(index, 1)[0]
       this.deck[player].unshift(card)
+
       amt -= 1
+
+      this.animations[player].push(
+        new Animation({
+          from: Zone.Hand,
+          to: Zone.Deck,
+          index: index,
+          index2: 0,
+        }),
+      )
     }
     return card
   }
