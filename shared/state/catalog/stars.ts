@@ -1,5 +1,5 @@
 import Card from '../card'
-import { SightCard } from '../card'
+import card, { SightCard } from '../card'
 import { Quality } from '../quality'
 import { Keywords } from '../keyword'
 import { Animation } from '../../animation'
@@ -321,6 +321,34 @@ const fable = new Fable({
   text: 'Exhale 5: Draw 3 cards.\nExhale 3: Create a Sickness in the story.\nExhale 1: Create a Dove in the story.',
 })
 
+class Eclipse extends Card {
+  onMorning(player: number, game: GameModel, index: number) {
+    if (game.hand[player].length > 0) {
+      const oldCard = game.hand[player][0]
+
+      const newCard = new Card({
+        name: oldCard.name,
+        id: oldCard.id,
+        cost: 3,
+        points: oldCard.points,
+        qualities: [Quality.FLEETING],
+        text: 'Fleeting',
+      })
+
+      game.hand[player][0] = newCard
+    }
+
+    return true
+  }
+}
+const eclipse = new Eclipse({
+  name: 'Eclipse',
+  id: 8094,
+  // cost: 6,
+  points: 6,
+  text: 'Morning: Remove all card text from a card in hand, set its cost to 3, and give it Fleeting.',
+})
+
 const phi = new Card({
   name: 'Phi',
   id: 8105,
@@ -364,5 +392,6 @@ export {
   pride,
   // NEW
   rocketship,
-  fable,
+  // fable,
+  eclipse,
 }
