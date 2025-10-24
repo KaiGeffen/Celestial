@@ -8,7 +8,7 @@ import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 import { Keywords } from '../../../shared/state/keyword'
 
 // The offset of cost / points
-const statOffset1 = 26
+const statOffset1 = 27
 const statOffset2 = 77
 
 const COLOR_BETTER = '#55dd55'
@@ -183,7 +183,7 @@ export class CardImage {
       } else if (this.card.cost < cost) {
         this.txtCost.setColor(COLOR_WORSE)
       } else {
-        this.txtCost.setColor(Color.cardText)
+        this.txtCost.setColor(Color.cardCost)
       }
     }
     return this
@@ -272,8 +272,8 @@ export class CardImage {
       .rexBBCodeText(
         -Space.cardWidth / 2 + statOffset1,
         -Space.cardHeight / 2 + statOffset1,
-        `[b]${this.card.cost}[/b]`,
-        BBStyle.cardStats,
+        `[stroke=#353F4E]${this.card.cost}[/stroke]`,
+        BBStyle.cardCost,
       )
       .setVisible(this.card.id !== Catalog.cardback.id)
       .setOrigin(0.5)
@@ -295,8 +295,8 @@ export class CardImage {
       .rexBBCodeText(
         -Space.cardWidth / 2 + statOffset1,
         -Space.cardHeight / 2 + statOffset2,
-        `[b]${this.card.points}[/b]`,
-        BBStyle.cardStats,
+        `[stroke=#353F4E]${this.card.points}[/stroke]`,
+        BBStyle.cardPoints,
       )
       .setVisible(this.card.id !== Catalog.cardback.id)
       .setOrigin(0.5)
@@ -353,7 +353,7 @@ export class CardImage {
 
     // Create the text
     this.txtText = this.scene.add
-      .rexBBCodeText(-1, 148, s, BBStyle.cardText)
+      .rexBBCodeText(0, 166, s, BBStyle.cardText)
       .setOrigin(0.5, 1)
       .setWordWrapWidth(Space.cardWidth)
       .setVisible(s !== '')
@@ -386,9 +386,9 @@ export class CardImage {
     this.txtTitle = this.scene.add
       .text(
         -Space.cardWidth / 2 + 56,
-        -Space.cardHeight / 2 + 2,
+        -Space.cardHeight / 2 + 3,
         this.card.name,
-        Style.todoBetaCardName,
+        Style.cardTitle,
       )
       .setOrigin(0)
 

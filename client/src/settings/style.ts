@@ -158,9 +158,9 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     fontSize: '12px',
     color: Color.todoSubtext,
   },
-  todoBetaCardName: {
-    fontFamily: mainFont,
-    fontSize: '24px',
+  cardTitle: {
+    fontFamily: altFont,
+    fontSize: '26px',
     color: Color.cardText,
   },
   homeSceneButton: {
@@ -197,11 +197,21 @@ export const BBStyle: Record<string, any> = {
       width: Space.maxTextWidth,
     },
   },
-  // Cost / Points shown above each card
-  cardStats: {
+  // Cost / Points stats that are shown above each card
+  cardCost: {
     fontFamily: mainFont,
     fontSize: '30px',
-    color: Color.cardText,
+    color: Color.cardCost,
+    stroke: Color.blackS,
+    strokeThickness: 3,
+    // TODO Add letter spacing after at least Phaser 3.6.0
+  },
+  cardPoints: {
+    fontFamily: mainFont,
+    fontSize: '30px',
+    color: Color.cardPoints,
+    stroke: Color.blackS,
+    strokeThickness: 3,
     // TODO Add letter spacing after at least Phaser 3.6.0
   },
   // The textbox for the card
@@ -212,9 +222,9 @@ export const BBStyle: Record<string, any> = {
     backgroundColor: 0x111111a0,
     wrap: {
       mode: 'word',
-      width: 180,
+      width: 224,
     },
-    fixedWidth: 190,
+    fixedWidth: 234,
     halign: 'center',
     padding: {
       left: 5,
