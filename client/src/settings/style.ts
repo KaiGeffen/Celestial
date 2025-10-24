@@ -224,7 +224,7 @@ export const BBStyle: Record<string, any> = {
       mode: 'word',
       width: 224,
     },
-    fixedWidth: 234,
+    fixedWidth: 232,
     halign: 'center',
     padding: {
       left: 5,

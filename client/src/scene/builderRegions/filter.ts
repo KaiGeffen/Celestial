@@ -56,6 +56,7 @@ export default class FilterRegion {
       .add(this.createBackButton().setDepth(2))
       .add(this.createSearchText().setDepth(2))
       .add(this.createFilterButtons().setDepth(2))
+      .add(this.createSortButton().setDepth(2))
       .addBackground(background.setDepth(2))
       .layout()
 
@@ -75,6 +76,24 @@ export default class FilterRegion {
       text: 'Back',
       f: () => {
         this.scene.doBack()
+      },
+    })
+    return container
+  }
+
+  private createSortButton() {
+    const container = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: container,
+      text: 'Sort',
+      f: () => {
+        this.scene.catalogRegion.toggleOrdering()
       },
     })
     return container

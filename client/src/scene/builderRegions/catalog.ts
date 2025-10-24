@@ -6,6 +6,7 @@ import { Space, Time, Scroll, Ease, Flags } from '../../settings/settings'
 import Catalog from '../../../../shared/state/catalog'
 import { BuilderBase } from '../builderScene'
 import newScrollablePanel from '../../lib/scrollablePanel'
+import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
 // Region where all of the available cards can be scrolled through
 export default class CatalogRegion {
@@ -29,13 +30,11 @@ export default class CatalogRegion {
     let pool = Flags.devCardsEnabled
       ? [...Catalog.collectibleCards, ...Catalog.betaCards]
       : Catalog.collectibleCards
-    pool
-      .sort((a, b) => a.cost - b.cost)
-      .forEach((card) => {
-        this.createCard(card)
-      })
+    pool.forEach((card) => {
+      this.createCard(card)
+    })
 
-    this.panel.layout()
+    this.toggleOrdering()
 
     return this
   }
@@ -117,6 +116,41 @@ export default class CatalogRegion {
     // Reset the scroll
     this.panel.t = 0
 
+    this.panel.layout()
+  }
+
+  // Toggle between ordering by cost or color
+  orderedByCost: boolean = false
+  toggleOrdering() {
+    // Toggle the ordering mode
+    this.orderedByCost = !this.orderedByCost
+
+    // Get the panel sizer
+    const sizer = this.panel.getElement('panel')
+
+    // Clear the current panel
+    sizer.clear()
+
+    // Create a copy of the catalog to sort
+    let sortedCatalog = [...this.cardCatalog]
+
+    if (this.orderedByCost) {
+      // Sort by cost, maintaining color order as secondary sort
+      sortedCatalog.sort((a, b) => a.card.cost - b.card.cost)
+    }
+    // If not ordered by cost, use the original catalog order (by color)
+
+    // Re-add all cards in the new order (except ones excluded by filter)
+    for (let cardImage of sortedCatalog) {
+      if (cardImage.container.visible) {
+        sizer.add(cardImage.container)
+      }
+    }
+
+    // Reset the scroll position
+    this.panel.t = 0
+
+    // Re-layout the panel
     this.panel.layout()
   }
 

@@ -353,7 +353,7 @@ export class CardImage {
 
     // Create the text
     this.txtText = this.scene.add
-      .rexBBCodeText(0, 166, s, BBStyle.cardText)
+      .rexBBCodeText(0, 156, s, BBStyle.cardText)
       .setOrigin(0.5, 1)
       .setWordWrapWidth(Space.cardWidth)
       .setVisible(s !== '')
