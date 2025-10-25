@@ -52,12 +52,22 @@ export class CardImage {
   }
   private getCount: () => number
 
-  constructor(card: Card, container: any, interactive: Boolean = true) {
+  constructor(
+    card: Card,
+    container: any,
+    interactive: boolean = true,
+    shadow: boolean = true,
+  ) {
     card = card || Catalog.cardback
-    this.init(card, container, interactive)
+    this.init(card, container, interactive, shadow)
   }
 
-  private init(card: Card, outerContainer: any, interactive: Boolean) {
+  private init(
+    card: Card,
+    outerContainer: any,
+    interactive: boolean,
+    shadow: boolean,
+  ) {
     this.card = card
     this.scene = outerContainer.scene
     this.createContainer(outerContainer)
@@ -69,6 +79,12 @@ export class CardImage {
       : 'card-Default'
     this.image = this.scene.add.image(0, 0, imageName)
     this.image.setDisplaySize(Space.cardWidth, Space.cardHeight)
+
+    // Add shadow to the card
+    if (shadow) {
+      this.scene.addShadow(this.image)
+    }
+
     this.container.add(this.image)
 
     // Stat text
@@ -519,8 +535,13 @@ export class CardImage {
 
 // For mobile, the larger, full-sized CardImage
 export class FullSizeCardImage extends CardImage {
-  constructor(card: Card, container: any, interactive: Boolean = true) {
-    super(card, container, interactive)
+  constructor(
+    card: Card,
+    container: any,
+    interactive: boolean = true,
+    shadow: boolean = true,
+  ) {
+    super(card, container, interactive, shadow)
 
     // Move cost and points back to their normal location
     this.revertStatsLocation()

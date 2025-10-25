@@ -157,7 +157,7 @@ export default class CatalogRegion {
   private createCard(card: Card): void {
     const container = this.panel.getElement('panel')
 
-    const cardImage = new CardImage(card, container)
+    const cardImage = new CardImage(card, container, true, false)
       .setOnClick(this.onClickCatalogCard(card))
       .setFocusOptions(
         'Add',
