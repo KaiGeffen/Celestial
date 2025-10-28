@@ -13,7 +13,7 @@ interface Match {
   ws1: MatchServerWS | null
   ws2: MatchServerWS | null
 
-  uuid1: string | null
+  uuid1: string
   uuid2: string | null
 
   deck1: Deck
@@ -25,7 +25,7 @@ interface Match {
 class Match implements Match {
   constructor(
     ws1: MatchServerWS,
-    uuid1: string | null = null,
+    uuid1: string,
     deck1: Deck,
     ws2: MatchServerWS | null,
     uuid2: string | null = null,
