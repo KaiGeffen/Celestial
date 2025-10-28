@@ -7,6 +7,9 @@ export interface UserDataClientMessages {
     uuid: string
     jti: string
   }
+  sendGuestToken: {
+    uuid: string
+  }
   sendDecks: {
     decks: Deck[]
   }

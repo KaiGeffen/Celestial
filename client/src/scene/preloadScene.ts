@@ -34,7 +34,7 @@ export class SigninScene extends Phaser.Scene {
     // Ensure animation is displayed
     Cinematic.ensure()
 
-    // If user is signed in, log them in
+    // If user is signed in with OAuth, log them in
     const storedToken = localStorage.getItem(Url.gsi_token)
     if (storedToken !== null) {
       const payload = jwt_decode<GoogleJwtPayload>(storedToken)
@@ -60,7 +60,8 @@ export class SigninScene extends Phaser.Scene {
       within: guestButtonContainer,
       text: 'Guest',
       f: () => {
-        this.onOptionClick()
+        // Log in as guest
+        UserDataServer.loginGuest(this.game, () => this.onOptionClick())
       },
       depth: -1,
     })

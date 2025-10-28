@@ -38,86 +38,13 @@ type UserData = null | {
 export default class UserDataServer {
   private static userData: UserData = null
 
-  // Log in with the server for user with given OAuth token
-  static login(
-    payload: GoogleJwtPayload,
+  // Register common websocket event handlers for both OAuth and guest login
+  private static registerCommonHandlers(
+    uuid: string,
     game: Phaser.Game,
-    callback = () => {},
+    callback: () => void,
   ) {
-    /*
-    Destructure the payload
-    Immediately send the payload information to server
-    Register a listener for the response of the user-data
-    Listen for a prompt for user to send initial values (Local storage information)
-    Listen for invalid_token and show an error message
-    Listen for close ? and resend the login information
-
-    This websocket stays open, and when the user updates anything that info
-    gets sent to the server. The wsServer above does get set by this, and user
-    in the static methods below. 
-    */
-
-    const email = payload.email
-    const uuid = uuidv5(payload.sub, UUID_NAMESPACE)
-    const jti = payload.jti
-
-    wsServer = UserDataServer.getSocket()
-
-    // Immediately send the payload information to server
-    wsServer.onOpen(() => {
-      wsServer.send({
-        type: 'sendToken',
-        email,
-        uuid,
-        jti,
-      })
-    })
-
-    // Register a listener for the response of the user-data
     wsServer
-      .on('promptUserInit', () => {
-        // Open username registration menu
-        game.scene.getAt(0).scene.launch('MenuScene', {
-          menu: 'registerUsername',
-          // Ensure that user is logged out if they cancel
-          exitCallback: () => {
-            UserDataServer.logout()
-          },
-        })
-      })
-      .on('invalidToken', () => {
-        console.log(
-          'Server has indicated that sent token is invalid. Logging out.',
-        )
-
-        game.scene.getScenes(true).forEach((scene) => {
-          if (scene instanceof BaseScene) {
-            scene.signalError('Invalid login token.')
-          }
-        })
-
-        wsServer.close(code)
-        wsServer = undefined
-      })
-      .on('alreadySignedIn', () => {
-        console.log(
-          'Server indicated that the given uuid is already signed in. Logging out.',
-        )
-        wsServer.close(code)
-        wsServer = undefined
-
-        UserDataServer.logout()
-
-        // TODO Make this a part of the static logout method
-        game.scene
-          .getScenes(true)[0]
-          .scene.start('SigninScene')
-          .launch('MenuScene', {
-            menu: 'message',
-            title: 'ERROR',
-            s: 'The selected account is already logged in on another device or tab. Please select another account option.',
-          })
-      })
       .on(
         'sendUserData',
         (data: {
@@ -162,6 +89,91 @@ export default class UserDataServer {
           reward: reward,
         })
       })
+  }
+
+  // Log in with the server for user with given OAuth token
+  static login(
+    payload: GoogleJwtPayload,
+    game: Phaser.Game,
+    callback = () => {},
+  ) {
+    /*
+    Destructure the payload
+    Immediately send the payload information to server
+    Register a listener for the response of the user-data
+    Listen for a prompt for user to send initial values (Local storage information)
+    Listen for invalid_token and show an error message
+    Listen for close ? and resend the login information
+
+    This websocket stays open, and when the user updates anything that info
+    gets sent to the server. The wsServer above does get set by this, and user
+    in the static methods below. 
+    */
+
+    const email = payload.email
+    const uuid = uuidv5(payload.sub, UUID_NAMESPACE)
+    const jti = payload.jti
+
+    wsServer = UserDataServer.getSocket()
+
+    // Immediately send the payload information to server
+    wsServer.onOpen(() => {
+      wsServer.send({
+        type: 'sendToken',
+        email,
+        uuid,
+        jti,
+      })
+    })
+
+    // Register OAuth-specific handlers
+    wsServer
+      .on('promptUserInit', () => {
+        // Open username registration menu
+        game.scene.getAt(0).scene.launch('MenuScene', {
+          menu: 'registerUsername',
+          // Ensure that user is logged out if they cancel
+          exitCallback: () => {
+            UserDataServer.logout()
+          },
+        })
+      })
+      .on('invalidToken', () => {
+        console.log(
+          'Server has indicated that sent token is invalid. Logging out.',
+        )
+
+        game.scene.getScenes(true).forEach((scene) => {
+          if (scene instanceof BaseScene) {
+            scene.signalError('Invalid login token.')
+          }
+        })
+
+        wsServer.close(code)
+        wsServer = undefined
+      })
+      .on('alreadySignedIn', () => {
+        console.log(
+          'Server indicated that the given uuid is already signed in. Logging out.',
+        )
+        wsServer.close(code)
+        wsServer = undefined
+
+        UserDataServer.logout()
+
+        // TODO Make this a part of the static logout method
+        game.scene
+          .getScenes(true)[0]
+          .scene.start('SigninScene')
+          .launch('MenuScene', {
+            menu: 'message',
+            title: 'ERROR',
+            s: 'The selected account is already logged in on another device or tab. Please select another account option.',
+          })
+      })
+
+    // Register common handlers
+    this.registerCommonHandlers(uuid, game, callback)
 
     // If the connection closes, login again with same args
     wsServer.ws.onclose = (event) => {
@@ -176,6 +188,59 @@ export default class UserDataServer {
         console.log(payload)
 
         UserDataServer.login(payload, game)
+      }
+    }
+  }
+
+  // Log in as a guest with a generated UUID
+  static loginGuest(game: Phaser.Game, callback = () => {}) {
+    // Get or generate a UUID for the guest
+    let uuid = localStorage.getItem('guest_uuid')
+    if (!uuid) {
+      // Generate a random UUID for new guests
+      uuid = crypto.randomUUID()
+      localStorage.setItem('guest_uuid', uuid)
+    }
+
+    wsServer = UserDataServer.getSocket()
+
+    // Send guest token with just UUID
+    wsServer.onOpen(() => {
+      wsServer.send({
+        type: 'sendGuestToken',
+        uuid,
+      })
+    })
+
+    // Register guest-specific handlers
+    wsServer
+      .on('promptUserInit', () => {
+        const decks = UserSettings._get('decks')
+        const inventory = UserSettings._get('inventory')
+        const missions = UserSettings._get('completedMissions')
+
+        wsServer.send({
+          type: 'sendInitialUserData',
+          username: 'Guest',
+          decks: decks,
+          inventory: UserDataServer.convertBoolArrayToBitString(inventory),
+          missions: UserDataServer.convertBoolArrayToBitString(missions),
+        })
+      })
+      .on('invalidToken', () => {
+        console.error('Invalid guest token')
+      })
+
+    // Register common handlers
+    this.registerCommonHandlers(uuid, game, callback)
+
+    // If the connection closes, login again
+    wsServer.ws.onclose = (event) => {
+      this.userData = null
+
+      if (event.code !== code) {
+        console.log('Guest websocket closing, reconnecting...')
+        UserDataServer.loginGuest(game)
       }
     }
   }

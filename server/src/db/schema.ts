@@ -41,7 +41,7 @@ export const players = pgTable(
   'players',
   {
     id: uuid('id').primaryKey(),
-    email: varchar('email', { length: 255 }).notNull(),
+    email: varchar('email', { length: 255 }),
     username: varchar('username', { length: 255 }).notNull(),
     createdate: date('createdate')
       .notNull()

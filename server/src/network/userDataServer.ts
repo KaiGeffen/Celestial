@@ -72,6 +72,26 @@ export default function createUserDataServer() {
           await AchievementManager.onConnection(id)
         }
       })
+        .on('sendGuestToken', async ({ uuid }) => {
+          id = uuid
+
+          // Check if guest user exists in database
+          const result = await db
+            .select()
+            .from(players)
+            .where(eq(players.id, uuid))
+            .limit(1)
+
+          if (result.length === 0) {
+            ws.send({ type: 'promptUserInit' })
+          } else if (result.length === 1) {
+            // Send user their data
+            await sendUserData(ws, id, result[0])
+
+            // Handle achievements
+            await AchievementManager.onConnection(id)
+          }
+        })
         .on('refreshUserData', async () => {
           if (!id) return
           const result = await db
@@ -115,15 +135,18 @@ export default function createUserDataServer() {
             }
 
             // If username already exists, error (Currently client sees error on their side, so this shouldn't happen. But if it does, don't create the row)
-            const result = await db
-              .select()
-              .from(players)
-              .where(sql`LOWER(${players.username}) = LOWER(${username})`)
-              .limit(1)
-            if (result.length > 0) {
-              throw new Error(
-                'Attemping to register a username that already exists',
-              )
+            // Exception: Allow multiple "Guest" usernames
+            if (username !== 'Guest') {
+              const result = await db
+                .select()
+                .from(players)
+                .where(sql`LOWER(${players.username}) = LOWER(${username})`)
+                .limit(1)
+              if (result.length > 0) {
+                throw new Error(
+                  'Attemping to register a username that already exists',
+                )
+              }
             }
 
             // Create new user entry in database
