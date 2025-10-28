@@ -8,6 +8,7 @@ import { MatchServerWS } from '../../../shared/network/matchWS'
 import Catalog from '../../../shared/state/catalog'
 import { Deck } from '../../../shared/types/deck'
 import { logFunnelEvent } from '../db/analytics'
+import { findActiveGame } from '../db/gameState'
 
 /*
 TODO
@@ -22,6 +23,9 @@ interface WaitingPlayer {
   uuid: string
   deck: Deck
 }
+
+// Map of currently connected players: uuid -> websocket
+let activePlayersMap: Map<string, MatchServerWS> = new Map()
 
 // Players searching for a match with password as key
 let searchingPlayers: { [key: string]: WaitingPlayer } = {}
@@ -38,8 +42,28 @@ class MatchQueue {
           .map((cardId) => Catalog.getCardById(cardId).name)
           .join(', '),
       )
+
+      // Add player to active players map
+      addActivePlayer(data.uuid, ws)
+
+      // Check for existing active game
+      const existingGame = await findActiveGame(data.uuid)
+
+      if (existingGame) {
+        console.log(
+          `Resuming existing PvE game ${existingGame.gameId} for ${data.uuid}`,
+        )
+        // TODO: Resume existing game - need to implement this after Match refactor
+        // For now, fall through to create new game
+      }
+
       const match = new PveMatch(ws, data.uuid, data.deck, data.aiDeck)
       registerEvents(ws, match, 0)
+
+      // Remove from active players on disconnect
+      ws.onClose(() => {
+        removeActivePlayer(data.uuid)
+      })
 
       // Analytics
       logFunnelEvent(data.uuid, 'play_mode', 'pve')
@@ -49,6 +73,20 @@ class MatchQueue {
     })
 
     ws.on('initPvp', async (data) => {
+      // Add player to active players map
+      addActivePlayer(data.uuid, ws)
+
+      // Check for existing active game
+      const existingGame = await findActiveGame(data.uuid)
+
+      if (existingGame) {
+        console.log(
+          `Resuming existing PvP game ${existingGame.gameId} for ${data.uuid}`,
+        )
+        // TODO: Resume existing game - need to implement this after Match refactor
+        // For now, fall through to matchmaking
+      }
+
       // Clean up stale entries first
       Object.keys(searchingPlayers).forEach((password) => {
         if (!searchingPlayers[password].ws.isOpen()) {
@@ -97,6 +135,14 @@ class MatchQueue {
         registerEvents(ws, match, 0)
         registerEvents(otherPlayer.ws, match, 1)
 
+        // Remove from active players on disconnect
+        ws.onClose(() => {
+          removeActivePlayer(data.uuid)
+        })
+        otherPlayer.ws.onClose(() => {
+          removeActivePlayer(otherPlayer.uuid)
+        })
+
         // Inform players that match started TODO That it's pvp specifically
         await match.notifyMatchStart()
 
@@ -111,10 +157,11 @@ class MatchQueue {
         }
         searchingPlayers[data.password] = waitingPlayer
 
-        // Ensure that if they leave, they are removed from the queue
+        // Ensure that if they leave, they are removed from the queue and active players
         const f = () => {
           console.log('Player disconnected before getting into a match:')
           delete searchingPlayers[data.password]
+          removeActivePlayer(data.uuid)
           ws.close()
         }
         ws.on('exitMatch', f)
@@ -125,8 +172,20 @@ class MatchQueue {
     ws.on('initTutorial', async (data) => {
       console.log('Tutorial: ', data.num, 'for uuid: ', data.uuid)
 
+      // Add player to active players map
+      if (data.uuid) {
+        addActivePlayer(data.uuid, ws)
+      }
+
       const match = new TutorialMatch(ws, data.num, data.uuid)
       registerEvents(ws, match, 0)
+
+      // Remove from active players on disconnect
+      if (data.uuid) {
+        ws.onClose(() => {
+          removeActivePlayer(data.uuid)
+        })
+      }
 
       // Start the match
       await match.notifyState()
@@ -157,6 +216,27 @@ function registerEvents(ws: MatchServerWS, match: Match, playerNumber: number) {
   ws.onClose(() => {
     match.doExit(ws)
   })
+}
+
+/**
+ * Add a player to the active players map
+ */
+function addActivePlayer(uuid: string, ws: MatchServerWS): void {
+  activePlayersMap.set(uuid, ws)
+}
+
+/**
+ * Remove a player from the active players map
+ */
+function removeActivePlayer(uuid: string): void {
+  activePlayersMap.delete(uuid)
+}
+
+/**
+ * Get a player's websocket from the active players map (for sending state updates to opponents)
+ */
+export function getPlayerWebsocket(uuid: string): MatchServerWS | undefined {
+  return activePlayersMap.get(uuid)
 }
 
 export default MatchQueue

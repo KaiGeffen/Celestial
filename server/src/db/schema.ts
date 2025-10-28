@@ -185,3 +185,28 @@ export const analytics = pgTable(
     ),
   }),
 )
+
+export const games = pgTable(
+  'games',
+  {
+    game_id: uuid('game_id').primaryKey(),
+    p1_id: uuid('p1_id')
+      .notNull()
+      .references(() => players.id),
+    // Nullable for PvE (AI opponent)
+    p2_id: uuid('p2_id').references(() => players.id),
+    // Serialized GameModel as JSON
+    game_state: varchar('game_state', { length: 50000 }).notNull(),
+    time: timestamp('time').notNull().defaultNow(),
+    is_over: boolean('is_over').notNull().default(false),
+  },
+  (table) => ({
+    // Indexes for finding a player's games
+    p1Idx: index('games_p1_idx').on(table.p1_id),
+    p2Idx: index('games_p2_idx').on(table.p2_id),
+    // Composite index for cleanup queries: "find old unfinished games"
+    activeGamesIdx: index('games_active_idx').on(table.is_over, table.time),
+    // Index for "find most recent game" sorted by time
+    timeIdx: index('games_time_idx').on(table.time.desc()),
+  }),
+)
