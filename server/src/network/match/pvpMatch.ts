@@ -3,6 +3,9 @@ import { MatchServerWS } from '../../../../shared/network/matchWS'
 import { updateMatchResultPVP } from '../../db/updateMatchResult'
 import { Deck } from '../../../../shared/types/deck'
 import { MechanicsSettings } from '../../../../shared/settings'
+import { getPlayerWebsocket } from '../matchQueue'
+import GameModel from '../../../../shared/state/gameModel'
+import { ServerController } from '../../gameController'
 
 class PvpMatch extends Match {
   timerCheckInterval: NodeJS.Timeout
@@ -18,6 +21,32 @@ class PvpMatch extends Match {
     super(ws1, uuid1, deck1, ws2, uuid2, deck2)
 
     // this.startTimerCheck() TODO Enable once in prod
+  }
+
+  /**
+   * Restore a PvP match from saved game state
+   */
+  static restoreFromState(
+    gameId: string,
+    gameState: GameModel,
+    uuid1: string,
+    uuid2: string,
+    deck1: Deck,
+    deck2: Deck,
+  ): PvpMatch {
+    const match = Object.create(PvpMatch.prototype)
+
+    match.gameId = gameId
+    match.uuid1 = uuid1
+    match.uuid2 = uuid2
+    match.deck1 = deck1
+    match.deck2 = deck2
+
+    // Restore game controller with the game state
+    match.game = new ServerController()
+    match.game.model = gameState
+
+    return match
   }
 
   protected async updateDatabases() {
@@ -54,30 +83,41 @@ class PvpMatch extends Match {
     // Don't send disconnect message if the game has already ended
     if (this.game === null || this.game.model.winner !== null) return
 
-    // Set the winner, notify connected players
-    const winner = this.ws1 === disconnectingWs ? 1 : 0
+    // Determine which player is disconnecting and set winner
+    const ws1 = getPlayerWebsocket(this.uuid1)
+    const disconnectingPlayer = ws1 === disconnectingWs ? 0 : 1
+    const winner = disconnectingPlayer === 0 ? 1 : 0
+
     this.game.setWinnerViaDisconnect(winner)
     await this.notifyState()
 
     // Notify opponent and close websockets
-    await Promise.all(
-      this.getActiveWsList().map((ws: MatchServerWS) => {
-        if (ws !== disconnectingWs) {
-          ws.send({ type: 'opponentDisconnected' })
-        }
-        ws.close()
-      }),
-    )
+    const ws2 = this.uuid2 ? getPlayerWebsocket(this.uuid2) : null
+
+    if (ws1 && ws1 !== disconnectingWs) {
+      ws1.send({ type: 'opponentDisconnected' })
+      ws1.close()
+    }
+
+    if (ws2 && ws2 !== disconnectingWs) {
+      ws2.send({ type: 'opponentDisconnected' })
+      ws2.close()
+    }
+
+    disconnectingWs.close()
   }
 
   // Start an interval to autopass if the user has no time left
   private startTimerCheck() {
     this.timerCheckInterval = setInterval(async () => {
-      // If game is over, stop checking
+      const ws1 = getPlayerWebsocket(this.uuid1)
+      const ws2 = this.uuid2 ? getPlayerWebsocket(this.uuid2) : null
+
+      // If game is over or no websockets connected, stop checking
       if (
         this.game.model.winner !== null ||
-        this.ws1 === null ||
-        this.ws2 === null
+        ws1 === undefined ||
+        ws2 === undefined
       ) {
         if (this.timerCheckInterval) {
           clearInterval(this.timerCheckInterval)

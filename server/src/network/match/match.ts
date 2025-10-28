@@ -8,11 +8,13 @@ import { eq } from 'drizzle-orm'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
 import { AchievementManager } from '../../achievementManager'
+import { saveGameState } from '../../db/gameState'
+import { getPlayerWebsocket } from '../matchQueue'
+import { randomUUID } from 'crypto'
+import GameModel from '../../../../shared/state/gameModel'
 
 interface Match {
-  ws1: MatchServerWS | null
-  ws2: MatchServerWS | null
-
+  gameId: string
   uuid1: string
   uuid2: string | null
 
@@ -31,9 +33,9 @@ class Match implements Match {
     uuid2: string | null = null,
     deck2: Deck,
   ) {
-    this.ws1 = ws1
+    // Generate unique game ID
+    this.gameId = randomUUID()
     this.uuid1 = uuid1
-    this.ws2 = ws2
     this.uuid2 = uuid2
 
     this.deck1 = deck1
@@ -47,6 +49,17 @@ class Match implements Match {
       deck1.cosmeticSet,
       deck2.cosmeticSet,
     )
+
+    // Save initial game state to database
+    saveGameState(
+      this.gameId,
+      this.uuid1,
+      this.uuid2,
+      this.game.model,
+      false,
+    ).catch((error) => {
+      console.error('Error saving initial game state:', error)
+    })
   }
 
   // Notify all connected players that the match has started
@@ -54,27 +67,28 @@ class Match implements Match {
     const user1 = await this.getUsernameElo(this.uuid1)
     const user2 = await this.getUsernameElo(this.uuid2)
 
-    await Promise.all(
-      this.getActiveWsList().map((ws) => {
-        if (ws === this.ws1) {
-          ws.send({
-            type: 'matchStart',
-            name1: user1.username,
-            name2: user2.username,
-            elo1: user1.elo,
-            elo2: user2.elo,
-          })
-        } else {
-          ws.send({
-            type: 'matchStart',
-            name1: user2.username,
-            name2: user1.username,
-            elo1: user2.elo,
-            elo2: user1.elo,
-          })
-        }
-      }),
-    )
+    const ws1 = getPlayerWebsocket(this.uuid1)
+    const ws2 = this.uuid2 ? getPlayerWebsocket(this.uuid2) : null
+
+    if (ws1) {
+      ws1.send({
+        type: 'matchStart',
+        name1: user1.username,
+        name2: user2.username,
+        elo1: user1.elo,
+        elo2: user2.elo,
+      })
+    }
+
+    if (ws2) {
+      ws2.send({
+        type: 'matchStart',
+        name1: user2.username,
+        name2: user1.username,
+        elo1: user2.elo,
+        elo2: user1.elo,
+      })
+    }
   }
 
   // Notify players of the state of the game
@@ -89,26 +103,51 @@ class Match implements Match {
       For actions besides the last pass of a round, this is just 1
       but for recaps it's each slice of the recap
     */
-    await Promise.all(
-      this.getActiveWsList().map((ws, player) => {
-        // Send any recap states
-        this.game.model.recentModels[player].forEach((state) =>
-          ws.send({
-            type: 'transmitState',
-            state: state,
-          }),
-        )
+    const ws1 = getPlayerWebsocket(this.uuid1)
+    const ws2 = this.uuid2 ? getPlayerWebsocket(this.uuid2) : null
 
-        // Send the normal state
-        ws.send({
+    // Send state to player 1
+    if (ws1) {
+      this.game.model.recentModels[0].forEach((state) =>
+        ws1.send({
           type: 'transmitState',
-          state: getClientGameModel(this.game.model, player, false),
-        })
-      }),
-    )
+          state: state,
+        }),
+      )
+      ws1.send({
+        type: 'transmitState',
+        state: getClientGameModel(this.game.model, 0, false),
+      })
+    }
+
+    // Send state to player 2
+    if (ws2) {
+      this.game.model.recentModels[1].forEach((state) =>
+        ws2.send({
+          type: 'transmitState',
+          state: state,
+        }),
+      )
+      ws2.send({
+        type: 'transmitState',
+        state: getClientGameModel(this.game.model, 1, false),
+      })
+    }
+
+    // Save game state to database after every state change
+    const isOver = this.game.model.winner !== null
+    await saveGameState(
+      this.gameId,
+      this.uuid1,
+      this.uuid2,
+      this.game.model,
+      isOver,
+    ).catch((error) => {
+      console.error('Error saving game state:', error)
+    })
 
     // Handle database and achievement updates as game ends
-    if (this.game.model.winner !== null) {
+    if (isOver) {
       await this.updateDatabases()
 
       // Update achievements
@@ -141,24 +180,21 @@ class Match implements Match {
     if (valid) {
       await this.notifyState()
     } else {
-      const ws = player === 0 ? this.ws1 : this.ws2
+      const uuid = player === 0 ? this.uuid1 : this.uuid2
+      const ws = uuid ? getPlayerWebsocket(uuid) : null
       // TODO
-      // await this.notifyError(ws)
+      // if (ws) await this.notifyError(ws)
     }
-  }
-
-  // Get the list of all active websockets connected to this match
-  protected getActiveWsList(): MatchServerWS[] {
-    return [this.ws1, this.ws2].filter((ws) => ws !== null)
   }
 
   async signalEmote(player: number, emoteNumber: number) {
     // TODO Use emoteNumber
-    if (player === 0 && this.ws2 !== null) {
-      await this.ws2.send({ type: 'opponentEmote' })
-    }
-    if (player === 1 && this.ws1 !== null) {
-      await this.ws1.send({ type: 'opponentEmote' })
+    const opponentUuid = player === 0 ? this.uuid2 : this.uuid1
+    if (opponentUuid) {
+      const opponentWs = getPlayerWebsocket(opponentUuid)
+      if (opponentWs) {
+        await opponentWs.send({ type: 'opponentEmote' })
+      }
     }
   }
 

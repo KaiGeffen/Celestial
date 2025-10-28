@@ -9,6 +9,7 @@ import Catalog from '../../../shared/state/catalog'
 import { Deck } from '../../../shared/types/deck'
 import { logFunnelEvent } from '../db/analytics'
 import { findActiveGame } from '../db/gameState'
+import GameModel from '../../../shared/state/gameModel'
 
 /*
 TODO
@@ -49,15 +50,33 @@ class MatchQueue {
       // Check for existing active game
       const existingGame = await findActiveGame(data.uuid)
 
+      let match: PveMatch
+
       if (existingGame) {
         console.log(
           `Resuming existing PvE game ${existingGame.gameId} for ${data.uuid}`,
         )
-        // TODO: Resume existing game - need to implement this after Match refactor
-        // For now, fall through to create new game
+
+        // Reconstruct decks from the saved state
+        const playerDeck = reconstructDeckFromGameState(
+          existingGame.gameState,
+          0,
+        )
+        const aiDeck = reconstructDeckFromGameState(existingGame.gameState, 1)
+
+        // Restore the match from saved state
+        match = PveMatch.restoreFromState(
+          existingGame.gameId,
+          existingGame.gameState,
+          data.uuid,
+          playerDeck,
+          aiDeck,
+        )
+      } else {
+        // Create new game
+        match = new PveMatch(ws, data.uuid, data.deck, data.aiDeck)
       }
 
-      const match = new PveMatch(ws, data.uuid, data.deck, data.aiDeck)
       registerEvents(ws, match, 0)
 
       // Remove from active players on disconnect
@@ -83,8 +102,36 @@ class MatchQueue {
         console.log(
           `Resuming existing PvP game ${existingGame.gameId} for ${data.uuid}`,
         )
-        // TODO: Resume existing game - need to implement this after Match refactor
-        // For now, fall through to matchmaking
+
+        // Determine which player this is (p1 or p2)
+        const isPlayer1 = existingGame.p1Id === data.uuid
+        const playerNum = isPlayer1 ? 0 : 1
+
+        // Reconstruct decks from the saved state
+        const deck1 = reconstructDeckFromGameState(existingGame.gameState, 0)
+        const deck2 = reconstructDeckFromGameState(existingGame.gameState, 1)
+
+        // Restore the match from saved state
+        const match = PvpMatch.restoreFromState(
+          existingGame.gameId,
+          existingGame.gameState,
+          existingGame.p1Id,
+          existingGame.p2Id,
+          deck1,
+          deck2,
+        )
+
+        registerEvents(ws, match, playerNum)
+
+        // Remove from active players on disconnect
+        ws.onClose(() => {
+          removeActivePlayer(data.uuid)
+        })
+
+        // Send current game state to the reconnecting player
+        await match.notifyState()
+
+        return // Don't fall through to matchmaking
       }
 
       // Clean up stale entries first
@@ -237,6 +284,36 @@ function removeActivePlayer(uuid: string): void {
  */
 export function getPlayerWebsocket(uuid: string): MatchServerWS | undefined {
   return activePlayersMap.get(uuid)
+}
+
+/**
+ * Reconstruct a deck from a game state
+ * Collects all cards from all zones for a given player
+ */
+function reconstructDeckFromGameState(
+  gameState: GameModel,
+  player: number,
+): Deck {
+  const allCards: number[] = []
+
+  // Collect cards from all zones
+  gameState.hand[player].forEach((card) => allCards.push(card.id))
+  gameState.deck[player].forEach((card) => allCards.push(card.id))
+  gameState.pile[player].forEach((card) => allCards.push(card.id))
+  gameState.expended[player].forEach((card) => allCards.push(card.id))
+
+  // Collect cards from story
+  gameState.story.acts.forEach((act) => {
+    if (act.owner === player) {
+      allCards.push(act.card.id)
+    }
+  })
+
+  return {
+    name: 'Resumed Game',
+    cards: allCards,
+    cosmeticSet: gameState.cosmeticSets[player],
+  }
 }
 
 export default MatchQueue

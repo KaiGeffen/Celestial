@@ -5,10 +5,38 @@ import { MatchServerWS } from '../../../../shared/network/matchWS'
 import { Deck } from '../../../../shared/types/deck'
 import { updateMatchResultPVE } from '../../db/updateMatchResult'
 import { AchievementManager } from '../../achievementManager'
+import { getPlayerWebsocket } from '../matchQueue'
+import GameModel from '../../../../shared/state/gameModel'
+import { ServerController } from '../../gameController'
 
 class PveMatch extends Match {
   constructor(ws: MatchServerWS, uuid: string, deck: Deck, aiDeck: Deck) {
     super(ws, uuid, deck, null, null, aiDeck)
+  }
+
+  /**
+   * Restore a PvE match from saved game state
+   */
+  static restoreFromState(
+    gameId: string,
+    gameState: GameModel,
+    uuid: string,
+    deck: Deck,
+    aiDeck: Deck,
+  ): PveMatch {
+    const match = Object.create(PveMatch.prototype)
+
+    match.gameId = gameId
+    match.uuid1 = uuid
+    match.uuid2 = null
+    match.deck1 = deck
+    match.deck2 = aiDeck
+
+    // Restore game controller with the game state
+    match.game = new ServerController()
+    match.game.model = gameState
+
+    return match
   }
 
   // Given ws is disconnecting
@@ -21,7 +49,11 @@ class PveMatch extends Match {
 
     // NOTE Game is null to prevent doExit from being called again
     this.game = null
-    disconnectingWs.close()
+
+    const ws = getPlayerWebsocket(this.uuid1)
+    if (ws) {
+      ws.close()
+    }
   }
 
   async notifyState() {

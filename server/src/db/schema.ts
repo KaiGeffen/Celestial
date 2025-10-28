@@ -186,10 +186,11 @@ export const analytics = pgTable(
   }),
 )
 
-export const games = pgTable(
-  'games',
+export const matches = pgTable(
+  'matches',
   {
-    game_id: uuid('game_id').primaryKey(),
+    id: serial('id').primaryKey(),
+    game_id: uuid('game_id').notNull(),
     p1_id: uuid('p1_id')
       .notNull()
       .references(() => players.id),
@@ -201,12 +202,14 @@ export const games = pgTable(
     is_over: boolean('is_over').notNull().default(false),
   },
   (table) => ({
+    // Index for finding all states of a specific game
+    gameIdIdx: index('matches_game_id_idx').on(table.game_id),
     // Indexes for finding a player's games
-    p1Idx: index('games_p1_idx').on(table.p1_id),
-    p2Idx: index('games_p2_idx').on(table.p2_id),
+    p1Idx: index('matches_p1_idx').on(table.p1_id),
+    p2Idx: index('matches_p2_idx').on(table.p2_id),
     // Composite index for cleanup queries: "find old unfinished games"
-    activeGamesIdx: index('games_active_idx').on(table.is_over, table.time),
+    activeGamesIdx: index('matches_active_idx').on(table.is_over, table.time),
     // Index for "find most recent game" sorted by time
-    timeIdx: index('games_time_idx').on(table.time.desc()),
+    timeIdx: index('matches_time_idx').on(table.time.desc()),
   }),
 )

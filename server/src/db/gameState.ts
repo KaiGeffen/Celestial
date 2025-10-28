@@ -1,5 +1,5 @@
 import { db } from './db'
-import { games } from './schema'
+import { matches } from './schema'
 import { eq, or, desc, and, sql } from 'drizzle-orm'
 import GameModel from '../../../shared/state/gameModel'
 
@@ -17,7 +17,7 @@ export async function saveGameState(
 ): Promise<void> {
   const serializedState = JSON.stringify(gameState)
 
-  await db.insert(games).values({
+  await db.insert(matches).values({
     game_id: gameId,
     p1_id: p1Id,
     p2_id: p2Id,
@@ -38,14 +38,14 @@ export async function findActiveGame(playerId: string): Promise<{
 } | null> {
   const result = await db
     .select()
-    .from(games)
+    .from(matches)
     .where(
       and(
-        or(eq(games.p1_id, playerId), eq(games.p2_id, playerId)),
-        eq(games.is_over, false),
+        or(eq(matches.p1_id, playerId), eq(matches.p2_id, playerId)),
+        eq(matches.is_over, false),
       ),
     )
-    .orderBy(desc(games.time))
+    .orderBy(desc(matches.time))
     .limit(1)
 
   if (result.length === 0) {
@@ -79,9 +79,11 @@ export async function cleanupAbandonedGames(
   // We look for game_ids where the most recent row is old and not marked as over
   const abandonedGames = await db
     .select()
-    .from(games)
-    .where(and(eq(games.is_over, false), sql`${games.time} < ${cutoffTime}`))
-    .orderBy(desc(games.time))
+    .from(matches)
+    .where(
+      and(eq(matches.is_over, false), sql`${matches.time} < ${cutoffTime}`),
+    )
+    .orderBy(desc(matches.time))
 
   // Group by game_id and get the most recent entry for each
   const uniqueGames = new Map<string, (typeof abandonedGames)[0]>()
