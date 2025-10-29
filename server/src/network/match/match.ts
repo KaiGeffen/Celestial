@@ -8,8 +8,11 @@ import { eq } from 'drizzle-orm'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
 import { AchievementManager } from '../../achievementManager'
+import { saveGameState } from '../../db/gameState'
+import { randomUUID } from 'crypto'
 
 interface Match {
+  gameId: string
   ws1: MatchServerWS | null
   ws2: MatchServerWS | null
 
@@ -31,6 +34,8 @@ class Match implements Match {
     uuid2: string | null = null,
     deck2: Deck,
   ) {
+    // Generate unique game ID
+    this.gameId = randomUUID()
     this.ws1 = ws1
     this.uuid1 = uuid1
     this.ws2 = ws2
@@ -106,6 +111,16 @@ class Match implements Match {
         })
       }),
     )
+
+    // Save game state to database after every state change
+    await saveGameState(
+      this.gameId,
+      this.uuid1,
+      this.uuid2,
+      this.game.model,
+    ).catch((error) => {
+      console.error('Error saving game state:', error)
+    })
 
     // Handle database and achievement updates as game ends
     if (this.game.model.winner !== null) {
