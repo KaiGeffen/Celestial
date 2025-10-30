@@ -197,7 +197,7 @@ export const matches = pgTable(
     // Nullable for PvE (AI opponent)
     p2_id: uuid('p2_id').references(() => players.id),
     // Serialized GameModel as JSON
-    game_state: varchar('game_state', { length: 50000 }).notNull(),
+    game_state: varchar('game_state', { length: 500000 }).notNull(),
     time: timestamp('time').notNull().defaultNow(),
   },
   (table) => ({
