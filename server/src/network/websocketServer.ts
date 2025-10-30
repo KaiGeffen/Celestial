@@ -24,8 +24,9 @@ import TutorialMatch from './match/tutorialMatch'
 // A player waiting for a game and their associated data
 interface WaitingPlayer {
   ws: ServerWS
-  uuid: string
+  id: string
   deck: Deck
+  activeGame: ActiveGame
 }
 
 // Players searching for a match with password as key
@@ -36,6 +37,12 @@ let activePlayers: { [key: string]: ServerWS } = {}
 
 // List of user ids that should attempt to reconnect if they regain connection
 let playersToReconnect: Set<string> = new Set()
+
+class ActiveGame {
+  match: Match
+  // Whether this is player 0 or 1 in the match
+  playerNumber: number
+}
 
 // Create the websocket server
 export default function createWebSocketServer() {
@@ -48,8 +55,10 @@ export default function createWebSocketServer() {
       // Remember the user once they've signed in
       let id: string = null
       let potentialEmail: string = null
-      let match: Match = null // Match if user is in one
-      let playerNumber: number = null // 0 or 1 for current match
+      let activeGame: ActiveGame = {
+        match: null, // Match if user is in one
+        playerNumber: null, // 0 or 1 for current match
+      }
 
       ws.on('sendToken', async ({ email, uuid, jti }) => {
         id = uuid
@@ -289,13 +298,14 @@ export default function createWebSocketServer() {
               .join(', '),
           )
 
-          match = new PveMatch(ws, uuid, deck, aiDeck)
+          activeGame.match = new PveMatch(ws, uuid, deck, aiDeck)
+          activeGame.playerNumber = 0
 
           // Analytics
           logFunnelEvent(uuid, 'play_mode', 'pve')
 
           // Start the match
-          await match.notifyState()
+          await activeGame.match.notifyState()
         })
         .on('initPvp', async (data) => {
           // Clean up stale entries first
@@ -327,37 +337,38 @@ export default function createWebSocketServer() {
             )
 
             // Analytics
-            logFunnelEvent(otherPlayer.uuid, 'play_mode', 'pvp_match_found')
+            logFunnelEvent(otherPlayer.id, 'play_mode', 'pvp_match_found')
 
             // Create a PvP match
-            match = new PvpMatch(
+            activeGame.match = new PvpMatch(
               ws,
               data.uuid,
               data.deck,
               otherPlayer.ws,
-              otherPlayer.uuid,
+              otherPlayer.id,
               otherPlayer.deck,
             )
+            activeGame.playerNumber = 0
 
-            // registerEvents(socket, match, playerNumber)
-            delete searchingPlayers[data.password]
+            // Set the other player's game to be the same, but with opposite player number
+            otherPlayer.activeGame.match = activeGame.match
+            otherPlayer.activeGame.playerNumber = 1
+
             // TODO Maybe just delete the last one? Somehow don't lose to race conditions
-
-            // TODO
-            // registerEvents(ws, match, 0)
-            // registerEvents(otherPlayer.ws, match, 1)
+            delete searchingPlayers[data.password]
 
             // Inform players that match started TODO That it's pvp specifically
-            await match.notifyMatchStart()
+            await activeGame.match.notifyMatchStart()
 
             // Notify both players that they are connected
-            await match.notifyState()
+            await activeGame.match.notifyState()
           } else {
             // Queue the player with their information
             const waitingPlayer = {
               ws: ws,
-              uuid: data.uuid,
+              id: data.uuid,
               deck: data.deck,
+              activeGame: activeGame,
             }
             searchingPlayers[data.password] = waitingPlayer
 
@@ -374,35 +385,44 @@ export default function createWebSocketServer() {
         .on('initTutorial', async (data) => {
           console.log('Tutorial: ', data.num, 'for uuid: ', data.uuid)
 
-          match = new TutorialMatch(ws, data.num, data.uuid)
+          activeGame.match = new TutorialMatch(ws, data.num, data.uuid)
+          activeGame.playerNumber = 0
 
           // Start the match
-          await match.notifyState()
+          await activeGame.match.notifyState()
         })
         // In match events
         .on('playCard', (data) => {
-          if (!match) return
-          match.doAction(playerNumber, data.cardNum, data.versionNo)
+          if (!activeGame.match) return
+          activeGame.match.doAction(
+            activeGame.playerNumber,
+            data.cardNum,
+            data.versionNo,
+          )
         })
         .on('mulligan', (data) => {
-          if (!match) return
-          match.doMulligan(playerNumber, data.mulligan)
+          if (!activeGame.match) return
+          activeGame.match.doMulligan(activeGame.playerNumber, data.mulligan)
         })
         .on('passTurn', (data) => {
-          if (!match) return
-          match.doAction(playerNumber, MechanicsSettings.PASS, data.versionNo)
+          if (!activeGame.match) return
+          activeGame.match.doAction(
+            activeGame.playerNumber,
+            MechanicsSettings.PASS,
+            data.versionNo,
+          )
         })
         .on('exitMatch', () => {
-          if (!match) return
-          match.doExit(ws)
-          match = null
+          if (!activeGame.match) return
+          activeGame.match.doExit(ws)
+          activeGame.match = null
 
           // TODO Remove refreshUserData from Messages
           // Refresh the user's data
         })
         .on('emote', () => {
-          if (!match) return
-          match.signalEmote(playerNumber, 0)
+          if (!activeGame.match) return
+          activeGame.match.signalEmote(activeGame.playerNumber, 0)
         })
 
       // Remove user from active list when they disconnect
@@ -413,7 +433,7 @@ export default function createWebSocketServer() {
         }
 
         // If in a match, add to reconnect queue with that match
-        if (match) {
+        if (activeGame.match) {
           console.log('Was in a match TODO')
         }
       })
