@@ -31,38 +31,18 @@ interface WaitingPlayer {
 // Players searching for a match with password as key
 let searchingPlayers: { [key: string]: WaitingPlayer } = {}
 
+// List of active user connections
+let activeUsers: { [key: string]: ServerWS } = {}
+
+// TODO List of user ids that should attempt to reconnect if they regain connection
+
 // Create the websocket server
 export default function createWebSocketServer() {
   const wss = new WebSocketServer({ port: USER_DATA_PORT })
 
   wss.on('connection', async (socket: WebSocket) => {
     try {
-      /* Request user's token
-       socket.send('request_token')
-       Register events for send_token
-      
-       Register send_token
-       If invalid, respond with invalid token
-       If uuid is in list of already signed in users, respond with already signed in
-       Otherwise get user data
-       If no data found, prompt user fields
-        Set those values in the database
-       Otherwise, send user data
-       Register events for updating fields in the db
-       * user_progress, decks, inventory, completed_missions, 
-       When user queues for a match, on the client side they send the uuid and the token
-       New matches are added to the live-match db
-       When they complete (By win/loss/tie) they are moved to history
-       If they time out, also added to history
-       A user queueing first looks for ongoing matchs in the live-match db
-       They are reconnected if one is found
-
-       Other supported commands:
-       get_leaderboard, get_match_history(uuid)
-
-       In that event, register events to 
-
-      */
+      // TODO Maintain a list of signed in users, if user is already signed in, don't let them sign in again
       const ws: ServerWS = new TypedWebSocket(socket)
 
       // Remember the user once they've signed in
@@ -72,6 +52,12 @@ export default function createWebSocketServer() {
       ws.on('sendToken', async ({ email, uuid, jti }) => {
         id = uuid
         potentialEmail = email
+
+        // Check if user is already connected
+        if (activeUsers[uuid]) {
+          ws.send({ type: 'alreadySignedIn' })
+          return
+        }
 
         // Check if user exists in database
         const result = await db
@@ -83,6 +69,9 @@ export default function createWebSocketServer() {
         if (result.length === 0) {
           ws.send({ type: 'promptUserInit' })
         } else if (result.length === 1) {
+          // Add to active users
+          activeUsers[uuid] = ws
+
           // Send user their data
           await sendUserData(ws, id, result[0])
 
@@ -92,6 +81,12 @@ export default function createWebSocketServer() {
       })
         .on('sendGuestToken', async ({ uuid }) => {
           id = uuid
+
+          // Check if user is already connected
+          if (activeUsers[uuid]) {
+            ws.send({ type: 'alreadySignedIn' })
+            return
+          }
 
           // Check if guest user exists in database
           const result = await db
@@ -103,6 +98,9 @@ export default function createWebSocketServer() {
           if (result.length === 0) {
             ws.send({ type: 'promptUserInit' })
           } else if (result.length === 1) {
+            // Add to active users
+            activeUsers[uuid] = ws
+
             // Send user their data
             await sendUserData(ws, id, result[0])
 
@@ -192,6 +190,9 @@ export default function createWebSocketServer() {
               }),
             }
             await db.insert(players).values(data)
+
+            // Add to active users
+            activeUsers[id] = ws
 
             // Send user their data
             await sendUserData(ws, id, data)
@@ -376,12 +377,25 @@ export default function createWebSocketServer() {
           // Start the match
           await match.notifyState()
         })
+
+      // Remove user from active list when they disconnect
+      ws.onClose(() => {
+        if (id && activeUsers[id] === ws) {
+          delete activeUsers[id]
+        }
+      })
     } catch (e) {
       console.error('Error in user data server:', e)
     }
   })
 
   console.log('User-data server is running on port: ', USER_DATA_PORT)
+
+  // Debug: Print active users every 5 seconds
+  setInterval(() => {
+    const userIds = Object.keys(activeUsers)
+    console.log(`Active users (${userIds.length}):`, userIds)
+  }, 5000)
 }
 
 // Send the user their full data

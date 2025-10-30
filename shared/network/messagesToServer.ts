@@ -23,6 +23,7 @@ export default interface messagesToServer {
   sendAvatarExperience: {
     experience: number[]
   }
+  // TODO Remove this, and on the occasions where it's needed the server should just send the data to client
   refreshUserData: {}
   sendInitialUserData: {
     username: string
