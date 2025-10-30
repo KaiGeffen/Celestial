@@ -10,7 +10,7 @@ import {
   UUID_NAMESPACE,
 } from '../../shared/network/settings'
 import type { GoogleJwtPayload } from './types/google'
-import { UserDataClientWS } from '../../shared/network/userDataWS'
+import { ClientWS } from '../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../shared/types/deck'
 import { CosmeticSet } from '../../shared/types/cosmeticSet'
 import { Achievement } from '../../shared/types/achievement'
@@ -22,7 +22,7 @@ const code = 1000
 
 // The websocket which is open with the main server (Authentication/pack opening)
 // TODO This is getting used throughout match and all the logic is there, it should be here instead to be understood
-export var server: UserDataClientWS = undefined
+export var server: ClientWS = undefined
 
 type UserData = null | {
   uuid: string
@@ -462,7 +462,7 @@ export default class Server {
   // TODO Clarify if we reuse a UserSessionWS or create a new ws even for signed in users
   // Get the appropriate websocket for this environment
   // If user is logged in, use the existing ws instead of opening a new one
-  private static getSocket(): UserDataClientWS {
+  private static getSocket(): ClientWS {
     // Establish a websocket based on the environment
     if (Flags.local) {
       return new TypedWebSocket(`ws://${URL}:${USER_DATA_PORT}`)

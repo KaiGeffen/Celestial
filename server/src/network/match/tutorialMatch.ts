@@ -2,12 +2,12 @@ import { MechanicsSettings } from '../../../../shared/settings'
 import { TutorialController } from '../../tutorialController'
 import PveMatch from './pveMatch'
 import { logTutorialProgress } from '../../db/analytics'
-import { MatchServerWS } from '../../../../shared/network/matchWS'
+import { ServerWS } from '../../../../shared/network/celestialTypedWebsocket'
 
 class TutorialMatch extends PveMatch {
   tutorialNum: number
 
-  constructor(ws: MatchServerWS, num: number, uuid: string | null) {
+  constructor(ws: ServerWS, num: number, uuid: string) {
     // TODO Weird to start a normal game, then erase it
     super(
       ws,

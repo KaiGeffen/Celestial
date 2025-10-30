@@ -1,7 +1,7 @@
 import { ServerController } from '../../gameController'
 import { Mulligan } from '../../../../shared/settings'
 import getClientGameModel from '../../../../shared/state/clientGameModel'
-import { MatchServerWS } from '../../../../shared/network/matchWS'
+import { ServerWS } from '../../../../shared/network/celestialTypedWebsocket'
 import { db } from '../../db/db'
 import { players } from '../../db/schema'
 import { eq } from 'drizzle-orm'
@@ -13,8 +13,8 @@ import { randomUUID } from 'crypto'
 
 interface Match {
   gameId: string
-  ws1: MatchServerWS | null
-  ws2: MatchServerWS | null
+  ws1: ServerWS | null
+  ws2: ServerWS | null
 
   uuid1: string
   uuid2: string | null
@@ -27,10 +27,10 @@ interface Match {
 
 class Match implements Match {
   constructor(
-    ws1: MatchServerWS,
+    ws1: ServerWS,
     uuid1: string,
     deck1: Deck,
-    ws2: MatchServerWS | null,
+    ws2: ServerWS | null,
     uuid2: string | null = null,
     deck2: Deck,
   ) {
@@ -164,7 +164,7 @@ class Match implements Match {
   }
 
   // Get the list of all active websockets connected to this match
-  protected getActiveWsList(): MatchServerWS[] {
+  protected getActiveWsList(): ServerWS[] {
     return [this.ws1, this.ws2].filter((ws) => ws !== null)
   }
 
@@ -179,7 +179,7 @@ class Match implements Match {
   }
 
   // Called when given ws is disconnecting, implemented in children
-  async doExit(disconnectingWs: MatchServerWS) {}
+  async doExit(disconnectingWs: ServerWS) {}
 
   // Get the name of player with given uuid
   private async getUsernameElo(

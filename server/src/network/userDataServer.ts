@@ -6,7 +6,7 @@ import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 import { db } from '../db/db'
 import { players } from '../db/schema'
 import { eq, sql } from 'drizzle-orm'
-import { UserDataServerWS } from '../../../shared/network/userDataWS'
+import { ServerWS } from '../../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../../shared/types/deck'
 import { STORE_ITEMS } from '../../../shared/storeItems'
 import { cosmeticsTransactions } from '../db/schema'
@@ -23,7 +23,7 @@ import TutorialMatch from './match/tutorialMatch'
 
 // A player waiting for a game and their associated data
 interface WaitingPlayer {
-  ws: UserDataServerWS
+  ws: ServerWS
   uuid: string
   deck: Deck
 }
@@ -63,7 +63,7 @@ export default function createUserDataServer() {
        In that event, register events to 
 
       */
-      const ws: UserDataServerWS = new TypedWebSocket(socket)
+      const ws: ServerWS = new TypedWebSocket(socket)
 
       // Remember the user once they've signed in
       let id: string = null
@@ -386,7 +386,7 @@ export default function createUserDataServer() {
 
 // Send the user their full data
 async function sendUserData(
-  ws: UserDataServerWS,
+  ws: ServerWS,
   id: string,
   data: {
     inventory: string
@@ -445,11 +445,7 @@ async function sendUserData(
 }
 
 // Register each of the events that the server receives during a match
-function registerEvents(
-  ws: UserDataServerWS,
-  match: Match,
-  playerNumber: number,
-) {
+function registerEvents(ws: ServerWS, match: Match, playerNumber: number) {
   ws.on('playCard', (data) => {
     match.doAction(playerNumber, data.cardNum, data.versionNo)
   })

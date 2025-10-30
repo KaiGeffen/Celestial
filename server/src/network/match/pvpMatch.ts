@@ -1,5 +1,5 @@
 import Match from './match'
-import { MatchServerWS } from '../../../../shared/network/matchWS'
+import { ServerWS } from '../../../../shared/network/celestialTypedWebsocket'
 import { updateMatchResultPVP } from '../../db/updateMatchResult'
 import { Deck } from '../../../../shared/types/deck'
 import { MechanicsSettings } from '../../../../shared/settings'
@@ -8,10 +8,10 @@ class PvpMatch extends Match {
   timerCheckInterval: NodeJS.Timeout
 
   constructor(
-    ws1: MatchServerWS,
+    ws1: ServerWS,
     uuid1: string,
     deck1: Deck,
-    ws2: MatchServerWS,
+    ws2: ServerWS,
     uuid2: string,
     deck2: Deck,
   ) {
@@ -50,7 +50,7 @@ class PvpMatch extends Match {
   }
 
   // Given ws is disconnecting
-  async doExit(disconnectingWs: MatchServerWS) {
+  async doExit(disconnectingWs: ServerWS) {
     // Don't send disconnect message if the game has already ended
     if (this.game === null || this.game.model.winner !== null) return
 
@@ -61,7 +61,7 @@ class PvpMatch extends Match {
 
     // Notify opponent and close websockets
     await Promise.all(
-      this.getActiveWsList().map((ws: MatchServerWS) => {
+      this.getActiveWsList().map((ws: ServerWS) => {
         if (ws !== disconnectingWs) {
           ws.send({ type: 'opponentDisconnected' })
         }

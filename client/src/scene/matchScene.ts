@@ -23,13 +23,13 @@ import { ResultsRegionJourney } from './matchRegions/matchResults'
 
 // TODO Figure out
 import { server } from '../server'
-import { UserDataClientWS } from '../../../shared/network/userDataWS'
+import { ClientWS } from '../../../shared/network/celestialTypedWebsocket'
 
 export class MatchScene extends BaseScene {
   params: any
 
   view: View
-  ws: UserDataClientWS
+  ws: ClientWS
 
   // Whether the match is paused (Awaiting user to click a button, for example)
   paused: boolean

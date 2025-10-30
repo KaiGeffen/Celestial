@@ -1,4 +1,3 @@
-import createMatchServer from './network/matchServer'
 import createUserDataServer from './network/userDataServer'
 import createLeaderboardServer from './network/leaderboardServer'
 import createMatchHistoryServer from './network/matchHistoryServer'
@@ -15,7 +14,6 @@ process.on('unhandledRejection', (reason, promise) => {
 })
 
 // Create the websocket for individual matchs
-// createMatchServer()
 createUserDataServer()
 createLeaderboardServer()
 createMatchHistoryServer()
