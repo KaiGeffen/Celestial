@@ -4,7 +4,7 @@ import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import type { CredentialResponse } from 'google-one-tap'
 import type { GoogleJwtPayload } from '../types/google'
 import Loader from '../loader/loader'
-import UserDataServer from '../network/userDataServer'
+import Server from '../server'
 import { Space, Url, UserSettings, Flags } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
@@ -38,7 +38,7 @@ export class SigninScene extends Phaser.Scene {
     const storedToken = localStorage.getItem(Url.gsi_token)
     if (storedToken !== null) {
       const payload = jwt_decode<GoogleJwtPayload>(storedToken)
-      UserDataServer.login(payload, this.game, () => this.onOptionClick())
+      Server.login(payload, this.game, () => this.onOptionClick())
     }
     // If user is not signed in, show gsi and guest button
     else {
@@ -61,7 +61,7 @@ export class SigninScene extends Phaser.Scene {
       text: 'Guest',
       f: () => {
         // Log in as guest
-        UserDataServer.loginGuest(this.game, () => this.onOptionClick())
+        Server.loginGuest(this.game, () => this.onOptionClick())
       },
       depth: -1,
     })
@@ -106,7 +106,7 @@ export class SigninScene extends Phaser.Scene {
         const payload = jwt_decode<GoogleJwtPayload>(token.credential)
 
         // Send jti to confirm connection. After server responds, complete login
-        UserDataServer.login(payload, this.game, () => this.onOptionClick())
+        Server.login(payload, this.game, () => this.onOptionClick())
       },
     })
 

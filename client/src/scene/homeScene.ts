@@ -2,7 +2,7 @@ import 'phaser'
 import { Style, Color, Space } from '../settings/settings'
 import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
-import UserDataServer from '../network/userDataServer'
+import Server from '../server'
 import Cinematic from '../lib/cinematic'
 import { openDiscord, openFeedbackForm } from '../utils/externalLinks'
 import logEvent from '../utils/analytics'
@@ -56,7 +56,7 @@ export default class HomeScene extends BaseScene {
   }
 
   private createUserDetails(): void {
-    if (!UserDataServer.isLoggedIn()) {
+    if (!Server.isLoggedIn()) {
       this.createLoginButton()
       return
     }
@@ -79,8 +79,8 @@ export default class HomeScene extends BaseScene {
     // Add avatar
     const avatar = new Buttons.Avatar({
       within: userDetails,
-      avatarId: UserDataServer.getUserData().cosmeticSet.avatar,
-      border: UserDataServer.getUserData().cosmeticSet.border,
+      avatarId: Server.getUserData().cosmeticSet.avatar,
+      border: Server.getUserData().cosmeticSet.border,
       y: Space.pad + Space.avatarSize / 2,
       f: () => {
         this.scene.launch('MenuScene', {
@@ -95,7 +95,7 @@ export default class HomeScene extends BaseScene {
     })
 
     // Add username and ELO
-    const userData = UserDataServer.getUserData()
+    const userData = Server.getUserData()
     let y = Space.pad + Space.avatarSize + Space.padSmall
     const username = userData.username || 'Guest'
     const elo = userData.elo || 1000
@@ -166,7 +166,7 @@ export default class HomeScene extends BaseScene {
       x: Space.pad + Space.iconSize * 0.5,
       y: Space.pad + Space.iconSize * 0.5,
       f: () => {
-        if (UserDataServer.isLoggedIn()) {
+        if (Server.isLoggedIn()) {
           // TODO Standardize this - either quests or achievements
           this.scene.launch('MenuScene', {
             menu: 'achievements',
@@ -202,7 +202,7 @@ export default class HomeScene extends BaseScene {
       x: Space.pad + Space.iconSize * 0.5,
       y: Space.pad * 2 + Space.iconSize * 1.5,
       f: () => {
-        if (UserDataServer.isLoggedIn()) {
+        if (Server.isLoggedIn()) {
           this.scene.start('StoreScene')
 
           logEvent('view_store')
@@ -219,7 +219,7 @@ export default class HomeScene extends BaseScene {
       x: Space.pad * 2 + Space.iconSize * 1.5,
       y: Space.pad * 2 + Space.iconSize * 1.5,
       f: () => {
-        if (UserDataServer.isLoggedIn()) {
+        if (Server.isLoggedIn()) {
           this.scene.start('MatchHistoryScene')
 
           logEvent('view_match_history')
@@ -271,7 +271,7 @@ export default class HomeScene extends BaseScene {
     })
 
     // Discord (If no Garden)
-    const garden = UserDataServer.getUserData()?.garden || []
+    const garden = Server.getUserData()?.garden || []
     const hasPlants = garden.some((plantTime) => plantTime !== null)
 
     if (!hasPlants) {
@@ -320,7 +320,7 @@ export default class HomeScene extends BaseScene {
   }
 
   private checkAndShowUnseenAchievements(): void {
-    const userAchievements = UserDataServer.getUserData()?.achievements || []
+    const userAchievements = Server.getUserData()?.achievements || []
 
     // Check if any achievements are unseen
     const hasUnseenAchievements = userAchievements.some((ach) => !ach.seen)
@@ -335,7 +335,7 @@ export default class HomeScene extends BaseScene {
 
   private createGarden(): void {
     // Remember each plant's time
-    this.gardenTimes = UserDataServer.getUserData().garden
+    this.gardenTimes = Server.getUserData().garden
 
     // Make a sizer for the garden
     const sizer = this.rexUI.add
@@ -390,7 +390,7 @@ export default class HomeScene extends BaseScene {
         // Clicking plant will harvest it if it's fully grown
         .on('pointerdown', () => {
           if (this.timeUntilFullyGrown(plantTime) <= 0) {
-            UserDataServer.harvestGarden(i)
+            Server.harvestGarden(i)
             // The result will be handled by the 'gardenHarvested' event
           } else {
             this.signalError('That plant is not ready to harvest.')

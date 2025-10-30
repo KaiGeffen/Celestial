@@ -1,7 +1,7 @@
 import 'phaser'
 import { Style, Color, Space, Flags, Scroll } from '../settings/settings'
 import { BaseSceneWithHeader } from './baseScene'
-import UserDataServer from '../network/userDataServer'
+import Server from '../server'
 import Buttons from '../lib/buttons/buttons'
 import { MatchHistoryEntry } from '../../../shared/types/matchHistory'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -42,7 +42,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
 
   private async fetchMatchHistoryData() {
     try {
-      const uuid = UserDataServer.getUserData().uuid
+      const uuid = Server.getUserData().uuid
       if (!uuid) {
         this.signalError('Log in to view your match history')
         return

@@ -2,7 +2,7 @@ import 'phaser'
 import { Style, Color, Space } from '../settings/settings'
 import { BaseSceneWithHeader } from './baseScene'
 import Buttons from '../lib/buttons/buttons'
-import UserDataServer from '../network/userDataServer'
+import Server from '../server'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import { STORE_ITEMS, StoreItem } from '../../../shared/storeItems'
 
@@ -226,7 +226,7 @@ export default class StoreScene extends BaseSceneWithHeader {
     })
 
     // Check if the item is owned
-    const userData = UserDataServer.getUserData()
+    const userData = Server.getUserData()
     const isOwned =
       userData && userData.ownedItems && userData.ownedItems.includes(item.id)
 
@@ -252,7 +252,7 @@ export default class StoreScene extends BaseSceneWithHeader {
         this.sound.play('click')
 
         // Get user's current balance
-        const balance = UserDataServer.getUserData().gems
+        const balance = Server.getUserData().gems
 
         // Launch the purchase menu
         this.scene.launch('MenuScene', {

@@ -2,7 +2,7 @@ import 'phaser'
 import { Style, Space, Color } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
-import UserDataServer from '../../network/userDataServer'
+import Server from '../../server'
 import {
   AchievementMeta,
   achievementsMeta,
@@ -23,16 +23,14 @@ export default class AchievementsMenu extends Menu {
     this.createContent()
 
     // Set achievements as seen on server
-    UserDataServer.setAchievementsSeen()
+    Server.setAchievementsSeen()
 
     this.layout()
   }
 
   private createContent() {
     // Map of user's achievements by id
-    const userAchievements = (
-      UserDataServer.getUserData()?.achievements || []
-    ).reduce(
+    const userAchievements = (Server.getUserData()?.achievements || []).reduce(
       (acc, ach) => {
         acc[ach.achievement_id] = ach
         return acc

@@ -5,7 +5,7 @@ import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import { StoreItem } from '../../../../shared/storeItems'
-import UserDataServer from '../../network/userDataServer'
+import Server from '../../server'
 
 export default class PurchaseItemMenu extends Menu {
   private item: StoreItem
@@ -37,7 +37,7 @@ export default class PurchaseItemMenu extends Menu {
   }
 
   private handlePurchase(): void {
-    if (!UserDataServer.isLoggedIn()) {
+    if (!Server.isLoggedIn()) {
       this.scene.signalError('You must be logged in to make purchases.')
       return
     }
@@ -48,7 +48,7 @@ export default class PurchaseItemMenu extends Menu {
     }
 
     // Purchase the item on the server (Updates local igc totals)
-    UserDataServer.purchaseItem(this.item.id, this.item.cost)
+    Server.purchaseItem(this.item.id, this.item.cost)
 
     // TODO Its sizer in some cases needs layout because different text width
     this.priceText.setText('Owned')

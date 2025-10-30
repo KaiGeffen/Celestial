@@ -3,7 +3,7 @@ import { Style, Color, Space } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
-import UserDataServer from '../../network/userDataServer'
+import Server from '../../server'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import AvatarButton from '../../lib/buttons/avatar'
 import BaseScene from '../baseScene'
@@ -79,13 +79,13 @@ export default class UserProfileMenu extends Menu {
     )
     this.currentAvatar = new Buttons.Avatar({
       within: container,
-      avatarId: UserDataServer.getUserData().cosmeticSet.avatar,
-      border: UserDataServer.getUserData().cosmeticSet.border,
+      avatarId: Server.getUserData().cosmeticSet.avatar,
+      border: Server.getUserData().cosmeticSet.border,
     })
     sizer.add(container)
 
     // Profile info
-    const userData = UserDataServer.getUserData()
+    const userData = Server.getUserData()
     const txtUsername = this.scene.add.text(
       0,
       0,
@@ -161,9 +161,9 @@ export default class UserProfileMenu extends Menu {
 
     new Buttons.Basic({
       within: container,
-      text: UserDataServer.isLoggedIn() ? 'Logout' : 'Login',
+      text: Server.isLoggedIn() ? 'Logout' : 'Login',
       f: () => {
-        UserDataServer.logout()
+        Server.logout()
 
         this.activeScene.scene.start('SigninScene')
         this.close()
@@ -228,7 +228,7 @@ export default class UserProfileMenu extends Menu {
         f: () => {
           const newSet = {
             avatar: avatarId,
-            border: UserDataServer.getUserData().cosmeticSet.border,
+            border: Server.getUserData().cosmeticSet.border,
           }
           this.updateCosmeticSet(newSet)
         },
@@ -257,7 +257,7 @@ export default class UserProfileMenu extends Menu {
         border: borderId,
         f: () => {
           const newSet = {
-            avatar: UserDataServer.getUserData().cosmeticSet.avatar,
+            avatar: Server.getUserData().cosmeticSet.avatar,
             border: borderId,
           }
           this.updateCosmeticSet(newSet)
@@ -285,8 +285,8 @@ export default class UserProfileMenu extends Menu {
       relicImage.setInteractive()
       relicImage.on('pointerdown', () => {
         const newSet = {
-          avatar: UserDataServer.getUserData().cosmeticSet.avatar,
-          border: UserDataServer.getUserData().cosmeticSet.border,
+          avatar: Server.getUserData().cosmeticSet.avatar,
+          border: Server.getUserData().cosmeticSet.border,
           relic: 0,
         }
         this.updateCosmeticSet(newSet)
@@ -306,6 +306,6 @@ export default class UserProfileMenu extends Menu {
     this.outerAvatar.setAvatar(newSet.avatar)
     this.outerAvatar.setBorder(newSet.border)
 
-    UserDataServer.setCosmeticSet(newSet)
+    Server.setCosmeticSet(newSet)
   }
 }

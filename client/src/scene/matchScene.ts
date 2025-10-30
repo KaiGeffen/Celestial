@@ -1,10 +1,4 @@
 import 'phaser'
-import {
-  MatchWS,
-  MatchPveWS,
-  MatchPvpWS,
-  MatchTutorialWS,
-} from '../network/matchServer'
 // Import Settings itself
 import { Ease, Space, UserSettings } from '../settings/settings'
 import BaseScene from './baseScene'
@@ -15,7 +9,7 @@ import OverlayRegion from './matchRegions/pileOverlays'
 import GameModel from '../../../shared/state/gameModel'
 import PassRegion from './matchRegions/pass'
 import { Deck } from '../../../shared/types/deck'
-import UserDataServer from '../network/userDataServer'
+import Server from '../server'
 import TheirAvatarRegion from './matchRegions/theirAvatar'
 import OurAvatarRegion from './matchRegions/ourAvatar'
 import TheirScoreRegion from './matchRegions/theirScore'
@@ -27,15 +21,15 @@ import MulliganRegion from './matchRegions/mulliganRegion'
 import CompanionRegion from './matchRegions/companion'
 import { ResultsRegionJourney } from './matchRegions/matchResults'
 
-// TODO FIgure out
-import { wsServer } from '../network/userDataServer'
+// TODO Figure out
+import { server } from '../server'
 import { UserDataClientWS } from '../../../shared/network/userDataWS'
 
 export class MatchScene extends BaseScene {
   params: any
 
   view: View
-  matchServer: UserDataClientWS
+  ws: UserDataClientWS
 
   // Whether the match is paused (Awaiting user to click a button, for example)
   paused: boolean
@@ -61,29 +55,28 @@ export class MatchScene extends BaseScene {
     this.queuedStates = {}
     this.currentVersion = this.maxVersion = -1
 
-    // Register the hooks for getting match info from server to this websocket
+    // Register each hook for a message from the server
     this.registerMatchServerHooks()
 
-    // Connect with the server
-    this.matchServer = wsServer
+    // Send initial message to the server
     if (this.isTutorial) {
-      this.matchServer.send({
+      server.send({
         type: 'initTutorial',
         num: params.missionID,
-        uuid: UserDataServer.getUserData().uuid,
+        uuid: Server.getUserData().uuid,
       })
     } else if (params.isPvp) {
-      this.matchServer.send({
+      server.send({
         type: 'initPvp',
         password: params.password,
-        uuid: UserDataServer.getUserData().uuid,
+        uuid: Server.getUserData().uuid,
         deck: params.deck,
       })
     } else {
-      this.matchServer.send({
+      server.send({
         type: 'initPve',
         aiDeck: params.aiDeck,
-        uuid: UserDataServer.getUserData().uuid,
+        uuid: Server.getUserData().uuid,
         deck: params.deck,
       })
     }
@@ -104,10 +97,10 @@ export class MatchScene extends BaseScene {
   }
 
   beforeExit() {
-    this.matchServer.send({
+    server.send({
       type: 'exitMatch',
     })
-    UserDataServer.refreshUserData()
+    Server.refreshUserData()
   }
 
   // Listens for websocket updates
@@ -176,7 +169,7 @@ export class MatchScene extends BaseScene {
 
     // Hand region
     view.ourBoard.setCardClickCallback((i: number) => {
-      this.matchServer.send({
+      server.send({
         type: 'playCard',
         cardNum: i,
         versionNo: this.currentVersion,
@@ -186,7 +179,7 @@ export class MatchScene extends BaseScene {
       this.view.ourScore.displayCost(cost)
     })
     view.ourAvatar.setEmoteCallback(() => {
-      this.matchServer.send({
+      server.send({
         type: 'emote',
       })
     })
@@ -231,7 +224,7 @@ export class MatchScene extends BaseScene {
     // Pass button
     view.pass.setCallback(() => {
       if (!this.paused) {
-        this.matchServer.send({
+        server.send({
           type: 'passTurn',
           versionNo: this.currentVersion,
         })
@@ -248,7 +241,7 @@ export class MatchScene extends BaseScene {
     // Mulligan
     view.mulligan.setCallback(() => {
       const choice: [boolean, boolean, boolean] = view.mulligan.mulliganChoices
-      this.matchServer.send({
+      server.send({
         type: 'mulligan',
         mulligan: choice,
       })
@@ -291,7 +284,7 @@ export class MatchScene extends BaseScene {
 
     // Autopass
     if (this.shouldPass(state)) {
-      this.matchServer.send({
+      server.send({
         type: 'passTurn',
         versionNo: state.versionNo,
       })
@@ -374,7 +367,7 @@ export class MatchScene extends BaseScene {
 
   private registerMatchServerHooks(): void {
     // Each registered event
-    wsServer
+    server
       .on('matchStart', ({ name1, name2, elo1, elo2 }) => {
         // Signal that a match has been found
         this.signalMatchFound(name1, name2, elo1, elo2)
@@ -393,12 +386,12 @@ export class MatchScene extends BaseScene {
         this.emote(0)
       })
 
-    wsServer.ws.onclose = () => {
+    server.ws.onclose = () => {
       // scene.signalError('Disconnected from the server')
       console.error('Server ws closed')
     }
 
-    wsServer.ws.onerror = (event: Event) => {
+    server.ws.onerror = (event: Event) => {
       this.signalError(`WebSocket error: ${event}`)
       console.error('WebSocket error!')
     }

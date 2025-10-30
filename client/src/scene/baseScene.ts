@@ -7,7 +7,7 @@ import Button from '../lib/buttons/button'
 import Hint from '../lib/hint'
 import ensureMusic from '../loader/audioManager'
 import Buttons from '../lib/buttons/buttons'
-import UserDataServer from '../network/userDataServer'
+import Server from '../server'
 
 // Functionality shared between BaseScene and MenuBaseScene
 class SharedBaseScene extends Phaser.Scene {
@@ -202,10 +202,10 @@ export class BaseSceneWithHeader extends BaseScene {
   private updateUserStatsDisplay(): void {
     // Update the user stats display
     // Get user data, use defaults if not logged in
-    const username = UserDataServer.getUserData().username || 'Guest'
-    const elo = UserDataServer.getUserData().elo || 1200
-    const gems = UserDataServer.getUserData().gems || 0
-    const coins = UserDataServer.getUserData().coins || 0
+    const username = Server.getUserData().username || 'Guest'
+    const elo = Server.getUserData().elo || 1200
+    const gems = Server.getUserData().gems || 0
+    const coins = Server.getUserData().coins || 0
 
     // Set the text to the user's stats (Which might update)
     this.userStatsDisplay.setText(`${username} (${elo}) ${gems}💎 ${coins}💰`)

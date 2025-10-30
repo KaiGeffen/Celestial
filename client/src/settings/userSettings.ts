@@ -1,4 +1,4 @@
-import Server from '../network/userDataServer'
+import Server from '../server'
 import Catalog from '../../../shared/state/catalog'
 import { Space } from './settings'
 import { Flags } from './flags'
