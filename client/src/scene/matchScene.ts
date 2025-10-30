@@ -4,7 +4,7 @@ import {
   MatchPveWS,
   MatchPvpWS,
   MatchTutorialWS,
-} from '../network/net'
+} from '../network/matchServer'
 // Import Settings itself
 import { Ease, Space, UserSettings } from '../settings/settings'
 import BaseScene from './baseScene'
@@ -31,7 +31,7 @@ export class MatchScene extends BaseScene {
   params: any
 
   view: View
-  net: MatchWS
+  matchServer: MatchWS
 
   // Whether the match is paused (Awaiting user to click a button, for example)
   paused: boolean
@@ -59,11 +59,11 @@ export class MatchScene extends BaseScene {
 
     // Connect with the server
     if (this.isTutorial) {
-      this.net = new MatchTutorialWS(this, params.missionID)
+      this.matchServer = new MatchTutorialWS(this, params.missionID)
     } else if (params.isPvp) {
-      this.net = new MatchPvpWS(this, params.deck, params.password)
+      this.matchServer = new MatchPvpWS(this, params.deck, params.password)
     } else {
-      this.net = new MatchPveWS(this, params.deck, params.aiDeck)
+      this.matchServer = new MatchPveWS(this, params.deck, params.aiDeck)
     }
 
     // Create the view
@@ -74,7 +74,7 @@ export class MatchScene extends BaseScene {
 
     this.paused = false
 
-    this.setCallbacks(this.view, this.net)
+    this.setCallbacks(this.view, this.matchServer)
   }
 
   restart(): void {
@@ -82,7 +82,7 @@ export class MatchScene extends BaseScene {
   }
 
   beforeExit() {
-    this.net.exitMatch()
+    this.matchServer.exitMatch()
     UserDataServer.refreshUserData()
   }
 
@@ -124,7 +124,7 @@ export class MatchScene extends BaseScene {
   }
 
   // Set all of the callback functions for the regions in the view
-  private setCallbacks(view, net: MatchWS): void {
+  private setCallbacks(view, serverConn: MatchWS): void {
     // Their score region
     view.theirScore.recapCallback = () => {
       // Scan backwards through the queued states to find the start of the recap
@@ -152,13 +152,13 @@ export class MatchScene extends BaseScene {
 
     // Hand region
     view.ourBoard.setCardClickCallback((i: number) => {
-      net.playCard(i, this.currentVersion)
+      serverConn.playCard(i, this.currentVersion)
     })
     view.ourBoard.setDisplayCostCallback((cost: number) => {
       this.view.ourScore.displayCost(cost)
     })
     view.ourAvatar.setEmoteCallback(() => {
-      this.net.signalEmote()
+      this.matchServer.signalEmote()
     })
 
     // Set the callbacks for overlays
@@ -201,7 +201,7 @@ export class MatchScene extends BaseScene {
     // Pass button
     view.pass.setCallback(() => {
       if (!this.paused) {
-        net.passTurn(this.currentVersion)
+        serverConn.passTurn(this.currentVersion)
       }
     })
     view.pass.setShowResultsCallback(() => {
@@ -215,7 +215,7 @@ export class MatchScene extends BaseScene {
     // Mulligan
     view.mulligan.setCallback(() => {
       const choice: [boolean, boolean, boolean] = view.mulligan.mulliganChoices
-      net.doMulligan(choice)
+      serverConn.doMulligan(choice)
     })
   }
 
@@ -255,7 +255,7 @@ export class MatchScene extends BaseScene {
 
     // Autopass
     if (this.shouldPass(state)) {
-      this.net.passTurn(state.versionNo)
+      this.matchServer.passTurn(state.versionNo)
     }
 
     // State was displayed
