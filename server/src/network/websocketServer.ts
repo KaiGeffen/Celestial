@@ -53,8 +53,9 @@ export default function createWebSocketServer() {
         id = uuid
         potentialEmail = email
 
-        // Check if user is already connected
-        if (activePlayers[uuid]) {
+        // Check if user is already connected with a live websocket
+        const existingWs = activePlayers[uuid]
+        if (existingWs && existingWs.isOpen()) {
           ws.send({ type: 'alreadySignedIn' })
           return
         }
@@ -82,8 +83,9 @@ export default function createWebSocketServer() {
         .on('sendGuestToken', async ({ uuid }) => {
           id = uuid
 
-          // Check if user is already connected
-          if (activePlayers[uuid]) {
+          // Check if user is already connected with a live websocket
+          const existingWs = activePlayers[uuid]
+          if (existingWs && existingWs.isOpen()) {
             ws.send({ type: 'alreadySignedIn' })
             return
           }
