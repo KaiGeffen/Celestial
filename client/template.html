@@ -46,10 +46,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Preload critical assets for faster FCP/LCP -->
-  <link rel="preload" href="assets/img/background/Light.webp" as="image" fetchpriority="high">
+  <link rel="preload" href="assets/animation/video-poster.webp" as="image" fetchpriority="high">
   <link rel="preload" href="assets/logo.svg" as="image" fetchpriority="high">
 
   <link rel="stylesheet" href="style.css">
+
+  <!-- Splash screen styles -->
+  <style>
+    #splash-screen {
+      transition: opacity 0.5s ease-out;
+    }
+
+    #splash-screen.fade-out {
+      opacity: 0;
+    }
+
+    #splash-logo {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10000;
+    }
+
+    #splash-logo img {
+      width: 20vw;
+      height: auto;
+      display: block;
+      pointer-events: none;
+    }
+  </style>
 
   <!-- Optimize Google Analytics loading -->
   <script>
@@ -84,8 +113,11 @@
 </head>
 <body>
   <!-- Splash Screen - Shows immediately for fast FCP -->
-  <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('assets/img/background/Light.webp'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;">
-    <img src="assets/logo.svg" alt="Celestial Logo" fetchpriority="high" style="width: 30vw; max-width: 500px; min-width: 200px; height: auto; filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));" />
+  <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('assets/animation/video-poster.webp'); background-size: cover; background-position: center; z-index: 9999;"></div>
+
+  <!-- Splash Logo - Same position as logo-container -->
+  <div id="splash-logo">
+    <img src="assets/logo.svg" alt="Celestial Logo" fetchpriority="high" />
   </div>
 
   <!-- Animation -->
@@ -112,16 +144,29 @@
 
   <!-- Splash screen controller -->
   <script>
-    // Hide splash screen when game is ready
-    function hideSplashScreen() {
+    // Transition splash to game
+    function transitionToGame() {
       const splash = document.getElementById('splash-screen');
+      const splashLogo = document.getElementById('splash-logo');
+      const logoContainer = document.getElementById('logo-container');
+
+      // Fade out splash background
       if (splash) {
-        splash.style.transition = 'opacity 0.5s ease-out';
-        splash.style.opacity = '0';
-        setTimeout(function() {
-          splash.style.display = 'none';
-        }, 500);
+        splash.classList.add('fade-out');
       }
+
+      // After fade completes, hide splash and show logo-container
+      setTimeout(function() {
+        if (splash) {
+          splash.style.display = 'none';
+        }
+        if (splashLogo) {
+          splashLogo.style.display = 'none';
+        }
+        if (logoContainer) {
+          logoContainer.style.display = 'flex';
+        }
+      }, 500); // Match fade transition duration
     }
 
     // Listen for Phaser game ready event
@@ -132,12 +177,12 @@
         if (gameEl && gameEl.children.length > 0) {
           clearInterval(checkGameReady);
           // Wait a moment for initial scene to render
-          setTimeout(hideSplashScreen, 500);
+          setTimeout(transitionToGame, 500);
         }
       }, 100);
 
-      // Fallback: hide after 5 seconds regardless
-      setTimeout(hideSplashScreen, 5000);
+      // Fallback: transition after 5 seconds regardless
+      setTimeout(transitionToGame, 5000);
     });
   </script>
 </body>
