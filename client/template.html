@@ -41,9 +41,13 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&display=swap" rel="stylesheet">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Preload critical assets for faster FCP/LCP -->
+  <link rel="preload" href="assets/img/background/Light.webp" as="image" fetchpriority="high">
+  <link rel="preload" href="assets/logo.svg" as="image" fetchpriority="high">
 
   <link rel="stylesheet" href="style.css">
 
@@ -54,7 +58,7 @@
     window.gtag = function(){window.dataLayer.push(arguments);};
     window.gtag('js', new Date());
     window.gtag('config', 'G-7E0LP0X7Y9');
-    
+
     // Load the actual GA script
     window.addEventListener('load', function() {
       setTimeout(function() {
@@ -71,7 +75,7 @@
     function isMobile() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
-    
+
     // Redirect to Discord if on mobile
     if (isMobile()) {
       window.location.href = "https://celestialdecks.gg/about/";
@@ -79,6 +83,11 @@
   </script>
 </head>
 <body>
+  <!-- Splash Screen - Shows immediately for fast FCP -->
+  <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('assets/img/background/Light.webp'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;">
+    <img src="assets/logo.svg" alt="Celestial Logo" fetchpriority="high" style="width: 30vw; max-width: 500px; min-width: 200px; height: auto; filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));" />
+  </div>
+
   <!-- Animation -->
   <video class="animation" id="animation" loop autoplay playsinline muted style="display: none;">
     <source src="" type=video/mp4>
@@ -88,7 +97,7 @@
   <div id="logo-container" style="position: absolute; top: 0; left: 0; width: 100%; display: none; justify-content: center; pointer-events: none;">
     <img src="assets/logo.svg" alt="Celestial Logo" fetchpriority="high" style="width: 20vw; height: auto; display: block; pointer-events: none;" />
   </div>
-  
+
   <div class="game" id="game">
 
   <div id="signin" style="position: absolute; bottom: 118px; left: 50%; transform: translateX(-50%);"></div>
@@ -100,5 +109,36 @@
   <audio id="dialog">
     <source src="" type="audio/ogg">
   </audio>
+
+  <!-- Splash screen controller -->
+  <script>
+    // Hide splash screen when game is ready
+    function hideSplashScreen() {
+      const splash = document.getElementById('splash-screen');
+      if (splash) {
+        splash.style.transition = 'opacity 0.5s ease-out';
+        splash.style.opacity = '0';
+        setTimeout(function() {
+          splash.style.display = 'none';
+        }, 500);
+      }
+    }
+
+    // Listen for Phaser game ready event
+    window.addEventListener('load', function() {
+      // Check if game element has content (Phaser canvas loaded)
+      const checkGameReady = setInterval(function() {
+        const gameEl = document.getElementById('game');
+        if (gameEl && gameEl.children.length > 0) {
+          clearInterval(checkGameReady);
+          // Wait a moment for initial scene to render
+          setTimeout(hideSplashScreen, 500);
+        }
+      }, 100);
+
+      // Fallback: hide after 5 seconds regardless
+      setTimeout(hideSplashScreen, 5000);
+    });
+  </script>
 </body>
 </html>
