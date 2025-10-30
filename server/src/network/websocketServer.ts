@@ -31,10 +31,11 @@ interface WaitingPlayer {
 // Players searching for a match with password as key
 let searchingPlayers: { [key: string]: WaitingPlayer } = {}
 
-// List of active user connections
-let activeUsers: { [key: string]: ServerWS } = {}
+// List of active player connections
+let activePlayers: { [key: string]: ServerWS } = {}
 
-// TODO List of user ids that should attempt to reconnect if they regain connection
+// List of user ids that should attempt to reconnect if they regain connection
+let playersToReconnect: Set<string> = new Set()
 
 // Create the websocket server
 export default function createWebSocketServer() {
@@ -42,7 +43,6 @@ export default function createWebSocketServer() {
 
   wss.on('connection', async (socket: WebSocket) => {
     try {
-      // TODO Maintain a list of signed in users, if user is already signed in, don't let them sign in again
       const ws: ServerWS = new TypedWebSocket(socket)
 
       // Remember the user once they've signed in
@@ -54,7 +54,7 @@ export default function createWebSocketServer() {
         potentialEmail = email
 
         // Check if user is already connected
-        if (activeUsers[uuid]) {
+        if (activePlayers[uuid]) {
           ws.send({ type: 'alreadySignedIn' })
           return
         }
@@ -70,7 +70,7 @@ export default function createWebSocketServer() {
           ws.send({ type: 'promptUserInit' })
         } else if (result.length === 1) {
           // Add to active users
-          activeUsers[uuid] = ws
+          activePlayers[uuid] = ws
 
           // Send user their data
           await sendUserData(ws, id, result[0])
@@ -83,7 +83,7 @@ export default function createWebSocketServer() {
           id = uuid
 
           // Check if user is already connected
-          if (activeUsers[uuid]) {
+          if (activePlayers[uuid]) {
             ws.send({ type: 'alreadySignedIn' })
             return
           }
@@ -99,7 +99,7 @@ export default function createWebSocketServer() {
             ws.send({ type: 'promptUserInit' })
           } else if (result.length === 1) {
             // Add to active users
-            activeUsers[uuid] = ws
+            activePlayers[uuid] = ws
 
             // Send user their data
             await sendUserData(ws, id, result[0])
@@ -192,7 +192,7 @@ export default function createWebSocketServer() {
             await db.insert(players).values(data)
 
             // Add to active users
-            activeUsers[id] = ws
+            activePlayers[id] = ws
 
             // Send user their data
             await sendUserData(ws, id, data)
@@ -380,8 +380,8 @@ export default function createWebSocketServer() {
 
       // Remove user from active list when they disconnect
       ws.onClose(() => {
-        if (id && activeUsers[id] === ws) {
-          delete activeUsers[id]
+        if (id && activePlayers[id] === ws) {
+          delete activePlayers[id]
         }
       })
     } catch (e) {
@@ -391,9 +391,10 @@ export default function createWebSocketServer() {
 
   console.log('User-data server is running on port: ', USER_DATA_PORT)
 
+  // TODO Remove
   // Debug: Print active users every 5 seconds
   setInterval(() => {
-    const userIds = Object.keys(activeUsers)
+    const userIds = Object.keys(activePlayers)
     console.log(`Active users (${userIds.length}):`, userIds)
   }, 5000)
 }
