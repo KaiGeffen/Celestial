@@ -15,7 +15,7 @@ process.on('unhandledRejection', (reason, promise) => {
 })
 
 // Create the websocket for individual matchs
-createMatchServer()
+// createMatchServer()
 createUserDataServer()
 createLeaderboardServer()
 createMatchHistoryServer()

@@ -27,11 +27,15 @@ import MulliganRegion from './matchRegions/mulliganRegion'
 import CompanionRegion from './matchRegions/companion'
 import { ResultsRegionJourney } from './matchRegions/matchResults'
 
+// TODO FIgure out
+import { wsServer } from '../network/userDataServer'
+import { UserDataClientWS } from '../../../shared/network/userDataWS'
+
 export class MatchScene extends BaseScene {
   params: any
 
   view: View
-  matchServer: MatchWS
+  matchServer: UserDataClientWS
 
   // Whether the match is paused (Awaiting user to click a button, for example)
   paused: boolean
@@ -57,13 +61,31 @@ export class MatchScene extends BaseScene {
     this.queuedStates = {}
     this.currentVersion = this.maxVersion = -1
 
+    // Register the hooks for getting match info from server to this websocket
+    this.registerMatchServerHooks()
+
     // Connect with the server
+    this.matchServer = wsServer
     if (this.isTutorial) {
-      this.matchServer = new MatchTutorialWS(this, params.missionID)
+      this.matchServer.send({
+        type: 'initTutorial',
+        num: params.missionID,
+        uuid: UserDataServer.getUserData().uuid,
+      })
     } else if (params.isPvp) {
-      this.matchServer = new MatchPvpWS(this, params.deck, params.password)
+      this.matchServer.send({
+        type: 'initPvp',
+        password: params.password,
+        uuid: UserDataServer.getUserData().uuid,
+        deck: params.deck,
+      })
     } else {
-      this.matchServer = new MatchPveWS(this, params.deck, params.aiDeck)
+      this.matchServer.send({
+        type: 'initPve',
+        aiDeck: params.aiDeck,
+        uuid: UserDataServer.getUserData().uuid,
+        deck: params.deck,
+      })
     }
 
     // Create the view
@@ -74,7 +96,7 @@ export class MatchScene extends BaseScene {
 
     this.paused = false
 
-    this.setCallbacks(this.view, this.matchServer)
+    this.setCallbacks(this.view)
   }
 
   restart(): void {
@@ -82,7 +104,9 @@ export class MatchScene extends BaseScene {
   }
 
   beforeExit() {
-    this.matchServer.exitMatch()
+    this.matchServer.send({
+      type: 'exitMatch',
+    })
     UserDataServer.refreshUserData()
   }
 
@@ -124,7 +148,7 @@ export class MatchScene extends BaseScene {
   }
 
   // Set all of the callback functions for the regions in the view
-  private setCallbacks(view, serverConn: MatchWS): void {
+  private setCallbacks(view): void {
     // Their score region
     view.theirScore.recapCallback = () => {
       // Scan backwards through the queued states to find the start of the recap
@@ -152,13 +176,19 @@ export class MatchScene extends BaseScene {
 
     // Hand region
     view.ourBoard.setCardClickCallback((i: number) => {
-      serverConn.playCard(i, this.currentVersion)
+      this.matchServer.send({
+        type: 'playCard',
+        cardNum: i,
+        versionNo: this.currentVersion,
+      })
     })
     view.ourBoard.setDisplayCostCallback((cost: number) => {
       this.view.ourScore.displayCost(cost)
     })
     view.ourAvatar.setEmoteCallback(() => {
-      this.matchServer.signalEmote()
+      this.matchServer.send({
+        type: 'emote',
+      })
     })
 
     // Set the callbacks for overlays
@@ -201,7 +231,10 @@ export class MatchScene extends BaseScene {
     // Pass button
     view.pass.setCallback(() => {
       if (!this.paused) {
-        serverConn.passTurn(this.currentVersion)
+        this.matchServer.send({
+          type: 'passTurn',
+          versionNo: this.currentVersion,
+        })
       }
     })
     view.pass.setShowResultsCallback(() => {
@@ -215,7 +248,10 @@ export class MatchScene extends BaseScene {
     // Mulligan
     view.mulligan.setCallback(() => {
       const choice: [boolean, boolean, boolean] = view.mulligan.mulliganChoices
-      serverConn.doMulligan(choice)
+      this.matchServer.send({
+        type: 'mulligan',
+        mulligan: choice,
+      })
     })
   }
 
@@ -255,7 +291,10 @@ export class MatchScene extends BaseScene {
 
     // Autopass
     if (this.shouldPass(state)) {
-      this.matchServer.passTurn(state.versionNo)
+      this.matchServer.send({
+        type: 'passTurn',
+        versionNo: state.versionNo,
+      })
     }
 
     // State was displayed
@@ -331,6 +370,38 @@ export class MatchScene extends BaseScene {
         this.view.ourBoard.lowerAllCards()
       }
     })
+  }
+
+  private registerMatchServerHooks(): void {
+    // Each registered event
+    wsServer
+      .on('matchStart', ({ name1, name2, elo1, elo2 }) => {
+        // Signal that a match has been found
+        this.signalMatchFound(name1, name2, elo1, elo2)
+      })
+      .on('transmitState', (data) => {
+        this.queueState(data.state)
+      })
+      .on('signalError', () => {
+        this.signalError('Server says that an action was in error.')
+        console.log('Server says that an action was in error.')
+      })
+      .on('opponentDisconnected', () => {
+        this.signalDC()
+      })
+      .on('opponentEmote', (data) => {
+        this.emote(0)
+      })
+
+    wsServer.ws.onclose = () => {
+      // scene.signalError('Disconnected from the server')
+      console.error('Server ws closed')
+    }
+
+    wsServer.ws.onerror = (event: Event) => {
+      this.signalError(`WebSocket error: ${event}`)
+      console.error('WebSocket error!')
+    }
   }
 
   onWindowResize(): void {

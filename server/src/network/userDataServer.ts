@@ -12,6 +12,24 @@ import { STORE_ITEMS } from '../../../shared/storeItems'
 import { cosmeticsTransactions } from '../db/schema'
 import { AchievementManager } from '../achievementManager'
 import Garden from '../db/garden'
+import Catalog from '../../../shared/state/catalog'
+
+import PveMatch from './match/pveMatch'
+import PvpMatch from './match/pvpMatch'
+import Match from './match/match'
+import { MechanicsSettings } from '../../../shared/settings'
+import { logFunnelEvent } from '../db/analytics'
+import TutorialMatch from './match/tutorialMatch'
+
+// A player waiting for a game and their associated data
+interface WaitingPlayer {
+  ws: UserDataServerWS
+  uuid: string
+  deck: Deck
+}
+
+// Players searching for a match with password as key
+let searchingPlayers: { [key: string]: WaitingPlayer } = {}
 
 // Create the websocket server
 export default function createUserDataServer() {
@@ -256,6 +274,108 @@ export default function createUserDataServer() {
             reward: harvestResult.reward,
           })
         })
+        // MATCH RELEVANT
+        // TODO too much in this file, break out some logic somewhere else
+        .on('initPve', async ({ aiDeck, uuid, deck }) => {
+          if (!id) return
+          console.log(
+            'PvE:',
+            deck.cards
+              .map((cardId) => Catalog.getCardById(cardId).name)
+              .join(', '),
+          )
+
+          const match = new PveMatch(ws, uuid, deck, aiDeck)
+          registerEvents(ws, match, 0)
+
+          // Analytics
+          logFunnelEvent(uuid, 'play_mode', 'pve')
+
+          // Start the match
+          await match.notifyState()
+        })
+        .on('initPvp', async (data) => {
+          // Clean up stale entries first
+          Object.keys(searchingPlayers).forEach((password) => {
+            if (!searchingPlayers[password].ws.isOpen()) {
+              console.log(
+                'Searching player went stale on password:',
+                searchingPlayers[password],
+              )
+              delete searchingPlayers[password]
+            }
+          })
+
+          // Analytics
+          logFunnelEvent(data.uuid, 'play_mode', 'pvp_queued_up')
+
+          // Check if there is another player, and they are still ready
+          const otherPlayer: WaitingPlayer = searchingPlayers[data.password]
+          if (otherPlayer) {
+            console.log(
+              'PVP:',
+              data.deck.cards
+                .map((cardId) => Catalog.getCardById(cardId).name)
+                .join(', '),
+              '\n',
+              otherPlayer.deck.cards
+                .map((cardId) => Catalog.getCardById(cardId).name)
+                .join(', '),
+            )
+
+            // Analytics
+            logFunnelEvent(otherPlayer.uuid, 'play_mode', 'pvp_match_found')
+
+            // Create a PvP match
+            const match = new PvpMatch(
+              ws,
+              data.uuid,
+              data.deck,
+              otherPlayer.ws,
+              otherPlayer.uuid,
+              otherPlayer.deck,
+            )
+
+            // registerEvents(socket, match, playerNumber)
+            delete searchingPlayers[data.password]
+            // TODO Maybe just delete the last one? Somehow don't lose to race conditions
+
+            registerEvents(ws, match, 0)
+            registerEvents(otherPlayer.ws, match, 1)
+
+            // Inform players that match started TODO That it's pvp specifically
+            await match.notifyMatchStart()
+
+            // Notify both players that they are connected
+            await match.notifyState()
+          } else {
+            // Queue the player with their information
+            const waitingPlayer = {
+              ws: ws,
+              uuid: data.uuid,
+              deck: data.deck,
+            }
+            searchingPlayers[data.password] = waitingPlayer
+
+            // Ensure that if they leave, they are removed from the queue
+            const f = () => {
+              console.log('Player disconnected before getting into a match:')
+              delete searchingPlayers[data.password]
+              ws.close()
+            }
+            ws.on('exitMatch', f)
+            ws.onClose(f)
+          }
+        })
+        .on('initTutorial', async (data) => {
+          console.log('Tutorial: ', data.num, 'for uuid: ', data.uuid)
+
+          const match = new TutorialMatch(ws, data.num, data.uuid)
+          registerEvents(ws, match, 0)
+
+          // Start the match
+          await match.notifyState()
+        })
     } catch (e) {
       console.error('Error in user data server:', e)
     }
@@ -322,4 +442,33 @@ async function sendUserData(
     .update(players)
     .set({ lastactive: new Date().toISOString() })
     .where(eq(players.id, id))
+}
+
+// Register each of the events that the server receives during a match
+function registerEvents(
+  ws: UserDataServerWS,
+  match: Match,
+  playerNumber: number,
+) {
+  ws.on('playCard', (data) => {
+    match.doAction(playerNumber, data.cardNum, data.versionNo)
+  })
+    .on('mulligan', (data) => {
+      match.doMulligan(playerNumber, data.mulligan)
+    })
+    .on('passTurn', (data) => {
+      match.doAction(playerNumber, MechanicsSettings.PASS, data.versionNo)
+    })
+    .on('exitMatch', () => {
+      match.doExit(ws)
+    })
+    .on('emote', () => {
+      const emote = 0 // TODO
+      match.signalEmote(playerNumber, emote)
+    })
+
+  // Websocketing closing for any reason
+  ws.onClose(() => {
+    match.doExit(ws)
+  })
 }

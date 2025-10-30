@@ -1,6 +1,8 @@
 import { Deck } from '../types/deck'
 import { CosmeticSet } from '../types/cosmeticSet'
 import { Achievement } from '../types/achievement'
+import GameModel from '../state/gameModel'
+import { Mulligan } from '../settings'
 export interface UserDataClientMessages {
   sendToken: {
     email: string
@@ -39,6 +41,36 @@ export interface UserDataClientMessages {
   harvestGarden: {
     index: number
   }
+
+  // MATCH RELEVANT
+  // to make only one init with the params about it
+  // Don't take the uuid, we already have it
+  initPvp: {
+    password: string
+    uuid: string
+    deck: Deck
+  }
+  initPve: {
+    aiDeck: Deck
+    uuid: string
+    deck: Deck
+  }
+  initTutorial: {
+    num: number
+    uuid: string
+  }
+  playCard: {
+    cardNum: number
+    versionNo: number
+  }
+  mulligan: {
+    mulligan: Mulligan
+  }
+  passTurn: {
+    versionNo: number
+  }
+  exitMatch: {}
+  emote: {}
 }
 
 export interface UserDataServerMessages {
@@ -68,4 +100,18 @@ export interface UserDataServerMessages {
     newGarden?: Date[]
     reward?: number
   }
+
+  // MATCH RELEVANT
+  matchStart: {
+    name1: string
+    name2: string
+    elo1: number
+    elo2: number
+  }
+  transmitState: {
+    state: GameModel
+  }
+  signalError: {}
+  opponentDisconnected: {}
+  opponentEmote: {}
 }

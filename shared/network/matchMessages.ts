@@ -2,6 +2,8 @@ import GameModel from '../state/gameModel'
 import { Mulligan } from '../settings'
 import { Deck } from '../types/deck'
 
+// TODO Get rid of this file
+
 export interface MatchClientMessages {
   initPvp: {
     password: string

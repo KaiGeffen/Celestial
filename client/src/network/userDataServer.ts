@@ -21,7 +21,8 @@ const port = 5555
 const code = 1000
 
 // The websocket which is open with the main server (Authentication/pack opening)
-var wsServer: UserDataClientWS = undefined
+// TODO This is getting used throughout match and all the logic is there, it should be here instead to be understood
+export var wsServer: UserDataClientWS = undefined
 
 type UserData = null | {
   uuid: string
