@@ -48,6 +48,8 @@ export default function createWebSocketServer() {
       // Remember the user once they've signed in
       let id: string = null
       let potentialEmail: string = null
+      let match: Match = null // Match if user is in one
+      let playerNumber: number = null // 0 or 1 for current match
 
       ws.on('sendToken', async ({ email, uuid, jti }) => {
         id = uuid
@@ -277,8 +279,7 @@ export default function createWebSocketServer() {
             reward: harvestResult.reward,
           })
         })
-        // MATCH RELEVANT
-        // TODO too much in this file, break out some logic somewhere else
+        // Connect to match
         .on('initPve', async ({ aiDeck, uuid, deck }) => {
           if (!id) return
           console.log(
@@ -288,8 +289,7 @@ export default function createWebSocketServer() {
               .join(', '),
           )
 
-          const match = new PveMatch(ws, uuid, deck, aiDeck)
-          registerEvents(ws, match, 0)
+          match = new PveMatch(ws, uuid, deck, aiDeck)
 
           // Analytics
           logFunnelEvent(uuid, 'play_mode', 'pve')
@@ -330,7 +330,7 @@ export default function createWebSocketServer() {
             logFunnelEvent(otherPlayer.uuid, 'play_mode', 'pvp_match_found')
 
             // Create a PvP match
-            const match = new PvpMatch(
+            match = new PvpMatch(
               ws,
               data.uuid,
               data.deck,
@@ -343,8 +343,9 @@ export default function createWebSocketServer() {
             delete searchingPlayers[data.password]
             // TODO Maybe just delete the last one? Somehow don't lose to race conditions
 
-            registerEvents(ws, match, 0)
-            registerEvents(otherPlayer.ws, match, 1)
+            // TODO
+            // registerEvents(ws, match, 0)
+            // registerEvents(otherPlayer.ws, match, 1)
 
             // Inform players that match started TODO That it's pvp specifically
             await match.notifyMatchStart()
@@ -373,17 +374,47 @@ export default function createWebSocketServer() {
         .on('initTutorial', async (data) => {
           console.log('Tutorial: ', data.num, 'for uuid: ', data.uuid)
 
-          const match = new TutorialMatch(ws, data.num, data.uuid)
-          registerEvents(ws, match, 0)
+          match = new TutorialMatch(ws, data.num, data.uuid)
 
           // Start the match
           await match.notifyState()
         })
+        // In match events
+        .on('playCard', (data) => {
+          if (!match) return
+          match.doAction(playerNumber, data.cardNum, data.versionNo)
+        })
+        .on('mulligan', (data) => {
+          if (!match) return
+          match.doMulligan(playerNumber, data.mulligan)
+        })
+        .on('passTurn', (data) => {
+          if (!match) return
+          match.doAction(playerNumber, MechanicsSettings.PASS, data.versionNo)
+        })
+        .on('exitMatch', () => {
+          if (!match) return
+          match.doExit(ws)
+          match = null
+
+          // TODO Remove refreshUserData from Messages
+          // Refresh the user's data
+        })
+        .on('emote', () => {
+          if (!match) return
+          match.signalEmote(playerNumber, 0)
+        })
 
       // Remove user from active list when they disconnect
       ws.onClose(() => {
+        console.log('User disconnected:', id)
         if (id && activePlayers[id] === ws) {
           delete activePlayers[id]
+        }
+
+        // If in a match, add to reconnect queue with that match
+        if (match) {
+          console.log('Was in a match TODO')
         }
       })
     } catch (e) {
@@ -459,29 +490,4 @@ async function sendUserData(
     .update(players)
     .set({ lastactive: new Date().toISOString() })
     .where(eq(players.id, id))
-}
-
-// Register each of the events that the server receives during a match
-function registerEvents(ws: ServerWS, match: Match, playerNumber: number) {
-  ws.on('playCard', (data) => {
-    match.doAction(playerNumber, data.cardNum, data.versionNo)
-  })
-    .on('mulligan', (data) => {
-      match.doMulligan(playerNumber, data.mulligan)
-    })
-    .on('passTurn', (data) => {
-      match.doAction(playerNumber, MechanicsSettings.PASS, data.versionNo)
-    })
-    .on('exitMatch', () => {
-      match.doExit(ws)
-    })
-    .on('emote', () => {
-      const emote = 0 // TODO
-      match.signalEmote(playerNumber, emote)
-    })
-
-  // Websocket closing for any reason
-  ws.onClose(() => {
-    match.doExit(ws)
-  })
 }
