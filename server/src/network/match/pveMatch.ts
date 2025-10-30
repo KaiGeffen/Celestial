@@ -21,7 +21,7 @@ class PveMatch extends Match {
 
     // NOTE Game is null to prevent doExit from being called again
     this.game = null
-    disconnectingWs.close()
+    // disconnectingWs.close()
   }
 
   async notifyState() {

@@ -65,7 +65,7 @@ class PvpMatch extends Match {
         if (ws !== disconnectingWs) {
           ws.send({ type: 'opponentDisconnected' })
         }
-        ws.close()
+        // ws.close()
       }),
     )
   }

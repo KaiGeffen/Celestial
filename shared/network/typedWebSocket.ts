@@ -3,7 +3,7 @@ export class TypedWebSocket<
   Sent extends Record<string, any>,
 > {
   private listeners: {
-    [T in keyof Received]?: Array<(data: Received[T]) => void>
+    [T in keyof Received]?: (data: Received[T]) => void
   } = {}
 
   ws: WebSocket
@@ -25,10 +25,9 @@ export class TypedWebSocket<
         return
       }
 
-      const listeners: Array<(data: Received[T]) => void> =
-        this.listeners[message.type]
-      if (listeners) {
-        listeners.forEach((callback) => callback(message))
+      const listener: (data: Received[T]) => void = this.listeners[message.type]
+      if (listener) {
+        listener(message)
       }
     }
   }
@@ -41,10 +40,7 @@ export class TypedWebSocket<
     messageType: T,
     callback: (data: Received[T]) => void,
   ): this {
-    if (!this.listeners[messageType]) {
-      this.listeners[messageType] = []
-    }
-    this.listeners[messageType]?.push(callback)
+    this.listeners[messageType] = callback
     return this
   }
 

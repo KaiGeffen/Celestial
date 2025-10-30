@@ -32,7 +32,7 @@ interface WaitingPlayer {
 let searchingPlayers: { [key: string]: WaitingPlayer } = {}
 
 // Create the websocket server
-export default function createUserDataServer() {
+export default function createWebSocketServer() {
   const wss = new WebSocketServer({ port: USER_DATA_PORT })
 
   wss.on('connection', async (socket: WebSocket) => {
@@ -463,7 +463,7 @@ function registerEvents(ws: ServerWS, match: Match, playerNumber: number) {
       match.signalEmote(playerNumber, emote)
     })
 
-  // Websocketing closing for any reason
+  // Websocket closing for any reason
   ws.onClose(() => {
     match.doExit(ws)
   })
