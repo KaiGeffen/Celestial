@@ -41,11 +41,44 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&display=swap" rel="stylesheet">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- Preload critical assets for faster FCP/LCP -->
+  <link rel="preload" href="assets/animation/video-poster.webp" as="image" fetchpriority="high">
+  <link rel="preload" href="assets/logo.svg" as="image" fetchpriority="high">
+
   <link rel="stylesheet" href="style.css">
+
+  <!-- Splash screen styles -->
+  <style>
+    #splash-screen {
+      transition: opacity 0.5s ease-out;
+    }
+
+    #splash-screen.fade-out {
+      opacity: 0;
+    }
+
+    #splash-logo {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10000;
+    }
+
+    #splash-logo img {
+      width: 20vw;
+      height: auto;
+      display: block;
+      pointer-events: none;
+    }
+  </style>
 
   <!-- Optimize Google Analytics loading -->
   <script>
@@ -54,7 +87,7 @@
     window.gtag = function(){window.dataLayer.push(arguments);};
     window.gtag('js', new Date());
     window.gtag('config', 'G-7E0LP0X7Y9');
-    
+
     // Load the actual GA script
     window.addEventListener('load', function() {
       setTimeout(function() {
@@ -71,7 +104,7 @@
     function isMobile() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
-    
+
     // Redirect to Discord if on mobile
     if (isMobile()) {
       window.location.href = "https://celestialdecks.gg/about/";
@@ -79,6 +112,14 @@
   </script>
 </head>
 <body>
+  <!-- Splash Screen - Shows immediately for fast FCP -->
+  <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('assets/animation/video-poster.webp'); background-size: cover; background-position: center; z-index: 9999;"></div>
+
+  <!-- Splash Logo - Same position as logo-container -->
+  <div id="splash-logo">
+    <img src="assets/logo.svg" alt="Celestial Logo" fetchpriority="high" />
+  </div>
+
   <!-- Animation -->
   <video class="animation" id="animation" loop autoplay playsinline muted style="display: none;">
     <source src="" type=video/mp4>
@@ -88,7 +129,7 @@
   <div id="logo-container" style="position: absolute; top: 0; left: 0; width: 100%; display: none; justify-content: center; pointer-events: none;">
     <img src="assets/logo.svg" alt="Celestial Logo" fetchpriority="high" style="width: 20vw; height: auto; display: block; pointer-events: none;" />
   </div>
-  
+
   <div class="game" id="game">
 
   <div id="signin" style="position: absolute; bottom: 118px; left: 50%; transform: translateX(-50%);"></div>
@@ -100,5 +141,66 @@
   <audio id="dialog">
     <source src="" type="audio/ogg">
   </audio>
+
+  <!-- Splash screen controller -->
+  <script>
+    // Transition splash to game
+    function transitionToGame() {
+      const splash = document.getElementById('splash-screen');
+      const splashLogo = document.getElementById('splash-logo');
+      const logoContainer = document.getElementById('logo-container');
+
+      // Fade out splash background
+      if (splash) {
+        splash.classList.add('fade-out');
+      }
+
+      // After fade completes, hide splash and show logo-container
+      setTimeout(function() {
+        if (splash) {
+          splash.style.display = 'none';
+        }
+        if (splashLogo) {
+          splashLogo.style.display = 'none';
+        }
+        if (logoContainer) {
+          logoContainer.style.display = 'flex';
+        }
+      }, 500); // Match fade transition duration
+    }
+
+    // Check if animation element is visible and ready to play
+    function isAnimationReady() {
+      const animation = document.getElementById('animation');
+      if (!animation) return false;
+
+      // Check if Cinematic.ensure() has been called (display is not 'none')
+      if (animation.style.display === 'none') return false;
+
+      // Check if video source has been set
+      if (!animation.src || animation.src === '') return false;
+
+      // Check if video has loaded enough data to play
+      // readyState: 0=HAVE_NOTHING, 1=HAVE_METADATA, 2=HAVE_CURRENT_DATA, 3=HAVE_FUTURE_DATA, 4=HAVE_ENOUGH_DATA
+      if (animation.readyState < 3) return false;
+
+      return true;
+    }
+
+    // Listen for Phaser game ready event
+    window.addEventListener('load', function() {
+      // Check if animation is visible and ready to play
+      const checkGameReady = setInterval(function() {
+        if (isAnimationReady()) {
+          clearInterval(checkGameReady);
+          // Wait a brief moment for video to start playing smoothly
+          setTimeout(transitionToGame, 200);
+        }
+      }, 100);
+
+      // Fallback: transition after 5 seconds regardless
+      setTimeout(transitionToGame, 5000);
+    });
+  </script>
 </body>
 </html>

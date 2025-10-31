@@ -75,6 +75,7 @@ module.exports = (_, argv) => {
         title: 'Caching',
         template: 'template.html',
         filename: '../index.html',
+        scriptLoading: 'defer',
       }),
     ],
     performance: {
