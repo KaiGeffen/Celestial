@@ -51,35 +51,6 @@
 
   <link rel="stylesheet" href="style.css">
 
-  <!-- Splash screen styles -->
-  <style>
-    #splash-screen {
-      transition: opacity 0.5s ease-out;
-    }
-
-    #splash-screen.fade-out {
-      opacity: 0;
-    }
-
-    #splash-logo {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      pointer-events: none;
-      z-index: 10000;
-    }
-
-    #splash-logo img {
-      width: 20vw;
-      height: auto;
-      display: block;
-      pointer-events: none;
-    }
-  </style>
-
   <!-- Optimize Google Analytics loading -->
   <script>
     // Initialize dataLayer and gtag stub immediately
@@ -113,12 +84,7 @@
 </head>
 <body>
   <!-- Splash Screen - Shows immediately for fast FCP -->
-  <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('assets/animation/video-poster.webp'); background-size: cover; background-position: center; z-index: 9999;"></div>
-
-  <!-- Splash Logo - Same position as logo-container -->
-  <div id="splash-logo">
-    <img src="assets/logo.svg" alt="Celestial Logo" fetchpriority="high" />
-  </div>
+  <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('assets/animation/video-poster.webp'); background-size: cover; background-position: center;"></div>
 
   <!-- Animation -->
   <video class="animation" id="animation" loop autoplay playsinline muted style="display: none;">
@@ -126,7 +92,7 @@
   </video>
 
   <!-- Logo -->
-  <div id="logo-container" style="position: absolute; top: 0; left: 0; width: 100%; display: none; justify-content: center; pointer-events: none;">
+  <div id="logo-container" style="position: absolute; top: 0; left: 0; width: 100%; display: flex; justify-content: center; pointer-events: none;">
     <img src="assets/logo.svg" alt="Celestial Logo" fetchpriority="high" style="width: 20vw; height: auto; display: block; pointer-events: none;" />
   </div>
 
@@ -144,31 +110,6 @@
 
   <!-- Splash screen controller -->
   <script>
-    // Transition splash to game
-    function transitionToGame() {
-      const splash = document.getElementById('splash-screen');
-      const splashLogo = document.getElementById('splash-logo');
-      const logoContainer = document.getElementById('logo-container');
-
-      // Fade out splash background
-      if (splash) {
-        splash.classList.add('fade-out');
-      }
-
-      // After fade completes, hide splash and show logo-container
-      setTimeout(function() {
-        if (splash) {
-          splash.style.display = 'none';
-        }
-        if (splashLogo) {
-          splashLogo.style.display = 'none';
-        }
-        if (logoContainer) {
-          logoContainer.style.display = 'flex';
-        }
-      }, 500); // Match fade transition duration
-    }
-
     // Check if animation element is visible and ready to play
     function isAnimationReady() {
       const animation = document.getElementById('animation');
@@ -193,8 +134,10 @@
       const checkGameReady = setInterval(function() {
         if (isAnimationReady()) {
           clearInterval(checkGameReady);
-          // Wait a brief moment for video to start playing smoothly
-          setTimeout(transitionToGame, 200);
+          const splash = document.getElementById('splash-screen');
+          if (splash) {
+            splash.style.display = 'none';
+          };
         }
       }, 100);
 
