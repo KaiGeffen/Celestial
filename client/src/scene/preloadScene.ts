@@ -9,6 +9,7 @@ import { Space, Url, UserSettings, Flags } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 import ensureMusic from '../loader/audioManager'
+import initializeSplashScreen from '../loader/splashLoader'
 import Cinematic from '../lib/cinematic'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
@@ -30,6 +31,9 @@ export class SigninScene extends Phaser.Scene {
   create(): void {
     // Clear any session storage (Related to a single page visit, not local storage)
     UserSettings.clearSessionStorage()
+
+    // Initialize splash screen transition logic
+    initializeSplashScreen()
 
     // Ensure animation is displayed
     Cinematic.ensure()
