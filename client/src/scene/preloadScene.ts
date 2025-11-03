@@ -32,9 +32,6 @@ export class SigninScene extends Phaser.Scene {
     // Clear any session storage (Related to a single page visit, not local storage)
     UserSettings.clearSessionStorage()
 
-    // Initialize splash screen transition logic
-    initializeSplashScreen()
-
     // Ensure animation is displayed
     Cinematic.ensure()
 
