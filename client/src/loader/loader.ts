@@ -119,21 +119,14 @@ export default class Loader {
     })
   }
 
-  // Loads all audio
+  // Loads all SFX, dialog handled in HTMLAudioElement
   private static loadAudio(scene: Phaser.Scene): void {
     const audioInfo = assetLists['sfx'] as unknown as AssetInfo
-    const dialogInfo = assetLists['dialog'] as unknown as AssetInfo
     const audioAssets = audioInfo?.files || []
-    const dialogAssets = dialogInfo?.files || []
 
     // Load SFX
     audioAssets.forEach((name) => {
       scene.load.audio(name, `sfx/${name}.opus`)
-    })
-
-    // Load dialog
-    dialogAssets.forEach((name) => {
-      scene.load.audio(`dialog-${name}`, `dialog/${name}.opus`)
     })
   }
 
