@@ -76,19 +76,19 @@ export default function createWebSocketServer() {
 
         // Check if user exists in database
         const result = await db
-          .select()
+          .select({ id: players.id })
           .from(players)
           .where(eq(players.id, uuid))
           .limit(1)
 
         if (result.length === 0) {
           ws.send({ type: 'promptUserInit' })
-        } else if (result.length === 1) {
+        } else {
           // Add to active users
           activePlayers[uuid] = ws
 
           // Send user their data
-          await sendUserData(ws, id, result[0])
+          await sendUserData(ws, id)
 
           // Handle achievements
           await AchievementManager.onConnection(id)
@@ -107,14 +107,7 @@ export default function createWebSocketServer() {
         }
       })
         .on('refreshUserData', async () => {
-          if (!id) return
-          const result = await db
-            .select()
-            .from(players)
-            .where(eq(players.id, id))
-            .limit(1)
-          if (result.length === 0) return
-          await sendUserData(ws, id, result[0])
+          await sendUserData(ws, id)
         })
         .on('sendDecks', async ({ decks }) => {
           if (!id) return
@@ -193,13 +186,27 @@ export default function createWebSocketServer() {
             activePlayers[id] = ws
 
             // Send user their data
-            await sendUserData(ws, id, data)
+            await sendUserData(ws, id)
 
             // Handle initial achievement
             await AchievementManager.onConnection(id)
           },
         )
-        // TODO Separate this to another "Store" server eventually
+        .on('setAchievementsSeen', async () => {
+          if (!id) return
+          await AchievementManager.setAchievementsSeen(id)
+        })
+        .on('harvestGarden', async ({ index }) => {
+          if (!id) return
+          const harvestResult = await Garden.harvest(id, index)
+          ws.send({
+            type: 'harvestGardenResult',
+            success: harvestResult.success,
+            newGarden: harvestResult.newGarden,
+            reward: harvestResult.reward,
+          })
+        })
+        // Store
         .on('purchaseItem', async ({ id: itemId }) => {
           if (!id) {
             throw new Error('User attempted to purchase item before signing in')
@@ -244,13 +251,7 @@ export default function createWebSocketServer() {
           })
 
           // Send updated user data
-          const result = await db
-            .select()
-            .from(players)
-            .where(eq(players.id, id))
-            .limit(1)
-          if (result.length === 0) return
-          await sendUserData(ws, id, result[0])
+          await sendUserData(ws, id)
         })
         .on('setCosmeticSet', async ({ value }) => {
           if (!id) return
@@ -258,20 +259,6 @@ export default function createWebSocketServer() {
             .update(players)
             .set({ cosmetic_set: JSON.stringify(value) })
             .where(eq(players.id, id))
-        })
-        .on('setAchievementsSeen', async () => {
-          if (!id) return
-          await AchievementManager.setAchievementsSeen(id)
-        })
-        .on('harvestGarden', async ({ index }) => {
-          if (!id) return
-          const harvestResult = await Garden.harvest(id, index)
-          ws.send({
-            type: 'harvestGardenResult',
-            success: harvestResult.success,
-            newGarden: harvestResult.newGarden,
-            reward: harvestResult.reward,
-          })
         })
         // Connect to match
         .on('initPve', async ({ aiDeck, uuid, deck }) => {
@@ -342,7 +329,7 @@ export default function createWebSocketServer() {
             // TODO Maybe just delete the last one? Somehow don't lose to race conditions
             delete searchingPlayers[data.password]
 
-            // Inform players that match started TODO That it's pvp specifically
+            // Inform players that match started TODO That it's pvp specifically (Change the name of the ws message to clarify that. All of this waits on deciding if elo/username is a part of gameState)
             await activeGame.match.notifyMatchStart()
 
             // Notify both players that they are connected
@@ -401,7 +388,7 @@ export default function createWebSocketServer() {
           activeGame.match.signalEmote(activeGame.playerNumber, 0)
         })
 
-      // Handle disconnect logic, including from a match
+      // Handle disconnect logic
       ws.onClose(() => {
         console.log('User disconnected:', id)
 
@@ -410,11 +397,11 @@ export default function createWebSocketServer() {
           delete activePlayers[id]
         }
 
-        // TODO If in a match, add to reconnect queue with that match
+        // Disconnect from active match
         if (activeGame.match) {
           activeGame.match.doDisconnect(ws)
 
-          // Add them to reconnect queue
+          // Queue them to be reconnected
           usersAwaitingReconnect[id] = activeGame
         }
       })
@@ -439,22 +426,18 @@ export default function createWebSocketServer() {
 }
 
 // Send the user their full data
-async function sendUserData(
-  ws: ServerWS,
-  id: string,
-  data: {
-    inventory: string
-    completedmissions: string
-    avatar_experience: number[]
-    decks: string[]
-    username: string
-    elo: number
-    garden: Date[]
-    gems: number
-    coins: number
-    cosmetic_set: string
-  },
-) {
+async function sendUserData(ws: ServerWS, id: string) {
+  // Get user's data
+  const result = await db
+    .select()
+    .from(players)
+    .where(eq(players.id, id))
+    .limit(1)
+
+  if (result.length === 0) return
+  const data = result[0]
+
+  // Parse decks
   let decks: Deck[] = []
   try {
     decks = data.decks.map((deck) => JSON.parse(deck))
@@ -475,6 +458,7 @@ async function sendUserData(
   // Get list of achievements
   const achievements = await AchievementManager.getAchievements(id)
 
+  // Send the user their data
   ws.send({
     type: 'sendUserData',
     inventory: data.inventory,
