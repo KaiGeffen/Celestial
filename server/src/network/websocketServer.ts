@@ -61,9 +61,11 @@ export default function createWebSocketServer() {
         playerNumber: null, // 0 or 1 for current match
       }
 
-      ws.on('sendToken', async ({ email, uuid, jti }) => {
-        id = uuid
+      ws.on('signIn', async ({ email, uuid, jti }) => {
+        // TODO If user has sent an email, check their jti
         potentialEmail = email
+
+        id = uuid
 
         // Check if user is already connected with a live websocket
         const existingWs = activePlayers[uuid]
@@ -90,38 +92,20 @@ export default function createWebSocketServer() {
 
           // Handle achievements
           await AchievementManager.onConnection(id)
+
+          // If user is in a match, reconnect them
+          if (usersAwaitingReconnect[uuid]) {
+            // Set the active game for this connection
+            activeGame = usersAwaitingReconnect[uuid]
+
+            // Remove them from the reconnect queue
+            delete usersAwaitingReconnect[uuid]
+
+            // Reconnect the user
+            activeGame.match.reconnectUser(ws, activeGame.playerNumber)
+          }
         }
       })
-        .on('sendGuestToken', async ({ uuid }) => {
-          id = uuid
-
-          // Check if user is already connected with a live websocket
-          const existingWs = activePlayers[uuid]
-          if (existingWs && existingWs.isOpen()) {
-            ws.send({ type: 'alreadySignedIn' })
-            return
-          }
-
-          // Check if guest user exists in database
-          const result = await db
-            .select()
-            .from(players)
-            .where(eq(players.id, uuid))
-            .limit(1)
-
-          if (result.length === 0) {
-            ws.send({ type: 'promptUserInit' })
-          } else if (result.length === 1) {
-            // Add to active users
-            activePlayers[uuid] = ws
-
-            // Send user their data
-            await sendUserData(ws, id, result[0])
-
-            // Handle achievements
-            await AchievementManager.onConnection(id)
-          }
-        })
         .on('refreshUserData', async () => {
           if (!id) return
           const result = await db

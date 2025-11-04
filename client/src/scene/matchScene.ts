@@ -49,6 +49,7 @@ export class MatchScene extends BaseScene {
     isPvp?: boolean
     password?: string
     aiDeck?: Deck
+    gameStartState?: GameModel
   }) {
     this.params = params
     // Reset variables
@@ -90,6 +91,14 @@ export class MatchScene extends BaseScene {
     this.paused = false
 
     this.setCallbacks(this.view)
+
+    // TODO Reorganize this
+    if (this.params.gameStartState) {
+      setTimeout(() => {
+        this.currentVersion = this.params.gameStartState.versionNo - 1
+        this.queueState(this.params.gameStartState)
+      }, 1000)
+    }
   }
 
   restart(): void {
@@ -131,6 +140,14 @@ export class MatchScene extends BaseScene {
       menu: 'message',
       title: 'Opponent Disconnected',
       s: 'Your opponent disconnected, now we wait for them to reconnect...',
+    })
+  }
+
+  signalOpponentReconnected(): void {
+    this.scene.launch('MenuScene', {
+      menu: 'message',
+      title: 'Opponent Reconnected',
+      s: 'Your opponent has reconnected, the game will resume!',
     })
   }
 
@@ -391,6 +408,9 @@ export class MatchScene extends BaseScene {
       })
       .on('opponentDisconnected', () => {
         this.signalOpponentDisconnect()
+      })
+      .on('opponentReconnected', () => {
+        this.signalOpponentReconnected()
       })
       .on('opponentEmote', (data) => {
         this.emote(0)

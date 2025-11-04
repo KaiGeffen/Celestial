@@ -3,13 +3,10 @@ import { CosmeticSet } from '../types/cosmeticSet'
 import { Mulligan } from '../settings'
 
 export default interface messagesToServer {
-  sendToken: {
-    email: string
+  signIn: {
+    email?: string
     uuid: string
-    jti: string
-  }
-  sendGuestToken: {
-    uuid: string
+    jti?: string
   }
   sendDecks: {
     decks: Deck[]

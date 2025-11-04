@@ -11,6 +11,8 @@ import { AchievementManager } from '../../achievementManager'
 import { saveGameState } from '../../db/gameState'
 import { randomUUID } from 'crypto'
 
+// TODO Timer logic for disconnects
+
 interface Match {
   gameId: string
   ws1: ServerWS | null
@@ -183,6 +185,38 @@ class Match implements Match {
 
   // Called when given ws is disconnecting, implemented in children
   async doDisconnect(disconnectingWs: ServerWS) {}
+
+  async reconnectUser(ws: ServerWS, playerNumber: number) {
+    if (playerNumber === 0) {
+      this.ws1 = ws
+    } else {
+      this.ws2 = ws
+    }
+
+    // Send user current state
+    await ws.send({
+      type: 'promptReconnect',
+      name1: 'TODO P1',
+      name2: 'TODO P2',
+      elo1: 111,
+      elo2: 222,
+      state: getClientGameModel(this.game.model, playerNumber, false),
+    })
+    // await ws.send({
+    //   type: 'transmitState',
+    //   state: getClientGameModel(this.game.model, playerNumber, false),
+    // })
+
+    // Send opp a message that their opp is back
+    let opponentWs = playerNumber === 0 ? this.ws2 : this.ws1
+    if (opponentWs) {
+      opponentWs.send({ type: 'opponentReconnected' })
+    }
+
+    // TODO Handle timer logic for reconnects
+
+    console.log('Reconnected user to match')
+  }
 
   // Get the name of player with given uuid
   private async getUsernameElo(

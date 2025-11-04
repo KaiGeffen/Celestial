@@ -30,6 +30,13 @@ export default interface messagesToClient {
     newGarden?: Date[]
     reward?: number
   }
+  promptReconnect: {
+    name1: string
+    name2: string
+    elo1: number
+    elo2: number
+    state: GameModel
+  }
   // MATCH RELEVANT
   matchStart: {
     name1: string
@@ -43,5 +50,6 @@ export default interface messagesToClient {
   signalError: {}
   opponentSurrendered: {}
   opponentDisconnected: {}
+  opponentReconnected: {}
   opponentEmote: {}
 }

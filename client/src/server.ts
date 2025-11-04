@@ -90,6 +90,16 @@ export default class Server {
           reward: reward,
         })
       })
+      .on('promptReconnect', (data) => {
+        setTimeout(() => {
+          game.scene.start('StandardMatchScene', {
+            isPvp: true,
+            deck: [],
+            aiDeck: [],
+            gameStartState: data.state,
+          })
+        }, 5000)
+      })
   }
 
   // Log in with the server for user with given OAuth token
@@ -120,7 +130,7 @@ export default class Server {
     // Immediately send the payload information to server
     server.onOpen(() => {
       server.send({
-        type: 'sendToken',
+        type: 'signIn',
         email,
         uuid,
         jti,
@@ -208,7 +218,7 @@ export default class Server {
     // Send guest token with just UUID
     server.onOpen(() => {
       server.send({
-        type: 'sendGuestToken',
+        type: 'signIn',
         uuid,
       })
     })

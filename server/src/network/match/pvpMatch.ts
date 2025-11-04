@@ -74,12 +74,7 @@ class PvpMatch extends Match {
     // Don't send disconnect message if the game has already ended
     if (this.game === null || this.game.model.winner !== null) return
 
-    // Set the winner, notify connected players
-    const winner = this.ws1 === disconnectingWs ? 1 : 0
-
     // TODO Allow time for reconnect
-    this.game.setWinnerViaSurrender(winner)
-    await this.notifyState()
 
     // Notify opponent
     await Promise.all(
