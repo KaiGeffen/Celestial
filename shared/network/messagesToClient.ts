@@ -31,10 +31,6 @@ export default interface messagesToClient {
     reward?: number
   }
   promptReconnect: {
-    name1: string
-    name2: string
-    elo1: number
-    elo2: number
     state: GameModel
   }
   // MATCH RELEVANT

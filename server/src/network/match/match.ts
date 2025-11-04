@@ -196,16 +196,8 @@ class Match implements Match {
     // Send user current state
     await ws.send({
       type: 'promptReconnect',
-      name1: 'TODO P1',
-      name2: 'TODO P2',
-      elo1: 111,
-      elo2: 222,
       state: getClientGameModel(this.game.model, playerNumber, false),
     })
-    // await ws.send({
-    //   type: 'transmitState',
-    //   state: getClientGameModel(this.game.model, playerNumber, false),
-    // })
 
     // Send opp a message that their opp is back
     let opponentWs = playerNumber === 0 ? this.ws2 : this.ws1
