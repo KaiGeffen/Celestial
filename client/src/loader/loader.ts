@@ -128,12 +128,12 @@ export default class Loader {
 
     // Load SFX
     audioAssets.forEach((name) => {
-      scene.load.audio(name, `sfx/${name}.mp3`)
+      scene.load.audio(name, `sfx/${name}.opus`)
     })
 
     // Load dialog
     dialogAssets.forEach((name) => {
-      scene.load.audio(`dialog-${name}`, `dialog/${name}.mp3`)
+      scene.load.audio(`dialog-${name}`, `dialog/${name}.opus`)
     })
   }
 
