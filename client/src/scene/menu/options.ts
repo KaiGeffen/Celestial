@@ -6,6 +6,7 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 import Menu from './menu'
 import BaseScene from '../baseScene'
+import { MatchScene } from '../matchScene'
 import {
   Space,
   Color,
@@ -218,6 +219,7 @@ export default class OptionsMenu extends Menu {
 
     return sizer
   }
+
   private createAudioPanel() {
     let sizer = this.scene.rexUI.add
       .sizer({
@@ -482,9 +484,10 @@ export default class OptionsMenu extends Menu {
       .add(containerQuit)
       .addSpace()
 
+    const buttonText = activeScene instanceof MatchScene ? 'Surrender' : 'Quit'
     new Buttons.Basic({
       within: containerQuit,
-      text: 'Quit',
+      text: buttonText,
       f: () => {
         // Stop this menu scene
         this.scene.scene.stop()
