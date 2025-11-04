@@ -120,8 +120,20 @@ export class SigninScene extends Phaser.Scene {
     })
   }
 
-  // Navigate to the first scene user should see (Home or Tutorial)
+  // Navigate to the first scene user sees (Home, tutorial, or reconnect to a match)
   protected startFirstScene(): void {
+    // Check if there's a pending reconnect - if so, start the match scene
+    const reconnect = Server.getPendingReconnect()
+    if (reconnect) {
+      this.scene.start('StandardMatchScene', {
+        isPvp: true,
+        deck: [],
+        aiDeck: [],
+        gameStartState: reconnect.state,
+      })
+      return
+    }
+
     // If the last tutorial isn't complete, start the next tutorial
     const missions = UserSettings._get('completedMissions')
     if (!missions[TUTORIAL_LENGTH - 1]) {

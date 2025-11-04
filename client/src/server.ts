@@ -14,6 +14,7 @@ import { ClientWS } from '../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../shared/types/deck'
 import { CosmeticSet } from '../../shared/types/cosmeticSet'
 import { Achievement } from '../../shared/types/achievement'
+import GameModel from '../../shared/state/gameModel'
 import { v5 as uuidv5 } from 'uuid'
 const ip = '127.0.0.1'
 const port = 5555
@@ -38,6 +39,7 @@ type UserData = null | {
 
 export default class Server {
   private static userData: UserData = null
+  private static pendingReconnect: { state: GameModel } | null = null
 
   // Register common websocket event handlers for both OAuth and guest login
   private static registerCommonHandlers(
@@ -91,14 +93,8 @@ export default class Server {
         })
       })
       .on('promptReconnect', (data) => {
-        setTimeout(() => {
-          game.scene.start('StandardMatchScene', {
-            isPvp: true,
-            deck: [],
-            aiDeck: [],
-            gameStartState: data.state,
-          })
-        }, 5000)
+        // Store reconnect data for PreloadScene to handle after assets load
+        this.pendingReconnect = { state: data.state }
       })
   }
 
@@ -379,6 +375,13 @@ export default class Server {
         UserSettings._get('completedMissions'),
       ),
     })
+  }
+
+  // Get and clear pending reconnect data
+  static getPendingReconnect(): { state: GameModel } | null {
+    const reconnect = this.pendingReconnect
+    this.pendingReconnect = null
+    return reconnect
   }
 
   static getUserData(): UserData {

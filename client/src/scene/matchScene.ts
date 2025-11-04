@@ -59,8 +59,11 @@ export class MatchScene extends BaseScene {
     // Register each hook for a message from the server
     this.registerMatchServerHooks()
 
-    // Send initial message to the server
-    if (this.isTutorial) {
+    // Send initial message to the server, unless we're reconnecting
+    if (this.params.gameStartState) {
+      this.currentVersion = this.params.gameStartState.versionNo - 1
+      this.queueState(this.params.gameStartState)
+    } else if (this.isTutorial) {
       server.send({
         type: 'initTutorial',
         num: params.missionID,
@@ -91,14 +94,6 @@ export class MatchScene extends BaseScene {
     this.paused = false
 
     this.setCallbacks(this.view)
-
-    // TODO Reorganize this
-    if (this.params.gameStartState) {
-      setTimeout(() => {
-        this.currentVersion = this.params.gameStartState.versionNo - 1
-        this.queueState(this.params.gameStartState)
-      }, 1000)
-    }
   }
 
   restart(): void {
@@ -147,7 +142,7 @@ export class MatchScene extends BaseScene {
     this.scene.launch('MenuScene', {
       menu: 'message',
       title: 'Opponent Reconnected',
-      s: 'Your opponent has reconnected, the game will resume!',
+      s: 'Your opponent has reconnected, resuming the game.',
     })
   }
 
