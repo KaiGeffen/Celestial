@@ -173,7 +173,7 @@ class ServerController {
     this.model.mulligansComplete[player] = true
   }
 
-  setWinnerViaDisconnect(winner: number): void {
+  setWinnerViaSurrender(winner: number): void {
     this.model.winner = winner
     this.model.mulligansComplete = [true, true]
     this.model.versionIncrClearAnimations()

@@ -153,7 +153,7 @@ async function createUserConnection(userId: number): Promise<void> {
         gameState.versionNo = message.state.versionNo
         // Toggle turn based on priority
         gameState.isMyTurn = message.state.priority === 0
-      } else if (message.type === 'opponentDisconnected') {
+      } else if (message.type === 'opponentSurrendered') {
         gameState.inGame = false
       }
     })

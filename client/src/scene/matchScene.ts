@@ -98,7 +98,7 @@ export class MatchScene extends BaseScene {
 
   beforeExit() {
     server.send({
-      type: 'exitMatch',
+      type: 'surrender',
     })
     Server.refreshUserData()
   }
@@ -118,8 +118,15 @@ export class MatchScene extends BaseScene {
     this.maxVersion = Math.max(this.maxVersion, state.versionNo)
   }
 
-  signalDC(): void {
-    // Show a message that opponent disconnected
+  signalOpponentSurrendered(): void {
+    this.scene.launch('MenuScene', {
+      menu: 'message',
+      title: 'Opponent Surrendered',
+      s: 'Your opponent surrendered, you win!',
+    })
+  }
+
+  signalOpponentDisconnect(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
       title: 'Opponent Disconnected',
@@ -379,8 +386,11 @@ export class MatchScene extends BaseScene {
         this.signalError('Server says that an action was in error.')
         console.log('Server says that an action was in error.')
       })
+      .on('opponentSurrendered', () => {
+        this.signalOpponentSurrendered()
+      })
       .on('opponentDisconnected', () => {
-        this.signalDC()
+        this.signalOpponentDisconnect()
       })
       .on('opponentEmote', (data) => {
         this.emote(0)

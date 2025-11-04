@@ -66,6 +66,7 @@ export default interface messagesToServer {
   passTurn: {
     versionNo: number
   }
-  exitMatch: {}
+  surrender: {}
+  disconnect: {}
   emote: {}
 }

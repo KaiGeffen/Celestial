@@ -178,8 +178,11 @@ class Match implements Match {
     }
   }
 
+  // Called when given ws is surrendering, implemented in children
+  async doSurrender(disconnectingWs: ServerWS) {}
+
   // Called when given ws is disconnecting, implemented in children
-  async doExit(disconnectingWs: ServerWS) {}
+  async doDisconnect(disconnectingWs: ServerWS) {}
 
   // Get the name of player with given uuid
   private async getUsernameElo(

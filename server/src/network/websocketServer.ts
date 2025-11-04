@@ -403,9 +403,9 @@ export default function createWebSocketServer() {
             data.versionNo,
           )
         })
-        .on('exitMatch', () => {
+        .on('surrender', () => {
           if (!activeGame.match) return
-          activeGame.match.doExit(ws)
+          activeGame.match.doSurrender(ws)
           activeGame.match = null
 
           // TODO Remove refreshUserData from Messages
@@ -416,7 +416,7 @@ export default function createWebSocketServer() {
           activeGame.match.signalEmote(activeGame.playerNumber, 0)
         })
 
-      // Remove user from active list when they disconnect
+      // Handle disconnect logic, including from a match
       ws.onClose(() => {
         console.log('User disconnected:', id)
 
@@ -425,9 +425,9 @@ export default function createWebSocketServer() {
           delete activePlayers[id]
         }
 
-        // If in a match, add to reconnect queue with that match
+        // TODO If in a match, add to reconnect queue with that match
         if (activeGame.match) {
-          activeGame.match.doExit(ws)
+          activeGame.match.doDisconnect(ws)
         }
       })
     } catch (e) {

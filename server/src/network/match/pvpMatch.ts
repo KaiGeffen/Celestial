@@ -49,17 +49,39 @@ class PvpMatch extends Match {
     })
   }
 
-  // Given ws is disconnecting
-  async doExit(disconnectingWs: ServerWS) {
+  // Called when ws has surrendered
+  async doSurrender(disconnectingWs: ServerWS) {
     // Don't send disconnect message if the game has already ended
     if (this.game === null || this.game.model.winner !== null) return
 
     // Set the winner, notify connected players
     const winner = this.ws1 === disconnectingWs ? 1 : 0
-    this.game.setWinnerViaDisconnect(winner)
+    this.game.setWinnerViaSurrender(winner)
     await this.notifyState()
 
-    // Notify opponent and close websockets
+    // Notify opponent
+    await Promise.all(
+      this.getActiveWsList().map((ws: ServerWS) => {
+        if (ws !== disconnectingWs) {
+          ws.send({ type: 'opponentSurrendered' })
+        }
+      }),
+    )
+  }
+
+  // Called when ws has disconnected
+  async doDisconnect(disconnectingWs: ServerWS) {
+    // Don't send disconnect message if the game has already ended
+    if (this.game === null || this.game.model.winner !== null) return
+
+    // Set the winner, notify connected players
+    const winner = this.ws1 === disconnectingWs ? 1 : 0
+
+    // TODO Allow time for reconnect
+    this.game.setWinnerViaSurrender(winner)
+    await this.notifyState()
+
+    // Notify opponent
     await Promise.all(
       this.getActiveWsList().map((ws: ServerWS) => {
         if (ws !== disconnectingWs) {
