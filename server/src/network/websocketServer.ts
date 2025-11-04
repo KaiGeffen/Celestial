@@ -371,15 +371,6 @@ export default function createWebSocketServer() {
               activeGame: activeGame,
             }
             searchingPlayers[data.password] = waitingPlayer
-
-            // Ensure that if they leave, they are removed from the queue
-            const f = () => {
-              console.log('Player disconnected before getting into a match:')
-              delete searchingPlayers[data.password]
-              ws.close()
-            }
-            ws.on('exitMatch', f)
-            ws.onClose(f)
           }
         })
         .on('initTutorial', async (data) => {
@@ -428,13 +419,15 @@ export default function createWebSocketServer() {
       // Remove user from active list when they disconnect
       ws.onClose(() => {
         console.log('User disconnected:', id)
-        if (id && activePlayers[id] === ws) {
+
+        // Remove them from active players
+        if (activePlayers[id] === ws) {
           delete activePlayers[id]
         }
 
         // If in a match, add to reconnect queue with that match
         if (activeGame.match) {
-          console.log('Was in a match TODO')
+          activeGame.match.doExit(ws)
         }
       })
     } catch (e) {
