@@ -21,6 +21,13 @@ import { MechanicsSettings } from '../../../shared/settings'
 import { logFunnelEvent } from '../db/analytics'
 import TutorialMatch from './match/tutorialMatch'
 
+// An ongoing match
+class ActiveGame {
+  match: Match
+  // Whether this is player 0 or 1 in the match
+  playerNumber: number
+}
+
 // A player waiting for a game and their associated data
 interface WaitingPlayer {
   ws: ServerWS
@@ -35,14 +42,8 @@ let searchingPlayers: { [key: string]: WaitingPlayer } = {}
 // List of active player connections
 let activePlayers: { [key: string]: ServerWS } = {}
 
-// List of user ids that should attempt to reconnect if they regain connection
-let playersToReconnect: Set<string> = new Set()
-
-class ActiveGame {
-  match: Match
-  // Whether this is player 0 or 1 in the match
-  playerNumber: number
-}
+// Dictionary of players that could reconnect, and the match they were in
+let usersAwaitingReconnect: { [key: string]: ActiveGame } = {}
 
 // Create the websocket server
 export default function createWebSocketServer() {
@@ -428,6 +429,9 @@ export default function createWebSocketServer() {
         // TODO If in a match, add to reconnect queue with that match
         if (activeGame.match) {
           activeGame.match.doDisconnect(ws)
+
+          // Add them to reconnect queue
+          usersAwaitingReconnect[id] = activeGame
         }
       })
     } catch (e) {
@@ -438,11 +442,16 @@ export default function createWebSocketServer() {
   console.log('User-data server is running on port: ', USER_DATA_PORT)
 
   // TODO Remove
-  // Debug: Print active users every 5 seconds
+  // Debug: Print active users every 2 seconds
   setInterval(() => {
     const userIds = Object.keys(activePlayers)
     console.log(`Active users (${userIds.length}):`, userIds)
-  }, 5000)
+    const awaitingReconnectIds = Object.keys(usersAwaitingReconnect)
+    console.log(
+      `Awaiting reconnect (${awaitingReconnectIds.length}):`,
+      awaitingReconnectIds,
+    )
+  }, 2000)
 }
 
 // Send the user their full data

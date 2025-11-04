@@ -51,15 +51,15 @@ class PvpMatch extends Match {
 
   // Called when ws has surrendered
   async doSurrender(disconnectingWs: ServerWS) {
-    // Don't send disconnect message if the game has already ended
+    // Skip if game is already over
     if (this.game === null || this.game.model.winner !== null) return
 
-    // Set the winner, notify connected players
+    // Set the winner, notify players of new state
     const winner = this.ws1 === disconnectingWs ? 1 : 0
     this.game.setWinnerViaSurrender(winner)
     await this.notifyState()
 
-    // Notify opponent
+    // Notify that a surrender happened
     await Promise.all(
       this.getActiveWsList().map((ws: ServerWS) => {
         if (ws !== disconnectingWs) {

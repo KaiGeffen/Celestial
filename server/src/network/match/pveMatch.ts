@@ -23,6 +23,8 @@ class PveMatch extends Match {
     this.game = null
   }
 
+  // TODO Handle disconnect separately
+
   async notifyState() {
     await super.notifyState()
 

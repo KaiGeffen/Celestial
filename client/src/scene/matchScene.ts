@@ -130,7 +130,7 @@ export class MatchScene extends BaseScene {
     this.scene.launch('MenuScene', {
       menu: 'message',
       title: 'Opponent Disconnected',
-      s: 'Your opponent disconnected, you win!',
+      s: 'Your opponent disconnected, now we wait for them to reconnect...',
     })
   }
 
