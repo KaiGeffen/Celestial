@@ -287,8 +287,9 @@ export default class Server {
 
   // Send server an updated list of decks
   static sendDecks(decks: Deck[]): void {
-    if (server === undefined) {
-      throw 'Sending decks when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Sending decks when server ws doesnt exist.')
+      return
     }
     server.send({
       type: 'sendDecks',
@@ -298,8 +299,9 @@ export default class Server {
 
   // Send server user's inventory of unlocked cards
   static sendInventory(inventory: boolean[]): void {
-    if (server === undefined) {
-      throw 'Sending inventory when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Sending inventory when server ws doesnt exist.')
+      return
     }
     server.send({
       type: 'sendInventory',
@@ -309,8 +311,9 @@ export default class Server {
 
   // Send server user's list of completed missions
   static sendCompletedMissions(missions: boolean[]): void {
-    if (server === undefined) {
-      throw 'Sending completed missions when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Sending completed missions when server ws doesnt exist.')
+      return
     }
     server.send({
       type: 'sendCompletedMissions',
@@ -320,8 +323,9 @@ export default class Server {
 
   // Send server user's experience with each avatar
   static sendAvatarExperience(experience: number[]): void {
-    if (server === undefined) {
-      throw 'Sending avatar experience when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Sending avatar experience when server ws doesnt exist.')
+      return
     }
     server.send({
       type: 'sendAvatarExperience',
@@ -331,8 +335,9 @@ export default class Server {
 
   // Send server user's list of completed missions
   static purchaseItem(id: number, cost: number): void {
-    if (server === undefined) {
-      throw 'Purchasing item when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Purchasing item when server ws doesnt exist.')
+      return
     }
     server.send({
       type: 'purchaseItem' as const,
@@ -345,8 +350,9 @@ export default class Server {
   }
 
   static setCosmeticSet(cosmeticSet: CosmeticSet): void {
-    if (server === undefined) {
-      throw 'Setting cosmetic set when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Setting cosmetic set when server ws doesnt exist.')
+      return
     }
 
     // Change it locally
@@ -360,8 +366,9 @@ export default class Server {
 
   // Send all data necessary to initialize a user
   static sendInitialUserData(username: string): void {
-    if (server === undefined) {
-      throw 'Sending initial user data when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Sending initial user data when server ws doesnt exist.')
+      return
     }
 
     server.send({
@@ -407,8 +414,9 @@ export default class Server {
   }
 
   static setAchievementsSeen(): void {
-    if (server === undefined) {
-      throw 'Setting achievements seen when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Setting achievements seen when server ws doesnt exist.')
+      return
     }
 
     this.userData.achievements.forEach((achievement) => {
@@ -421,8 +429,9 @@ export default class Server {
   }
 
   static harvestGarden(plotNumber: number): void {
-    if (server === undefined) {
-      throw 'Harvesting garden when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Harvesting garden when server ws doesnt exist.')
+      return
     }
     server.send({
       type: 'harvestGarden',
