@@ -33,7 +33,11 @@ export class TypedWebSocket<
   }
 
   send<T extends keyof Sent>(message: Sent[T] & { type: T }): void {
-    return this.ws.send(JSON.stringify(message))
+    if (!this.isOpen()) {
+      console.log('WebSocket is not open, message not sent:', message)
+      return
+    }
+    this.ws.send(JSON.stringify(message))
   }
 
   on<T extends keyof Received>(

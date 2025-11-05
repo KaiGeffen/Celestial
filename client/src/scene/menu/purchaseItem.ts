@@ -37,11 +37,6 @@ export default class PurchaseItemMenu extends Menu {
   }
 
   private handlePurchase(): void {
-    if (!Server.isLoggedIn()) {
-      this.scene.signalError('You must be logged in to make purchases.')
-      return
-    }
-
     if (this.balance < this.item.cost) {
       this.scene.signalError('Insufficient gems to make this purchase.')
       return

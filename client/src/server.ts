@@ -194,8 +194,12 @@ export default class Server {
         )
         console.log(payload)
 
-        Server.login(payload, game)
+        // Server.login(payload, game)
       }
+    }
+
+    server.ws.onerror = (event: Event) => {
+      console.error(`WebSocket error: ${event}`)
     }
   }
 
@@ -261,28 +265,17 @@ export default class Server {
     // Clear the sign-in token
     localStorage.removeItem(Url.gsi_token)
 
-    if (Server.isLoggedIn()) {
-      console.log('server was logged in and now its logging out...')
+    server.close(code)
+    server = undefined
 
-      server.close(code)
-      server = undefined
-
-      UserSettings.clearSessionStorage()
-    }
-  }
-
-  // Returns if the user is logged in
-  static isLoggedIn(): boolean {
-    return server !== undefined
+    UserSettings.clearSessionStorage()
   }
 
   // Call the server to refresh the user data
   static refreshUserData(): void {
-    if (Server.isLoggedIn()) {
-      server.send({
-        type: 'refreshUserData',
-      })
-    }
+    server.send({
+      type: 'refreshUserData',
+    })
   }
 
   // Send server an updated list of decks

@@ -3,6 +3,7 @@ import { CosmeticSet } from '../types/cosmeticSet'
 import { Mulligan } from '../settings'
 
 export default interface messagesToServer {
+  // TODO
   signIn: {
     email?: string
     uuid: string

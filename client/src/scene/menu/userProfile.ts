@@ -161,7 +161,7 @@ export default class UserProfileMenu extends Menu {
 
     new Buttons.Basic({
       within: container,
-      text: Server.isLoggedIn() ? 'Logout' : 'Login',
+      text: 'Logout',
       f: () => {
         Server.logout()
 

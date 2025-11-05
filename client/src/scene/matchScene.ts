@@ -410,16 +410,6 @@ export class MatchScene extends BaseScene {
       .on('opponentEmote', (data) => {
         this.emote(0)
       })
-
-    server.ws.onclose = () => {
-      // scene.signalError('Disconnected from the server')
-      console.error('Server ws closed')
-    }
-
-    server.ws.onerror = (event: Event) => {
-      this.signalError(`WebSocket error: ${event}`)
-      console.error('WebSocket error!')
-    }
   }
 
   onWindowResize(): void {

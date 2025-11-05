@@ -56,11 +56,6 @@ export default class HomeScene extends BaseScene {
   }
 
   private createUserDetails(): void {
-    if (!Server.isLoggedIn()) {
-      this.createLoginButton()
-      return
-    }
-
     const regionWidth = Space.avatarSize + Space.pad * 2
     const regionHeight = 200
     const userDetails = this.add.container(
@@ -166,17 +161,13 @@ export default class HomeScene extends BaseScene {
       x: Space.pad + Space.iconSize * 0.5,
       y: Space.pad + Space.iconSize * 0.5,
       f: () => {
-        if (Server.isLoggedIn()) {
-          // TODO Standardize this - either quests or achievements
-          this.scene.launch('MenuScene', {
-            menu: 'achievements',
-            activeScene: this,
-          })
+        // TODO Standardize this - either quests or achievements
+        this.scene.launch('MenuScene', {
+          menu: 'achievements',
+          activeScene: this,
+        })
 
-          logEvent('view_quests')
-        } else {
-          this.signalError('Must be signed in.')
-        }
+        logEvent('view_quests')
       },
       hint: 'Quests',
       muteClick: true,
@@ -202,13 +193,9 @@ export default class HomeScene extends BaseScene {
       x: Space.pad + Space.iconSize * 0.5,
       y: Space.pad * 2 + Space.iconSize * 1.5,
       f: () => {
-        if (Server.isLoggedIn()) {
-          this.scene.start('StoreScene')
+        this.scene.start('StoreScene')
 
-          logEvent('view_store')
-        } else {
-          this.signalError('Must be signed in.')
-        }
+        logEvent('view_store')
       },
       hint: 'Store',
     })
@@ -219,13 +206,9 @@ export default class HomeScene extends BaseScene {
       x: Space.pad * 2 + Space.iconSize * 1.5,
       y: Space.pad * 2 + Space.iconSize * 1.5,
       f: () => {
-        if (Server.isLoggedIn()) {
-          this.scene.start('MatchHistoryScene')
+        this.scene.start('MatchHistoryScene')
 
-          logEvent('view_match_history')
-        } else {
-          this.signalError('Must be signed in.')
-        }
+        logEvent('view_match_history')
       },
       hint: 'Match History',
     })
