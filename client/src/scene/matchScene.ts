@@ -259,6 +259,12 @@ export class MatchScene extends BaseScene {
 
     // Mulligan
     view.mulligan.setCallback(() => {
+      if (!server.isOpen()) {
+        this.signalError('Server is disconnected.')
+        return
+      }
+
+      // Get the choice and send to server
       const choice: [boolean, boolean, boolean] = view.mulligan.mulliganChoices
       server.send({
         type: 'mulligan',
