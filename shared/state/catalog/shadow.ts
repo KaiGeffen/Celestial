@@ -193,7 +193,7 @@ class Victim extends Card {
 const victim = new Victim({
   name: 'Victim',
   id: 43,
-  cost: 1,
+  cost: 2,
   text: 'If you lose this round, Nourish -1 your opponent for each point you lost by.',
 })
 
