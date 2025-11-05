@@ -9,6 +9,7 @@ import {
   Ease,
 } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
+import { server } from '../server'
 import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -466,6 +467,11 @@ export default class JourneyScene extends BaseScene {
       within: cont3,
       text: 'Start',
       f: () => {
+        if (!server || !server.isOpen()) {
+          this.signalError('Server is disconnected.')
+          return
+        }
+
         // Start journey
         const deck: Deck = {
           name: 'Journey deck',

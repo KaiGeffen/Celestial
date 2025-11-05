@@ -8,6 +8,7 @@ import GameModel from '../../../../shared/state/gameModel'
 import avatarNames from '../../data/avatarNames'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import logEvent from '../../utils/analytics'
+import { server } from '../../server'
 
 export default class MatchResultsRegion extends Region {
   // Whether the results have been seen already
@@ -353,6 +354,11 @@ export class ResultsRegionTutorial extends MatchResultsRegion {
       if (this.missionID >= TUTORIAL_LENGTH) {
         this.scene.scene.start('HomeScene')
       } else {
+        if (!server || !server.isOpen()) {
+          this.scene.signalError('Server is disconnected.')
+          return
+        }
+
         this.scene.scene.start('TutorialMatchScene', {
           missionID: this.missionID,
         })

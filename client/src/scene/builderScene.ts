@@ -2,6 +2,7 @@ import 'phaser'
 import Card from '../../../shared/state/card'
 import BaseScene from './baseScene'
 import { Deck } from '../../../shared/types/deck'
+import { server } from '../server'
 
 import CatalogRegion, { CatalogRegionJourney } from './builderRegions/catalog'
 import DeckRegion from './builderRegions/deck'
@@ -131,6 +132,11 @@ export class JourneyBuilderScene extends BuilderBase {
 
   private startCallback(): () => void {
     return () => {
+      if (!server || !server.isOpen()) {
+        this.signalError('Server is disconnected.')
+        return
+      }
+
       // Create a proper deck object using the new type
       const aiDeck: Deck = {
         name: 'AI Deck',
