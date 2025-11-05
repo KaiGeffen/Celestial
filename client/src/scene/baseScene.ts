@@ -162,8 +162,8 @@ export default class BaseScene extends SharedBaseScene {
 
     // Anchor below options button
     this.plugins.get('rexAnchor')['add'](this.btnNetworkStatus.icon, {
-      x: `100%-${Space.pad + (Space.iconSize * 3) / 2 + Space.pad}`,
-      y: `0%+${Space.pad + Space.iconSize / 2}`,
+      x: `100%-${Space.pad + Space.iconSize * 1.5}`,
+      y: `0%+${Space.pad + Space.iconSize * 1.5}`,
     })
 
     // When esc key is pressed, toggle the menu open/closed
