@@ -215,7 +215,7 @@ export default class OptionsMenu extends Menu {
       .addSpace()
       .add(this.createHotkeys(), { expand: true })
       .addSpace()
-      .add(this.createQuit(activeScene), { expand: true })
+      .add(this.createHome(activeScene), { expand: true })
 
     return sizer
   }
@@ -467,10 +467,10 @@ export default class OptionsMenu extends Menu {
     return sizer
   }
 
-  private createQuit(activeScene: BaseScene) {
+  private createHome(activeScene: BaseScene) {
     let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
-    let containerQuit = new ContainerLite(
+    let containerHome = new ContainerLite(
       this.scene,
       0,
       0,
@@ -481,12 +481,13 @@ export default class OptionsMenu extends Menu {
       .addSpace()
       .add(this.createCancelButton())
       .addSpace()
-      .add(containerQuit)
+      .add(containerHome)
       .addSpace()
 
-    const buttonText = activeScene instanceof MatchScene ? 'Surrender' : 'Quit'
+    const buttonText =
+      activeScene instanceof MatchScene ? 'Surrender' : 'Go Home'
     new Buttons.Basic({
-      within: containerQuit,
+      within: containerHome,
       text: buttonText,
       f: () => {
         // Stop this menu scene
