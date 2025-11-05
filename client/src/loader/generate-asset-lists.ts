@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import sharp from 'sharp'
+import ffmpeg from 'fluent-ffmpeg'
 
 const ASSETS_ROOT = path.join(__dirname, '../../../client/assets')
 
@@ -63,6 +64,37 @@ async function convertPngToWebp(pngPath: string): Promise<string> {
   }
 }
 
+// Function to convert MP3 to Opus using FFmpeg
+async function convertMp3ToOpus(mp3Path: string): Promise<string> {
+  const opusPath = mp3Path.replace('.mp3', '.opus')
+
+  return new Promise((resolve, reject) => {
+    ffmpeg(mp3Path)
+      .audioCodec('libopus')
+      .audioBitrate('96k') // 96 kbps provides excellent quality for game audio
+      .audioChannels(2) // Stereo
+      .audioFrequency(48000) // 48 kHz sample rate (Opus standard)
+      .output(opusPath)
+      .on('end', () => {
+        console.log(`Converted ${mp3Path} to ${opusPath}`)
+
+        // Delete the original MP3 file after successful conversion
+        try {
+          fs.unlinkSync(mp3Path)
+          resolve(opusPath)
+        } catch (error) {
+          console.error(`Failed to delete ${mp3Path}:`, error)
+          resolve(opusPath) // Still resolve with opus path even if deletion fails
+        }
+      })
+      .on('error', (error) => {
+        console.error(`Failed to convert ${mp3Path} to Opus:`, error)
+        reject(error)
+      })
+      .run()
+  })
+}
+
 function parseDimensions(
   dirName: string,
 ): { width: number; height: number } | undefined {
@@ -89,10 +121,26 @@ async function getAssetFiles(dir: string): Promise<{
 
   // Handle audio files differently
   if (dir === 'sfx' || dir === 'dialog') {
-    const files = fs
-      .readdirSync(fullPath)
-      .filter((file) => file.endsWith('.mp3'))
-      .map((file) => file.replace('.mp3', ''))
+    const allFiles = fs.readdirSync(fullPath)
+    const files: string[] = []
+
+    for (const file of allFiles) {
+      if (file.endsWith('.mp3')) {
+        // Convert MP3 to Opus
+        const mp3Path = path.join(fullPath, file)
+        try {
+          await convertMp3ToOpus(mp3Path)
+          files.push(file.replace('.mp3', ''))
+        } catch (error) {
+          console.error(`Failed to convert ${mp3Path}, keeping original`)
+          files.push(file.replace('.mp3', ''))
+        }
+      } else if (file.endsWith('.opus')) {
+        // Already converted, just add to list
+        files.push(file.replace('.opus', ''))
+      }
+    }
+
     return { files }
   }
 
