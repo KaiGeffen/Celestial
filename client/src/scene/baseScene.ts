@@ -8,6 +8,7 @@ import Hint from '../lib/hint'
 import ensureMusic from '../loader/audioManager'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
+import { server } from '../server'
 
 // Functionality shared between BaseScene and MenuBaseScene
 class SharedBaseScene extends Phaser.Scene {
@@ -108,6 +109,7 @@ class SharedBaseScene extends Phaser.Scene {
 // What scenes on the bottom (Not menus) inherit their common functionality from
 export default class BaseScene extends SharedBaseScene {
   private btnOptions: Button
+  private btnNetworkStatus: Button
 
   // The last scene before this one
   private lastScene: string
@@ -144,9 +146,53 @@ export default class BaseScene extends SharedBaseScene {
       y: `0%+${Space.pad}`,
     })
 
+    // Disconnected indicator (gear icon below options)
+    this.btnNetworkStatus = new Buttons.Icon({
+      name: 'Speed',
+      within: this,
+      f: () => {}, // No action, just a visual indicator
+      muteClick: true,
+      hint: 'Server is disconnected',
+    })
+      .setDepth(10)
+      .setNoScroll()
+
+    // Hide by default
+    this.btnNetworkStatus.icon.setVisible(false)
+
+    // Anchor below options button
+    this.plugins.get('rexAnchor')['add'](this.btnNetworkStatus.icon, {
+      x: `100%-${Space.pad + (Space.iconSize * 3) / 2 + Space.pad}`,
+      y: `0%+${Space.pad + Space.iconSize / 2}`,
+    })
+
     // When esc key is pressed, toggle the menu open/closed
     let esc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC)
     esc.on('down', this.openMenu(), this)
+
+    // For testing: Press P to close the server connection
+    let pKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P)
+    pKey.on('down', () => {
+      if (server) {
+        server.close()
+        console.log('Server connection closed (testing)')
+      }
+    })
+  }
+
+  update(time: number, delta: number): void {
+    super.update(time, delta)
+
+    // Check server connection status
+    if (server && !server.isOpen()) {
+      // Server is disconnected - show and rotate the icon
+      this.btnNetworkStatus.icon.setVisible(true)
+      this.btnNetworkStatus.icon.rotation += (delta / 1000) * Math.PI * 2 // Rotate 360 degrees per second
+    } else {
+      // Server is connected - hide the icon
+      this.btnNetworkStatus.icon.setVisible(false)
+      this.btnNetworkStatus.icon.rotation = 0 // Reset rotation
+    }
   }
 
   doExit(): () => void {

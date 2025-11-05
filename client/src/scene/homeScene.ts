@@ -9,6 +9,7 @@ import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
 import { GardenSettings } from '../../../shared/settings'
 import Catalog from '../../../shared/state/catalog'
+import { server } from '../server'
 
 const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
@@ -466,11 +467,11 @@ export default class HomeScene extends BaseScene {
 
   // Update garden display every minute to show plant growth
   lastUpdate = 0
-  update(): void {
-    const now = Date.now()
-    if (now - this.lastUpdate > 60000) {
+  update(time: number, delta: number): void {
+    super.update(time, delta)
+    if (time - this.lastUpdate > 60000) {
       this.updateGarden()
-      this.lastUpdate = now
+      this.lastUpdate = time
     }
   }
 

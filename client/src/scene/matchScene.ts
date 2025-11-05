@@ -269,6 +269,8 @@ export class MatchScene extends BaseScene {
 
   // Try to display the next queued state TODO Recovery if we've been waiting too long
   update(time, delta): void {
+    super.update(time, delta)
+
     // Enable the searching region visual update
     this.view.searching.update(time, delta)
 

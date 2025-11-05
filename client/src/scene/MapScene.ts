@@ -38,6 +38,8 @@ export default class MapScene extends Scene {
   }
 
   update(time, delta): void {
+    super.update(time, delta)
+
     // If pointer is released, stop panning
     if (!this.input.activePointer.isDown) {
       this.panDirection = undefined
