@@ -171,13 +171,13 @@ export default class BaseScene extends SharedBaseScene {
     esc.on('down', this.openMenu(), this)
 
     // For testing: Press P to close the server connection
-    let pKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P)
-    pKey.on('down', () => {
-      if (server) {
+    if (Flags.networkToggle) {
+      let pKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P)
+      pKey.on('down', () => {
         server.close()
         console.log('Server connection closed (testing)')
-      }
-    })
+      })
+    }
   }
 
   update(time: number, delta: number): void {

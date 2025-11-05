@@ -16,4 +16,9 @@ export const Flags = {
 
   // If user is on a mobile device
   mobile: mobileCheck(),
+
+  // Allow network toggle for debugging
+  networkToggle: new URLSearchParams(window.location.search).has(
+    'networkToggle',
+  ),
 }
