@@ -394,8 +394,8 @@ export default function createWebSocketServer() {
           delete activePlayers[id]
         }
 
-        // Disconnect from active match
-        if (activeGame.match) {
+        // Disconnect from active match if it hasn't ended
+        if (activeGame.match && !activeGame.match.isOver()) {
           activeGame.match.doDisconnect(ws)
 
           // Queue them to be reconnected

@@ -170,6 +170,11 @@ class Match implements Match {
     }
   }
 
+  // Whether the match is over
+  isOver(): boolean {
+    return this.game && this.game.model.winner !== null
+  }
+
   // Get the list of all active websockets connected to this match
   protected getActiveWsList(): ServerWS[] {
     return [this.ws1, this.ws2].filter((ws) => ws !== null)
