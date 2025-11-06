@@ -148,9 +148,8 @@ export default class BaseScene extends SharedBaseScene {
 
     // Disconnected indicator (gear icon below options)
     this.btnNetworkStatus = new Buttons.Icon({
-      name: 'Speed',
+      name: 'Network',
       within: this,
-      f: () => {}, // No action, just a visual indicator
       muteClick: true,
       hint: 'Server is disconnected',
     })
@@ -162,8 +161,8 @@ export default class BaseScene extends SharedBaseScene {
 
     // Anchor below options button
     this.plugins.get('rexAnchor')['add'](this.btnNetworkStatus.icon, {
-      x: `100%-${Space.pad + Space.iconSize * 1.5}`,
-      y: `0%+${Space.pad + Space.iconSize * 1.5}`,
+      x: `100%-${Space.pad + Space.iconSize * 1.5 + Space.pad}`,
+      y: `0%+${Space.pad + Space.iconSize / 2}`,
     })
 
     // When esc key is pressed, toggle the menu open/closed
@@ -180,18 +179,26 @@ export default class BaseScene extends SharedBaseScene {
     }
   }
 
+  private lastFlipTime: number = 0
   update(time: number, delta: number): void {
     super.update(time, delta)
 
     // Check server connection status
+    const icon = this.btnNetworkStatus.icon
     if (server && !server.isOpen()) {
-      // Server is disconnected - show and rotate the icon
-      this.btnNetworkStatus.icon.setVisible(true)
-      this.btnNetworkStatus.icon.rotation += (delta / 1000) * Math.PI * 2 // Rotate 360 degrees per second
+      // Server is disconnected - show the icon
+      icon.setVisible(true)
+
+      // Flip twice per second (every 500ms)
+      if (time - this.lastFlipTime >= 500) {
+        icon.setScale(-icon.scaleX, 1)
+        this.lastFlipTime = time
+      }
     } else {
       // Server is connected - hide the icon
-      this.btnNetworkStatus.icon.setVisible(false)
-      this.btnNetworkStatus.icon.rotation = 0 // Reset rotation
+      icon.setVisible(false)
+      icon.setScale(1, 1) // Reset scale when hidden
+      this.lastFlipTime = 0 // Reset flip timer
     }
   }
 
