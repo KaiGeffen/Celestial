@@ -25,6 +25,7 @@ import { creditsString } from '../../data/credits'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 import { openDiscord } from '../../utils/externalLinks'
 import { server } from '../../server'
+import SearchingRegion from '../matchRegions/searching'
 
 // TODO Use a non-mock color for the menu background
 const COLOR = Color.backgroundLight
@@ -479,41 +480,43 @@ export default class OptionsMenu extends Menu {
       .add(container)
       .addSpace()
 
-    // Surrender button if in a match
+    // Normally show Go Home
+    let s = 'Go Home'
+    // TODO This is super hacky - refactor searching to be a scene not a region
     if (activeScene instanceof MatchScene) {
-      new Buttons.Basic({
-        within: container,
-        text: 'Surrender',
-        f: () => {
-          // Stop this menu scene
-          this.scene.scene.stop()
-
-          // Surrender & cancel (In case not yet in a match)
-          server.send({
-            type: 'surrender',
-          })
-          // TODO
-          // server.send({
-          //   type: 'cancelQueue',
-          // })
-
-          // Exit the active scene
-          activeScene.doExit()()
-        },
-      })
-    } else {
-      new Buttons.Basic({
-        within: container,
-        text: 'Go Home',
-        f: () => {
-          // Stop this menu scene
-          this.scene.scene.stop()
-
-          // Exit the active scene
-          activeScene.doExit()()
-        },
-      })
+      const region: SearchingRegion = activeScene.view.searching as any
+      if (region.matchFound) {
+        s = 'Surrender'
+      }
     }
+    new Buttons.Basic({
+      within: container,
+      text: s,
+      f: () => {
+        // Stop this menu scene
+        this.scene.scene.stop()
+
+        // Exit the active scene
+        activeScene.doExit()()
+
+        // Either cancel the search for a match, or forfeit the match
+        if (activeScene instanceof MatchScene) {
+          const searchingRegion: SearchingRegion = activeScene.view
+            .searching as any
+
+          if (searchingRegion.matchFound) {
+            server.send({
+              type: 'surrender',
+            })
+          } else {
+            server.send({
+              type: 'cancelQueue',
+              password: searchingRegion.password,
+            })
+          }
+        }
+      },
+    })
 
     return sizer
   }

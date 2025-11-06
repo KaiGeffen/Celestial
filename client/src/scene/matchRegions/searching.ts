@@ -93,6 +93,14 @@ export default class SearchingRegion extends Region {
     })
   }
 
+  // TODO This is a hack to force matchFound true when region hides, REFACTOR THIS REGION TO A SCENE
+  hide(): Region {
+    this.matchFound = true
+    super.hide()
+
+    return this
+  }
+
   private createBackground(scene: Phaser.Scene): void {
     let background = scene.add
       .rectangle(0, 0, 1, 1, Color.backgroundLight)
