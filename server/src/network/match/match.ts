@@ -8,9 +8,8 @@ import { eq } from 'drizzle-orm'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
 import { AchievementManager } from '../../achievementManager'
-import { saveGameState } from '../../db/gameState'
 import { randomUUID } from 'crypto'
-import { sendUserData } from '../websocketServer'
+import sendUserData from '../sendUserData'
 
 // TODO Timer logic for disconnects
 
