@@ -13,6 +13,8 @@ import ensureMusic from '../loader/audioManager'
 import Cinematic from '../lib/cinematic'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
+const RECONNECT_PAUSE = 2000
+
 // Scene for user to select a sign in option, without loading assets
 export class SigninScene extends Phaser.Scene {
   // Allows for typing objects in RexUI library
@@ -21,7 +23,7 @@ export class SigninScene extends Phaser.Scene {
   // True when user is signed or chose to be a guest
   signedInOrGuest: boolean = false
   guestButton: Button
-  private txtNetworkStatus: Phaser.GameObjects.Text
+  private txt: Phaser.GameObjects.Text
 
   constructor(args) {
     super({
@@ -56,28 +58,27 @@ export class SigninScene extends Phaser.Scene {
       this.createButtons()
     }
 
-    // Disconnected indicator (text in center of page)
-    this.txtNetworkStatus = this.add
+    // Text describing anything going on
+    this.txt = this.add
       .text(
         Space.windowWidth / 2,
         Space.windowHeight / 2,
-        'Server is disconnected',
+        '',
         Style.announcement,
       )
       .setOrigin(0.5)
       .setDepth(10)
-      .setAlpha(0)
   }
 
   update(time: number, delta: number): void {
     super.update(time, delta)
 
     // Check server connection status
+    const s = 'Server is disconnected'
     if (server && !server.isOpen()) {
-      const newAlpha = Math.min(1, this.txtNetworkStatus.alpha + delta / 300)
-      this.txtNetworkStatus.setAlpha(newAlpha)
-    } else {
-      this.txtNetworkStatus.setAlpha(0)
+      this.txt.setText('Server is disconnected')
+    } else if (this.txt.text === s) {
+      this.txt.setText('')
     }
   }
 
@@ -153,12 +154,15 @@ export class SigninScene extends Phaser.Scene {
     // Check if there's a pending reconnect - if so, start the match scene
     const reconnect = Server.getPendingReconnect()
     if (reconnect) {
-      this.scene.start('StandardMatchScene', {
-        isPvp: true,
-        deck: [],
-        aiDeck: [],
-        gameStartState: reconnect.state,
-      })
+      this.txt.setText('Reconnecting to match...')
+      setTimeout(() => {
+        this.scene.start('StandardMatchScene', {
+          isPvp: true,
+          deck: [],
+          aiDeck: [],
+          gameStartState: reconnect.state,
+        })
+      }, RECONNECT_PAUSE)
       return
     }
 
