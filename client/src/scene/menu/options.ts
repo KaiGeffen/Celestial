@@ -24,6 +24,7 @@ import { rulebookString } from '../../data/rulebook'
 import { creditsString } from '../../data/credits'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 import { openDiscord } from '../../utils/externalLinks'
+import { server } from '../../server'
 
 // TODO Use a non-mock color for the menu background
 const COLOR = Color.backgroundLight
@@ -470,33 +471,45 @@ export default class OptionsMenu extends Menu {
   private createHome(activeScene: BaseScene) {
     let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
-    let containerHome = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth,
-      50,
-    )
+    let container = new ContainerLite(this.scene, 0, 0, Space.buttonWidth, 50)
     sizer
       .addSpace()
       .add(this.createCancelButton())
       .addSpace()
-      .add(containerHome)
+      .add(container)
       .addSpace()
 
-    const buttonText =
-      activeScene instanceof MatchScene ? 'Surrender' : 'Go Home'
-    new Buttons.Basic({
-      within: containerHome,
-      text: buttonText,
-      f: () => {
-        // Stop this menu scene
-        this.scene.scene.stop()
+    // Surrender button if in a match
+    if (activeScene instanceof MatchScene) {
+      new Buttons.Basic({
+        within: container,
+        text: 'Surrender',
+        f: () => {
+          // Stop this menu scene
+          this.scene.scene.stop()
 
-        // Exit the active scene
-        activeScene.doExit()()
-      },
-    })
+          // Surrender
+          server.send({
+            type: 'surrender',
+          })
+
+          // Exit the active scene
+          activeScene.doExit()()
+        },
+      })
+    } else {
+      new Buttons.Basic({
+        within: container,
+        text: 'Go Home',
+        f: () => {
+          // Stop this menu scene
+          this.scene.scene.stop()
+
+          // Exit the active scene
+          activeScene.doExit()()
+        },
+      })
+    }
 
     return sizer
   }
