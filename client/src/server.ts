@@ -141,10 +141,6 @@ export default class Server {
         Server.login(payload, game)
       }
     }
-
-    server.ws.onerror = (event: Event) => {
-      console.error(`WebSocket error: ${event}`)
-    }
   }
 
   // Log in as a guest with a generated UUID
@@ -255,6 +251,10 @@ export default class Server {
         // Store reconnect data for PreloadScene to handle after assets load
         this.pendingReconnect = { state: data.state }
       })
+
+    server.ws.onerror = (event: Event) => {
+      console.error(`WebSocket error: ${event}`)
+    }
   }
 
   static logout(): void {
