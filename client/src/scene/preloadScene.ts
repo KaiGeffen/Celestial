@@ -5,7 +5,8 @@ import type { CredentialResponse } from 'google-one-tap'
 import type { GoogleJwtPayload } from '../types/google'
 import Loader from '../loader/loader'
 import Server from '../server'
-import { Space, Url, UserSettings, Flags } from '../settings/settings'
+import { server } from '../server'
+import { Space, Url, UserSettings, Flags, Style } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 import ensureMusic from '../loader/audioManager'
@@ -20,6 +21,7 @@ export class SigninScene extends Phaser.Scene {
   // True when user is signed or chose to be a guest
   signedInOrGuest: boolean = false
   guestButton: Button
+  private txtNetworkStatus: Phaser.GameObjects.Text
 
   constructor(args) {
     super({
@@ -39,6 +41,8 @@ export class SigninScene extends Phaser.Scene {
     if (storedToken !== null) {
       const payload = jwt_decode<GoogleJwtPayload>(storedToken)
       Server.login(payload, this.game, () => this.onOptionClick())
+
+      // TODO If this fails because the token is invalid or the server is offline, show options or say network offline
     }
     // If user is not signed in, show gsi and guest button
     else {
@@ -50,6 +54,30 @@ export class SigninScene extends Phaser.Scene {
 
       // Add buttons to sign in or play as a guest
       this.createButtons()
+    }
+
+    // Disconnected indicator (text in center of page)
+    this.txtNetworkStatus = this.add
+      .text(
+        Space.windowWidth / 2,
+        Space.windowHeight / 2,
+        'Server is disconnected',
+        Style.announcement,
+      )
+      .setOrigin(0.5)
+      .setDepth(10)
+      .setAlpha(0)
+  }
+
+  update(time: number, delta: number): void {
+    super.update(time, delta)
+
+    // Check server connection status
+    if (server && !server.isOpen()) {
+      const newAlpha = Math.min(1, this.txtNetworkStatus.alpha + delta / 300)
+      this.txtNetworkStatus.setAlpha(newAlpha)
+    } else {
+      this.txtNetworkStatus.setAlpha(0)
     }
   }
 

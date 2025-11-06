@@ -125,22 +125,6 @@ export default class Server {
 
     // Register common handlers
     this.registerCommonHandlers(uuid, game, callback)
-
-    // If the connection closes, login again with same args
-    server.ws.onclose = (event) => {
-      // Clear user data after logging out
-      this.userData = null
-
-      // Don't attempt to login again if the server explicitly logged us out
-      if (event.code !== code) {
-        console.log(
-          'Logged in websocket is closing, signing in again with token:',
-        )
-        console.log(payload)
-
-        Server.login(payload, game)
-      }
-    }
   }
 
   // Log in as a guest with a generated UUID
@@ -184,16 +168,6 @@ export default class Server {
 
     // Register common handlers
     this.registerCommonHandlers(uuid, game, callback)
-
-    // If the connection closes, login again
-    server.ws.onclose = (event) => {
-      this.userData = null
-
-      if (event.code !== code) {
-        console.log('Guest websocket closing, reconnecting...')
-        Server.loginGuest(game)
-      }
-    }
   }
 
   // Register common websocket event handlers for both OAuth and guest login
@@ -268,6 +242,7 @@ export default class Server {
 
     server.close(code)
     server = undefined
+    Server.userData = null
 
     UserSettings.clearSessionStorage()
   }
