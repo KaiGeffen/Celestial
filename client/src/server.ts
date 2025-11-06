@@ -271,13 +271,6 @@ export default class Server {
     UserSettings.clearSessionStorage()
   }
 
-  // Call the server to refresh the user data
-  static refreshUserData(): void {
-    server.send({
-      type: 'refreshUserData',
-    })
-  }
-
   // Send server an updated list of decks
   static sendDecks(decks: Deck[]): void {
     if (!server || !server.isOpen()) {

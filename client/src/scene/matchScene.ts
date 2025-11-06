@@ -108,10 +108,6 @@ export class MatchScene extends BaseScene {
     )
   }
 
-  beforeExit() {
-    Server.refreshUserData()
-  }
-
   // Listens for websocket updates
   // Manages user decisions (What card to play, when to pass)
 

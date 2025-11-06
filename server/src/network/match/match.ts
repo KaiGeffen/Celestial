@@ -10,6 +10,7 @@ import Catalog from '../../../../shared/state/catalog'
 import { AchievementManager } from '../../achievementManager'
 import { saveGameState } from '../../db/gameState'
 import { randomUUID } from 'crypto'
+import { sendUserData } from '../websocketServer'
 
 // TODO Timer logic for disconnects
 
@@ -142,6 +143,10 @@ class Match implements Match {
         true,
         1,
       )
+
+      // Inform users of their new state
+      await sendUserData(this.ws1, this.uuid1)
+      await sendUserData(this.ws2, this.uuid2)
     }
   }
 

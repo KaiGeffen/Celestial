@@ -106,9 +106,6 @@ export default function createWebSocketServer() {
           }
         }
       })
-        .on('refreshUserData', async () => {
-          await sendUserData(ws, id)
-        })
         .on('sendDecks', async ({ decks }) => {
           if (!id) return
           await db
@@ -378,13 +375,10 @@ export default function createWebSocketServer() {
             data.versionNo,
           )
         })
-        .on('surrender', () => {
+        .on('surrender', async () => {
           if (!activeGame.match) return
-          activeGame.match.doSurrender(ws)
+          await activeGame.match.doSurrender(ws)
           activeGame.match = null
-
-          // TODO Remove refreshUserData from Messages
-          // Refresh the user's data
         })
         .on('emote', () => {
           if (!activeGame.match) return
@@ -429,7 +423,7 @@ export default function createWebSocketServer() {
 }
 
 // Send the user their full data
-async function sendUserData(ws: ServerWS, id: string) {
+export async function sendUserData(ws: ServerWS, id: string) {
   // Get user's data
   const result = await db
     .select()
