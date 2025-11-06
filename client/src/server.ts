@@ -16,15 +16,16 @@ import { CosmeticSet } from '../../shared/types/cosmeticSet'
 import { Achievement } from '../../shared/types/achievement'
 import GameModel from '../../shared/state/gameModel'
 import { v5 as uuidv5 } from 'uuid'
+
 const ip = '127.0.0.1'
 const port = 5555
 // Custom code for closing websocket connection due to invalid token
 const code = 1000
 
-// The websocket which is open with the main server (Authentication/pack opening)
-// TODO This is getting used throughout match and all the logic is there, it should be here instead to be understood
+// The websocket connetion to the server
 export var server: ClientWS = undefined
 
+// User data
 type UserData = null | {
   uuid: string
   username: string
@@ -40,63 +41,6 @@ type UserData = null | {
 export default class Server {
   private static userData: UserData = null
   private static pendingReconnect: { state: GameModel } | null = null
-
-  // Register common websocket event handlers for both OAuth and guest login
-  private static registerCommonHandlers(
-    uuid: string,
-    game: Phaser.Game,
-    callback: () => void,
-  ) {
-    server
-      .on(
-        'sendUserData',
-        (data: {
-          inventory: string
-          completedMissions: string
-          avatar_experience: number[]
-          decks: Deck[]
-          username: string
-          elo: number
-          garden: Date[]
-          gems: number
-          coins: number
-          ownedItems: number[]
-          cosmeticSet: CosmeticSet
-          achievements: Achievement[]
-        }) => {
-          // Store the uuid and user data after successful login
-          this.userData = {
-            uuid,
-            ...data,
-            garden: data.garden.map((dateStr) => new Date(dateStr)),
-          }
-
-          this.loadUserData(data)
-          // TODO Bad smell, the callback should only happen once as it references a scene
-          if (callback) {
-            callback()
-            callback = null
-          }
-        },
-      )
-      .on('harvestGardenResult', ({ success, newGarden, reward }) => {
-        // Only update the stored garden if the harvest was successful
-        if (success) {
-          this.userData.garden = newGarden.map((dateStr) => new Date(dateStr))
-        }
-
-        // Emit global event that HomeScene can listen to regardless of success
-        game.events.emit('gardenHarvested', {
-          success: success,
-          newGarden: this.userData.garden,
-          reward: reward,
-        })
-      })
-      .on('promptReconnect', (data) => {
-        // Store reconnect data for PreloadScene to handle after assets load
-        this.pendingReconnect = { state: data.state }
-      })
-  }
 
   // Log in with the server for user with given OAuth token
   static login(
@@ -194,7 +138,7 @@ export default class Server {
         )
         console.log(payload)
 
-        // Server.login(payload, game)
+        Server.login(payload, game)
       }
     }
 
@@ -254,6 +198,63 @@ export default class Server {
         Server.loginGuest(game)
       }
     }
+  }
+
+  // Register common websocket event handlers for both OAuth and guest login
+  private static registerCommonHandlers(
+    uuid: string,
+    game: Phaser.Game,
+    callback: () => void,
+  ) {
+    server
+      .on(
+        'sendUserData',
+        (data: {
+          inventory: string
+          completedMissions: string
+          avatar_experience: number[]
+          decks: Deck[]
+          username: string
+          elo: number
+          garden: Date[]
+          gems: number
+          coins: number
+          ownedItems: number[]
+          cosmeticSet: CosmeticSet
+          achievements: Achievement[]
+        }) => {
+          // Store the uuid and user data after successful login
+          this.userData = {
+            uuid,
+            ...data,
+            garden: data.garden.map((dateStr) => new Date(dateStr)),
+          }
+
+          this.loadUserData(data)
+          // TODO Bad smell, the callback should only happen once as it references a scene
+          if (callback) {
+            callback()
+            callback = null
+          }
+        },
+      )
+      .on('harvestGardenResult', ({ success, newGarden, reward }) => {
+        // Only update the stored garden if the harvest was successful
+        if (success) {
+          this.userData.garden = newGarden.map((dateStr) => new Date(dateStr))
+        }
+
+        // Emit global event that HomeScene can listen to regardless of success
+        game.events.emit('gardenHarvested', {
+          success: success,
+          newGarden: this.userData.garden,
+          reward: reward,
+        })
+      })
+      .on('promptReconnect', (data) => {
+        // Store reconnect data for PreloadScene to handle after assets load
+        this.pendingReconnect = { state: data.state }
+      })
   }
 
   static logout(): void {
@@ -467,18 +468,11 @@ export default class Server {
     )
   }
 
-  // TODO Clarify if we reuse a UserSessionWS or create a new ws even for signed in users
-  // Get the appropriate websocket for this environment
-  // If user is logged in, use the existing ws instead of opening a new one
+  // Get a websocket right for the current environment
   private static getSocket(): ClientWS {
-    // Establish a websocket based on the environment
-    if (Flags.local) {
-      return new TypedWebSocket(`ws://${URL}:${USER_DATA_PORT}`)
-    } else {
-      // The WS location on DO
-      // let loc = window.location
-      const fullPath = `wss://celestialdecks.gg/user_data_ws`
-      return new TypedWebSocket(fullPath)
-    }
+    const path = Flags.local
+      ? `ws://${URL}:${USER_DATA_PORT}`
+      : `wss://celestialdecks.gg/user_data_ws`
+    return new TypedWebSocket(path)
   }
 }
