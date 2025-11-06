@@ -488,10 +488,14 @@ export default class OptionsMenu extends Menu {
           // Stop this menu scene
           this.scene.scene.stop()
 
-          // Surrender
+          // Surrender & cancel (In case not yet in a match)
           server.send({
             type: 'surrender',
           })
+          // TODO
+          // server.send({
+          //   type: 'cancelQueue',
+          // })
 
           // Exit the active scene
           activeScene.doExit()()

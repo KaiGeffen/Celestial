@@ -86,7 +86,11 @@ export class MatchScene extends BaseScene {
     }
 
     // Create the view
-    this.view = new View(this, this.params.deck?.cosmeticSet?.avatar ?? 0)
+    this.view = new View(
+      this,
+      this.params.deck?.cosmeticSet?.avatar ?? 0,
+      this.params.password,
+    )
 
     // Register the shift hotkey to explain hotkeys in all regions
     this.addHotkeyHint()
@@ -97,13 +101,14 @@ export class MatchScene extends BaseScene {
   }
 
   restart(): void {
-    this.view = new View(this, this.params.deck?.cosmeticSet?.avatar ?? 0)
+    this.view = new View(
+      this,
+      this.params.deck?.cosmeticSet?.avatar ?? 0,
+      this.params.password,
+    )
   }
 
   beforeExit() {
-    server.send({
-      type: 'surrender',
-    })
     Server.refreshUserData()
   }
 
@@ -466,7 +471,7 @@ export class View {
 
   background: Phaser.GameObjects.Image
 
-  constructor(scene: MatchScene, avatarId: number) {
+  constructor(scene: MatchScene, avatarId: number, password: string) {
     this.scene = scene
 
     this.background = scene.add
@@ -485,7 +490,7 @@ export class View {
         : Space.windowWidth / this.background.width,
     )
 
-    this.searching = new Regions.Searching().create(scene, avatarId)
+    this.searching = new Regions.Searching().create(scene, avatarId, password)
 
     // Create each of the regions
     // this.createOurHand()

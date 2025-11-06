@@ -354,6 +354,9 @@ export default function createWebSocketServer() {
           // Start the match
           await activeGame.match.notifyState()
         })
+        .on('cancelQueue', ({ password }) => {
+          delete searchingPlayers[password]
+        })
         // In match events
         .on('playCard', (data) => {
           if (!activeGame.match) return

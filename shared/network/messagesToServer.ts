@@ -39,7 +39,7 @@ export default interface messagesToServer {
   harvestGarden: {
     index: number
   }
-  // MATCH RELEVANT
+  // Queueing events
   initPvp: {
     password: string
     uuid: string
@@ -54,6 +54,10 @@ export default interface messagesToServer {
     num: number
     uuid: string
   }
+  cancelQueue: {
+    password: string
+  }
+  // In match events
   playCard: {
     cardNum: number
     versionNo: number
