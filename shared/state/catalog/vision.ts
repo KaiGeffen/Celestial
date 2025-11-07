@@ -332,7 +332,7 @@ export {
   beggingBowl,
   // NEW CARDS
   suddenInsight,
-  realms,
+  // realms,
   greatWheel,
-  switcheroo,
+  // switcheroo,
 }

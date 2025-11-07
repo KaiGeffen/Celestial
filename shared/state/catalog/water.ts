@@ -310,6 +310,6 @@ export {
   damBreaks,
   overflow,
   // NEW
-  drip as foo,
+  drip,
   ouroboros,
 }

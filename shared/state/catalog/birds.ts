@@ -328,6 +328,34 @@ const updraft = new Updraft({
   text: 'Fleeting\nMove your next card in the story forward one spot.',
 })
 
+class Birdsong extends Card {
+  onMorning(player: number, game: GameModel, index: number) {
+    if (game.hand[player].length > 0) {
+      const oldCard = game.hand[player][0]
+
+      const newCard = new Card({
+        name: oldCard.name,
+        id: oldCard.id,
+        cost: 3,
+        points: oldCard.points,
+        qualities: [Quality.FLEETING],
+        text: 'Fleeting',
+      })
+
+      game.hand[player][0] = newCard
+    }
+
+    return true
+  }
+}
+const birdsong = new Birdsong({
+  name: 'Birdsong',
+  id: 8094,
+  cost: 5,
+  points: 5,
+  text: 'Morning: Remove all card text from a card in hand, set its cost to 3, and give it Fleeting.',
+})
+
 export {
   dove,
   starling,
@@ -342,5 +370,7 @@ export {
   vulture,
   rooster,
   letGo,
+  // NEW
   updraft,
+  birdsong as eclipse,
 }

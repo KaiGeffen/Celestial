@@ -314,6 +314,6 @@ export {
   parade,
   meAndHer,
   sensualist,
-  // NEW CARDS
+  // NEW
   doll,
 }

@@ -264,15 +264,16 @@ class Voices extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    // Initiation
-    if (super.exhale(4, game, player)) {
-      // Opponent adds first
+    // Opponent adds first
+    if (super.exhale(1, game, player)) {
       if (game.hand[player ^ 1].length > 0) {
         const card = game.hand[player ^ 1].shift()
         game.story.addAct(card, player ^ 1, 0)
       }
+    }
 
-      // Player adds second
+    // Player adds second
+    if (super.exhale(3, game, player)) {
       if (game.hand[player].length > 0) {
         const card = game.hand[player].shift()
         game.story.addAct(card, player, 1)
@@ -285,7 +286,7 @@ const voices = new Voices({
   id: 483,
   cost: 1,
   points: 1,
-  text: 'Exhale 4: Your opponent adds a card from their hand to the story, then you do the same.',
+  text: 'Exhale 2: Your opponent adds a card from their hand to the story.\nExhale 2: You do the same after their card.',
 })
 
 class Isolation extends Card {
@@ -340,6 +341,7 @@ export {
   lostInShadow,
   vampire,
   // NEW CARDS
+  // isolation,
   voices,
   spider,
 }
