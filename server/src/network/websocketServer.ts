@@ -397,8 +397,10 @@ export default function createWebSocketServer() {
         if (activeGame.match && !activeGame.match.isOver()) {
           activeGame.match.doDisconnect(ws)
 
-          // Queue them to be reconnected
-          usersAwaitingReconnect[id] = activeGame
+          // Queue them to be reconnected (Unless tutorial)
+          if (!(activeGame.match instanceof TutorialMatch)) {
+            usersAwaitingReconnect[id] = activeGame
+          }
         }
       })
     } catch (e) {

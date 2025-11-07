@@ -215,8 +215,6 @@ class Match implements Match {
     }
 
     // TODO Handle timer logic for reconnects
-
-    console.log('Reconnected user to match')
   }
 
   // Get the name of player with given uuid
