@@ -97,10 +97,17 @@ export default class CatalogRegion {
     let sizer = this.panel.getElement('panel')
     sizer.clear()
 
-    // For each card in the catalog, add it to the sizer if it satisfies
+    // Get the calendar sorted by currently selected criteria
+    const sortedCatalog = [...this.cardCatalog]
+    if (this.orderedByCost) {
+      // Sort by cost, maintaining color order as secondary sort
+      sortedCatalog.sort((a, b) => a.card.cost - b.card.cost)
+    }
+
+    // For each card in the sorted catalog, add it to the sizer if it satisfies
     // Otherwise make it invisible
-    for (let i = 0; i < this.cardCatalog.length; i++) {
-      let cardImage = this.cardCatalog[i]
+    for (let i = 0; i < sortedCatalog.length; i++) {
+      let cardImage = sortedCatalog[i]
 
       // Check if this card is present
       if (filterFunction(cardImage.card)) {
