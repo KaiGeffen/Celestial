@@ -45,5 +45,8 @@ export default class Cinematic {
     // Hide the logo as well
     const logo = document.getElementById('logo-container')
     if (logo) logo.style.display = 'none'
+
+    const splash = document.getElementById('splash-screen')
+    if (splash) splash.style.display = 'none'
   }
 }
