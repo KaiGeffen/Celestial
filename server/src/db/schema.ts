@@ -207,6 +207,6 @@ export const matches = pgTable(
     p1Idx: index('matches_p1_idx').on(table.p1_id),
     p2Idx: index('matches_p2_idx').on(table.p2_id),
     // Index for "find most recent game" sorted by time
-    timeIdx: index('matches_time_idx').on(table.time.desc()),
+    timeIdx: index('matches_time_idx').on(table.time),
   }),
 )
