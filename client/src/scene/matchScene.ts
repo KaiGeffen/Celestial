@@ -799,7 +799,10 @@ export class MapJourneyMatchScene extends MatchScene {
   private unlockMissionRewards(): void {
     // Set that user has completed the missions with this id
     if (this.params.missionID !== undefined) {
-      UserSettings._setIndex('completedMissions', this.params.missionID, true)
+      // NOTE This is a hack to prevent the server sending the mission to overwrite our local completed missions change
+      setTimeout(() => {
+        UserSettings._setIndex('completedMissions', this.params.missionID, true)
+      }, 200)
     }
   }
 
