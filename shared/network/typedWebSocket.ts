@@ -3,7 +3,7 @@ export class TypedWebSocket<
   Sent extends Record<string, any>,
 > {
   private listeners: {
-    [T in keyof Received]?: Array<(data: Received[T]) => void>
+    [T in keyof Received]?: (data: Received[T]) => void
   } = {}
 
   ws: WebSocket
@@ -25,26 +25,26 @@ export class TypedWebSocket<
         return
       }
 
-      const listeners: Array<(data: Received[T]) => void> =
-        this.listeners[message.type]
-      if (listeners) {
-        listeners.forEach((callback) => callback(message))
+      const listener: (data: Received[T]) => void = this.listeners[message.type]
+      if (listener) {
+        listener(message)
       }
     }
   }
 
   send<T extends keyof Sent>(message: Sent[T] & { type: T }): void {
-    return this.ws.send(JSON.stringify(message))
+    if (!this.isOpen()) {
+      console.log('WebSocket is not open, message not sent:', message)
+      return
+    }
+    this.ws.send(JSON.stringify(message))
   }
 
   on<T extends keyof Received>(
     messageType: T,
     callback: (data: Received[T]) => void,
   ): this {
-    if (!this.listeners[messageType]) {
-      this.listeners[messageType] = []
-    }
-    this.listeners[messageType]?.push(callback)
+    this.listeners[messageType] = callback
     return this
   }
 

@@ -6,6 +6,7 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 import Menu from './menu'
 import BaseScene from '../baseScene'
+import { MatchScene } from '../matchScene'
 import {
   Space,
   Color,
@@ -23,6 +24,8 @@ import { rulebookString } from '../../data/rulebook'
 import { creditsString } from '../../data/credits'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 import { openDiscord } from '../../utils/externalLinks'
+import { server } from '../../server'
+import SearchingRegion from '../matchRegions/searching'
 
 // TODO Use a non-mock color for the menu background
 const COLOR = Color.backgroundLight
@@ -214,10 +217,11 @@ export default class OptionsMenu extends Menu {
       .addSpace()
       .add(this.createHotkeys(), { expand: true })
       .addSpace()
-      .add(this.createQuit(activeScene), { expand: true })
+      .add(this.createHome(activeScene), { expand: true })
 
     return sizer
   }
+
   private createAudioPanel() {
     let sizer = this.scene.rexUI.add
       .sizer({
@@ -465,32 +469,52 @@ export default class OptionsMenu extends Menu {
     return sizer
   }
 
-  private createQuit(activeScene: BaseScene) {
+  private createHome(activeScene: BaseScene) {
     let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
-    let containerQuit = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth,
-      50,
-    )
+    let container = new ContainerLite(this.scene, 0, 0, Space.buttonWidth, 50)
     sizer
       .addSpace()
       .add(this.createCancelButton())
       .addSpace()
-      .add(containerQuit)
+      .add(container)
       .addSpace()
 
+    // Normally show Go Home
+    let s = 'Go Home'
+    // TODO This is super hacky - refactor searching to be a scene not a region
+    if (activeScene instanceof MatchScene) {
+      const region: SearchingRegion = activeScene.view.searching as any
+      if (region.matchFound) {
+        s = 'Surrender'
+      }
+    }
     new Buttons.Basic({
-      within: containerQuit,
-      text: 'Quit',
+      within: container,
+      text: s,
       f: () => {
         // Stop this menu scene
         this.scene.scene.stop()
 
         // Exit the active scene
         activeScene.doExit()()
+
+        // Either cancel the search for a match, or forfeit the match
+        if (activeScene instanceof MatchScene) {
+          const searchingRegion: SearchingRegion = activeScene.view
+            .searching as any
+
+          if (searchingRegion.matchFound) {
+            server.send({
+              type: 'surrender',
+            })
+          } else {
+            server.send({
+              type: 'cancelQueue',
+              password: searchingRegion.password,
+            })
+          }
+        }
       },
     })
 

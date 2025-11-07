@@ -3,7 +3,6 @@ import Catalog from './catalog'
 import type GameModel from './gameModel'
 import { Zone } from './zone'
 import { Visibility } from '../animation'
-import { match } from 'assert'
 
 export default function getClientGameModel(
   orig: GameModel,
@@ -125,13 +124,11 @@ function hideDeckOrder(model: GameModel) {
 
 function hideHiddenOpponentAnimations(model: GameModel) {
   model.animations[1] = model.animations[1]
-    // Hide initial cards drawn for the opponent
-    .filter((_) => model.versionNo > 0)
     // Hide mulligan choices
     .filter((animation) => animation.from !== Zone.Mulligan)
     // Obfuscate the cards opponent is drawing
     .map((animation) => {
-      if (animation.to === Zone.Hand) {
+      if (animation.to === Zone.Hand || animation.to === Zone.Mulligan) {
         switch (animation.visibility) {
           case undefined:
           case Visibility.KnowItOccurred:

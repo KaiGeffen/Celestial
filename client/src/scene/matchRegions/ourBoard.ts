@@ -6,6 +6,7 @@ import Region from './baseRegion'
 import CardLocation from './cardLocation'
 import { MatchScene } from '../matchScene'
 import { MechanicsSettings } from '../../../../shared/settings'
+import { server } from '../../server'
 
 // The y distance card moves up when hovered
 const HOVER_OFFSET = Space.cardHeight / 2 + Space.padSmall
@@ -84,6 +85,8 @@ export default class OurBoardRegion extends Region {
         msg = "It's not your turn."
       } else if (state.cardCosts[i] > state.breath[0]) {
         msg = 'Not enough breath.'
+      } else if (!server.isOpen()) {
+        msg = 'Server is disconnected.'
       }
 
       if (msg !== undefined) {

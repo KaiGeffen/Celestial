@@ -2,7 +2,7 @@ import GameModel from '../../shared/state/gameModel'
 import Card from '../../shared/state/card'
 
 import { SoundEffect } from '../../shared/state/soundEffect'
-import { Animation } from '../../shared/animation'
+import { Animation, Visibility } from '../../shared/animation'
 import { Zone } from '../../shared/state/zone'
 import { MechanicsSettings, Mulligan } from '../../shared/settings'
 import { CosmeticSet } from '../../shared/types/cosmeticSet'
@@ -10,13 +10,15 @@ import { CosmeticSet } from '../../shared/types/cosmeticSet'
 class ServerController {
   model: GameModel
 
-  constructor(
+  // Start the game
+  startGame(
     deck1: Card[],
     deck2: Card[],
     cosmeticSet1: CosmeticSet,
     cosmeticSet2: CosmeticSet,
     shuffle: boolean = true,
-  ) {
+  ): void {
+    // Create initial game model
     this.model = new GameModel(
       deck1,
       deck2,
@@ -24,42 +26,10 @@ class ServerController {
       cosmeticSet2,
       shuffle,
     )
-  }
-
-  start(): void {
-    this.doSetup()
-
-    for (const player of [0, 1]) {
-      this.model.animations[player] = []
-      this.model.amtDrawn[player] = 0
-
-      for (
-        let i = 0;
-        i <
-        Math.min(MechanicsSettings.START_HAND, this.model.deck[player].length);
-        i++
-      ) {
-        const card = this.model.hand[player][i]
-        this.model.animations[player].push(
-          new Animation({
-            from: Zone.Deck,
-            to: Zone.Mulligan,
-            card: card,
-            index: i,
-          }),
-        )
-      }
-    }
 
     // Win the game automically if flag is present
     if (process.argv.includes('--force-win')) {
       this.model.winner = 0
-    }
-  }
-
-  doSetup(): void {
-    for (const player of [0, 1]) {
-      this.model.draw(player, MechanicsSettings.START_HAND, true)
     }
   }
 
@@ -87,30 +57,28 @@ class ServerController {
     // Update the player's in-game timer
     this.updatePlayerTimer(player, true)
 
+    // Do action: Pass or play a card
     if (choice === MechanicsSettings.PASS) {
-      if (!this.canPass(player)) {
-        return false
+      // NOTE This logic isn't put in model because handling phase change is controller's responsibility
+      this.model.passes += 1
+      this.model.amtPasses[player] += 1
+      this.model.switchPriority()
+      this.model.sound = SoundEffect.Pass
+
+      if (this.model.passes === 2) {
+        this.doResolvePhase()
+        this.doUpkeep()
       } else {
-        this.model.passes += 1
-        this.model.amtPasses[player] += 1
-        this.model.switchPriority()
-        this.model.sound = SoundEffect.Pass
-
-        if (this.model.passes === 2) {
-          this.doResolvePhase()
-          this.doUpkeep()
-        } else {
-          this.model.versionIncr()
-        }
-
-        return true
+        this.model.versionIncrClearAnimations()
       }
+
+      return true
     } else {
       if (this.attemptPlay(player, choice)) {
         this.model.passes = 0
         this.model.lastPlayerWhoPlayed = player
         this.model.switchPriority()
-        this.model.versionIncr()
+        this.model.versionIncrClearAnimations()
         return true
       } else {
         return false
@@ -143,7 +111,7 @@ class ServerController {
   }
 
   doMulligan(player: number, mulligans: Mulligan): void {
-    this.model.versionIncr()
+    this.model.versionIncrClearAnimations()
 
     // Update the time of last played card only if mulligans are now complete (And player with priority is now on the clock)
     const updateLastPlayedTime = this.model.mulligansComplete[player ^ 1]
@@ -198,10 +166,10 @@ class ServerController {
     this.model.mulligansComplete[player] = true
   }
 
-  setWinnerViaDisconnect(winner: number): void {
+  setWinnerViaSurrender(winner: number): void {
     this.model.winner = winner
     this.model.mulligansComplete = [true, true]
-    this.model.versionIncr()
+    this.model.versionIncrClearAnimations()
   }
 
   protected doUpkeep(): void {
@@ -214,7 +182,7 @@ class ServerController {
     this.model.priority = this.model.lastPlayerWhoPlayed
 
     // Determine order of player triggers
-    const players = this.model.priority === 1 ? [1, 0] : [0, 1]
+    const players = this.model.priority === 0 ? [0, 1] : [1, 0]
 
     // Increase max breath by 1 for the first 10 rounds
     for (const player of players) {
@@ -292,21 +260,17 @@ class ServerController {
   // The resolution phase, after both players have passed. Points and effects happen as cards resolve
   private doResolvePhase(): void {
     this.model.score = [0, 0]
-    const wins: [number, number] = [0, 0]
 
-    // this.model.recap.reset()
     this.model.story.run(this.model)
 
     // If a player has more points, they win the round
     if (this.model.score[0] > this.model.score[1]) {
-      wins[0] += 1
+      this.model.wins[0] += 1
     } else if (this.model.score[1] > this.model.score[0]) {
-      wins[1] += 1
+      this.model.wins[1] += 1
     }
 
-    this.model.wins[0] += wins[0]
-    this.model.wins[1] += wins[1]
-    // Declare a game winner if a player has 5 wins
+    // Declare match winner if a player has 5 wins
     ;[0, 1].forEach((player) => {
       if (this.model.wins[player] >= 5) {
         this.model.winner = player
@@ -348,22 +312,6 @@ class ServerController {
     }
 
     return true
-  }
-
-  private canPass(player: number): boolean {
-    return true
-    // if (
-    //   this.model.maxBreath[player] === BREATH_CAP &&
-    //   this.model.story.acts.length === 0
-    // ) {
-    //   for (let i = 0; i < this.model.hand[player].length; i++) {
-    //     if (this.canPlay(player, i)) {
-    //       return false
-    //     }
-    //   }
-    // }
-
-    // return true
   }
 
   // Update the given player's in-game timer

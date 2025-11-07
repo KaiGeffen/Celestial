@@ -1,5 +1,5 @@
 import Match from './match'
-import { MatchServerWS } from '../../../../shared/network/matchWS'
+import { ServerWS } from '../../../../shared/network/celestialTypedWebsocket'
 import { updateMatchResultPVP } from '../../db/updateMatchResult'
 import { Deck } from '../../../../shared/types/deck'
 import { MechanicsSettings } from '../../../../shared/settings'
@@ -8,10 +8,10 @@ class PvpMatch extends Match {
   timerCheckInterval: NodeJS.Timeout
 
   constructor(
-    ws1: MatchServerWS,
+    ws1: ServerWS,
     uuid1: string,
     deck1: Deck,
-    ws2: MatchServerWS,
+    ws2: ServerWS,
     uuid2: string,
     deck2: Deck,
   ) {
@@ -49,23 +49,39 @@ class PvpMatch extends Match {
     })
   }
 
-  // Given ws is disconnecting
-  async doExit(disconnectingWs: MatchServerWS) {
+  // Called when ws has surrendered
+  async doSurrender(disconnectingWs: ServerWS) {
+    // Skip if game is already over
+    if (this.game === null || this.game.model.winner !== null) return
+
+    // Set the winner, notify players of new state
+    const winner = this.ws1 === disconnectingWs ? 1 : 0
+    this.game.setWinnerViaSurrender(winner)
+    await this.notifyState()
+
+    // Notify that a surrender happened
+    await Promise.all(
+      this.getActiveWsList().map((ws: ServerWS) => {
+        if (ws !== disconnectingWs) {
+          ws.send({ type: 'opponentSurrendered' })
+        }
+      }),
+    )
+  }
+
+  // Called when ws has disconnected
+  async doDisconnect(disconnectingWs: ServerWS) {
     // Don't send disconnect message if the game has already ended
     if (this.game === null || this.game.model.winner !== null) return
 
-    // Set the winner, notify connected players
-    const winner = this.ws1 === disconnectingWs ? 1 : 0
-    this.game.setWinnerViaDisconnect(winner)
-    await this.notifyState()
+    // TODO Allow time for reconnect
 
-    // Notify opponent and close websockets
+    // Notify opponent
     await Promise.all(
-      this.getActiveWsList().map((ws: MatchServerWS) => {
+      this.getActiveWsList().map((ws: ServerWS) => {
         if (ws !== disconnectingWs) {
           ws.send({ type: 'opponentDisconnected' })
         }
-        ws.close()
       }),
     )
   }

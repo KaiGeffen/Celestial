@@ -1,28 +1,31 @@
 import 'phaser'
 
-import Card from '../../../shared/state/card'
-import { Flags, Url, UserSettings } from '../settings/settings'
-import BaseScene from '../scene/baseScene'
-import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
+import Card from '../../shared/state/card'
+import { Flags, Url, UserSettings } from './settings/settings'
+import BaseScene from './scene/baseScene'
+import { TypedWebSocket } from '../../shared/network/typedWebSocket'
 import {
   URL,
   USER_DATA_PORT,
   UUID_NAMESPACE,
-} from '../../../shared/network/settings'
-import type { GoogleJwtPayload } from '../types/google'
-import { UserDataClientWS } from '../../../shared/network/userDataWS'
-import { Deck } from '../../../shared/types/deck'
-import { CosmeticSet } from '../../../shared/types/cosmeticSet'
-import { Achievement } from '../../../shared/types/achievement'
+} from '../../shared/network/settings'
+import type { GoogleJwtPayload } from './types/google'
+import { ClientWS } from '../../shared/network/celestialTypedWebsocket'
+import { Deck } from '../../shared/types/deck'
+import { CosmeticSet } from '../../shared/types/cosmeticSet'
+import { Achievement } from '../../shared/types/achievement'
+import GameModel from '../../shared/state/gameModel'
 import { v5 as uuidv5 } from 'uuid'
+
 const ip = '127.0.0.1'
 const port = 5555
 // Custom code for closing websocket connection due to invalid token
 const code = 1000
 
-// The websocket which is open with the main server (Authentication/pack opening)
-var wsServer: UserDataClientWS = undefined
+// The websocket connetion to the server
+export var server: ClientWS = undefined
 
+// User data
 type UserData = null | {
   uuid: string
   username: string
@@ -35,15 +38,12 @@ type UserData = null | {
   achievements: Achievement[]
 }
 
-export default class UserDataServer {
+export default class Server {
   private static userData: UserData = null
+  static pendingReconnect: { state: GameModel } | null = null
 
   // Log in with the server for user with given OAuth token
-  static login(
-    payload: GoogleJwtPayload,
-    game: Phaser.Game,
-    callback = () => {},
-  ) {
+  static login(payload: GoogleJwtPayload, game: Phaser.Game, callback) {
     /*
     Destructure the payload
     Immediately send the payload information to server
@@ -61,27 +61,27 @@ export default class UserDataServer {
     const uuid = uuidv5(payload.sub, UUID_NAMESPACE)
     const jti = payload.jti
 
-    wsServer = UserDataServer.getSocket()
+    server = Server.getSocket()
 
     // Immediately send the payload information to server
-    wsServer.onOpen(() => {
-      wsServer.send({
-        type: 'sendToken',
+    server.onOpen(() => {
+      server.send({
+        type: 'signIn',
         email,
         uuid,
         jti,
       })
     })
 
-    // Register a listener for the response of the user-data
-    wsServer
+    // Register OAuth-specific handlers
+    server
       .on('promptUserInit', () => {
         // Open username registration menu
         game.scene.getAt(0).scene.launch('MenuScene', {
           menu: 'registerUsername',
           // Ensure that user is logged out if they cancel
           exitCallback: () => {
-            UserDataServer.logout()
+            Server.logout()
           },
         })
       })
@@ -96,17 +96,17 @@ export default class UserDataServer {
           }
         })
 
-        wsServer.close(code)
-        wsServer = undefined
+        server.close(code)
+        server = undefined
       })
       .on('alreadySignedIn', () => {
         console.log(
           'Server indicated that the given uuid is already signed in. Logging out.',
         )
-        wsServer.close(code)
-        wsServer = undefined
+        server.close(code)
+        server = undefined
 
-        UserDataServer.logout()
+        Server.logout()
 
         // TODO Make this a part of the static logout method
         game.scene
@@ -118,6 +118,61 @@ export default class UserDataServer {
             s: 'The selected account is already logged in on another device or tab. Please select another account option.',
           })
       })
+
+    // Register common handlers
+    this.registerCommonHandlers(uuid, game, callback)
+  }
+
+  // Log in as a guest with a generated UUID
+  static loginGuest(game: Phaser.Game, callback) {
+    // Get or generate a UUID for the guest
+    let uuid = localStorage.getItem('guest_uuid')
+    if (!uuid) {
+      // Generate a random UUID for new guests
+      uuid = crypto.randomUUID()
+      localStorage.setItem('guest_uuid', uuid)
+    }
+
+    server = Server.getSocket()
+
+    // Send guest token with just UUID
+    server.onOpen(() => {
+      server.send({
+        type: 'signIn',
+        uuid,
+      })
+    })
+
+    // Register guest-specific handlers
+    server
+      .on('promptUserInit', () => {
+        const decks = UserSettings._get('decks')
+        const inventory = UserSettings._get('inventory')
+        const missions = UserSettings._get('completedMissions')
+
+        server.send({
+          type: 'sendInitialUserData',
+          username: 'Guest',
+          decks: decks,
+          inventory: Server.convertBoolArrayToBitString(inventory),
+          missions: Server.convertBoolArrayToBitString(missions),
+        })
+      })
+      .on('invalidToken', () => {
+        console.error('Invalid guest token')
+      })
+
+    // Register common handlers
+    this.registerCommonHandlers(uuid, game, callback)
+  }
+
+  // Register common websocket event handlers for both OAuth and guest login
+  private static registerCommonHandlers(
+    uuid: string,
+    game: Phaser.Game,
+    callback: () => void,
+  ) {
+    server
       .on(
         'sendUserData',
         (data: {
@@ -162,21 +217,13 @@ export default class UserDataServer {
           reward: reward,
         })
       })
+      .on('promptReconnect', (data) => {
+        // Store reconnect data for PreloadScene to handle after assets load
+        this.pendingReconnect = { state: data.state }
+      })
 
-    // If the connection closes, login again with same args
-    wsServer.ws.onclose = (event) => {
-      // Clear user data after logging out
-      this.userData = null
-
-      // Don't attempt to login again if the server explicitly logged us out
-      if (event.code !== code) {
-        console.log(
-          'Logged in websocket is closing, signing in again with token:',
-        )
-        console.log(payload)
-
-        UserDataServer.login(payload, game)
-      }
+    server.ws.onerror = (event: Event) => {
+      console.error(`WebSocket error: ${event}`)
     }
   }
 
@@ -189,36 +236,20 @@ export default class UserDataServer {
     // Clear the sign-in token
     localStorage.removeItem(Url.gsi_token)
 
-    if (UserDataServer.isLoggedIn()) {
-      console.log('server was logged in and now its logging out...')
+    server.close(code)
+    server = undefined
+    Server.userData = null
 
-      wsServer.close(code)
-      wsServer = undefined
-
-      UserSettings.clearSessionStorage()
-    }
-  }
-
-  // Returns if the user is logged in
-  static isLoggedIn(): boolean {
-    return wsServer !== undefined
-  }
-
-  // Call the server to refresh the user data
-  static refreshUserData(): void {
-    if (UserDataServer.isLoggedIn()) {
-      wsServer.send({
-        type: 'refreshUserData',
-      })
-    }
+    UserSettings.clearSessionStorage()
   }
 
   // Send server an updated list of decks
   static sendDecks(decks: Deck[]): void {
-    if (wsServer === undefined) {
-      throw 'Sending decks when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Sending decks when server ws doesnt exist.')
+      return
     }
-    wsServer.send({
+    server.send({
       type: 'sendDecks',
       decks: decks,
     })
@@ -226,10 +257,11 @@ export default class UserDataServer {
 
   // Send server user's inventory of unlocked cards
   static sendInventory(inventory: boolean[]): void {
-    if (wsServer === undefined) {
-      throw 'Sending inventory when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Sending inventory when server ws doesnt exist.')
+      return
     }
-    wsServer.send({
+    server.send({
       type: 'sendInventory',
       inventory: this.convertBoolArrayToBitString(inventory),
     })
@@ -237,10 +269,11 @@ export default class UserDataServer {
 
   // Send server user's list of completed missions
   static sendCompletedMissions(missions: boolean[]): void {
-    if (wsServer === undefined) {
-      throw 'Sending completed missions when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Sending completed missions when server ws doesnt exist.')
+      return
     }
-    wsServer.send({
+    server.send({
       type: 'sendCompletedMissions',
       missions: this.convertBoolArrayToBitString(missions),
     })
@@ -248,10 +281,11 @@ export default class UserDataServer {
 
   // Send server user's experience with each avatar
   static sendAvatarExperience(experience: number[]): void {
-    if (wsServer === undefined) {
-      throw 'Sending avatar experience when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Sending avatar experience when server ws doesnt exist.')
+      return
     }
-    wsServer.send({
+    server.send({
       type: 'sendAvatarExperience',
       experience: experience,
     })
@@ -259,28 +293,30 @@ export default class UserDataServer {
 
   // Send server user's list of completed missions
   static purchaseItem(id: number, cost: number): void {
-    if (wsServer === undefined) {
-      throw 'Purchasing item when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Purchasing item when server ws doesnt exist.')
+      return
     }
-    wsServer.send({
+    server.send({
       type: 'purchaseItem' as const,
       id,
     })
 
     // Locally manage the purchase
-    UserDataServer.getUserData().gems -= cost
+    Server.getUserData().gems -= cost
     // TODO Cosmetic array update
   }
 
   static setCosmeticSet(cosmeticSet: CosmeticSet): void {
-    if (wsServer === undefined) {
-      throw 'Setting cosmetic set when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Setting cosmetic set when server ws doesnt exist.')
+      return
     }
 
     // Change it locally
     this.userData.cosmeticSet = cosmeticSet
 
-    wsServer.send({
+    server.send({
       type: 'setCosmeticSet',
       value: cosmeticSet,
     })
@@ -288,11 +324,12 @@ export default class UserDataServer {
 
   // Send all data necessary to initialize a user
   static sendInitialUserData(username: string): void {
-    if (wsServer === undefined) {
-      throw 'Sending initial user data when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Sending initial user data when server ws doesnt exist.')
+      return
     }
 
-    wsServer.send({
+    server.send({
       type: 'sendInitialUserData',
       username: username,
       decks: UserSettings._get('decks'),
@@ -328,24 +365,26 @@ export default class UserDataServer {
   }
 
   static setAchievementsSeen(): void {
-    if (wsServer === undefined) {
-      throw 'Setting achievements seen when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Setting achievements seen when server ws doesnt exist.')
+      return
     }
 
     this.userData.achievements.forEach((achievement) => {
       achievement.seen = true
     })
 
-    wsServer.send({
+    server.send({
       type: 'setAchievementsSeen',
     })
   }
 
   static harvestGarden(plotNumber: number): void {
-    if (wsServer === undefined) {
-      throw 'Harvesting garden when server ws doesnt exist.'
+    if (!server || !server.isOpen()) {
+      console.error('Harvesting garden when server ws doesnt exist.')
+      return
     }
-    wsServer.send({
+    server.send({
       type: 'harvestGarden',
       index: plotNumber,
     })
@@ -393,18 +432,11 @@ export default class UserDataServer {
     )
   }
 
-  // TODO Clarify if we reuse a UserSessionWS or create a new ws even for signed in users
-  // Get the appropriate websocket for this environment
-  // If user is logged in, use the existing ws instead of opening a new one
-  private static getSocket(): UserDataClientWS {
-    // Establish a websocket based on the environment
-    if (Flags.local) {
-      return new TypedWebSocket(`ws://${URL}:${USER_DATA_PORT}`)
-    } else {
-      // The WS location on DO
-      // let loc = window.location
-      const fullPath = `wss://celestialdecks.gg/user_data_ws`
-      return new TypedWebSocket(fullPath)
-    }
+  // Get a websocket right for the current environment
+  private static getSocket(): ClientWS {
+    const path = Flags.local
+      ? `ws://${URL}:${USER_DATA_PORT}`
+      : `wss://celestialdecks.gg/user_data_ws`
+    return new TypedWebSocket(path)
   }
 }

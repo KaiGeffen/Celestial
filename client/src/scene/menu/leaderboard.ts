@@ -2,7 +2,7 @@ import 'phaser'
 import { Color, Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
-import UserDataServer from '../../network/userDataServer'
+import Server from '../../server'
 
 const height = (Space.windowHeight * 2) / 3
 const width = 1000
@@ -33,7 +33,7 @@ export default class LeaderboardMenu extends Menu {
 
   private async fetchLeaderboardData() {
     try {
-      const userData = UserDataServer.getUserData()
+      const userData = Server.getUserData()
       const response = await fetch(
         `https://celestialdecks.gg/leaderboard/${userData.uuid}`,
       )
@@ -112,7 +112,7 @@ export default class LeaderboardMenu extends Menu {
     })
 
     // If the row is our account, highlight it
-    if (entry.username === UserDataServer.getUserData().username) {
+    if (entry.username === Server.getUserData().username) {
       rowSizer.addBackground(
         this.scene.add.rectangle(0, 0, 1, 1, Color.rowHighlight),
       )

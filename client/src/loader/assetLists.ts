@@ -297,6 +297,8 @@ export const assetLists = {
       "Inspire",
       "Leaderboard",
       "Moon",
+      "Network",
+      "Network",
       "New",
       "Nourish",
       "Options",

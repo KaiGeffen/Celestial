@@ -8,6 +8,7 @@ import MenuScene from '../menuScene'
 import getRandomAiDeck from '../../data/aiDecks'
 import { Deck } from '../../../../shared/types/deck'
 import logEvent from '../../utils/analytics'
+import { server } from '../../server'
 
 const width = 550
 
@@ -87,6 +88,11 @@ export default class ModeMenu extends Menu {
       within: container,
       text: 'AI',
       f: () => {
+        if (!server || !server.isOpen()) {
+          this.scene.signalError('Server is disconnected.')
+          return
+        }
+
         activeScene.scene.stop()
 
         this.scene.scene.start('StandardMatchScene', {
@@ -113,6 +119,11 @@ export default class ModeMenu extends Menu {
       within: container,
       text: 'PVP',
       f: () => {
+        if (!server || !server.isOpen()) {
+          this.scene.signalError('Server is disconnected.')
+          return
+        }
+
         activeScene.scene.stop()
 
         this.scene.scene.start('StandardMatchScene', {
@@ -139,6 +150,11 @@ export default class ModeMenu extends Menu {
       within: container,
       text: 'PWD',
       f: () => {
+        if (!server || !server.isOpen()) {
+          this.scene.signalError('Server is disconnected.')
+          return
+        }
+
         activeScene.scene.stop()
 
         this.scene.scene.start('StandardMatchScene', {

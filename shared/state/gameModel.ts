@@ -86,9 +86,14 @@ export default class GameModel {
     // Starting priority is random
     this.priority = Math.floor(Math.random() * 2)
     this.status = [new Statuses(), new Statuses()]
+
+    // Draw starting hand
+    for (const player of [0, 1]) {
+      this.draw(player, MechanicsSettings.START_HAND, true)
+    }
   }
 
-  versionIncr() {
+  versionIncrClearAnimations() {
     this.versionNo++
     this.animations = [[], []]
   }
@@ -174,25 +179,40 @@ export default class GameModel {
       card = this.deck[player].pop()
       this.hand[player].push(card)
 
-      // Increment draw counter
-      this.amtDrawn[player] += 1
-
       // Trigger its on draw effects, except during setup phase
       if (!isSetup) {
         card.onDraw(player, this)
+
+        // Only increment draw counter for cards that are confirmed (After mulligan)
+        this.amtDrawn[player] += 1
       }
 
-      amt -= 1
+      // Animate the draw to hand or to mulligan zone
+      if (isSetup) {
+        this.animations[player].push(
+          new Animation({
+            from: Zone.Deck,
+            to: Zone.Mulligan,
+            card: card,
+            index: this.hand[player].length - 1,
+            // Opponent doesn't see the starting cards drawn
+            visibility: Visibility.FullyUnknown,
+          }),
+        )
+      } else {
+        // Animate this draw
+        this.animations[player].push(
+          new Animation({
+            from: Zone.Deck,
+            to: Zone.Hand,
+            card: card,
+            index2: this.hand[player].length - 1,
+          }),
+        )
+      }
 
-      // Animate this draw
-      this.animations[player].push(
-        new Animation({
-          from: Zone.Deck,
-          to: Zone.Hand,
-          card: card,
-          index2: this.hand[player].length - 1,
-        }),
-      )
+      // Keep track of how many cards are left to draw
+      amt -= 1
     }
     return card
   }

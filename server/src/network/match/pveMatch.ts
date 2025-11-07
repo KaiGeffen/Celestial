@@ -1,28 +1,29 @@
 import Match from './match'
 import { getAction } from '../../ai'
 import getClientGameModel from '../../../../shared/state/clientGameModel'
-import { MatchServerWS } from '../../../../shared/network/matchWS'
+import { ServerWS } from '../../../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../../../shared/types/deck'
 import { updateMatchResultPVE } from '../../db/updateMatchResult'
 import { AchievementManager } from '../../achievementManager'
 
 class PveMatch extends Match {
-  constructor(ws: MatchServerWS, uuid: string, deck: Deck, aiDeck: Deck) {
+  constructor(ws: ServerWS, uuid: string, deck: Deck, aiDeck: Deck) {
     super(ws, uuid, deck, null, null, aiDeck)
   }
 
   // Given ws is disconnecting
-  async doExit(disconnectingWs: MatchServerWS) {
+  async doSurrender(disconnectingWs: ServerWS) {
     if (this.game === null || this.game.model.winner !== null) return
 
     // AI wins by default
-    this.game.setWinnerViaDisconnect(1)
+    this.game.setWinnerViaSurrender(1)
     await this.notifyState()
 
     // NOTE Game is null to prevent doExit from being called again
     this.game = null
-    disconnectingWs.close()
   }
+
+  // TODO Handle disconnect separately
 
   async notifyState() {
     await super.notifyState()

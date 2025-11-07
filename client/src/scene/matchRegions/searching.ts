@@ -6,6 +6,7 @@ import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import avatarNames from '../../data/avatarNames'
 import GameModel from '../../../../shared/state/gameModel'
+import { server } from '../../server'
 
 export default class SearchingRegion extends Region {
   mysteryAvatar: Phaser.GameObjects.Image
@@ -14,9 +15,12 @@ export default class SearchingRegion extends Region {
   txtTitle: Phaser.GameObjects.Text
   txtTime: Phaser.GameObjects.Text
   matchFound: boolean
+  password: string
 
-  create(scene: MatchScene, avatarId: number): Region {
+  create(scene: MatchScene, avatarId: number, password: string): Region {
     this.scene = scene
+    this.password = password
+
     this.container = scene.add.container().setDepth(Depth.searching)
     this.scene.plugins.get('rexAnchor')['add'](this.container, {
       x: `50%`,
@@ -89,6 +93,14 @@ export default class SearchingRegion extends Region {
     })
   }
 
+  // TODO This is a hack to force matchFound true when region hides, REFACTOR THIS REGION TO A SCENE
+  hide(): Region {
+    this.matchFound = true
+    super.hide()
+
+    return this
+  }
+
   private createBackground(scene: Phaser.Scene): void {
     let background = scene.add
       .rectangle(0, 0, 1, 1, Color.backgroundLight)
@@ -123,6 +135,14 @@ export default class SearchingRegion extends Region {
       .text(0, -100, 'Searching for an opponent', Style.announcement)
       .setOrigin(0.5)
 
+    // Password text
+    if (this.password) {
+      const txtPassword = scene.add
+        .text(0, -50, `Password: ${this.password}`, Style.basic)
+        .setOrigin(0.5)
+      this.container.add(txtPassword)
+    }
+
     // Time text
     this.txtTime = scene.add.text(0, 0, '', Style.announcement).setOrigin(0.5)
 
@@ -134,7 +154,13 @@ export default class SearchingRegion extends Region {
       within: this.container,
       text: 'Cancel',
       y: 100,
-      f: () => scene.doBack(),
+      f: () => {
+        server.send({
+          type: 'cancelQueue',
+          password: this.password,
+        })
+        scene.doBack()
+      },
     })
   }
 }

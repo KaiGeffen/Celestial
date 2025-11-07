@@ -1,10 +1,4 @@
 import 'phaser'
-import {
-  MatchWS,
-  MatchPveWS,
-  MatchPvpWS,
-  MatchTutorialWS,
-} from '../network/net'
 // Import Settings itself
 import { Ease, Space, UserSettings } from '../settings/settings'
 import BaseScene from './baseScene'
@@ -15,7 +9,7 @@ import OverlayRegion from './matchRegions/pileOverlays'
 import GameModel from '../../../shared/state/gameModel'
 import PassRegion from './matchRegions/pass'
 import { Deck } from '../../../shared/types/deck'
-import UserDataServer from '../network/userDataServer'
+import Server from '../server'
 import TheirAvatarRegion from './matchRegions/theirAvatar'
 import OurAvatarRegion from './matchRegions/ourAvatar'
 import TheirScoreRegion from './matchRegions/theirScore'
@@ -27,11 +21,15 @@ import MulliganRegion from './matchRegions/mulliganRegion'
 import CompanionRegion from './matchRegions/companion'
 import { ResultsRegionJourney } from './matchRegions/matchResults'
 
+// TODO Figure out
+import { server } from '../server'
+import { ClientWS } from '../../../shared/network/celestialTypedWebsocket'
+
 export class MatchScene extends BaseScene {
   params: any
 
   view: View
-  net: MatchWS
+  ws: ClientWS
 
   // Whether the match is paused (Awaiting user to click a button, for example)
   paused: boolean
@@ -51,39 +49,63 @@ export class MatchScene extends BaseScene {
     isPvp?: boolean
     password?: string
     aiDeck?: Deck
+    gameStartState?: GameModel
   }) {
     this.params = params
     // Reset variables
     this.queuedStates = {}
     this.currentVersion = this.maxVersion = -1
 
-    // Connect with the server
-    if (this.isTutorial) {
-      this.net = new MatchTutorialWS(this, params.missionID)
+    // Register each hook for a message from the server
+    this.registerMatchServerHooks()
+
+    // Send initial message to the server, unless we're reconnecting
+    if (this.params.gameStartState) {
+      this.currentVersion = this.params.gameStartState.versionNo - 1
+      this.queueState(this.params.gameStartState)
+    } else if (this.isTutorial) {
+      server.send({
+        type: 'initTutorial',
+        num: params.missionID,
+        uuid: Server.getUserData().uuid,
+      })
     } else if (params.isPvp) {
-      this.net = new MatchPvpWS(this, params.deck, params.password)
+      server.send({
+        type: 'initPvp',
+        password: params.password,
+        uuid: Server.getUserData().uuid,
+        deck: params.deck,
+      })
     } else {
-      this.net = new MatchPveWS(this, params.deck, params.aiDeck)
+      server.send({
+        type: 'initPve',
+        aiDeck: params.aiDeck,
+        uuid: Server.getUserData().uuid,
+        deck: params.deck,
+      })
     }
 
     // Create the view
-    this.view = new View(this, this.params.deck?.cosmeticSet?.avatar ?? 0)
+    this.view = new View(
+      this,
+      this.params.deck?.cosmeticSet?.avatar ?? 0,
+      this.params.password,
+    )
 
     // Register the shift hotkey to explain hotkeys in all regions
     this.addHotkeyHint()
 
     this.paused = false
 
-    this.setCallbacks(this.view, this.net)
+    this.setCallbacks(this.view)
   }
 
   restart(): void {
-    this.view = new View(this, this.params.deck?.cosmeticSet?.avatar ?? 0)
-  }
-
-  beforeExit() {
-    this.net.exitMatch()
-    UserDataServer.refreshUserData()
+    this.view = new View(
+      this,
+      this.params.deck?.cosmeticSet?.avatar ?? 0,
+      this.params.password,
+    )
   }
 
   // Listens for websocket updates
@@ -101,12 +123,27 @@ export class MatchScene extends BaseScene {
     this.maxVersion = Math.max(this.maxVersion, state.versionNo)
   }
 
-  signalDC(): void {
-    // Show a message that opponent disconnected
+  signalOpponentSurrendered(): void {
+    this.scene.launch('MenuScene', {
+      menu: 'message',
+      title: 'Opponent Surrendered',
+      s: 'Your opponent surrendered, you win!',
+    })
+  }
+
+  signalOpponentDisconnect(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
       title: 'Opponent Disconnected',
-      s: 'Your opponent disconnected, you win!',
+      s: 'Your opponent disconnected, now we wait for them to reconnect...',
+    })
+  }
+
+  signalOpponentReconnected(): void {
+    this.scene.launch('MenuScene', {
+      menu: 'message',
+      title: 'Opponent Reconnected',
+      s: 'Your opponent has reconnected, resuming the game.',
     })
   }
 
@@ -124,7 +161,7 @@ export class MatchScene extends BaseScene {
   }
 
   // Set all of the callback functions for the regions in the view
-  private setCallbacks(view, net: MatchWS): void {
+  private setCallbacks(view): void {
     // Their score region
     view.theirScore.recapCallback = () => {
       // Scan backwards through the queued states to find the start of the recap
@@ -152,13 +189,19 @@ export class MatchScene extends BaseScene {
 
     // Hand region
     view.ourBoard.setCardClickCallback((i: number) => {
-      net.playCard(i, this.currentVersion)
+      server.send({
+        type: 'playCard',
+        cardNum: i,
+        versionNo: this.currentVersion,
+      })
     })
     view.ourBoard.setDisplayCostCallback((cost: number) => {
       this.view.ourScore.displayCost(cost)
     })
     view.ourAvatar.setEmoteCallback(() => {
-      this.net.signalEmote()
+      server.send({
+        type: 'emote',
+      })
     })
 
     // Set the callbacks for overlays
@@ -201,7 +244,10 @@ export class MatchScene extends BaseScene {
     // Pass button
     view.pass.setCallback(() => {
       if (!this.paused) {
-        net.passTurn(this.currentVersion)
+        server.send({
+          type: 'passTurn',
+          versionNo: this.currentVersion,
+        })
       }
     })
     view.pass.setShowResultsCallback(() => {
@@ -214,13 +260,24 @@ export class MatchScene extends BaseScene {
 
     // Mulligan
     view.mulligan.setCallback(() => {
+      if (!server.isOpen()) {
+        this.signalError('Server is disconnected.')
+        return
+      }
+
+      // Get the choice and send to server
       const choice: [boolean, boolean, boolean] = view.mulligan.mulliganChoices
-      net.doMulligan(choice)
+      server.send({
+        type: 'mulligan',
+        mulligan: choice,
+      })
     })
   }
 
   // Try to display the next queued state TODO Recovery if we've been waiting too long
   update(time, delta): void {
+    super.update(time, delta)
+
     // Enable the searching region visual update
     this.view.searching.update(time, delta)
 
@@ -255,7 +312,10 @@ export class MatchScene extends BaseScene {
 
     // Autopass
     if (this.shouldPass(state)) {
-      this.net.passTurn(state.versionNo)
+      server.send({
+        type: 'passTurn',
+        versionNo: state.versionNo,
+      })
     }
 
     // State was displayed
@@ -333,6 +393,34 @@ export class MatchScene extends BaseScene {
     })
   }
 
+  private registerMatchServerHooks(): void {
+    // Each registered event
+    server
+      .on('matchStart', ({ name1, name2, elo1, elo2 }) => {
+        // Signal that a match has been found
+        this.signalMatchFound(name1, name2, elo1, elo2)
+      })
+      .on('transmitState', (data) => {
+        this.queueState(data.state)
+      })
+      .on('signalError', () => {
+        this.signalError('Server says that an action was in error.')
+        console.log('Server says that an action was in error.')
+      })
+      .on('opponentSurrendered', () => {
+        this.signalOpponentSurrendered()
+      })
+      .on('opponentDisconnected', () => {
+        this.signalOpponentDisconnect()
+      })
+      .on('opponentReconnected', () => {
+        this.signalOpponentReconnected()
+      })
+      .on('opponentEmote', (data) => {
+        this.emote(0)
+      })
+  }
+
   onWindowResize(): void {
     this.view.ourBoard.onWindowResize()
     this.view.theirBoard.onWindowResize()
@@ -379,7 +467,7 @@ export class View {
 
   background: Phaser.GameObjects.Image
 
-  constructor(scene: MatchScene, avatarId: number) {
+  constructor(scene: MatchScene, avatarId: number, password: string) {
     this.scene = scene
 
     this.background = scene.add
@@ -398,7 +486,7 @@ export class View {
         : Space.windowWidth / this.background.width,
     )
 
-    this.searching = new Regions.Searching().create(scene, avatarId)
+    this.searching = new Regions.Searching().create(scene, avatarId, password)
 
     // Create each of the regions
     // this.createOurHand()

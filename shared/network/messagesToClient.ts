@@ -1,44 +1,9 @@
 import { Deck } from '../types/deck'
 import { CosmeticSet } from '../types/cosmeticSet'
 import { Achievement } from '../types/achievement'
-export interface UserDataClientMessages {
-  sendToken: {
-    email: string
-    uuid: string
-    jti: string
-  }
-  sendDecks: {
-    decks: Deck[]
-  }
-  sendInventory: {
-    inventory: string
-  }
-  sendCompletedMissions: {
-    missions: string
-  }
-  sendAvatarExperience: {
-    experience: number[]
-  }
-  refreshUserData: {}
-  sendInitialUserData: {
-    username: string
-    decks: Deck[]
-    inventory: string
-    missions: string
-  }
-  purchaseItem: {
-    id: number
-  }
-  setCosmeticSet: {
-    value: CosmeticSet
-  }
-  setAchievementsSeen: {}
-  harvestGarden: {
-    index: number
-  }
-}
+import GameModel from '../state/gameModel'
 
-export interface UserDataServerMessages {
+export default interface messagesToClient {
   promptUserInit: {}
   invalidToken: {}
   alreadySignedIn: {}
@@ -65,4 +30,22 @@ export interface UserDataServerMessages {
     newGarden?: Date[]
     reward?: number
   }
+  promptReconnect: {
+    state: GameModel
+  }
+  // MATCH RELEVANT
+  matchStart: {
+    name1: string
+    name2: string
+    elo1: number
+    elo2: number
+  }
+  transmitState: {
+    state: GameModel
+  }
+  signalError: {}
+  opponentSurrendered: {}
+  opponentDisconnected: {}
+  opponentReconnected: {}
+  opponentEmote: {}
 }

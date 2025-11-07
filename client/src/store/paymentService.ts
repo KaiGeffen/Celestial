@@ -2,7 +2,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Url } from '../settings/url'
 import { PAYMENT_PORT } from '../../../shared/network/settings'
 import { Flags } from '../settings/flags'
-import UserDataServer from '../network/userDataServer'
+import Server from '../server'
 
 const stripePromise = loadStripe(Url.stripePublishableKey)
 
@@ -11,7 +11,7 @@ export const paymentService = {
   async purchaseGems(
     gemPackage: string,
   ): Promise<{ sessionId: string; amount: number; gems: number }> {
-    const uuid = UserDataServer.getUserData().uuid
+    const uuid = Server.getUserData().uuid
     if (!uuid) throw new Error('Must be logged in to purchase gems')
 
     // Get the base URL

@@ -153,7 +153,10 @@ class TutorialController extends ServerController {
       ai_deck = o_decks[num]
     }
 
-    super(
+    super()
+
+    // Start the game with given tutorial decks
+    this.startGame(
       player_deck,
       ai_deck,
       { avatar: 0, border: 0 },
@@ -161,6 +164,7 @@ class TutorialController extends ServerController {
       false,
     )
 
+    // Player starts, start with 2 wins, skip the mulligan phase
     this.model.priority = 0
     this.model.wins[0] = 2
     this.model.mulligansComplete = [true, true]

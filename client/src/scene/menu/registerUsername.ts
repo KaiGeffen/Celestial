@@ -4,7 +4,7 @@ import Buttons from '../../lib/buttons/buttons'
 import { Color, Space, Style, Url } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
-import UserDataServer from '../../network/userDataServer'
+import Server from '../../server'
 import Button from '../../lib/buttons/button'
 import { openDiscord } from '../../utils/externalLinks'
 import logEvent from '../../utils/analytics'
@@ -168,7 +168,7 @@ export class RegisterUsernameMenu extends Menu {
         this.scene.scene.stop()
 
         // Send username to server
-        UserDataServer.sendInitialUserData(this.username)
+        Server.sendInitialUserData(this.username)
 
         logEvent('registered')
       },
