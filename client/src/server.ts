@@ -96,15 +96,13 @@ export default class Server {
           }
         })
 
-        server.close(code)
+        if (server) server.close(code)
         server = undefined
       })
       .on('alreadySignedIn', () => {
         console.log(
           'Server indicated that the given uuid is already signed in. Logging out.',
         )
-        server.close(code)
-        server = undefined
 
         Server.logout()
 
@@ -236,7 +234,7 @@ export default class Server {
     // Clear the sign-in token
     localStorage.removeItem(Url.gsi_token)
 
-    server.close(code)
+    if (server) server.close(code)
     server = undefined
     Server.userData = null
 
