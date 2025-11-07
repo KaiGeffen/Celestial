@@ -15,7 +15,7 @@ import {
   MechanicsSettings,
 } from '../../../../shared/settings'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
-import UserDataServer from '../../network/userDataServer'
+import Server from '../../server'
 import { getUnlockedAvatars, getUnlockedBorders } from '../../utils/cosmetics'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
@@ -69,11 +69,9 @@ class AlterDeckMenu extends Menu {
 
     this.name = params.deckName
     this.selectedAvatar =
-      params.cosmeticSet?.avatar ??
-      UserDataServer.getUserData().cosmeticSet?.avatar
+      params.cosmeticSet?.avatar ?? Server.getUserData().cosmeticSet?.avatar
     this.selectedBorder =
-      params.cosmeticSet?.border ??
-      UserDataServer.getUserData().cosmeticSet?.border
+      params.cosmeticSet?.border ?? Server.getUserData().cosmeticSet?.border
     this.titleString = titleString
     this.confirmString = confirmString
     this.deckCode = params.deckCode ?? []

@@ -2,8 +2,9 @@ import 'phaser'
 import Card from '../../../shared/state/card'
 import BaseScene from './baseScene'
 import { Deck } from '../../../shared/types/deck'
+import { server } from '../server'
 
-import CatalogRegion, { CatalogRegionJourney } from './builderRegions/catalog'
+import CatalogRegion from './builderRegions/catalog'
 import DeckRegion from './builderRegions/deck'
 import DecklistsRegion from './builderRegions/decklists'
 import FilterRegion from './builderRegions/filter'
@@ -80,22 +81,30 @@ export class BuilderBase extends BaseScene {
   getCount(card: Card): number {
     return this.deckRegion.getCount(card)
   }
+
+  protected createBackground(): void {
+    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
+
+    this.plugins.get('rexAnchor')['add'](background, {
+      width: `100%`,
+      height: `100%`,
+    })
+  }
 }
 
 export class JourneyBuilderScene extends BuilderBase {
   journeyRegion: JourneyRegion
 
-  constructor() {
-    super({
-      key: 'JourneyBuilderScene',
-      lastScene: 'JourneyScene',
-    })
+  constructor(
+    args = { key: 'JourneyBuilderScene', lastScene: 'MapJourneyScene' },
+  ) {
+    super(args)
   }
 
   create(params): void {
     super.create(params)
 
-    this.catalogRegion = new CatalogRegionJourney().create(this)
+    this.catalogRegion = new CatalogRegion().create(this)
 
     // TODO Not just the 100s digit number
     const avatar = (Math.floor(params.id / 100) - 1) % 6
@@ -112,6 +121,8 @@ export class JourneyBuilderScene extends BuilderBase {
 
     // Must filter out cards that you don't have access to
     this.filter()
+
+    this.catalogRegion.resize(Space.cutoutWidth)
   }
 
   onWindowResize(): void {
@@ -129,8 +140,13 @@ export class JourneyBuilderScene extends BuilderBase {
 
   updateSavedDeck(deck: string): void {}
 
-  private startCallback(): () => void {
+  protected startCallback(): () => void {
     return () => {
+      if (!server || !server.isOpen()) {
+        this.signalError('Server is disconnected.')
+        return
+      }
+
       // Create a proper deck object using the new type
       const aiDeck: Deck = {
         name: 'AI Deck',
@@ -145,6 +161,92 @@ export class JourneyBuilderScene extends BuilderBase {
 
       // Start a match against an ai opponent with the specified deck
       this.scene.start('JourneyMatchScene', {
+        deck: this.journeyRegion.getDeck(),
+        aiDeck: aiDeck,
+        missionID: this.params.id,
+      })
+    }
+  }
+
+  isOverfull(): boolean {
+    return this.journeyRegion.isOverfull()
+  }
+
+  // Get the amt of a given card in the current deck
+  getCount(card: Card): number {
+    return this.journeyRegion.getCount(card)
+  }
+}
+
+export class MapJourneyBuilderScene extends BuilderBase {
+  journeyRegion: JourneyRegion
+
+  constructor() {
+    super({
+      key: 'MapJourneyBuilderScene',
+      lastScene: 'MapJourneyScene',
+    })
+  }
+
+  create(params): void {
+    super.create(params)
+
+    console.log('MapJourneyBuilderScene create', params)
+
+    this.createBackground()
+
+    this.catalogRegion = new CatalogRegion().create(this)
+
+    // TODO Not just the 100s digit number
+    const avatar = (Math.floor(params.id / 100) - 1) % 6
+    this.journeyRegion = new JourneyRegion().create(
+      this,
+      this.startCallback(),
+      avatar,
+      this.params.storyTitle,
+      this.params.storyText,
+    )
+    this.journeyRegion.addRequiredCards(params.deck)
+
+    this.filterRegion = new FilterRegion().create(this, true)
+
+    // Must filter out cards that you don't have access to
+    this.filter()
+
+    this.catalogRegion.resize(Space.cutoutWidth)
+  }
+
+  onWindowResize(): void {
+    this.journeyRegion.onWindowResize()
+    this.catalogRegion.resize(Space.cutoutWidth)
+  }
+
+  addCardToDeck(card: Card): void {
+    this.journeyRegion.addCardToDeck(card)
+  }
+
+  getDeckCode(): number[] {
+    return this.journeyRegion.getDeckCode()
+  }
+
+  updateSavedDeck(deck: string): void {}
+
+  protected startCallback(): () => void {
+    return () => {
+      // Create a proper deck object using the new type
+      const aiDeck: Deck = {
+        name: 'AI Deck',
+        cards: this.params.opponent,
+        // TODO: Make this is specific to the mission
+        cosmeticSet: {
+          avatar: 0,
+          border: 0,
+          relic: 0,
+        },
+      }
+
+      // Start a match against an ai opponent with the specified deck
+      this.scene.start('MapJourneyMatchScene', {
         deck: this.journeyRegion.getDeck(),
         aiDeck: aiDeck,
         missionID: this.params.id,
@@ -294,15 +396,6 @@ export class BuilderScene extends BuilderBase {
     if (this.filterRegion.searchObj !== undefined) {
       this.filterRegion.searchObj.setVisible(value)
     }
-  }
-
-  private createBackground(): void {
-    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
-
-    this.plugins.get('rexAnchor')['add'](background, {
-      width: `100%`,
-      height: `100%`,
-    })
   }
 
   // Remember what deck / decklist was selected

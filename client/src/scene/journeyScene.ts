@@ -9,6 +9,7 @@ import {
   Ease,
 } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
+import { server } from '../server'
 import Catalog from '../../../shared/state/catalog'
 import Cutout from '../lib/buttons/cutout'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -37,7 +38,6 @@ import getUnlockedCards, {
 } from '../journey/unlockedInventories'
 import { createExpBar } from '../lib/expBar'
 import { CardImage } from '../lib/cardImage'
-import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import logEvent from '../utils/analytics'
 
 export default class JourneyScene extends BaseScene {
@@ -189,7 +189,33 @@ export default class JourneyScene extends BaseScene {
       right: `100%-${Space.pad}`,
     })
 
-    this.characterSelectView.add(sizers[0]).add(sizers[1])
+    // Add center button to switch to old journey mode
+    const centerBtnContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: centerBtnContainer,
+      text: 'Map Mode',
+      f: () => {
+        // Switch to old journey (map) mode
+        this.beforeExit()
+        this.scene.start('MapJourneyScene')
+      },
+    })
+
+    this.plugins.get('rexAnchor')['add'](centerBtnContainer, {
+      x: `50%`,
+      y: `50%`,
+    })
+
+    this.characterSelectView
+      .add(sizers[0])
+      .add(sizers[1])
+      .add(centerBtnContainer)
   }
 
   private createMissionDetails() {
@@ -261,12 +287,15 @@ export default class JourneyScene extends BaseScene {
 
     // Create catalog region
     this.catalogRegion = new CatalogRegionJourney()
-    const catalogPanel = this.catalogRegion.create(this as any) // Cast to BuilderBase type
+    const catalogRegion = this.catalogRegion.create(this as any) // Cast to BuilderBase type
     // TODO Fix the cast >n<
+    catalogRegion.filter((card) => {
+      return getUnlockedCards().has(card)
+    })
 
     this.missionDetailsView
       .add(leftSizer, { expand: true })
-      .add(catalogPanel, { expand: true })
+      .add(catalogRegion.panel, { expand: true })
       .addBackground(background)
       .layout()
 
@@ -466,6 +495,11 @@ export default class JourneyScene extends BaseScene {
       within: cont3,
       text: 'Start',
       f: () => {
+        if (!server || !server.isOpen()) {
+          this.signalError('Server is disconnected.')
+          return
+        }
+
         // Start journey
         const deck: Deck = {
           name: 'Journey deck',

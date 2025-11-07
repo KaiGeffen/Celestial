@@ -7,7 +7,8 @@ import Button from '../lib/buttons/button'
 import Hint from '../lib/hint'
 import ensureMusic from '../loader/audioManager'
 import Buttons from '../lib/buttons/buttons'
-import UserDataServer from '../network/userDataServer'
+import Server from '../server'
+import { server } from '../server'
 
 // Functionality shared between BaseScene and MenuBaseScene
 class SharedBaseScene extends Phaser.Scene {
@@ -108,6 +109,7 @@ class SharedBaseScene extends Phaser.Scene {
 // What scenes on the bottom (Not menus) inherit their common functionality from
 export default class BaseScene extends SharedBaseScene {
   private btnOptions: Button
+  private btnNetworkStatus: Button
 
   // The last scene before this one
   private lastScene: string
@@ -144,9 +146,60 @@ export default class BaseScene extends SharedBaseScene {
       y: `0%+${Space.pad}`,
     })
 
+    // Disconnected indicator (gear icon below options)
+    this.btnNetworkStatus = new Buttons.Icon({
+      name: 'Network',
+      within: this,
+      muteClick: true,
+      hint: 'Server is disconnected',
+    })
+      .setDepth(10)
+      .setNoScroll()
+
+    // Hide by default
+    this.btnNetworkStatus.icon.setVisible(false)
+
+    // Anchor below options button
+    this.plugins.get('rexAnchor')['add'](this.btnNetworkStatus.icon, {
+      x: `100%-${Space.pad + Space.iconSize * 1.5 + Space.pad}`,
+      y: `0%+${Space.pad + Space.iconSize / 2}`,
+    })
+
     // When esc key is pressed, toggle the menu open/closed
     let esc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC)
     esc.on('down', this.openMenu(), this)
+
+    // For testing: Press P to close the server connection
+    if (Flags.networkToggle) {
+      let pKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P)
+      pKey.on('down', () => {
+        server.close()
+        console.log('Server connection closed (testing)')
+      })
+    }
+  }
+
+  private lastFlipTime: number = 0
+  update(time: number, delta: number): void {
+    super.update(time, delta)
+
+    // Check server connection status
+    const icon = this.btnNetworkStatus.icon
+    if (server && !server.isOpen()) {
+      // Server is disconnected - show the icon
+      icon.setVisible(true)
+
+      // Flip twice per second (every 500ms)
+      if (time - this.lastFlipTime >= 500) {
+        icon.setScale(-icon.scaleX, 1)
+        this.lastFlipTime = time
+      }
+    } else {
+      // Server is connected - hide the icon
+      icon.setVisible(false)
+      icon.setScale(1, 1) // Reset scale when hidden
+      this.lastFlipTime = 0 // Reset flip timer
+    }
   }
 
   doExit(): () => void {
@@ -202,10 +255,10 @@ export class BaseSceneWithHeader extends BaseScene {
   private updateUserStatsDisplay(): void {
     // Update the user stats display
     // Get user data, use defaults if not logged in
-    const username = UserDataServer.getUserData().username || 'Guest'
-    const elo = UserDataServer.getUserData().elo || 1200
-    const gems = UserDataServer.getUserData().gems || 0
-    const coins = UserDataServer.getUserData().coins || 0
+    const username = Server.getUserData().username || 'Guest'
+    const elo = Server.getUserData().elo || 1200
+    const gems = Server.getUserData().gems || 0
+    const coins = Server.getUserData().coins || 0
 
     // Set the text to the user's stats (Which might update)
     this.userStatsDisplay.setText(`${username} (${elo}) ${gems}💎 ${coins}💰`)

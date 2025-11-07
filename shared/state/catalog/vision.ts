@@ -212,9 +212,9 @@ class Lantern extends Card {
     if (game.story.acts.length === 0) {
       const card = game.hand[player].splice(0, 1)[0]
       if (card !== undefined) {
-        // Create a new copy of the card, but with 1 more point
+        // Create a new copy of the card, but with 2 more points
         const copy = this.copy()
-        copy.points += 1
+        copy.points += 2
 
         game.hand[player].unshift(copy)
       }
@@ -227,7 +227,7 @@ const lantern = new Lantern({
   cost: 5,
   points: 5,
   qualities: [Quality.FLEETING],
-  text: 'Fleeting\nIf this is the last card in the story, transform a card in hand into a copy of this with +1 point.',
+  text: 'Fleeting\nIf this is the last card in the story, transform a card in hand into a copy of this with +2 point.',
 })
 
 class BeggingBowl extends Card {

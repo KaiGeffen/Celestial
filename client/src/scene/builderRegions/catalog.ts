@@ -6,6 +6,7 @@ import { Space, Time, Scroll, Ease, Flags } from '../../settings/settings'
 import Catalog from '../../../../shared/state/catalog'
 import { BuilderBase } from '../builderScene'
 import newScrollablePanel from '../../lib/scrollablePanel'
+import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
 // Region where all of the available cards can be scrolled through
 export default class CatalogRegion {
@@ -13,7 +14,7 @@ export default class CatalogRegion {
   scene: BuilderBase
 
   // The scrollable panel on which the catalog exists
-  protected panel
+  panel
 
   // Full list of all cards in the catalog (Even those invisible)
   cardCatalog: CardImage[]
@@ -29,13 +30,11 @@ export default class CatalogRegion {
     let pool = Flags.devCardsEnabled
       ? [...Catalog.collectibleCards, ...Catalog.betaCards]
       : Catalog.collectibleCards
-    pool
-      .sort((a, b) => a.cost - b.cost)
-      .forEach((card) => {
-        this.createCard(card)
-      })
+    pool.forEach((card) => {
+      this.createCard(card)
+    })
 
-    this.panel.layout()
+    this.toggleOrdering()
 
     return this
   }
@@ -98,10 +97,17 @@ export default class CatalogRegion {
     let sizer = this.panel.getElement('panel')
     sizer.clear()
 
-    // For each card in the catalog, add it to the sizer if it satisfies
+    // Get the calendar sorted by currently selected criteria
+    const sortedCatalog = [...this.cardCatalog]
+    if (this.orderedByCost) {
+      // Sort by cost, maintaining color order as secondary sort
+      sortedCatalog.sort((a, b) => a.card.cost - b.card.cost)
+    }
+
+    // For each card in the sorted catalog, add it to the sizer if it satisfies
     // Otherwise make it invisible
-    for (let i = 0; i < this.cardCatalog.length; i++) {
-      let cardImage = this.cardCatalog[i]
+    for (let i = 0; i < sortedCatalog.length; i++) {
+      let cardImage = sortedCatalog[i]
 
       // Check if this card is present
       if (filterFunction(cardImage.card)) {
@@ -120,10 +126,45 @@ export default class CatalogRegion {
     this.panel.layout()
   }
 
+  // Toggle between ordering by cost or color
+  orderedByCost: boolean = false
+  toggleOrdering() {
+    // Toggle the ordering mode
+    this.orderedByCost = !this.orderedByCost
+
+    // Get the panel sizer
+    const sizer = this.panel.getElement('panel')
+
+    // Clear the current panel
+    sizer.clear()
+
+    // Create a copy of the catalog to sort
+    let sortedCatalog = [...this.cardCatalog]
+
+    if (this.orderedByCost) {
+      // Sort by cost, maintaining color order as secondary sort
+      sortedCatalog.sort((a, b) => a.card.cost - b.card.cost)
+    }
+    // If not ordered by cost, use the original catalog order (by color)
+
+    // Re-add all cards in the new order (except ones excluded by filter)
+    for (let cardImage of sortedCatalog) {
+      if (cardImage.container.visible) {
+        sizer.add(cardImage.container)
+      }
+    }
+
+    // Reset the scroll position
+    this.panel.t = 0
+
+    // Re-layout the panel
+    this.panel.layout()
+  }
+
   private createCard(card: Card): void {
     const container = this.panel.getElement('panel')
 
-    const cardImage = new CardImage(card, container)
+    const cardImage = new CardImage(card, container, true, false)
       .setOnClick(this.onClickCatalogCard(card))
       .setFocusOptions(
         'Add',
@@ -221,12 +262,12 @@ export default class CatalogRegion {
 }
 
 export class CatalogRegionJourney extends CatalogRegion {
-  create(scene: BuilderBase) {
+  create(scene: BuilderBase): this {
     super.create(scene)
 
     // TODO Don't use this literal
     this.panel.setMinSize(850)
 
-    return this.panel
+    return this
   }
 }

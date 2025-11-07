@@ -19,23 +19,23 @@
     "card": 7
   },
   {
-    "name": "Birds 2 - Phoenix",
+    "name": "Birds 2 - Truth",
     "id": 102,
     "x": 3890,
     "y": 865,
     "prereq": [[101]],
-    "deck": [0, 0, 4, 4, 4, 4, 9, 7, 7, 51, 51, 18],
+    "deck": [0, 0, 4, 4, 4, 4, 9, 7, 7, 61, 61, 18],
     "opponent": [3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 11, 11, 14, 14, 17],
     "storyTitle": "Rebirth",
     "storyText": "When I turned 16, I remember my routine of keeping my head down and shutting up, was starting to break apart. I didn't know why, but I couldn't help but cry, or yell at my teachers. Seeing myself so out of control was a new kind of scary, and it didn't go away until I moved out from my parents. In every way you could see things were worse: I was a high-school dropout, living on people's couches, I ate much less, but inside I felt reborn. Light for the first time in years. That was the first time I started going by 'Jules'."
   },
   {
-    "name": "Phoenix",
+    "name": "Truth",
     "id": 103,
     "x": 3857,
     "y": 265,
     "prereq": [[102]],
-    "card": 51
+    "card": 61
   },
   {
     "name": "Birds 3 - Heron",
@@ -44,7 +44,7 @@
     "y": 885,
     "prereq": [[103]],
     "deck": [65, 65, 7, 7, 7, 4, 4, 4, 4, 4],
-    "opponent": [21, 51, 51, 14, 14, 11, 11, 6, 7, 7, 3, 3, 4, 4, 5],
+    "opponent": [21, 61, 61, 14, 14, 11, 11, 6, 7, 7, 3, 3, 4, 4, 5],
     "storyTitle": "Finding Peace",
     "storyText": "When I finally left the city I had grown up in, I traveled around for a couple years, not spending more than a couple months in any one spot. There was so much to see, so many different colors for me to try on. Each place I would land, I would introduce myself with no reservations, 'I am Jules'. This was either accepted or not, but not once did I hold onto the response. After everything, I was free."
   },
@@ -82,7 +82,7 @@
       [121, 207],
       [121, 207]
     ],
-    "deck": [21, 20, 51, 63, 63],
+    "deck": [21, 20, 61, 63, 63],
     "opponent": [12, 12, 12, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
   },
   {
@@ -99,7 +99,7 @@
     "x": 1990,
     "y": 1050,
     "prereq": [[105, 306, 123]],
-    "deck": [51, 40, 40, 32, 63, 1, 3],
+    "deck": [61, 40, 40, 32, 63, 1, 3],
     "opponent": [12, 12, 12, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
   },
   {

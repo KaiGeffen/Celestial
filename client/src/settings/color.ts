@@ -81,6 +81,8 @@ export const Color: Record<string, any> = {
   cardGreyed: CoreColors.lightGrey,
   // The color of either stat if it has been changed
   cardText: CoreColors.goldS,
+  cardCost: '#B9F2FF',
+  cardPoints: CoreColors.goldS,
   cardStatChanged: '#00aa00',
   cardTextBackground: 0x000000,
 

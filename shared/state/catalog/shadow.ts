@@ -64,10 +64,22 @@ const imprison = new Imprison({
 
 class Nightmare extends Card {
   onMorning(player: number, game: GameModel, index: number) {
-    if (game.hand[player ^ 1].length < game.hand[player].length) {
-      game.pile[player].splice(index, 1)
-      game.createInStory(player, this)
-      return true
+    if (super.exhale(1, game, player)) {
+      if (game.hand[player ^ 1].length < game.hand[player].length) {
+        game.pile[player].splice(index, 1)
+        game.createInStory(player, this)
+
+        game.animations[player].push(
+          new Animation({
+            from: Zone.Discard,
+            to: Zone.Story,
+            card: this,
+            index: 0,
+            index2: game.story.acts.length - 1,
+          }),
+        )
+        return true
+      }
     }
     return false
   }
@@ -77,7 +89,7 @@ const nightmare = new Nightmare({
   id: 68,
   cost: 2,
   points: 2,
-  text: 'Morning: If you have more cards in hand than your opponent, add this to the story.',
+  text: 'Morning: Exhale 1: If you have more cards in hand than your opponent, add this to the story.',
   story:
     'I struggle to find myself\nBetween the claws and biting words\nShearing my mind away',
 })
@@ -194,7 +206,7 @@ class Victim extends Card {
 const victim = new Victim({
   name: 'Victim',
   id: 43,
-  cost: 1,
+  cost: 2,
   text: 'If you lose this round, Nourish -1 your opponent for each point you lost by.',
 })
 

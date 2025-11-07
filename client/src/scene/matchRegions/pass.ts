@@ -16,6 +16,7 @@ import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import { MechanicsSettings } from '../../../../shared/settings'
 import Buttons from '../../lib/buttons/buttons'
+import { server } from '../../server'
 
 // During the round, shows Pass button, who has passed, and who has priority
 export default class PassRegion extends Region {
@@ -102,28 +103,15 @@ export default class PassRegion extends Region {
           this.showResultsCallback()
         })
     } else if (state.priority === 0 && !state.isRecap) {
-      // Under the special condition where:
-      // Max breath reached, can play card, start of round
-      // The player is not allowed to pass
-      // const canPlay = state.cardCosts.some((cost) => cost <= state.breath[0])
-      // if (
-      //   state.roundCount + 1 >= MechanicsSettings.BREATH_CAP &&
-      //   canPlay &&
-      //   state.story.acts.length === 0
-      // ) {
-      //   this.btnPass
-      //     .setOnClick(() => {
-      //       const s = "You can't pass to start the 10th or later round."
-      //       this.scene.signalError(s)
-      //     })
-      //     .enable()
-      // }
-      // Otherwise, allow them to pass as normal
-      // else {
+      // Call callback if network is connected
       this.btnPass.enable().setOnClick(() => {
-        this.callback()
-      }, true)
-      // }
+        if (!server.isOpen()) {
+          this.scene.signalError('Server is disconnected.')
+        } else {
+          this.callback()
+          this.btnPass.disable()
+        }
+      })
     } else {
       this.btnPass.disable()
     }

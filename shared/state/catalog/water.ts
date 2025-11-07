@@ -179,7 +179,7 @@ class Cloud extends RefreshCard {
     if (super.exhale(1, game, player)) {
       game.draw(player, 1)
     }
-    if (super.exhale(1, game, player)) {
+    if (super.exhale(2, game, player)) {
       game.draw(player, 1)
     }
   }
@@ -197,7 +197,7 @@ const cloud = new Cloud({
   id: 102,
   cost: 5,
   points: 5,
-  text: 'Refresh\nExhale 1: Draw a card.\nExhale 1: Draw a card.\nExhale 1: Draw a card.',
+  text: 'Refresh\nExhale 1: Draw a card.\nExhale 1: Draw a card.\nExhale 2: Draw a card.',
 })
 
 class GainAndLoss extends Card {

@@ -94,16 +94,18 @@ export default class Cutout extends Button {
     const txtCost = this.scene.add.rexBBCodeText(
       -164,
       -22,
-      `[b]${card.cost}[/b]`,
-      BBStyle.cardStats,
+      `[stroke=#353F4E]${card.cost}[/stroke]`,
+      BBStyle.cardCost,
     )
     within.add(txtCost)
-    const txtPoints = this.scene.add.rexBBCodeText(
-      -130,
-      -12,
-      `[b]${card.points}[/b]`,
-      BBStyle.cardStats,
-    )
+    const txtPoints = this.scene.add
+      .rexBBCodeText(
+        -121,
+        5,
+        `[stroke=#353F4E]${card.points}[/stroke]`,
+        BBStyle.cardPoints,
+      )
+      .setOrigin(0.5)
     within.add(txtPoints)
 
     // The base scene's hint text object

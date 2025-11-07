@@ -41,9 +41,13 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&display=swap" rel="stylesheet"> 
+  <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300&display=swap" rel="stylesheet">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Preload critical assets for faster FCP/LCP -->
+  <link rel="preload" href="assets/animation/stillframe.webp" as="image" fetchpriority="high">
+  <link rel="preload" href="assets/logo.svg" as="image" fetchpriority="high">
 
   <link rel="stylesheet" href="style.css">
 
@@ -54,7 +58,7 @@
     window.gtag = function(){window.dataLayer.push(arguments);};
     window.gtag('js', new Date());
     window.gtag('config', 'G-7E0LP0X7Y9');
-    
+
     // Load the actual GA script
     window.addEventListener('load', function() {
       setTimeout(function() {
@@ -71,7 +75,7 @@
     function isMobile() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
-    
+
     // Redirect to Discord if on mobile
     if (isMobile()) {
       window.location.href = "https://celestialdecks.gg/about/";
@@ -79,17 +83,19 @@
   </script>
 </head>
 <body>
+  <!-- Splash Screen - Shows immediately for fast FCP -->
+  <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('assets/animation/stillframe.webp'); background-size: cover; background-position: center;"></div>
+
   <!-- Animation -->
   <video class="animation" id="animation" loop autoplay playsinline muted style="display: none;">
     <source src="" type=video/mp4>
   </video>
 
   <!-- Logo -->
-  <div id="logo-container" style="position: absolute; top: 0; left: 0; width: 100%; display: none; justify-content: center; pointer-events: none;">
-    <img src="assets/logo.svg" alt="Celestial Logo" style="width: 20vw; height: auto; display: block; pointer-events: none;" />
+  <div id="logo-container" style="position: absolute; top: 0; left: 0; width: 100%; display: flex; justify-content: center; pointer-events: none;">
+    <img src="assets/logo.svg" alt="Celestial Logo" fetchpriority="high" style="width: 20vw; height: auto; display: block; pointer-events: none;" />
   </div>
-  
-  
+
   <div class="game" id="game">
 
   <div id="signin" style="position: absolute; bottom: 118px; left: 50%; transform: translateX(-50%);"></div>

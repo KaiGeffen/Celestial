@@ -20,7 +20,7 @@ import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
 import { BuilderBase, BuilderScene } from '../builderScene'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
-import UserDataServer from '../../network/userDataServer'
+import Server from '../../server'
 import logEvent from '../../utils/analytics'
 
 const width = Space.decklistPanelWidth
@@ -178,7 +178,7 @@ export default class DecklistsRegion {
     if (UserSettings._get('decks').length >= DecklistSettings.MAX_DECKS) {
       return false
     } else {
-      const cosmeticSet: CosmeticSet = UserDataServer.getUserData().cosmeticSet
+      const cosmeticSet: CosmeticSet = Server.getUserData().cosmeticSet
       this.createCallback()(undefined, cosmeticSet, [])
       return true
     }

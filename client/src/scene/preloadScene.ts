@@ -4,13 +4,20 @@ import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import type { CredentialResponse } from 'google-one-tap'
 import type { GoogleJwtPayload } from '../types/google'
 import Loader from '../loader/loader'
-import UserDataServer from '../network/userDataServer'
-import { Space, Url, UserSettings, Flags } from '../settings/settings'
+import Server from '../server'
+import { server } from '../server'
+import { Space, Url, UserSettings, Flags, Style } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 import ensureMusic from '../loader/audioManager'
+import initializeSplashScreen from '../loader/splashLoader'
 import Cinematic from '../lib/cinematic'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
+
+// How long to wait for server before saying it's disconnected
+const GRACE_PERIOD_TO_CONNECT = 300
+// How long the reconnect message lasts on screen
+const RECONNECT_MESSAGE_TIME = 2000
 
 // Scene for user to select a sign in option, without loading assets
 export class SigninScene extends Phaser.Scene {
@@ -20,6 +27,8 @@ export class SigninScene extends Phaser.Scene {
   // True when user is signed or chose to be a guest
   signedInOrGuest: boolean = false
   guestButton: Button
+  private txt: Phaser.GameObjects.Text
+  private timeSceneStart: number
 
   constructor(args) {
     super({
@@ -28,17 +37,21 @@ export class SigninScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.timeSceneStart = Date.now()
+
     // Clear any session storage (Related to a single page visit, not local storage)
     UserSettings.clearSessionStorage()
 
     // Ensure animation is displayed
     Cinematic.ensure()
 
-    // If user is signed in, log them in
+    // If user is signed in with OAuth, log them in
     const storedToken = localStorage.getItem(Url.gsi_token)
     if (storedToken !== null) {
       const payload = jwt_decode<GoogleJwtPayload>(storedToken)
-      UserDataServer.login(payload, this.game, () => this.onOptionClick())
+      Server.login(payload, this.game, () => this.onOptionClick())
+
+      // TODO If this fails because the token is invalid or the server is offline, show options or say network offline
     }
     // If user is not signed in, show gsi and guest button
     else {
@@ -51,6 +64,35 @@ export class SigninScene extends Phaser.Scene {
       // Add buttons to sign in or play as a guest
       this.createButtons()
     }
+
+    // Text describing anything going on
+    this.txt = this.add
+      .text(
+        Space.windowWidth / 2,
+        Space.windowHeight / 2,
+        '',
+        Style.announcement,
+      )
+      .setOrigin(0.5)
+      .setDepth(10)
+  }
+
+  // Signal to user any disconnections or attempts to reconnect
+  update(time: number, delta: number): void {
+    super.update(time, delta)
+
+    // Check server connection status
+    if (
+      server &&
+      !server.isOpen() &&
+      Date.now() - this.timeSceneStart > GRACE_PERIOD_TO_CONNECT
+    ) {
+      this.txt.setText('Server is disconnected')
+    } else if (Server.pendingReconnect) {
+      this.txt.setText('Reconnecting to match...')
+    } else {
+      this.txt.setText('')
+    }
   }
 
   // Create buttons for each of the signin options (Guest, OAuth)
@@ -60,7 +102,8 @@ export class SigninScene extends Phaser.Scene {
       within: guestButtonContainer,
       text: 'Guest',
       f: () => {
-        this.onOptionClick()
+        // Log in as guest
+        Server.loginGuest(this.game, () => this.onOptionClick())
       },
       depth: -1,
     })
@@ -105,7 +148,7 @@ export class SigninScene extends Phaser.Scene {
         const payload = jwt_decode<GoogleJwtPayload>(token.credential)
 
         // Send jti to confirm connection. After server responds, complete login
-        UserDataServer.login(payload, this.game, () => this.onOptionClick())
+        Server.login(payload, this.game, () => this.onOptionClick())
       },
     })
 
@@ -119,8 +162,31 @@ export class SigninScene extends Phaser.Scene {
     })
   }
 
-  // Navigate to the first scene user should see (Home or Tutorial)
+  // Navigate to the first scene user sees (Home, tutorial, or reconnect to a match)
   protected startFirstScene(): void {
+    // Check if there's a pending reconnect - if so, start the match scene
+    const reconnect = Server.pendingReconnect
+    if (reconnect) {
+      const timeToWait = Math.max(
+        0,
+        Date.now() - this.timeSceneStart - RECONNECT_MESSAGE_TIME,
+      )
+
+      setTimeout(() => {
+        // Clear the pending reconnect
+        Server.pendingReconnect = null
+
+        // Start the match scene for the reconnected match
+        this.scene.start('StandardMatchScene', {
+          isPvp: true,
+          deck: [],
+          aiDeck: [],
+          gameStartState: reconnect.state,
+        })
+      }, timeToWait)
+      return
+    }
+
     // If the last tutorial isn't complete, start the next tutorial
     const missions = UserSettings._get('completedMissions')
     if (!missions[TUTORIAL_LENGTH - 1]) {

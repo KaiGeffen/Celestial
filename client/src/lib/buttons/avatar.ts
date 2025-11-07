@@ -107,7 +107,7 @@ export default class AvatarButton extends Button {
     const dialogAudio = document.getElementById('dialog') as HTMLAudioElement
 
     // Set the source and play
-    dialogAudio.src = `assets/dialog/${this.name}.mp3`
+    dialogAudio.src = `assets/dialog/${this.name}.opus`
     dialogAudio.currentTime = 0
     dialogAudio.play()
 

@@ -157,7 +157,7 @@ const storytime = new Storytime({
   name: 'Storytime',
   id: 82,
   cost: 6,
-  points: 2,
+  points: 4,
   text: 'Create a copy in hand of each card later in the 	story with base-cost 0.',
 })
 
@@ -179,6 +179,7 @@ const pregnant = new Pregnant({
   name: 'Pregnant',
   id: 83,
   cost: 1,
+  points: 1,
   text: 'Create a Child on top of your deck.',
 })
 

@@ -3,16 +3,26 @@ import 'phaser'
 import MenuScene from './scene/menuScene'
 import { PreloadScene, SigninScene } from './scene/preloadScene'
 import HomeScene from './scene/homeScene'
-import { StandardMatchScene, JourneyMatchScene } from './scene/matchScene'
+import {
+  StandardMatchScene,
+  JourneyMatchScene,
+  MapJourneyMatchScene,
+} from './scene/matchScene'
 import TutorialMatchScene from './scene/tutorialScene'
-import { BuilderScene, JourneyBuilderScene } from './scene/builderScene'
+import {
+  BuilderScene,
+  JourneyBuilderScene,
+  MapJourneyBuilderScene,
+} from './scene/builderScene'
 import MatchHistoryScene from './scene/matchHistoryScene'
 
 import JourneyScene from './scene/journeyScene'
 import PlaceholderScene from './scene/placeholderScene'
+import MapJourneyScene from './scene/mapJourneyScene'
 
 import { Space } from './settings/settings'
 import addResizeHandler from './loader/windowResizeManager'
+import initializeSplashScreen from './loader/splashLoader'
 
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import RoundRectanglePlugin from 'phaser3-rex-plugins/plugins/roundrectangle-plugin.js'
@@ -59,6 +69,11 @@ const config: Phaser.Types.Core.GameConfig = {
     MatchHistoryScene,
     StoreScene,
     CharacterProfileScene,
+
+    // Allowing old map based journey mode
+    MapJourneyScene,
+    MapJourneyMatchScene,
+    MapJourneyBuilderScene,
   ],
   plugins: {
     scene: [
@@ -137,5 +152,7 @@ export class CelestialGame extends Phaser.Game {
 }
 
 window.onload = () => {
+  // Initialize splash screen transition logic
+  initializeSplashScreen()
   var game = new CelestialGame(config)
 }

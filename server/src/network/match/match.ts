@@ -1,19 +1,24 @@
 import { ServerController } from '../../gameController'
 import { Mulligan } from '../../../../shared/settings'
 import getClientGameModel from '../../../../shared/state/clientGameModel'
-import { MatchServerWS } from '../../../../shared/network/matchWS'
+import { ServerWS } from '../../../../shared/network/celestialTypedWebsocket'
 import { db } from '../../db/db'
 import { players } from '../../db/schema'
 import { eq } from 'drizzle-orm'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
 import { AchievementManager } from '../../achievementManager'
+import { randomUUID } from 'crypto'
+import sendUserData from '../sendUserData'
+
+// TODO Timer logic for disconnects
 
 interface Match {
-  ws1: MatchServerWS | null
-  ws2: MatchServerWS | null
+  gameId: string
+  ws1: ServerWS | null
+  ws2: ServerWS | null
 
-  uuid1: string | null
+  uuid1: string
   uuid2: string | null
 
   deck1: Deck
@@ -24,13 +29,15 @@ interface Match {
 
 class Match implements Match {
   constructor(
-    ws1: MatchServerWS,
-    uuid1: string | null = null,
+    ws1: ServerWS,
+    uuid1: string,
     deck1: Deck,
-    ws2: MatchServerWS | null,
+    ws2: ServerWS | null,
     uuid2: string | null = null,
     deck2: Deck,
   ) {
+    // Generate unique game ID
+    this.gameId = randomUUID()
     this.ws1 = ws1
     this.uuid1 = uuid1
     this.ws2 = ws2
@@ -40,13 +47,13 @@ class Match implements Match {
     this.deck2 = deck2
 
     // Make a new game
-    this.game = new ServerController(
+    this.game = new ServerController()
+    this.game.startGame(
       deck1.cards.map((cardId) => Catalog.getCardById(cardId)),
       deck2.cards.map((cardId) => Catalog.getCardById(cardId)),
       deck1.cosmeticSet,
       deck2.cosmeticSet,
     )
-    this.game.start()
   }
 
   // Notify all connected players that the match has started
@@ -107,6 +114,17 @@ class Match implements Match {
       }),
     )
 
+    // TODO Support compression so that these aren't each 500kb
+    // Save game state to database after every state change
+    // await saveGameState(
+    //   this.gameId,
+    //   this.uuid1,
+    //   this.uuid2,
+    //   this.game.model,
+    // ).catch((error) => {
+    //   console.error('Error saving game state:', error)
+    // })
+
     // Handle database and achievement updates as game ends
     if (this.game.model.winner !== null) {
       await this.updateDatabases()
@@ -124,6 +142,10 @@ class Match implements Match {
         true,
         1,
       )
+
+      // Inform users of their new state
+      await sendUserData(this.ws1, this.uuid1)
+      await sendUserData(this.ws2, this.uuid2)
     }
   }
 
@@ -147,8 +169,13 @@ class Match implements Match {
     }
   }
 
+  // Whether the match is over
+  isOver(): boolean {
+    return this.game && this.game.model.winner !== null
+  }
+
   // Get the list of all active websockets connected to this match
-  protected getActiveWsList(): MatchServerWS[] {
+  protected getActiveWsList(): ServerWS[] {
     return [this.ws1, this.ws2].filter((ws) => ws !== null)
   }
 
@@ -162,8 +189,33 @@ class Match implements Match {
     }
   }
 
+  // Called when given ws is surrendering, implemented in children
+  async doSurrender(disconnectingWs: ServerWS) {}
+
   // Called when given ws is disconnecting, implemented in children
-  async doExit(disconnectingWs: MatchServerWS) {}
+  async doDisconnect(disconnectingWs: ServerWS) {}
+
+  async reconnectUser(ws: ServerWS, playerNumber: number) {
+    if (playerNumber === 0) {
+      this.ws1 = ws
+    } else {
+      this.ws2 = ws
+    }
+
+    // Send user current state
+    await ws.send({
+      type: 'promptReconnect',
+      state: getClientGameModel(this.game.model, playerNumber, false),
+    })
+
+    // Send opp a message that their opp is back
+    let opponentWs = playerNumber === 0 ? this.ws2 : this.ws1
+    if (opponentWs) {
+      opponentWs.send({ type: 'opponentReconnected' })
+    }
+
+    // TODO Handle timer logic for reconnects
+  }
 
   // Get the name of player with given uuid
   private async getUsernameElo(

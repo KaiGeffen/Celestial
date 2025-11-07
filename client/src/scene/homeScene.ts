@@ -2,13 +2,14 @@ import 'phaser'
 import { Style, Color, Space } from '../settings/settings'
 import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
-import UserDataServer from '../network/userDataServer'
+import Server from '../server'
 import Cinematic from '../lib/cinematic'
-import { openFeedbackForm } from '../utils/externalLinks'
+import { openDiscord, openFeedbackForm } from '../utils/externalLinks'
 import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
 import { GardenSettings } from '../../../shared/settings'
 import Catalog from '../../../shared/state/catalog'
+import { server } from '../server'
 
 const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
@@ -56,11 +57,6 @@ export default class HomeScene extends BaseScene {
   }
 
   private createUserDetails(): void {
-    if (!UserDataServer.isLoggedIn()) {
-      this.createLoginButton()
-      return
-    }
-
     const regionWidth = Space.avatarSize + Space.pad * 2
     const regionHeight = 200
     const userDetails = this.add.container(
@@ -79,8 +75,8 @@ export default class HomeScene extends BaseScene {
     // Add avatar
     const avatar = new Buttons.Avatar({
       within: userDetails,
-      avatarId: UserDataServer.getUserData().cosmeticSet.avatar,
-      border: UserDataServer.getUserData().cosmeticSet.border,
+      avatarId: Server.getUserData().cosmeticSet.avatar,
+      border: Server.getUserData().cosmeticSet.border,
       y: Space.pad + Space.avatarSize / 2,
       f: () => {
         this.scene.launch('MenuScene', {
@@ -95,7 +91,7 @@ export default class HomeScene extends BaseScene {
     })
 
     // Add username and ELO
-    const userData = UserDataServer.getUserData()
+    const userData = Server.getUserData()
     let y = Space.pad + Space.avatarSize + Space.padSmall
     const username = userData.username || 'Guest'
     const elo = userData.elo || 1000
@@ -166,17 +162,13 @@ export default class HomeScene extends BaseScene {
       x: Space.pad + Space.iconSize * 0.5,
       y: Space.pad + Space.iconSize * 0.5,
       f: () => {
-        if (UserDataServer.isLoggedIn()) {
-          // TODO Standardize this - either quests or achievements
-          this.scene.launch('MenuScene', {
-            menu: 'achievements',
-            activeScene: this,
-          })
+        // TODO Standardize this - either quests or achievements
+        this.scene.launch('MenuScene', {
+          menu: 'achievements',
+          activeScene: this,
+        })
 
-          logEvent('view_quests')
-        } else {
-          this.signalError('Must be signed in.')
-        }
+        logEvent('view_quests')
       },
       hint: 'Quests',
       muteClick: true,
@@ -202,13 +194,9 @@ export default class HomeScene extends BaseScene {
       x: Space.pad + Space.iconSize * 0.5,
       y: Space.pad * 2 + Space.iconSize * 1.5,
       f: () => {
-        if (UserDataServer.isLoggedIn()) {
-          this.scene.start('StoreScene')
+        this.scene.start('StoreScene')
 
-          logEvent('view_store')
-        } else {
-          this.signalError('Must be signed in.')
-        }
+        logEvent('view_store')
       },
       hint: 'Store',
     })
@@ -219,13 +207,9 @@ export default class HomeScene extends BaseScene {
       x: Space.pad * 2 + Space.iconSize * 1.5,
       y: Space.pad * 2 + Space.iconSize * 1.5,
       f: () => {
-        if (UserDataServer.isLoggedIn()) {
-          this.scene.start('MatchHistoryScene')
+        this.scene.start('MatchHistoryScene')
 
-          logEvent('view_match_history')
-        } else {
-          this.signalError('Must be signed in.')
-        }
+        logEvent('view_match_history')
       },
       hint: 'Match History',
     })
@@ -260,7 +244,17 @@ export default class HomeScene extends BaseScene {
       within: journeyContainer,
       text: 'Journey',
       f: () => {
-        this.scene.start('JourneyScene', { postMatch: false })
+        // A/B test: Route based on UUID parity if logged in
+        const uuid = Server.getUserData().uuid
+        const lastChar = uuid.charAt(uuid.length - 1)
+        const numValue = parseInt(lastChar, 16)
+
+        // Even UUID -> new JourneyScene, Odd UUID -> old MapJourneyScene
+        if (!isNaN(numValue) && numValue % 2 === 1) {
+          this.scene.start('MapJourneyScene', {})
+        } else {
+          this.scene.start('JourneyScene', { postMatch: false })
+        }
 
         logEvent('view_journey')
       },
@@ -269,6 +263,23 @@ export default class HomeScene extends BaseScene {
       x: `0%+${buttonWidth / 2 + Space.pad}`,
       y: `100%-${buttonHeight / 2 + Space.pad}`,
     })
+
+    // Discord (If no Garden)
+    const garden = Server.getUserData()?.garden || []
+    const hasPlants = garden.some((plantTime) => plantTime !== null)
+
+    if (!hasPlants) {
+      const discordContainer = this.add.container()
+      new Buttons.HomeScene({
+        within: discordContainer,
+        text: 'Discord',
+        f: openDiscord,
+      })
+      this.plugins.get('rexAnchor')['add'](discordContainer, {
+        x: '50%',
+        y: `100%-${buttonHeight / 2 + Space.pad}`,
+      })
+    }
 
     // Play
     const playContainer = this.add.container()
@@ -303,7 +314,7 @@ export default class HomeScene extends BaseScene {
   }
 
   private checkAndShowUnseenAchievements(): void {
-    const userAchievements = UserDataServer.getUserData()?.achievements || []
+    const userAchievements = Server.getUserData()?.achievements || []
 
     // Check if any achievements are unseen
     const hasUnseenAchievements = userAchievements.some((ach) => !ach.seen)
@@ -318,7 +329,7 @@ export default class HomeScene extends BaseScene {
 
   private createGarden(): void {
     // Remember each plant's time
-    this.gardenTimes = UserDataServer.getUserData().garden
+    this.gardenTimes = Server.getUserData().garden
 
     // Make a sizer for the garden
     const sizer = this.rexUI.add
@@ -373,7 +384,7 @@ export default class HomeScene extends BaseScene {
         // Clicking plant will harvest it if it's fully grown
         .on('pointerdown', () => {
           if (this.timeUntilFullyGrown(plantTime) <= 0) {
-            UserDataServer.harvestGarden(i)
+            Server.harvestGarden(i)
             // The result will be handled by the 'gardenHarvested' event
           } else {
             this.signalError('That plant is not ready to harvest.')
@@ -466,11 +477,11 @@ export default class HomeScene extends BaseScene {
 
   // Update garden display every minute to show plant growth
   lastUpdate = 0
-  update(): void {
-    const now = Date.now()
-    if (now - this.lastUpdate > 60000) {
+  update(time: number, delta: number): void {
+    super.update(time, delta)
+    if (time - this.lastUpdate > 60000) {
       this.updateGarden()
-      this.lastUpdate = now
+      this.lastUpdate = time
     }
   }
 

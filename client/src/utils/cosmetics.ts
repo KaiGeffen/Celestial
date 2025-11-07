@@ -1,8 +1,8 @@
-import UserDataServer from '../network/userDataServer'
+import Server from '../server'
 import { achievementsMeta } from '../../../shared/achievementsData'
 
 export function getUnlockedAvatars(): number[] {
-  const userData = UserDataServer.getUserData()
+  const userData = Server.getUserData()
   const unlockedAvatars = new Set<number>()
 
   // Default avatars
@@ -33,7 +33,7 @@ export function getUnlockedAvatars(): number[] {
 }
 
 export function getUnlockedBorders(): number[] {
-  const userData = UserDataServer.getUserData()
+  const userData = Server.getUserData()
   const unlockedBorders = new Set<number>()
 
   // Default border (0)

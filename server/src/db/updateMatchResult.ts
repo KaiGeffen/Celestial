@@ -7,28 +7,24 @@ import Garden from './garden'
 
 const K_FACTOR = 32 // Standard K-factor used in chess
 const elo = new EloRank(K_FACTOR)
-const BASE_ELO = 1000
-const DEFAULT_PLAYER_DATA = {
-  elo: BASE_ELO,
-  username: 'Guest',
-  id: null,
-}
 
-async function getPlayerData(playerId: string | null) {
-  if (!playerId) return DEFAULT_PLAYER_DATA
-
+async function getPlayerData(playerId: string) {
   const result = await db
     .select()
     .from(players)
     .where(eq(players.id, playerId))
     .limit(1)
 
-  return result.length ? result[0] : DEFAULT_PLAYER_DATA
+  if (result.length === 0) {
+    throw new Error(`Player with id ${playerId} not found in database`)
+  }
+
+  return result[0]
 }
 
 export async function updateMatchResultPVP(
-  winnerId: string | null,
-  loserId: string | null,
+  winnerId: string,
+  loserId: string,
   winnerDeck: Deck,
   loserDeck: Deck,
   roundsWLT: [number, number, number],
@@ -39,8 +35,8 @@ export async function updateMatchResultPVP(
 
   // Remember the match
   await insertMatchHistory(
-    winnerData.id,
-    loserData.id,
+    winnerId,
+    loserId,
     winnerData,
     loserData,
     winnerDeck,
@@ -49,7 +45,7 @@ export async function updateMatchResultPVP(
   )
 
   // Plant a seed for the winner
-  if (winnerData.id) await Garden.plantSeed(winnerData.id)
+  await Garden.plantSeed(winnerId)
 
   // Calculate new ELO
   // Calculate expected scores
@@ -65,29 +61,25 @@ export async function updateMatchResultPVP(
   const newLoserRating = elo.updateRating(expectedScoreLoser, 0, loserData.elo)
 
   // Update the database with new ELO for winner and loser
-  await db.transaction(async (tx) => {
-    await tx
-      .update(players)
-      .set({
-        elo: newWinnerRating,
-        wins: sql`${players.wins} + 1`,
-        ...winnerData,
-      })
-      .where(eq(players.id, winnerData.id))
+  await db
+    .update(players)
+    .set({
+      elo: newWinnerRating,
+      wins: sql`${players.wins} + 1`,
+    })
+    .where(eq(players.id, winnerId))
 
-    await tx
-      .update(players)
-      .set({
-        elo: newLoserRating,
-        losses: sql`${players.losses} + 1`,
-        ...loserData,
-      })
-      .where(eq(players.id, loserData.id))
-  })
+  await db
+    .update(players)
+    .set({
+      elo: newLoserRating,
+      losses: sql`${players.losses} + 1`,
+    })
+    .where(eq(players.id, loserId))
 }
 
 export async function updateMatchResultPVE(
-  playerId: string | null,
+  playerId: string,
   playerDeck: Deck,
   aiDeck: Deck,
   wasPlayerWin: boolean,
@@ -119,7 +111,7 @@ export async function updateMatchResultPVE(
   )
 
   // Plant a seed for the winner
-  if (wasPlayerWin && playerId) await Garden.plantSeed(winnerId)
+  if (wasPlayerWin) await Garden.plantSeed(playerId)
 
   // Update the number of pve wins and losses
   if (wasPlayerWin) {
@@ -141,8 +133,8 @@ export async function updateMatchResultPVE(
 
 // Insert this match into the match history table
 async function insertMatchHistory(
-  winnerId: string,
-  loserId: string,
+  winnerId: string | null,
+  loserId: string | null,
   winnerData,
   loserData,
   winnerDeck: Deck,
