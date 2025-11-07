@@ -6,7 +6,7 @@ import { Animation } from '../../animation'
 
 class Seen extends Card {
   onUpkeepInHand(player: number, game: GameModel, index: number): boolean {
-    game.status[player ^ 1].vision += 4
+    game.status[player ^ 1].vision += 3
     return true
   }
 }
@@ -15,7 +15,7 @@ const seen = new Seen({
   id: 1001,
   cost: 2,
   qualities: [Quality.FLEETING],
-  text: 'Fleeting\nAt the start of each round, if this is in your hand, give your opponent Sight 4.',
+  text: 'Fleeting\nAt the start of each round, if this is in your hand, give your opponent Sight 3.',
 })
 
 class Ashes extends Card {

@@ -22,6 +22,7 @@ import MapJourneyScene from './scene/mapJourneyScene'
 
 import { Space } from './settings/settings'
 import addResizeHandler from './loader/windowResizeManager'
+import initializeSplashScreen from './loader/splashLoader'
 
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import RoundRectanglePlugin from 'phaser3-rex-plugins/plugins/roundrectangle-plugin.js'
@@ -151,5 +152,7 @@ export class CelestialGame extends Phaser.Game {
 }
 
 window.onload = () => {
+  // Initialize splash screen transition logic
+  initializeSplashScreen()
   var game = new CelestialGame(config)
 }

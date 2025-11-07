@@ -102,11 +102,7 @@ class Phoenix extends Card {
     // Replace acts in the story
     game.story.acts.forEach((act, i) => {
       const card = act.card
-      if (
-        i !== index &&
-        act.owner === player &&
-        card.qualities.includes(Quality.FLEETING)
-      ) {
+      if (act.owner === player && card.qualities.includes(Quality.FLEETING)) {
         const cardCopy = card.copy()
         cardCopy.points += 1
         act.card = cardCopy
@@ -118,7 +114,7 @@ const phoenix = new Phoenix({
   name: 'Phoenix',
   id: 51,
   cost: 6,
-  points: 1,
+  points: 3,
   qualities: [Quality.VISIBLE, Quality.FLEETING],
   text: 'Visible\nFleeting\nGive your other Fleeting cards everywhere +1 point.',
   story:
@@ -185,7 +181,7 @@ const truth = new Card({
   name: 'Truth',
   id: 61,
   cost: 6,
-  points: 7,
+  points: 8,
 })
 
 class Defiance extends Card {
