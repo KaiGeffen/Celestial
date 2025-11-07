@@ -33,12 +33,6 @@ class ServerController {
     }
   }
 
-  /* TODO This function becomes
-  Take a given model, as well as existing params
-  Do the same thing on that model
-  If change occurred, save the model's new state
-  Otherwise do roughly the same thing
-  */
   onPlayerInput(player: number, choice: number, versionNo: number): boolean {
     // Game is over
     if (this.model.winner !== null) {
@@ -116,7 +110,6 @@ class ServerController {
     card.onPlay(player, this.model)
   }
 
-  // TODO This is the only place where you have race conditions, since its valid for both to happen simultaneously
   doMulligan(player: number, mulligans: Mulligan): void {
     this.model.versionIncrClearAnimations()
 

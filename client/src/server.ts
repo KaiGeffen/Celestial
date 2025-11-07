@@ -43,11 +43,7 @@ export default class Server {
   static pendingReconnect: { state: GameModel } | null = null
 
   // Log in with the server for user with given OAuth token
-  static login(
-    payload: GoogleJwtPayload,
-    game: Phaser.Game,
-    callback = () => {},
-  ) {
+  static login(payload: GoogleJwtPayload, game: Phaser.Game, callback) {
     /*
     Destructure the payload
     Immediately send the payload information to server
@@ -128,7 +124,7 @@ export default class Server {
   }
 
   // Log in as a guest with a generated UUID
-  static loginGuest(game: Phaser.Game, callback = () => {}) {
+  static loginGuest(game: Phaser.Game, callback) {
     // Get or generate a UUID for the guest
     let uuid = localStorage.getItem('guest_uuid')
     if (!uuid) {
