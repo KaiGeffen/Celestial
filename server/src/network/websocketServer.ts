@@ -410,15 +410,14 @@ export default function createWebSocketServer() {
 
   console.log('User-data server is running on port: ', USER_DATA_PORT)
 
-  // TODO Remove
   // Debug: Print active users every 2 seconds
-  setInterval(() => {
-    const userIds = Object.keys(activePlayers)
-    console.log(`Active users (${userIds.length}):`, userIds)
-    const awaitingReconnectIds = Object.keys(usersAwaitingReconnect)
-    console.log(
-      `Awaiting reconnect (${awaitingReconnectIds.length}):`,
-      awaitingReconnectIds,
-    )
-  }, 2000)
+  // setInterval(() => {
+  //   const userIds = Object.keys(activePlayers)
+  //   console.log(`Active users (${userIds.length}):`, userIds)
+  //   const awaitingReconnectIds = Object.keys(usersAwaitingReconnect)
+  //   console.log(
+  //     `Awaiting reconnect (${awaitingReconnectIds.length}):`,
+  //     awaitingReconnectIds,
+  //   )
+  // }, 2000)
 }

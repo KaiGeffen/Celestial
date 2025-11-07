@@ -81,6 +81,15 @@ export class BuilderBase extends BaseScene {
   getCount(card: Card): number {
     return this.deckRegion.getCount(card)
   }
+
+  protected createBackground(): void {
+    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
+
+    this.plugins.get('rexAnchor')['add'](background, {
+      width: `100%`,
+      height: `100%`,
+    })
+  }
 }
 
 export class JourneyBuilderScene extends BuilderBase {
@@ -183,6 +192,8 @@ export class MapJourneyBuilderScene extends BuilderBase {
     super.create(params)
 
     console.log('MapJourneyBuilderScene create', params)
+
+    this.createBackground()
 
     this.catalogRegion = new CatalogRegion().create(this)
 
@@ -385,15 +396,6 @@ export class BuilderScene extends BuilderBase {
     if (this.filterRegion.searchObj !== undefined) {
       this.filterRegion.searchObj.setVisible(value)
     }
-  }
-
-  private createBackground(): void {
-    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
-
-    this.plugins.get('rexAnchor')['add'](background, {
-      width: `100%`,
-      height: `100%`,
-    })
   }
 
   // Remember what deck / decklist was selected
