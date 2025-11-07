@@ -388,8 +388,6 @@ export default function createWebSocketServer() {
 
       // Handle disconnect logic
       ws.onClose(() => {
-        console.log('User disconnected:', id)
-
         // Remove them from active players
         if (activePlayers[id] === ws) {
           delete activePlayers[id]
