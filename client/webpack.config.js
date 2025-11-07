@@ -43,28 +43,26 @@ module.exports = (_, argv) => {
           ],
           splitChunks: {
             chunks: 'all',
-            minSize: 20000,
-            maxSize: 244000,
+            maxSize: 500000,
             cacheGroups: {
               phaser: {
                 test: /[\\/]node_modules[\\/](phaser|phaser3-rex-plugins)[\\/]/,
                 name: 'phaser',
                 chunks: 'all',
-                priority: 10,
+                priority: 20,
               },
               vendor: {
                 test: /[\\/]node_modules[\\/]/,
-                name(module) {
-                  const packageName = module.context.match(
-                    /[\\/]node_modules[\\/](.*?)([\\/]|$)/,
-                  )[1]
-                  return `vendor.${packageName.replace('@', '')}`
-                },
+                name: 'vendor',
+                chunks: 'all',
+                priority: 10,
               },
               common: {
                 name: 'common',
                 minChunks: 2,
-                priority: -10,
+                chunks: 'all',
+                priority: 5,
+                reuseExistingChunk: true,
               },
             },
           },
