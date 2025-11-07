@@ -158,7 +158,6 @@ import FocusMenu from './focus'
 import SearchMenu from './search'
 import LeaderboardMenu from './leaderboard'
 import { RegisterUsernameMenu } from './registerUsername'
-import PurchaseGemsMenu from './purchaseGems'
 import PurchaseItemMenu from './purchaseItem'
 import UserProfileMenu from './userProfile'
 import AchievementsMenu from './achievements'
@@ -178,17 +177,27 @@ const menus = {
   search: SearchMenu,
   leaderboard: LeaderboardMenu,
   registerUsername: RegisterUsernameMenu,
-  purchaseGems: PurchaseGemsMenu,
+  purchaseGems: null, // Lazy-loaded to avoid loading Stripe on app startup
   purchaseItem: PurchaseItemMenu,
   userProfile: UserProfileMenu,
   achievements: AchievementsMenu,
 }
 
 // Function exposed for the creation of custom menus
-export function createMenu(scene: Phaser.Scene, title: string, params): Menu {
+export async function createMenu(
+  scene: Phaser.Scene,
+  title: string,
+  params,
+): Promise<Menu> {
   // Check if the given menu exists, if not throw
   if (!(title in menus)) {
     throw `Given menu ${title} is not in list of implemented menus.`
+  }
+
+  // Lazy-load purchaseGems menu to avoid loading Stripe eagerly
+  if (title === 'purchaseGems' && !menus.purchaseGems) {
+    const module = await import('./purchaseGems')
+    menus.purchaseGems = module.default
   }
 
   return new menus[title](scene, params)

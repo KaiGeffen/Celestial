@@ -29,7 +29,7 @@ export default class MenuScene extends BaseMenuScene {
     })
   }
 
-  create(params): void {
+  async create(params): Promise<void> {
     super.create(params)
 
     // Hide hint on all active scenes
@@ -45,7 +45,7 @@ export default class MenuScene extends BaseMenuScene {
 
     this.addBackground()
 
-    this.menu = createMenu(this, params.menu, params)
+    this.menu = await createMenu(this, params.menu, params)
 
     // When esc is pressed, close this scene
     let esc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC)
