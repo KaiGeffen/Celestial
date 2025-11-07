@@ -13,7 +13,10 @@ import ensureMusic from '../loader/audioManager'
 import Cinematic from '../lib/cinematic'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
-const RECONNECT_PAUSE = 2000
+// How long to wait for server before saying it's disconnected
+const GRACE_PERIOD_TO_CONNECT = 300
+// How long the reconnect message lasts on screen
+const RECONNECT_MESSAGE_TIME = 2000
 
 // Scene for user to select a sign in option, without loading assets
 export class SigninScene extends Phaser.Scene {
@@ -24,6 +27,7 @@ export class SigninScene extends Phaser.Scene {
   signedInOrGuest: boolean = false
   guestButton: Button
   private txt: Phaser.GameObjects.Text
+  private timeSceneStart: number
 
   constructor(args) {
     super({
@@ -32,6 +36,8 @@ export class SigninScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.timeSceneStart = Date.now()
+
     // Clear any session storage (Related to a single page visit, not local storage)
     UserSettings.clearSessionStorage()
 
@@ -70,14 +76,20 @@ export class SigninScene extends Phaser.Scene {
       .setDepth(10)
   }
 
+  // Signal to user any disconnections or attempts to reconnect
   update(time: number, delta: number): void {
     super.update(time, delta)
 
     // Check server connection status
-    const s = 'Server is disconnected'
-    if (server && !server.isOpen()) {
+    if (
+      server &&
+      !server.isOpen() &&
+      Date.now() - this.timeSceneStart > GRACE_PERIOD_TO_CONNECT
+    ) {
       this.txt.setText('Server is disconnected')
-    } else if (this.txt.text === s) {
+    } else if (Server.pendingReconnect) {
+      this.txt.setText('Reconnecting to match...')
+    } else {
       this.txt.setText('')
     }
   }
@@ -152,17 +164,25 @@ export class SigninScene extends Phaser.Scene {
   // Navigate to the first scene user sees (Home, tutorial, or reconnect to a match)
   protected startFirstScene(): void {
     // Check if there's a pending reconnect - if so, start the match scene
-    const reconnect = Server.getPendingReconnect()
+    const reconnect = Server.pendingReconnect
     if (reconnect) {
-      this.txt.setText('Reconnecting to match...')
+      const timeToWait = Math.max(
+        0,
+        Date.now() - this.timeSceneStart - RECONNECT_MESSAGE_TIME,
+      )
+
       setTimeout(() => {
+        // Clear the pending reconnect
+        Server.pendingReconnect = null
+
+        // Start the match scene for the reconnected match
         this.scene.start('StandardMatchScene', {
           isPvp: true,
           deck: [],
           aiDeck: [],
           gameStartState: reconnect.state,
         })
-      }, RECONNECT_PAUSE)
+      }, timeToWait)
       return
     }
 

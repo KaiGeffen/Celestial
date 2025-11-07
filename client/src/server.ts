@@ -40,7 +40,7 @@ type UserData = null | {
 
 export default class Server {
   private static userData: UserData = null
-  private static pendingReconnect: { state: GameModel } | null = null
+  static pendingReconnect: { state: GameModel } | null = null
 
   // Log in with the server for user with given OAuth token
   static login(
@@ -344,13 +344,6 @@ export default class Server {
         UserSettings._get('completedMissions'),
       ),
     })
-  }
-
-  // Get and clear pending reconnect data
-  static getPendingReconnect(): { state: GameModel } | null {
-    const reconnect = this.pendingReconnect
-    this.pendingReconnect = null
-    return reconnect
   }
 
   static getUserData(): UserData {
