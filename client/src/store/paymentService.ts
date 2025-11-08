@@ -4,8 +4,6 @@ import { PAYMENT_PORT } from '../../../shared/network/settings'
 import { Flags } from '../settings/flags'
 import Server from '../server'
 
-const stripePromise = loadStripe(Url.stripePublishableKey)
-
 export const paymentService = {
   // Initialize a purchase for gems
   async purchaseGems(
@@ -45,7 +43,7 @@ export const paymentService = {
 
   // Open Stripe Checkout
   async openCheckout(sessionId: string): Promise<boolean> {
-    const stripe = await stripePromise
+    const stripe = await loadStripe(Url.stripePublishableKey)
     if (!stripe) throw new Error('Stripe failed to initialize')
 
     const { error } = await stripe.redirectToCheckout({
