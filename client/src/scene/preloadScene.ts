@@ -60,6 +60,11 @@ export class SigninScene extends Phaser.Scene {
       const payload = jwt_decode<GoogleJwtPayload>(storedToken)
       Server.login(payload, this.game, () => this.onOptionClick())
 
+      // Show the guest button when menu closes
+      this.events.on('showGuestButton', () => {
+        this.guestButton.setVisible(true)
+      })
+
       // TODO If this fails because the token is invalid or the server is offline, show options or say network offline
     }
     // If user is not signed in, show gsi and guest button

@@ -85,6 +85,11 @@ export default class Server {
           // Ensure that user is logged out and can signin if they cancel
           exitCallback: () => {
             Server.logout()
+
+            // Ensure guest button is visible
+            game.scene.getScenes(true).forEach((scene) => {
+              scene.events.emit('showGuestButton')
+            })
           },
         })
       })
