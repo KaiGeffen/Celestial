@@ -7,19 +7,19 @@ export interface LevelData {
   totalExp: number
 }
 
-export const MAX_LEVEL = 10
-
 export const LEVEL_PROGRESSION: LevelData[] = [
   { level: 1, expToNext: 100, totalExp: 0 },
-  { level: 2, expToNext: 200, totalExp: 100 },
-  { level: 3, expToNext: 300, totalExp: 300 },
-  { level: 4, expToNext: 500, totalExp: 600 },
-  { level: 5, expToNext: 700, totalExp: 1100 },
-  { level: 6, expToNext: 1000, totalExp: 1800 },
-  { level: 7, expToNext: 1300, totalExp: 2800 },
-  { level: 8, expToNext: 1800, totalExp: 4100 },
-  { level: 9, expToNext: 2500, totalExp: 5900 },
+  { level: 2, expToNext: 100, totalExp: 100 },
+  { level: 3, expToNext: 100, totalExp: 200 },
+  { level: 4, expToNext: 200, totalExp: 300 },
+  { level: 5, expToNext: 200, totalExp: 500 },
+  { level: 6, expToNext: 200, totalExp: 700 },
+  { level: 7, expToNext: 300, totalExp: 900 },
+  { level: 8, expToNext: 300, totalExp: 1200 },
+  { level: 9, expToNext: 300, totalExp: 1500 },
 ]
+
+export const MAX_LEVEL = LEVEL_PROGRESSION.length
 
 /**
  * Get what level the given character is at

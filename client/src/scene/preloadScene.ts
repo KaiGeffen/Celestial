@@ -17,7 +17,6 @@ import {
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 import ensureMusic from '../loader/audioManager'
-import initializeSplashScreen from '../loader/splashLoader'
 import Cinematic from '../lib/cinematic'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
