@@ -31,6 +31,8 @@ export default class Loader {
       frameWidth: Space.buttonWidth,
       frameHeight: Space.bigButtonHeight,
     })
+
+    scene.load.image(`icon-InputText`, `img/icon/InputText.${EXTENSION}`)
   }
 
   // Load all assets
