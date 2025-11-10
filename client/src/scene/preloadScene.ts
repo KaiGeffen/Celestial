@@ -22,7 +22,7 @@ import Cinematic from '../lib/cinematic'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
 // How long to wait for server before saying it's disconnected
-const GRACE_PERIOD_TO_CONNECT = 300
+const GRACE_PERIOD_TO_CONNECT = 1000
 // How long the reconnect message lasts on screen
 const RECONNECT_MESSAGE_TIME = 2000
 
