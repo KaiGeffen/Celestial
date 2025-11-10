@@ -7,6 +7,7 @@ import {
   UserSettings,
   Flags,
   Ease,
+  Messages,
 } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
 import { server } from '../server'
@@ -496,7 +497,7 @@ export default class JourneyScene extends BaseScene {
       text: 'Start',
       f: () => {
         if (!server || !server.isOpen()) {
-          this.signalError('Server is disconnected.')
+          this.signalError(Messages.disconnectError)
           return
         }
 

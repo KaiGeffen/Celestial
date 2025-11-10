@@ -6,7 +6,14 @@ import type { GoogleJwtPayload } from '../types/google'
 import Loader from '../loader/loader'
 import Server from '../server'
 import { server } from '../server'
-import { Space, Url, UserSettings, Flags, Style } from '../settings/settings'
+import {
+  Space,
+  Url,
+  UserSettings,
+  Flags,
+  Style,
+  Messages,
+} from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 import ensureMusic from '../loader/audioManager'
@@ -87,7 +94,7 @@ export class SigninScene extends Phaser.Scene {
       !server.isOpen() &&
       Date.now() - this.timeSceneStart > GRACE_PERIOD_TO_CONNECT
     ) {
-      this.txt.setText('Server is disconnected')
+      this.txt.setText(Messages.disconnectError)
     } else if (Server.pendingReconnect) {
       this.txt.setText('Reconnecting to match...')
     } else {

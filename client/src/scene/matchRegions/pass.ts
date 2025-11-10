@@ -11,6 +11,7 @@ import {
   Flags,
   UserSettings,
   Depth,
+  Messages,
 } from '../../settings/settings'
 import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
@@ -106,7 +107,7 @@ export default class PassRegion extends Region {
       // Call callback if network is connected
       this.btnPass.enable().setOnClick(() => {
         if (!server.isOpen()) {
-          this.scene.signalError('Server is disconnected.')
+          this.scene.signalError(Messages.disconnectError)
         } else {
           this.callback()
           this.btnPass.disable()

@@ -11,6 +11,7 @@ import { UserSettings } from './userSettings'
 import { Depth } from './depth'
 import { Scroll } from './scroll'
 import { Ease } from './ease'
+import { Messages } from './messages'
 
 export {
   Color,
@@ -24,4 +25,5 @@ export {
   Scroll,
   Ease,
   Flags,
+  Messages,
 }

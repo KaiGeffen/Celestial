@@ -1,7 +1,13 @@
 import 'phaser'
 import { CardImage } from '../../lib/cardImage'
 import GameModel from '../../../../shared/state/gameModel'
-import { Depth, Space, Time, UserSettings } from '../../settings/settings'
+import {
+  Depth,
+  Space,
+  Time,
+  UserSettings,
+  Messages,
+} from '../../settings/settings'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
 import { MatchScene } from '../matchScene'
@@ -86,7 +92,7 @@ export default class OurBoardRegion extends Region {
       } else if (state.cardCosts[i] > state.breath[0]) {
         msg = 'Not enough breath.'
       } else if (!server.isOpen()) {
-        msg = 'Server is disconnected.'
+        msg = Messages.disconnectError
       }
 
       if (msg !== undefined) {

@@ -1,6 +1,6 @@
 import 'phaser'
 // Import Settings itself
-import { Ease, Space, UserSettings } from '../settings/settings'
+import { Ease, Space, UserSettings, Messages } from '../settings/settings'
 import BaseScene from './baseScene'
 import Animator from './matchRegions/animator'
 import Region from './matchRegions/baseRegion'
@@ -261,7 +261,7 @@ export class MatchScene extends BaseScene {
     // Mulligan
     view.mulligan.setCallback(() => {
       if (!server.isOpen()) {
-        this.signalError('Server is disconnected.')
+        this.signalError(Messages.disconnectError)
         return
       }
 

@@ -2,7 +2,14 @@ import 'phaser'
 
 import Region from './baseRegion'
 
-import { Space, Color, Style, BBStyle, Depth } from '../../settings/settings'
+import {
+  Space,
+  Color,
+  Style,
+  BBStyle,
+  Depth,
+  Messages,
+} from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import GameModel from '../../../../shared/state/gameModel'
 import avatarNames from '../../data/avatarNames'
@@ -355,7 +362,7 @@ export class ResultsRegionTutorial extends MatchResultsRegion {
         this.scene.scene.start('HomeScene')
       } else {
         if (!server || !server.isOpen()) {
-          this.scene.signalError('Server is disconnected.')
+          this.scene.signalError(Messages.disconnectError)
           return
         }
 

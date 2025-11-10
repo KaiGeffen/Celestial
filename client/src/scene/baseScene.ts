@@ -2,13 +2,24 @@ import 'phaser'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
 
-import { BBStyle, Time, Space, Flags, Color, Style } from '../settings/settings'
+import {
+  BBStyle,
+  Time,
+  Space,
+  Flags,
+  Color,
+  Style,
+  Messages,
+} from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Hint from '../lib/hint'
 import ensureMusic from '../loader/audioManager'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
 import { server } from '../server'
+
+// Whether the user has seen the disconnect error message since their last connection
+let hasShownDisconnectError = false
 
 // Functionality shared between BaseScene and MenuBaseScene
 class SharedBaseScene extends Phaser.Scene {
@@ -151,7 +162,7 @@ export default class BaseScene extends SharedBaseScene {
       name: 'Network',
       within: this,
       muteClick: true,
-      hint: 'Server is disconnected',
+      hint: Messages.disconnectError,
     })
       .setDepth(10)
       .setNoScroll()
@@ -189,6 +200,12 @@ export default class BaseScene extends SharedBaseScene {
       // Server is disconnected - show the icon
       icon.setVisible(true)
 
+      // Signal error on first disconnection
+      if (!hasShownDisconnectError) {
+        this.signalError(Messages.disconnectError)
+        hasShownDisconnectError = true
+      }
+
       // Flip twice per second (every 500ms)
       if (time - this.lastFlipTime >= 500) {
         icon.setScale(-icon.scaleX, 1)
@@ -199,6 +216,7 @@ export default class BaseScene extends SharedBaseScene {
       icon.setVisible(false)
       icon.setScale(1, 1) // Reset scale when hidden
       this.lastFlipTime = 0 // Reset flip timer
+      hasShownDisconnectError = false // Reset error flag when reconnected
     }
   }
 
