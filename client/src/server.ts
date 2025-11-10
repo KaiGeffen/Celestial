@@ -76,10 +76,13 @@ export default class Server {
     // Register OAuth-specific handlers
     server
       .on('promptUserInit', () => {
+        // Hide the signin button
+        document.getElementById('signin').hidden = true
+
         // Open username registration menu
         game.scene.getAt(0).scene.launch('MenuScene', {
           menu: 'registerUsername',
-          // Ensure that user is logged out if they cancel
+          // Ensure that user is logged out and can signin if they cancel
           exitCallback: () => {
             Server.logout()
           },
@@ -239,6 +242,9 @@ export default class Server {
     Server.userData = null
 
     UserSettings.clearSessionStorage()
+
+    // Show the signin button
+    document.getElementById('signin').hidden = false
   }
 
   // Send server an updated list of decks

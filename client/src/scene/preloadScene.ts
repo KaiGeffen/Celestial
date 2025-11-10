@@ -51,6 +51,9 @@ export class SigninScene extends Phaser.Scene {
     // Ensure animation is displayed
     Cinematic.ensure()
 
+    // Add buttons to sign in or play as a guest
+    this.createButtons()
+
     // If user is signed in with OAuth, log them in
     const storedToken = localStorage.getItem(Url.gsi_token)
     if (storedToken !== null) {
@@ -63,12 +66,6 @@ export class SigninScene extends Phaser.Scene {
     else {
       // Sign in is visible on this page, hidden on all other pages
       document.getElementById('signin').hidden = false
-      this.events.on('shutdown', () => {
-        document.getElementById('signin').hidden = true
-      })
-
-      // Add buttons to sign in or play as a guest
-      this.createButtons()
     }
 
     // Text describing anything going on
