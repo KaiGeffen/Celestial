@@ -15,7 +15,7 @@ const inputTextWidth = 200
 export class RegisterUsernameMenu extends Menu {
   private username: string = ''
   private usernameInputText
-  private confirmButton: Button
+  private btn: Button
   private errorText: Phaser.GameObjects.Text
 
   constructor(scene: MenuScene, params: { exitCallback: () => void }) {
@@ -37,24 +37,20 @@ export class RegisterUsernameMenu extends Menu {
       )
 
       if (!response.ok) {
-        this.errorText.setText('Error checking username').setVisible(true)
-        this.confirmButton.disable()
+        this.btn.setText('Error').disable()
         return
       }
 
       const data = await response.json()
 
       if (data.exists) {
-        this.errorText.setText('Username already taken').setVisible(true)
-        this.confirmButton.disable()
+        this.btn.setText('Taken').disable()
       } else {
-        this.errorText.setVisible(false)
-        this.confirmButton.enable()
+        this.btn.setText('Confirm').enable()
       }
     } catch (error) {
       console.error('Error checking username:', error)
-      this.errorText.setText('Error checking username').setVisible(true)
-      this.confirmButton.disable()
+      this.btn.setText('Error').disable()
     }
   }
 
@@ -66,18 +62,7 @@ export class RegisterUsernameMenu extends Menu {
       .addNewLine()
       .add(this.createDisclaimerText())
       .addNewLine()
-      .add(this.createErrorText())
-      .addNewLine()
       .add(this.createButtons())
-  }
-
-  private createErrorText() {
-    this.errorText = this.scene.add.text(0, 0, '', Style.error).setOrigin(0.5)
-    this.errorText.setVisible(false)
-
-    let sizer = this.scene.rexUI.add.sizer()
-    sizer.addSpace().add(this.errorText).addSpace()
-    return sizer
   }
 
   private createDisclaimerText() {
@@ -116,8 +101,7 @@ export class RegisterUsernameMenu extends Menu {
         if (this.username.length > 0) {
           this.checkUsername(this.username)
         } else {
-          this.errorText.setVisible(false)
-          this.confirmButton.disable()
+          this.btn.setText('Confirm').disable()
         }
       })
 
@@ -160,7 +144,7 @@ export class RegisterUsernameMenu extends Menu {
       Space.buttonHeight,
     )
 
-    this.confirmButton = new Buttons.Basic({
+    this.btn = new Buttons.Basic({
       within: container,
       text: 'Confirm',
       f: () => {
