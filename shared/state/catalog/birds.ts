@@ -114,7 +114,7 @@ const phoenix = new Phoenix({
   name: 'Phoenix',
   id: 51,
   cost: 6,
-  points: 4,
+  points: 3,
   qualities: [Quality.VISIBLE, Quality.FLEETING],
   text: 'Visible\nFleeting\nGive your other Fleeting cards everywhere +1 point.',
   story:
