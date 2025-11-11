@@ -78,7 +78,7 @@ class PveMatch extends Match {
       console.error('Error updating match results:', error)
     })
 
-    // Update achievements if user logged in
+    // Update achievements
     await AchievementManager.onGamePlayed(this.uuid1, this.game.model, false, 0)
   }
 }
