@@ -7,40 +7,44 @@ export interface AchievementMeta {
   // The cosmetics this unlocks
   iconUnlock?: number
   borderUnlock?: number
+  goldReward?: number
 }
 
 export const achievementsMeta: Record<number, AchievementMeta> = {
   0: {
     title: 'Welcome!',
     description: "You've arrived :)",
+    goldReward: 108,
   },
   1: {
     title: 'Day 2',
     description: 'Log in a second day.',
+    goldReward: 40,
   },
   2: {
     title: 'Day 3',
     description: 'Log in a third day.',
-    image: 'avatar-Imani',
-    iconUnlock: 4,
+    goldReward: 55,
   },
   3: {
     title: 'Day 4',
     description: 'Log in a fourth day.',
+    goldReward: 61,
   },
   4: {
     title: 'Day 5',
     description: 'Log in a fifth day.',
+    goldReward: 63,
   },
   5: {
     title: 'Day 6',
     description: 'Log in a sixth day.',
+    goldReward: 74,
   },
   6: {
     title: 'Day 7',
     description: 'Log in a seventh day.',
-    image: 'avatar-Mitra',
-    iconUnlock: 5,
+    goldReward: 777,
   },
   7: {
     title: 'Game Night',
@@ -51,58 +55,66 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
   8: {
     title: 'Getting Started',
     description: 'Play 10 games against the computer.',
-    image: 'avatar-Kitz',
     progress: 10,
-    iconUnlock: 3,
+    goldReward: 231,
   },
   9: {
     title: 'Getting Serious',
     description: 'Win 1 game against another player.',
-    image: 'avatar-Mia',
-    iconUnlock: 2,
+    goldReward: 189,
   },
 
   // Fun things
   10: {
     title: 'Big Time',
     description: 'Earn at least 20 points in a single round.',
+    goldReward: 200,
   },
   11: {
     title: 'Bigger Time',
     description: 'Earn at least 30 points in a single round.',
+    goldReward: 300,
   },
   12: {
     title: 'Letting Go',
     description:
       'End the game with 6 or fewer cards between your deck, discard pile, and hand.',
+    goldReward: 60,
   },
   13: {
     title: 'Tower of Babel',
     description: 'Have 15 or more cards in your discard pile.',
+    goldReward: 45,
   },
   14: {
     title: 'Crawl Away',
     description: 'Win a round in which you earn 0 or fewer points.',
+    goldReward: 118,
   },
   15: {
     title: 'My Love',
     description: 'Hold a card worth 10 or more points in your hand.',
+    goldReward: 57,
   },
   16: {
     title: 'The Future is Now',
     description: 'Hold The Future in hand with cost 0.',
+    goldReward: 75,
   },
   17: {
     title: 'All Things',
     description: 'Have Inspired, Nourish, and Vision at the same time.',
+    goldReward: 42,
   },
   18: {
     title: 'Torrent of Cards',
     description: 'Draw 6 or more cards in a single round.',
+    goldReward: 99,
   },
   19: {
     title: 'In Awe',
     description: 'Have 15 or more breath.',
+    goldReward: 115,
   },
 
   // Manually unlocked
