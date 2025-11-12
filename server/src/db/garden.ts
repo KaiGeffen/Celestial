@@ -42,6 +42,7 @@ export default class Garden {
     success: boolean
     newGarden?: Date[]
     reward?: number
+    goldReward?: number
   }> {
     // Get the player's garden
     const player = await db
@@ -87,10 +88,14 @@ export default class Garden {
     // Randomly select a reward from the distribution
     const reward = Math.floor(100 * Math.random())
 
+    // Random gold reward between 50-80 (inclusive)
+    const goldReward = Math.floor(Math.random() * 31) + 50
+
     return {
       success: true,
       newGarden: gardenState,
       reward: reward,
+      goldReward: goldReward,
     }
   }
 }

@@ -441,6 +441,7 @@ export default class HomeScene extends BaseScene {
     success: boolean
     newGarden?: Date[]
     reward?: any
+    goldReward?: number
   }): void {
     if (data.success) {
       // Update the garden data
@@ -449,12 +450,18 @@ export default class HomeScene extends BaseScene {
       // Recreate the garden display with updated data
       this.refreshGardenDisplay()
 
+      // Update the user's local gold balance
+      Server.getUserData().coins += data.goldReward
+
       // Show success message and reward
       const card = Catalog.getCardById(data.reward)
+      const s =
+        `+${data.goldReward} 💰\n` +
+        (card.story || `${card.name} was in your garden...`)
       this.scene.launch('MenuScene', {
         menu: 'message',
         title: 'Garden Harvested',
-        s: card.story || `${card.name} was in your garden...`,
+        s,
         card: card,
       })
     } else {

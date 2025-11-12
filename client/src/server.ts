@@ -210,19 +210,23 @@ export default class Server {
           }
         },
       )
-      .on('harvestGardenResult', ({ success, newGarden, reward }) => {
-        // Only update the stored garden if the harvest was successful
-        if (success) {
-          this.userData.garden = newGarden.map((dateStr) => new Date(dateStr))
-        }
+      .on(
+        'harvestGardenResult',
+        ({ success, newGarden, reward, goldReward }) => {
+          // Only update the stored garden if the harvest was successful
+          if (success) {
+            this.userData.garden = newGarden.map((dateStr) => new Date(dateStr))
+          }
 
-        // Emit global event that HomeScene can listen to regardless of success
-        game.events.emit('gardenHarvested', {
-          success: success,
-          newGarden: this.userData.garden,
-          reward: reward,
-        })
-      })
+          // Emit global event that HomeScene can listen to regardless of success
+          game.events.emit('gardenHarvested', {
+            success: success,
+            newGarden: this.userData.garden,
+            reward: reward,
+            goldReward: goldReward,
+          })
+        },
+      )
       .on('promptReconnect', (data) => {
         // Store reconnect data for PreloadScene to handle after assets load
         this.pendingReconnect = { state: data.state }

@@ -267,6 +267,7 @@ export class BaseSceneWithHeader extends BaseScene {
   update(time: number, delta: number): void {
     super.update(time, delta)
 
+    console.log('updateUserStatsDisplay')
     this.updateUserStatsDisplay()
   }
 

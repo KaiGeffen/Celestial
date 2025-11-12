@@ -28,6 +28,7 @@ export async function updateMatchResultPVP(
   winnerDeck: Deck,
   loserDeck: Deck,
   roundsWLT: [number, number, number],
+  matchQualifiesForRewards: boolean,
 ) {
   // Get player data
   const winnerData = await getPlayerData(winnerId)
@@ -44,8 +45,11 @@ export async function updateMatchResultPVP(
     roundsWLT,
   )
 
-  // Plant a seed for the winner
-  await Garden.plantSeed(winnerId)
+  // Plant a seed for both players
+  if (matchQualifiesForRewards) {
+    await Garden.plantSeed(winnerId)
+    await Garden.plantSeed(loserId)
+  }
 
   // Calculate new ELO
   // Calculate expected scores
@@ -84,6 +88,7 @@ export async function updateMatchResultPVE(
   aiDeck: Deck,
   wasPlayerWin: boolean,
   roundsWLT: [number, number, number],
+  matchQualifiesForRewards: boolean,
 ) {
   // Get player data
   const playerData = await getPlayerData(playerId)
@@ -110,8 +115,10 @@ export async function updateMatchResultPVE(
     roundsWLT,
   )
 
-  // Plant a seed for the winner
-  if (wasPlayerWin) await Garden.plantSeed(playerId)
+  // Plant a seed
+  if (matchQualifiesForRewards || wasPlayerWin) {
+    await Garden.plantSeed(playerId)
+  }
 
   // Update the number of pve wins and losses
   if (wasPlayerWin) {

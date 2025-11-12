@@ -202,6 +202,7 @@ export default function createWebSocketServer() {
             success: harvestResult.success,
             newGarden: harvestResult.newGarden,
             reward: harvestResult.reward,
+            goldReward: harvestResult.goldReward,
           })
         })
         // Store
