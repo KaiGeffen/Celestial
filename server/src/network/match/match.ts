@@ -25,6 +25,7 @@ interface Match {
   deck2: Deck
 
   game: ServerController
+  isPvp: boolean
 }
 
 class Match implements Match {
@@ -45,6 +46,9 @@ class Match implements Match {
 
     this.deck1 = deck1
     this.deck2 = deck2
+
+    // isPvp is true if uuid2 is not null (i.e., there's a real player 2)
+    this.isPvp = uuid2 !== null
 
     // Make a new game
     this.game = new ServerController()
@@ -133,13 +137,13 @@ class Match implements Match {
       await AchievementManager.onGamePlayed(
         this.uuid1,
         this.game.model,
-        true,
+        this.isPvp,
         0,
       )
       await AchievementManager.onGamePlayed(
         this.uuid2,
         this.game.model,
-        true,
+        this.isPvp,
         1,
       )
 

@@ -1,9 +1,10 @@
 import { Achievement } from '../../shared/types/achievement'
 import { db } from './db/db'
-import { achievements } from './db/schema'
+import { achievements, players } from './db/schema'
 import { eq, and, is, sql } from 'drizzle-orm'
 import GameModel from '../../shared/state/gameModel'
 import Card from '../../shared/state/card'
+import { achievementsMeta } from '../../shared/achievementsData'
 
 export class AchievementManager {
   // Get all of the achievements for player
@@ -152,7 +153,28 @@ export class AchievementManager {
   }
 
   // Unlock achievementId if not already unlocked
-  private static async unlock(playerId: string, achievementId: number) {
+  // Returns true if this was a new unlock, false if already existed
+  private static async unlock(
+    playerId: string,
+    achievementId: number,
+  ): Promise<boolean> {
+    // Check if already unlocked - if so, onConflictDoNothing will skip the insert anyway
+    const existing = await db
+      .select()
+      .from(achievements)
+      .where(
+        and(
+          eq(achievements.player_id, playerId),
+          eq(achievements.achievement_id, achievementId),
+        ),
+      )
+      .limit(1)
+
+    if (existing.length > 0) {
+      return false
+    }
+
+    // Insert the achievement (first time unlock)
     await db
       .insert(achievements)
       .values({
@@ -163,6 +185,20 @@ export class AchievementManager {
       })
       .onConflictDoNothing()
       .execute()
+
+    // Award gold reward if the achievement has one
+    const meta = achievementsMeta[achievementId]
+    if (meta?.goldReward) {
+      console.log(meta)
+      await db
+        .update(players)
+        .set({
+          coins: sql`${players.coins} + ${meta.goldReward}`,
+        })
+        .where(eq(players.id, playerId))
+    }
+
+    return true
   }
 
   // Unlock achievementId if 24h have passed since previous achievement was unlocked
@@ -212,6 +248,17 @@ export class AchievementManager {
           seen: false,
         })
         .execute()
+
+      // Award gold reward if the achievement has one
+      const meta = achievementsMeta[achievementId]
+      if (meta?.goldReward) {
+        await db
+          .update(players)
+          .set({
+            coins: sql`${players.coins} + ${meta.goldReward}`,
+          })
+          .where(eq(players.id, playerId))
+      }
     }
   }
 
@@ -221,7 +268,25 @@ export class AchievementManager {
     achievementId: number,
   ) {
     // Init the achievement if it doesn't exist
-    await this.unlock(playerId, achievementId)
+    const wasNew = await this.unlock(playerId, achievementId)
+
+    // Get current progress before incrementing
+    const current = await db
+      .select()
+      .from(achievements)
+      .where(
+        and(
+          eq(achievements.player_id, playerId),
+          eq(achievements.achievement_id, achievementId),
+        ),
+      )
+      .limit(1)
+
+    if (current.length === 0) return
+
+    const currentProgress = current[0].progress
+    const meta = achievementsMeta[achievementId]
+    const threshold = meta?.progress
 
     // Increment progress
     await db
@@ -233,6 +298,23 @@ export class AchievementManager {
           eq(achievements.achievement_id, achievementId),
         ),
       )
+
+    // If this increment completed the achievement (progress reached threshold) and it wasn't just unlocked,
+    // award gold reward
+    if (
+      !wasNew &&
+      threshold &&
+      currentProgress + 1 >= threshold &&
+      currentProgress < threshold &&
+      meta?.goldReward
+    ) {
+      await db
+        .update(players)
+        .set({
+          coins: sql`${players.coins} + ${meta.goldReward}`,
+        })
+        .where(eq(players.id, playerId))
+    }
   }
 
   // ...add more methods as needed (mark as seen, get all achievements, etc.)
