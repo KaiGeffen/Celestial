@@ -1,6 +1,6 @@
 import { db } from './db'
 import { players } from './schema'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { GardenSettings } from '../../../shared/settings'
 
 export default class Garden {
@@ -22,7 +22,7 @@ export default class Garden {
       return false
     }
 
-    // Add new seed with current timestamp
+    // Add new seed with timestamp 1 day in the past
     gardenState.push(new Date())
 
     // Update the database
@@ -79,17 +79,20 @@ export default class Garden {
     // Remove the plant at the specified plot
     gardenState.splice(plotNumber, 1)
 
-    // Update the database
-    await db
-      .update(players)
-      .set({ garden: gardenState })
-      .where(eq(players.id, playerId))
-
     // Randomly select a reward from the distribution
     const reward = Math.floor(100 * Math.random())
 
     // Random gold reward between 50-80 (inclusive)
     const goldReward = Math.floor(Math.random() * 31) + 50
+
+    // Update the database with new garden state and add gold reward to coins
+    await db
+      .update(players)
+      .set({
+        garden: gardenState,
+        coins: sql`${players.coins} + ${goldReward}`,
+      })
+      .where(eq(players.id, playerId))
 
     return {
       success: true,

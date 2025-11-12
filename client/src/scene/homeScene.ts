@@ -17,6 +17,8 @@ const height = Space.iconSize * 2 + Space.pad * 3
 export default class HomeScene extends BaseScene {
   gardenTimes: Date[]
   gardenPlants: Phaser.GameObjects.Image[]
+  txtGem: Phaser.GameObjects.Text
+  txtCoins: Phaser.GameObjects.Text
 
   constructor() {
     super({
@@ -113,7 +115,7 @@ export default class HomeScene extends BaseScene {
       .setAlpha(0.3)
     this.addShadow(smallBg1)
     const amtGems = userData.gems || 0
-    const txtGem = this.add
+    this.txtGem = this.add
       .text(0, y, `${amtGems} 💎`, Style.username)
       .setOrigin(0.5)
 
@@ -124,11 +126,11 @@ export default class HomeScene extends BaseScene {
       .setAlpha(0.3)
     this.addShadow(smallBg2)
     const amtCoins = userData.coins || 0
-    const txtCoins = this.add
+    this.txtCoins = this.add
       .text(0, y, `${amtCoins}💰`, Style.username)
       .setOrigin(0.5)
 
-    userDetails.add([smallBg1, txtGem, smallBg2, txtCoins])
+    userDetails.add([smallBg1, this.txtGem, smallBg2, this.txtCoins])
   }
 
   private createLoginButton(): void {
@@ -489,6 +491,14 @@ export default class HomeScene extends BaseScene {
     if (time - this.lastUpdate > 60000) {
       this.updateGarden()
       this.lastUpdate = time
+    }
+
+    // Update the currency displays
+    if (this.txtGem) {
+      this.txtGem.setText(`${Server.getUserData().gems} 💎`)
+    }
+    if (this.txtCoins) {
+      this.txtCoins.setText(`${Server.getUserData().coins}💰`)
     }
   }
 

@@ -267,17 +267,14 @@ export class BaseSceneWithHeader extends BaseScene {
   update(time: number, delta: number): void {
     super.update(time, delta)
 
-    console.log('updateUserStatsDisplay')
     this.updateUserStatsDisplay()
   }
 
   private updateUserStatsDisplay(): void {
-    // Update the user stats display
-    // Get user data, use defaults if not logged in
-    const username = Server.getUserData().username || 'Guest'
-    const elo = Server.getUserData().elo || 1200
-    const gems = Server.getUserData().gems || 0
-    const coins = Server.getUserData().coins || 0
+    const username = Server.getUserData().username
+    const elo = Server.getUserData().elo
+    const gems = Server.getUserData().gems
+    const coins = Server.getUserData().coins
 
     // Set the text to the user's stats (Which might update)
     this.userStatsDisplay.setText(`${username} (${elo}) ${gems}💎 ${coins}💰`)
