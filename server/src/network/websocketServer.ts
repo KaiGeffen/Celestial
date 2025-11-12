@@ -88,11 +88,11 @@ export default function createWebSocketServer() {
           // Add to active users
           activePlayers[uuid] = ws
 
-          // Send user their data
-          await sendUserData(ws, id)
-
           // Handle achievements
           await AchievementManager.onConnection(id)
+
+          // Send user their data
+          await sendUserData(ws, id)
 
           // If user is in a match, reconnect them
           if (usersAwaitingReconnect[uuid]) {
@@ -183,11 +183,11 @@ export default function createWebSocketServer() {
             // Add to active users
             activePlayers[id] = ws
 
-            // Send user their data
-            await sendUserData(ws, id)
-
             // Handle initial achievement
             await AchievementManager.onConnection(id)
+
+            // Send user their data
+            await sendUserData(ws, id)
           },
         )
         .on('setAchievementsSeen', async () => {
