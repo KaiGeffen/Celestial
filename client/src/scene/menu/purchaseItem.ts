@@ -4,20 +4,24 @@ import Menu from './menu'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import { StoreItem } from '../../../../shared/storeItems'
 import Server from '../../server'
+import { CardImage } from '../../lib/cardImage'
+import Card from '../../../../shared/state/card'
+import { UserSettings } from '../../settings/userSettings'
 
 export default class PurchaseItemMenu extends Menu {
-  private item: StoreItem
+  private card: Card
+  private cost: number
   private balance: number
   private isOwned: boolean
   // Price text is broader store scene, set to `owned` if we buy it
-
   private priceText: Phaser.GameObjects.Text
+
   constructor(
     scene: MenuScene,
     params: {
-      item: StoreItem
+      card: Card
+      cost: number
       balance: number
       isOwned: boolean
       priceText: Phaser.GameObjects.Text
@@ -26,7 +30,8 @@ export default class PurchaseItemMenu extends Menu {
     super(scene, 800) // Wider menu to accommodate the image and description
 
     // Set properties before creating content
-    this.item = params.item
+    this.card = params.card
+    this.cost = params.cost
     this.balance = params.balance
     this.isOwned = params.isOwned
     this.priceText = params.priceText
@@ -37,15 +42,21 @@ export default class PurchaseItemMenu extends Menu {
   }
 
   private handlePurchase(): void {
-    if (this.balance < this.item.cost) {
-      this.scene.signalError('Insufficient gems to make this purchase.')
+    if (this.balance < this.cost) {
+      this.scene.signalError('Insufficient coins to make this purchase.')
       return
     }
 
-    // Purchase the item on the server (Updates local igc totals)
-    Server.purchaseItem(this.item.id, this.item.cost)
+    // Update coins locally
+    Server.getUserData().coins -= this.cost
 
-    // TODO Its sizer in some cases needs layout because different text width
+    // Update inventory to mark card as owned
+    const inventory = UserSettings._get('inventory')
+    inventory[this.card.id] = true
+    UserSettings._set('inventory', inventory)
+    Server.sendInventory(inventory)
+
+    // Update price text
     this.priceText.setText('Owned')
 
     // Close the menu
@@ -53,7 +64,7 @@ export default class PurchaseItemMenu extends Menu {
   }
 
   private createContent(): void {
-    this.createHeader(this.item.name)
+    this.createHeader(this.card.name)
 
     // Create main content sizer
     const contentSizer = this.scene.rexUI.add.sizer({
@@ -61,48 +72,40 @@ export default class PurchaseItemMenu extends Menu {
       space: { item: Space.pad * 2 },
     })
 
-    // Add item image on the left
-    const image = this.scene.add.image(0, 0, `store-${this.item.imageKey}-full`)
-    const imageContainer = new ContainerLite(
+    // Add card image on the left
+    const cardImageContainer = new ContainerLite(
       this.scene,
       0,
       0,
-      image.width,
-      image.height,
+      Space.cardWidth,
+      Space.cardHeight,
     )
-    imageContainer.add(image)
-    contentSizer.add(imageContainer)
+    const cardImage = new CardImage(this.card, cardImageContainer, false, false)
+    contentSizer.add(cardImageContainer)
 
-    // Create right side sizer for description and purchase info
+    // Create right side sizer for purchase info
     const rightSizer = this.scene.rexUI.add.sizer({
       orientation: 'vertical',
       space: { item: Space.pad * 2 },
     })
 
-    // Add description text
-    const description = this.scene.add.text(0, 0, this.item.description, {
-      ...Style.basic,
-      wordWrap: { width: 350 },
-    })
-    rightSizer.add(description)
-
     // Add cost and balance if not owned
     if (!this.isOwned) {
-      // Add cost text or "Owned" text
+      // Add cost text
       const costText = this.scene.add.text(
         0,
         0,
-        `Cost: ${this.item.cost} 💎`,
+        `Cost: ${this.cost} 💰`,
         Style.announcement,
       )
       rightSizer.add(costText)
 
       // Balance after text, in red if negative
-      const balanceAfter = this.balance - this.item.cost
+      const balanceAfter = this.balance - this.cost
       const balanceText = this.scene.add.text(
         0,
         0,
-        `Balance after: ${balanceAfter} 💎`,
+        `Balance after: ${balanceAfter} 💰`,
         {
           ...Style.basic,
           color: balanceAfter < 0 ? '#ff0000' : '#ffffff',

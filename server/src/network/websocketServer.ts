@@ -8,8 +8,6 @@ import { players } from '../db/schema'
 import { eq, sql } from 'drizzle-orm'
 import { ServerWS } from '../../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../../shared/types/deck'
-import { STORE_ITEMS } from '../../../shared/storeItems'
-import { cosmeticsTransactions } from '../db/schema'
 import { AchievementManager } from '../achievementManager'
 import Garden from '../db/garden'
 import Catalog from '../../../shared/state/catalog'
@@ -206,6 +204,7 @@ export default function createWebSocketServer() {
           })
         })
         // Store
+        /* TODO
         .on('purchaseItem', async ({ id: itemId }) => {
           if (!id) {
             throw new Error('User attempted to purchase item before signing in')
@@ -252,6 +251,7 @@ export default function createWebSocketServer() {
           // Send updated user data
           await sendUserData(ws, id)
         })
+          */
         .on('setCosmeticSet', async ({ value }) => {
           if (!id) return
           await db
