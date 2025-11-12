@@ -92,8 +92,13 @@ class Match implements Match {
   async notifyState() {
     if (this.game === null) return
 
-    // TODO This is bugged for the Torrent quest because it doesn't check each slice of the recap
+    // Handle achievements for current state and each slice of the recap
     AchievementManager.onStateUpdate(this.uuid1, this.uuid2, this.game.model)
+    ;[0, 1].forEach((player) => {
+      this.game.model.recentModels[player].forEach(async (model) => {
+        await AchievementManager.onStateUpdate(this.uuid1, this.uuid2, model)
+      })
+    })
 
     /*
       Send each state since last input

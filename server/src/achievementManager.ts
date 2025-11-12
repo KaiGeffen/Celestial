@@ -158,47 +158,37 @@ export class AchievementManager {
     playerId: string,
     achievementId: number,
   ): Promise<boolean> {
-    // Check if already unlocked - if so, onConflictDoNothing will skip the insert anyway
-    const existing = await db
-      .select()
-      .from(achievements)
-      .where(
-        and(
-          eq(achievements.player_id, playerId),
-          eq(achievements.achievement_id, achievementId),
-        ),
+    return await db.transaction(async (tx) => {
+      // Use INSERT ... ON CONFLICT DO NOTHING RETURNING to atomically insert
+      // and detect if we actually inserted a row
+      // If RETURNING returns a row, we inserted it. If it returns nothing, it already existed.
+      const result = await tx.execute(
+        sql`
+          INSERT INTO achievements (player_id, achievement_id, progress, seen)
+          VALUES (${playerId}::uuid, ${achievementId}, 0, false)
+          ON CONFLICT (player_id, achievement_id) DO NOTHING
+          RETURNING id
+        `,
       )
-      .limit(1)
 
-    if (existing.length > 0) {
-      return false
-    }
+      // If no row was returned, the achievement already existed (conflict occurred)
+      if (result.rows.length === 0) {
+        return false
+      }
 
-    // Insert the achievement (first time unlock)
-    await db
-      .insert(achievements)
-      .values({
-        player_id: playerId,
-        achievement_id: achievementId,
-        progress: 0,
-        seen: false,
-      })
-      .onConflictDoNothing()
-      .execute()
+      // We successfully inserted the achievement, so award gold reward if applicable
+      const meta = achievementsMeta[achievementId]
+      if (meta?.goldReward) {
+        await tx
+          .update(players)
+          .set({
+            coins: sql`${players.coins} + ${meta.goldReward}`,
+          })
+          .where(eq(players.id, playerId))
+      }
 
-    // Award gold reward if the achievement has one
-    const meta = achievementsMeta[achievementId]
-    if (meta?.goldReward) {
-      console.log(meta)
-      await db
-        .update(players)
-        .set({
-          coins: sql`${players.coins} + ${meta.goldReward}`,
-        })
-        .where(eq(players.id, playerId))
-    }
-
-    return true
+      return true
+    })
   }
 
   // Unlock achievementId if 24h have passed since previous achievement was unlocked
