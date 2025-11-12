@@ -292,7 +292,7 @@ const ouroboros = new Ouroboros({
   id: 8006,
   cost: 6,
   points: 6,
-  text: 'At the start of turn, if you hand has at least 5 cards including this, discard this to Inspired 1.',
+  text: 'At the start of turn, if your hand has at least 5 cards including this, discard this to Inspired 1.',
 })
 
 export {
