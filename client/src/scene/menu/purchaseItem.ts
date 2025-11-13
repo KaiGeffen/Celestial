@@ -99,19 +99,6 @@ export default class PurchaseItemMenu extends Menu {
         Style.announcement,
       )
       rightSizer.add(costText)
-
-      // Balance after text, in red if negative
-      const balanceAfter = this.balance - this.cost
-      const balanceText = this.scene.add.text(
-        0,
-        0,
-        `Balance after: ${balanceAfter} 💰`,
-        {
-          ...Style.basic,
-          color: balanceAfter < 0 ? '#ff0000' : '#ffffff',
-        },
-      )
-      rightSizer.add(balanceText)
     }
 
     // Add right side sizer to main content

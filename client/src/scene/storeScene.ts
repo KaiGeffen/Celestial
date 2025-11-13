@@ -20,7 +20,7 @@ export default class StoreScene extends BaseSceneWithHeader {
   create(): void {
     this.createBackground()
     super.create({ title: 'Store' })
-    this.createPurchaseGemsButton()
+    // this.createPurchaseGemsButton()
     this.createStoreItems()
   }
 

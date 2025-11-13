@@ -300,7 +300,7 @@ export class BaseSceneWithHeader extends BaseScene {
       x: Space.pad + Space.buttonWidth / 2,
       y: this.headerHeight / 2,
       f: () => this.scene.start('HomeScene'),
-    })
+    }).setDepth(2)
 
     // Create title back in center
     this.add
