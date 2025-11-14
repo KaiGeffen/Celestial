@@ -5,6 +5,7 @@ import Card from '../../../shared/state/card'
 import { Space } from '../settings/settings'
 import { MechanicsSettings } from '../../../shared/settings'
 import ContainerLite from 'phaser3-rex-plugins/templates/ui/container/Container'
+import { UserSettings } from '../settings/userSettings'
 
 // TODO The cutouts arent being destroyed when cutouts destroy themselves
 
@@ -84,10 +85,17 @@ export default class Decklist {
     this.cutouts = []
     this.countCards = 0
 
-    // Add the new deck
+    // Get card inventory (owned cards)
+    const cardInventory = UserSettings._get('cardInventory') || []
+
+    // Add the new deck, only including cards the player owns
     for (let i = 0; i < deck.length; i++) {
       let card = deck[i]
-      this.addCard(card)
+
+      // Only add cards that the player owns
+      if (cardInventory[card.id]) {
+        this.addCard(card)
+      }
     }
 
     return true
