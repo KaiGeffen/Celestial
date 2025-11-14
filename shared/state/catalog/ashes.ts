@@ -449,7 +449,7 @@ export {
   // NEW
   // initiative,
   wildfire,
-  // eternalFlame,
+  eternalFlame,
   // dyingLight,
   // momentum,
   // finale,
