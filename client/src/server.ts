@@ -16,6 +16,7 @@ import { CosmeticSet } from '../../shared/types/cosmeticSet'
 import { Achievement } from '../../shared/types/achievement'
 import GameModel from '../../shared/state/gameModel'
 import { v5 as uuidv5 } from 'uuid'
+import messagesToClient from '../../shared/network/messagesToClient'
 
 const ip = '127.0.0.1'
 const port = 5555
@@ -179,37 +180,21 @@ export default class Server {
     callback: () => void,
   ) {
     server
-      .on(
-        'sendUserData',
-        (data: {
-          inventory: string
-          completedMissions: string
-          avatar_experience: number[]
-          decks: Deck[]
-          username: string
-          elo: number
-          garden: Date[]
-          gems: number
-          coins: number
-          ownedItems: number[]
-          cosmeticSet: CosmeticSet
-          achievements: Achievement[]
-        }) => {
-          // Store the uuid and user data after successful login
-          this.userData = {
-            uuid,
-            ...data,
-            garden: data.garden.map((dateStr) => new Date(dateStr)),
-          }
+      .on('sendUserData', (data: messagesToClient['sendUserData']) => {
+        // Store the uuid and user data after successful login
+        this.userData = {
+          uuid,
+          ...data,
+          garden: data.garden.map((dateStr) => new Date(dateStr)),
+        }
 
-          this.loadUserData(data)
-          // TODO Bad smell, the callback should only happen once as it references a scene
-          if (callback) {
-            callback()
-            callback = null
-          }
-        },
-      )
+        this.loadUserData(data)
+        // TODO Bad smell, the callback should only happen once as it references a scene
+        if (callback) {
+          callback()
+          callback = null
+        }
+      })
       .on(
         'harvestGardenResult',
         ({ success, newGarden, reward, goldReward }) => {
@@ -304,20 +289,15 @@ export default class Server {
     })
   }
 
-  // Send server user's list of completed missions
-  static purchaseItem(id: number, cost: number): void {
+  static purchaseItem(id: number): void {
     if (!server || !server.isOpen()) {
       console.error('Purchasing item when server ws doesnt exist.')
       return
     }
     server.send({
-      type: 'purchaseItem' as const,
+      type: 'purchaseItem',
       id,
     })
-
-    // Locally manage the purchase
-    Server.getUserData().gems -= cost
-    // TODO Cosmetic array update
   }
 
   static setCosmeticSet(cosmeticSet: CosmeticSet): void {
@@ -408,16 +388,7 @@ export default class Server {
   }
 
   // Load user data that was sent from server into session storage
-  private static loadUserData(data: {
-    inventory: string
-    completedMissions: string
-    avatar_experience: number[]
-    decks: Deck[]
-    username: string
-    elo: number
-    gems: number
-    ownedItems: number[]
-  }): void {
+  private static loadUserData(data: messagesToClient['sendUserData']): void {
     // Map from binary string to bool array
     sessionStorage.setItem(
       'inventory',
