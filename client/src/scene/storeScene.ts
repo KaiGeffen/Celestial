@@ -22,6 +22,11 @@ export default class StoreScene extends BaseSceneWithHeader {
     super.create({ title: 'Store' })
     // this.createPurchaseGemsButton()
     this.createStoreItems()
+
+    // Refresh store when user data is updated (e.g., after purchase)
+    this.game.events.on('userDataUpdated', () => {
+      this.createStoreItems()
+    })
   }
 
   private createBackground(): void {
@@ -75,8 +80,14 @@ export default class StoreScene extends BaseSceneWithHeader {
       },
     })
 
-    // Get all collectible cards
-    const cards = Catalog.collectibleCards
+    // Get card inventory (owned cards)
+    const cardInventory = UserSettings._get('cardInventory') || []
+
+    // Get all collectible cards that are NOT owned
+    const cards = Catalog.collectibleCards.filter((card) => {
+      // Check if card is owned (indexed by card ID)
+      return !cardInventory[card.id]
+    })
 
     // Create store items for each card
     cards.forEach((card) => {
@@ -98,13 +109,6 @@ export default class StoreScene extends BaseSceneWithHeader {
   }
 
   private createCardItem(card: Card): Phaser.GameObjects.GameObject {
-    // Check if the card is owned (using inventory)
-    const inventory = UserSettings._get('inventory')
-    const isOwned = inventory && inventory[card.id] === true
-
-    // Constant cost of 1000 coins
-    const cost = 1000
-
     // Use CardImage for the card
     const cardImageContainer = new ContainerLite(
       this,
@@ -119,26 +123,10 @@ export default class StoreScene extends BaseSceneWithHeader {
     cardImage.setOnClick(() => {
       this.sound.play('click')
 
-      // Get user's current balance (coins)
-      const balance = Server.getUserData().coins
-
-      // Create a dummy price text object for the menu (won't be displayed in store)
-      const priceText = this.add.text(
-        0,
-        0,
-        isOwned ? 'Owned' : `${cost} 💰`,
-        Style.basic,
-      )
-      priceText.setVisible(false)
-
       // Launch the purchase menu
       this.scene.launch('MenuScene', {
         menu: 'purchaseItem',
         card,
-        cost,
-        balance,
-        isOwned,
-        priceText,
       })
     })
 

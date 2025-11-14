@@ -7,12 +7,12 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Server from '../../server'
 import { CardImage } from '../../lib/cardImage'
 import Card from '../../../../shared/state/card'
-import { UserSettings } from '../../settings/userSettings'
+
+const COST = 1000
 
 export default class PurchaseItemMenu extends Menu {
   private card: Card
   private cost: number
-  private balance: number
   private isOwned: boolean
   // Price text is broader store scene, set to `owned` if we buy it
   private priceText: Phaser.GameObjects.Text
@@ -21,20 +21,12 @@ export default class PurchaseItemMenu extends Menu {
     scene: MenuScene,
     params: {
       card: Card
-      cost: number
-      balance: number
-      isOwned: boolean
-      priceText: Phaser.GameObjects.Text
     },
   ) {
     super(scene, 800) // Wider menu to accommodate the image and description
 
     // Set properties before creating content
     this.card = params.card
-    this.cost = params.cost
-    this.balance = params.balance
-    this.isOwned = params.isOwned
-    this.priceText = params.priceText
 
     // Now create content with properties set
     this.createContent()
@@ -42,24 +34,16 @@ export default class PurchaseItemMenu extends Menu {
   }
 
   private handlePurchase(): void {
-    if (this.balance < this.cost) {
+    const balance = Server.getUserData().coins
+
+    if (balance < COST) {
       this.scene.signalError('Insufficient coins to make this purchase.')
       return
     }
 
-    // Update coins locally
-    Server.getUserData().coins -= this.cost
+    // Send purchase request to server - it will update user data via sendUserData response
+    Server.purchaseItem(this.card.id)
 
-    // Update inventory to mark card as owned
-    const inventory = UserSettings._get('inventory')
-    inventory[this.card.id] = true
-    UserSettings._set('inventory', inventory)
-    Server.sendInventory(inventory)
-
-    // Update price text
-    this.priceText.setText('Owned')
-
-    // Close the menu
     this.close()
   }
 
@@ -89,17 +73,14 @@ export default class PurchaseItemMenu extends Menu {
       space: { item: Space.pad * 2 },
     })
 
-    // Add cost and balance if not owned
-    if (!this.isOwned) {
-      // Add cost text
-      const costText = this.scene.add.text(
-        0,
-        0,
-        `Cost: ${this.cost} 💰`,
-        Style.announcement,
-      )
-      rightSizer.add(costText)
-    }
+    // Add cost text
+    const costText = this.scene.add.text(
+      0,
+      0,
+      `Cost: ${COST} 💰`,
+      Style.announcement,
+    )
+    rightSizer.add(costText)
 
     // Add right side sizer to main content
     contentSizer.add(rightSizer)
@@ -116,7 +97,7 @@ export default class PurchaseItemMenu extends Menu {
     // Add cancel button
     buttonsSizer.add(this.createCancelButton())
 
-    // Add buy button or "Owned" button
+    // Add buy button
     const buyContainer = new ContainerLite(
       this.scene,
       0,
@@ -125,22 +106,13 @@ export default class PurchaseItemMenu extends Menu {
       Space.buttonHeight,
     )
 
-    if (this.isOwned) {
-      // Create a disabled "Owned" button
-      new Buttons.Basic({
-        within: buyContainer,
-        text: 'Owned',
-      }).disable()
-    } else {
-      // Create a normal buy button
-      new Buttons.Basic({
-        within: buyContainer,
-        text: 'Buy',
-        f: () => {
-          this.handlePurchase()
-        },
-      })
-    }
+    new Buttons.Basic({
+      within: buyContainer,
+      text: 'Buy',
+      f: () => {
+        this.handlePurchase()
+      },
+    })
 
     buttonsSizer.add(buyContainer)
 

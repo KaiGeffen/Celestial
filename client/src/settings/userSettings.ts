@@ -31,6 +31,9 @@ export class UserSettings {
       // For journey mode, for each card, whether or not that card has been unlocked
       inventory: getStartingInventory(),
 
+      // Card ownership inventory (indexed by card ID)
+      cardInventory: Array(10000).fill(false),
+
       // List of each mission by its id, and if the player has completed it
       completedMissions: [],
 
