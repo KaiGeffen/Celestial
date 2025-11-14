@@ -20,6 +20,7 @@ export default interface messagesToClient {
     ownedItems: number[]
     cosmeticSet: CosmeticSet
     achievements: Achievement[]
+    cardInventory: string
   }
   purchaseItemSuccess: {
     itemId: number

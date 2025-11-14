@@ -59,6 +59,9 @@ export const players = pgTable(
     completedmissions: varchar('completedmissions', { length: 1000 }).notNull(),
     avatar_experience: integer('avatar_experience').array().notNull(),
 
+    // Card ownership (separate from journey inventory)
+    card_inventory: varchar('card_inventory', { length: 1000 }).notNull(),
+
     // Garden
     garden: timestamp('garden', { mode: 'date' }).array(),
 

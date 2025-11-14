@@ -13,7 +13,6 @@ import * as specialCardsCatalog from './catalog/specialCards'
 import { Keyword, Keywords } from './keyword'
 
 const fullCatalog = [
-  ...Object.values(waterCatalog).sort((a, b) => a.cost - b.cost),
   ...Object.values(birdsCatalog).sort((a, b) => a.cost - b.cost),
   ...Object.values(ashesCatalog).sort((a, b) => a.cost - b.cost),
   ...Object.values(petCatalog).sort((a, b) => a.cost - b.cost),
@@ -21,6 +20,7 @@ const fullCatalog = [
   ...Object.values(birthCatalog).sort((a, b) => a.cost - b.cost),
   ...Object.values(visionCatalog).sort((a, b) => a.cost - b.cost),
   ...Object.values(starsCatalog).sort((a, b) => a.cost - b.cost),
+  ...Object.values(waterCatalog).sort((a, b) => a.cost - b.cost),
   ...Object.values(specialCardsCatalog).sort((a, b) => a.cost - b.cost),
 ]
 const nonCollectibles = [...Object.values(tokensCatalog)]
