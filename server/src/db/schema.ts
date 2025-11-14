@@ -59,7 +59,7 @@ export const players = pgTable(
     completedmissions: varchar('completedmissions', { length: 1000 }).notNull(),
     avatar_experience: integer('avatar_experience').array().notNull(),
 
-    // Card ownership (separate from journey inventory)
+    // TODO Rename this inventory after the map journey mode is removed
     card_inventory: varchar('card_inventory', { length: 1000 }).notNull(),
 
     // Garden

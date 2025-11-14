@@ -199,6 +199,7 @@ export default function createWebSocketServer() {
         .on('accessDiscord', async () => {
           if (!id) return
           await AchievementManager.onDiscordAccess(id)
+          await sendUserData(ws, id)
         })
         .on('harvestGarden', async ({ index }) => {
           if (!id) return
