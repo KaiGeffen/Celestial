@@ -66,6 +66,9 @@ export default class StoreScene extends BaseSceneWithHeader {
     // Remove existing scrollable panel if it exists
     if (this.scrollablePanel) {
       this.scrollablePanel.destroy()
+
+      // Remove previous panels wheel event
+      this.input.off('wheel')
     }
 
     // Create a sizer for the cards
@@ -75,6 +78,7 @@ export default class StoreScene extends BaseSceneWithHeader {
         item: Space.pad,
         line: Space.pad,
         top: Space.pad,
+        bottom: Space.pad,
         left: Space.pad,
         right: Space.pad,
       },
