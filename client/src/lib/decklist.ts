@@ -89,13 +89,21 @@ export default class Decklist {
     const cardInventory = UserSettings._get('cardInventory') || []
 
     // Add the new deck, only including cards the player owns
+    let someCardsNotOwned = false
     for (let i = 0; i < deck.length; i++) {
       let card = deck[i]
 
       // Only add cards that the player owns
       if (cardInventory[card.id]) {
         this.addCard(card)
+      } else {
+        someCardsNotOwned = true
       }
+    }
+
+    // Signal to user if they're missing any cards
+    if (someCardsNotOwned) {
+      this.scene.signalError("You don't own some of those cards.")
     }
 
     return true
