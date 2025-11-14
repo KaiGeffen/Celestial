@@ -196,6 +196,10 @@ export default function createWebSocketServer() {
           if (!id) return
           await AchievementManager.setAchievementsSeen(id)
         })
+        .on('accessDiscord', async () => {
+          if (!id) return
+          await AchievementManager.onDiscordAccess(id)
+        })
         .on('harvestGarden', async ({ index }) => {
           if (!id) return
           const harvestResult = await Garden.harvest(id, index)

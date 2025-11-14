@@ -130,4 +130,9 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
     image: 'border-Shadow',
     borderUnlock: 3,
   },
+  1003: {
+    title: 'Community',
+    description: 'Access the Discord server.',
+    goldReward: 2000,
+  },
 }

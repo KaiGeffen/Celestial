@@ -34,6 +34,7 @@ export default interface messagesToServer {
     value: CosmeticSet
   }
   setAchievementsSeen: {}
+  accessDiscord: {}
   harvestGarden: {
     index: number
   }

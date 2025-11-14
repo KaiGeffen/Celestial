@@ -152,6 +152,13 @@ export class AchievementManager {
       .where(eq(achievements.player_id, playerId))
   }
 
+  // Called when user accesses Discord
+  static async onDiscordAccess(playerId: string) {
+    if (!playerId) return
+    // Unlock achievement 1003 for accessing Discord
+    await this.unlock(playerId, 1003)
+  }
+
   // Unlock achievementId if not already unlocked
   // Returns true if this was a new unlock, false if already existed
   private static async unlock(

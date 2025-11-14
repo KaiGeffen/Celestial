@@ -372,6 +372,17 @@ export default class Server {
     })
   }
 
+  static accessDiscord(): void {
+    if (!server || !server.isOpen()) {
+      console.error('Accessing Discord when server ws doesnt exist.')
+      return
+    }
+
+    server.send({
+      type: 'accessDiscord',
+    })
+  }
+
   static harvestGarden(plotNumber: number): void {
     if (!server || !server.isOpen()) {
       console.error('Harvesting garden when server ws doesnt exist.')
