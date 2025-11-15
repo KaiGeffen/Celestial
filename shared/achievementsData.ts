@@ -133,6 +133,6 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
   1003: {
     title: 'Community',
     description: 'Access the Discord server.',
-    goldReward: 2000,
+    goldReward: 7500,
   },
 }
