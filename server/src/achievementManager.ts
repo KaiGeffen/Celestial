@@ -143,6 +143,15 @@ export class AchievementManager {
     if (game.breath[player] >= 15) {
       await this.unlock(playerId, 19)
     }
+
+    // 20: Have 8 or more cards in the story
+    const ourActs = game.story.acts.filter((act) => act.owner === player)
+    const ourResolvedActs = game.story.resolvedActs.filter(
+      (act) => act.owner === player,
+    )
+    if (ourActs.length + ourResolvedActs.length >= 8) {
+      await this.unlock(playerId, 20)
+    }
   }
 
   static async setAchievementsSeen(playerId: string) {

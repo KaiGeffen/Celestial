@@ -116,6 +116,11 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
     description: 'Have 15 or more breath.',
     goldReward: 300,
   },
+  20: {
+    title: 'An Epic',
+    description: 'Have 8 or more cards in the story.',
+    goldReward: 400,
+  },
 
   // Manually unlocked
   1001: {
