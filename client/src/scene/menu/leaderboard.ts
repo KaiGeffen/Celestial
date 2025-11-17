@@ -3,6 +3,11 @@ import { Color, Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import Server from '../../server'
+import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
+import Buttons from '../../lib/buttons/buttons'
+import { Flags } from '../../settings/flags'
+import { LEADERBOARD_PORT } from '../../../../shared/network/settings'
+import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 const height = (Space.windowHeight * 2) / 3
 const width = 1000
@@ -15,6 +20,7 @@ interface LeaderboardEntry {
   wins: number
   losses: number
   gamesPlayed: number
+  cosmeticSet: CosmeticSet
 }
 
 export default class LeaderboardMenu extends Menu {
@@ -35,7 +41,9 @@ export default class LeaderboardMenu extends Menu {
     try {
       const userData = Server.getUserData()
       const response = await fetch(
-        `https://celestialdecks.gg/leaderboard/${userData.uuid}`,
+        Flags.local
+          ? `http://localhost:${LEADERBOARD_PORT}/leaderboard/${userData.uuid}`
+          : `https://celestialdecks.gg/leaderboard/${userData.uuid}`,
       )
       if (!response.ok) {
         throw new Error('Failed to fetch leaderboard data')
@@ -59,14 +67,16 @@ export default class LeaderboardMenu extends Menu {
     })
 
     let rankText = this.scene.add.text(0, 0, '\tRank', Style.basic)
+    const avatarText = this.scene.add.text(0, 0, '', Style.basic)
     let usernameText = this.scene.add.text(0, 0, 'Username', Style.basic)
     let winsText = this.scene.add.text(0, 0, 'Wins', Style.basic)
     let lossesText = this.scene.add.text(0, 0, 'Losses', Style.basic)
     let eloText = this.scene.add.text(0, 0, 'Elo', Style.basic)
 
     headerSizer
-      .add(rankText, { proportion: 1 })
-      .add(usernameText, { proportion: 3 })
+      .add(rankText, { proportion: 0.5 })
+      .add(avatarText, { proportion: 1.5 })
+      .add(usernameText, { proportion: 2 })
       .add(winsText, { proportion: 1 })
       .add(lossesText, { proportion: 1 })
       .add(eloText, { proportion: 1 })
@@ -109,6 +119,10 @@ export default class LeaderboardMenu extends Menu {
   private createRow(entry: LeaderboardEntry) {
     let rowSizer = this.scene.rexUI.add.sizer({
       width: width,
+      space: {
+        top: Space.padSmall,
+        bottom: Space.padSmall,
+      },
     })
 
     // If the row is our account, highlight it
@@ -117,6 +131,21 @@ export default class LeaderboardMenu extends Menu {
         this.scene.add.rectangle(0, 0, 1, 1, Color.rowHighlight),
       )
     }
+
+    // Avatar
+    const avatarContainer = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.avatarSize,
+      Space.avatarSize,
+    )
+    const avatar = new Buttons.Avatar({
+      within: avatarContainer,
+      avatarId: entry.cosmeticSet.avatar,
+      border: entry.cosmeticSet.border,
+      muteClick: true,
+    })
 
     // Add each text object
     let rankText = this.scene.add.text(0, 0, `\t${entry.rank}`, Style.basic)
@@ -132,8 +161,9 @@ export default class LeaderboardMenu extends Menu {
 
     // Add each text with the right proportion
     rowSizer
-      .add(rankText, { proportion: 1 })
-      .add(usernameText, { proportion: 3 })
+      .add(rankText, { proportion: 0.5 })
+      .add(avatarContainer, { proportion: 1.5 })
+      .add(usernameText, { proportion: 2 })
       .add(winsText, { proportion: 1 })
       .add(lossesText, { proportion: 1 })
       .add(eloText, { proportion: 1 })
