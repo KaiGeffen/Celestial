@@ -92,6 +92,9 @@ export default class UserProfileMenu extends Menu {
       userData.username || 'Guest',
       Style.announcement,
     )
+    // Ensure the username isn't too long
+    const safeWidth = Math.min(Space.buttonWidth, txtUsername.width)
+    txtUsername.setFixedSize(safeWidth, 0)
     const txtElo = this.scene.add.text(
       0,
       0,
