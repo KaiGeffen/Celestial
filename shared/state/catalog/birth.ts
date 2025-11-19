@@ -221,7 +221,7 @@ const justLikeDad = new JustLikeDad({
 class Hug extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     if (game.story.acts.length > 0 && game.story.acts[0].owner === player) {
-      bonus += 2
+      bonus += 1
     }
     super.play(player, game, index, bonus)
   }
@@ -230,8 +230,8 @@ const hug = new Hug({
   name: 'Hug',
   id: 86,
   cost: 2,
-  points: 1,
-  text: 'Worth +2 if the next card in the story is yours.',
+  points: 2,
+  text: 'Worth +1 if the next card in the story is yours.',
 })
 
 class LittleMischief extends Card {
@@ -266,6 +266,56 @@ const bar = new Bar({
   text: 'Worth +1 for each of your cards later in the story.',
 })
 
+class Naptime extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    this.reset(game)
+  }
+
+  // TODO onPlay
+
+  getCost(player: number, game: GameModel) {
+    let totalChildPoints = 0
+    for (const card of game.hand[player]) {
+      if (card.name === child.name) {
+        totalChildPoints += card.points
+      }
+    }
+
+    // Cost won't go up
+    const reducedCost = Math.min(this.cost, this.cost - totalChildPoints)
+
+    // Spend all of the player's breath
+    return Math.max(game.breath[player], reducedCost)
+  }
+}
+const naptime = new Naptime({
+  name: 'Naptime',
+  id: 5022,
+  cost: 6,
+  points: 0,
+  text: "You can spend the points from a Child in hand as breath to play this.\nSet both players' points to 0.",
+})
+
+class Genesis extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    if (game.score[player] > 5) {
+      const amt = game.score[player] - 5
+      game.score[player] = 5
+      this.birth(amt, game, player)
+    }
+  }
+}
+const genesis = new Genesis({
+  name: 'Genesis',
+  id: 5023,
+  cost: 5,
+  points: 5,
+  text: 'Set your points to 5, then Birth 1 for each point you lost.',
+})
+
 // Genesis, Beginner's Mind,
 
 export {
@@ -285,4 +335,5 @@ export {
   // NEW
   // littleMischief,
   // bar,
+  genesis,
 }
