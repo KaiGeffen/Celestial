@@ -3,7 +3,7 @@ import { Quality } from '../quality'
 import GameModel from '../gameModel'
 import { Zone } from '../zone'
 import { Animation, Visibility } from '../../animation'
-// import { wound } from './tokens'
+import { wound } from './tokens'
 
 class Dagger extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -210,18 +210,18 @@ const victim = new Victim({
   text: 'If you lose this round, Nourish -1 your opponent for each point you lost by.',
 })
 
-// class Rupture extends Card {
-//   play(player: number, game: GameModel, index: number, bonus: number) {
-//     super.play(player, game, index, bonus)
-//     game.create(player ^ 1, wound)
-//   }
-// }
-// const rupture = new Rupture({
-//   name: 'Rupture',
-//   id: 72,
-//   cost: 1,
-//   text: "Create a Wound in your opponent's hand.",
-// })
+class Rupture extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    game.create(player ^ 1, wound)
+  }
+}
+const rupture = new Rupture({
+  name: 'Rupture',
+  id: 72,
+  cost: 1,
+  text: "Create a Wound in your opponent's hand.",
+})
 
 class LostInShadow extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -342,6 +342,7 @@ export {
   vampire,
   // NEW CARDS
   // isolation,
+  rupture,
   voices,
   spider,
 }

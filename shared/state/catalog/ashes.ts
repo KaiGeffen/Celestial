@@ -355,7 +355,7 @@ const wildfire = new Wildfire({
   text: 'Inspire 1\nExhale 1, discard a card: Create a Wildfire in the story.',
 })
 
-class EternalFlame extends Card {
+class Remnant extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -369,8 +369,8 @@ class EternalFlame extends Card {
     return true
   }
 }
-const eternalFlame = new EternalFlame({
-  name: 'Eternal Flame',
+const remnant = new Remnant({
+  name: 'Remnant',
   id: 2050,
   cost: 2,
   points: 2,
@@ -429,7 +429,7 @@ const finale = new Finale({
   id: 2055,
   cost: 7,
   points: 5,
-  text: 'Worth +1 for every 3 cards in your discard pile. Create 6 Ashes on top of your deck, draw 6.',
+  text: '.',
 })
 
 export {
@@ -448,8 +448,8 @@ export {
   spark,
   // NEW
   // initiative,
-  wildfire,
-  eternalFlame,
+  // wildfire,
+  remnant,
   // dyingLight,
   // momentum,
   // finale,
