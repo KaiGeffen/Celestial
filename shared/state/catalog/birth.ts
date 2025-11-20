@@ -316,6 +316,22 @@ const genesis = new Genesis({
   text: 'Set your points to 5, then Birth 1 for each point you lost.',
 })
 
+class BeginnersMind extends Card {
+  onShuffle(player: number, game: GameModel, index: number) {
+    super.onShuffle(player, game, index)
+
+    game.deck[player].splice(index, 1)
+    game.deck[player].push(this)
+  }
+}
+const beginnersMind = new BeginnersMind({
+  name: "Beginner's Mind",
+  id: 5024,
+  cost: 1,
+  points: 1,
+  text: 'When this is shuffled, move it to the top of your deck.',
+})
+
 // Genesis, Beginner's Mind,
 
 export {
@@ -336,4 +352,5 @@ export {
   // littleMischief,
   // bar,
   genesis,
+  beginnersMind,
 }

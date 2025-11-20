@@ -375,15 +375,34 @@ export default class GameModel {
     }
   }
 
+  /**
+   * Shuffle the deck of the given player
+   * @param player - The player whose deck to shuffle
+   * @param remember - Whether to remember the cards that were shuffled
+   * @param take_pile - Whether to shuffle the discard pile in
+   */
   shuffle(player: number, remember = true, take_pile = true) {
+    // Remember the cards that were shuffled
     if (remember) {
       this.lastShuffle[player] = this.pile[player]
     }
+
+    // Shuffle the discard pile in
     if (take_pile) {
       this.deck[player] = this.pile[player].concat(this.deck[player])
       this.pile[player] = []
     }
+
+    // Randomize the deck
     this.deck[player].sort(() => Math.random() - 0.5)
+
+    // Trigger any on shuffle effects
+    // NOTE Must start from the top since a card moves itself
+    for (let i = this.deck[player].length - 1; i >= 0; i--) {
+      this.deck[player][i].onShuffle(player, this, i)
+    }
+
+    // Animate
     if (this.deck[player].length > 0) {
       this.animations[player].push(
         new Animation({

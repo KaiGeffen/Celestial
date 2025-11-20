@@ -177,6 +177,8 @@ export default class Card {
 
   onDraw(player: number, game: GameModel): void {}
 
+  onShuffle(player: number, game: GameModel, index: number): void {}
+
   /* Common functions */
   reset(game: GameModel) {
     game.score = [0, 0]
