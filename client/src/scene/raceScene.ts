@@ -66,9 +66,6 @@ export default class RaceScene extends BaseScene {
     // Bound camera on this map
     this.cameras.main.setBounds(0, 0, this.map.width, this.map.height)
 
-    // Add button for help menu
-    this.createHelpButton()
-
     // Create deck display on the right side
     this.createDeckDisplay()
 
@@ -175,29 +172,6 @@ export default class RaceScene extends BaseScene {
       .map((id) => Catalog.getCardById(id))
       .filter(Boolean)
     this.deckDisplay.setDeck(deckCards)
-  }
-
-  private createHelpButton(): void {
-    const x =
-      Space.windowWidth -
-      Space.buttonWidth / 2 -
-      (Space.iconSize + Space.pad * 2)
-    const y = Space.buttonHeight / 2 + Space.pad
-    new Buttons.Basic({
-      within: this,
-      text: 'Help',
-      x,
-      y,
-      f: () => {
-        this.scene.launch('MenuScene', {
-          menu: 'help',
-          callback: () => {
-            this.scene.start('TutorialGameScene', { missionID: 0 })
-          },
-        })
-      },
-      depth: 10,
-    }).setNoScroll()
   }
 
   // Create indicators for any incomplete nodes on the map out of the camera's view
