@@ -268,9 +268,11 @@ export default class RaceScene extends BaseScene {
   // Type 1: Show decklist and let user confirm to set to that deck
   private showDecklistConfirm(deckCode: number[]): void {
     this.scene.launch('MenuScene', {
-      menu: 'confirm',
-      text: 'This will replace your current deck. Are you sure?',
-      callback: () => {
+      menu: 'message',
+      title: 'Set Deck?',
+      s: 'This will replace your current deck. Are you sure?',
+      deck: deckCode,
+      onConfirm: () => {
         const newDeck = [...deckCode]
         this.currentDeck = newDeck
         this.updateDeckDisplay()
