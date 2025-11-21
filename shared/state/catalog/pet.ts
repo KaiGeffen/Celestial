@@ -325,7 +325,7 @@ class Hiding extends Card {
 const hiding = new Hiding({
   name: 'Hiding',
   id: 1007,
-  cost: 3,
+  cost: 2,
   points: 2,
   text: 'When played, transform this into Skittish.',
 })
