@@ -19,6 +19,7 @@ import MatchHistoryScene from './scene/matchHistoryScene'
 import JourneyScene from './scene/journeyScene'
 import PlaceholderScene from './scene/placeholderScene'
 import MapJourneyScene from './scene/mapJourneyScene'
+import RaceScene from './scene/raceScene'
 
 import { Space } from './settings/settings'
 import addResizeHandler from './loader/windowResizeManager'
@@ -74,6 +75,8 @@ const config: Phaser.Types.Core.GameConfig = {
     MapJourneyScene,
     MapJourneyMatchScene,
     MapJourneyBuilderScene,
+    // Race mode
+    RaceScene,
   ],
   plugins: {
     scene: [

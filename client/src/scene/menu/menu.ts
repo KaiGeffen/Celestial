@@ -161,6 +161,8 @@ import PurchaseGemsMenu from './purchaseGems'
 import PurchaseItemMenu from './purchaseItem'
 import UserProfileMenu from './userProfile'
 import AchievementsMenu from './achievements'
+import RaceCardChoiceMenu from './raceCardChoice'
+import RaceDeckReplacementMenu from './raceDeckReplacement'
 
 const menus = {
   options: OptionsMenu,
@@ -180,6 +182,8 @@ const menus = {
   purchaseItem: PurchaseItemMenu,
   userProfile: UserProfileMenu,
   achievements: AchievementsMenu,
+  raceCardChoice: RaceCardChoiceMenu,
+  raceDeckReplacement: RaceDeckReplacementMenu,
 }
 
 // Function exposed for the creation of custom menus

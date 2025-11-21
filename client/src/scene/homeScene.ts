@@ -45,6 +45,10 @@ export default class HomeScene extends BaseScene {
 
     // Normal buttons
     this.createFeedbackButton()
+    this.createRaceButton() // TODO Move somewhere else
+
+    // Check if there are any unseen achievements and show achievements menu if so
+    this.checkAndShowUnseenAchievements()
 
     // Show any plants in the garden
     this.createGarden()
@@ -300,6 +304,23 @@ export default class HomeScene extends BaseScene {
     this.plugins.get('rexAnchor')['add'](container, {
       x: `100%-${Space.padSmall + Space.buttonWidth / 2}`,
       y: `0%+${Space.pad * 4 + Space.iconSize * 2 + Space.buttonHeight * 0.5}`,
+    })
+  }
+
+  private createRaceButton(): void {
+    const container = this.add.container()
+    new Buttons.Basic({
+      within: container,
+      text: 'Race',
+      f: () => {
+        this.scene.start('RaceScene', {})
+      },
+    })
+
+    // Anchor to right
+    this.plugins.get('rexAnchor')['add'](container, {
+      x: `100%-${Space.padSmall + Space.buttonWidth / 2}`,
+      y: `0%+${Space.pad * 5 + Space.iconSize * 2 + Space.buttonHeight * 1.5}`,
     })
   }
 

@@ -237,7 +237,7 @@ export default class DeckRegion {
 
   // Set the current deck, and return whether the given deck was valid
   setDeck(deck: Card[]): boolean {
-    this.decklist.setDeck(deck)
+    this.decklist.setDeck(deck, true)
 
     this.updateText()
 

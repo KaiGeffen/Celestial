@@ -1,0 +1,90 @@
+// Race node types
+interface RaceBase {
+  x: number
+  y: number
+  id: number
+}
+
+// Type 1: Shows decklist and lets user confirm to set to that deck
+interface DeckNode extends RaceBase {
+  deck: number[]
+}
+
+// Type 2: Starts a match with current deck (PVE)
+interface MatchNode extends RaceBase {
+  opponent: number[]
+}
+
+// Type 3: Shows choice of 3 random cards, click one to replace a card in deck
+interface CardChoiceNode extends RaceBase {
+  cardChoices?: number // Number of card choices (default 3)
+}
+
+export type raceNode = DeckNode | MatchNode | CardChoiceNode
+
+// Example race data - you can customize this
+export const raceData: raceNode[] = [
+  // Type 1: Three deck nodes in a line
+  {
+    id: 1,
+    x: 200,
+    y: 300,
+    deck: [56, 65, 65, 12, 12, 7, 7, 7, 7, 4, 4, 4, 4, 4, 4],
+  },
+  {
+    id: 2,
+    x: 400,
+    y: 300,
+    deck: [21, 20, 20, 17, 17, 14, 14, 6, 3, 3, 3, 3, 3, 0, 0],
+  },
+  {
+    id: 3,
+    x: 600,
+    y: 300,
+    deck: [0, 0, 4, 4, 28, 33, 33, 33, 33, 34, 34, 11, 11, 11, 71],
+  },
+  // Type 2: One match node
+  {
+    id: 11,
+    x: 200,
+    y: 500,
+    opponent: [56, 65, 65, 12, 12, 7, 7, 7, 7, 4, 4, 4, 4, 4, 4],
+  },
+  {
+    id: 12,
+    x: 300,
+    y: 500,
+    opponent: [21, 20, 20, 17, 17, 14, 14, 6, 3, 3, 3, 3, 3, 0, 0],
+  },
+  {
+    id: 13,
+    x: 400,
+    y: 500,
+    opponent: [1, 1, 1, 1, 1, 1, 35, 35, 13, 20, 19, 19, 19, 19, 23],
+  },
+  {
+    id: 14,
+    x: 500,
+    y: 500,
+    opponent: [0, 0, 4, 4, 28, 33, 33, 33, 33, 34, 34, 11, 11, 11, 71],
+  },
+  {
+    id: 15,
+    x: 600,
+    y: 500,
+    opponent: [22, 22, 66, 60, 10, 11, 8, 8, 8, 4, 4, 2, 2, 2, 2],
+  },
+  {
+    id: 16,
+    x: 700,
+    y: 500,
+    opponent: [50, 27, 27, 27, 27, 25, 88, 88, 31, 39, 11, 13, 91, 45, 45],
+  },
+  // Type 3: Card choice node
+  {
+    id: 20,
+    x: 1000,
+    y: 300,
+    cardChoices: 3,
+  },
+]
