@@ -107,6 +107,10 @@ class ServerController {
     this.model.story.addAct(card, player)
 
     // Trigger on-play effects
+    for (let i = 0; i < this.model.story.acts.length - 1; i++) {
+      const act = this.model.story.acts[i]
+      act.card.onCardPlayedAfter(player, this.model, i)
+    }
     card.onPlay(player, this.model)
 
     // Increment count of player's played cards

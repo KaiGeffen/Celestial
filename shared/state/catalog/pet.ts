@@ -300,6 +300,36 @@ const doll = new Doll({
   text: 'Morning: Worth X permanently, where X is how many points you won the last round by.',
 })
 
+class Skittish extends Card {
+  onCardPlayedAfter(player: number, game: GameModel, index: number) {
+    console.log('onCardPlayedAfter', index)
+    this.transform(index, hiding, game)
+  }
+}
+const skittish = new Skittish({
+  name: 'Skittish',
+  id: 4082,
+  cost: 3,
+  points: 4,
+  text: 'When a card is played after this, transform this into Hiding.',
+})
+
+// TODO Move to a transformation file or something
+class Hiding extends Card {
+  onPlay(player: number, game: GameModel) {
+    const index = game.story.acts.length - 1
+    this.transform(index, skittish, game)
+    game.story.replaceAct(index, new Act(skittish, player))
+  }
+}
+const hiding = new Hiding({
+  name: 'Hiding',
+  id: 1007,
+  cost: 3,
+  points: 2,
+  text: 'When played, transform this into Skittish.',
+})
+
 export {
   fruit,
   oak,
@@ -316,4 +346,6 @@ export {
   sensualist,
   // NEW
   doll,
+  skittish,
+  hiding,
 }

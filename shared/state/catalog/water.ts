@@ -273,27 +273,6 @@ const drip = new Drip({
 })
 
 // TODO
-class Ouroboros extends Card {
-  onUpkeepInHand(
-    player: number,
-    game: GameModel,
-    index: number,
-  ): [boolean, boolean] {
-    if (game.hand[player].length >= 5) {
-      game.discard(player, 1, index)
-      this.inspired(1, game, player)
-      return [true, true]
-    }
-    return [false, false]
-  }
-}
-const ouroboros = new Ouroboros({
-  name: 'Ouroboros',
-  id: 8006,
-  cost: 6,
-  points: 6,
-  text: 'At the start of turn, if your hand has at least 5 cards including this, discard this to Inspired 1.',
-})
 
 export {
   mercy,
@@ -311,5 +290,4 @@ export {
   overflow,
   // NEW
   drip,
-  ouroboros,
 }

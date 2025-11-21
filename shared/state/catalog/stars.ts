@@ -348,6 +348,28 @@ const outerSpace = new OuterSpace({
   text: 'Gain 1 breath for each card before this in the story.\nExhale 4: Set your points to 0.',
 })
 
+class Starfall extends Card {
+  onUpkeepInHand(
+    player: number,
+    game: GameModel,
+    index: number,
+  ): [boolean, boolean] {
+    if (game.hand[player].length >= 5) {
+      game.discard(player, 1, index)
+      this.inspired(1, game, player)
+      return [true, true]
+    }
+    return [false, false]
+  }
+}
+const starfall = new Starfall({
+  name: 'Starfall',
+  id: 8006,
+  cost: 6,
+  points: 6,
+  text: 'At the start of turn, if your hand has at least 5 cards including this, discard this to Inspired 1.',
+})
+
 export {
   stars,
   cosmos,
@@ -365,4 +387,5 @@ export {
   // NEW
   rocketship,
   // fable,
+  starfall,
 }

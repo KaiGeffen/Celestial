@@ -179,6 +179,9 @@ export default class Card {
 
   onShuffle(player: number, game: GameModel, index: number): void {}
 
+  // Called when a card is played while this is in the story
+  onCardPlayedAfter(player: number, game: GameModel, index: number): void {}
+
   /* Common functions */
   reset(game: GameModel) {
     game.score = [0, 0]
