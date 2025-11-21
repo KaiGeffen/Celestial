@@ -301,8 +301,8 @@ class Genesis extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    if (game.score[player] > 5) {
-      const amt = game.score[player] - 5
+    const amt = game.score[player] - 5
+    if (amt > 0) {
       game.score[player] = 5
       this.birth(amt, game, player)
     }
@@ -332,8 +332,6 @@ const beginnersMind = new BeginnersMind({
   text: 'When this is shuffled, move it to the top of your deck.',
 })
 
-// Genesis, Beginner's Mind,
-
 export {
   nascence,
   birth,
@@ -349,8 +347,6 @@ export {
   justLikeDad,
   hug,
   // NEW
-  // littleMischief,
-  // bar,
   genesis,
   beginnersMind,
 }

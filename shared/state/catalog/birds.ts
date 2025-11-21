@@ -336,10 +336,8 @@ class Birdsong extends Card {
       const newCard = new Card({
         name: oldCard.name,
         id: oldCard.id,
-        cost: 3,
+        cost: oldCard.cost,
         points: oldCard.points,
-        qualities: [Quality.FLEETING],
-        text: 'Fleeting',
       })
 
       game.hand[player][0] = newCard
@@ -353,7 +351,7 @@ const birdsong = new Birdsong({
   id: 8094,
   cost: 5,
   points: 5,
-  text: 'Morning: Remove all card text from a card in hand, set its cost to 3, and give it Fleeting.',
+  text: 'Morning: Remove all card text from a card in your hand.',
 })
 
 export {
