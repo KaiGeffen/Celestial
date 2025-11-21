@@ -276,11 +276,6 @@ export default class RaceScene extends BaseScene {
         const newDeck = [...deckCode]
         this.currentDeck = newDeck
         this.updateDeckDisplay()
-        this.scene.launch('MenuScene', {
-          menu: 'message',
-          title: 'Deck Updated',
-          s: 'Your deck has been updated!',
-        })
       },
     })
   }
@@ -312,7 +307,7 @@ export default class RaceScene extends BaseScene {
       },
     }
 
-    this.scene.start('StandardMatchScene', {
+    this.scene.start('RaceMatchScene', {
       isPvp: false,
       deck: playerDeck,
       aiDeck: aiDeck,
@@ -359,12 +354,6 @@ export default class RaceScene extends BaseScene {
         }
         this.currentDeck = deck
         this.updateDeckDisplay()
-
-        this.scene.launch('MenuScene', {
-          menu: 'message',
-          title: 'Deck Updated',
-          s: 'Your deck has been updated!',
-        })
       },
     })
   }

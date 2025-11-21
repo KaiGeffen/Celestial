@@ -812,3 +812,9 @@ export class MapJourneyMatchScene extends MatchScene {
     }
   }
 }
+
+export class RaceMatchScene extends MatchScene {
+  constructor(args = { key: 'RaceMatchScene', lastScene: 'RaceScene' }) {
+    super(args)
+  }
+}

@@ -7,6 +7,7 @@ import { Style, Space } from '../../settings/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Catalog from '../../../../shared/state/catalog'
 import Decklist from '../../lib/decklist'
+import newScrollablePanel from '../../lib/scrollablePanel'
 
 const width = 900
 
@@ -24,6 +25,17 @@ export default class RaceDeckReplacementMenu extends Menu {
     const currentDeck: number[] = params.currentDeck || []
     const onReplacement = params.onReplacement
 
+    // Create horizontal sizer for new card and decklist side by side
+    const horizontalSizer = this.scene.rexUI.add.sizer({
+      orientation: 'horizontal',
+      width: this.width - Space.pad * 2,
+      space: {
+        item: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+      },
+    })
+
     // Show the new card that will be added
     const newCard = Catalog.getCardById(newCardId)
     if (newCard) {
@@ -36,17 +48,14 @@ export default class RaceDeckReplacementMenu extends Menu {
         Space.cardHeight,
       )
       new CardImage(newCard, newCardContainer, false)
-      const padding = {
-        padding: {
-          left: Space.pad,
-          right: Space.pad,
-        },
-      }
-      this.sizer.add(newCardContainer, padding).addNewLine()
+      horizontalSizer.add(newCardContainer)
     }
 
     // Show current deck and let user select a card to replace
-    this.createDeckSelection(currentDeck, onReplacement)
+    const deckSelection = this.createDeckSelection(currentDeck, onReplacement)
+    horizontalSizer.add(deckSelection)
+
+    this.sizer.add(horizontalSizer).addNewLine()
 
     this.layout()
   }
@@ -54,7 +63,7 @@ export default class RaceDeckReplacementMenu extends Menu {
   private createDeckSelection(
     currentDeck: number[],
     onReplacement: (cardId: number) => void,
-  ): void {
+  ): any {
     // Create a decklist to show current deck
     const decklist = new Decklist(this.scene as any, (cutout) => {
       return () => {
@@ -70,13 +79,19 @@ export default class RaceDeckReplacementMenu extends Menu {
       .filter(Boolean)
     decklist.setDeck(deckCards)
 
-    const padding = {
-      padding: {
-        left: Space.pad,
-        right: Space.pad,
+    // Create scrollable panel for the deck
+    const scrollableDeck = newScrollablePanel(this.scene, {
+      width: Space.cutoutWidth + 10,
+      height: Math.min(
+        deckCards.length * (Space.cutoutHeight + Space.padSmall),
+        400,
+      ),
+      panel: {
+        child: decklist.sizer,
       },
-    }
+      scrollMode: 'y',
+    })
 
-    this.sizer.add(decklist.sizer, padding).addNewLine()
+    return scrollableDeck
   }
 }
