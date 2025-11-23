@@ -7,7 +7,8 @@ import { Style, Space } from '../../settings/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Catalog from '../../../../shared/state/catalog'
 
-const width = 900
+const numCards = 3
+const width = Space.cardWidth * numCards + Space.pad * (numCards + 1)
 
 export default class RaceCardChoiceMenu extends Menu {
   constructor(scene: MenuScene, params) {
@@ -19,10 +20,30 @@ export default class RaceCardChoiceMenu extends Menu {
     const s = params.s || 'Select a card to add to your deck:'
     this.createText(s)
 
-    const cardIds: number[] = params.cardIds || []
+    // If cardIds provided, use them. Otherwise, generate 3 random choices
+    const cardIds: number[] = this.generateRandomChoices(numCards)
     this.createCardChoices(cardIds, params.onCardSelected)
 
     this.layout()
+  }
+
+  /**
+   * Generates random card choices from collectible cards
+   * Uses Fisher-Yates shuffle for proper randomization
+   */
+  private generateRandomChoices(numChoices: number): number[] {
+    const collectibleCards = Catalog.collectibleCards
+    if (collectibleCards.length === 0) return []
+
+    // Create a copy and shuffle using Fisher-Yates algorithm
+    const shuffled = [...collectibleCards]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+
+    // Return the first numChoices card IDs
+    return shuffled.slice(0, numChoices).map((card) => card.id)
   }
 
   private createCardChoices(
@@ -30,7 +51,6 @@ export default class RaceCardChoiceMenu extends Menu {
     onCardSelected: (cardId: number) => void,
   ): void {
     const cardsSizer = this.scene.rexUI.add.sizer({
-      width: this.width - Space.pad * 2,
       space: { item: Space.pad },
     })
 
@@ -45,10 +65,7 @@ export default class RaceCardChoiceMenu extends Menu {
         Space.cardWidth,
         Space.cardHeight,
       )
-      const cardImage = new CardImage(card, container, true)
-
-      // Make card clickable
-      cardImage.image.on('pointerdown', () => {
+      const cardImage = new CardImage(card, container).setOnClick(() => {
         onCardSelected(cardId)
         this.close()
       })

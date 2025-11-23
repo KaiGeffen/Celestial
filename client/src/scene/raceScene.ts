@@ -234,7 +234,7 @@ export default class RaceScene extends BaseScene {
         this.startPVEMatch(node.opponent)
       } else if ('cardChoices' in node) {
         // Type 3: Show choice of 3 random cards, click one to replace a card in deck
-        this.showCardChoice(node.cardChoices || 3)
+        this.showCardChoice()
       }
     }
   }
@@ -289,17 +289,11 @@ export default class RaceScene extends BaseScene {
   }
 
   // Type 3: Show choice of 3 random cards, click one to replace a card in deck
-  private showCardChoice(numChoices: number = 3): void {
-    // Get random cards from collectible cards
-    const collectibleCards = Catalog.collectibleCards
-    const shuffled = [...collectibleCards].sort(() => Math.random() - 0.5)
-    const choices = shuffled.slice(0, numChoices).map((card) => card.id)
-
+  private showCardChoice(): void {
     this.scene.launch('MenuScene', {
       menu: 'raceCardChoice',
       title: 'Choose a Card',
       s: 'Select a card to add to your deck. Then choose a card to replace.',
-      cardIds: choices,
       currentDeck: [...this.currentDeck],
       onCardSelected: (selectedCardId: number) => {
         // Show deck selection to replace a card
