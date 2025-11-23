@@ -15,11 +15,8 @@ export default class RaceDeckReplacementMenu extends Menu {
   constructor(scene: MenuScene, params) {
     super(scene, width)
 
-    const title = params.title || 'Replace Card'
-    this.createHeader(title)
-
-    const s = params.s || 'Select a card from your deck to replace:'
-    this.createText(s)
+    this.createHeader('Replace Card')
+    this.createText('Select a card from your deck to replace:')
 
     const newCardId: number = params.newCardId
     const currentDeck: number[] = params.currentDeck || []
@@ -28,7 +25,6 @@ export default class RaceDeckReplacementMenu extends Menu {
     // Create horizontal sizer for new card and decklist side by side
     const horizontalSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
-      width: this.width - Space.pad * 2,
       space: {
         item: Space.pad,
         left: Space.pad,
@@ -39,7 +35,6 @@ export default class RaceDeckReplacementMenu extends Menu {
     // Show the new card that will be added
     const newCard = Catalog.getCardById(newCardId)
     if (newCard) {
-      this.createText('New card to add:')
       const newCardContainer = new ContainerLite(
         this.scene,
         0,
@@ -55,7 +50,7 @@ export default class RaceDeckReplacementMenu extends Menu {
     const deckSelection = this.createDeckSelection(currentDeck, onReplacement)
     horizontalSizer.add(deckSelection)
 
-    this.sizer.add(horizontalSizer).addNewLine()
+    this.sizer.add(horizontalSizer)
 
     this.layout()
   }
