@@ -119,9 +119,6 @@ export default class RaceScene extends BaseScene {
 
     // Adjust alpha/location of each indicator
     this.adjustIndicators()
-
-    // Update deck display if needed
-    this.updateDeckDisplay()
   }
 
   private createDeckDisplay(): void {
@@ -158,8 +155,6 @@ export default class RaceScene extends BaseScene {
       },
       scrollMode: 'vertical',
     })
-    scrollablePanel.setScrollFactor(0)
-    scrollablePanel.setDepth(6)
 
     // Update the deck display
     this.updateDeckDisplay()
@@ -203,7 +198,7 @@ export default class RaceScene extends BaseScene {
       // Determine node type icon
       let nodeType = 'QuestionMark'
       if ('deck' in node) {
-        nodeType = 'Mission'
+        nodeType = 'QuestionMark'
       } else if ('opponent' in node) {
         nodeType = 'Mission'
       } else if ('cardChoices' in node) {
