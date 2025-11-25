@@ -204,14 +204,6 @@ export default class OptionsMenu extends Menu {
       )
       .hide()
 
-    // Allow user to skip Tutorial, if they haven't completed it
-    const missions = UserSettings._get('completedMissions')
-    if (!missions[TUTORIAL_LENGTH - 1]) {
-      sizer
-        .add(this.createSkipTutorial(activeScene), { expand: true })
-        .addSpace()
-    }
-
     sizer
       .add(this.createAutopass(), { expand: true })
       .addSpace()
@@ -360,49 +352,6 @@ export default class OptionsMenu extends Menu {
   }
 
   // Elements within the panels:
-  private createSkipTutorial(activeScene: BaseScene) {
-    let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
-
-    let txtHint = this.scene.add.text(0, 0, 'Skip Tutorial:', Style.basic)
-    sizer.add(txtHint)
-    sizer.addSpace()
-
-    let container = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    let btn = new Buttons.Basic({
-      within: container,
-      text: 'Skip',
-      f: () => {
-        this.scene.scene.start('MenuScene', {
-          menu: 'confirm',
-          callback: () => {
-            // Complete each mission in the intro
-            for (let i = 0; i < TUTORIAL_LENGTH; i++) {
-              UserSettings._setIndex('completedMissions', i, true)
-            }
-
-            // Stop the other active scene
-            activeScene.beforeExit()
-            activeScene.scene.stop()
-
-            // Stop this scene and start the home scene
-            this.scene.scene.start('HomeScene')
-          },
-          hint: 'skip the tutorial',
-        })
-      },
-      muteClick: true,
-    })
-    sizer.add(container)
-
-    return sizer
-  }
-
   private createAutopass() {
     let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
@@ -480,19 +429,39 @@ export default class OptionsMenu extends Menu {
       .add(container)
       .addSpace()
 
-    // Normally show Go Home
+    // Check if tutorials have been completed
+    const missions = UserSettings._get('completedMissions')
+    const tutorialsCompleted = missions[TUTORIAL_LENGTH - 1]
+
+    // Button text and callback
     let s = 'Go Home'
-    // TODO This is super hacky - refactor searching to be a scene not a region
-    if (activeScene instanceof MatchScene) {
-      const region: SearchingRegion = activeScene.view.searching as any
-      if (region.matchFound) {
-        s = 'Surrender'
+    let action: () => void
+
+    if (!tutorialsCompleted) {
+      s = 'Skip Tutorial'
+      action = () => {
+        // Complete each mission in the intro
+        for (let i = 0; i < TUTORIAL_LENGTH; i++) {
+          UserSettings._setIndex('completedMissions', i, true)
+        }
+
+        // Stop the other active scene
+        activeScene.beforeExit()
+        activeScene.scene.stop()
+
+        // Stop this menu scene and start the home scene
+        this.scene.scene.stop()
+        this.scene.scene.start('HomeScene')
       }
-    }
-    new Buttons.Basic({
-      within: container,
-      text: s,
-      f: () => {
+    } else {
+      // TODO This is super hacky - refactor searching to be a scene not a region
+      if (activeScene instanceof MatchScene) {
+        const region: SearchingRegion = activeScene.view.searching as any
+        if (region.matchFound) {
+          s = 'Surrender'
+        }
+      }
+      action = () => {
         // Stop this menu scene
         this.scene.scene.stop()
 
@@ -509,13 +478,20 @@ export default class OptionsMenu extends Menu {
               type: 'surrender',
             })
           } else {
+            // In case we are in match queue, this will cancel the search
             server.send({
               type: 'cancelQueue',
               password: searchingRegion.password,
             })
           }
         }
-      },
+      }
+    }
+
+    new Buttons.Basic({
+      within: container,
+      text: s,
+      f: action,
     })
 
     return sizer
