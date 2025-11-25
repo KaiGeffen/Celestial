@@ -108,23 +108,6 @@ export default class Server {
         if (server) server.close(code)
         server = undefined
       })
-      .on('alreadySignedIn', () => {
-        console.log(
-          'Server indicated that the given uuid is already signed in. Logging out.',
-        )
-
-        Server.logout()
-
-        // TODO Make this a part of the static logout method
-        game.scene
-          .getScenes(true)[0]
-          .scene.start('SigninScene')
-          .launch('MenuScene', {
-            menu: 'message',
-            title: 'ERROR',
-            s: 'The selected account is already logged in on another device or tab. Please select another account option.',
-          })
-      })
 
     // Register common handlers
     this.registerCommonHandlers(uuid, game, callback)

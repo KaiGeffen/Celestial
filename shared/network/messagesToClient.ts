@@ -6,7 +6,6 @@ import GameModel from '../state/gameModel'
 export default interface messagesToClient {
   promptUserInit: {}
   invalidToken: {}
-  alreadySignedIn: {}
   sendUserData: {
     inventory: string
     completedMissions: string
