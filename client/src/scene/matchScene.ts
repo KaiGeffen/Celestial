@@ -24,6 +24,7 @@ import { ResultsRegionJourney } from './matchRegions/matchResults'
 // TODO Figure out
 import { server } from '../server'
 import { ClientWS } from '../../../shared/network/celestialTypedWebsocket'
+import logEvent from '../utils/analytics'
 
 export class MatchScene extends BaseScene {
   params: any
@@ -64,6 +65,8 @@ export class MatchScene extends BaseScene {
       this.currentVersion = this.params.gameStartState.versionNo - 1
       this.queueState(this.params.gameStartState)
     } else if (this.isTutorial) {
+      logEvent(`Start tutorial ${params.missionID + 1}`)
+
       server.send({
         type: 'initTutorial',
         num: params.missionID,
