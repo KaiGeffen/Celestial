@@ -163,6 +163,8 @@ import UserProfileMenu from './userProfile'
 import AchievementsMenu from './achievements'
 import RaceCardChoiceMenu from './raceCardChoice'
 import RaceDeckReplacementMenu from './raceDeckReplacement'
+import RaceDeckSelectionMenu from './raceDeckSelection'
+import RaceCardUpgradeMenu from './raceCardUpgrade'
 
 const menus = {
   options: OptionsMenu,
@@ -184,6 +186,8 @@ const menus = {
   achievements: AchievementsMenu,
   raceCardChoice: RaceCardChoiceMenu,
   raceDeckReplacement: RaceDeckReplacementMenu,
+  raceDeckSelection: RaceDeckSelectionMenu,
+  raceCardUpgrade: RaceCardUpgradeMenu,
 }
 
 // Function exposed for the creation of custom menus

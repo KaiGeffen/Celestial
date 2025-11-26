@@ -20,7 +20,10 @@ interface CardChoiceNode extends RaceBase {
   cardChoices?: number // Number of card choices (default 3)
 }
 
-export type raceNode = DeckNode | MatchNode | CardChoiceNode
+// Type 4: Upgrade a card - select a card from deck, then choose from 3 versions
+interface UpgradeCardNode extends RaceBase {}
+
+export type raceNode = DeckNode | MatchNode | CardChoiceNode | UpgradeCardNode
 
 // Example race data - you can customize this
 export const raceData: raceNode[] = [
@@ -86,5 +89,11 @@ export const raceData: raceNode[] = [
     x: 1000,
     y: 300,
     cardChoices: 3,
+  },
+  // Type 4: Upgrade card node
+  {
+    id: 21,
+    x: 1000,
+    y: 400,
   },
 ]

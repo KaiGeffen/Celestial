@@ -203,6 +203,9 @@ export default class RaceScene extends BaseScene {
         nodeType = 'Mission'
       } else if ('cardChoices' in node) {
         nodeType = 'QuestionMark'
+      } else {
+        // Upgrade card node
+        nodeType = 'QuestionMark'
       }
 
       let btn = new Buttons.Mission(
@@ -230,6 +233,9 @@ export default class RaceScene extends BaseScene {
       } else if ('cardChoices' in node) {
         // Type 3: Show choice of 3 random cards, click one to replace a card in deck
         this.showCardChoice()
+      } else {
+        // Type 4: Upgrade a card - select from deck, then choose from 3 versions
+        this.showUpgradeCard()
       }
     }
   }
@@ -317,6 +323,48 @@ export default class RaceScene extends BaseScene {
         }
         this.currentDeck = deck
         this.updateDeckDisplay()
+      },
+    })
+  }
+
+  // Type 4: Upgrade a card - select from deck, then choose from 3 versions
+  private showUpgradeCard(): void {
+    this.scene.launch('MenuScene', {
+      menu: 'raceDeckSelection',
+      title: 'Upgrade Card',
+      s: 'Select a card from your deck to upgrade:',
+      currentDeck: [...this.currentDeck],
+      onCardSelected: (selectedCardId: number) => {
+        // Show 3 versions of the selected card
+        this.showCardUpgradeVersions(selectedCardId)
+      },
+    })
+  }
+
+  // Show 3 versions of a card to choose from
+  private showCardUpgradeVersions(cardId: number): void {
+    const card = Catalog.getCardById(cardId)
+    if (!card) return
+
+    // For now, show 3 identical versions (no changes yet)
+    const versions = [card.id, card.id, card.id]
+
+    this.scene.launch('MenuScene', {
+      menu: 'raceCardUpgrade',
+      title: 'Choose Upgrade',
+      s: `Select an upgraded version of ${card.name}:`,
+      cardId: cardId,
+      versions: versions,
+      currentDeck: [...this.currentDeck],
+      onVersionSelected: (selectedVersionId: number) => {
+        // Replace the card in deck with the upgraded version
+        const deck = [...this.currentDeck]
+        const index = deck.indexOf(cardId)
+        if (index !== -1) {
+          deck[index] = selectedVersionId
+          this.currentDeck = deck
+          this.updateDeckDisplay()
+        }
       },
     })
   }
