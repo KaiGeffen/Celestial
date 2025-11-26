@@ -8,6 +8,7 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Catalog from '../../../../shared/state/catalog'
 import Decklist from '../../lib/decklist'
 import newScrollablePanel from '../../lib/scrollablePanel'
+import { getCardFromEncodedId } from '../../../../shared/state/cardUpgrades'
 
 const width = 900
 
@@ -57,21 +58,33 @@ export default class RaceDeckReplacementMenu extends Menu {
 
   private createDeckSelection(
     currentDeck: number[],
-    onReplacement: (cardId: number) => void,
+    onReplacement: (encodedId: number) => void,
   ): any {
     // Create a decklist to show current deck
+    // Store mapping of card to encoded ID for replacement
+    const cardToEncodedId = new Map<Card, number>()
+
     const decklist = new Decklist(this.scene as any, (cutout) => {
       return () => {
-        // When a card is clicked, replace it
-        onReplacement(cutout.card.id)
-        this.close()
+        // When a card is clicked, replace it using the encoded ID
+        const encodedId = cardToEncodedId.get(cutout.card)
+        if (encodedId !== undefined) {
+          onReplacement(encodedId)
+          this.close()
+        }
       }
     })
 
-    // Set the deck
+    // Set the deck - decode encoded IDs to get Card objects
     const deckCards = currentDeck
-      .map((id) => Catalog.getCardById(id))
-      .filter(Boolean)
+      .map((encodedId) => {
+        const card = getCardFromEncodedId(encodedId, Catalog)
+        if (card) {
+          cardToEncodedId.set(card, encodedId)
+        }
+        return card
+      })
+      .filter(Boolean) as Card[]
     decklist.setDeck(deckCards)
 
     // Create scrollable panel for the deck

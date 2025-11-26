@@ -36,11 +36,15 @@ export default class Decklist {
 
   // Add a new card to the deck
   addCard(card: Card) {
-    // If card exists in deck, increment it
+    // If card exists in deck with same ID AND version, increment it
     for (let i = 0; i < this.cutouts.length; i++) {
       const cutout = this.cutouts[i]
 
-      if (cutout.card.id === card.id && !cutout.required) {
+      if (
+        cutout.card.id === card.id &&
+        cutout.card.upgradeVersion === card.upgradeVersion &&
+        !cutout.required
+      ) {
         cutout.increment()
         this.countCards++
         return
@@ -53,11 +57,15 @@ export default class Decklist {
 
   // Remove a copy of the given card from the deck, return whether cutout is fully removed
   removeCard(card: Card): boolean {
-    // Find the cutout
+    // Find the cutout with matching ID and version
     for (let i = 0; i < this.cutouts.length; i++) {
       const cutout = this.cutouts[i]
 
-      if (cutout.card.id === card.id && !cutout.required) {
+      if (
+        cutout.card.id === card.id &&
+        cutout.card.upgradeVersion === card.upgradeVersion &&
+        !cutout.required
+      ) {
         // Update values
         cutout.decrement()
         this.countCards--

@@ -6,6 +6,7 @@ import { CardImage } from '../../lib/cardImage'
 import { Style, Space } from '../../settings/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Catalog from '../../../../shared/state/catalog'
+import { getAllCardVersions } from '../../../../shared/state/cardUpgrades'
 
 const numCards = 3
 const width = Space.cardWidth * numCards + Space.pad * (numCards + 1)
@@ -20,8 +21,18 @@ export default class RaceCardUpgradeMenu extends Menu {
     const s = params.s || 'Select an upgraded version:'
     this.createText(s)
 
-    const versions: number[] = params.versions || []
+    const cardId: number = params.cardId
     const onVersionSelected = params.onVersionSelected
+
+    // Get base card and create all versions
+    const baseCard = Catalog.getCardById(cardId)
+    if (!baseCard) {
+      this.layout()
+      return
+    }
+
+    // Get all versions (base, version 1, version 2)
+    const versions = getAllCardVersions(baseCard)
 
     // Show 3 versions to choose from
     this.createCardVersions(versions, onVersionSelected)
@@ -30,17 +41,14 @@ export default class RaceCardUpgradeMenu extends Menu {
   }
 
   private createCardVersions(
-    versionIds: number[],
-    onVersionSelected: (cardId: number) => void,
+    versionCards: Card[],
+    onVersionSelected: (card: Card) => void,
   ): void {
     const cardsSizer = this.scene.rexUI.add.sizer({
       space: { item: Space.pad },
     })
 
-    versionIds.forEach((versionId) => {
-      const card = Catalog.getCardById(versionId)
-      if (!card) return
-
+    versionCards.forEach((card) => {
       const container = new ContainerLite(
         this.scene,
         0,
@@ -49,7 +57,7 @@ export default class RaceCardUpgradeMenu extends Menu {
         Space.cardHeight,
       )
       const cardImage = new CardImage(card, container).setOnClick(() => {
-        onVersionSelected(versionId)
+        onVersionSelected(card)
         this.close()
       })
 

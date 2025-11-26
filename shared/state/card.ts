@@ -14,6 +14,9 @@ interface CardData {
   basePoints?: number
   qualities?: Quality[]
 
+  // Upgrade version of the card
+  upgradeVersion?: number
+
   // Just used by client
   text?: string
   story?: string
@@ -28,6 +31,8 @@ export default class Card {
   basePoints: number
   qualities: Quality[]
 
+  upgradeVersion: number
+
   // Only used client-side
   text: string
   story: string = ''
@@ -40,6 +45,8 @@ export default class Card {
     points = 0,
     basePoints = points,
     qualities = [],
+    upgradeVersion = 0,
+    upgradeVersion: version = 0,
 
     text = '',
     story = '',
@@ -51,6 +58,8 @@ export default class Card {
     this.points = points
     this.basePoints = basePoints
     this.qualities = qualities
+    this.upgradeVersion = upgradeVersion
+    this.upgradeVersion = version
 
     this.text = text
     this.story = story

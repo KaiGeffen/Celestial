@@ -96,14 +96,19 @@ export default class Cutout extends Button {
       )
       .setOrigin(0.5)
     const txtName = this.scene.add
-      .text(-95, 0, `${card.name}${'+'.repeat(card.version)}`, Style.cardCount)
+      .text(
+        -95,
+        0,
+        `${card.name}${'+'.repeat(card.upgradeVersion)}`,
+        Style.cardCount,
+      )
       .setOrigin(0, 0.5)
     within.add([txtCost, txtName, txtPoints])
 
     // The base scene's hint text object
     let hint: Hint = within.scene['hint']
 
-    this.name = card.name + '+'.repeat(card.version)
+    this.name = card.name + '+'.repeat(card.upgradeVersion)
     this.id = card.id
     this.card = card
 

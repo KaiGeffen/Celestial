@@ -16,6 +16,11 @@ import { raceData, raceNode } from '../data/raceData'
 import { Deck } from '../../../shared/types/deck'
 import Decklist from '../lib/decklist'
 import Card from '../../../shared/state/card'
+import {
+  encodeCardId,
+  decodeCardId,
+  getCardFromEncodedId,
+} from '../../../shared/state/cardUpgrades'
 import { CardImage } from '../lib/cardImage'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import { server } from '../server'
@@ -164,7 +169,7 @@ export default class RaceScene extends BaseScene {
     if (!this.deckDisplay) return
 
     const deckCards = this.currentDeck
-      .map((id) => Catalog.getCardById(id))
+      .map((encodedId) => getCardFromEncodedId(encodedId, Catalog))
       .filter(Boolean)
     this.deckDisplay.setDeck(deckCards)
   }
@@ -311,11 +316,12 @@ export default class RaceScene extends BaseScene {
       s: 'Select a card from your deck to replace:',
       newCardId: newCardId,
       currentDeck: [...this.currentDeck],
-      onReplacement: (oldCardId: number) => {
-        // Replace the card
+      onReplacement: (oldEncodedId: number) => {
+        // Replace the card using the encoded ID
         const deck = [...this.currentDeck]
-        const index = deck.indexOf(oldCardId)
+        const index = deck.indexOf(oldEncodedId)
         if (index !== -1) {
+          // Replace with base card ID (version 0)
           deck[index] = newCardId
         } else {
           // If card not found, just add the new card
@@ -334,34 +340,38 @@ export default class RaceScene extends BaseScene {
       title: 'Upgrade Card',
       s: 'Select a card from your deck to upgrade:',
       currentDeck: [...this.currentDeck],
-      onCardSelected: (selectedCardId: number) => {
-        // Show 3 versions of the selected card
-        this.showCardUpgradeVersions(selectedCardId)
+      onCardSelected: (selectedEncodedId: number) => {
+        // Decode to get base card ID
+        const { cardId } = decodeCardId(selectedEncodedId)
+        // Show 3 versions of the selected card, passing the encoded ID to track which copy
+        this.showCardUpgradeVersions(cardId, selectedEncodedId)
       },
     })
   }
 
   // Show 3 versions of a card to choose from
-  private showCardUpgradeVersions(cardId: number): void {
+  private showCardUpgradeVersions(
+    cardId: number,
+    encodedIdToReplace: number,
+  ): void {
     const card = Catalog.getCardById(cardId)
     if (!card) return
-
-    // For now, show 3 identical versions (no changes yet)
-    const versions = [card.id, card.id, card.id]
 
     this.scene.launch('MenuScene', {
       menu: 'raceCardUpgrade',
       title: 'Choose Upgrade',
       s: `Select an upgraded version of ${card.name}:`,
       cardId: cardId,
-      versions: versions,
-      currentDeck: [...this.currentDeck],
-      onVersionSelected: (selectedVersionId: number) => {
-        // Replace the card in deck with the upgraded version
+      onVersionSelected: (selectedCard: Card) => {
+        // Replace the specific card copy in deck with the upgraded version
         const deck = [...this.currentDeck]
-        const index = deck.indexOf(cardId)
+
+        // Find the exact encoded ID to replace
+        const index = deck.indexOf(encodedIdToReplace)
         if (index !== -1) {
-          deck[index] = selectedVersionId
+          // Encode the selected card with its version
+          const newEncodedId = encodeCardId(cardId, selectedCard.upgradeVersion)
+          deck[index] = newEncodedId
           this.currentDeck = deck
           this.updateDeckDisplay()
         }
