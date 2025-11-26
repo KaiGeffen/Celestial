@@ -8,8 +8,13 @@ import GameModel from '../gameModel'
 
 class Stars extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
+    const amt = this.upgradeVersion === 1 ? 2 : 1
     super.play(player, game, index, bonus)
-    this.inspire(1, game, player)
+    this.inspire(amt, game, player)
+
+    if (this.upgradeVersion === 2) {
+      game.draw(player, 1)
+    }
   }
 }
 const stars = new Stars({

@@ -21,9 +21,23 @@ const dove = new Dove({
 
 class Starling extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    if (game.story.acts.length > 0) {
+    const amt = this.upgradeVersion === 2 ? 3 : 1
+
+    // Check YOUR next card
+    if (this.upgradeVersion === 1) {
+      for (const act of game.story.acts) {
+        if (act.owner === player) {
+          if (act.card.cost === 1) {
+            bonus += amt
+          }
+          break
+        }
+      }
+    }
+    // Check EITHER PLAYER'S next card
+    else if (game.story.acts.length > 0) {
       if (game.story.acts[0].card.cost === 1) {
-        bonus += 1
+        bonus += amt
       }
     }
     super.play(player, game, index, bonus)

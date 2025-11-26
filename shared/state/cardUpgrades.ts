@@ -6,6 +6,7 @@ import * as birthCatalog from './catalog/birth'
 import * as visionCatalog from './catalog/vision'
 import * as starsCatalog from './catalog/stars'
 import * as waterCatalog from './catalog/water'
+import * as specialCardsCatalog from './catalog/specialCards'
 
 import Card from './card'
 
@@ -25,11 +26,32 @@ export const cardUpgrades: {
     }>
   }
 } = {
+  // BIRDS
   [birdsCatalog.dove.id]: {
     1: { cost: -1 },
     2: { points: 1 },
   },
   [birdsCatalog.starling.id]: {
+    1: { text: birdsCatalog.starling.text.replace('the next', 'your next') },
+    2: { text: birdsCatalog.starling.text.replace('+1', '+3') },
+  },
+  [birdsCatalog.secretaryBird.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birdsCatalog.phoenix.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birdsCatalog.heron.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birdsCatalog.fledgling.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birdsCatalog.nest.id]: {
     1: { cost: -1 },
     2: { points: 1 },
   },
@@ -37,11 +59,408 @@ export const cardUpgrades: {
     1: { cost: -1 },
     2: { points: 2 },
   },
+  [birdsCatalog.defiance.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birdsCatalog.layBare.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birdsCatalog.vulture.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birdsCatalog.rooster.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birdsCatalog.letGo.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+
+  // ASHES
+  [ashesCatalog.dash.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [ashesCatalog.impulse.id]: {
+    1: { points: 1 },
+    2: {
+      qualities: [],
+      text: ashesCatalog.impulse.text.replace('Fleeting\n', ''),
+    },
+  },
+  [ashesCatalog.mine.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [ashesCatalog.arsonist.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [ashesCatalog.parch.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [ashesCatalog.veteran.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [ashesCatalog.cling.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [ashesCatalog.death.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [ashesCatalog.fromAshes.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [ashesCatalog.goliath.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [ashesCatalog.firebug.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [ashesCatalog.immolant.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [ashesCatalog.spark.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+
+  // PET
+  [petCatalog.fruit.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [petCatalog.oak.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [petCatalog.bounty.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [petCatalog.pet.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [petCatalog.hollow.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [petCatalog.holdTight.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [petCatalog.yearn.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [petCatalog.pomegranate.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [petCatalog.abundance.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [petCatalog.rose.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [petCatalog.parade.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [petCatalog.meAndHer.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [petCatalog.sensualist.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+
+  // SHADOW
+  [shadowCatalog.dagger.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [shadowCatalog.shadow.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [shadowCatalog.imprison.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [shadowCatalog.nightmare.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [shadowCatalog.boa.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [shadowCatalog.hungryGhost.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [shadowCatalog.hurricane.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [shadowCatalog.wingClipping.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [shadowCatalog.sickness.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [shadowCatalog.victim.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [shadowCatalog.lostInShadow.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [shadowCatalog.vampire.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+
+  // BIRTH
+  [birthCatalog.nascence.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birthCatalog.birth.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birthCatalog.ancestry.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birthCatalog.theFuture.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birthCatalog.posterity.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birthCatalog.rebirth.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birthCatalog.cradle.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birthCatalog.uprising.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birthCatalog.storytime.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birthCatalog.pregnant.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birthCatalog.passOn.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birthCatalog.justLikeDad.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [birthCatalog.hug.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+
+  // VISION
+  [visionCatalog.dawn.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [visionCatalog.nectar.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [visionCatalog.clearView.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [visionCatalog.awakening.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [visionCatalog.enlightenment.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [visionCatalog.prey.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [visionCatalog.conquer.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [visionCatalog.timid.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [visionCatalog.balance.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [visionCatalog.riddle.id]: {
+    1: { points: 1 },
+    2: { qualities: [], text: "When played, double this card's points." },
+  },
+  [visionCatalog.bull.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [visionCatalog.lantern.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [visionCatalog.beggingBowl.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+
+  // STARS
+  [starsCatalog.stars.id]: {
+    1: { text: starsCatalog.stars.text.replace('1', '2') },
+    2: { text: starsCatalog.stars.text + '\nDraw a card.' },
+  },
+  [starsCatalog.cosmos.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [starsCatalog.nightVision.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [starsCatalog.ecology.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [starsCatalog.sun.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [starsCatalog.moon.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [starsCatalog.sunflower.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [starsCatalog.fates.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [starsCatalog.hero.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [starsCatalog.possibility.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [starsCatalog.cloakOfStars.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [starsCatalog.dreamer.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [starsCatalog.pride.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
 
   // WATER
   [waterCatalog.mercy.id]: {
     1: { text: 'Each player draws 3 cards.' },
     2: { text: 'Draw a card.' },
+  },
+  [waterCatalog.excess.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [waterCatalog.fishingBoat.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [waterCatalog.drown.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [waterCatalog.iceberg.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [waterCatalog.dew.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [waterCatalog.gentleRain.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [waterCatalog.refresh.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [waterCatalog.fish.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [waterCatalog.cloud.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [waterCatalog.gainAndLoss.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [waterCatalog.damBreaks.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [waterCatalog.overflow.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+
+  // SPECIAL
+  [specialCardsCatalog.paramountcy.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
   },
 }
 
