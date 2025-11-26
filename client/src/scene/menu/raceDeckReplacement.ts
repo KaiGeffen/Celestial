@@ -8,7 +8,8 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Catalog from '../../../../shared/state/catalog'
 import Decklist from '../../lib/decklist'
 import newScrollablePanel from '../../lib/scrollablePanel'
-import { getCardFromEncodedId } from '../../../../shared/state/cardUpgrades'
+import { getCardWithVersion } from '../../../../shared/state/cardUpgrades'
+import { Deck } from '../../../../shared/types/deck'
 
 const width = 900
 
@@ -20,7 +21,7 @@ export default class RaceDeckReplacementMenu extends Menu {
     this.createText('Select a card from your deck to replace:')
 
     const newCardId: number = params.newCardId
-    const currentDeck: number[] = params.currentDeck || []
+    const currentDeck: Deck = params.currentDeck
     const onReplacement = params.onReplacement
 
     // Create horizontal sizer for new card and decklist side by side
@@ -57,30 +58,31 @@ export default class RaceDeckReplacementMenu extends Menu {
   }
 
   private createDeckSelection(
-    currentDeck: number[],
-    onReplacement: (encodedId: number) => void,
+    currentDeck: Deck,
+    onReplacement: (index: number) => void,
   ): any {
     // Create a decklist to show current deck
-    // Store mapping of card to encoded ID for replacement
-    const cardToEncodedId = new Map<Card, number>()
+    // Store mapping of card to index for replacement
+    const cardToIndex = new Map<Card, number>()
 
     const decklist = new Decklist(this.scene as any, (cutout) => {
       return () => {
-        // When a card is clicked, replace it using the encoded ID
-        const encodedId = cardToEncodedId.get(cutout.card)
-        if (encodedId !== undefined) {
-          onReplacement(encodedId)
+        // When a card is clicked, replace it using the index
+        const index = cardToIndex.get(cutout.card)
+        if (index !== undefined) {
+          onReplacement(index)
           this.close()
         }
       }
     })
 
-    // Set the deck - decode encoded IDs to get Card objects
-    const deckCards = currentDeck
-      .map((encodedId) => {
-        const card = getCardFromEncodedId(encodedId, Catalog)
+    // Set the deck - get Card objects with their versions
+    const deckCards = currentDeck.cards
+      .map((cardId, index) => {
+        const version = currentDeck.cardUpgrades?.[index] || 0
+        const card = getCardWithVersion(cardId, version, Catalog)
         if (card) {
-          cardToEncodedId.set(card, encodedId)
+          cardToIndex.set(card, index)
         }
         return card
       })

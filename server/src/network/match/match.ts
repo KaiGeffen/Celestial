@@ -10,6 +10,7 @@ import Catalog from '../../../../shared/state/catalog'
 import { AchievementManager } from '../../achievementManager'
 import { randomUUID } from 'crypto'
 import sendUserData from '../sendUserData'
+import { getCardWithVersion } from '../../../../shared/state/cardUpgrades'
 
 // TODO Timer logic for disconnects
 
@@ -52,9 +53,23 @@ class Match implements Match {
 
     // Make a new game
     this.game = new ServerController()
+    // Convert deck cards with their upgrade versions to Card objects
+    // Default to version 0 (base) if cardUpgrades not provided
+    const deck1Cards = deck1.cards
+      .map((cardId, index) => {
+        const version = deck1.cardUpgrades?.[index] || 0
+        return getCardWithVersion(cardId, version, Catalog)
+      })
+      .filter(Boolean)
+    const deck2Cards = deck2.cards
+      .map((cardId, index) => {
+        const version = deck2.cardUpgrades?.[index] || 0
+        return getCardWithVersion(cardId, version, Catalog)
+      })
+      .filter(Boolean)
     this.game.startGame(
-      deck1.cards.map((cardId) => Catalog.getCardById(cardId)),
-      deck2.cards.map((cardId) => Catalog.getCardById(cardId)),
+      deck1Cards,
+      deck2Cards,
       deck1.cosmeticSet,
       deck2.cosmeticSet,
     )

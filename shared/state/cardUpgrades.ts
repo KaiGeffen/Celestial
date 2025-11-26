@@ -21,33 +21,6 @@ export const cardUpgrades: {
 }
 
 /**
- * Encodes a card ID and version into a single number for storage
- * Encoding: base ID for version 0, negative for version 1, base + 10000 for version 2
- */
-export function encodeCardId(cardId: number, version: number): number {
-  if (version === 0) return cardId
-  if (version === 1) return -cardId
-  if (version === 2) return cardId + 10000
-  return cardId
-}
-
-/**
- * Decodes a stored card ID back to base ID and version
- */
-export function decodeCardId(encodedId: number): {
-  cardId: number
-  version: number
-} {
-  if (encodedId < 0) {
-    return { cardId: -encodedId, version: 1 }
-  }
-  if (encodedId >= 10000) {
-    return { cardId: encodedId - 10000, version: 2 }
-  }
-  return { cardId: encodedId, version: 0 }
-}
-
-/**
  * Creates an upgraded version of a card
  * @param baseCard - The base card to upgrade
  * @param version - The version number (0 = base, 1 = upgrade 1, 2 = upgrade 2)
@@ -112,13 +85,13 @@ export function getAllCardVersions(baseCard: Card): Card[] {
 }
 
 /**
- * Converts an encoded card ID to a Card object with the correct version
+ * Converts a card ID and version to a Card object with the correct version
  */
-export function getCardFromEncodedId(
-  encodedId: number,
+export function getCardWithVersion(
+  cardId: number,
+  version: number,
   catalog: any,
 ): Card | null {
-  const { cardId, version } = decodeCardId(encodedId)
   const baseCard = catalog.getCardById(cardId)
   if (!baseCard) return null
   return createUpgradedCard(baseCard, version)
