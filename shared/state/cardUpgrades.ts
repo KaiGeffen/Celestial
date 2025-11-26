@@ -1,22 +1,32 @@
+import { dove, starling, truth } from './catalog/birds'
+
 import Card from './card'
 
 // Upgrade registry: maps cardId -> version -> modifications
 // Version 0 is base card, 1 and 2 are upgrades
+// cost and points are relative changes (e.g., -1 means 1 less, +1 means 1 more)
+// text and qualities are absolute replacements
 export const cardUpgrades: {
   [cardId: number]: {
     [version: number]: Partial<{
       cost: number
       points: number
-      basePoints: number
       text: string
       qualities: any[]
     }>
   }
 } = {
-  // Dove (id: 4)
-  4: {
-    1: { cost: 0 }, // Version 1: cost becomes 0
-    2: { points: 2 }, // Version 2: points becomes 2
+  [dove.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [starling.id]: {
+    1: { cost: -1 },
+    2: { points: 1 },
+  },
+  [truth.id]: {
+    1: { cost: -1 },
+    2: { points: 2 },
   },
 }
 
@@ -49,18 +59,20 @@ export function createUpgradedCard(baseCard: Card, version: number): Card {
   const upgradedCard = baseCard.copy()
 
   // Apply modifications
+  // Cost is relative (add/subtract from base)
   if (modifications.cost !== undefined) {
-    upgradedCard.cost = modifications.cost
+    upgradedCard.cost = baseCard.cost + modifications.cost
   }
+  // Points is relative and affects both points and basePoints
   if (modifications.points !== undefined) {
-    upgradedCard.points = modifications.points
+    upgradedCard.points = baseCard.points + modifications.points
+    upgradedCard.basePoints = baseCard.basePoints + modifications.points
   }
-  if (modifications.basePoints !== undefined) {
-    upgradedCard.basePoints = modifications.basePoints
-  }
+  // Text is absolute replacement
   if (modifications.text !== undefined) {
     upgradedCard.text = modifications.text
   }
+  // Qualities is absolute replacement
   if (modifications.qualities !== undefined) {
     upgradedCard.qualities = [...modifications.qualities]
   }
