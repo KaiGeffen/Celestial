@@ -29,7 +29,11 @@ export const cardUpgrades: {
   // BIRDS
   [birdsCatalog.dove.id]: {
     1: { cost: -1 },
-    2: { points: 1 },
+    2: {
+      text:
+        birdsCatalog.dove.text +
+        '\nPut the top card with base cost 1 from your deck into your hand.',
+    },
   },
   [birdsCatalog.starling.id]: {
     1: { text: birdsCatalog.starling.text.replace('the next', 'your next') },
@@ -105,8 +109,14 @@ export const cardUpgrades: {
     2: { points: 1 },
   },
   [ashesCatalog.veteran.id]: {
-    1: { cost: -1 },
-    2: { points: 1 },
+    1: {
+      points: -4,
+      cost: 1,
+      text: 'Worth +1 for each card in your discard pile.',
+    },
+    2: {
+      text: ashesCatalog.veteran.text.replace('Worth +3', 'Double your points'),
+    },
   },
   [ashesCatalog.cling.id]: {
     1: { cost: -1 },

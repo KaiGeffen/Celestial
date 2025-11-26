@@ -116,11 +116,21 @@ const parch = new Parch({
 
 class Veteran extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    if (game.pile[player].length >= 8) {
-      bonus += 3
+    switch (this.upgradeVersion) {
+      case 0:
+        bonus += game.pile[player].length >= 8 ? 3 : 0
+        break
+      case 1:
+        bonus += game.pile[player].length
+        break
     }
 
     super.play(player, game, index, bonus)
+
+    // Upgrade 2: Double if at least 8 cards
+    if (this.upgradeVersion === 2 && game.pile[player].length >= 8) {
+      game.score[player] *= 2
+    }
   }
 
   ratePlay(world: GameModel): number {

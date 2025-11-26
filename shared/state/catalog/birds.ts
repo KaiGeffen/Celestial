@@ -7,6 +7,11 @@ import { Animation } from '../../animation'
 class Dove extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
+
+    // Tutor a 1
+    if (this.upgradeVersion === 2) {
+      game.tutor(player, 1)
+    }
   }
 }
 const dove = new Dove({
