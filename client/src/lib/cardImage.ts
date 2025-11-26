@@ -207,7 +207,10 @@ export class CardImage {
 
   // Set this to be the given card, if it isn't already
   setCard(card: Card): this {
-    if (this.card.id !== card.id) {
+    if (
+      this.card.id !== card.id ||
+      this.card.upgradeVersion !== card.upgradeVersion
+    ) {
       this.card = card
 
       // Destroy each of the existing elements
