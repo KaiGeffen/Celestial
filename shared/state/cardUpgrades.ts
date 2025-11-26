@@ -1,6 +1,15 @@
-import { dove, starling, truth } from './catalog/birds'
+import * as birdsCatalog from './catalog/birds'
+import * as ashesCatalog from './catalog/ashes'
+import * as petCatalog from './catalog/pet'
+import * as shadowCatalog from './catalog/shadow'
+import * as birthCatalog from './catalog/birth'
+import * as visionCatalog from './catalog/vision'
+import * as starsCatalog from './catalog/stars'
+import * as waterCatalog from './catalog/water'
 
 import Card from './card'
+
+// TODO Make the text for card's include escapes such that it translates for each upgrade from the single string (Ex: "Each player draws ${1 + upgradeVersion} cards.")
 
 // Upgrade registry: maps cardId -> version -> modifications
 // Version 0 is base card, 1 and 2 are upgrades
@@ -16,17 +25,23 @@ export const cardUpgrades: {
     }>
   }
 } = {
-  [dove.id]: {
+  [birdsCatalog.dove.id]: {
     1: { cost: -1 },
     2: { points: 1 },
   },
-  [starling.id]: {
+  [birdsCatalog.starling.id]: {
     1: { cost: -1 },
     2: { points: 1 },
   },
-  [truth.id]: {
+  [birdsCatalog.truth.id]: {
     1: { cost: -1 },
     2: { points: 2 },
+  },
+
+  // WATER
+  [waterCatalog.mercy.id]: {
+    1: { text: 'Each player draws 3 cards.' },
+    2: { text: 'Draw a card.' },
   },
 }
 

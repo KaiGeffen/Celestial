@@ -4,10 +4,15 @@ import { Keywords } from '../keyword'
 
 class Mercy extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
+    const amt = this.upgradeVersion === 1 ? 3 : 1
     super.play(player, game, index, bonus)
 
-    for (let i = 0; i < 2; i++) {
-      game.draw(i, 1)
+    // You draw
+    game.draw(player, amt)
+
+    // Opponent draw
+    if (this.upgradeVersion !== 2) {
+      game.draw(player ^ 1, amt)
     }
   }
 }

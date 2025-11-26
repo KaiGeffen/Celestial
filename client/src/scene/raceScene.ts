@@ -16,12 +16,7 @@ import { raceData, raceNode } from '../data/raceData'
 import { Deck } from '../../../shared/types/deck'
 import Decklist from '../lib/decklist'
 import Card from '../../../shared/state/card'
-import {
-  getCardWithVersion,
-  createUpgradedCard,
-} from '../../../shared/state/cardUpgrades'
-import { CardImage } from '../lib/cardImage'
-import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
+import { getCardWithVersion } from '../../../shared/state/cardUpgrades'
 import { server } from '../server'
 import newScrollablePanel from '../lib/scrollablePanel'
 

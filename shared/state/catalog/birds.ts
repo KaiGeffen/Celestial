@@ -1,7 +1,6 @@
 import Card from '../card'
 import { Quality } from '../quality'
 import GameModel from '../gameModel'
-import { Keywords } from '../keyword'
 import { Zone } from '../zone'
 import { Animation } from '../../animation'
 
