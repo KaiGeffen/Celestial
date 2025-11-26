@@ -155,12 +155,18 @@ export default class Decklist {
     newCutout.setOnClick(this.cutoutClickCallback(newCutout))
 
     // Add at the right index
+    // Sort order: cost (ascending) -> name (ascending) -> upgrade version (ascending)
+    // This ensures base versions (upgradeVersion 0) appear before + (1) and ++ (2)
+    // Example: "Dove", "Dove+", "Dove++", "Yearn" will appear in that order
     for (let i = 0; i < this.cutouts.length; i++) {
       const cutoutI = this.cutouts[i]
 
       if (
         cutoutI.card.cost > card.cost ||
-        (cutoutI.card.cost === card.cost && cutoutI.card.name > card.name)
+        (cutoutI.card.cost === card.cost &&
+          (cutoutI.card.name > card.name ||
+            (cutoutI.card.name === card.name &&
+              (cutoutI.card.upgradeVersion || 0) > (card.upgradeVersion || 0))))
       ) {
         this.sizer.insert(i, container).layout()
 
