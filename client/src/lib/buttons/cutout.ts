@@ -80,16 +80,6 @@ export default class Cutout extends Button {
       },
     })
 
-    // FOR TESTING TODO Flag to include
-    if (!this.scene.game.textures.exists(`cutout-${card.name}`)) {
-      const s = `${card.name} - ${card.cost}:${card.points}`
-      const txt = this.scene.add
-        .text(0, 0, s, Style.cardCount)
-        .setWordWrapWidth(Space.cardWidth)
-        .setOrigin(0.5, 0.5)
-      within.add(txt)
-    }
-
     // Cost and points of the card
     const txtCost = this.scene.add.rexBBCodeText(
       -164,
@@ -97,7 +87,6 @@ export default class Cutout extends Button {
       `[stroke=#353F4E]${card.cost}[/stroke]`,
       BBStyle.cardCost,
     )
-    within.add(txtCost)
     const txtPoints = this.scene.add
       .rexBBCodeText(
         -121,
@@ -106,13 +95,15 @@ export default class Cutout extends Button {
         BBStyle.cardPoints,
       )
       .setOrigin(0.5)
-    within.add(txtPoints)
+    const txtName = this.scene.add
+      .text(-95, 0, `${card.name}${'+'.repeat(card.version)}`, Style.cardCount)
+      .setOrigin(0, 0.5)
+    within.add([txtCost, txtName, txtPoints])
 
     // The base scene's hint text object
     let hint: Hint = within.scene['hint']
 
-    // Set variables
-    this.name = card.name
+    this.name = card.name + '+'.repeat(card.version)
     this.id = card.id
     this.card = card
 
