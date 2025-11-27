@@ -86,14 +86,22 @@ export const cardUpgrades: {
 
   // ASHES
   [ashesCatalog.dash.id]: {
-    1: { cost: -1 },
-    2: { points: 1 },
+    1: {
+      text:
+        'When played, discard a card, then draw a card.\n' +
+        ashesCatalog.dash.text,
+    },
+    2: {
+      text: 'Create an Ashes in your discard pile for each card before this in the story.',
+    },
   },
   [ashesCatalog.impulse.id]: {
-    1: { text: ashesCatalog.impulse.text.replace('two Ashes', 'three Ashes') },
+    1: { cost: -1 },
     2: {
-      qualities: [],
-      text: ashesCatalog.impulse.text.replace('Fleeting\n', ''),
+      text: ashesCatalog.impulse.text.replace(
+        'your discard pile',
+        "your opponent's hand",
+      ),
     },
   },
   [ashesCatalog.mine.id]: {
@@ -102,7 +110,10 @@ export const cardUpgrades: {
   },
   [ashesCatalog.arsonist.id]: {
     1: { cost: -1 },
-    2: { points: 1 },
+    2: {
+      qualities: [],
+      text: 'When played, transform cards with base cost less than 4 in your hand into Arsonist.',
+    },
   },
   [ashesCatalog.parch.id]: {
     1: { cost: -1 },

@@ -7,8 +7,23 @@ import GameModel from '../gameModel'
 
 class Dash extends Card {
   play(player: number, game: GameModel, index: number, bonus: number): void {
-    bonus -= index
+    if (this.upgradeVersion !== 2) {
+      bonus -= index
+    }
+
     super.play(player, game, index, bonus)
+
+    if (this.upgradeVersion === 2) {
+      // Create an Ashes for each card before this
+      for (let i = 0; i < index; i++) {
+        game.createInPile(player, ashes)
+      }
+    }
+  }
+
+  onPlay(player: number, game: GameModel) {
+    game.discard(player)
+    game.draw(player)
   }
 
   ratePlay(world: GameModel): number {
@@ -26,12 +41,18 @@ const dash = new Dash({
 
 class Impulse extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    const amt = this.upgradeVersion === 1 ? 3 : 2
-
     super.play(player, game, index, bonus)
 
-    for (let i = 0; i < amt; i++) {
-      game.createInPile(player, ashes)
+    if (this.upgradeVersion === 2) {
+      game.createOnDeck(player ^ 1, ashes)
+    }
+
+    for (let i = 0; i < 2; i++) {
+      if (this.upgradeVersion !== 2) {
+        game.createInPile(player, ashes)
+      } else {
+        game.createOnDeck(player ^ 1, ashes)
+      }
     }
   }
 }
@@ -69,6 +90,17 @@ class Arsonist extends Card {
 
     for (let i = 0; i < 3; i++) {
       game.createInPile(player, ashes)
+    }
+  }
+
+  onPlay(player: number, game: GameModel) {
+    if (this.upgradeVersion === 2) {
+      for (let i = 0; i < game.hand[player].length; i++) {
+        const card = game.hand[player][i]
+        if (card.cost < 4) {
+          game.hand[player][i] = arsonist
+        }
+      }
     }
   }
 }
