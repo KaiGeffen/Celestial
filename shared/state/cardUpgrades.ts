@@ -90,7 +90,7 @@ export const cardUpgrades: {
     2: { points: 1 },
   },
   [ashesCatalog.impulse.id]: {
-    1: { points: 1 },
+    1: { text: ashesCatalog.impulse.text.replace('two Ashes', 'three Ashes') },
     2: {
       qualities: [],
       text: ashesCatalog.impulse.text.replace('Fleeting\n', ''),

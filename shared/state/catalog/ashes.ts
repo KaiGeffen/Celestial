@@ -26,9 +26,11 @@ const dash = new Dash({
 
 class Impulse extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
+    const amt = this.upgradeVersion === 1 ? 3 : 2
+
     super.play(player, game, index, bonus)
 
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < amt; i++) {
       game.createInPile(player, ashes)
     }
   }
