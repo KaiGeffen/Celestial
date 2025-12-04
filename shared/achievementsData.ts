@@ -140,4 +140,40 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
     description: 'Access the Discord server.',
     goldReward: 7500,
   },
+  1004: {
+    title: 'Birds Border',
+    description: 'Let go',
+    image: 'border-Birds',
+    borderUnlock: 4,
+  },
+  1005: {
+    title: 'Ashes Border',
+    description: 'It all burns down',
+    image: 'border-Ashes',
+    borderUnlock: 5,
+  },
+  1006: {
+    title: 'Birth Border',
+    description: 'Ancestor above watch over me',
+    image: 'border-Birth',
+    borderUnlock: 6,
+  },
+  1007: {
+    title: 'Vision Border',
+    description: 'All four season',
+    image: 'border-Vision',
+    borderUnlock: 7,
+  },
+  1008: {
+    title: 'Water Border',
+    description: 'Splash!',
+    image: 'border-Water',
+    borderUnlock: 8,
+  },
+  1009: {
+    title: 'Stars Border',
+    description: 'The constellations',
+    image: 'border-Stars',
+    borderUnlock: 9,
+  },
 }

@@ -364,10 +364,16 @@ export const assetLists = {
   },
   "border": {
     "files": [
+      "Ashes",
+      "Birds",
+      "Birth",
       "Grape",
       "None",
       "Shadow",
-      "Thorns"
+      "Stars",
+      "Thorns",
+      "Vision",
+      "Water"
     ],
     "pixelArt": true
   },

@@ -4,7 +4,18 @@ import avatarNames from '../../data/avatarNames'
 import { Color, Time } from '../../settings/settings'
 
 // TODO As this grows move it to another file
-const borderNames = ['None', 'Thorns', 'Grape', 'Shadow']
+const borderNames = [
+  'None',
+  'Thorns',
+  'Grape',
+  'Shadow',
+  'Birds',
+  'Ashes',
+  'Birth',
+  'Vision',
+  'Water',
+  'Stars',
+]
 
 // Used when selected an avatar, when editing an avatar, and in a match
 export default class AvatarButton extends Button {
