@@ -20,6 +20,7 @@ export default class UserProfileMenu extends Menu {
   private currentTab: string = 'Icon'
   private currentAvatar: AvatarButton
   private gridSizer: GridSizer // Store reference to grid sizer
+  private gridContainer: any // Container that holds the grid sizer (RexUI sizer)
 
   // The home scene, which is closed when logging out
   private activeScene: BaseScene
@@ -178,9 +179,37 @@ export default class UserProfileMenu extends Menu {
 
   // Right column - grid of choices
   private createRightColumn() {
+    // Create a sizer container to hold the grid sizer (which will be recreated dynamically)
+    this.gridContainer = this.scene.rexUI.add.sizer({
+      width: Space.avatarSize * 3 + Space.pad * 4,
+      height: 600,
+    })
+
+    this.updateGridContent()
+    this.sizer.add(this.gridContainer)
+  }
+
+  private updateGridContent() {
+    // Clear existing grid sizer from container
+    if (this.gridSizer) {
+      this.gridContainer.remove(this.gridSizer, true)
+      this.gridSizer = null
+    }
+
+    // Calculate number of rows needed based on current tab
+    let rows = 2 // Default for Relic tab
+    if (this.currentTab === 'Icon') {
+      const unlockedAvatars = getUnlockedAvatars()
+      rows = Math.max(2, Math.ceil(unlockedAvatars.length / 3))
+    } else if (this.currentTab === 'Border') {
+      const unlockedBorders = getUnlockedBorders()
+      rows = Math.max(2, Math.ceil(unlockedBorders.length / 3))
+    }
+
+    // Create new grid sizer with correct number of rows
     this.gridSizer = this.scene.rexUI.add.gridSizer({
       column: 3,
-      row: 2,
+      row: rows,
       width: Space.avatarSize * 3 + Space.pad * 4,
       height: 600,
       space: {
@@ -193,14 +222,11 @@ export default class UserProfileMenu extends Menu {
       },
     })
 
-    this.updateGridContent()
-    this.sizer.add(this.gridSizer)
-  }
+    // Add grid sizer to container
+    this.gridContainer.add(this.gridSizer)
+    this.gridContainer.layout()
 
-  private updateGridContent() {
-    // Clear existing content
-    this.gridSizer.removeAll(true)
-
+    // Populate grid based on current tab
     if (this.currentTab === 'Icon') {
       this.createIconGrid()
     } else if (this.currentTab === 'Border') {
