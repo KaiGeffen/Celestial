@@ -7,8 +7,9 @@ import { Animation, Visibility } from '../../animation'
 
 class Dagger extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
+    const amt = this.upgradeVersion === 2 ? 2 : 1
+    game.discard(player ^ 1, amt)
     super.play(player, game, index, bonus)
-    game.discard(player ^ 1)
   }
 
   ratePlay(world: GameModel): number {
@@ -25,6 +26,13 @@ const dagger = new Dagger({
 })
 
 class Shadow extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    if (this.upgradeVersion === 2) {
+      game.draw(player)
+    }
+  }
+
   getCost(player: number, game: GameModel): number {
     return game.hand[player ^ 1].length
   }
@@ -45,10 +53,17 @@ const shadow = new Shadow({
 
 class Imprison extends Card {
   onRoundEndIfThisResolved(player: number, game: GameModel) {
-    // If opponent had 2 or fewer points
-    if (game.score[player ^ 1] <= 2) {
-      // Give them Nourish -1
-      game.status[player ^ 1].nourish -= 1
+    console.log('imprison', this.upgradeVersion)
+    if (this.upgradeVersion === 1) {
+      // Unless opponent won, give them nourish -2
+      if (game.score[player] >= game.score[player ^ 1]) {
+        game.status[player ^ 1].nourish += -2
+      }
+    } else {
+      // If opponent had 2 or fewer points, give them nourish -1
+      if (game.score[player ^ 1] <= 2) {
+        game.status[player ^ 1].nourish += -1
+      }
     }
   }
 }

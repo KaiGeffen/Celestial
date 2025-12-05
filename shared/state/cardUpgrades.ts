@@ -36,7 +36,12 @@ export const cardUpgrades: {
     },
   },
   [birdsCatalog.starling.id]: {
-    1: { text: birdsCatalog.starling.text.replace('the next', 'your next') },
+    1: {
+      text: birdsCatalog.starling.text.replace(
+        'if the next card in the story has',
+        'for each card later in the story with',
+      ),
+    },
     2: { text: birdsCatalog.starling.text.replace('+1', '+3') },
   },
   [birdsCatalog.secretaryBird.id]: {
@@ -214,19 +219,28 @@ export const cardUpgrades: {
 
   // SHADOW
   [shadowCatalog.dagger.id]: {
-    1: { cost: -1 },
-    2: { points: 1 },
+    1: { points: 1 },
+    2: {
+      text: shadowCatalog.dagger.text.replace('a card', '2 cards'),
+    },
   },
   [shadowCatalog.shadow.id]: {
-    1: { cost: -1 },
-    2: { points: 1 },
+    1: { points: 2 },
+    2: { text: shadowCatalog.shadow.text + '\nDraw a card.' },
   },
   [shadowCatalog.imprison.id]: {
-    1: { cost: -1 },
-    2: { points: 1 },
+    1: {
+      text: 'If your opponent loses or ties this round, give them Nourish -2.',
+    },
+    2: { cost: -2, points: -2 },
   },
   [shadowCatalog.nightmare.id]: {
-    1: { cost: -1 },
+    1: {
+      text: shadowCatalog.nightmare.text.replace(
+        '.',
+        ' and double its points permanently.',
+      ),
+    },
     2: { points: 1 },
   },
   [shadowCatalog.boa.id]: {

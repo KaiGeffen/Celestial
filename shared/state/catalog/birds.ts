@@ -28,14 +28,11 @@ class Starling extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     const amt = this.upgradeVersion === 2 ? 3 : 1
 
-    // Check YOUR next card
+    // Check all cards later in the story
     if (this.upgradeVersion === 1) {
       for (const act of game.story.acts) {
-        if (act.owner === player) {
-          if (act.card.cost === 1) {
-            bonus += amt
-          }
-          break
+        if (act.card.cost === 1) {
+          bonus += amt
         }
       }
     }

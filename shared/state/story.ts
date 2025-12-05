@@ -38,7 +38,11 @@ class Story {
       game.sound = SoundEffect.Resolve
 
       act.card.play(act.owner, game, index, 0)
-      roundEndEffects.push([act.card.onRoundEndIfThisResolved, act.owner])
+      roundEndEffects.push([
+        // NOTE Preserver this to be the card
+        act.card.onRoundEndIfThisResolved.bind(act.card),
+        act.owner,
+      ])
 
       // Put in pile or remove from game if Fleeting
       if (act.card.name === 'Pet') {

@@ -46,7 +46,6 @@ export default class Card {
     basePoints = points,
     qualities = [],
     upgradeVersion = 0,
-    upgradeVersion: version = 0,
 
     text = '',
     story = '',
@@ -59,7 +58,6 @@ export default class Card {
     this.basePoints = basePoints
     this.qualities = qualities
     this.upgradeVersion = upgradeVersion
-    this.upgradeVersion = version
 
     this.text = text
     this.story = story
