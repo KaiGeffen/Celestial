@@ -13,6 +13,7 @@ import sendUserData from '../sendUserData'
 import { getCardWithVersion } from '../../../../shared/state/cardUpgrades'
 
 // TODO Timer logic for disconnects
+// TODO Remove isPVP
 
 interface Match {
   gameId: string
@@ -26,7 +27,6 @@ interface Match {
   deck2: Deck
 
   game: ServerController
-  isPvp: boolean
 }
 
 class Match implements Match {
@@ -47,9 +47,6 @@ class Match implements Match {
 
     this.deck1 = deck1
     this.deck2 = deck2
-
-    // isPvp is true if uuid2 is not null (i.e., there's a real player 2)
-    this.isPvp = uuid2 !== null
 
     // Make a new game
     this.game = new ServerController()
@@ -154,18 +151,7 @@ class Match implements Match {
       await this.updateDatabases()
 
       // Update achievements
-      await AchievementManager.onGamePlayed(
-        this.uuid1,
-        this.game.model,
-        this.isPvp,
-        0,
-      )
-      await AchievementManager.onGamePlayed(
-        this.uuid2,
-        this.game.model,
-        this.isPvp,
-        1,
-      )
+      this.updateAchievements()
 
       // Inform users of their new state
       await sendUserData(this.ws1, this.uuid1)
@@ -265,6 +251,9 @@ class Match implements Match {
       return { username: '', elo: 0 }
     }
   }
+
+  // Update all player achievements
+  protected async updateAchievements() {}
 }
 
 export default Match

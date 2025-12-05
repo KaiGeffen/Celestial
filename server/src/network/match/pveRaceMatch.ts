@@ -84,10 +84,6 @@ class PveMatch extends Match {
     // Update achievements
     await AchievementManager.onGamePlayed(this.uuid1, this.game.model, false, 0)
   }
-
-  protected async updateAchievements() {
-    await AchievementManager.onGamePlayed(this.uuid1, this.game.model, false, 0)
-  }
 }
 
 export default PveMatch

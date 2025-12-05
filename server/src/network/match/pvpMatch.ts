@@ -3,6 +3,7 @@ import { ServerWS } from '../../../../shared/network/celestialTypedWebsocket'
 import { updateMatchResultPVP } from '../../db/updateMatchResult'
 import { Deck } from '../../../../shared/types/deck'
 import { MechanicsSettings } from '../../../../shared/settings'
+import { AchievementManager } from '../../achievementManager'
 
 class PvpMatch extends Match {
   timerCheckInterval: NodeJS.Timeout
@@ -129,6 +130,11 @@ class PvpMatch extends Match {
         }
       }
     }, 1000)
+  }
+
+  protected async updateAchievements() {
+    await AchievementManager.onGamePlayed(this.uuid1, this.game.model, true, 0)
+    await AchievementManager.onGamePlayed(this.uuid2, this.game.model, true, 1)
   }
 }
 
