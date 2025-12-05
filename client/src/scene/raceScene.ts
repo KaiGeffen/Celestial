@@ -217,6 +217,8 @@ export default class RaceScene extends BaseScene {
         nodeType = 'Mission'
       } else if ('cardChoices' in node) {
         nodeType = 'QuestionMark'
+      } else if ('info' in node) {
+        nodeType = 'QuestionMark'
       } else {
         // Upgrade card node
         nodeType = 'QuestionMark'
@@ -244,13 +246,16 @@ export default class RaceScene extends BaseScene {
       } else if ('opponent' in node) {
         // Type 2: Start a PVE match with current deck
         this.startPVEMatch(node.opponent)
-      } else if ('cardChoices' in node) {
-        // Type 3: Show choice of 3 random cards, click one to replace a card in deck
-        this.showCardChoice()
-      } else {
-        // Type 4: Upgrade a card - select from deck, then choose from 3 versions
-        this.showUpgradeCard()
-      }
+        } else if ('cardChoices' in node) {
+          // Type 3: Show choice of 3 random cards, click one to replace a card in deck
+          this.showCardChoice()
+        } else if ('info' in node) {
+          // Type 5: Show informational message
+          this.showInfoMessage(node.info)
+        } else {
+          // Type 4: Upgrade a card - select from deck, then choose from 3 versions
+          this.showUpgradeCard()
+        }
     }
   }
 
@@ -372,6 +377,15 @@ export default class RaceScene extends BaseScene {
         // Show 3 versions of the selected card, passing the index to track which copy
         this.showCardUpgradeVersions(cardId, index)
       },
+    })
+  }
+
+  // Type 5: Show informational message
+  private showInfoMessage(message: string): void {
+    this.scene.launch('MenuScene', {
+      menu: 'message',
+      title: 'Race Mode Guide',
+      s: message,
     })
   }
 

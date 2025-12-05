@@ -24,7 +24,17 @@ interface CardChoiceNode extends RaceBase {
 // Type 4: Upgrade a card - select a card from deck, then choose from 3 versions
 interface UpgradeCardNode extends RaceBase {}
 
-export type raceNode = DeckNode | MatchNode | CardChoiceNode | UpgradeCardNode
+// Type 5: Info node - shows an informational message
+interface InfoNode extends RaceBase {
+  info: string
+}
+
+export type raceNode =
+  | DeckNode
+  | MatchNode
+  | CardChoiceNode
+  | UpgradeCardNode
+  | InfoNode
 
 // Example race data - you can customize this
 export const raceData: raceNode[] = [
@@ -35,17 +45,17 @@ export const raceData: raceNode[] = [
     deck: [61, 12, 12, 7, 7, 7, 7, 7, 4, 4, 4, 4, 4, 4, 4],
   },
   {
-    x: 400,
+    x: 300,
     y: 300,
     deck: [17, 17, 17, 14, 14, 6, 6, 3, 3, 3, 3, 3, 3, 0, 0],
   },
   {
-    x: 600,
+    x: 400,
     y: 300,
     deck: [1, 1, 1, 1, 1, 1, 19, 19, 19, 19, 68, 68, 68, 35, 35],
   },
   {
-    x: 800,
+    x: 500,
     y: 300,
     deck: [0, 0, 78, 78, 78, 33, 33, 33, 33, 34, 34, 11, 11, 11, 11],
   },
@@ -102,5 +112,20 @@ export const raceData: raceNode[] = [
   {
     x: 1000,
     y: 400,
+  },
+  // Type 5: Info node - explains the race map layout
+  {
+    x: 500,
+    y: 200,
+    info: `Race Mode Layout:
+
+Top Row: Select a starting deck from the available options.
+
+Right Side: Upgrade cards or choose new cards to replace in your deck.
+
+Bottom Row: Enter matches to test your deck. The leftmost match is the easiest, with difficulty increasing as you move right.
+
+We're thinking you replace after each match, and get an upgrade choice every couple matches, but feel free to experiment and find out what you like :)
+-Kai`,
   },
 ]
