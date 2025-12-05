@@ -79,7 +79,7 @@ export default class Decklist {
   }
 
   // Set the deck to the given cards
-  setDeck(deck: Card[]) {
+  setDeck(deck: Card[], mustOwn = false) {
     // Remove the current deck
     this.cutouts.forEach((cutout) => cutout.destroy())
     this.cutouts = []
@@ -102,7 +102,7 @@ export default class Decklist {
     }
 
     // Signal to user if they're missing any cards
-    if (someCardsNotOwned) {
+    if (someCardsNotOwned && mustOwn) {
       this.scene.signalError("You don't own some of those cards.")
     }
 
