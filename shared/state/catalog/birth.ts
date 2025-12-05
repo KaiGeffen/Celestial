@@ -221,7 +221,7 @@ const justLikeDad = new JustLikeDad({
 class Hug extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     if (game.story.acts.length > 0 && game.story.acts[0].owner === player) {
-      bonus += 2
+      bonus += 1
     }
     super.play(player, game, index, bonus)
   }
@@ -230,8 +230,8 @@ const hug = new Hug({
   name: 'Hug',
   id: 86,
   cost: 2,
-  points: 1,
-  text: 'Worth +2 if the next card in the story is yours.',
+  points: 2,
+  text: 'Worth +1 if the next card in the story is yours.',
 })
 
 export {

@@ -242,7 +242,7 @@ const dreamer = new Dreamer({
 
 class Pride extends Card {
   onMorning(player: number, game: GameModel, index: number) {
-    if (super.exhale(2, game, player)) {
+    if (super.exhale(1, game, player)) {
       game.pile[player].splice(index, 1)
       game.createInStory(player, this)
       game.discard(player)
@@ -255,7 +255,7 @@ const pride = new Pride({
   id: 98,
   cost: 3,
   points: 3,
-  text: 'Morning: Exhale 2: Add this to the story. Discard a card.',
+  text: 'Morning: Exhale 1: Add this to the story. Discard a card.',
 })
 
 export {

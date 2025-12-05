@@ -56,7 +56,7 @@ class Pet extends Card {
       id: 34,
       cost: 2,
       points,
-      basePoints: 1,
+      basePoints: 2,
       text,
     })
   }
@@ -70,7 +70,7 @@ class Pet extends Card {
     super.play(player, game, index, bonus)
   }
 }
-const pet = new Pet(1)
+const pet = new Pet(2)
 
 class Hollow extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
