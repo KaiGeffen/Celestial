@@ -147,10 +147,10 @@ export default class RaceScene extends BaseScene {
       .setScrollFactor(0)
       .setDepth(6)
 
-    // Create decklist - add console log to test clicking
+    // Create decklist - clicking shows upgrade menu
     this.deckDisplay = new Decklist(this, (cutout) => {
       return () => {
-        console.log('Cutout clicked:', cutout.card.name)
+        this.handleDecklistCardClick(cutout.card)
       }
     })
 
@@ -219,9 +219,6 @@ export default class RaceScene extends BaseScene {
         nodeType = 'QuestionMark'
       } else if ('info' in node) {
         nodeType = 'QuestionMark'
-      } else {
-        // Upgrade card node
-        nodeType = 'QuestionMark'
       }
 
       let btn = new Buttons.Mission(
@@ -250,11 +247,8 @@ export default class RaceScene extends BaseScene {
           // Type 3: Show choice of 3 random cards, click one to replace a card in deck
           this.showCardChoice()
         } else if ('info' in node) {
-          // Type 5: Show informational message
+          // Type 4: Show informational message
           this.showInfoMessage(node.info)
-        } else {
-          // Type 4: Upgrade a card - select from deck, then choose from 3 versions
-          this.showUpgradeCard()
         }
     }
   }
@@ -363,30 +357,41 @@ export default class RaceScene extends BaseScene {
     })
   }
 
-  // Type 4: Upgrade a card - select from deck, then choose from 3 versions
-  private showUpgradeCard(): void {
-    this.scene.launch('MenuScene', {
-      menu: 'raceDeckSelection',
-      title: 'Upgrade Card',
-      s: 'Select a card from your deck to upgrade:',
-      currentDeck: this.currentDeck,
-      onCardSelected: (index: number) => {
-        // Get the card at this index
-        const deck = this.currentDeck
-        const cardId = deck.cards[index]
-        // Show 3 versions of the selected card, passing the index to track which copy
-        this.showCardUpgradeVersions(cardId, index)
-      },
-    })
-  }
-
-  // Type 5: Show informational message
+  // Type 4: Show informational message
   private showInfoMessage(message: string): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
       title: 'Race Mode Guide',
       s: message,
     })
+  }
+
+  // Handle clicking a card in the decklist - show upgrade menu
+  private handleDecklistCardClick(clickedCard: Card): void {
+    const deck = this.currentDeck
+    const matchingIndices: number[] = []
+
+    // Find all indices in the deck that match this card (same ID and version)
+    for (let i = 0; i < deck.cards.length; i++) {
+      const cardId = deck.cards[i]
+      const version = deck.cardUpgrades?.[i] || 0
+      if (cardId === clickedCard.id && version === clickedCard.upgradeVersion) {
+        matchingIndices.push(i)
+      }
+    }
+
+    if (matchingIndices.length === 0) {
+      // Shouldn't happen, but handle gracefully
+      return
+    } else if (matchingIndices.length === 1) {
+      // Only one match, show upgrade menu directly
+      this.showCardUpgradeVersions(clickedCard.id, matchingIndices[0])
+    } else {
+      // Multiple matches - since the decklist groups cards with same ID/version,
+      // we'll show the upgrade menu for the first matching card.
+      // In the future, we could enhance this to show a selection menu.
+      this.showCardUpgradeVersions(clickedCard.id, matchingIndices[0])
+    }
   }
 
   // Show 3 versions of a card to choose from

@@ -21,10 +21,7 @@ interface CardChoiceNode extends RaceBase {
   cardChoices?: number // Number of card choices (default 3)
 }
 
-// Type 4: Upgrade a card - select a card from deck, then choose from 3 versions
-interface UpgradeCardNode extends RaceBase {}
-
-// Type 5: Info node - shows an informational message
+// Type 4: Info node - shows an informational message
 interface InfoNode extends RaceBase {
   info: string
 }
@@ -33,7 +30,6 @@ export type raceNode =
   | DeckNode
   | MatchNode
   | CardChoiceNode
-  | UpgradeCardNode
   | InfoNode
 
 // Example race data - you can customize this
@@ -108,12 +104,7 @@ export const raceData: raceNode[] = [
     y: 300,
     cardChoices: 3,
   },
-  // Type 4: Upgrade card node
-  {
-    x: 1000,
-    y: 400,
-  },
-  // Type 5: Info node - explains the race map layout
+  // Type 4: Info node - explains the race map layout
   {
     x: 500,
     y: 200,
@@ -121,7 +112,7 @@ export const raceData: raceNode[] = [
 
 Top Row: Select a starting deck from the available options.
 
-Right Side: Upgrade cards or choose new cards to replace in your deck.
+Right Side: Your current deck is displayed. Click any card to upgrade it, or use card choice nodes to add new cards.
 
 Bottom Row: Enter matches to test your deck. The leftmost match is the easiest, with difficulty increasing as you move right.
 
