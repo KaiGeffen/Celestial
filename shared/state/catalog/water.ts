@@ -146,7 +146,7 @@ const overflow = new Overflow({
   name: 'Overflow',
   id: 100,
   cost: 3,
-  points: -1,
+  points: 0,
   text: 'Refresh\nWorth +1 for each card in your hand.',
 })
 
