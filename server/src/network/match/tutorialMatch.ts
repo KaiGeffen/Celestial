@@ -8,7 +8,7 @@ class TutorialMatch extends PveMatch {
   tutorialNum: number
 
   constructor(ws: ServerWS, num: number, uuid: string) {
-    // TODO Weird to start a normal game, then erase it
+    // TODO Weird to start a normal game, then erase it (When startGame called below)
     super(
       ws,
       uuid,
@@ -17,8 +17,7 @@ class TutorialMatch extends PveMatch {
     )
 
     this.tutorialNum = num
-    // TODO Turn this into a static call
-    this.game = new TutorialController(num)
+    this.game = new TutorialController(this.tutorialNum)
 
     // Log tutorial start progress
     logTutorialProgress(this.uuid1, `tutorial_${num + 1}`, 0)

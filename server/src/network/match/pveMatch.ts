@@ -8,7 +8,7 @@ import { AchievementManager } from '../../achievementManager'
 
 class PveMatch extends Match {
   constructor(ws: ServerWS, uuid: string, deck: Deck, aiDeck: Deck) {
-    super(ws, uuid, deck, null, null, aiDeck)
+    super(ws, uuid, deck, aiDeck)
   }
 
   // Given ws is disconnecting

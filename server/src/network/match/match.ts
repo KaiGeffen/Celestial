@@ -13,7 +13,6 @@ import sendUserData from '../sendUserData'
 import { getCardWithVersion } from '../../../../shared/state/cardUpgrades'
 
 // TODO Timer logic for disconnects
-// TODO Remove isPVP
 
 interface Match {
   gameId: string
@@ -30,45 +29,25 @@ interface Match {
 }
 
 class Match implements Match {
-  constructor(
-    ws1: ServerWS,
-    uuid1: string,
-    deck1: Deck,
-    ws2: ServerWS | null,
-    uuid2: string | null = null,
-    deck2: Deck,
-  ) {
+  constructor(ws1: ServerWS, uuid1: string, deck1: Deck, deck2: Deck) {
     // Generate unique game ID
     this.gameId = randomUUID()
+
+    // Store at least the first player's information (In pvpMatch store second)
     this.ws1 = ws1
     this.uuid1 = uuid1
-    this.ws2 = ws2
-    this.uuid2 = uuid2
 
     this.deck1 = deck1
     this.deck2 = deck2
 
     // Make a new game
+    // TODO Custom modes (tutorial, race) will overwrite this. Instead they should never make this
     this.game = new ServerController()
-    // Convert deck cards with their upgrade versions to Card objects
-    // Default to version 0 (base) if cardUpgrades not provided
-    const deck1Cards = deck1.cards
-      .map((cardId, index) => {
-        const version = deck1.cardUpgrades?.[index] || 0
-        return getCardWithVersion(cardId, version, Catalog)
-      })
-      .filter(Boolean)
-    const deck2Cards = deck2.cards
-      .map((cardId, index) => {
-        const version = deck2.cardUpgrades?.[index] || 0
-        return getCardWithVersion(cardId, version, Catalog)
-      })
-      .filter(Boolean)
     this.game.startGame(
-      deck1Cards,
-      deck2Cards,
-      deck1.cosmeticSet,
-      deck2.cosmeticSet,
+      this.deck1.cards.map((cardId) => Catalog.getCardById(cardId)),
+      this.deck2.cards.map((cardId) => Catalog.getCardById(cardId)),
+      this.deck1.cosmeticSet,
+      this.deck2.cosmeticSet,
     )
   }
 
@@ -186,7 +165,7 @@ class Match implements Match {
 
   // Get the list of all active websockets connected to this match
   protected getActiveWsList(): ServerWS[] {
-    return [this.ws1, this.ws2].filter((ws) => ws !== null)
+    return [this.ws1, this.ws2].filter((ws) => ws)
   }
 
   async signalEmote(player: number, emoteNumber: number) {

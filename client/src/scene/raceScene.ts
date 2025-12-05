@@ -243,13 +243,13 @@ export default class RaceScene extends BaseScene {
       } else if ('opponent' in node) {
         // Type 2: Start a PVE match with current deck
         this.startPVEMatch(node.opponent)
-        } else if ('cardChoices' in node) {
-          // Type 3: Show choice of 3 random cards, click one to replace a card in deck
-          this.showCardChoice()
-        } else if ('info' in node) {
-          // Type 4: Show informational message
-          this.showInfoMessage(node.info)
-        }
+      } else if ('cardChoices' in node) {
+        // Type 3: Show choice of 3 random cards, click one to replace a card in deck
+        this.showCardChoice()
+      } else if ('info' in node) {
+        // Type 4: Show informational message
+        this.showInfoMessage(node.info)
+      }
     }
   }
 
@@ -307,6 +307,8 @@ export default class RaceScene extends BaseScene {
       isPvp: false,
       deck: playerDeck,
       aiDeck: aiDeck,
+      // TODO Make this dynamic
+      specialMode: 1,
     })
   }
 

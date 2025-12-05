@@ -16,7 +16,10 @@ class PvpMatch extends Match {
     uuid2: string,
     deck2: Deck,
   ) {
-    super(ws1, uuid1, deck1, ws2, uuid2, deck2)
+    super(ws1, uuid1, deck1, deck2)
+
+    this.ws2 = ws2
+    this.uuid2 = uuid2
 
     // this.startTimerCheck() TODO Enable once in prod
   }

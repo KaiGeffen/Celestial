@@ -81,7 +81,10 @@ export default class GameModel {
         this.shuffle(p, false)
       }
     }
-    this.cosmeticSets = [cosmeticSet1, cosmeticSet2]
+    this.cosmeticSets = [
+      cosmeticSet1 ?? { avatar: 0, border: 0 },
+      cosmeticSet2 ?? { avatar: 0, border: 0 },
+    ]
 
     // Starting priority is random
     this.priority = Math.floor(Math.random() * 2)

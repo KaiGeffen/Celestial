@@ -53,6 +53,12 @@ export default interface messagesToServer {
     num: number
     uuid: string
   }
+  initRace: {
+    aiDeck: Deck
+    uuid: string
+    deck: Deck
+    modeNumber: number
+  }
   cancelQueue: {
     password: string
   }

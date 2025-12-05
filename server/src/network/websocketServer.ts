@@ -20,6 +20,7 @@ import { logFunnelEvent } from '../db/analytics'
 import TutorialMatch from './match/tutorialMatch'
 import sendUserData from './sendUserData'
 import { getStartingInventoryBitString } from '../startingInventory'
+import PveRaceMatch from './match/pveRaceMatch'
 
 // An ongoing match
 class ActiveGame {
@@ -290,6 +291,30 @@ export default function createWebSocketServer() {
 
           // Analytics
           logFunnelEvent(uuid, 'play_mode', 'pve')
+
+          // Start the match
+          await activeGame.match.notifyState()
+        })
+        .on('initRace', async ({ aiDeck, uuid, deck, modeNumber }) => {
+          if (!id) return
+          console.log(
+            'Race:',
+            deck.cards
+              .map((cardId) => Catalog.getCardById(cardId).name)
+              .join(', '),
+          )
+
+          activeGame.match = new PveRaceMatch(
+            ws,
+            uuid,
+            deck,
+            aiDeck,
+            modeNumber,
+          )
+          activeGame.playerNumber = 0
+
+          // Analytics
+          logFunnelEvent(uuid, 'play_mode', 'race')
 
           // Start the match
           await activeGame.match.notifyState()
