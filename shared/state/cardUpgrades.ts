@@ -236,9 +236,10 @@ export const cardUpgrades: {
   },
   [shadowCatalog.nightmare.id]: {
     1: {
+      points: 1,
       text: shadowCatalog.nightmare.text.replace(
-        '.',
-        ' and double its points permanently.',
+        'add this to the story',
+        'create a Shadow in the story',
       ),
     },
     2: { points: 1 },
