@@ -308,7 +308,7 @@ export default class RaceScene extends BaseScene {
       deck: playerDeck,
       aiDeck: aiDeck,
       // TODO Make this dynamic
-      specialMode: 1,
+      enabledModes: [0],
     })
   }
 

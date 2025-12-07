@@ -53,11 +53,11 @@ export default interface messagesToServer {
     num: number
     uuid: string
   }
-  initRace: {
+  initSpecialPve: {
     aiDeck: Deck
     uuid: string
     deck: Deck
-    modeNumber: number
+    enabledModes: number[]
   }
   cancelQueue: {
     password: string

@@ -20,7 +20,7 @@ import { logFunnelEvent } from '../db/analytics'
 import TutorialMatch from './match/tutorialMatch'
 import sendUserData from './sendUserData'
 import { getStartingInventoryBitString } from '../startingInventory'
-import PveRaceMatch from './match/pveRaceMatch'
+import PveSpecialMatch from './match/pveSpecialMatch'
 
 // An ongoing match
 class ActiveGame {
@@ -295,7 +295,7 @@ export default function createWebSocketServer() {
           // Start the match
           await activeGame.match.notifyState()
         })
-        .on('initRace', async ({ aiDeck, uuid, deck, modeNumber }) => {
+        .on('initSpecialPve', async ({ aiDeck, uuid, deck, enabledModes }) => {
           if (!id) return
           console.log(
             'Race:',
@@ -304,12 +304,12 @@ export default function createWebSocketServer() {
               .join(', '),
           )
 
-          activeGame.match = new PveRaceMatch(
+          activeGame.match = new PveSpecialMatch(
             ws,
             uuid,
             deck,
             aiDeck,
-            modeNumber,
+            enabledModes,
           )
           activeGame.playerNumber = 0
 

@@ -50,7 +50,7 @@ export class MatchScene extends BaseScene {
     password?: string
     aiDeck?: Deck
     gameStartState?: GameModel
-    specialMode?: number
+    enabledModes?: number[]
   }) {
     this.params = params
     // Reset variables
@@ -77,13 +77,13 @@ export class MatchScene extends BaseScene {
         uuid: Server.getUserData().uuid,
         deck: params.deck,
       })
-    } else if (params.specialMode) {
+    } else if (params.enabledModes) {
       server.send({
-        type: 'initRace',
+        type: 'initSpecialPve',
         aiDeck: params.aiDeck,
         uuid: Server.getUserData().uuid,
         deck: params.deck,
-        modeNumber: params.specialMode,
+        enabledModes: params.enabledModes,
       })
     } else {
       server.send({

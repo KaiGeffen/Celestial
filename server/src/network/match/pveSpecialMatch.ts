@@ -1,5 +1,5 @@
 import PveMatch from './pveMatch'
-import { ControllerBreath3 } from '../../gameControllerSpecial'
+import { SpecialController } from '../../gameControllerSpecial'
 import { ServerWS } from '../../../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../../../shared/types/deck'
 import { getCardWithVersion } from '../../../../shared/state/cardUpgrades'
@@ -7,18 +7,13 @@ import Catalog from '../../../../shared/state/catalog'
 import Card from '../../../../shared/state/card'
 import { ServerController } from '../../gameController'
 
-const MODES: (typeof ServerController)[] = [ServerController, ControllerBreath3]
-
-class PveRaceMatch extends PveMatch {
-  // Which special mode this is
-  modeNumber: number
-
+class PveSpecialMatch extends PveMatch {
   constructor(
     ws: ServerWS,
     uuid: string,
     deck: Deck,
     aiDeck: Deck,
-    modeNumber: number,
+    enabledModes: number[],
   ) {
     super(ws, uuid, deck, aiDeck)
 
@@ -39,7 +34,7 @@ class PveRaceMatch extends PveMatch {
       .filter(Boolean)
 
     // Start the game
-    this.game = new ControllerBreath3()
+    this.game = new SpecialController(enabledModes)
     this.game.startGame(
       deck1Cards,
       deck2Cards,
@@ -49,4 +44,4 @@ class PveRaceMatch extends PveMatch {
   }
 }
 
-export default PveRaceMatch
+export default PveSpecialMatch
