@@ -149,7 +149,7 @@ export default class MapJourneyScene extends BaseScene {
     const y = Space.buttonHeight / 2 + Space.pad
     new Buttons.Basic({
       within: this,
-      text: 'Story Mode',
+      text: 'Old Version',
       x,
       y,
       f: () => {

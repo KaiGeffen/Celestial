@@ -238,17 +238,7 @@ export default class HomeScene extends BaseScene {
       within: journeyContainer,
       text: 'Journey',
       f: () => {
-        // A/B test: Route based on UUID parity if logged in
-        const uuid = Server.getUserData().uuid
-        const lastChar = uuid.charAt(uuid.length - 1)
-        const numValue = parseInt(lastChar, 16)
-
-        // Even UUID -> new JourneyScene, Odd UUID -> old MapJourneyScene
-        if (!isNaN(numValue) && numValue % 2 === 1) {
-          this.scene.start('MapJourneyScene', {})
-        } else {
-          this.scene.start('JourneyScene', { postMatch: false })
-        }
+        this.scene.start('MapJourneyScene', {})
 
         logEvent('view_journey')
       },

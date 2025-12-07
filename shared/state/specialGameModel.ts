@@ -4,7 +4,7 @@ import { Story } from './story'
 import { Quality } from './quality'
 import { CosmeticSet } from '../types/cosmeticSet'
 
-// Special Story that handles Mode 2 and Mode 4
+// Story with funtionality needed for the special modes
 class SpecialStory extends Story {
   enabledModes: number[]
 
@@ -13,8 +13,8 @@ class SpecialStory extends Story {
     this.enabledModes = enabledModes
   }
 
-  // Mode 2: When a card is added to the story, increase its points by 1
   addAct(card: Card, owner: number, i?: number) {
+    // Mode 2: When a card is added to the story, increase its points by 1
     if (this.enabledModes.includes(2)) {
       card = card.copy()
       card.points += 1
@@ -26,10 +26,10 @@ class SpecialStory extends Story {
   run(game: GameModel) {
     super.run(game)
 
-    // Mode 4: Cards with Fleeting are discarded instead of removed from the game AT END OF ROUND
+    // Mode 4: Cards that have been removed from the game are added back to the discard pile
     if (this.enabledModes.includes(4)) {
       for (const player of [0, 1]) {
-        // Move all Fleeting cards from expended to pile
+        // Move all cards from expended to pile
         const fleetingCards = game.expended[player].filter((card) =>
           card.qualities.includes(Quality.FLEETING),
         )
