@@ -26,11 +26,7 @@ interface InfoNode extends RaceBase {
   info: string
 }
 
-export type raceNode =
-  | DeckNode
-  | MatchNode
-  | CardChoiceNode
-  | InfoNode
+export type raceNode = DeckNode | MatchNode | CardChoiceNode | InfoNode
 
 // Example race data - you can customize this
 export const raceData: raceNode[] = [
@@ -117,6 +113,8 @@ Right Side: Your current deck is displayed. Click any card to upgrade it, or use
 Bottom Row: Enter matches to test your deck. The leftmost match is the easiest, with difficulty increasing as you move right.
 
 We're thinking you replace after each match, and get an upgrade choice every couple matches, but feel free to experiment and find out what you like :)
+
+Win 5 matches to win the race!
 -Kai`,
   },
 ]

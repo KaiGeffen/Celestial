@@ -30,13 +30,9 @@ class SpecialStory extends Story {
     if (this.enabledModes.includes(4)) {
       for (const player of [0, 1]) {
         // Move all cards from expended to pile
-        const fleetingCards = game.expended[player].filter((card) =>
-          card.qualities.includes(Quality.FLEETING),
-        )
-        game.expended[player] = game.expended[player].filter(
-          (card) => !card.qualities.includes(Quality.FLEETING),
-        )
-        game.pile[player].push(...fleetingCards)
+        const allRemovedCards = [...game.expended[player]]
+        game.expended[player] = []
+        game.pile[player].push(...allRemovedCards)
       }
     }
   }

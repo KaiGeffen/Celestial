@@ -8,8 +8,10 @@ import Act from '../act'
 
 class Fruit extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
+    const amt = this.upgradeVersion === 1 ? 5 : 3
+
     super.play(player, game, index, bonus)
-    this.nourish(3, game, player)
+    this.nourish(amt, game, player)
   }
 }
 const fruit = new Fruit({
@@ -88,17 +90,27 @@ const hollow = new Hollow({
 
 class HoldTight extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
+    const amt = this.upgradeVersion === 2 ? 2 : 1
+
     super.play(player, game, index, bonus)
-    if (game.pile[player].length > 0) {
-      const card = game.pile[player].pop()
-      game.deck[player].push(card)
-      game.animations[player].push(
-        new Animation({
-          from: Zone.Discard,
-          to: Zone.Deck,
-          card: card,
-        }),
-      )
+    // Put the top amt cards
+    for (let i = 0; i < amt; i++) {
+      if (game.pile[player].length > 0) {
+        const card = game.pile[player].pop()
+        game.deck[player].push(card)
+        game.animations[player].push(
+          new Animation({
+            from: Zone.Discard,
+            to: Zone.Deck,
+            card: card,
+          }),
+        )
+      }
+    }
+
+    // Create a copy of this in hand
+    if (this.upgradeVersion === 1) {
+      game.create(player, this)
     }
   }
 }

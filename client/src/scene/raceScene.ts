@@ -162,6 +162,7 @@ export default class RaceScene extends BaseScene {
           menu: 'raceSpecialModes',
         })
       },
+      muteClick: true,
     })
     specialModesContainer.add(specialModesButtonContainer)
 
@@ -189,8 +190,41 @@ export default class RaceScene extends BaseScene {
       f: () => {
         this.showCardChoice()
       },
+      muteClick: true,
     })
     replaceContainer.add(replaceButtonContainer)
+
+    // Info button (stacked below Replace button)
+    const infoContainer = this.add.container(
+      Space.windowWidth -
+        Space.cutoutWidth -
+        Space.pad * 2 -
+        Space.buttonWidth -
+        Space.pad,
+      Space.pad * 2 + yOffset + (50 + Space.pad) * 2,
+    )
+    infoContainer.setDepth(6)
+
+    const infoButtonContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      50,
+    )
+    new Buttons.Basic({
+      within: infoButtonContainer,
+      text: 'Info',
+      f: () => {
+        // Get the info message from raceData
+        const infoNode = raceData.find((node) => 'info' in node) as any
+        if (infoNode) {
+          this.showInfoMessage(infoNode.info)
+        }
+      },
+      muteClick: true,
+    })
+    infoContainer.add(infoButtonContainer)
 
     // Title
     const title = this.add
@@ -265,8 +299,8 @@ export default class RaceScene extends BaseScene {
     // All nodes are unlocked in Race mode
     this.animatedBtns = []
     raceData.forEach((node: raceNode) => {
-      // Skip cardChoices nodes - they're handled by a button in the UI
-      if ('cardChoices' in node) {
+      // Skip cardChoices and info nodes - they're handled by buttons in the UI
+      if ('cardChoices' in node || 'info' in node) {
         return
       }
 
@@ -276,8 +310,6 @@ export default class RaceScene extends BaseScene {
         nodeType = 'QuestionMark'
       } else if ('opponent' in node) {
         nodeType = 'Mission'
-      } else if ('info' in node) {
-        nodeType = 'QuestionMark'
       }
 
       let btn = new Buttons.Mission(

@@ -7,6 +7,7 @@ import * as visionCatalog from './catalog/vision'
 import * as starsCatalog from './catalog/stars'
 import * as waterCatalog from './catalog/water'
 import * as specialCardsCatalog from './catalog/specialCards'
+import { Quality } from './quality'
 
 import Card from './card'
 
@@ -165,8 +166,8 @@ export const cardUpgrades: {
 
   // PET
   [petCatalog.fruit.id]: {
-    1: { cost: -1 },
-    2: { points: 1 },
+    1: { text: petCatalog.fruit.text.replace('3', '5') },
+    2: { points: 3 },
   },
   [petCatalog.oak.id]: {
     1: { cost: -1 },
@@ -177,16 +178,27 @@ export const cardUpgrades: {
     2: { points: 1 },
   },
   [petCatalog.pet.id]: {
-    1: { cost: -1 },
-    2: { points: 1 },
+    1: { cost: -2, points: -1 },
+    2: { cost: 1, points: 2 },
   },
   [petCatalog.hollow.id]: {
     1: { cost: -1 },
     2: { points: 1 },
   },
   [petCatalog.holdTight.id]: {
-    1: { cost: -1 },
-    2: { points: 1 },
+    1: {
+      cost: -1,
+      points: -1,
+      qualities: [Quality.FLEETING],
+      text:
+        'Fleeting\n' +
+        petCatalog.holdTight.text +
+        ' Create a copy of this in hand.',
+    },
+    2: {
+      points: 1,
+      text: petCatalog.holdTight.text.replace('top card', 'top 2 cards'),
+    },
   },
   [petCatalog.yearn.id]: {
     1: { cost: -1 },
@@ -202,7 +214,7 @@ export const cardUpgrades: {
   },
   [petCatalog.rose.id]: {
     1: { cost: -1 },
-    2: { points: 1 },
+    2: { points: 2 },
   },
   [petCatalog.parade.id]: {
     1: { cost: -1 },

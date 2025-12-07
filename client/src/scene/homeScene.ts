@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Color, Space } from '../settings/settings'
+import { Style, Color, Space, Flags } from '../settings/settings'
 import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
@@ -45,7 +45,10 @@ export default class HomeScene extends BaseScene {
 
     // Normal buttons
     this.createFeedbackButton()
-    this.createRaceButton() // TODO Move somewhere else
+
+    if (Flags.devCardsEnabled) {
+      this.createRaceButton()
+    }
 
     // Check if there are any unseen achievements and show achievements menu if so
     this.checkAndShowUnseenAchievements()
