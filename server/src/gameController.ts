@@ -250,9 +250,10 @@ class ServerController {
       }
     }
 
-    // Draw cards for the turn, ensure breath is at least 0
+    this.doUpkeepDraws()
+
+    // Ensure breath is at least 0
     for (const player of players) {
-      this.model.draw(player, MechanicsSettings.DRAW_PER_TURN)
       this.model.breath[player] = Math.max(this.model.breath[player], 0)
     }
   }
@@ -326,6 +327,13 @@ class ServerController {
 
     // Recoup time for having acted
     this.model.timers[player] += MechanicsSettings.TIMER_RECOUP
+  }
+
+  // Normally each player draws 2 cards per turn
+  protected doUpkeepDraws(): void {
+    for (const player of [0, 1]) {
+      this.model.draw(player, MechanicsSettings.DRAW_PER_TURN)
+    }
   }
 }
 

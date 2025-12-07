@@ -10,6 +10,7 @@ import {
 } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
 import Button from '../lib/buttons/button'
+import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 import Catalog from '../../../shared/state/catalog'
 import { raceData, raceNode } from '../data/raceData'
@@ -135,6 +136,31 @@ export default class RaceScene extends BaseScene {
     // Offset to lower the display
     const yOffset = Space.pad * 3
 
+    // Special Modes button
+    const specialModesContainer = this.add.container(
+      Space.windowWidth - Space.cutoutWidth - Space.pad * 2,
+      Space.pad + yOffset,
+    )
+    specialModesContainer.setDepth(6)
+
+    const buttonContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      50,
+    )
+    new Buttons.Basic({
+      within: buttonContainer,
+      text: 'Special Modes',
+      f: () => {
+        this.scene.launch('MenuScene', {
+          menu: 'raceSpecialModes',
+        })
+      },
+    })
+    specialModesContainer.add(buttonContainer)
+
     // Title
     const title = this.add
       .text(
@@ -144,7 +170,6 @@ export default class RaceScene extends BaseScene {
         Style.announcement,
       )
       .setOrigin(0.5, 0)
-      .setScrollFactor(0)
       .setDepth(6)
 
     // Create decklist - clicking shows upgrade menu
@@ -303,12 +328,14 @@ export default class RaceScene extends BaseScene {
       },
     }
 
+    // Get enabled modes from UserSettings, default to empty array
+    const enabledModes = UserSettings._get('raceEnabledModes') || []
+
     this.scene.start('RaceMatchScene', {
       isPvp: false,
       deck: playerDeck,
       aiDeck: aiDeck,
-      // TODO Make this dynamic
-      enabledModes: [0],
+      enabledModes: enabledModes,
     })
   }
 
