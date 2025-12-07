@@ -5,9 +5,13 @@ import { Zone } from '../zone'
 import { Animation } from '../../animation'
 
 class Seen extends Card {
-  onUpkeepInHand(player: number, game: GameModel, index: number): boolean {
+  onUpkeepInHand(
+    player: number,
+    game: GameModel,
+    index: number,
+  ): [boolean, boolean] {
     game.status[player ^ 1].vision += 3
-    return true
+    return [true, false]
   }
 }
 const seen = new Seen({
@@ -57,30 +61,30 @@ const predator = new Predator({
   text: "Fleeting\nWorth +2 for each Prey in your opponent's discard pile.",
 })
 
-// class Wound extends Card {
-//   onDiscard(player: number, game: GameModel) {
-//     game.animations[player].push(
-//       new Animation({
-//         from: Zone.Discard,
-//         to: Zone.Story,
-//         index: game.pile[player].length - 1,
-//         index2: game.story.resolvedActs.length + 1,
-//       }),
-//     )
+class Wound extends Card {
+  onDiscard(player: number, game: GameModel) {
+    game.animations[player].push(
+      new Animation({
+        from: Zone.Discard,
+        to: Zone.Story,
+        index: game.pile[player].length - 1,
+        index2: game.story.resolvedActs.length + 1,
+      }),
+    )
 
-//     // Remove this from the discard pile
-//     game.pile[player].pop()
+    // Remove this from the discard pile
+    game.pile[player].pop()
 
-//     game.story.addAct(this, player, 0)
-//   }
-// }
-// const wound = new Wound({
-//   name: 'Wound',
-//   id: 1005,
-//   points: -3,
-//   qualities: [Quality.FLEETING],
-//   text: 'Fleeting\nWhen this is discarded, add it next in the story.',
-// })
+    game.story.addAct(this, player, 0)
+  }
+}
+const wound = new Wound({
+  name: 'Wound',
+  id: 1005,
+  points: -3,
+  qualities: [Quality.FLEETING],
+  text: 'Fleeting\nWhen this is discarded, add it next in the story.',
+})
 
 const heirloom = new Card({
   name: 'Heirloom',
@@ -88,11 +92,4 @@ const heirloom = new Card({
   points: 4,
 })
 
-export {
-  seen,
-  ashes,
-  child,
-  predator,
-  // wound,
-  heirloom,
-}
+export { seen, ashes, child, predator, wound, heirloom }

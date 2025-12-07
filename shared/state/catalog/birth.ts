@@ -234,6 +234,106 @@ const hug = new Hug({
   text: 'Worth +1 if the next card in the story is yours.',
 })
 
+class LittleMischief extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    bonus += game.amtCardsPlayedLastRound[player]
+
+    super.play(player, game, index, bonus)
+  }
+}
+const littleMischief = new LittleMischief({
+  name: 'Little Mischief',
+  id: 5086,
+  cost: 5,
+  points: 3,
+  text: 'Worth +1 for each card you played last round.',
+})
+
+class Bar extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    for (const act of game.story.acts) {
+      if (act.owner === player) {
+        bonus += 1
+      }
+    }
+    super.play(player, game, index, bonus)
+  }
+}
+const bar = new Bar({
+  name: 'Bar',
+  id: 5087,
+  cost: 1,
+  text: 'Worth +1 for each of your cards later in the story.',
+})
+
+class Naptime extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    this.reset(game)
+  }
+
+  // TODO onPlay
+
+  getCost(player: number, game: GameModel) {
+    let totalChildPoints = 0
+    for (const card of game.hand[player]) {
+      if (card.name === child.name) {
+        totalChildPoints += card.points
+      }
+    }
+
+    // Cost won't go up
+    const reducedCost = Math.min(this.cost, this.cost - totalChildPoints)
+
+    // Spend all of the player's breath
+    return Math.max(game.breath[player], reducedCost)
+  }
+}
+const naptime = new Naptime({
+  name: 'Naptime',
+  id: 5022,
+  cost: 6,
+  points: 0,
+  text: "You can spend the points from a Child in hand as breath to play this.\nSet both players' points to 0.",
+})
+
+class Genesis extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    const amt = game.score[player] - 5
+    if (amt > 0) {
+      game.score[player] = 5
+      this.birth(amt, game, player)
+    }
+  }
+}
+const genesis = new Genesis({
+  name: 'Genesis',
+  id: 5023,
+  cost: 5,
+  points: 5,
+  text: 'Set your points to 5, then Birth 1 for each point you lost.',
+  beta: true,
+})
+
+class BeginnersMind extends Card {
+  onShuffle(player: number, game: GameModel, index: number) {
+    super.onShuffle(player, game, index)
+
+    game.deck[player].splice(index, 1)
+    game.deck[player].push(this)
+  }
+}
+const beginnersMind = new BeginnersMind({
+  name: "Beginner's Mind",
+  id: 5024,
+  cost: 1,
+  points: 1,
+  text: 'When this is shuffled, move it to the top of your deck.',
+  beta: true,
+})
+
 export {
   nascence,
   birth,
@@ -248,4 +348,7 @@ export {
   passOn,
   justLikeDad,
   hug,
+  // NEW
+  genesis,
+  beginnersMind,
 }

@@ -245,7 +245,7 @@ const cling = new Cling({
   name: 'Cling',
   id: 20,
   cost: 6,
-  text: 'Worth +X, where X is the highest base cost in your discard pile. Put that card on top of your deck.',
+  text: 'Worth +X, where X is the highest base-cost in your discard pile. Put that card on top of your deck.',
   story:
     'Reaching back with the back of the eyes\nTo that moment when\nI see myself – not as I am – but as I was - clearly',
 })
@@ -365,6 +365,118 @@ const spark = new Spark({
   text: 'When played, gain 3 breath.\nDiscard your next card in the story.',
 })
 
+class Initiative extends Card {
+  onPlay(player: number, game: GameModel) {
+    game.switchPriority()
+  }
+}
+const initiative = new Initiative({
+  name: 'Initiative',
+  id: 2071,
+  cost: 1,
+  points: 1,
+  qualities: [Quality.VISIBLE],
+  text: 'Visible\nWhen played, keep priority.',
+})
+
+class Wildfire extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    this.inspire(1, game, player)
+
+    if (super.exhale(1, game, player) && game.hand[player].length > 0) {
+      game.discard(player)
+      game.createInStory(player, wildfire, 0)
+    }
+  }
+}
+const wildfire = new Wildfire({
+  name: 'Wildfire',
+  id: 2072,
+  cost: 2,
+  points: 1,
+  text: 'Inspire 1\nExhale 1, discard a card: Create a Wildfire in the story.',
+})
+
+class Remnant extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    game.createInPile(player, ashes)
+  }
+
+  onMorning(player: number, game: GameModel, index: number): boolean {
+    game.pile[player].splice(index, 1)
+    game.create(player, this)
+    game.discard(player)
+    return true
+  }
+}
+const remnant = new Remnant({
+  name: 'Remnant',
+  id: 2050,
+  cost: 2,
+  points: 2,
+  text: 'Add an Ashes to your discard pile.\nMorning: Return this to hand. Discard a card.',
+  beta: true,
+})
+
+class DyingLight extends Card {
+  onPlay(player: number, game: GameModel) {
+    game.breath[player] += Math.floor(game.pile[player].length / 3)
+  }
+}
+const dyingLight = new DyingLight({
+  name: 'Dying Light',
+  id: 2053,
+  cost: 6,
+  points: 6,
+  text: 'When played, gain 1 breath for every 3 cards in your discard pile.',
+})
+
+class Momentum extends Card {
+  onUpkeepInHand(
+    player: number,
+    game: GameModel,
+    index: number,
+  ): [boolean, boolean] {
+    const oppWonPreviousRound = game.checkPlayerWonPreviousRound(player ^ 1)
+
+    if (oppWonPreviousRound) {
+      game.discard(player, 1, index)
+      return [true, true]
+    }
+    return [false, false]
+  }
+}
+const momentum = new Momentum({
+  name: 'Momentum',
+  id: 2054,
+  cost: 6,
+  points: 8,
+  text: 'When you lose a round while this is in hand, discard it.',
+})
+
+class Finale extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    bonus += Math.floor(game.pile[player].length / 3)
+    super.play(player, game, index, bonus)
+
+    for (let i = 0; i < 6; i++) {
+      game.createOnDeck(player, ashes)
+    }
+    game.draw(player, 6)
+  }
+}
+const finale = new Finale({
+  name: 'finale',
+  id: 2055,
+  cost: 7,
+  points: 5,
+  text: '.',
+})
+
 export {
   dash,
   impulse,
@@ -379,4 +491,11 @@ export {
   firebug,
   immolant,
   spark,
+  // NEW
+  // initiative,
+  // wildfire,
+  remnant,
+  // dyingLight,
+  // momentum,
+  // finale,
 }

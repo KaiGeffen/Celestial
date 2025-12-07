@@ -26,14 +26,19 @@ export default class CatalogRegion {
 
     this.createPanel(scene)
 
-    let pool = Flags.devCardsEnabled
-      ? [...Catalog.collectibleCards, ...Catalog.betaCards]
-      : Catalog.collectibleCards
+    // In dev mode, show beta cards and cards you don't own
+    let pool = []
+    if (Flags.devCardsEnabled) {
+      pool = [...Catalog.collectibleCards, ...Catalog.betaCards]
+    } else {
+      pool = Catalog.collectibleCards
 
-    // Only show owned cards
-    const cardInventory = UserSettings._get('cardInventory') || []
-    pool = pool.filter((card) => cardInventory[card.id] === true)
+      // Only show owned cards
+      const cardInventory = UserSettings._get('cardInventory') || []
+      pool = pool.filter((card) => cardInventory[card.id] === true)
+    }
 
+    // Create all the cards in pool
     pool.forEach((card) => {
       this.createCard(card)
     })

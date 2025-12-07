@@ -288,6 +288,63 @@ const sensualist = new Sensualist({
   text: 'Costs 1 less for each of the following statuses you have: Nourish, Inspired, Sight.',
 })
 
+// NEW CARDS
+class Doll extends Card {
+  onMorning(player: number, game: GameModel, index: number) {
+    const length = game.roundResults[player].length
+    const previousRoundResults =
+      game.roundResults[player][length - 1] -
+      game.roundResults[player ^ 1][length - 1]
+
+    // Replace this with a copy with points equal to the previous round results
+    const copy = this.copy()
+    copy.points = Math.max(0, previousRoundResults)
+    game.pile[player][index] = copy
+
+    return true
+  }
+}
+const doll = new Doll({
+  name: 'Doll',
+  id: 482,
+  cost: 1,
+  points: 1,
+  text: 'Morning: Worth X permanently, where X is how many points you won the last round by.',
+  beta: true,
+})
+
+class Skittish extends Card {
+  onCardPlayedAfter(player: number, game: GameModel, index: number) {
+    console.log('onCardPlayedAfter', index)
+    this.transform(index, hiding, game)
+  }
+}
+const skittish = new Skittish({
+  name: 'Skittish',
+  id: 4082,
+  cost: 3,
+  points: 4,
+  text: 'When a card is played after this, transform this into Hiding.',
+  beta: true,
+})
+
+// TODO Move to a transformation file or something
+class Hiding extends Card {
+  onPlay(player: number, game: GameModel) {
+    const index = game.story.acts.length - 1
+    this.transform(index, skittish, game)
+    game.story.replaceAct(index, new Act(skittish, player))
+  }
+}
+const hiding = new Hiding({
+  name: 'Hiding',
+  id: 1007,
+  cost: 2,
+  points: 2,
+  text: 'When played, transform this into Skittish.',
+  beta: true,
+})
+
 export {
   fruit,
   oak,
@@ -302,4 +359,8 @@ export {
   parade,
   meAndHer,
   sensualist,
+  // NEW
+  doll,
+  skittish,
+  hiding,
 }

@@ -10,6 +10,9 @@ class Story {
   acts: Act[] = []
   resolvedActs: Act[] = []
 
+  // Some effects cause a round to end immediately
+  roundEndedForced: boolean = false
+
   // Add a card to the story with given owner and at given position
   addAct(card: Card, owner: number, i?: number) {
     const act = new Act(card, owner)
@@ -25,6 +28,7 @@ class Story {
     game.score = [0, 0]
     game.recentModels = [[], []]
     this.resolvedActs = []
+    this.roundEndedForced = false
 
     // Add a model at the start
     game.versionIncrClearAnimations()
@@ -32,7 +36,7 @@ class Story {
 
     let index = 0
     const roundEndEffects: [Function, number][] = []
-    while (this.acts.length > 0) {
+    while (this.acts.length > 0 && !this.roundEndedForced) {
       const act = this.acts.shift()!
 
       game.sound = SoundEffect.Resolve
@@ -44,10 +48,8 @@ class Story {
         act.owner,
       ])
 
-      // Put in pile or remove from game if Fleeting
-      if (act.card.name === 'Pet') {
-        // Pet creates a new pet, so don't add to either pile
-      } else if (!act.card.qualities.includes(Quality.FLEETING)) {
+      // Put in discard pile or remove from game if Fleeting
+      if (!act.card.qualities.includes(Quality.FLEETING)) {
         game.pile[act.owner].push(act.card)
       } else {
         game.expended[act.owner].push(act.card)
@@ -66,8 +68,8 @@ class Story {
     }
   }
 
-  // Save the final state of the story resolving, and clear the story
-  saveFinalStateAndClear(game: GameModel) {
+  // Save the final state of the story resolving, and clear resolved acts
+  saveFinalStateAndClearResolved(game: GameModel) {
     addRecentModels(game)
 
     this.resolvedActs = []
@@ -89,10 +91,6 @@ class Story {
       game.recentModels[1][game.recentModels[1].length - 1].sound =
         SoundEffect.Tie
     }
-
-    // Clear the story
-    this.acts = []
-    this.resolvedActs = []
   }
 
   // Remove the act at the given index

@@ -107,7 +107,14 @@ class ServerController {
     this.model.story.addAct(card, player)
 
     // Trigger on-play effects
+    for (let i = 0; i < this.model.story.acts.length - 1; i++) {
+      const act = this.model.story.acts[i]
+      act.card.onCardPlayedAfter(player, this.model, i)
+    }
     card.onPlay(player, this.model)
+
+    // Increment count of player's played cards
+    this.model.amtCardsPlayedThisRound[player] += 1
   }
 
   doMulligan(player: number, mulligans: Mulligan): void {
@@ -178,6 +185,10 @@ class ServerController {
     this.model.amtPasses = [0, 0]
     this.model.amtDrawn = [0, 0]
 
+    // Set cards played this round / last round
+    this.model.amtCardsPlayedLastRound = this.model.amtCardsPlayedThisRound
+    this.model.amtCardsPlayedThisRound = [0, 0]
+
     // Set priority
     this.model.priority = this.model.lastPlayerWhoPlayed
 
@@ -204,7 +215,7 @@ class ServerController {
       let index = 0
       while (index < this.model.hand[player].length) {
         const card = this.model.hand[player][index]
-        const somethingActivated = card.onUpkeepInHand(
+        const [somethingActivated, cardLeftHand] = card.onUpkeepInHand(
           player,
           this.model,
           index,
@@ -222,7 +233,9 @@ class ServerController {
           )
         }
 
-        index += 1
+        if (!cardLeftHand) {
+          index += 1
+        }
       }
     }
 
@@ -286,7 +299,7 @@ class ServerController {
     this.model.endingBreath[0] = this.model.breath[0]
     this.model.endingBreath[1] = this.model.breath[1]
 
-    this.model.story.saveFinalStateAndClear(this.model)
+    this.model.story.saveFinalStateAndClearResolved(this.model)
 
     this.model.sound = null
   }

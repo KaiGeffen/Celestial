@@ -1,10 +1,11 @@
 import Card from '../card'
-import { SightCard } from '../card'
+import card, { SightCard } from '../card'
 import { Quality } from '../quality'
 import { Keywords } from '../keyword'
 import { Animation } from '../../animation'
 import { Zone } from '../zone'
 import GameModel from '../gameModel'
+import { dove } from './birds'
 
 class Stars extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -136,7 +137,6 @@ const sunflower = new Sunflower({
   text: 'Inspire 1 for each point this is worth.',
 })
 
-// Beta
 class Fates extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
@@ -263,6 +263,120 @@ const pride = new Pride({
   text: 'Morning: Exhale 1: Add this to the story. Discard a card.',
 })
 
+// NEW
+class Rocketship extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    bonus += game.hand[player].filter((card) => card.cost >= 6).length
+
+    super.play(player, game, index, bonus)
+
+    for (let i = 0; i < game.hand[player].length; ) {
+      const card = game.hand[player][i]
+
+      // Either remove a card or increment i
+      if (card.cost >= 6) {
+        game.bottom(player, 1, i)
+      } else {
+        i++
+      }
+    }
+  }
+}
+const rocketship = new Rocketship({
+  name: 'Rocketship',
+  id: 8094,
+  cost: 2,
+  points: 2,
+  text: 'Worth +1 for each card in your hand with base cost 6 or more. Put those cards on the bottom of your deck.',
+  beta: true,
+})
+
+class Fable extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    // Characters
+    if (super.exhale(1, game, player)) {
+      game.createInStory(player, dove)
+    }
+
+    // Conflict
+    if (super.exhale(3, game, player)) {
+      // Get the base cost of all cards in the story
+      const baseCosts = [1] //game.pile[player].map((card) => card.cost)
+
+      for (let i = 0; i < game.story.acts.length; ) {
+        // Discard the card if it shares a cost, otherwise move to next card
+        if (game.story.acts[i].card.cost in baseCosts) {
+          game.removeAct(i)
+        } else {
+          i++
+        }
+      }
+    }
+
+    // Moral
+    if (super.exhale(1, game, player)) {
+      game.draw(player, 1)
+    }
+  }
+}
+const fable = new Fable({
+  name: 'Fable',
+  id: 8093,
+  text: 'Exhale 5: Draw 3 cards.\nExhale 3: Create a Sickness in the story.\nExhale 1: Create a Dove in the story.',
+})
+
+const phi = new Card({
+  name: 'Phi',
+  id: 8105,
+  cost: 8,
+  points: 8,
+  text: 'If this is in hand at the end of a round, reduce its cost by 1 for each breath you have until you play it.',
+})
+
+class OuterSpace extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    game.breath[player] += index
+
+    if (super.exhale(4, game, player)) {
+      game.score[player] = 0
+    }
+  }
+}
+const outerSpace = new OuterSpace({
+  name: 'Outer Space',
+  id: 8097,
+  cost: 2,
+  points: 2,
+  text: 'Gain 1 breath for each card before this in the story.\nExhale 4: Set your points to 0.',
+})
+
+class Starfall extends Card {
+  onUpkeepInHand(
+    player: number,
+    game: GameModel,
+    index: number,
+  ): [boolean, boolean] {
+    if (game.hand[player].length >= 5) {
+      game.discard(player, 1, index)
+      this.inspired(1, game, player)
+      return [true, true]
+    }
+    return [false, false]
+  }
+}
+const starfall = new Starfall({
+  name: 'Starfall',
+  id: 8006,
+  cost: 6,
+  points: 6,
+  text: 'At the start of turn, if your hand has at least 5 cards including this, discard this to Inspired 1.',
+  beta: true,
+})
+
 export {
   stars,
   cosmos,
@@ -277,4 +391,8 @@ export {
   cloakOfStars,
   dreamer,
   pride,
+  // NEW
+  rocketship,
+  // fable,
+  starfall,
 }

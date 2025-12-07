@@ -163,8 +163,13 @@ export default class Card {
   }
 
   /* Triggers */
-  onUpkeepInHand(player: number, game: GameModel, index: number): boolean {
-    return false
+  // Return whether something activated, and whether the card left hand
+  onUpkeepInHand(
+    player: number,
+    game: GameModel,
+    index: number,
+  ): [boolean, boolean] {
+    return [false, false]
   }
 
   onMorning(player: number, game: GameModel, index: number): boolean {
@@ -178,6 +183,11 @@ export default class Card {
   onRoundEndIfThisResolved(player: number, game: GameModel): void {}
 
   onDraw(player: number, game: GameModel): void {}
+
+  onShuffle(player: number, game: GameModel, index: number): void {}
+
+  // Called when a card is played while this is in the story
+  onCardPlayedAfter(player: number, game: GameModel, index: number): void {}
 
   /* Common functions */
   reset(game: GameModel) {

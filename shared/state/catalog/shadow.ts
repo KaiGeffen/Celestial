@@ -3,7 +3,7 @@ import { Quality } from '../quality'
 import GameModel from '../gameModel'
 import { Zone } from '../zone'
 import { Animation, Visibility } from '../../animation'
-// import { wound } from './tokens'
+import { wound } from './tokens'
 
 class Dagger extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -238,18 +238,19 @@ const victim = new Victim({
   text: 'If you lose this round, Nourish -1 your opponent for each point you lost by.',
 })
 
-// class Rupture extends Card {
-//   play(player: number, game: GameModel, index: number, bonus: number) {
-//     super.play(player, game, index, bonus)
-//     game.create(player ^ 1, wound)
-//   }
-// }
-// const rupture = new Rupture({
-//   name: 'Rupture',
-//   id: 72,
-//   cost: 1,
-//   text: "Create a Wound in your opponent's hand.",
-// })
+class Rupture extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    game.create(player ^ 1, wound)
+  }
+}
+const rupture = new Rupture({
+  name: 'Rupture',
+  id: 72,
+  cost: 1,
+  text: "Create a Wound in your opponent's hand.",
+  beta: true,
+})
 
 class LostInShadow extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -287,6 +288,76 @@ const vampire = new Vampire({
   text: "Worth -X where X is your opponent's points.\nCosts 1 less for each card in the story.",
 })
 
+// NEW CARDS
+class Voices extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    // Opponent adds first
+    if (super.exhale(1, game, player)) {
+      if (game.hand[player ^ 1].length > 0) {
+        const card = game.hand[player ^ 1].shift()
+        game.story.addAct(card, player ^ 1, 0)
+      }
+    }
+
+    // Player adds second
+    if (super.exhale(3, game, player)) {
+      if (game.hand[player].length > 0) {
+        const card = game.hand[player].shift()
+        game.story.addAct(card, player, 1)
+      }
+    }
+  }
+}
+const voices = new Voices({
+  name: 'Voices',
+  id: 483,
+  cost: 1,
+  points: 1,
+  text: 'Exhale 2: Your opponent adds a card from their hand to the story.\nExhale 2: You do the same after their card.',
+  beta: true,
+})
+
+class Isolation extends Card {
+  getCost(player: number, game: GameModel): number {
+    const wonPreviousRound = game.checkPlayerWonPreviousRound(player)
+
+    if (wonPreviousRound && game.amtCardsPlayedLastRound[player] === 0) {
+      return 0
+    }
+
+    return this.cost
+  }
+}
+const isolation = new Isolation({
+  name: 'Isolation',
+  id: 484,
+  cost: 7,
+  points: 7,
+  text: 'Costs 0 if you won last round without playing any cards.',
+})
+
+class Spider extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    if (super.exhale(2, game, player)) {
+      if (game.story.acts.length > 0) {
+        game.returnActToHand(0)
+      }
+    }
+  }
+}
+const spider = new Spider({
+  name: 'Spider',
+  id: 485,
+  cost: 3,
+  points: 3,
+  text: "Exhale 2: Return the next card in the story to its owner's hand.",
+  beta: true,
+})
+
 export {
   dagger,
   shadow,
@@ -300,4 +371,9 @@ export {
   victim,
   lostInShadow,
   vampire,
+  // NEW CARDS
+  // isolation,
+  rupture,
+  voices,
+  spider,
 }

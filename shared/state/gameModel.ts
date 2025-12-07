@@ -62,9 +62,13 @@ export default class GameModel {
   // For client side visualization
   cardCosts: number[]
 
-  // Other (For weird cards)
+  // Other (For specific cards)
   amtPasses: number[] = [0, 0]
   amtDrawn: number[] = [0, 0]
+  amtCardsPlayedLastRound: [number, number] = [0, 0]
+  amtCardsPlayedThisRound: [number, number] = [0, 0]
+
+  // The cosmetics used in this match
   cosmeticSets: CosmeticSet[]
 
   constructor(
@@ -220,10 +224,10 @@ export default class GameModel {
     return card
   }
 
-  discard(player: number, amt = 1) {
+  discard(player: number, amt = 1, index = 0) {
     for (let i = 0; i < amt; i++) {
-      if (this.hand[player].length > 0) {
-        const card = this.hand[player].splice(0, 1)[0]
+      if (this.hand[player].length > index) {
+        const card = this.hand[player].splice(index, 1)[0]
         this.pile[player].push(card)
 
         const discardPileIndex = this.pile[player].length - 1
@@ -248,7 +252,17 @@ export default class GameModel {
     while (amt > 0 && this.hand[player].length > index) {
       card = this.hand[player].splice(index, 1)[0]
       this.deck[player].unshift(card)
+
       amt -= 1
+
+      this.animations[player].push(
+        new Animation({
+          from: Zone.Hand,
+          to: Zone.Deck,
+          index: index,
+          index2: 0,
+        }),
+      )
     }
     return card
   }
@@ -269,6 +283,10 @@ export default class GameModel {
               index2: this.hand[player].length - 1,
             }),
           )
+
+          // Trigger its on draw effects
+          card.onDraw(player, this)
+
           return card
         }
       }
@@ -321,8 +339,8 @@ export default class GameModel {
     this.deck[player].push(card)
   }
 
-  createInStory(player: number, card: Card) {
-    this.story.addAct(card, player)
+  createInStory(player: number, card: Card, i?: number) {
+    this.story.addAct(card, player, i)
   }
 
   dig(player: number, amt: number) {
@@ -360,15 +378,34 @@ export default class GameModel {
     }
   }
 
+  /**
+   * Shuffle the deck of the given player
+   * @param player - The player whose deck to shuffle
+   * @param remember - Whether to remember the cards that were shuffled
+   * @param take_pile - Whether to shuffle the discard pile in
+   */
   shuffle(player: number, remember = true, take_pile = true) {
+    // Remember the cards that were shuffled
     if (remember) {
       this.lastShuffle[player] = this.pile[player]
     }
+
+    // Shuffle the discard pile in
     if (take_pile) {
       this.deck[player] = this.pile[player].concat(this.deck[player])
       this.pile[player] = []
     }
+
+    // Randomize the deck
     this.deck[player].sort(() => Math.random() - 0.5)
+
+    // Trigger any on shuffle effects
+    // NOTE Must start from the top since a card moves itself
+    for (let i = this.deck[player].length - 1; i >= 0; i--) {
+      this.deck[player][i].onShuffle(player, this, i)
+    }
+
+    // Animate
     if (this.deck[player].length > 0) {
       this.animations[player].push(
         new Animation({
@@ -412,6 +449,15 @@ export default class GameModel {
         index2: this.hand[act.owner].length - 1,
         visibility: Visibility.KnowAllDetails,
       }),
+    )
+  }
+
+  // Return whether the given player won the previous round
+  checkPlayerWonPreviousRound(player: number): boolean {
+    const length = this.roundResults[0].length
+    return (
+      this.roundResults[player][length - 1] >
+      this.roundResults[player ^ 1][length - 1]
     )
   }
 }
