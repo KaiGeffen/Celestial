@@ -26,9 +26,7 @@ class SpecialStory extends Story {
   run(game: GameModel) {
     super.run(game)
 
-    // TODO This isn't right
-
-    // Mode 4: Cards with Fleeting are discarded instead of removed from the game
+    // Mode 4: Cards with Fleeting are discarded instead of removed from the game AT END OF ROUND
     if (this.enabledModes.includes(4)) {
       for (const player of [0, 1]) {
         // Move all Fleeting cards from expended to pile

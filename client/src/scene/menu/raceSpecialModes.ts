@@ -12,7 +12,7 @@ const modeNames: string[] = [
   'Instead of normal draws as the round starts, discard hand and draw 5',
   'When a card is added to the story, increase its points by 1 permanently',
   'At the end of each round, discard a card',
-  'BROKEN: Cards with Fleeting are discarded instead of removed from the game',
+  "At the end of each round, add cards removed from the game back to their owner's discard pile",
 ]
 
 export default class RaceSpecialModesMenu extends Menu {
@@ -41,7 +41,7 @@ export default class RaceSpecialModesMenu extends Menu {
 
   private createModeToggle(modeNumber: number) {
     const isEnabled = this.enabledModes.includes(modeNumber)
-    const buttonText = isEnabled ? 'Enabled' : 'Disabled'
+    const buttonText = isEnabled ? 'Enabled' : ''
 
     let sizer = this.scene.rexUI.add.sizer({
       width: width - Space.pad * 2,
@@ -75,7 +75,7 @@ export default class RaceSpecialModesMenu extends Menu {
     if (index > -1) {
       // Disable mode
       this.enabledModes.splice(index, 1)
-      this.modeButtons[modeNumber].setText('Disabled')
+      this.modeButtons[modeNumber].setText('')
     } else {
       // Enable mode
       this.enabledModes.push(modeNumber)

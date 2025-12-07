@@ -39,7 +39,7 @@ class Story {
 
       act.card.play(act.owner, game, index, 0)
       roundEndEffects.push([
-        // NOTE Preserver this to be the card
+        // NOTE Preserve 'this' in the callback to be the card
         act.card.onRoundEndIfThisResolved.bind(act.card),
         act.owner,
       ])

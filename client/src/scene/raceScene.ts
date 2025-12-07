@@ -138,18 +138,12 @@ export default class RaceScene extends BaseScene {
 
     // Special Modes button
     const specialModesContainer = this.add.container(
-      Space.windowWidth - Space.cutoutWidth - Space.pad * 2,
+      Space.windowWidth / 2 - Space.cutoutWidth - Space.pad * 2,
       Space.pad + yOffset,
     )
     specialModesContainer.setDepth(6)
 
-    const buttonContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      50,
-    )
+    const buttonContainer = new ContainerLite(this, 0, 0, Space.buttonWidth, 50)
     new Buttons.Basic({
       within: buttonContainer,
       text: 'Special Modes',
