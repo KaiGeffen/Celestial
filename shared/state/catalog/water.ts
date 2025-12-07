@@ -270,6 +270,7 @@ const drip = new Drip({
   points: 1,
   qualities: [Quality.VISIBLE],
   text: 'Visible\nWhen drawn, add this to the story.',
+  beta: true,
 })
 
 // TODO

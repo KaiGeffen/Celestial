@@ -375,6 +375,7 @@ const remnant = new Remnant({
   cost: 2,
   points: 2,
   text: 'Add an Ashes to your discard pile.\nMorning: Return this to hand. Discard a card.',
+  beta: true,
 })
 
 class DyingLight extends Card {

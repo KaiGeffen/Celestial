@@ -283,6 +283,7 @@ const rocketship = new Rocketship({
   cost: 2,
   points: 2,
   text: 'Worth +1 for each card in your hand with base cost 6 or more. Put those cards on the bottom of your deck.',
+  beta: true,
 })
 
 class Fable extends Card {
@@ -368,6 +369,7 @@ const starfall = new Starfall({
   cost: 6,
   points: 6,
   text: 'At the start of turn, if your hand has at least 5 cards including this, discard this to Inspired 1.',
+  beta: true,
 })
 
 export {

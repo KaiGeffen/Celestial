@@ -298,6 +298,7 @@ const doll = new Doll({
   cost: 1,
   points: 1,
   text: 'Morning: Worth X permanently, where X is how many points you won the last round by.',
+  beta: true,
 })
 
 class Skittish extends Card {
@@ -312,6 +313,7 @@ const skittish = new Skittish({
   cost: 3,
   points: 4,
   text: 'When a card is played after this, transform this into Hiding.',
+  beta: true,
 })
 
 // TODO Move to a transformation file or something
@@ -328,6 +330,7 @@ const hiding = new Hiding({
   cost: 2,
   points: 2,
   text: 'When played, transform this into Skittish.',
+  beta: true,
 })
 
 export {

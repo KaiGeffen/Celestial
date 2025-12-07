@@ -221,6 +221,7 @@ const rupture = new Rupture({
   id: 72,
   cost: 1,
   text: "Create a Wound in your opponent's hand.",
+  beta: true,
 })
 
 class LostInShadow extends Card {
@@ -287,6 +288,7 @@ const voices = new Voices({
   cost: 1,
   points: 1,
   text: 'Exhale 2: Your opponent adds a card from their hand to the story.\nExhale 2: You do the same after their card.',
+  beta: true,
 })
 
 class Isolation extends Card {
@@ -325,6 +327,7 @@ const spider = new Spider({
   cost: 3,
   points: 3,
   text: "Exhale 2: Return the next card in the story to its owner's hand.",
+  beta: true,
 })
 
 export {

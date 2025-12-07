@@ -326,6 +326,7 @@ const updraft = new Updraft({
   id: 1066,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nMove your next card in the story forward one spot.',
+  beta: true,
 })
 
 class Birdsong extends Card {
@@ -352,6 +353,7 @@ const birdsong = new Birdsong({
   cost: 5,
   points: 5,
   text: 'Morning: Remove all card text from a card in your hand.',
+  beta: true,
 })
 
 export {
