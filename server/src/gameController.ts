@@ -259,7 +259,7 @@ class ServerController {
   }
 
   // The resolution phase, after both players have passed. Points and effects happen as cards resolve
-  private doResolvePhase(): void {
+  protected doResolvePhase(): void {
     this.model.score = [0, 0]
 
     this.model.story.run(this.model)

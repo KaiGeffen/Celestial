@@ -10,7 +10,9 @@ const width = 900
 const modeNames: string[] = [
   'Start at 3 breath',
   'Instead of normal draws as the round starts, discard hand and draw 5',
-  'When you play a card, increase its points by 1 permanently',
+  'When a card is added to the story, increase its points by 1 permanently',
+  'At the end of each round, discard a card',
+  'BROKEN: Cards with Fleeting are discarded instead of removed from the game',
 ]
 
 export default class RaceSpecialModesMenu extends Menu {
