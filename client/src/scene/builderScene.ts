@@ -9,7 +9,7 @@ import DeckRegion from './builderRegions/deck'
 import DecklistsRegion from './builderRegions/decklists'
 import FilterRegion from './builderRegions/filter'
 import JourneyRegion from './builderRegions/journey'
-import { Space } from '../settings/settings'
+import { Space, Messages } from '../settings/settings'
 import { DecklistSettings } from '../../../shared/settings'
 import Catalog from '../../../shared/state/catalog'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
@@ -143,7 +143,7 @@ export class JourneyBuilderScene extends BuilderBase {
   protected startCallback(): () => void {
     return () => {
       if (!server || !server.isOpen()) {
-        this.signalError('Server is disconnected.')
+        this.signalError(Messages.disconnectError)
         return
       }
 

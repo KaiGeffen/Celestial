@@ -27,19 +27,32 @@ export default function createLeaderboardServer() {
           wins: players.wins,
           losses: players.losses,
           elo: players.elo,
+          cosmetic_set: players.cosmetic_set,
         })
         .from(players)
-        // TODO Remove once those old accounts have been deleted
         .where(
-          sql`${players.username} != 'Player' AND (${players.wins} + ${players.losses}) > 0`,
+          sql`${players.username} != 'Guest' AND (${players.wins} + ${players.losses}) > 0`,
         )
         .orderBy(desc(players.elo))
-        .limit(100)
+        .limit(1000)
 
-      const rankedData = leaderboardData.map((player, index) => ({
-        ...player,
-        rank: index + 1,
-      }))
+      const rankedData = leaderboardData.map((player, index) => {
+        let cosmeticSet
+        try {
+          cosmeticSet = JSON.parse(player.cosmetic_set)
+        } catch (e) {
+          // Default to avatar 0, border 0 if parsing fails
+          cosmeticSet = { avatar: 0, border: 0 }
+        }
+        return {
+          username: player.username,
+          wins: player.wins,
+          losses: player.losses,
+          elo: player.elo,
+          cosmeticSet,
+          rank: index + 1,
+        }
+      })
 
       res.json(rankedData)
     } catch (error) {

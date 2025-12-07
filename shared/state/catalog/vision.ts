@@ -148,7 +148,7 @@ const timid = new Timid(3, {
 class Balance extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     if (game.story.resolvedActs.length === game.story.acts.length) {
-      bonus += 3
+      bonus += 2
     }
     super.play(player, game, index, bonus)
   }
@@ -157,8 +157,8 @@ const balance = new Balance({
   name: 'Balance',
   id: 88,
   cost: 2,
-  points: 1,
-  text: 'Worth +3 if the number of cards before this in the story is equal to the number of cards after this.',
+  points: 2,
+  text: 'Worth +2 if the number of cards before this in the story is equal to the number of cards after this.',
 })
 
 class Riddle extends Card {

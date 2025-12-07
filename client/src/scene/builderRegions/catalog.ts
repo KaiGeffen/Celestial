@@ -6,7 +6,7 @@ import { Space, Time, Scroll, Ease, Flags } from '../../settings/settings'
 import Catalog from '../../../../shared/state/catalog'
 import { BuilderBase } from '../builderScene'
 import newScrollablePanel from '../../lib/scrollablePanel'
-import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
+import { UserSettings } from '../../settings/userSettings'
 
 // Region where all of the available cards can be scrolled through
 export default class CatalogRegion {
@@ -26,10 +26,14 @@ export default class CatalogRegion {
 
     this.createPanel(scene)
 
-    // Add each card, sorted by cost
     let pool = Flags.devCardsEnabled
       ? [...Catalog.collectibleCards, ...Catalog.betaCards]
       : Catalog.collectibleCards
+
+    // Only show owned cards
+    const cardInventory = UserSettings._get('cardInventory') || []
+    pool = pool.filter((card) => cardInventory[card.id] === true)
+
     pool.forEach((card) => {
       this.createCard(card)
     })

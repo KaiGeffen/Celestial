@@ -34,7 +34,7 @@ export class TypedWebSocket<
 
   send<T extends keyof Sent>(message: Sent[T] & { type: T }): void {
     if (!this.isOpen()) {
-      console.log('WebSocket is not open, message not sent:', message)
+      console.log('WebSocket is not open, message not sent')
       return
     }
     this.ws.send(JSON.stringify(message))
@@ -61,7 +61,7 @@ export class TypedWebSocket<
   }
 
   isOpen(): boolean {
-    // TODO Websocket.OPEN is 1, but remote vs local views Websocket differently
+    // TODO Websocket.OPEN is 1, but remote vs local views Websocket (The library) differently
     return this.ws.readyState === 1
   }
 }

@@ -25,13 +25,13 @@ Hit play to get into a match, or customize your avatar by clicking on it.`,
  * Shows a tooltip for the given scene if it hasn't been seen before
  * @param scene - The Phaser scene to show the tooltip for
  */
-export default function showTooltip(scene: any): void {
+export default function showTooltip(scene: any): boolean {
   // Get the scene name from the scene's key
   const sceneName = scene.scene.key
 
   // Check if we have a tooltip for this scene
   if (!(sceneName in SCENE_TOOLTIPS)) {
-    return
+    return false
   }
 
   // Get the list of seen tooltips
@@ -39,7 +39,7 @@ export default function showTooltip(scene: any): void {
 
   // Check if this tooltip has already been seen
   if (tooltipsSeen.includes(sceneName)) {
-    return
+    return false
   }
 
   // Mark this tooltip as seen
@@ -54,4 +54,6 @@ export default function showTooltip(scene: any): void {
     s: tooltip.message,
     activeScene: scene,
   })
+
+  return true
 }

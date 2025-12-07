@@ -124,10 +124,15 @@ export default class MapJourneyScene extends BaseScene {
       y,
       f: () => {
         this.scene.launch('MenuScene', {
-          menu: 'help',
-          callback: () => {
-            this.scene.start('TutorialGameScene', { missionID: 0 })
-          },
+          menu: 'message',
+          title: 'Help',
+          s: `Explore the city, learning about each of the travelers who was called here.
+
+          Each character has a neighborhood, where the missions revolve around their unique mechanics and delve into their backstory.
+          
+          Each mission has a set of cards that you must use for the match, plus whatever cards you choose to include from your inventory.
+          
+          Completing a mission unlocks new cards and missions. Completing the core missions for a character will often unlock additional neighborhoods.`,
         })
       },
       depth: 10,

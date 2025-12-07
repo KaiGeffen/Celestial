@@ -16,6 +16,7 @@ import { CosmeticSet } from '../../shared/types/cosmeticSet'
 import { Achievement } from '../../shared/types/achievement'
 import GameModel from '../../shared/state/gameModel'
 import { v5 as uuidv5 } from 'uuid'
+import messagesToClient from '../../shared/network/messagesToClient'
 
 const ip = '127.0.0.1'
 const port = 5555
@@ -76,12 +77,20 @@ export default class Server {
     // Register OAuth-specific handlers
     server
       .on('promptUserInit', () => {
+        // Hide the signin button
+        document.getElementById('signin').hidden = true
+
         // Open username registration menu
         game.scene.getAt(0).scene.launch('MenuScene', {
           menu: 'registerUsername',
-          // Ensure that user is logged out if they cancel
+          // Ensure that user is logged out and can signin if they cancel
           exitCallback: () => {
             Server.logout()
+
+            // Ensure guest button is visible
+            game.scene.getScenes(true).forEach((scene) => {
+              scene.events.emit('showGuestButton')
+            })
           },
         })
       })
@@ -98,23 +107,6 @@ export default class Server {
 
         if (server) server.close(code)
         server = undefined
-      })
-      .on('alreadySignedIn', () => {
-        console.log(
-          'Server indicated that the given uuid is already signed in. Logging out.',
-        )
-
-        Server.logout()
-
-        // TODO Make this a part of the static logout method
-        game.scene
-          .getScenes(true)[0]
-          .scene.start('SigninScene')
-          .launch('MenuScene', {
-            menu: 'message',
-            title: 'ERROR',
-            s: 'The selected account is already logged in on another device or tab. Please select another account option.',
-          })
       })
 
     // Register common handlers
@@ -171,50 +163,38 @@ export default class Server {
     callback: () => void,
   ) {
     server
-      .on(
-        'sendUserData',
-        (data: {
-          inventory: string
-          completedMissions: string
-          avatar_experience: number[]
-          decks: Deck[]
-          username: string
-          elo: number
-          garden: Date[]
-          gems: number
-          coins: number
-          ownedItems: number[]
-          cosmeticSet: CosmeticSet
-          achievements: Achievement[]
-        }) => {
-          // Store the uuid and user data after successful login
-          this.userData = {
-            uuid,
-            ...data,
-            garden: data.garden.map((dateStr) => new Date(dateStr)),
-          }
-
-          this.loadUserData(data)
-          // TODO Bad smell, the callback should only happen once as it references a scene
-          if (callback) {
-            callback()
-            callback = null
-          }
-        },
-      )
-      .on('harvestGardenResult', ({ success, newGarden, reward }) => {
-        // Only update the stored garden if the harvest was successful
-        if (success) {
-          this.userData.garden = newGarden.map((dateStr) => new Date(dateStr))
+      .on('sendUserData', (data: messagesToClient['sendUserData']) => {
+        // Store the uuid and user data after successful login
+        this.userData = {
+          uuid,
+          ...data,
+          garden: data.garden.map((dateStr) => new Date(dateStr)),
         }
 
-        // Emit global event that HomeScene can listen to regardless of success
-        game.events.emit('gardenHarvested', {
-          success: success,
-          newGarden: this.userData.garden,
-          reward: reward,
-        })
+        this.loadUserData(data, game)
+        // TODO Bad smell, the callback should only happen once as it references a scene
+        if (callback) {
+          callback()
+          callback = null
+        }
       })
+      .on(
+        'harvestGardenResult',
+        ({ success, newGarden, reward, goldReward }) => {
+          // Only update the stored garden if the harvest was successful
+          if (success) {
+            this.userData.garden = newGarden.map((dateStr) => new Date(dateStr))
+          }
+
+          // Emit global event that HomeScene can listen to regardless of success
+          game.events.emit('gardenHarvested', {
+            success: success,
+            newGarden: this.userData.garden,
+            reward: reward,
+            goldReward: goldReward,
+          })
+        },
+      )
       .on('promptReconnect', (data) => {
         // Store reconnect data for PreloadScene to handle after assets load
         this.pendingReconnect = { state: data.state }
@@ -239,6 +219,9 @@ export default class Server {
     Server.userData = null
 
     UserSettings.clearSessionStorage()
+
+    // Show the signin button
+    document.getElementById('signin').hidden = false
   }
 
   // Send server an updated list of decks
@@ -289,20 +272,15 @@ export default class Server {
     })
   }
 
-  // Send server user's list of completed missions
-  static purchaseItem(id: number, cost: number): void {
+  static purchaseItem(id: number): void {
     if (!server || !server.isOpen()) {
       console.error('Purchasing item when server ws doesnt exist.')
       return
     }
     server.send({
-      type: 'purchaseItem' as const,
+      type: 'purchaseItem',
       id,
     })
-
-    // Locally manage the purchase
-    Server.getUserData().gems -= cost
-    // TODO Cosmetic array update
   }
 
   static setCosmeticSet(cosmeticSet: CosmeticSet): void {
@@ -377,6 +355,17 @@ export default class Server {
     })
   }
 
+  static accessDiscord(): void {
+    if (!server || !server.isOpen()) {
+      console.error('Accessing Discord when server ws doesnt exist.')
+      return
+    }
+
+    server.send({
+      type: 'accessDiscord',
+    })
+  }
+
   static harvestGarden(plotNumber: number): void {
     if (!server || !server.isOpen()) {
       console.error('Harvesting garden when server ws doesnt exist.')
@@ -393,16 +382,10 @@ export default class Server {
   }
 
   // Load user data that was sent from server into session storage
-  private static loadUserData(data: {
-    inventory: string
-    completedMissions: string
-    avatar_experience: number[]
-    decks: Deck[]
-    username: string
-    elo: number
-    gems: number
-    ownedItems: number[]
-  }): void {
+  private static loadUserData(
+    data: messagesToClient['sendUserData'],
+    game: Phaser.Game,
+  ): void {
     // Map from binary string to bool array
     sessionStorage.setItem(
       'inventory',
@@ -422,12 +405,24 @@ export default class Server {
           .map((char) => char === '1'),
       ),
     )
+    sessionStorage.setItem(
+      'cardInventory',
+      JSON.stringify(
+        data.cardInventory
+          .toString()
+          .split('')
+          .map((char) => char === '1'),
+      ),
+    )
 
     sessionStorage.setItem('decks', JSON.stringify(data.decks))
     sessionStorage.setItem(
       'avatar_experience',
       JSON.stringify(data.avatar_experience),
     )
+
+    // Emit event so scenes can refresh if needed
+    game.events.emit('userDataUpdated')
   }
 
   // Get a websocket right for the current environment

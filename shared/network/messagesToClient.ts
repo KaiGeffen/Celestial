@@ -6,7 +6,6 @@ import GameModel from '../state/gameModel'
 export default interface messagesToClient {
   promptUserInit: {}
   invalidToken: {}
-  alreadySignedIn: {}
   sendUserData: {
     inventory: string
     completedMissions: string
@@ -20,6 +19,7 @@ export default interface messagesToClient {
     ownedItems: number[]
     cosmeticSet: CosmeticSet
     achievements: Achievement[]
+    cardInventory: string
   }
   purchaseItemSuccess: {
     itemId: number
@@ -29,6 +29,7 @@ export default interface messagesToClient {
     success: boolean
     newGarden?: Date[]
     reward?: number
+    goldReward?: number
   }
   promptReconnect: {
     state: GameModel

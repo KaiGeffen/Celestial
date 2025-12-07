@@ -9,7 +9,6 @@ import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
 import { GardenSettings } from '../../../shared/settings'
 import Catalog from '../../../shared/state/catalog'
-import { server } from '../server'
 
 const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
@@ -17,6 +16,8 @@ const height = Space.iconSize * 2 + Space.pad * 3
 export default class HomeScene extends BaseScene {
   gardenTimes: Date[]
   gardenPlants: Phaser.GameObjects.Image[]
+  txtGem: Phaser.GameObjects.Text
+  txtCoins: Phaser.GameObjects.Text
 
   constructor() {
     super({
@@ -45,15 +46,14 @@ export default class HomeScene extends BaseScene {
     // Normal buttons
     this.createFeedbackButton()
 
-    // Check if there are any unseen achievements and show achievements menu if so
-    this.checkAndShowUnseenAchievements()
-
     // Show any plants in the garden
     this.createGarden()
     this.game.events.on('gardenHarvested', this.onGardenHarvested, this)
 
-    // Show tooltip for new users
-    showTooltip(this)
+    // Show tooltip for new users, or if not, show Discord prompt
+    if (!showTooltip(this)) {
+      this.checkAndShowDiscordPrompt()
+    }
   }
 
   private createUserDetails(): void {
@@ -113,7 +113,7 @@ export default class HomeScene extends BaseScene {
       .setAlpha(0.3)
     this.addShadow(smallBg1)
     const amtGems = userData.gems || 0
-    const txtGem = this.add
+    this.txtGem = this.add
       .text(0, y, `${amtGems} 💎`, Style.username)
       .setOrigin(0.5)
 
@@ -124,21 +124,11 @@ export default class HomeScene extends BaseScene {
       .setAlpha(0.3)
     this.addShadow(smallBg2)
     const amtCoins = userData.coins || 0
-    const txtCoins = this.add
+    this.txtCoins = this.add
       .text(0, y, `${amtCoins}💰`, Style.username)
       .setOrigin(0.5)
 
-    userDetails.add([smallBg1, txtGem, smallBg2, txtCoins])
-  }
-
-  private createLoginButton(): void {
-    new Buttons.Basic({
-      within: this,
-      text: 'Login',
-      x: Space.pad + Space.buttonWidth / 2,
-      y: Space.pad + Space.buttonHeight / 2,
-      f: () => this.scene.start('SigninScene'),
-    })
+    userDetails.add([smallBg1, this.txtGem, smallBg2, this.txtCoins])
   }
 
   private createIcons(): void {
@@ -314,7 +304,12 @@ export default class HomeScene extends BaseScene {
   }
 
   private checkAndShowUnseenAchievements(): void {
-    const userAchievements = Server.getUserData()?.achievements || []
+    // Don't show if a menu is already open
+    if (this.scene.isActive('MenuScene')) {
+      return
+    }
+
+    const userAchievements = Server.getUserData().achievements
 
     // Check if any achievements are unseen
     const hasUnseenAchievements = userAchievements.some((ach) => !ach.seen)
@@ -323,6 +318,35 @@ export default class HomeScene extends BaseScene {
       this.scene.launch('MenuScene', {
         menu: 'achievements',
         activeScene: this,
+      })
+    }
+  }
+
+  // Show a prompt to join Discord if they haven't already
+  discordPromptShown = false
+  private checkAndShowDiscordPrompt(): void {
+    // Check if we've already shown this prompt in this session
+    if (this.discordPromptShown) {
+      return
+    }
+    this.discordPromptShown = true
+
+    const userAchievements = Server.getUserData().achievements
+
+    // Check if user has the Discord achievement (ID 1003)
+    const hasDiscordAchievement = userAchievements.some(
+      (ach) => ach.achievement_id === 1003,
+    )
+
+    if (!hasDiscordAchievement) {
+      // Show confirm menu prompting user to join Discord
+      this.scene.launch('MenuScene', {
+        menu: 'confirm',
+        text: 'Join the Discord server for updates, and to earn a 7,500 coin reward!',
+        hint: 'Join the Discord',
+        callback: () => {
+          openDiscord()
+        },
       })
     }
   }
@@ -441,6 +465,7 @@ export default class HomeScene extends BaseScene {
     success: boolean
     newGarden?: Date[]
     reward?: any
+    goldReward?: number
   }): void {
     if (data.success) {
       // Update the garden data
@@ -449,12 +474,18 @@ export default class HomeScene extends BaseScene {
       // Recreate the garden display with updated data
       this.refreshGardenDisplay()
 
+      // Update the user's local gold balance
+      Server.getUserData().coins += data.goldReward
+
       // Show success message and reward
       const card = Catalog.getCardById(data.reward)
+      const s =
+        `+${data.goldReward} 💰\n` +
+        (card.story || `${card.name} was in your garden...`)
       this.scene.launch('MenuScene', {
         menu: 'message',
         title: 'Garden Harvested',
-        s: card.story || `${card.name} was in your garden...`,
+        s,
         card: card,
       })
     } else {
@@ -482,6 +513,17 @@ export default class HomeScene extends BaseScene {
     if (time - this.lastUpdate > 60000) {
       this.updateGarden()
       this.lastUpdate = time
+    }
+
+    // Show any unseen achievements
+    this.checkAndShowUnseenAchievements()
+
+    // Update the currency displays
+    if (this.txtGem) {
+      this.txtGem.setText(`${Server.getUserData().gems} 💎`)
+    }
+    if (this.txtCoins) {
+      this.txtCoins.setText(`${Server.getUserData().coins}💰`)
     }
   }
 

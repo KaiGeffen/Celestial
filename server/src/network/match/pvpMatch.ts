@@ -38,12 +38,15 @@ class PvpMatch extends Match {
         this.game.model.wins[winner ^ 1],
     ]
 
+    const matchQualifiesForRewards = this.game.model.roundCount >= 3
+
     await updateMatchResultPVP(
       idWinner,
       idLoser,
       winnerDeck,
       loserDeck,
       roundsWLT,
+      matchQualifiesForRewards,
     ).catch((error) => {
       console.error('Error updating match results:', error)
     })

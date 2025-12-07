@@ -6,16 +6,22 @@ import type { GoogleJwtPayload } from '../types/google'
 import Loader from '../loader/loader'
 import Server from '../server'
 import { server } from '../server'
-import { Space, Url, UserSettings, Flags, Style } from '../settings/settings'
+import {
+  Space,
+  Url,
+  UserSettings,
+  Flags,
+  Style,
+  Messages,
+} from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 import ensureMusic from '../loader/audioManager'
-import initializeSplashScreen from '../loader/splashLoader'
 import Cinematic from '../lib/cinematic'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
 // How long to wait for server before saying it's disconnected
-const GRACE_PERIOD_TO_CONNECT = 300
+const GRACE_PERIOD_TO_CONNECT = 1000
 // How long the reconnect message lasts on screen
 const RECONNECT_MESSAGE_TIME = 2000
 
@@ -45,11 +51,19 @@ export class SigninScene extends Phaser.Scene {
     // Ensure animation is displayed
     Cinematic.ensure()
 
+    // Add buttons to sign in or play as a guest
+    this.createButtons()
+
     // If user is signed in with OAuth, log them in
     const storedToken = localStorage.getItem(Url.gsi_token)
     if (storedToken !== null) {
       const payload = jwt_decode<GoogleJwtPayload>(storedToken)
       Server.login(payload, this.game, () => this.onOptionClick())
+
+      // Show the guest button when menu closes
+      this.events.on('showGuestButton', () => {
+        this.guestButton.setVisible(true)
+      })
 
       // TODO If this fails because the token is invalid or the server is offline, show options or say network offline
     }
@@ -57,12 +71,6 @@ export class SigninScene extends Phaser.Scene {
     else {
       // Sign in is visible on this page, hidden on all other pages
       document.getElementById('signin').hidden = false
-      this.events.on('shutdown', () => {
-        document.getElementById('signin').hidden = true
-      })
-
-      // Add buttons to sign in or play as a guest
-      this.createButtons()
     }
 
     // Text describing anything going on
@@ -87,7 +95,7 @@ export class SigninScene extends Phaser.Scene {
       !server.isOpen() &&
       Date.now() - this.timeSceneStart > GRACE_PERIOD_TO_CONNECT
     ) {
-      this.txt.setText('Server is disconnected')
+      this.txt.setText(Messages.disconnectError)
     } else if (Server.pendingReconnect) {
       this.txt.setText('Reconnecting to match...')
     } else {

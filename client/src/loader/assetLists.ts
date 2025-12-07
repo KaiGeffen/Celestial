@@ -360,7 +360,18 @@ export const assetLists = {
     pixelArt: true,
   },
   border: {
-    files: ['Grape', 'None', 'Shadow', 'Thorns'],
+    files: [
+      'Ashes',
+      'Birds',
+      'Birth',
+      'Grape',
+      'None',
+      'Shadow',
+      'Stars',
+      'Thorns',
+      'Vision',
+      'Water',
+    ],
     pixelArt: true,
   },
   relic: {

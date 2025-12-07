@@ -7,7 +7,6 @@ import {
   AchievementMeta,
   achievementsMeta,
 } from '../../../../shared/achievementsData'
-import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite'
 
 const width = 900
 const height = 600
@@ -133,15 +132,29 @@ export default class AchievementsMenu extends Menu {
         )
       }
 
-      // Add row content
-      const rewardContainer = new ContainerLite(
-        this.scene,
-        0,
-        0,
-        Space.avatarSize,
-        meta.image ? Space.avatarSize : 0,
-        this.scene.add.image(0, 0, meta.image),
-      )
+      // Add row content - reward container using sizer
+      const rewardSizer = this.scene.rexUI.add.sizer({
+        orientation: 'vertical',
+        width: Space.avatarSize,
+        space: {
+          item: Space.padSmall,
+        },
+      })
+
+      // Add gold reward if it exists (above image if both exist)
+      if (meta.goldReward) {
+        const goldText = this.scene.add
+          .text(0, 0, `${meta.goldReward}💰`, Style.basic)
+          .setOrigin(0.5)
+        rewardSizer.add(goldText)
+      }
+
+      // Add image if it exists
+      if (meta.image) {
+        const image = this.scene.add.image(0, 0, meta.image)
+        rewardSizer.add(image)
+      }
+
       singleRowSizer
         .add(this.scene.add.text(0, 0, meta.title, Style.basic), {
           proportion: 2,
@@ -155,7 +168,7 @@ export default class AchievementsMenu extends Menu {
             proportion: 5,
           },
         )
-        .add(rewardContainer)
+        .add(rewardSizer)
 
       rowsSizer.add(singleRowSizer)
     }

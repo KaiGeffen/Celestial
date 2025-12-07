@@ -2,7 +2,7 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
-import { Color, Space, Style } from '../../settings/settings'
+import { Color, Messages, Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import getRandomAiDeck from '../../data/aiDecks'
@@ -89,7 +89,7 @@ export default class ModeMenu extends Menu {
       text: 'AI',
       f: () => {
         if (!server || !server.isOpen()) {
-          this.scene.signalError('Server is disconnected.')
+          this.scene.signalError(Messages.disconnectError)
           return
         }
 
@@ -120,7 +120,7 @@ export default class ModeMenu extends Menu {
       text: 'PVP',
       f: () => {
         if (!server || !server.isOpen()) {
-          this.scene.signalError('Server is disconnected.')
+          this.scene.signalError(Messages.disconnectError)
           return
         }
 
@@ -151,7 +151,7 @@ export default class ModeMenu extends Menu {
       text: 'PWD',
       f: () => {
         if (!server || !server.isOpen()) {
-          this.scene.signalError('Server is disconnected.')
+          this.scene.signalError(Messages.disconnectError)
           return
         }
 

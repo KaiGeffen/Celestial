@@ -6,6 +6,7 @@
   "scripts": {
     "generate-assets": "npx ts-node src/loader/generate-asset-lists.ts",
     "build": "webpack",
+    "build:prod": "webpack --mode production",
     "start": "npm run build && live-server --port=8083",
     "dev": "webpack --watch & live-server --port=4949"
   },

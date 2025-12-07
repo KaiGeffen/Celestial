@@ -8,8 +8,6 @@ import { players } from '../db/schema'
 import { eq, sql } from 'drizzle-orm'
 import { ServerWS } from '../../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../../shared/types/deck'
-import { STORE_ITEMS } from '../../../shared/storeItems'
-import { cosmeticsTransactions } from '../db/schema'
 import { AchievementManager } from '../achievementManager'
 import Garden from '../db/garden'
 import Catalog from '../../../shared/state/catalog'
@@ -21,6 +19,7 @@ import { MechanicsSettings } from '../../../shared/settings'
 import { logFunnelEvent } from '../db/analytics'
 import TutorialMatch from './match/tutorialMatch'
 import sendUserData from './sendUserData'
+import { getStartingInventoryBitString } from '../startingInventory'
 
 // An ongoing match
 class ActiveGame {
@@ -36,6 +35,8 @@ interface WaitingPlayer {
   deck: Deck
   activeGame: ActiveGame
 }
+
+const CARD_COST = 1000
 
 // Players searching for a match with password as key
 let searchingPlayers: { [key: string]: WaitingPlayer } = {}
@@ -71,8 +72,11 @@ export default function createWebSocketServer() {
         // Check if user is already connected with a live websocket
         const existingWs = activePlayers[uuid]
         if (existingWs && existingWs.isOpen()) {
-          ws.send({ type: 'alreadySignedIn' })
-          return
+          // Close the old connection to allow the new one
+          existingWs.close(1000, 'Logged in from another device')
+
+          // Remove existing ws from active players immediately
+          delete activePlayers[uuid]
         }
 
         // Check if user exists in database
@@ -88,11 +92,11 @@ export default function createWebSocketServer() {
           // Add to active users
           activePlayers[uuid] = ws
 
-          // Send user their data
-          await sendUserData(ws, id)
-
           // Handle achievements
           await AchievementManager.onConnection(id)
+
+          // Send user their data
+          await sendUserData(ws, id)
 
           // If user is in a match, reconnect them
           if (usersAwaitingReconnect[uuid]) {
@@ -168,6 +172,7 @@ export default function createWebSocketServer() {
               inventory: inventory,
               completedmissions: missions,
               avatar_experience: [0, 0, 0, 0, 0, 0],
+              card_inventory: getStartingInventoryBitString(),
               lastactive: new Date().toISOString(),
               garden: [],
               gems: 0,
@@ -183,16 +188,21 @@ export default function createWebSocketServer() {
             // Add to active users
             activePlayers[id] = ws
 
-            // Send user their data
-            await sendUserData(ws, id)
-
             // Handle initial achievement
             await AchievementManager.onConnection(id)
+
+            // Send user their data
+            await sendUserData(ws, id)
           },
         )
         .on('setAchievementsSeen', async () => {
           if (!id) return
           await AchievementManager.setAchievementsSeen(id)
+        })
+        .on('accessDiscord', async () => {
+          if (!id) return
+          await AchievementManager.onDiscordAccess(id)
+          await sendUserData(ws, id)
         })
         .on('harvestGarden', async ({ index }) => {
           if (!id) return
@@ -202,50 +212,60 @@ export default function createWebSocketServer() {
             success: harvestResult.success,
             newGarden: harvestResult.newGarden,
             reward: harvestResult.reward,
+            goldReward: harvestResult.goldReward,
           })
         })
         // Store
         .on('purchaseItem', async ({ id: itemId }) => {
-          if (!id) {
-            throw new Error('User attempted to purchase item before signing in')
-          }
+          if (!id) return
 
-          const item = Object.values(STORE_ITEMS).find(
-            (item) => item.id === itemId,
-          )
-          if (!item) {
-            throw new Error(
-              `User attempted to purchase invalid item: ${itemId}`,
-            )
-          }
-          const cost = item.cost
+          // Check if this is a valid card
+          if (!Catalog.getCardById(itemId)) return
 
-          const currentBalance = await db
-            .select({ balance: players.gems })
+          // Get current user data
+          const userData = await db
+            .select({
+              coins: players.coins,
+              card_inventory: players.card_inventory,
+            })
             .from(players)
             .where(eq(players.id, id))
             .limit(1)
 
-          // TODO Check that user doesnt already own this item
-          if (currentBalance[0].balance < cost) {
-            // TODO Send error to client
+          // Check if user has enough coins
+          const currentBalance = userData[0].coins
+          if (currentBalance < CARD_COST) {
+            ws.send({ type: 'signalError' })
             return
           }
 
+          // Convert inventory bit string to array
+          const inventoryArray = userData[0].card_inventory
+            .split('')
+            .map((char) => char === '1')
+
+          // Check if already owned
+          if (inventoryArray[itemId] === true) {
+            ws.send({ type: 'signalError' })
+            return
+          }
+
+          // Update inventory to mark card as owned
+          inventoryArray[itemId] = true
+          const newInventoryBitString = inventoryArray
+            .map((value) => (value ? '1' : '0'))
+            .join('')
+
           // Start a transaction
           await db.transaction(async (tx) => {
-            // Update balance
+            // Update coins and inventory
             await tx
               .update(players)
-              .set({ gems: currentBalance[0].balance - cost })
+              .set({
+                coins: currentBalance - CARD_COST,
+                card_inventory: newInventoryBitString,
+              })
               .where(eq(players.id, id))
-
-            // Record the transaction
-            await tx.insert(cosmeticsTransactions).values({
-              player_id: id,
-              item_id: itemId,
-              transaction_type: 'purchase',
-            })
           })
 
           // Send updated user data
@@ -281,10 +301,6 @@ export default function createWebSocketServer() {
           // Clean up stale entries first
           Object.keys(searchingPlayers).forEach((password) => {
             if (!searchingPlayers[password].ws.isOpen()) {
-              console.log(
-                'Searching player went stale on password:',
-                searchingPlayers[password],
-              )
               delete searchingPlayers[password]
             }
           })

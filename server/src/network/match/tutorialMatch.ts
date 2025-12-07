@@ -44,6 +44,9 @@ class TutorialMatch extends PveMatch {
       this.game.model.versionNo,
     )
   }
+
+  // Don't update the database for tutorial matches
+  protected async updateDatabases() {}
 }
 
 export default TutorialMatch
