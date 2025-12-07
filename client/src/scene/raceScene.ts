@@ -136,16 +136,26 @@ export default class RaceScene extends BaseScene {
     // Offset to lower the display
     const yOffset = Space.pad * 3
 
-    // Special Modes button
+    // Special Modes button (stacked vertically to the left of decklist)
     const specialModesContainer = this.add.container(
-      Space.windowWidth / 2 - Space.cutoutWidth - Space.pad * 2,
-      Space.pad + yOffset,
+      Space.windowWidth -
+        Space.cutoutWidth -
+        Space.pad * 2 -
+        Space.buttonWidth -
+        Space.pad,
+      Space.pad * 2 + yOffset,
     )
     specialModesContainer.setDepth(6)
 
-    const buttonContainer = new ContainerLite(this, 0, 0, Space.buttonWidth, 50)
+    const specialModesButtonContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      50,
+    )
     new Buttons.Basic({
-      within: buttonContainer,
+      within: specialModesButtonContainer,
       text: 'Special Modes',
       f: () => {
         this.scene.launch('MenuScene', {
@@ -153,7 +163,34 @@ export default class RaceScene extends BaseScene {
         })
       },
     })
-    specialModesContainer.add(buttonContainer)
+    specialModesContainer.add(specialModesButtonContainer)
+
+    // Replace button (stacked below Special Modes button)
+    const replaceContainer = this.add.container(
+      Space.windowWidth -
+        Space.cutoutWidth -
+        Space.pad * 2 -
+        Space.buttonWidth -
+        Space.pad,
+      Space.pad * 2 + yOffset + 50 + Space.pad,
+    )
+    replaceContainer.setDepth(6)
+
+    const replaceButtonContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      50,
+    )
+    new Buttons.Basic({
+      within: replaceButtonContainer,
+      text: 'Replace',
+      f: () => {
+        this.showCardChoice()
+      },
+    })
+    replaceContainer.add(replaceButtonContainer)
 
     // Title
     const title = this.add
@@ -228,14 +265,17 @@ export default class RaceScene extends BaseScene {
     // All nodes are unlocked in Race mode
     this.animatedBtns = []
     raceData.forEach((node: raceNode) => {
+      // Skip cardChoices nodes - they're handled by a button in the UI
+      if ('cardChoices' in node) {
+        return
+      }
+
       // Determine node type icon
       let nodeType = 'QuestionMark'
       if ('deck' in node) {
         nodeType = 'QuestionMark'
       } else if ('opponent' in node) {
         nodeType = 'Mission'
-      } else if ('cardChoices' in node) {
-        nodeType = 'QuestionMark'
       } else if ('info' in node) {
         nodeType = 'QuestionMark'
       }

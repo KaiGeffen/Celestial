@@ -17,6 +17,7 @@ import {
   Ease,
   Flags,
   Style,
+  UserSettings,
 } from '../../settings/settings'
 import { BuilderScene } from '../builderScene'
 import newScrollablePanel from '../../lib/scrollablePanel'

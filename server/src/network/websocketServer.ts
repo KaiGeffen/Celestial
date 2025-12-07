@@ -73,8 +73,11 @@ export default function createWebSocketServer() {
         // Check if user is already connected with a live websocket
         const existingWs = activePlayers[uuid]
         if (existingWs && existingWs.isOpen()) {
-          ws.send({ type: 'alreadySignedIn' })
-          return
+          // Close the old connection to allow the new one
+          existingWs.close(1000, 'Logged in from another device')
+
+          // Remove existing ws from active players immediately
+          delete activePlayers[uuid]
         }
 
         // Check if user exists in database
@@ -323,10 +326,6 @@ export default function createWebSocketServer() {
           // Clean up stale entries first
           Object.keys(searchingPlayers).forEach((password) => {
             if (!searchingPlayers[password].ws.isOpen()) {
-              console.log(
-                'Searching player went stale on password:',
-                searchingPlayers[password],
-              )
               delete searchingPlayers[password]
             }
           })
