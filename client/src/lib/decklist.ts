@@ -102,7 +102,7 @@ export default class Decklist {
       let card = deck[i]
 
       // Only add cards that the player owns
-      if (cardInventory[card.id]) {
+      if (cardInventory[card.id] || !mustOwn) {
         this.addCard(card)
       } else {
         someCardsNotOwned = true
