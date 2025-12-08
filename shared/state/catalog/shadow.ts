@@ -53,7 +53,6 @@ const shadow = new Shadow({
 
 class Imprison extends Card {
   onRoundEndIfThisResolved(player: number, game: GameModel) {
-    console.log('imprison', this.upgradeVersion)
     if (this.upgradeVersion === 1) {
       // Unless opponent won, give them nourish -2
       if (game.score[player] >= game.score[player ^ 1]) {
