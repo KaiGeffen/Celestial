@@ -80,7 +80,21 @@ const imprison = new Imprison({
 class Nightmare extends Card {
   onMorning(player: number, game: GameModel, index: number) {
     if (game.hand[player ^ 1].length < game.hand[player].length) {
+      // Upgrade 1: Create a shadow
       if (this.upgradeVersion === 1) {
+        game.createInStory(player, shadow)
+
+        game.animations[player].push(
+          new Animation({
+            from: Zone.Create,
+            to: Zone.Story,
+            card: shadow,
+            index: 0,
+            index2: game.story.acts.length - 1,
+          }),
+        )
+      } else {
+        // Move THIS card from discard to story
         game.pile[player].splice(index, 1)
 
         game.createInStory(player, this)
@@ -90,18 +104,6 @@ class Nightmare extends Card {
             from: Zone.Discard,
             to: Zone.Story,
             card: this,
-            index: 0,
-            index2: game.story.acts.length - 1,
-          }),
-        )
-      } else {
-        game.createInStory(player, shadow)
-
-        game.animations[player].push(
-          new Animation({
-            from: Zone.Create,
-            to: Zone.Story,
-            card: shadow,
             index: 0,
             index2: game.story.acts.length - 1,
           }),
