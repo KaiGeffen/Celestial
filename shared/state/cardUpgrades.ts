@@ -404,7 +404,7 @@ export const cardUpgrades: {
   },
   [starsCatalog.cosmos.id]: {
     1: { cost: -1 },
-    2: { points: 1 },
+    2: { points: 2 },
   },
   [starsCatalog.nightVision.id]: {
     1: { cost: -1 },
@@ -462,7 +462,7 @@ export const cardUpgrades: {
   },
   [waterCatalog.fishingBoat.id]: {
     1: { cost: -1 },
-    2: { points: 1 },
+    2: { points: 2 },
   },
   [waterCatalog.drown.id]: {
     1: { cost: -1 },

@@ -14,6 +14,7 @@ interface DeckNode extends RaceBase {
 // Type 2: Starts a match with current deck (PVE)
 interface MatchNode extends RaceBase {
   opponent: number[]
+  cardUpgrades?: number[] // Optional array of card upgrade versions (defaults to 15 zeros if missing)
 }
 
 // Type 3: Shows choice of 3 random cards, click one to replace a card in deck
@@ -94,6 +95,29 @@ export const raceData: raceNode[] = [
     y: 500,
     opponent: [50, 27, 27, 27, 27, 25, 88, 88, 31, 39, 11, 13, 91, 45, 45],
   },
+  // Type 2: Second row with upgraded opponents
+  {
+    x: 100,
+    y: 600,
+    // 3x Spark, 2x Dove, 2x Impulse, 2x Starling, 2x Mine, 2x Cloud, 2x Phoenix
+    // TODO Computer plays this wrong
+    opponent: [70, 70, 70, 4, 4, 3, 3, 7, 7, 15, 15, 102, 102, 51, 51],
+    cardUpgrades: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+  },
+  {
+    x: 200,
+    y: 600,
+    // Birds
+    opponent: [4, 4, 4, 4, 4, 4, 4, 7, 7, 7, 7, 61, 65, 54, 51],
+    cardUpgrades: [2, 2, 2, 2, 0, 0, 0, 1, 1, 0, 0, 2, 0, 0, 0],
+  },
+  {
+    x: 300,
+    y: 600,
+    // 5x Immolant, 2x Drown, 2x Gain and Loss, 2x Fishing Boat (M), 2x Excess, 1x Cosmos (M), 1x Sun
+    opponent: [42, 42, 42, 42, 42, 5, 5, 103, 103, 32, 32, 46, 46, 9, 56],
+    cardUpgrades: [0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 2, 0],
+  },
   // Type 3: Card choice node
   {
     x: 1000,
@@ -110,7 +134,7 @@ Top Row: Select a starting deck from the available options.
 
 Right Side: Your current deck is displayed. Click any card to upgrade it, or use card choice nodes to add new cards.
 
-Bottom Row: Enter matches to test your deck. The leftmost match is the easiest, with difficulty increasing as you move right.
+Bottom Row: Enter matches to test your deck. The leftmost match is the easiest, with difficulty increasing as you move right. Nodes on bottom row have upgraded cards.
 
 We're thinking you replace after each match, and get an upgrade choice every couple matches, but feel free to experiment and find out what you like :)
 

@@ -333,7 +333,7 @@ export default class RaceScene extends BaseScene {
         this.showDecklistConfirm(node.deck)
       } else if ('opponent' in node) {
         // Type 2: Start a PVE match with current deck
-        this.startPVEMatch(node.opponent)
+        this.startPVEMatch(node.opponent, node.cardUpgrades)
       } else if ('cardChoices' in node) {
         // Type 3: Show choice of 3 random cards, click one to replace a card in deck
         this.showCardChoice()
@@ -365,7 +365,7 @@ export default class RaceScene extends BaseScene {
   }
 
   // Type 2: Start a PVE match with current deck
-  private startPVEMatch(opponentDeck: number[]): void {
+  private startPVEMatch(opponentDeck: number[], cardUpgrades?: number[]): void {
     if (!server || !server.isOpen()) {
       this.signalError('Server is disconnected.')
       return
@@ -383,10 +383,15 @@ export default class RaceScene extends BaseScene {
 
     console.log('playerDeck', playerDeck)
 
+    // Ensure cardUpgrades matches deck length (default to zeros if missing or too short)
+    const upgradesArray =
+      cardUpgrades && cardUpgrades.length >= opponentDeck.length
+        ? cardUpgrades
+        : new Array(opponentDeck.length).fill(0)
     const aiDeck: Deck = {
       name: 'AI Deck',
       cards: opponentDeck,
-      cardUpgrades: new Array(opponentDeck.length).fill(0),
+      cardUpgrades: upgradesArray,
       cosmeticSet: {
         avatar: 0,
         border: 0,
