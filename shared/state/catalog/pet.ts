@@ -51,28 +51,23 @@ const bounty = new Bounty({
 })
 
 class Pet extends Card {
-  constructor(points: number) {
-    const text = `This permanently retains all changes to its points`
-    super({
-      name: 'Pet',
-      id: 34,
-      cost: 2,
-      points,
-      basePoints: 2,
-      text,
-    })
-  }
-
   play(player: number, game: GameModel, index: number, bonus: number) {
-    let points = this.points + bonus
-    points += game.status[player].nourish
-    const pet = new Pet(points)
-    game.pile[player].push(pet)
+    // Get the new version of pet after it resolves
+    const newVersion = this.copy()
+    newVersion.points = this.points + bonus + game.status[player].nourish
 
     super.play(player, game, index, bonus)
+
+    return newVersion
   }
 }
-const pet = new Pet(2)
+const pet = new Pet({
+  name: 'Pet',
+  id: 34,
+  cost: 2,
+  points: 2,
+  text: 'This permanently retains all changes to its points',
+})
 
 class Hollow extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {

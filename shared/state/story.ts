@@ -41,7 +41,12 @@ class Story {
 
       game.sound = SoundEffect.Resolve
 
-      act.card.play(act.owner, game, index, 0)
+      // If a card changes as a result of playing, update the card (Pet is the only one)
+      const newCard = act.card.play(act.owner, game, index, 0)
+      if (newCard) {
+        act.card = newCard
+      }
+
       roundEndEffects.push([
         // NOTE Preserve 'this' in the callback to be the card
         act.card.onRoundEndIfThisResolved.bind(act.card),

@@ -65,7 +65,12 @@ export default class Card {
   }
 
   /* Main functions */
-  play(player: number, game: GameModel, index: number, bonus: number): void {
+  play(
+    player: number,
+    game: GameModel,
+    index: number,
+    bonus: number,
+  ): Card | void {
     let result = this.points + bonus
 
     result += game.status[player].nourish
