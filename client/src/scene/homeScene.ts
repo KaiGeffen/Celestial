@@ -9,6 +9,7 @@ import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
 import { GardenSettings } from '../../../shared/settings'
 import Catalog from '../../../shared/state/catalog'
+import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 const width = Space.iconSize * 3 + Space.pad * 4
 const height = Space.iconSize * 2 + Space.pad * 3
@@ -31,20 +32,17 @@ export default class HomeScene extends BaseScene {
     // Some events must fire when this scene exits
     this.events.on('shutdown', () => this.beforeExit())
 
+    // Hide the logo
+    const logoContainer = document.getElementById('logo-container')
+    if (logoContainer) {
+      logoContainer.style.display = 'none'
+    }
+
     // Cinematic plays while this is active
     Cinematic.ensure()
 
-    // Create the avatar and details about user
-    this.createUserDetails()
-
-    // Create the icons in the top right
-    this.createIcons()
-
-    // Create primary buttons (Journey, Free Play)
-    this.createPrimaryButtons()
-
-    // Normal buttons
-    this.createFeedbackButton()
+    // Create the new layout: left side (user details + navigation) and right side (content)
+    this.createMainLayout()
 
     if (Flags.devCardsEnabled) {
       this.createRaceButton()
@@ -53,181 +51,343 @@ export default class HomeScene extends BaseScene {
     // Check if there are any unseen achievements and show achievements menu if so
     this.checkAndShowUnseenAchievements()
 
-    // Show any plants in the garden
-    this.createGarden()
-    this.game.events.on('gardenHarvested', this.onGardenHarvested, this)
-
     // Show tooltip for new users, or if not, show Discord prompt
     if (!showTooltip(this)) {
       this.checkAndShowDiscordPrompt()
     }
   }
 
-  private createUserDetails(): void {
-    const regionWidth = Space.avatarSize + Space.pad * 2
-    const regionHeight = 200
-    const userDetails = this.add.container(
-      Space.pad + regionWidth / 2,
-      Space.pad,
-    )
+  private createMainLayout(): void {
+    // Create main horizontal sizer for left and right panels
+    const mainSizer = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      space: {
+        item: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+      },
+    })
+
+    // Left panel: User details + Navigation buttons
+    const leftPanelWidth = 300
+    const leftPanel = this.createLeftPanel(leftPanelWidth)
+    mainSizer.add(leftPanel, { align: 'top', expand: false })
+
+    // Right panel: Title, image, and text - expand to fill remaining width
+    const rightPanel = this.createRightPanel()
+    mainSizer.add(rightPanel, { align: 'top', expand: true, proportion: 1 })
+
+    // Layout the sizer first
+    mainSizer.layout()
+
+    // Anchor main sizer to fill entire screen (after layout so it positions correctly)
+    this.plugins.get('rexAnchor')['add'](mainSizer, {
+      left: 'left',
+      right: 'right',
+      top: 'top',
+      bottom: 'bottom',
+    })
+  }
+
+  private createLeftPanel(width: number): any {
+    const panelSizer = this.rexUI.add.fixWidthSizer({
+      width: width,
+      space: {
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+        item: Space.pad,
+        line: Space.pad,
+      },
+    })
 
     // Add background
     const background = this.rexUI.add
-      .roundRectangle(0, 0, regionWidth, regionHeight, 5, 0xffffff)
+      .roundRectangle(0, 0, 1, 1, 5, 0xffffff)
       .setAlpha(0.3)
-      .setOrigin(0.5, 0)
+      .setInteractive()
+    panelSizer.addBackground(background)
     this.addShadow(background)
-    userDetails.add(background)
 
-    // Add avatar
+    // User details section
+    const userDetailsSizer = this.createUserDetailsSection(
+      width - Space.pad * 2,
+    )
+    panelSizer.add(userDetailsSizer).addNewLine()
+
+    // Navigation buttons section
+    const navButtonsSizer = this.createNavigationButtons(width - Space.pad * 2)
+    panelSizer.add(navButtonsSizer)
+
+    // Layout the panel sizer
+    panelSizer.layout()
+
+    return panelSizer
+  }
+
+  private createUserDetailsSection(width: number): any {
+    // Main horizontal sizer for avatar on left, text on right
+    const mainSizer = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      width: width,
+      space: {
+        item: Space.pad,
+      },
+    })
+
+    // Avatar container - fixed size
+    const avatarContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.avatarSize,
+      Space.avatarSize,
+    )
     const avatar = new Buttons.Avatar({
-      within: userDetails,
+      within: avatarContainer,
       avatarId: Server.getUserData().cosmeticSet.avatar,
       border: Server.getUserData().cosmeticSet.border,
-      y: Space.pad + Space.avatarSize / 2,
       f: () => {
         this.scene.launch('MenuScene', {
           menu: 'userProfile',
           activeScene: this,
           outerAvatar: avatar,
         })
-
         logEvent('view_user_profile')
       },
       muteClick: true,
     })
+    mainSizer.add(avatarContainer)
 
-    // Add username and ELO
-    const userData = Server.getUserData()
-    let y = Space.pad + Space.avatarSize + Space.padSmall
-    const username = userData.username || 'Guest'
-    const elo = userData.elo || 1000
-
-    const txtUsername = this.add
-      .text(0, y, username, Style.username)
-      .setOrigin(0.5, 0)
-    const txtElo = this.add
-      .text(0, y + 16 + 5, elo.toString(), Style.usernameElo)
-      .setOrigin(0.5, 0)
-
-    userDetails.add([txtUsername, txtElo])
-
-    // Add gems
-    const subHeight = 30
-    y = regionHeight + Space.padSmall + subHeight / 2
-    const smallBg1 = this.rexUI.add
-      .roundRectangle(0, y, regionWidth, subHeight, 5, 0xffffff)
-      .setAlpha(0.3)
-    this.addShadow(smallBg1)
-    const amtGems = userData.gems || 0
-    this.txtGem = this.add
-      .text(0, y, `${amtGems} 💎`, Style.username)
-      .setOrigin(0.5)
-
-    // Add coins
-    y += Space.padSmall + subHeight
-    const smallBg2 = this.rexUI.add
-      .roundRectangle(0, y, regionWidth, subHeight, 5, 0xffffff)
-      .setAlpha(0.3)
-    this.addShadow(smallBg2)
-    const amtCoins = userData.coins || 0
-    this.txtCoins = this.add
-      .text(0, y, `${amtCoins}💰`, Style.username)
-      .setOrigin(0.5)
-
-    userDetails.add([smallBg1, this.txtGem, smallBg2, this.txtCoins])
-  }
-
-  private createIcons(): void {
-    const iconContainer = this.add.container()
-    const background = this.rexUI.add
-      .roundRectangle(0, 0, width, height, 5, 0xffffff)
-      .setAlpha(0.3)
-      .setOrigin(0, 0)
-    this.addShadow(background)
-    iconContainer.add(background)
-
-    // Anchor to right
-    this.plugins.get('rexAnchor')['add'](iconContainer, {
-      x: `100%-${width}`,
+    // Right side: vertical sizer for 3 lines of text
+    const textSizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: {
+        item: Space.padSmall,
+      },
     })
 
-    // First row
-    new Buttons.Icon({
-      within: iconContainer,
-      name: 'Quest',
-      x: Space.pad + Space.iconSize * 0.5,
-      y: Space.pad + Space.iconSize * 0.5,
+    // Line 1: Username + ELO
+    const userData = Server.getUserData()
+    const username = userData.username || 'Guest'
+    const elo = userData.elo || 1000
+    const usernameEloText = this.add
+      .text(0, 0, `${username} (${elo})`, Style.username)
+      .setOrigin(0, 0.5)
+    textSizer.add(usernameEloText)
+
+    // Line 2: Gold (coins)
+    const amtCoins = userData.coins || 0
+    this.txtCoins = this.add
+      .text(0, 0, `${amtCoins}💰`, Style.username)
+      .setOrigin(0, 0.5)
+    textSizer.add(this.txtCoins)
+
+    // Line 3: Gems
+    const amtGems = userData.gems || 0
+    this.txtGem = this.add
+      .text(0, 0, `${amtGems} 💎`, Style.username)
+      .setOrigin(0, 0.5)
+    textSizer.add(this.txtGem)
+
+    // Layout text sizer
+    textSizer.layout()
+
+    // Add text sizer to main sizer
+    mainSizer.add(textSizer)
+
+    // Layout the main sizer
+    mainSizer.layout()
+
+    return mainSizer
+  }
+
+  private createNavigationButtons(width: number): any {
+    const sizer = this.rexUI.add.fixWidthSizer({
+      width: width,
+      space: {
+        item: Space.padSmall,
+        line: Space.padSmall,
+      },
+    })
+
+    // Play button
+    const playContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: playContainer,
+      text: 'Play',
       f: () => {
-        // TODO Standardize this - either quests or achievements
+        this.scene.launch('MenuScene', {
+          menu: 'play',
+          activeScene: this,
+        })
+        logEvent('view_play')
+      },
+    })
+    sizer.add(playContainer).addNewLine()
+
+    // Deckbuilder button
+    const deckbuilderContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: deckbuilderContainer,
+      text: 'Deckbuilder',
+      f: () => {
+        this.scene.start('BuilderScene', { isTutorial: false })
+        logEvent('view_deckbuilder')
+      },
+    })
+    sizer.add(deckbuilderContainer).addNewLine()
+
+    // Store button
+    const storeContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: storeContainer,
+      text: 'Store',
+      f: () => {
+        this.scene.start('StoreScene')
+        logEvent('view_store')
+      },
+    })
+    sizer.add(storeContainer).addNewLine()
+
+    // Quests button
+    const questsContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: questsContainer,
+      text: 'Quests',
+      f: () => {
         this.scene.launch('MenuScene', {
           menu: 'achievements',
           activeScene: this,
         })
-
         logEvent('view_quests')
       },
-      hint: 'Quests',
-      muteClick: true,
     })
+    sizer.add(questsContainer).addNewLine()
 
-    new Buttons.Icon({
-      within: iconContainer,
-      name: 'Friends',
-      x: Space.pad * 2 + Space.iconSize * 1.5,
-      y: Space.pad + Space.iconSize * 0.5,
-      f: () => {
-        this.scene.start('CharacterProfileScene')
-
-        logEvent('view_character_profile')
-      },
-      hint: 'Characters',
-    })
-
-    // Second row
-    new Buttons.Icon({
-      within: iconContainer,
-      name: 'Store',
-      x: Space.pad + Space.iconSize * 0.5,
-      y: Space.pad * 2 + Space.iconSize * 1.5,
-      f: () => {
-        this.scene.start('StoreScene')
-
-        logEvent('view_store')
-      },
-      hint: 'Store',
-    })
-
-    new Buttons.Icon({
-      within: iconContainer,
-      name: 'History',
-      x: Space.pad * 2 + Space.iconSize * 1.5,
-      y: Space.pad * 2 + Space.iconSize * 1.5,
+    // Match History button
+    const matchHistoryContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: matchHistoryContainer,
+      text: 'Match History',
       f: () => {
         this.scene.start('MatchHistoryScene')
-
         logEvent('view_match_history')
       },
-      hint: 'Match History',
     })
+    sizer.add(matchHistoryContainer).addNewLine()
 
-    new Buttons.Icon({
-      within: iconContainer,
-      name: 'Leaderboard',
-      x: Space.pad * 3 + Space.iconSize * 2.5,
-      y: Space.pad * 2 + Space.iconSize * 1.5,
+    // Leaderboard button
+    const leaderboardContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: leaderboardContainer,
+      text: 'Leaderboard',
       f: () => {
         this.scene.launch('MenuScene', {
           menu: 'leaderboard',
           hint: 'leaderboard',
           activeScene: this,
         })
-
         logEvent('view_leaderboard')
       },
-      hint: 'Leaderboard',
-      muteClick: true,
     })
+    sizer.add(leaderboardContainer)
+
+    // Layout the sizer
+    sizer.layout()
+
+    return sizer
+  }
+
+  private createRightPanel(): any {
+    // Use fixWidthSizer - width will be set dynamically via anchor
+    // Provide a default width that will be overridden by anchor
+    const panelSizer = this.rexUI.add.fixWidthSizer({
+      width: 800, // Default width, will be overridden by anchor
+      space: {
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+        item: Space.pad,
+        line: Space.pad,
+      },
+    })
+
+    // Add background
+    const background = this.rexUI.add
+      .roundRectangle(0, 0, 1, 1, 5, Color.backgroundLight)
+      .setAlpha(0.3)
+      .setInteractive()
+    panelSizer.addBackground(background)
+    this.addShadow(background)
+
+    // Title
+    const title = this.add
+      .text(0, 0, 'New Update!', Style.announcement)
+      .setOrigin(0.5, 0)
+    panelSizer.add(title).addNewLine()
+
+    // Image - news asset
+    const image = this.add.image(0, 0, 'news-LayBare').setOrigin(0.5, 0)
+    panelSizer.add(image).addNewLine()
+
+    // Lorem ipsum text - use most of the available width
+    const loremText =
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+    const text = this.add
+      .text(0, 0, loremText, {
+        ...Style.basic,
+        wordWrap: { width: 800 },
+      })
+      .setOrigin(0.5, 0)
+    panelSizer.add(text)
+
+    // Anchor right panel to take 100% width
+    this.plugins.get('rexAnchor')['add'](panelSizer, {
+      width: '100%',
+    })
+
+    return panelSizer
   }
 
   createPrimaryButtons() {
@@ -285,21 +445,6 @@ export default class HomeScene extends BaseScene {
     this.plugins.get('rexAnchor')['add'](playContainer, {
       x: `100%-${buttonWidth / 2 + Space.pad}`,
       y: `100%-${buttonHeight / 2 + Space.pad}`,
-    })
-  }
-
-  private createFeedbackButton(): void {
-    const container = this.add.container()
-    new Buttons.Basic({
-      within: container,
-      text: 'Feedback',
-      f: openFeedbackForm,
-    })
-
-    // Anchor to right
-    this.plugins.get('rexAnchor')['add'](container, {
-      x: `100%-${Space.padSmall + Space.buttonWidth / 2}`,
-      y: `0%+${Space.pad * 4 + Space.iconSize * 2 + Space.buttonHeight * 0.5}`,
     })
   }
 

@@ -27,6 +27,7 @@ const DIRECTORIES = [
   'img/pet',
   'img/roundResult',
   'img/chrome',
+  'img/news',
   'sfx',
   'dialog',
 ]
