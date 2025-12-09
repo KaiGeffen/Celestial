@@ -229,6 +229,7 @@ export default class HomeScene extends BaseScene {
         })
         logEvent('view_play')
       },
+      muteClick: true,
     })
     sizer.add(playContainer).addNewLine()
 
@@ -286,6 +287,7 @@ export default class HomeScene extends BaseScene {
         })
         logEvent('view_quests')
       },
+      muteClick: true,
     })
     sizer.add(questsContainer).addNewLine()
 
@@ -326,6 +328,7 @@ export default class HomeScene extends BaseScene {
         })
         logEvent('view_leaderboard')
       },
+      muteClick: true,
     })
     sizer.add(leaderboardContainer)
 

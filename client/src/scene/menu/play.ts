@@ -38,6 +38,7 @@ export default class PlayMenu extends Menu {
   deck: Deck
   gardenTimes: Date[]
   gardenPlants: Phaser.GameObjects.Image[]
+  gardenTimers: Phaser.GameObjects.Text[]
   txtDeckName: RexUIPlugin.BBCodeText
   avatar: Button
   txtDeckValidation: Phaser.GameObjects.Text
@@ -89,6 +90,14 @@ export default class PlayMenu extends Menu {
 
     // Reskin input text after layout
     this.reskinInputText()
+
+    // Set up timer update loop - update every second
+    this.scene.time.addEvent({
+      delay: 1000,
+      callback: this.updateTimers,
+      callbackScope: this,
+      loop: true,
+    })
   }
 
   private reskinInputText(): void {
@@ -151,7 +160,7 @@ export default class PlayMenu extends Menu {
         fixedHeight: 50 + Space.padSmall,
       })
       .setOrigin(0.5)
-      .setText(this.deck.name || 'Unnamed Deck')
+      .setText(this.deck.name || '')
     // Center by adding space before and after
     deckNameSizer.addSpace().add(this.txtDeckName).addSpace()
     panelSizer.add(deckNameSizer, { padding: { top: Space.pad } }).addNewLine()
@@ -174,7 +183,7 @@ export default class PlayMenu extends Menu {
     )
     new Buttons.Big({
       within: changeDeckContainer,
-      text: 'Change\nDeck',
+      text: 'Change\n  Deck',
       f: () => {
         this.scene.scene.stop()
         const activeScene = this.scene.scene.manager
@@ -507,6 +516,7 @@ export default class PlayMenu extends Menu {
     // Get garden data
     this.gardenTimes = Server.getUserData().garden || []
     this.gardenPlants = []
+    this.gardenTimers = []
 
     // Create each plant with timer
     for (let i = 0; i < this.gardenTimes.length; i++) {
@@ -526,41 +536,25 @@ export default class PlayMenu extends Menu {
       const growthStage = this.getGrowthStage(plantTime)
       plant.setFrame(growthStage)
 
-      // Create timer text below plant
-      const hoursRemaining = this.timeUntilFullyGrown(plantTime)
-      const hours = Math.floor(hoursRemaining)
-      const minutes = Math.floor((hoursRemaining - hours) * 60)
-
-      let timerText = ''
-      if (hoursRemaining <= 0) {
-        timerText = 'Ready!'
-      } else if (hours > 0) {
-        timerText = `${hours}h ${minutes}m`
-      } else {
-        timerText = `${minutes}m`
-      }
-
+      // Create timer text below plant - will be updated in update loop
       const timer = this.scene.add
-        .text(0, 0, timerText, Style.basic)
+        .text(0, 0, this.formatTimer(plantTime), Style.basic)
         .setOrigin(0.5)
+      this.gardenTimers.push(timer)
 
-      // Hover behavior
+      // Hover behavior - only show hint if ready to harvest
       plant
         .on('pointerover', () => {
-          let hintText = ''
+          const hoursRemaining = this.timeUntilFullyGrown(plantTime)
           if (hoursRemaining <= 0) {
-            hintText = 'Fully grown! Ready to harvest.'
-          } else if (hours > 0) {
-            hintText = `${hours}h ${minutes}m until fully grown`
-          } else {
-            hintText = `${minutes}m until fully grown`
+            this.scene.hint.showText('Fully grown! Ready to harvest.')
           }
-          this.scene.hint.showText(hintText)
         })
         .on('pointerout', () => {
           this.scene.hint.hide()
         })
         .on('pointerdown', () => {
+          const hoursRemaining = this.timeUntilFullyGrown(plantTime)
           if (hoursRemaining <= 0) {
             Server.harvestGarden(i)
           } else {
@@ -593,5 +587,31 @@ export default class PlayMenu extends Menu {
     const hoursElapsed =
       (now.getTime() - plantedTime.getTime()) / (1000 * 60 * 60)
     return Math.max(GardenSettings.GROWTH_TIME_HOURS - hoursElapsed, 0)
+  }
+
+  private formatTimer(plantedTime: Date): string {
+    const hoursRemaining = this.timeUntilFullyGrown(plantedTime)
+
+    if (hoursRemaining <= 0) {
+      return '00:00:00'
+    }
+
+    const totalSeconds = Math.floor(hoursRemaining * 3600)
+    const hours = Math.floor(totalSeconds / 3600)
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+    const seconds = totalSeconds % 60
+
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+  }
+
+  private updateTimers(): void {
+    // Update garden timers every second
+    if (this.gardenTimers && this.gardenTimes) {
+      for (let i = 0; i < this.gardenTimers.length; i++) {
+        if (this.gardenTimers[i] && this.gardenTimes[i]) {
+          this.gardenTimers[i].setText(this.formatTimer(this.gardenTimes[i]))
+        }
+      }
+    }
   }
 }
