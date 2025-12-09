@@ -166,6 +166,7 @@ import RaceDeckReplacementMenu from './raceDeckReplacement'
 import RaceDeckSelectionMenu from './raceDeckSelection'
 import RaceCardUpgradeMenu from './raceCardUpgrade'
 import RaceSpecialModesMenu from './raceSpecialModes'
+import PlayMenu from './play'
 
 const menus = {
   options: OptionsMenu,
@@ -190,6 +191,7 @@ const menus = {
   raceDeckSelection: RaceDeckSelectionMenu,
   raceCardUpgrade: RaceCardUpgradeMenu,
   raceSpecialModes: RaceSpecialModesMenu,
+  play: PlayMenu,
 }
 
 // Function exposed for the creation of custom menus

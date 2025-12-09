@@ -274,7 +274,10 @@ export default class HomeScene extends BaseScene {
       within: playContainer,
       text: 'Play',
       f: () => {
-        this.scene.start('BuilderScene', { isTutorial: false })
+        this.scene.launch('MenuScene', {
+          menu: 'play',
+          activeScene: this,
+        })
 
         logEvent('view_play')
       },
