@@ -33,6 +33,7 @@ export default class PlayMenu extends Menu {
   password: string
   inputText
   btnPwd: Button
+  friendlyMatchButton: Button
   decklist: Decklist
   deck: Deck
   gardenTimes: Date[]
@@ -349,30 +350,37 @@ export default class PlayMenu extends Menu {
       .addNewLine()
 
     // Friendly Match (pw)
-    contentSizer
-      .add(
-        this.createPlayOption('Friendly Match (pw)', 'Go', () => {
-          if (!server || !server.isOpen()) {
-            this.scene.signalError(Messages.disconnectError)
-            return
-          }
-          if (!this.password || this.password === '') {
-            this.scene.signalError('Please enter a password')
-            return
-          }
-          this.scene.scene.stop()
-          if (this.activeScene) {
-            this.activeScene.scene.stop()
-          }
-          this.scene.scene.start('StandardMatchScene', {
-            isPvp: true,
-            deck: this.deck,
-            password: this.password,
-          })
-          logEvent('queue_pwd')
-        }),
-      )
-      .addNewLine()
+    const friendlyMatchOption = this.createPlayOption(
+      'Friendly Match (pw)',
+      'Go',
+      () => {
+        if (!server || !server.isOpen()) {
+          this.scene.signalError(Messages.disconnectError)
+          return
+        }
+        if (!this.password || this.password === '') {
+          this.scene.signalError('Please enter a password')
+          return
+        }
+        this.scene.scene.stop()
+        if (this.activeScene) {
+          this.activeScene.scene.stop()
+        }
+        this.scene.scene.start('StandardMatchScene', {
+          isPvp: true,
+          deck: this.deck,
+          password: this.password,
+        })
+        logEvent('queue_pwd')
+      },
+    )
+    // Store reference to the Friendly Match button
+    this.friendlyMatchButton =
+      this.playOptionButtons[this.playOptionButtons.length - 1]
+    // Initially disable since password field is empty (updateFriendlyMatchButton will handle this)
+    this.updateFriendlyMatchButton()
+
+    contentSizer.add(friendlyMatchOption).addNewLine()
 
     // Password entry for PWD
     this.inputText = this.scene.add
@@ -391,6 +399,8 @@ export default class PlayMenu extends Menu {
       })
       .on('textchange', (inputText) => {
         this.password = inputText.text
+        // Enable/disable Friendly Match button based on password and deck validity
+        this.updateFriendlyMatchButton()
       })
     contentSizer.add(this.inputText).addNewLine()
 
@@ -473,6 +483,19 @@ export default class PlayMenu extends Menu {
   private isDeckValid(): boolean {
     const deckSize = this.deck.cards ? this.deck.cards.length : 0
     return deckSize === MechanicsSettings.DECK_SIZE
+  }
+
+  private updateFriendlyMatchButton(): void {
+    if (this.friendlyMatchButton) {
+      const hasPassword = this.password && this.password.trim() !== ''
+      const deckValid = this.isDeckValid()
+      // Button is enabled only if both password exists and deck is valid
+      if (hasPassword && deckValid) {
+        this.friendlyMatchButton.enable()
+      } else {
+        this.friendlyMatchButton.disable()
+      }
+    }
   }
 
   private createGarden(): any {
