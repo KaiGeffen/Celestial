@@ -21,13 +21,13 @@ import Catalog from '../../../../shared/state/catalog'
 import Card from '../../../../shared/state/card'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import Server from '../../server'
-import { GardenSettings } from '../../../../shared/settings'
+import { GardenSettings, MechanicsSettings } from '../../../../shared/settings'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import newScrollablePanel from '../../lib/scrollablePanel'
 
 const menuWidth = 1000
 const deckPanelWidth = Space.cutoutWidth + Space.pad * 2
-const playPanelWidth = 400
+const playPanelWidth = 500
 
 export default class PlayMenu extends Menu {
   password: string
@@ -39,6 +39,8 @@ export default class PlayMenu extends Menu {
   gardenPlants: Phaser.GameObjects.Image[]
   txtDeckName: RexUIPlugin.BBCodeText
   avatar: Button
+  txtDeckValidation: Phaser.GameObjects.Text
+  playOptionButtons: Button[] = []
 
   private activeScene: Phaser.Scene
 
@@ -99,16 +101,20 @@ export default class PlayMenu extends Menu {
     const mainSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
       width: menuWidth - Space.pad * 2,
-      space: { item: Space.pad },
+      space: {
+        item: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+      },
     })
 
     // Left panel: Deck
     const deckPanel = this.createDeckPanel()
-    mainSizer.add(deckPanel)
+    mainSizer.add(deckPanel, { align: 'top' })
 
-    // Right panel: Play options with garden at bottom
+    // Right panel: Play options with garden at bottom - align to top
     const playPanel = this.createPlayPanel()
-    mainSizer.add(playPanel)
+    mainSizer.add(playPanel, { align: 'top' })
 
     this.sizer.add(mainSizer).addNewLine()
   }
@@ -117,8 +123,8 @@ export default class PlayMenu extends Menu {
     const panelSizer = this.scene.rexUI.add.fixWidthSizer({
       width: deckPanelWidth,
       space: {
-        top: Space.pad * 2,
-        bottom: Space.pad,
+        top: 0,
+        bottom: 0,
         left: Space.pad,
         right: Space.pad,
         item: Space.padSmall,
@@ -132,17 +138,22 @@ export default class PlayMenu extends Menu {
     panelSizer.addBackground(background)
     this.scene.addShadow(background, -90)
 
-    // Deck name
+    // Deck name - centered using sizer alignment
+    const deckNameSizer = this.scene.rexUI.add.sizer({
+      width: deckPanelWidth - Space.pad * 2,
+      orientation: 'horizontal',
+    })
     this.txtDeckName = this.scene.rexUI.add
       .BBCodeText()
       .setStyle({
         ...BBStyle.deckName,
-        fixedWidth: deckPanelWidth - Space.pad * 2,
         fixedHeight: 50 + Space.padSmall,
       })
       .setOrigin(0.5)
       .setText(this.deck.name || 'Unnamed Deck')
-    panelSizer.add(this.txtDeckName).addNewLine()
+    // Center by adding space before and after
+    deckNameSizer.addSpace().add(this.txtDeckName).addSpace()
+    panelSizer.add(deckNameSizer, { padding: { top: Space.pad } }).addNewLine()
 
     // Change Deck button and Avatar side by side, centered
     const buttonAvatarSizer = this.scene.rexUI.add.sizer({
@@ -197,13 +208,29 @@ export default class PlayMenu extends Menu {
 
     panelSizer.add(buttonAvatarSizer).addNewLine()
 
-    // Decklist
-    this.decklist = new Decklist(this.scene as any, () => () => {
-      // No-op click handler for decklist items in this menu
-    })
+    // Deck validation message - centered
+    const deckSize = this.deck.cards ? this.deck.cards.length : 0
+    const isValid = deckSize === MechanicsSettings.DECK_SIZE
 
-    // Remove top space from decklist sizer
-    this.decklist.sizer.space.top = 0
+    if (!isValid) {
+      const validationSizer = this.scene.rexUI.add.sizer({
+        width: deckPanelWidth - Space.pad * 2,
+        orientation: 'horizontal',
+      })
+      this.txtDeckValidation = this.scene.add
+        .text(0, 0, 'Invalid deck', {
+          ...Style.basic,
+          color: '#ff0000',
+          wordWrap: { width: deckPanelWidth - Space.pad * 2 },
+        })
+        .setOrigin(0.5, 0)
+      // Center by adding space before and after
+      validationSizer.addSpace().add(this.txtDeckValidation).addSpace()
+      panelSizer.add(validationSizer).addNewLine()
+    }
+
+    // Decklist
+    this.decklist = new Decklist(this.scene as any, () => () => {})
 
     // Convert deck card IDs to Card objects, filtering out any invalid cards
     const deckCards: Card[] = this.deck.cards
@@ -221,14 +248,9 @@ export default class PlayMenu extends Menu {
     }
 
     // Create scrollable panel for the deck
-    const deckHeight = Math.max(
-      Math.min(deckCards.length * (Space.cutoutHeight + Space.padSmall), 400),
-      100, // Minimum height
-    )
-
     const scrollableDeck = newScrollablePanel(this.scene, {
       width: deckPanelWidth - Space.pad * 2,
-      height: deckHeight,
+      height: 420,
       panel: {
         child: this.decklist.sizer,
       },
@@ -245,7 +267,7 @@ export default class PlayMenu extends Menu {
     const panelSizer = this.scene.rexUI.add.fixWidthSizer({
       width: playPanelWidth,
       space: {
-        top: Space.pad * 2,
+        top: 0,
         bottom: Space.pad,
         left: Space.pad,
         right: Space.pad,
@@ -254,29 +276,33 @@ export default class PlayMenu extends Menu {
       },
     })
 
-    const background = this.scene.add
-      .rectangle(0, 0, playPanelWidth, 1, Color.backgroundLight)
-      .setInteractive()
-    panelSizer.addBackground(background)
-    this.scene.addShadow(background, -90)
-
-    // Create a vertical sizer for the content (play options at top, garden at bottom)
+    // Create a vertical sizer for the content (play options at top) with its own background
     const contentSizer = this.scene.rexUI.add.fixWidthSizer({
       width: playPanelWidth - Space.pad * 2,
       space: {
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
         item: Space.padSmall,
-        line: Space.padSmall,
+        line: Space.pad,
       },
     })
 
-    // Player vs Player section
-    const pvpTitle = this.scene.add.text(
-      0,
-      0,
-      'PLAYER VS PLAYER',
-      Style.announcement,
-    )
-    contentSizer.add(pvpTitle).addNewLine()
+    const contentBackground = this.scene.add
+      .rectangle(0, 0, 1, 1, Color.backgroundLight)
+      .setInteractive()
+    contentSizer.addBackground(contentBackground)
+    this.scene.addShadow(contentBackground, -90)
+
+    // Player vs Player section - center the title
+    const titleSizer = this.scene.rexUI.add.sizer({
+      width: playPanelWidth - Space.pad * 2,
+      orientation: 'horizontal',
+    })
+    const txtTitle = this.scene.add.text(0, 0, 'Game Mode', Style.announcement)
+    titleSizer.addSpace().add(txtTitle).addSpace()
+    contentSizer.add(titleSizer).addNewLine()
 
     // Practice (vs AI)
     contentSizer
@@ -368,41 +394,41 @@ export default class PlayMenu extends Menu {
       })
     contentSizer.add(this.inputText).addNewLine()
 
-    // Single Player section
-    const spTitle = this.scene.add.text(
-      0,
-      0,
-      'SINGLE PLAYER',
-      Style.announcement,
-    )
-    contentSizer.add(spTitle).addNewLine()
+    // Add content sizer to panel (game modes)
+    panelSizer.add(contentSizer).addNewLine()
 
-    // Story Mode (placeholder)
-    contentSizer
-      .add(
-        this.createPlayOption('Story Mode', 'Go', () => {
-          // TODO: Implement story mode
-          this.scene.signalError('Story Mode coming soon')
-        }),
-      )
-      .addNewLine()
-
-    // Journey Mode (placeholder)
-    contentSizer.add(
-      this.createPlayOption('Journey Mode', 'Go', () => {
-        // TODO: Implement journey mode
-        this.scene.signalError('Journey Mode coming soon')
-      }),
-    )
-
-    // Add content sizer to panel
-    panelSizer.add(contentSizer)
-
-    // Add garden at the bottom of the right panel
-    const gardenPanel = this.createGarden()
+    // Add garden as separate panel with its own background
+    const gardenPanel = this.createGardenPanel()
     panelSizer.add(gardenPanel)
 
     return panelSizer
+  }
+
+  private createGardenPanel(): any {
+    // Create a sizer for the garden with its own background
+    const gardenSizer = this.scene.rexUI.add.fixWidthSizer({
+      width: playPanelWidth,
+      space: {
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+        item: Space.padSmall,
+        line: Space.padSmall,
+      },
+    })
+
+    const background = this.scene.add
+      .rectangle(0, 0, playPanelWidth, 1, Color.backgroundLight)
+      .setInteractive()
+    gardenSizer.addBackground(background)
+    this.scene.addShadow(background, -90)
+
+    // Create the garden content
+    const gardenContent = this.createGarden()
+    gardenSizer.add(gardenContent)
+
+    return gardenSizer
   }
 
   private createPlayOption(
@@ -412,19 +438,41 @@ export default class PlayMenu extends Menu {
   ): any {
     const sizer = this.scene.rexUI.add.sizer({
       width: playPanelWidth - Space.pad * 2,
-      space: { left: 0, right: 0 },
     })
 
     const txt = this.scene.add.text(0, 0, text, Style.basic)
     const container = new ContainerLite(this.scene, 0, 0, Space.buttonWidth, 50)
-    new Buttons.Basic({
+    const button = new Buttons.Basic({
       within: container,
       text: buttonText,
-      f: callback,
+      f: () => {
+        // Check deck validity before starting match
+        if (!this.isDeckValid()) {
+          this.scene.signalError(
+            `Deck must have exactly ${MechanicsSettings.DECK_SIZE} cards to play`,
+          )
+          return
+        }
+        callback()
+      },
     })
 
+    // Store button reference for enabling/disabling
+    this.playOptionButtons.push(button)
+
+    // Disable if deck is invalid
+    if (!this.isDeckValid()) {
+      button.disable()
+    }
+
+    // Add text and button with space between them (text left, button right, full width)
     sizer.add(txt).addSpace().add(container)
     return sizer
+  }
+
+  private isDeckValid(): boolean {
+    const deckSize = this.deck.cards ? this.deck.cards.length : 0
+    return deckSize === MechanicsSettings.DECK_SIZE
   }
 
   private createGarden(): any {
@@ -437,9 +485,16 @@ export default class PlayMenu extends Menu {
     this.gardenTimes = Server.getUserData().garden || []
     this.gardenPlants = []
 
-    // Create each plant
+    // Create each plant with timer
     for (let i = 0; i < this.gardenTimes.length; i++) {
       const plantTime = this.gardenTimes[i]
+
+      // Create a sizer for each plant (plant + timer)
+      const plantSizer = this.scene.rexUI.add.sizer({
+        orientation: 'vertical',
+        space: { item: Space.padSmall },
+      })
+
       const plant = this.scene.add
         .image(0, 0, 'relic-Dandelion')
         .setInteractive()
@@ -448,21 +503,34 @@ export default class PlayMenu extends Menu {
       const growthStage = this.getGrowthStage(plantTime)
       plant.setFrame(growthStage)
 
+      // Create timer text below plant
+      const hoursRemaining = this.timeUntilFullyGrown(plantTime)
+      const hours = Math.floor(hoursRemaining)
+      const minutes = Math.floor((hoursRemaining - hours) * 60)
+
+      let timerText = ''
+      if (hoursRemaining <= 0) {
+        timerText = 'Ready!'
+      } else if (hours > 0) {
+        timerText = `${hours}h ${minutes}m`
+      } else {
+        timerText = `${minutes}m`
+      }
+
+      const timer = this.scene.add
+        .text(0, 0, timerText, Style.basic)
+        .setOrigin(0.5)
+
       // Hover behavior
       plant
         .on('pointerover', () => {
-          const hoursRemaining = this.timeUntilFullyGrown(plantTime)
           let hintText = ''
           if (hoursRemaining <= 0) {
             hintText = 'Fully grown! Ready to harvest.'
+          } else if (hours > 0) {
+            hintText = `${hours}h ${minutes}m until fully grown`
           } else {
-            const hours = Math.floor(hoursRemaining)
-            const minutes = Math.floor((hoursRemaining - hours) * 60)
-            if (hours > 0) {
-              hintText = `${hours}h ${minutes}m until fully grown`
-            } else {
-              hintText = `${minutes}m until fully grown`
-            }
+            hintText = `${minutes}m until fully grown`
           }
           this.scene.hint.showText(hintText)
         })
@@ -470,14 +538,15 @@ export default class PlayMenu extends Menu {
           this.scene.hint.hide()
         })
         .on('pointerdown', () => {
-          if (this.timeUntilFullyGrown(plantTime) <= 0) {
+          if (hoursRemaining <= 0) {
             Server.harvestGarden(i)
           } else {
             this.scene.signalError('That plant is not ready to harvest.')
           }
         })
 
-      gardenSizer.add(plant)
+      plantSizer.add(plant).add(timer)
+      gardenSizer.add(plantSizer)
       this.gardenPlants.push(plant)
     }
 
