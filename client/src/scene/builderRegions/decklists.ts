@@ -134,6 +134,9 @@ export default class DecklistsRegion {
     let index = this.decklistBtns.length - 1
     this.decklistBtns[index].onClick()
 
+    // Set this deck as the equipped deck
+    UserSettings._set('equippedDeckIndex', index)
+
     // Scroll down to show the new deck
     this.scrollablePanel.t = 1
 
@@ -169,6 +172,7 @@ export default class DecklistsRegion {
       }
 
       this.createDeck(name, cosmeticSet, deck)
+      // Note: createDeck already sets the equipped deck index
     }
   }
 
@@ -386,6 +390,9 @@ export default class DecklistsRegion {
 
         // Set the displayed avatar to this deck's avatar
         this.scene.setCosmeticSet(deck.cosmeticSet).setName(deck.name)
+
+        // Set this deck as the equipped deck
+        UserSettings._set('equippedDeckIndex', i)
       }
     }
   }

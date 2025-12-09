@@ -27,6 +27,8 @@ export class UserSettings {
       decks: [],
       // List to use when playing with in development content
       devDecks: [],
+      // Index of the currently equipped deck (for play menu)
+      equippedDeckIndex: 0,
 
       // For journey mode, for each card, whether or not that card has been unlocked
       inventory: getStartingInventory(),

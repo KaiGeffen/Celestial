@@ -45,14 +45,29 @@ export default class PlayMenu extends Menu {
   constructor(scene: MenuScene, params) {
     super(scene, menuWidth)
 
-    // Get the deck from params or use the first deck
+    // Add method to reskin input text like in mode.ts
+    this.reskinInputText = () => {
+      if (this.inputText) {
+        this.scene.add.image(
+          this.inputText.x,
+          this.inputText.y,
+          'icon-InputText',
+        )
+      }
+    }
+
+    // Get the deck from params or use the equipped deck
     this.activeScene = params.activeScene
     if (params.deck) {
       this.deck = params.deck
     } else {
       const decks = UserSettings._get('decks')
+      const equippedDeckIndex = UserSettings._get('equippedDeckIndex') || 0
+
       if (decks && decks.length > 0) {
-        this.deck = decks[0]
+        // Use equipped deck index, or fall back to 0 if index is invalid
+        const validIndex = Math.min(equippedDeckIndex, decks.length - 1)
+        this.deck = decks[validIndex] || decks[0]
       } else {
         // Default empty deck
         this.deck = {
@@ -68,10 +83,19 @@ export default class PlayMenu extends Menu {
 
     this.createContent()
     this.layout()
+
+    // Reskin input text after layout
+    this.reskinInputText()
+  }
+
+  private reskinInputText(): void {
+    if (this.inputText) {
+      this.scene.add.image(this.inputText.x, this.inputText.y, 'icon-InputText')
+    }
   }
 
   private createContent() {
-    // Create main horizontal sizer for left (deck) and right (play options) panels
+    // Create main horizontal sizer for left (deck) and right (play options + garden) panels
     const mainSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
       width: menuWidth - Space.pad * 2,
@@ -82,22 +106,18 @@ export default class PlayMenu extends Menu {
     const deckPanel = this.createDeckPanel()
     mainSizer.add(deckPanel)
 
-    // Right panel: Play options
+    // Right panel: Play options with garden at bottom
     const playPanel = this.createPlayPanel()
     mainSizer.add(playPanel)
 
     this.sizer.add(mainSizer).addNewLine()
-
-    // Garden at the bottom
-    const gardenPanel = this.createGarden()
-    this.sizer.add(gardenPanel)
   }
 
   private createDeckPanel(): any {
     const panelSizer = this.scene.rexUI.add.fixWidthSizer({
       width: deckPanelWidth,
       space: {
-        top: Space.pad,
+        top: Space.pad * 2,
         bottom: Space.pad,
         left: Space.pad,
         right: Space.pad,
@@ -124,12 +144,13 @@ export default class PlayMenu extends Menu {
       .setText(this.deck.name || 'Unnamed Deck')
     panelSizer.add(this.txtDeckName).addNewLine()
 
-    // Change Deck button and Avatar side by side
+    // Change Deck button and Avatar side by side, centered
     const buttonAvatarSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
       width: deckPanelWidth - Space.pad * 2,
       space: { item: Space.pad },
     })
+    buttonAvatarSizer.addSpace() // Add space before to center
 
     // Change Deck button
     const changeDeckContainer = new ContainerLite(
@@ -172,6 +193,7 @@ export default class PlayMenu extends Menu {
       muteClick: true,
     })
     buttonAvatarSizer.add(avatarContainer)
+    buttonAvatarSizer.addSpace() // Add space after to center
 
     panelSizer.add(buttonAvatarSizer).addNewLine()
 
@@ -179,6 +201,9 @@ export default class PlayMenu extends Menu {
     this.decklist = new Decklist(this.scene as any, () => () => {
       // No-op click handler for decklist items in this menu
     })
+
+    // Remove top space from decklist sizer
+    this.decklist.sizer.space.top = 0
 
     // Convert deck card IDs to Card objects, filtering out any invalid cards
     const deckCards: Card[] = this.deck.cards
@@ -216,10 +241,11 @@ export default class PlayMenu extends Menu {
   }
 
   private createPlayPanel(): any {
+    // Create a vertical sizer to hold play options at top and garden at bottom
     const panelSizer = this.scene.rexUI.add.fixWidthSizer({
       width: playPanelWidth,
       space: {
-        top: Space.pad,
+        top: Space.pad * 2,
         bottom: Space.pad,
         left: Space.pad,
         right: Space.pad,
@@ -234,6 +260,15 @@ export default class PlayMenu extends Menu {
     panelSizer.addBackground(background)
     this.scene.addShadow(background, -90)
 
+    // Create a vertical sizer for the content (play options at top, garden at bottom)
+    const contentSizer = this.scene.rexUI.add.fixWidthSizer({
+      width: playPanelWidth - Space.pad * 2,
+      space: {
+        item: Space.padSmall,
+        line: Space.padSmall,
+      },
+    })
+
     // Player vs Player section
     const pvpTitle = this.scene.add.text(
       0,
@@ -241,32 +276,10 @@ export default class PlayMenu extends Menu {
       'PLAYER VS PLAYER',
       Style.announcement,
     )
-    panelSizer.add(pvpTitle).addNewLine()
-
-    // Ranked Match
-    panelSizer
-      .add(
-        this.createPlayOption('Ranked Match', 'Go', () => {
-          if (!server || !server.isOpen()) {
-            this.scene.signalError(Messages.disconnectError)
-            return
-          }
-          this.scene.scene.stop()
-          if (this.activeScene) {
-            this.activeScene.scene.stop()
-          }
-          this.scene.scene.start('StandardMatchScene', {
-            isPvp: true,
-            deck: this.deck,
-            password: '',
-          })
-          logEvent('queue_pvp')
-        }),
-      )
-      .addNewLine()
+    contentSizer.add(pvpTitle).addNewLine()
 
     // Practice (vs AI)
-    panelSizer
+    contentSizer
       .add(
         this.createPlayOption('Practice (vs AI)', 'Go', () => {
           if (!server || !server.isOpen()) {
@@ -287,8 +300,30 @@ export default class PlayMenu extends Menu {
       )
       .addNewLine()
 
+    // Ranked Match
+    contentSizer
+      .add(
+        this.createPlayOption('Ranked Match', 'Go', () => {
+          if (!server || !server.isOpen()) {
+            this.scene.signalError(Messages.disconnectError)
+            return
+          }
+          this.scene.scene.stop()
+          if (this.activeScene) {
+            this.activeScene.scene.stop()
+          }
+          this.scene.scene.start('StandardMatchScene', {
+            isPvp: true,
+            deck: this.deck,
+            password: '',
+          })
+          logEvent('queue_pvp')
+        }),
+      )
+      .addNewLine()
+
     // Friendly Match (pw)
-    panelSizer
+    contentSizer
       .add(
         this.createPlayOption('Friendly Match (pw)', 'Go', () => {
           if (!server || !server.isOpen()) {
@@ -320,15 +355,18 @@ export default class PlayMenu extends Menu {
         text: '',
         align: 'center',
         placeholder: 'Password',
+        tooltip: 'Password for PWD mode.',
         fontFamily: 'Mulish',
         fontSize: '24px',
         color: Color.textboxText,
         maxLength: 10,
+        selectAll: true,
+        id: 'search-field',
       })
       .on('textchange', (inputText) => {
         this.password = inputText.text
       })
-    panelSizer.add(this.inputText).addNewLine()
+    contentSizer.add(this.inputText).addNewLine()
 
     // Single Player section
     const spTitle = this.scene.add.text(
@@ -337,10 +375,10 @@ export default class PlayMenu extends Menu {
       'SINGLE PLAYER',
       Style.announcement,
     )
-    panelSizer.add(spTitle).addNewLine()
+    contentSizer.add(spTitle).addNewLine()
 
     // Story Mode (placeholder)
-    panelSizer
+    contentSizer
       .add(
         this.createPlayOption('Story Mode', 'Go', () => {
           // TODO: Implement story mode
@@ -350,12 +388,19 @@ export default class PlayMenu extends Menu {
       .addNewLine()
 
     // Journey Mode (placeholder)
-    panelSizer.add(
+    contentSizer.add(
       this.createPlayOption('Journey Mode', 'Go', () => {
         // TODO: Implement journey mode
         this.scene.signalError('Journey Mode coming soon')
       }),
     )
+
+    // Add content sizer to panel
+    panelSizer.add(contentSizer)
+
+    // Add garden at the bottom of the right panel
+    const gardenPanel = this.createGarden()
+    panelSizer.add(gardenPanel)
 
     return panelSizer
   }
@@ -367,6 +412,7 @@ export default class PlayMenu extends Menu {
   ): any {
     const sizer = this.scene.rexUI.add.sizer({
       width: playPanelWidth - Space.pad * 2,
+      space: { left: 0, right: 0 },
     })
 
     const txt = this.scene.add.text(0, 0, text, Style.basic)

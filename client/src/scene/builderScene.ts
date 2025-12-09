@@ -16,6 +16,7 @@ import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import Buttons from '../lib/buttons/buttons'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import showTooltip from '../utils/tooltips'
+import { UserSettings } from '../settings/userSettings'
 
 // Features common between all builders
 export class BuilderBase extends BaseScene {
@@ -309,8 +310,16 @@ export class BuilderScene extends BuilderBase {
     // Add the pin / unpin button
     this.addPinButton()
 
-    // Set starting deck
-    if (this.lastDecklist !== undefined) {
+    // Set starting deck - use equipped deck index if available, otherwise use lastDecklist
+    const equippedDeckIndex = UserSettings._get('equippedDeckIndex')
+    if (equippedDeckIndex !== undefined && equippedDeckIndex !== null) {
+      const decks = UserSettings._get('decks')
+      if (decks && decks.length > equippedDeckIndex) {
+        this.decklistsRegion.selectDeck(equippedDeckIndex)
+      } else if (this.lastDecklist !== undefined) {
+        this.decklistsRegion.selectDeck(this.lastDecklist)
+      }
+    } else if (this.lastDecklist !== undefined) {
       this.decklistsRegion.selectDeck(this.lastDecklist)
     }
 
