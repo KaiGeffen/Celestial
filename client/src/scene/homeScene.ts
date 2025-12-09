@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Color, Space, Flags } from '../settings/settings'
+import { Style, Color, Space, Flags, BBStyle } from '../settings/settings'
 import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
@@ -367,20 +367,64 @@ export default class HomeScene extends BaseScene {
       .setOrigin(0.5, 0)
     panelSizer.add(title).addNewLine()
 
-    // Image - news asset
-    const image = this.add.image(0, 0, 'news-LayBare').setOrigin(0.5, 0)
-    panelSizer.add(image).addNewLine()
+    // Create horizontal sizer for image and text side by side
+    const contentSizer = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      space: {
+        item: Space.pad,
+      },
+    })
 
-    // Lorem ipsum text - use most of the available width
-    const loremText =
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-    const text = this.add
-      .text(0, 0, loremText, {
-        ...Style.basic,
-        wordWrap: { width: 800 },
+    // Image - news asset
+    const image = this.add.image(0, 0, 'news-LayBare').setOrigin(0, 0)
+    contentSizer.add(image, { align: 'top' })
+
+    // Update notes text with BBCode for hoverable card names
+    const updateText = `An exciting tournament approaches! The 7th Celestial tournament will be held on the 20th at noon EST.
+
+Join us for the 7th Celestial tournament! Play in person or remote. Exclusive prizes for all participants, $120 prize pool, and Swiss format competition.
+
+[area=_link_register][color=#FABD5D]Register here[/color][/area]
+
+Card changes:
+☝️ [area=_Phoenix][color=#FABD5D]Phoenix[/color][/area] cost 6 > 5
+☝️ [area=_Pride][color=#FABD5D]Pride[/color][/area] Exhale cost 2 > 1
+☝️ [area=_Pet][color=#FABD5D]Pet[/color][/area] points 1 > 2
+☝️ [area=_Overflow][color=#FABD5D]Overflow[/color][/area] points -1 > 0
+☝️ [area=_Hug][color=#FABD5D]Hug[/color][/area] points 1 > 2, bonus 2 > 1
+☝️ [area=_Balance][color=#FABD5D]Balance[/color][/area] points 1 > 2, bonus 3 > 2
+      `
+
+    const text = this.rexUI.add
+      .BBCodeText(0, 0, updateText, {
+        ...BBStyle.description,
+        wordWrap: { width: 600 },
       })
-      .setOrigin(0.5, 0)
-    panelSizer.add(text)
+      .setInteractive()
+      .on('areaover', (key: string) => {
+        if (key === '_link_register') {
+          // Show cursor as pointer for link
+          this.input.setDefaultCursor('pointer')
+        } else if (key[0] === '_') {
+          this.hint.showCard(key.slice(1))
+        }
+      })
+      .on('areaout', (key: string) => {
+        if (key === '_link_register') {
+          this.input.setDefaultCursor('default')
+        }
+        this.hint.hide()
+      })
+      .on('areadown', (key: string) => {
+        if (key === '_link_register') {
+          window.open('https://luma.com/og92agfp', '_blank')
+        }
+      })
+      .setOrigin(0, 0)
+    contentSizer.add(text, { align: 'top', expand: true })
+
+    contentSizer.layout()
+    panelSizer.add(contentSizer)
 
     // Anchor right panel to take 100% width
     this.plugins.get('rexAnchor')['add'](panelSizer, {
