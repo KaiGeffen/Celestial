@@ -206,21 +206,24 @@ export default class HomeScene extends BaseScene {
     const sizer = this.rexUI.add.fixWidthSizer({
       width: width,
       space: {
-        item: Space.padSmall,
-        line: Space.padSmall,
+        line: Space.pad,
       },
     })
 
+    // Helper to create a centered button row
+    const createButtonRow = (button: any) => {
+      const rowSizer = this.rexUI.add.sizer({
+        orientation: 'horizontal',
+        width: width,
+      })
+      rowSizer.addSpace().add(button.container).addSpace()
+      rowSizer.layout()
+      return rowSizer
+    }
+
     // Play button
-    const playContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: playContainer,
+    const playButton = new Buttons.Navigation({
+      within: this,
       text: 'Play',
       f: () => {
         this.scene.launch('MenuScene', {
@@ -231,54 +234,33 @@ export default class HomeScene extends BaseScene {
       },
       muteClick: true,
     })
-    sizer.add(playContainer).addNewLine()
+    sizer.add(createButtonRow(playButton)).addNewLine()
 
     // Deckbuilder button
-    const deckbuilderContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: deckbuilderContainer,
+    const deckbuilderButton = new Buttons.Navigation({
+      within: this,
       text: 'Deckbuilder',
       f: () => {
         this.scene.start('BuilderScene', { isTutorial: false })
         logEvent('view_deckbuilder')
       },
     })
-    sizer.add(deckbuilderContainer).addNewLine()
+    sizer.add(createButtonRow(deckbuilderButton)).addNewLine()
 
     // Store button
-    const storeContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: storeContainer,
+    const storeButton = new Buttons.Navigation({
+      within: this,
       text: 'Store',
       f: () => {
         this.scene.start('StoreScene')
         logEvent('view_store')
       },
     })
-    sizer.add(storeContainer).addNewLine()
+    sizer.add(createButtonRow(storeButton)).addNewLine()
 
     // Quests button
-    const questsContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: questsContainer,
+    const questsButton = new Buttons.Navigation({
+      within: this,
       text: 'Quests',
       f: () => {
         this.scene.launch('MenuScene', {
@@ -289,36 +271,22 @@ export default class HomeScene extends BaseScene {
       },
       muteClick: true,
     })
-    sizer.add(questsContainer).addNewLine()
+    sizer.add(createButtonRow(questsButton)).addNewLine()
 
     // Match History button
-    const matchHistoryContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: matchHistoryContainer,
+    const matchHistoryButton = new Buttons.Navigation({
+      within: this,
       text: 'Match History',
       f: () => {
         this.scene.start('MatchHistoryScene')
         logEvent('view_match_history')
       },
     })
-    sizer.add(matchHistoryContainer).addNewLine()
+    sizer.add(createButtonRow(matchHistoryButton)).addNewLine()
 
     // Leaderboard button
-    const leaderboardContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: leaderboardContainer,
+    const leaderboardButton = new Buttons.Navigation({
+      within: this,
       text: 'Leaderboard',
       f: () => {
         this.scene.launch('MenuScene', {
@@ -330,7 +298,7 @@ export default class HomeScene extends BaseScene {
       },
       muteClick: true,
     })
-    sizer.add(leaderboardContainer)
+    sizer.add(createButtonRow(leaderboardButton))
 
     // Layout the sizer
     sizer.layout()
@@ -363,7 +331,7 @@ export default class HomeScene extends BaseScene {
 
     // Title
     const title = this.add
-      .text(0, 0, 'New Update!', Style.announcement)
+      .text(0, 0, 'New Update [0.7.10]', Style.announcement)
       .setOrigin(0.5, 0)
     panelSizer.add(title).addNewLine()
 
@@ -380,9 +348,9 @@ export default class HomeScene extends BaseScene {
     contentSizer.add(image, { align: 'top' })
 
     // Update notes text with BBCode for hoverable card names
-    const updateText = `An exciting tournament approaches! The 7th Celestial tournament will be held on the 20th at noon EST.
+    const updateText = `An exciting tournament approaches! December 20th at noon (EST) join for the 7th Celestial tournament!
 
-Join us for the 7th Celestial tournament! Play in person or remote. Exclusive prizes for all participants, $120 prize pool, and Swiss format competition.
+Play in person or remote in this Swiss style tournament. Exclusive cosmetic and cash prizes for winners!
 
 [area=_link_register][color=#FABD5D]Register here[/color][/area]
 

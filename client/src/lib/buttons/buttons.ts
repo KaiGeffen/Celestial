@@ -9,6 +9,7 @@ import HomeSceneButton from './homeSceneButton'
 import Icon from './icon'
 import Sun from './sun'
 import Moon from './moon'
+import NavigationButton from './navigation'
 
 // Export all of the available buttons
 export default class Buttons {
@@ -28,6 +29,7 @@ export default class Buttons {
   }
   static Mission = MissionButton
   static HomeScene = HomeSceneButton
+  static Navigation = NavigationButton
 
   static Sun = Sun
   static Moon = Moon
