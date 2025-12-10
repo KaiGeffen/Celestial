@@ -7,6 +7,7 @@ import {
   UserSettings,
   Time,
   Ease,
+  Flags,
 } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
 import Button from '../lib/buttons/button'
@@ -47,6 +48,11 @@ export default class MapJourneyScene extends BaseScene {
 
     // Add button to switch back to new journey mode
     this.createStoryModeButton()
+
+    // Add race button if dev mode is enabled
+    if (Flags.devCardsEnabled) {
+      this.createRaceButton()
+    }
 
     // Add all of the available nodes
     this.addJourneyData()
@@ -155,6 +161,26 @@ export default class MapJourneyScene extends BaseScene {
       f: () => {
         // Switch to new journey (story) mode
         this.scene.start('JourneyScene')
+      },
+      depth: 10,
+    }).setNoScroll()
+  }
+
+  private createRaceButton(): void {
+    const x =
+      Space.windowWidth -
+      Space.buttonWidth / 2 -
+      (Space.iconSize + Space.pad * 2) -
+      Space.buttonWidth * 2 -
+      Space.pad * 2
+    const y = Space.buttonHeight / 2 + Space.pad
+    new Buttons.Basic({
+      within: this,
+      text: 'Race',
+      x,
+      y,
+      f: () => {
+        this.scene.start('RaceScene', {})
       },
       depth: 10,
     }).setNoScroll()

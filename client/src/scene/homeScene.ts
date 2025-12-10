@@ -1,17 +1,13 @@
 import 'phaser'
-import { Style, Color, Space, Flags, BBStyle } from '../settings/settings'
+import { Style, Color, Space, BBStyle } from '../settings/settings'
 import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
 import Cinematic from '../lib/cinematic'
-import { openDiscord, openFeedbackForm } from '../utils/externalLinks'
+import { openDiscord } from '../utils/externalLinks'
 import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
-import Catalog from '../../../shared/state/catalog'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-
-const width = Space.iconSize * 3 + Space.pad * 4
-const height = Space.iconSize * 2 + Space.pad * 3
 
 export default class HomeScene extends BaseScene {
   txtGem: Phaser.GameObjects.Text
@@ -40,10 +36,6 @@ export default class HomeScene extends BaseScene {
 
     // Create the new layout: left side (user details + navigation) and right side (content)
     this.createMainLayout()
-
-    if (Flags.devCardsEnabled) {
-      this.createRaceButton()
-    }
 
     // Check if there are any unseen achievements and show achievements menu if so
     this.checkAndShowUnseenAchievements()
@@ -250,6 +242,17 @@ export default class HomeScene extends BaseScene {
     })
     sizer.add(createButtonRow(deckbuilderButton)).addNewLine()
 
+    // Journey button
+    const journeyButton = new Buttons.Navigation({
+      within: this,
+      text: 'Journey',
+      f: () => {
+        this.scene.start('MapJourneyScene', {})
+        logEvent('view_journey')
+      },
+    })
+    sizer.add(createButtonRow(journeyButton)).addNewLine()
+
     // Store button
     const storeButton = new Buttons.Navigation({
       within: this,
@@ -402,64 +405,6 @@ Card changes:
     })
 
     return panelSizer
-  }
-
-  createPrimaryButtons() {
-    // TODO Put these elsewhere to not confuse with standard button sizes
-    const buttonWidth = 220
-    const buttonHeight = 120
-
-    // Journey
-    const journeyContainer = this.add.container()
-    new Buttons.HomeScene({
-      within: journeyContainer,
-      text: 'Journey',
-      f: () => {
-        this.scene.start('MapJourneyScene', {})
-
-        logEvent('view_journey')
-      },
-    })
-    this.plugins.get('rexAnchor')['add'](journeyContainer, {
-      x: `0%+${buttonWidth / 2 + Space.pad}`,
-      y: `100%-${buttonHeight / 2 + Space.pad}`,
-    })
-
-    // Play
-    const playContainer = this.add.container()
-    new Buttons.HomeScene({
-      within: playContainer,
-      text: 'Play',
-      f: () => {
-        this.scene.launch('MenuScene', {
-          menu: 'play',
-          activeScene: this,
-        })
-
-        logEvent('view_play')
-      },
-    })
-    this.plugins.get('rexAnchor')['add'](playContainer, {
-      x: `100%-${buttonWidth / 2 + Space.pad}`,
-      y: `100%-${buttonHeight / 2 + Space.pad}`,
-    })
-  }
-
-  private createRaceButton(): void {
-    const container = this.add.container()
-    new Buttons.Basic({
-      within: container,
-      text: 'Race',
-      f: () => {
-        this.scene.start('RaceScene', {})
-      },
-    })
-
-    // Anchor to right
-    this.plugins.get('rexAnchor')['add'](container, {
-      x: `100%-${Space.padSmall + Space.buttonWidth / 2}`,
-      y: `0%+${Space.pad * 5 + Space.iconSize * 2 + Space.buttonHeight * 1.5}`,
-    })
   }
 
   private checkAndShowUnseenAchievements(): void {
