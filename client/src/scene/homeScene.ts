@@ -216,6 +216,9 @@ export default class HomeScene extends BaseScene {
         orientation: 'horizontal',
         width: width,
       })
+      // Reset button container position to 0,0 and set origin to 0,0 for proper sizer positioning
+      button.container.setPosition(0, 0)
+      button.container.setOrigin(0, 0)
       rowSizer.addSpace().add(button.container).addSpace()
       rowSizer.layout()
       return rowSizer
@@ -360,8 +363,7 @@ Card changes:
 ☝️ [area=_Pet][color=#FABD5D]Pet[/color][/area] points 1 > 2
 ☝️ [area=_Overflow][color=#FABD5D]Overflow[/color][/area] points -1 > 0
 ☝️ [area=_Hug][color=#FABD5D]Hug[/color][/area] points 1 > 2, bonus 2 > 1
-☝️ [area=_Balance][color=#FABD5D]Balance[/color][/area] points 1 > 2, bonus 3 > 2
-      `
+☝️ [area=_Balance][color=#FABD5D]Balance[/color][/area] points 1 > 2, bonus 3 > 2`
 
     const text = this.rexUI.add
       .BBCodeText(0, 0, updateText, {

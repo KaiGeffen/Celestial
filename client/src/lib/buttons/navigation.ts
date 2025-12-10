@@ -19,10 +19,9 @@ export default class NavigationButton extends Button {
     muteClick = false,
   }) {
     // Get the scene
-    const scene =
-      within instanceof Phaser.Scene ? within : within.scene
+    const scene = within instanceof Phaser.Scene ? within : within.scene
 
-    // Create container for the button
+    // Create container for the button (origin at top-left for proper positioning)
     const container = new ContainerLite(
       scene,
       x,
@@ -30,33 +29,28 @@ export default class NavigationButton extends Button {
       NAVIGATION_BUTTON_WIDTH,
       Space.buttonHeight,
     )
-    container.setOrigin(0.5, 0.5)
 
-    // Add background rectangle
+    // Add background rectangle covering the full container
     const background = scene.add
-      .rectangle(0, 0, NAVIGATION_BUTTON_WIDTH, Space.buttonHeight, NAVIGATION_BUTTON_COLOR)
+      .rectangle(
+        NAVIGATION_BUTTON_WIDTH / 2,
+        Space.buttonHeight / 2,
+        NAVIGATION_BUTTON_WIDTH,
+        Space.buttonHeight,
+        NAVIGATION_BUTTON_COLOR,
+      )
       .setOrigin(0.5, 0.5)
     container.add(background)
 
-    // Create the button with text only (no icon) - text color is gold
-    const goldTextStyle = {
-      ...Style.button,
-      color: Color.goldS,
-    }
-    super(container, 0, 0, {
+    super(container, NAVIGATION_BUTTON_WIDTH / 2, Space.buttonHeight / 2, {
+      icon: {
+        name: 'NavigationButton',
+        interactive: true,
+      },
       text: {
         text: text,
-        interactive: true,
-        style: goldTextStyle,
-        hitArea: [
-          new Phaser.Geom.Rectangle(
-            -NAVIGATION_BUTTON_WIDTH / 2,
-            -Space.buttonHeight / 2,
-            NAVIGATION_BUTTON_WIDTH,
-            Space.buttonHeight,
-          ),
-          Phaser.Geom.Rectangle.Contains,
-        ],
+        interactive: false,
+        style: Style.button,
       },
       callbacks: {
         click: f,
@@ -66,8 +60,39 @@ export default class NavigationButton extends Button {
       },
     })
 
+    // Make the container itself interactive to cover the full button area
+    // This ensures the hitbox matches the container size exactly
+    container.setSize(NAVIGATION_BUTTON_WIDTH, Space.buttonHeight)
+    container.setInteractive(
+      new Phaser.Geom.Rectangle(
+        0,
+        0,
+        NAVIGATION_BUTTON_WIDTH,
+        Space.buttonHeight,
+      ),
+      Phaser.Geom.Rectangle.Contains,
+    )
+
+    // Make the background interactive as well to cover the full button area
+    background.setInteractive(
+      new Phaser.Geom.Rectangle(
+        -NAVIGATION_BUTTON_WIDTH / 2,
+        -Space.buttonHeight / 2,
+        NAVIGATION_BUTTON_WIDTH,
+        Space.buttonHeight,
+      ),
+      Phaser.Geom.Rectangle.Contains,
+    )
+
+    // Make both container and background trigger the same click
+    container.on('pointerdown', () => {
+      this.onClick()
+    })
+    background.on('pointerdown', () => {
+      this.onClick()
+    })
+
     this.container = container
     this.background = background
   }
 }
-

@@ -292,6 +292,7 @@ export const assetLists = {
       "Inspire",
       "Leaderboard",
       "Moon",
+      "NavigationButton",
       "Network",
       "New",
       "Nourish",
