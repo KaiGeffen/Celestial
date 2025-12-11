@@ -137,8 +137,8 @@ export default class PlayMenu extends Menu {
       space: {
         top: 0,
         bottom: 0,
-        left: Space.pad,
-        right: Space.pad,
+        left: 0,
+        right: 0,
         item: Space.padSmall,
         line: Space.padSmall,
       },
@@ -151,10 +151,21 @@ export default class PlayMenu extends Menu {
     this.scene.addShadow(background, -90)
 
     // Deck name - centered using sizer alignment
-    const deckNameSizer = this.scene.rexUI.add.sizer({
-      width: deckPanelWidth - Space.pad * 2,
-      orientation: 'horizontal',
+    const deckNameBackground = this.scene.add
+      .rectangle(0, 0, deckPanelWidth, 1, Color.backgroundDark)
+      .setInteractive()
+    this.scene.addShadow(deckNameBackground, -90)
+
+    const deckNameSizer = this.scene.rexUI.add.fixWidthSizer({
+      width: deckPanelWidth,
+      align: 'center',
+      space: {
+        top: Space.pad,
+        bottom: Space.pad,
+      },
     })
+    deckNameSizer.addBackground(deckNameBackground)
+
     this.txtDeckName = this.scene.rexUI.add
       .BBCodeText()
       .setStyle({
@@ -163,9 +174,8 @@ export default class PlayMenu extends Menu {
       })
       .setOrigin(0.5)
       .setText(this.deck.name || '')
-    // Center by adding space before and after
-    deckNameSizer.addSpace().add(this.txtDeckName).addSpace()
-    panelSizer.add(deckNameSizer, { padding: { top: Space.pad } }).addNewLine()
+    deckNameSizer.add(this.txtDeckName)
+    panelSizer.add(deckNameSizer).addNewLine()
 
     // Change Deck button and Avatar side by side, centered
     const buttonAvatarSizer = this.scene.rexUI.add.sizer({
@@ -281,8 +291,8 @@ export default class PlayMenu extends Menu {
       space: {
         top: 0,
         bottom: Space.pad,
-        left: Space.pad,
-        right: Space.pad,
+        left: 0,
+        right: 0,
         item: Space.padSmall,
         line: Space.padSmall,
       },
@@ -290,12 +300,12 @@ export default class PlayMenu extends Menu {
 
     // Create a vertical sizer for the content (play options at top) with its own background
     const contentSizer = this.scene.rexUI.add.fixWidthSizer({
-      width: playPanelWidth - Space.pad * 2,
+      width: playPanelWidth,
       space: {
-        top: Space.pad,
+        top: 0,
         bottom: Space.pad,
-        left: Space.pad,
-        right: Space.pad,
+        left: 0,
+        right: 0,
         item: Space.padSmall,
         line: Space.pad,
       },
@@ -308,12 +318,25 @@ export default class PlayMenu extends Menu {
     this.scene.addShadow(contentBackground, -90)
 
     // Player vs Player section - center the title
-    const titleSizer = this.scene.rexUI.add.sizer({
-      width: playPanelWidth - Space.pad * 2,
-      orientation: 'horizontal',
+    const titleBackground = this.scene.add
+      .rectangle(0, 0, playPanelWidth, 1, Color.backgroundDark)
+      .setInteractive()
+    this.scene.addShadow(titleBackground, -90)
+
+    const titleSizer = this.scene.rexUI.add.fixWidthSizer({
+      width: playPanelWidth,
+      align: 'center',
+      space: {
+        top: Space.pad,
+        bottom: Space.pad,
+      },
     })
-    const txtTitle = this.scene.add.text(0, 0, 'Game Mode', Style.announcement)
-    titleSizer.addSpace().add(txtTitle).addSpace()
+    titleSizer.addBackground(titleBackground)
+
+    const txtTitle = this.scene.add
+      .text(0, 0, 'Game Mode', Style.announcement)
+      .setOrigin(0.5)
+    titleSizer.add(txtTitle)
     contentSizer.add(titleSizer).addNewLine()
 
     // Practice (vs AI)
