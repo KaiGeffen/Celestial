@@ -354,10 +354,9 @@ export default class HomeScene extends BaseScene {
     contentSizer.add(image, { align: 'top' })
 
     // Update notes text with BBCode for hoverable card names
-    const updateText = `An exciting tournament approaches! December 20th at noon (EST) join for the 7th Celestial tournament!
+    const updateText = `This is your first look at our interstitial UI! While we'd love your feedback, know that we plan to overhaul it in the not too distant future.
 
-Play in person or remote in this Swiss style tournament. Exclusive cosmetic and cash prizes for winners!
-
+Join us December 20th at noon EST for the 7th Celestial tournament! Play in person or remote for the chance to take home some exclusive cosmetic and cash prizes!
 [area=_link_register][color=#FABD5D]Register here[/color][/area]
 
 Card changes:
@@ -366,7 +365,10 @@ Card changes:
 ☝️ [area=_Pet][color=#FABD5D]Pet[/color][/area] points 1 > 2
 ☝️ [area=_Overflow][color=#FABD5D]Overflow[/color][/area] points -1 > 0
 ☝️ [area=_Hug][color=#FABD5D]Hug[/color][/area] points 1 > 2, bonus 2 > 1
-☝️ [area=_Balance][color=#FABD5D]Balance[/color][/area] points 1 > 2, bonus 3 > 2`
+☝️ [area=_Balance][color=#FABD5D]Balance[/color][/area] points 1 > 2, bonus 3 > 2
+
+Thanks so much for playing! We couldn't do this without you 😊
+`
 
     const text = this.rexUI.add
       .BBCodeText(0, 0, updateText, {
