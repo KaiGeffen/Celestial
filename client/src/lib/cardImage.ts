@@ -35,6 +35,9 @@ export class CardImage {
   // The card's cost, if it has been changed
   cost: number
 
+  // The card's displayed points, if it has been changed
+  points: number
+
   // Use arrow functions for callbacks to preserve 'this'
   hoverCallback: () => void = () => {}
   exitCallback: () => void = () => {}
@@ -234,6 +237,7 @@ export class CardImage {
   }
 
   setPoints(amt: number): this {
+    this.points = amt
     this.txtPoints.setText(amt)
 
     // Use the correct color
@@ -319,11 +323,13 @@ export class CardImage {
       )
       .setVisible(this.card.id !== Catalog.cardback.id)
       .setOrigin(0.5)
-      .on('pointerover', () =>
-        hint.showText(
-          `This card is worth ${this.txtPoints.text} point${this.card.points === 1 ? '' : 's'}.`,
-        ),
-      )
+      .on('pointerover', () => {
+        let s = `This card is worth ${this.points} point${this.points === 1 ? '' : 's'}.`
+        if (this.points !== this.card.basePoints) {
+          s += `\nIt has base-points ${this.card.basePoints}.`
+        }
+        hint.showText(s)
+      })
       .on('pointerout', () => {
         this.onHoverExit()()
         hint.hide()

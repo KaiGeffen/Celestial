@@ -10,6 +10,8 @@ import Buttons from '../../lib/buttons/buttons'
 
 export default class OverlayRegion extends Region {
   txtTitle: Phaser.GameObjects.Text
+  cardImages: CardImage[] = []
+  hoveredCard: CardImage | null = null
 
   create(scene: MatchScene, title: string): OverlayRegion {
     this.scene = scene
@@ -62,6 +64,8 @@ export default class OverlayRegion extends Region {
 
   protected displayCards(cards: Card[]): void {
     this.deleteTemp()
+    this.cardImages = []
+    this.hoveredCard = null
 
     const total = cards.length
     for (let i = 0; i < total; i++) {
@@ -71,6 +75,17 @@ export default class OverlayRegion extends Region {
     this.txtTitle.setVisible(total <= 15)
   }
 
+  // Grey out all cards except the hovered one
+  private updateCardGreying(): void {
+    this.cardImages.forEach((cardImage) => {
+      if (cardImage === this.hoveredCard) {
+        cardImage.setPlayable(true) // Clear tint
+      } else {
+        cardImage.setPlayable(false) // Grey out
+      }
+    })
+  }
+
   // Add a card to this overlay
   private addOverlayCard(card: Card, i: number, total: number): CardImage {
     const titleHeight = this.txtTitle.height
@@ -78,6 +93,39 @@ export default class OverlayRegion extends Region {
 
     let cardImage = this.addCard(card, position).moveToTopOnHover()
 
+    // Set up hover handlers to track which card is hovered
+    cardImage.setOnHover(
+      () => {
+        this.hoveredCard = cardImage
+        this.updateCardGreying()
+      },
+      () => {
+        // Check if pointer is still over any card before clearing hover
+        const pointer = this.scene.input.activePointer
+        let stillHovering = false
+
+        for (const img of this.cardImages) {
+          if (img.image.getBounds().contains(pointer.x, pointer.y)) {
+            stillHovering = true
+            if (img !== cardImage) {
+              this.hoveredCard = img
+              this.updateCardGreying()
+            }
+            break
+          }
+        }
+
+        if (!stillHovering) {
+          this.hoveredCard = null
+          this.updateCardGreying()
+        }
+      },
+    )
+
+    // Initially grey out the card
+    cardImage.setPlayable(false)
+
+    this.cardImages.push(cardImage)
     this.temp.push(cardImage)
 
     return cardImage
