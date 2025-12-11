@@ -163,44 +163,46 @@ export default class HomeScene extends BaseScene {
     })
     mainSizer.add(avatarContainer)
 
-    // Right side: vertical sizer for 3 lines of text
+    // Right side: vertical sizer for text content
     const textSizer = this.rexUI.add.sizer({
       orientation: 'vertical',
       space: {
-        item: Space.padSmall,
+        item: Space.padSmall * 0.75,
       },
     })
 
-    // Line 1: Username
     const userData = Server.getUserData()
     const username = userData.username || 'Guest'
-    // Calculate max width: button width minus avatar size and padding
-    const maxUsernameWidth =
+    const elo = userData.elo || 1000
+    const amtCoins = userData.coins || 0
+    const amtGems = userData.gems || 0
+
+    // Calculate max width for text: button width minus avatar size and padding
+    const maxTextWidth =
       NAVIGATION_BUTTON_WIDTH - Space.avatarSize - Space.pad * 3
+
+    // Line 1: Username (with word wrap to prevent overflow)
     const usernameText = this.add
       .text(0, 0, username, Style.username)
       .setOrigin(0, 0.5)
-      .setWordWrapWidth(maxUsernameWidth)
+      .setWordWrapWidth(maxTextWidth)
     textSizer.add(usernameText, { align: 'left' })
 
-    // Line 2: ELO
-    const elo = userData.elo || 1000
+    // Line 2: ELO (on same line as username would be ideal, but keeping separate for clarity)
     const eloText = this.add
-      .text(0, 0, `(${elo})`, Style.username)
+      .text(0, 0, `ELO: ${elo}`, Style.username)
       .setOrigin(0, 0.5)
     textSizer.add(eloText, { align: 'left' })
 
-    // Line 3: Gold (coins)
-    const amtCoins = userData.coins || 0
+    // Line 3: Coins
     this.txtCoins = this.add
-      .text(0, 0, `${amtCoins}💰`, Style.username)
+      .text(0, 0, `${amtCoins.toLocaleString()} 💰`, Style.username)
       .setOrigin(0, 0.5)
     textSizer.add(this.txtCoins, { align: 'left' })
 
     // Line 4: Gems
-    const amtGems = userData.gems || 0
     this.txtGem = this.add
-      .text(0, 0, `${amtGems} 💎`, Style.username)
+      .text(0, 0, `${amtGems.toLocaleString()} 💎`, Style.username)
       .setOrigin(0, 0.5)
     textSizer.add(this.txtGem, { align: 'left' })
 
@@ -502,10 +504,10 @@ Thanks so much for playing! We couldn't do this without you 😊`
 
     // Update the currency displays
     if (this.txtGem) {
-      this.txtGem.setText(`${Server.getUserData().gems} 💎`)
+      this.txtGem.setText(`${Server.getUserData().gems.toLocaleString()} 💎`)
     }
     if (this.txtCoins) {
-      this.txtCoins.setText(`${Server.getUserData().coins}💰`)
+      this.txtCoins.setText(`${Server.getUserData().coins.toLocaleString()} 💰`)
     }
   }
 
