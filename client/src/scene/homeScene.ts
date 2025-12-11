@@ -373,8 +373,19 @@ export default class HomeScene extends BaseScene {
       },
     })
 
-    // Image - news asset
-    const image = this.add.image(0, 0, 'news-LayBare').setOrigin(0, 0)
+    // Image - news asset (deterministic by day of week)
+    const dayOfWeek = new Date().getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const newsImages = [
+      'Birth', // Sunday (0)
+      'Goliath', // Monday (1)
+      'LayBare', // Tuesday (2)
+      'MeAndHer', // Wednesday (3)
+      'Nightmare', // Thursday (4)
+      'Possibilities', // Friday (5)
+      'Refresh', // Saturday (6)
+    ]
+    const newsImageName = newsImages[dayOfWeek]
+    const image = this.add.image(0, 0, `news-${newsImageName}`).setOrigin(0, 0)
     contentSizer.add(image, { align: 'top' })
 
     // Update notes text with BBCode for hoverable card names
