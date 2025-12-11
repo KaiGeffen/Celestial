@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Color, Space, BBStyle } from '../settings/settings'
+import { Style, Color, Space, BBStyle, Flags } from '../settings/settings'
 import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
@@ -167,7 +167,6 @@ export default class HomeScene extends BaseScene {
     const textSizer = this.rexUI.add.sizer({
       orientation: 'vertical',
       space: {
-        top: Space.pad,
         item: Space.padSmall,
       },
     })
@@ -182,28 +181,28 @@ export default class HomeScene extends BaseScene {
       .text(0, 0, username, Style.username)
       .setOrigin(0, 0.5)
       .setWordWrapWidth(maxUsernameWidth)
-    textSizer.add(usernameText)
+    textSizer.add(usernameText, { align: 'left' })
 
     // Line 2: ELO
     const elo = userData.elo || 1000
     const eloText = this.add
       .text(0, 0, `(${elo})`, Style.username)
       .setOrigin(0, 0.5)
-    textSizer.add(eloText)
+    textSizer.add(eloText, { align: 'left' })
 
     // Line 3: Gold (coins)
     const amtCoins = userData.coins || 0
     this.txtCoins = this.add
       .text(0, 0, `${amtCoins}💰`, Style.username)
       .setOrigin(0, 0.5)
-    textSizer.add(this.txtCoins)
+    textSizer.add(this.txtCoins, { align: 'left' })
 
     // Line 4: Gems
     const amtGems = userData.gems || 0
     this.txtGem = this.add
       .text(0, 0, `${amtGems} 💎`, Style.username)
       .setOrigin(0, 0.5)
-    textSizer.add(this.txtGem)
+    textSizer.add(this.txtGem, { align: 'left' })
 
     // Layout text sizer
     textSizer.layout()
@@ -242,7 +241,7 @@ export default class HomeScene extends BaseScene {
     // Play button
     const playButton = new Buttons.Navigation({
       within: this,
-      text: 'Play',
+      iconName: 'PlayTab',
       f: () => {
         this.scene.launch('MenuScene', {
           menu: 'play',
@@ -257,7 +256,7 @@ export default class HomeScene extends BaseScene {
     // Deckbuilder button
     const deckbuilderButton = new Buttons.Navigation({
       within: this,
-      text: 'Deckbuilder',
+      iconName: 'DeckbuilderTab',
       f: () => {
         this.scene.start('BuilderScene', { isTutorial: false })
         logEvent('view_deckbuilder')
@@ -268,7 +267,7 @@ export default class HomeScene extends BaseScene {
     // Journey button
     const journeyButton = new Buttons.Navigation({
       within: this,
-      text: 'Journey',
+      iconName: 'JourneyTab',
       f: () => {
         this.scene.start('MapJourneyScene', {})
         logEvent('view_journey')
@@ -279,7 +278,7 @@ export default class HomeScene extends BaseScene {
     // Store button
     const storeButton = new Buttons.Navigation({
       within: this,
-      text: 'Store',
+      iconName: 'StoreTab',
       f: () => {
         this.scene.start('StoreScene')
         logEvent('view_store')
@@ -290,7 +289,7 @@ export default class HomeScene extends BaseScene {
     // Quests button
     const questsButton = new Buttons.Navigation({
       within: this,
-      text: 'Quests',
+      iconName: 'QuestsTab',
       f: () => {
         this.scene.launch('MenuScene', {
           menu: 'achievements',
@@ -305,7 +304,7 @@ export default class HomeScene extends BaseScene {
     // Match History button
     const matchHistoryButton = new Buttons.Navigation({
       within: this,
-      text: 'Match History',
+      iconName: 'MatchHistoryTab',
       f: () => {
         this.scene.start('MatchHistoryScene')
         logEvent('view_match_history')
@@ -316,7 +315,7 @@ export default class HomeScene extends BaseScene {
     // Leaderboard button
     const leaderboardButton = new Buttons.Navigation({
       within: this,
-      text: 'Leaderboard',
+      iconName: 'LeaderboardTab',
       f: () => {
         this.scene.launch('MenuScene', {
           menu: 'leaderboard',
@@ -336,17 +335,15 @@ export default class HomeScene extends BaseScene {
   }
 
   private createRightPanel(): any {
-    // Use fixWidthSizer - width will be set dynamically via anchor
-    // Provide a default width that will be overridden by anchor
-    const panelSizer = this.rexUI.add.fixWidthSizer({
-      width: 800, // Default width, will be overridden by anchor
+    // Use vertical sizer to allow content to expand to fill height
+    const panelSizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
       space: {
         top: Space.pad,
         bottom: Space.pad,
         left: Space.pad,
         right: Space.pad,
         item: Space.pad,
-        line: Space.pad,
       },
     })
 
@@ -358,11 +355,15 @@ export default class HomeScene extends BaseScene {
     panelSizer.addBackground(background)
     this.addShadow(background)
 
-    // Title
+    // Title with line below
     const title = this.add
       .text(0, 0, 'New Update [0.7.10]', Style.announcement)
       .setOrigin(0.5, 0)
-    panelSizer.add(title).addNewLine()
+    panelSizer.add(title)
+
+    // Line below title (using a thin rectangle)
+    const line = this.add.rectangle(0, 0, 1, 3, 0x353f4e).setOrigin(0, 0)
+    panelSizer.add(line, { expand: true })
 
     // Create horizontal sizer for image and text side by side
     const contentSizer = this.rexUI.add.sizer({
@@ -390,8 +391,7 @@ Card changes:
 ☝️ [area=_Hug][color=#FABD5D]Hug[/color][/area] points 1 > 2, bonus 2 > 1
 ☝️ [area=_Balance][color=#FABD5D]Balance[/color][/area] points 1 > 2, bonus 3 > 2
 
-Thanks so much for playing! We couldn't do this without you 😊
-`
+Thanks so much for playing! We couldn't do this without you 😊`
 
     const text = this.rexUI.add
       .BBCodeText(0, 0, updateText, {
@@ -422,11 +422,14 @@ Thanks so much for playing! We couldn't do this without you 😊
     contentSizer.add(text, { align: 'top', expand: true })
 
     contentSizer.layout()
-    panelSizer.add(contentSizer)
+    // Add content sizer with proportion to fill remaining vertical space
+    // For vertical sizer, proportion stretches vertically, expand stretches horizontally
+    panelSizer.add(contentSizer, { proportion: 1 })
 
-    // Anchor right panel to take 100% width
+    // Anchor right panel to take 100% width and height
     this.plugins.get('rexAnchor')['add'](panelSizer, {
       width: '100%',
+      height: '100%',
     })
 
     return panelSizer

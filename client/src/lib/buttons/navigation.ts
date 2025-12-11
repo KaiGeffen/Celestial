@@ -1,18 +1,16 @@
 import 'phaser'
 import Button from './button'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import { Style, Space, Color } from '../../settings/settings'
+import { Space } from '../../settings/settings'
 
 const NAVIGATION_BUTTON_WIDTH = 275
-const NAVIGATION_BUTTON_COLOR = 0x162731 // Blueish dark color
 
 export default class NavigationButton extends Button {
   container: ContainerLite
-  background: Phaser.GameObjects.Rectangle
 
   constructor({
     within,
-    text = '',
+    iconName,
     x = 0,
     y = 0,
     f = () => {},
@@ -30,27 +28,10 @@ export default class NavigationButton extends Button {
       Space.buttonHeight,
     )
 
-    // Add background rectangle covering the full container
-    const background = scene.add
-      .rectangle(
-        NAVIGATION_BUTTON_WIDTH / 2,
-        Space.buttonHeight / 2,
-        NAVIGATION_BUTTON_WIDTH,
-        Space.buttonHeight,
-        NAVIGATION_BUTTON_COLOR,
-      )
-      .setOrigin(0.5, 0.5)
-    container.add(background)
-
     super(container, NAVIGATION_BUTTON_WIDTH / 2, Space.buttonHeight / 2, {
       icon: {
-        name: 'NavigationButton',
+        name: iconName,
         interactive: true,
-      },
-      text: {
-        text: text,
-        interactive: false,
-        style: Style.button,
       },
       callbacks: {
         click: f,
@@ -73,26 +54,11 @@ export default class NavigationButton extends Button {
       Phaser.Geom.Rectangle.Contains,
     )
 
-    // Make the background interactive as well to cover the full button area
-    background.setInteractive(
-      new Phaser.Geom.Rectangle(
-        -NAVIGATION_BUTTON_WIDTH / 2,
-        -Space.buttonHeight / 2,
-        NAVIGATION_BUTTON_WIDTH,
-        Space.buttonHeight,
-      ),
-      Phaser.Geom.Rectangle.Contains,
-    )
-
-    // Make both container and background trigger the same click
+    // Make the container trigger the click
     container.on('pointerdown', () => {
-      this.onClick()
-    })
-    background.on('pointerdown', () => {
       this.onClick()
     })
 
     this.container = container
-    this.background = background
   }
 }
