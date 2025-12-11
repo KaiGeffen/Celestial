@@ -39,6 +39,8 @@ export default class PlayMenu extends Menu {
   gardenTimes: Date[]
   gardenPlants: Phaser.GameObjects.Image[]
   gardenTimers: Phaser.GameObjects.Text[]
+  gardenGlows: any[] // Store glow effects for ready-to-harvest plants
+  gardenGlowTweens: Phaser.Tweens.Tween[] // Store tween animations for pulsing glow
   txtDeckName: RexUIPlugin.BBCodeText
   avatar: Button
   txtDeckValidation: Phaser.GameObjects.Text
@@ -517,6 +519,8 @@ export default class PlayMenu extends Menu {
     this.gardenTimes = Server.getUserData().garden || []
     this.gardenPlants = []
     this.gardenTimers = []
+    this.gardenGlows = []
+    this.gardenGlowTweens = []
 
     // Create each plant with timer
     for (let i = 0; i < this.gardenTimes.length; i++) {
@@ -535,6 +539,32 @@ export default class PlayMenu extends Menu {
       // Calculate growth stage
       const growthStage = this.getGrowthStage(plantTime)
       plant.setFrame(growthStage)
+
+      // Apply glow effect if plant is ready to harvest
+      const hoursRemaining = this.timeUntilFullyGrown(plantTime)
+      let glowEffect = null
+      let glowTween = null
+      if (hoursRemaining <= 0) {
+        // Use outline pipeline with pulsing alpha animation as a visual indicator
+        const outlinePlugin = this.scene.plugins.get('rexOutlinePipeline')
+        glowEffect = outlinePlugin['add'](plant, {
+          thickness: 2,
+          outlineColor: Color.gold,
+          quality: 0.3,
+        })
+
+        // Create pulsing animation by animating plant alpha (less intense fade)
+        glowTween = this.scene.tweens.add({
+          targets: plant,
+          alpha: 0.75,
+          duration: 2000,
+          ease: 'Sine.easeInOut',
+          yoyo: true,
+          repeat: -1,
+        })
+      }
+      this.gardenGlows.push(glowEffect)
+      this.gardenGlowTweens.push(glowTween)
 
       // Create timer text below plant - will be updated in update loop
       const timer = this.scene.add
@@ -593,7 +623,7 @@ export default class PlayMenu extends Menu {
     const hoursRemaining = this.timeUntilFullyGrown(plantedTime)
 
     if (hoursRemaining <= 0) {
-      return '00:00:00'
+      return 'Ready'
     }
 
     const totalSeconds = Math.floor(hoursRemaining * 3600)
@@ -607,9 +637,43 @@ export default class PlayMenu extends Menu {
   private updateTimers(): void {
     // Update garden timers every second
     if (this.gardenTimers && this.gardenTimes) {
+      const outlinePlugin = this.scene.plugins.get('rexOutlinePipeline')
       for (let i = 0; i < this.gardenTimers.length; i++) {
         if (this.gardenTimers[i] && this.gardenTimes[i]) {
           this.gardenTimers[i].setText(this.formatTimer(this.gardenTimes[i]))
+
+          // Check if plant is ready to harvest and update glow
+          const hoursRemaining = this.timeUntilFullyGrown(this.gardenTimes[i])
+          const isReady = hoursRemaining <= 0
+          const hasGlow = this.gardenGlows[i] !== null
+
+          if (isReady && !hasGlow && this.gardenPlants[i]) {
+            // Plant just became ready - add outline with pulsing alpha animation
+            const outlinePlugin = this.scene.plugins.get('rexOutlinePipeline')
+            this.gardenGlows[i] = outlinePlugin['add'](this.gardenPlants[i], {
+              thickness: 2,
+              outlineColor: Color.gold,
+              quality: 0.3,
+            })
+
+            // Create pulsing animation by animating plant alpha (less intense fade)
+            this.gardenGlowTweens[i] = this.scene.tweens.add({
+              targets: this.gardenPlants[i],
+              alpha: 0.45,
+              duration: 1400,
+              ease: 'Sine.easeInOut',
+              yoyo: true,
+              repeat: -1,
+            })
+          } else if (!isReady && hasGlow) {
+            // Plant is no longer ready (shouldn't happen, but handle it)
+            if (this.gardenGlowTweens[i]) {
+              this.gardenGlowTweens[i].remove()
+              this.gardenGlowTweens[i] = null
+            }
+            outlinePlugin['remove'](this.gardenPlants[i])
+            this.gardenGlows[i] = null
+          }
         }
       }
     }
