@@ -18,7 +18,6 @@ import TheirBoardRegion from './matchRegions/theirBoard'
 import StoryRegion from './matchRegions/story'
 import OurScoreRegion from './matchRegions/ourScore'
 import MulliganRegion from './matchRegions/mulliganRegion'
-import CompanionRegion from './matchRegions/companion'
 import { ResultsRegionJourney } from './matchRegions/matchResults'
 
 // TODO Figure out
@@ -293,9 +292,6 @@ export class MatchScene extends BaseScene {
     // Enable the searching region visual update
     this.view.searching.update(time, delta)
 
-    // Update pet
-    this.view.pet.update(time, delta)
-
     if (this.currentVersion + 1 in this.queuedStates) {
       let isDisplayed = this.displayState(
         this.queuedStates[this.currentVersion + 1],
@@ -475,8 +471,6 @@ export class View {
   // Class that animates everything that is animated
   animator: Animator
 
-  pet: CompanionRegion
-
   background: Phaser.GameObjects.Image
 
   constructor(scene: MatchScene, avatarId: number, password: string) {
@@ -548,9 +542,6 @@ export class View {
     this.results = new Regions.MatchResults().create(scene)
 
     this.animator = new Animator(scene, this)
-
-    // Create pet region
-    this.pet = new Regions.Companion().create(scene)
   }
 
   displayState(state: GameModel) {
@@ -589,9 +580,6 @@ export class View {
     if (state.sound) {
       this.scene.playSound(state.sound)
     }
-
-    // Update pet
-    this.pet.displayState(state)
 
     // At night, background is dark
     this.tweenBackgroundTint(state.isRecap)
