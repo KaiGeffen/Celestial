@@ -119,13 +119,25 @@ export default class HomeScene extends BaseScene {
 
   private createUserDetailsSection(width: number): any {
     // Main horizontal sizer for avatar on left, text on right
-    const mainSizer = this.rexUI.add.sizer({
-      orientation: 'horizontal',
-      width: width,
+    // Match the width of navigation buttons (275px)
+    const NAVIGATION_BUTTON_WIDTH = 275
+    const mainSizer = this.rexUI.add.fixWidthSizer({
+      width: NAVIGATION_BUTTON_WIDTH,
       space: {
         item: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
       },
     })
+
+    // Add dark background
+    const background = this.add
+      .rectangle(0, 0, 1, 1, Color.backgroundDark)
+      .setInteractive()
+    mainSizer.addBackground(background)
+    this.addShadow(background)
 
     // Avatar container - fixed size
     const avatarContainer = new ContainerLite(
@@ -155,27 +167,38 @@ export default class HomeScene extends BaseScene {
     const textSizer = this.rexUI.add.sizer({
       orientation: 'vertical',
       space: {
+        top: Space.pad,
         item: Space.padSmall,
       },
     })
 
-    // Line 1: Username + ELO
+    // Line 1: Username
     const userData = Server.getUserData()
     const username = userData.username || 'Guest'
-    const elo = userData.elo || 1000
-    const usernameEloText = this.add
-      .text(0, 0, `${username} (${elo})`, Style.username)
+    // Calculate max width: button width minus avatar size and padding
+    const maxUsernameWidth =
+      NAVIGATION_BUTTON_WIDTH - Space.avatarSize - Space.pad * 3
+    const usernameText = this.add
+      .text(0, 0, username, Style.username)
       .setOrigin(0, 0.5)
-    textSizer.add(usernameEloText)
+      .setWordWrapWidth(maxUsernameWidth)
+    textSizer.add(usernameText)
 
-    // Line 2: Gold (coins)
+    // Line 2: ELO
+    const elo = userData.elo || 1000
+    const eloText = this.add
+      .text(0, 0, `(${elo})`, Style.username)
+      .setOrigin(0, 0.5)
+    textSizer.add(eloText)
+
+    // Line 3: Gold (coins)
     const amtCoins = userData.coins || 0
     this.txtCoins = this.add
       .text(0, 0, `${amtCoins}💰`, Style.username)
       .setOrigin(0, 0.5)
     textSizer.add(this.txtCoins)
 
-    // Line 3: Gems
+    // Line 4: Gems
     const amtGems = userData.gems || 0
     this.txtGem = this.add
       .text(0, 0, `${amtGems} 💎`, Style.username)
