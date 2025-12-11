@@ -108,7 +108,7 @@ class AlterDeckMenu extends Menu {
       width: width - Space.pad * 2,
     })
 
-    const tabs = ['Icon', 'Border', 'Relic', 'Pet']
+    const tabs = ['Icon', 'Border']
     tabs.forEach((tabText, index) => {
       const container = new ContainerLite(
         this.scene,
@@ -121,10 +121,6 @@ class AlterDeckMenu extends Menu {
         within: container,
         text: tabText,
         f: () => {
-          if (tabText === 'Relic' || tabText === 'Pet') {
-            this.scene.signalError('Coming soon')
-            return
-          }
           this.currentTab = tabText === 'Icon' ? tab.ICON : tab.BORDER
           this.updateCosmeticGrid()
         },

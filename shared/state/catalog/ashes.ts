@@ -22,8 +22,10 @@ class Dash extends Card {
   }
 
   onPlay(player: number, game: GameModel) {
-    game.discard(player)
-    game.draw(player)
+    if (this.upgradeVersion === 1) {
+      game.discard(player)
+      game.draw(player)
+    }
   }
 
   ratePlay(world: GameModel): number {
