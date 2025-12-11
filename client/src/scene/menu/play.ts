@@ -171,6 +171,7 @@ export default class PlayMenu extends Menu {
       .setStyle({
         ...BBStyle.deckName,
         fixedHeight: 50 + Space.padSmall,
+        fixedWidth: deckPanelWidth - Space.pad * 2,
       })
       .setOrigin(0.5)
       .setText(this.deck.name || '')
