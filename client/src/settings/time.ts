@@ -66,4 +66,7 @@ export class Time {
 
   // On the searching scene when a match is found, how long for text to fade in/out
   static searchFlash = 500
+
+  // How long for a card to move up when focused
+  static cardFocus = 150
 }

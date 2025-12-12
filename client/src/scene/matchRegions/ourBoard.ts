@@ -277,7 +277,7 @@ export default class OurBoardRegion extends Region {
         this.scene.tweens.add({
           targets: card.container,
           y: -HOVER_OFFSET,
-          duration: Time.playCard() / 2,
+          duration: Time.cardFocus,
           ease: 'Sine.easeOut',
         })
 
@@ -303,7 +303,7 @@ export default class OurBoardRegion extends Region {
         this.scene.tweens.add({
           targets: card.container,
           y: Space.cardHeight / 2 - Space.todoHandOffset,
-          duration: Time.playCard() / 2,
+          duration: Time.cardFocus,
           ease: 'Sine.easeOut',
         })
 
@@ -335,7 +335,7 @@ export default class OurBoardRegion extends Region {
       this.scene.tweens.add({
         targets: card.container,
         y: -HOVER_OFFSET,
-        duration: Time.playCard() / 2,
+        duration: Time.cardFocus,
         ease: 'Sine.easeOut',
       })
     })
@@ -350,7 +350,7 @@ export default class OurBoardRegion extends Region {
       this.scene.tweens.add({
         targets: card.container,
         y: Space.cardHeight / 2 - Space.todoHandOffset,
-        duration: Time.playCard() / 2,
+        duration: Time.cardFocus,
         ease: 'Sine.easeOut',
       })
     })
