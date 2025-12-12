@@ -8,6 +8,7 @@ import Buttons from '../../lib/buttons/buttons'
 import { Flags } from '../../settings/flags'
 import { LEADERBOARD_PORT } from '../../../../shared/network/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
+import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
 const height = (Space.windowHeight * 2) / 3
 const width = 1000
@@ -25,6 +26,7 @@ interface LeaderboardEntry {
 
 export default class LeaderboardMenu extends Menu {
   private leaderboardData: LeaderboardEntry[] = []
+  private scrollablePanel: ScrollablePanel
 
   constructor(scene: MenuScene, params) {
     super(scene, width, params)
@@ -84,7 +86,7 @@ export default class LeaderboardMenu extends Menu {
     const line = this.scene.add.line(0, 0, 0, 0, width, 0, Color.line)
 
     // Create scrollable panel for all player rows
-    let scrollablePanel = this.scene.rexUI.add.scrollablePanel({
+    this.scrollablePanel = this.scene.rexUI.add.scrollablePanel({
       width: width,
       height: height,
       scrollMode: 0,
@@ -97,7 +99,30 @@ export default class LeaderboardMenu extends Menu {
       },
     })
 
-    this.sizer.add(headerSizer).add(line).add(scrollablePanel)
+    this.sizer.add(headerSizer).add(line).add(this.scrollablePanel)
+
+    // After layout, scroll to user's position if they're in the list
+    this.scrollablePanel.layout()
+    this.scrollToUserPosition()
+  }
+
+  private scrollToUserPosition() {
+    if (!this.scrollablePanel || this.leaderboardData.length === 0) {
+      return
+    }
+
+    const userData = Server.getUserData()
+    const userIndex = this.leaderboardData.findIndex(
+      (entry) => entry.username === userData.username,
+    )
+
+    // If user is found in the list, scroll to their position
+    if (userIndex !== -1) {
+      const totalLength = this.leaderboardData.length
+      const ratio = totalLength > 1 ? userIndex / (totalLength - 1) : 0
+      // Clamp ratio to valid scroll range (0 to 0.999999)
+      this.scrollablePanel.t = Math.min(0.999999, Math.max(0, ratio))
+    }
   }
 
   private createPlayerRows() {
