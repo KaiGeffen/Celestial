@@ -42,7 +42,7 @@ export function createExpBar(
       table: function (level) {
         if (level > LEVEL_PROGRESSION.length)
           return LEVEL_PROGRESSION[LEVEL_PROGRESSION.length - 1].totalExp
-        return LEVEL_PROGRESSION[level - 1].totalExp
+        return LEVEL_PROGRESSION[Math.max(0, level - 1)].totalExp
       },
       maxLevel: MAX_LEVEL,
       exp: currentExp,
