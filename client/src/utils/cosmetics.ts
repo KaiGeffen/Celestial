@@ -36,6 +36,14 @@ export function getUnlockedBorders(): number[] {
   const userData = Server.getUserData()
   const unlockedBorders = new Set<number>()
 
+  // I get all borders heehee
+  if (userData.username === 'Kai') {
+    for (let i = 0; i <= 9; i++) {
+      unlockedBorders.add(i)
+    }
+    return Array.from(unlockedBorders).sort((a, b) => a - b)
+  }
+
   // Default border (0)
   unlockedBorders.add(0)
 
