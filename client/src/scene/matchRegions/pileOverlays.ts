@@ -12,6 +12,7 @@ export default class OverlayRegion extends Region {
   txtTitle: Phaser.GameObjects.Text
   cardImages: CardImage[] = []
   hoveredCard: CardImage | null = null
+  switchButton: any = null // Store reference to switch button
 
   create(scene: MatchScene, title: string): OverlayRegion {
     this.scene = scene
@@ -159,8 +160,32 @@ export class OurDiscardOverlay extends OverlayRegion {
     return this
   }
 
+  // Override setSwitch to position button below title and update text
+  setSwitch(callback: () => void): this {
+    // Position button below title text, with more spacing
+    const titleY = Space.cardHeight / 2
+    const titleHeight = this.txtTitle.height
+    const buttonY = titleY + titleHeight + Space.pad * 2
+
+    this.switchButton = new Buttons.Basic({
+      within: this.container,
+      text: 'Removed (0)', // Will be updated in displayState
+      x: 0, // Centered horizontally
+      y: buttonY,
+      f: callback,
+    })
+
+    return this
+  }
+
   displayState(state: GameModel): void {
     this.displayCards(state.pile[0])
+    
+    // Update button text with expended card count
+    if (this.switchButton) {
+      const expendedCount = state.expended[0]?.length || 0
+      this.switchButton.setText(`Removed (${expendedCount})`)
+    }
   }
 }
 
@@ -169,8 +194,32 @@ export class TheirDiscardOverlay extends OverlayRegion {
     return super.create(scene, 'Their Discard Pile')
   }
 
+  // Override setSwitch to position button below title and update text
+  setSwitch(callback: () => void): this {
+    // Position button below title text, with more spacing
+    const titleY = Space.cardHeight / 2
+    const titleHeight = this.txtTitle.height
+    const buttonY = titleY + titleHeight + Space.pad * 2
+
+    this.switchButton = new Buttons.Basic({
+      within: this.container,
+      text: 'Removed (0)', // Will be updated in displayState
+      x: 0, // Centered horizontally
+      y: buttonY,
+      f: callback,
+    })
+
+    return this
+  }
+
   displayState(state: GameModel): void {
     this.displayCards(state.pile[1])
+    
+    // Update button text with expended card count
+    if (this.switchButton) {
+      const expendedCount = state.expended[1]?.length || 0
+      this.switchButton.setText(`Removed (${expendedCount})`)
+    }
   }
 }
 
@@ -181,8 +230,32 @@ export class OurExpendedOverlay extends OverlayRegion {
     return this
   }
 
+  // Override setSwitch to position button below title and update text
+  setSwitch(callback: () => void): this {
+    // Position button below title text, with more spacing
+    const titleY = Space.cardHeight / 2
+    const titleHeight = this.txtTitle.height
+    const buttonY = titleY + titleHeight + Space.pad * 2
+
+    this.switchButton = new Buttons.Basic({
+      within: this.container,
+      text: 'Discard (0)', // Will be updated in displayState
+      x: 0, // Centered horizontally
+      y: buttonY,
+      f: callback,
+    })
+
+    return this
+  }
+
   displayState(state: GameModel): void {
     this.displayCards(state.expended[0])
+    
+    // Update button text with discard card count
+    if (this.switchButton) {
+      const discardCount = state.pile[0]?.length || 0
+      this.switchButton.setText(`Discard (${discardCount})`)
+    }
   }
 }
 
@@ -191,7 +264,31 @@ export class TheirExpendedOverlay extends OverlayRegion {
     return super.create(scene, 'Their Removed From Game Cards')
   }
 
+  // Override setSwitch to position button below title and update text
+  setSwitch(callback: () => void): this {
+    // Position button below title text, with more spacing
+    const titleY = Space.cardHeight / 2
+    const titleHeight = this.txtTitle.height
+    const buttonY = titleY + titleHeight + Space.pad * 2
+
+    this.switchButton = new Buttons.Basic({
+      within: this.container,
+      text: 'Discard (0)', // Will be updated in displayState
+      x: 0, // Centered horizontally
+      y: buttonY,
+      f: callback,
+    })
+
+    return this
+  }
+
   displayState(state: GameModel): void {
     this.displayCards(state.expended[1])
+    
+    // Update button text with discard card count
+    if (this.switchButton) {
+      const discardCount = state.pile[1]?.length || 0
+      this.switchButton.setText(`Discard (${discardCount})`)
+    }
   }
 }
