@@ -57,29 +57,29 @@ export default class HomeScene extends BaseScene {
     })
 
     // Left panel: User details + Navigation buttons
-    const leftPanelWidth = 300
-    const leftPanel = this.createLeftPanel(leftPanelWidth)
-    mainSizer.add(leftPanel, { align: 'top', expand: false })
+    const leftPanel = this.createLeftPanel()
+    mainSizer.add(leftPanel, { align: 'top' })
 
     // Right panel: Title, image, and text - expand to fill remaining width
     const rightPanel = this.createRightPanel()
-    mainSizer.add(rightPanel, { align: 'top', expand: true, proportion: 1 })
-
-    // Layout the sizer first
-    mainSizer.layout()
+    mainSizer.add(rightPanel)
 
     // Anchor main sizer to fill entire screen (after layout so it positions correctly)
     this.plugins.get('rexAnchor')['add'](mainSizer, {
+      width: '100%',
+      height: '100%',
       left: 'left',
-      right: 'right',
       top: 'top',
-      bottom: 'bottom',
     })
+
+    // Layout the sizer first
+    mainSizer.layout()
   }
 
-  private createLeftPanel(width: number): any {
+  private createLeftPanel(): any {
+    const width = 300
     const panelSizer = this.rexUI.add.fixWidthSizer({
-      width: width,
+      width,
       space: {
         top: Space.pad,
         bottom: Space.pad,
@@ -91,8 +91,8 @@ export default class HomeScene extends BaseScene {
     })
 
     // Add background
-    const background = this.rexUI.add
-      .roundRectangle(0, 0, 1, 1, 5, 0xffffff)
+    const background = this.add
+      .rectangle(0, 0, 1, 1, 0xffffff)
       .setAlpha(0.3)
       .setInteractive()
     panelSizer.addBackground(background)
@@ -256,10 +256,9 @@ export default class HomeScene extends BaseScene {
     })
 
     // Add background
-    const background = this.rexUI.add
-      .roundRectangle(0, 0, 1, 1, 5, Color.backgroundLight)
+    const background = this.add
+      .rectangle(0, 0, 1, 1, Color.backgroundLight)
       .setAlpha(0.3)
-      .setInteractive()
     panelSizer.addBackground(background)
     this.addShadow(background)
 
@@ -296,7 +295,7 @@ export default class HomeScene extends BaseScene {
     const image = this.add.image(0, 0, `news-${newsImageName}`).setOrigin(0, 0)
     contentSizer.add(image, { align: 'top' })
 
-    // Update notes text with BBCode for hoverable card names
+    // Make news content as BBCode to have hoverable card names and links
     const updateText = `This is your first look at our interstitial UI! While we'd love your feedback, know that we plan to overhaul it in the not too distant future.
 
 Join us December 20th at noon EST for the 7th Celestial tournament! Play in person or remote for the chance to take home some exclusive cosmetic and cash prizes!
@@ -340,16 +339,7 @@ Thanks so much for playing! We couldn't do this without you 😊`
       .setOrigin(0, 0)
     contentSizer.add(text, { align: 'top', expand: true })
 
-    contentSizer.layout()
-    // Add content sizer with proportion to fill remaining vertical space
-    // For vertical sizer, proportion stretches vertically, expand stretches horizontally
-    panelSizer.add(contentSizer, { proportion: 1 })
-
-    // Anchor right panel to take 100% width and height
-    this.plugins.get('rexAnchor')['add'](panelSizer, {
-      width: '100%',
-      height: '100%',
-    })
+    panelSizer.add(contentSizer)
 
     return panelSizer
   }
