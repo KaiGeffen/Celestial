@@ -13,8 +13,8 @@ import { achievementsMeta } from '../../../../shared/achievementsData'
 import { getUnlockedAvatars, getUnlockedBorders } from '../../utils/cosmetics'
 
 export default class UserProfileMenu extends Menu {
-  // The avatar on the homeScene
-  private outerAvatar: AvatarButton
+  // The avatar on the homeScene (optional, may be null if not displayed)
+  private outerAvatar: AvatarButton | null
 
   // TODO Refactor to remove this
   private currentTab: string = 'Icon'
@@ -27,7 +27,7 @@ export default class UserProfileMenu extends Menu {
 
   constructor(
     scene: MenuScene,
-    params: { activeScene: BaseScene; outerAvatar: AvatarButton },
+    params: { activeScene: BaseScene; outerAvatar: AvatarButton | null },
   ) {
     super(scene, 700)
     this.activeScene = params.activeScene
@@ -300,8 +300,10 @@ export default class UserProfileMenu extends Menu {
     this.currentAvatar.setAvatar(newSet.avatar)
     this.currentAvatar.setBorder(newSet.border)
 
-    this.outerAvatar.setAvatar(newSet.avatar)
-    this.outerAvatar.setBorder(newSet.border)
+    if (this.outerAvatar) {
+      this.outerAvatar.setAvatar(newSet.avatar)
+      this.outerAvatar.setBorder(newSet.border)
+    }
 
     Server.setCosmeticSet(newSet)
   }
