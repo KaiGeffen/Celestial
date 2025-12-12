@@ -13,7 +13,6 @@ import MulliganRegion from './mulliganRegion'
 import MatchResultsRegion from './matchResults'
 import OurAvatarRegion from './ourAvatar'
 import TheirAvatarRegion from './theirAvatar'
-import CompanionRegion from './companion'
 
 export default class Regions {
   static Searching = SearchingRegion
@@ -45,6 +44,4 @@ export default class Regions {
   // Regions for special periods of the game
   static Mulligan = MulliganRegion
   static MatchResults = MatchResultsRegion
-
-  static Companion = CompanionRegion
 }
