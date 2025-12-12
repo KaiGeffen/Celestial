@@ -63,9 +63,12 @@ export default class HomeScene extends BaseScene {
     const leftPanel = this.createLeftPanel()
     mainSizer.add(leftPanel, { align: 'top' })
 
+    // TODO Passing the height is a hacky way to make these have the same height within a sizer
+    const leftHeight = leftPanel.height
+
     // Right panel: Title, image, and text - expand to fill remaining width
-    const rightPanel = this.createRightPanel()
-    mainSizer.add(rightPanel, { align: 'right' })
+    const rightPanel = this.createRightPanel(leftHeight)
+    mainSizer.add(rightPanel, { align: 'top' })
 
     // Anchor main sizer to fill entire screen (after layout so it positions correctly)
     this.plugins.get('rexAnchor')['add'](mainSizer, {
@@ -338,10 +341,11 @@ export default class HomeScene extends BaseScene {
     return mainSizer
   }
 
-  private createRightPanel(): any {
+  private createRightPanel(height: number): any {
     // Use vertical sizer to allow content to expand to fill height
     const panelSizer = this.rexUI.add.sizer({
       orientation: 'vertical',
+      height,
       space: {
         top: Space.pad,
         bottom: Space.pad,
