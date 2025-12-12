@@ -9,6 +9,9 @@ import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
+const NAVIGATION_BUTTON_WIDTH = 278
+const URL = 'https://luma.com/og92agfp'
+
 export default class HomeScene extends BaseScene {
   constructor() {
     super({
@@ -98,8 +101,12 @@ export default class HomeScene extends BaseScene {
     panelSizer.addBackground(background)
     this.addShadow(background)
 
+    // User profile section - same width as navigation buttons
+    const userProfileSizer = this.createUserProfileSection()
+    panelSizer.add(userProfileSizer)
+
     // Navigation buttons section
-    const navButtonsSizer = this.createNavigationButtons(width - Space.pad * 2)
+    const navButtonsSizer = this.createNavigationButtons()
     panelSizer.add(navButtonsSizer)
 
     // Layout the panel sizer
@@ -108,9 +115,9 @@ export default class HomeScene extends BaseScene {
     return panelSizer
   }
 
-  private createNavigationButtons(width: number): any {
+  private createNavigationButtons(): any {
     const sizer = this.rexUI.add.fixWidthSizer({
-      width: width,
+      width: NAVIGATION_BUTTON_WIDTH,
       space: {
         line: Space.pad,
       },
@@ -120,7 +127,7 @@ export default class HomeScene extends BaseScene {
     const createButtonRow = (button: any) => {
       const rowSizer = this.rexUI.add.sizer({
         orientation: 'horizontal',
-        width: width,
+        width: NAVIGATION_BUTTON_WIDTH,
       })
       // Reset button container position to 0,0 and set origin to 0,0 for proper sizer positioning
       button.container.setPosition(0, 0)
@@ -220,26 +227,115 @@ export default class HomeScene extends BaseScene {
     })
     sizer.add(createButtonRow(leaderboardButton))
 
-    // Profile button
-    const profileButton = new Buttons.Navigation({
-      within: this,
-      iconName: 'ProfileTab',
+    // Layout the sizer
+    sizer.layout()
+
+    return sizer
+  }
+
+  private createUserProfileSection(): any {
+    // Main horizontal sizer for avatar on left, info on right
+    const mainSizer = this.rexUI.add.fixWidthSizer({
+      width: NAVIGATION_BUTTON_WIDTH,
+      space: {
+        item: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+      },
+    })
+
+    // Add dark background
+    const background = this.add
+      .rectangle(0, 0, 1, 1, Color.backgroundDark)
+      .setInteractive()
+    mainSizer.addBackground(background)
+    this.addShadow(background)
+
+    // Avatar container - fixed size
+    const avatarContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.avatarSize,
+      Space.avatarSize,
+    )
+    const avatar = new Buttons.Avatar({
+      within: avatarContainer,
+      avatarId: Server.getUserData().cosmeticSet.avatar,
+      border: Server.getUserData().cosmeticSet.border,
       f: () => {
         this.scene.launch('MenuScene', {
           menu: 'userProfile',
           activeScene: this,
-          outerAvatar: null,
+          outerAvatar: avatar,
         })
         logEvent('view_user_profile')
       },
       muteClick: true,
     })
-    sizer.add(createButtonRow(profileButton))
+    mainSizer.add(avatarContainer)
 
-    // Layout the sizer
-    sizer.layout()
+    // Right side: vertical sizer for text content
+    const textSizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: {
+        item: Space.padSmall * 0.75,
+      },
+    })
 
-    return sizer
+    const userData = Server.getUserData()
+    const username = userData.username || 'Guest'
+    const elo = userData.elo || 1000
+    const amtCoins = userData.coins || 0
+    const amtGems = userData.gems || 0
+
+    // Calculate max width for text: button width minus avatar size and padding
+    const maxTextWidth =
+      NAVIGATION_BUTTON_WIDTH - Space.avatarSize - Space.pad * 3
+
+    // Line 1: Username (with word wrap to prevent overflow)
+    const usernameText = this.add
+      .text(0, 0, username, Style.username)
+      .setOrigin(0, 0.5)
+      .setWordWrapWidth(maxTextWidth)
+    textSizer.add(usernameText, { align: 'left' })
+
+    // Line 2: Divider line (thin black line)
+    const divider = this.add
+      .rectangle(0, 0, maxTextWidth, 2, 0x000000)
+      .setOrigin(0, 0.5)
+    textSizer.add(divider, { align: 'left' })
+
+    // Line 3: ELO
+    const eloText = this.add
+      .text(0, 0, `ELO: ${elo}`, Style.username)
+      .setOrigin(0, 0.5)
+    textSizer.add(eloText, { align: 'left' })
+
+    // Line 4: Gems
+    const gemsText = this.add
+      .text(0, 0, `💎 ${amtGems.toLocaleString()}`, Style.username)
+      .setOrigin(0, 0.5)
+    textSizer.add(gemsText, { align: 'left' })
+
+    // Line 5: Coins
+    const coinsText = this.add
+      .text(0, 0, `💰 ${amtCoins.toLocaleString()}`, Style.username)
+      .setOrigin(0, 0.5)
+    textSizer.add(coinsText, { align: 'left' })
+
+    // Layout text sizer
+    textSizer.layout()
+
+    // Add text sizer to main sizer
+    mainSizer.add(textSizer)
+
+    // Layout the main sizer
+    mainSizer.layout()
+
+    return mainSizer
   }
 
   private createRightPanel(): any {
@@ -330,7 +426,7 @@ Thanks so much for playing! We couldn't do this without you 😊`
       })
       .on('areadown', (key: string) => {
         if (key === '_link_register') {
-          window.open('https://luma.com/og92agfp', '_blank')
+          window.open(URL, '_blank')
         }
       })
       .setOrigin(0, 0)

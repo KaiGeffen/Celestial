@@ -45,6 +45,7 @@ export default class PlayMenu extends Menu {
   avatar: Button
   txtDeckValidation: Phaser.GameObjects.Text
   playOptionButtons: Button[] = []
+  gardenSizer: any // Store reference to garden sizer for updates
 
   private activeScene: Phaser.Scene
 
@@ -100,6 +101,21 @@ export default class PlayMenu extends Menu {
       callbackScope: this,
       loop: true,
     })
+
+    // Listen for garden harvest events
+    this.scene.game.events.on('gardenHarvested', this.onGardenHarvested, this)
+  }
+
+  close() {
+    // Clean up event listener
+    if (this.scene && this.scene.game) {
+      this.scene.game.events.off(
+        'gardenHarvested',
+        this.onGardenHarvested,
+        this,
+      )
+    }
+    super.close()
   }
 
   private reskinInputText(): void {
@@ -596,24 +612,30 @@ export default class PlayMenu extends Menu {
         .setOrigin(0.5)
       this.gardenTimers.push(timer)
 
-      // Hover behavior - only show hint if ready to harvest
+      // Hover behavior - always show "Click to harvest" hint
       plant
         .on('pointerover', () => {
-          const hoursRemaining = this.timeUntilFullyGrown(plantTime)
-          if (hoursRemaining <= 0) {
-            this.scene.hint.showText('Fully grown! Ready to harvest.')
-          }
+          this.scene.hint.showText('Click to harvest')
         })
         .on('pointerout', () => {
           this.scene.hint.hide()
         })
         .on('pointerdown', () => {
+          // Hide hint when clicking
+          this.scene.hint.hide()
           const hoursRemaining = this.timeUntilFullyGrown(plantTime)
           if (hoursRemaining <= 0) {
-            Server.harvestGarden(i)
-          } else {
-            this.scene.signalError('That plant is not ready to harvest.')
+            // Find the index in the current server garden state (not display index)
+            // This ensures we send the correct index even if there are pending harvests
+            const serverGarden = Server.getUserData().garden || []
+            const serverIndex = serverGarden.findIndex(
+              (date) => date.getTime() === plantTime.getTime(),
+            )
+            if (serverIndex !== -1) {
+              Server.harvestGarden(serverIndex)
+            }
           }
+          // Don't show error if not ready - just do nothing
         })
 
       plantSizer.add(plant).add(timer)
@@ -621,7 +643,99 @@ export default class PlayMenu extends Menu {
       this.gardenPlants.push(plant)
     }
 
+    // Store reference to garden sizer for updates
+    this.gardenSizer = gardenSizer
+
     return gardenSizer
+  }
+
+  private onGardenHarvested(data: {
+    success: boolean
+    newGarden?: Date[]
+    reward?: number
+    goldReward?: number
+  }): void {
+    if (!data.success || !this.gardenSizer || !data.newGarden) {
+      return
+    }
+
+    // Find which plant was harvested by comparing old and new garden states
+    // The harvested plant is the one that exists in old state but not in new state
+    const newGardenDates = data.newGarden.map((dateStr) => new Date(dateStr))
+    let harvestedIndex = -1
+
+    for (let i = 0; i < this.gardenTimes.length; i++) {
+      const oldTime = this.gardenTimes[i].getTime()
+      const stillExists = newGardenDates.some(
+        (newDate) => newDate.getTime() === oldTime,
+      )
+      if (!stillExists) {
+        harvestedIndex = i
+        break
+      }
+    }
+
+    if (harvestedIndex === -1) {
+      // Couldn't find which plant was harvested, just update the state
+      this.gardenTimes = newGardenDates
+      return
+    }
+
+    // Get all children from the garden sizer
+    const children = this.gardenSizer.getChildren()
+    const plantSizer = children[harvestedIndex]
+    if (!plantSizer) {
+      // Update state and return
+      this.gardenTimes = newGardenDates
+      return
+    }
+
+    // Clean up glow effects and tweens for the harvested plant
+    if (this.gardenGlows[harvestedIndex] && this.gardenPlants[harvestedIndex]) {
+      const outlinePlugin = this.scene.plugins.get('rexOutlinePipeline')
+      outlinePlugin['remove'](this.gardenPlants[harvestedIndex])
+      this.gardenGlows[harvestedIndex] = null
+    }
+    if (this.gardenGlowTweens[harvestedIndex]) {
+      this.gardenGlowTweens[harvestedIndex].remove()
+      this.gardenGlowTweens[harvestedIndex] = null
+    }
+
+    // Remove the plant and timer from the plant sizer
+    plantSizer.removeAll(true)
+
+    // Create gold display to replace the plant
+    const goldText = this.scene.add
+      .text(0, 0, `+${data.goldReward} 💰`, {
+        ...Style.basic,
+        color: Color.gold,
+        fontSize: '24px',
+      })
+      .setOrigin(0.5)
+
+    // Add gold display to plant sizer
+    plantSizer.add(goldText)
+    plantSizer.layout()
+
+    // Fade out the gold text after 1 second
+    this.scene.tweens.add({
+      targets: goldText,
+      alpha: 0,
+      duration: 500,
+      delay: 1000,
+      onComplete: () => {
+        goldText.destroy()
+      },
+    })
+
+    // Update garden times
+    this.gardenTimes = newGardenDates
+
+    // Remove the harvested plant from arrays
+    this.gardenPlants.splice(harvestedIndex, 1)
+    this.gardenTimers.splice(harvestedIndex, 1)
+    this.gardenGlows.splice(harvestedIndex, 1)
+    this.gardenGlowTweens.splice(harvestedIndex, 1)
   }
 
   private getGrowthStage(plantedTime: Date): number {
