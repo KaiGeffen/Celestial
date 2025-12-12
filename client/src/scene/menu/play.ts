@@ -319,10 +319,7 @@ export default class PlayMenu extends Menu {
     const contentSizer = this.scene.rexUI.add.fixWidthSizer({
       width: playPanelWidth,
       space: {
-        top: 0,
         bottom: Space.pad,
-        left: 0,
-        right: 0,
         item: Space.padSmall,
         line: Space.pad,
       },
@@ -499,6 +496,9 @@ export default class PlayMenu extends Menu {
   ): any {
     const sizer = this.scene.rexUI.add.sizer({
       width: playPanelWidth - Space.pad * 2,
+      space: {
+        left: Space.pad,
+      },
     })
 
     const txt = this.scene.add.text(0, 0, text, Style.basic)
