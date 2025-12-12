@@ -62,7 +62,7 @@ export default class HomeScene extends BaseScene {
 
     // Right panel: Title, image, and text - expand to fill remaining width
     const rightPanel = this.createRightPanel()
-    mainSizer.add(rightPanel)
+    mainSizer.add(rightPanel, { align: 'right' })
 
     // Anchor main sizer to fill entire screen (after layout so it positions correctly)
     this.plugins.get('rexAnchor')['add'](mainSizer, {
@@ -312,10 +312,7 @@ Card changes:
 Thanks so much for playing! We couldn't do this without you 😊`
 
     const text = this.rexUI.add
-      .BBCodeText(0, 0, updateText, {
-        ...BBStyle.description,
-        wordWrap: { width: 600 },
-      })
+      .BBCodeText(0, 0, updateText, BBStyle.description)
       .setInteractive()
       .on('areaover', (key: string) => {
         if (key === '_link_register') {
