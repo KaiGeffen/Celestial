@@ -184,6 +184,11 @@ export default class Server {
           // Only update the stored garden if the harvest was successful
           if (success) {
             this.userData.garden = newGarden.map((dateStr) => new Date(dateStr))
+
+            // Update coins
+            if (goldReward !== undefined) {
+              this.userData.coins = (this.userData.coins || 0) + goldReward
+            }
           }
 
           // Emit global event that HomeScene can listen to regardless of success
