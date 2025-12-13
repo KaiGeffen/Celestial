@@ -219,7 +219,6 @@ export default class TutorialMatchScene extends JourneyMatchScene {
     switch (this.progress) {
       case 0:
         this.view.pass.hide()
-        this.view.pet.hide()
         this.view.ourAvatar.hide()
         this.view.theirAvatar.hide()
         this.view.theirBoard.hide()
