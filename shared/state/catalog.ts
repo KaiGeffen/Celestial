@@ -31,7 +31,7 @@ console.log('Catalog currently has', fullCatalog.length, 'cards')
 export default class Catalog {
   static allCards = allCards
   static collectibleCards = fullCatalog.filter((c) => !c.beta)
-  static betaCards = fullCatalog.filter((c) => c.beta)
+  static collectibleCardsWithBetaCards = fullCatalog
   static cardback = new Card({ name: 'Cardback', id: 1000 })
 
   static getCard(s: string): Card {
