@@ -295,7 +295,7 @@ class Voices extends Card {
     super.play(player, game, index, bonus)
 
     // Opponent adds first
-    if (super.exhale(2, game, player)) {
+    if (super.exhale(1, game, player)) {
       if (game.hand[player ^ 1].length > 0) {
         const card = game.hand[player ^ 1].shift()
         game.story.addAct(card, player ^ 1, 0)
@@ -316,7 +316,7 @@ const voices = new Voices({
   id: 483,
   cost: 1,
   points: 1,
-  text: 'Exhale 2: Your opponent adds a card from their hand to the story.\nExhale 2: You do the same after their card.',
+  text: 'Exhale 1: Your opponent adds a card from their hand to the story.\nExhale 2: You do the same after their card.',
   beta: true,
 })
 
