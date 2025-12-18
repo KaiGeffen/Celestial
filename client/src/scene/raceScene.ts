@@ -529,16 +529,36 @@ export default class RaceScene extends BaseScene {
       const hoverOn = btn.onHover
       const hoverOff = btn.onExit
       if (btn.icon && hoverOn && hoverOff) {
+        // Store the original onClick function
+        const originalOnClick = btn.onClick
+
         // Override disable to preserve hover functionality
         const originalDisable = btn.disable.bind(btn)
+        const originalEnable = btn.enable.bind(btn)
+
         btn.disable = function () {
           originalDisable()
           // Re-enable icon for hover events only (prevent clicks)
           if (this.icon) {
             this.icon.setInteractive()
-            // Remove ALL click handlers to prevent clicks
-            this.icon.removeAllListeners('pointerdown')
+            // Remove click handler to prevent clicks
+            this.icon.off('pointerdown')
             // Re-add hover handlers
+            this.icon.on('pointerover', hoverOn)
+            this.icon.on('pointerout', hoverOff)
+          }
+          return this
+        }
+
+        // Override enable to restore click handler
+        btn.enable = function () {
+          originalEnable()
+          // Restore click handler
+          if (this.icon && originalOnClick) {
+            this.icon.on('pointerdown', originalOnClick)
+          }
+          // Re-add hover handlers
+          if (this.icon) {
             this.icon.on('pointerover', hoverOn)
             this.icon.on('pointerout', hoverOff)
           }
