@@ -211,7 +211,7 @@ export class SigninScene extends Phaser.Scene {
         }
       }
     } else {
-      this.scene.start('HomeScene')
+      this.scene.start('RaceScene')
     }
   }
 }

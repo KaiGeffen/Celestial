@@ -9,71 +9,95 @@ import Decklist from '../../lib/decklist'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import { getCardWithVersion } from '../../../../shared/state/cardUpgrades'
 import { Deck } from '../../../../shared/types/deck'
+import Button from '../../lib/buttons/button'
+import Buttons from '../../lib/buttons/buttons'
 
-const width = 900
+const width = 1200
 
 export default class RaceDeckSelectionMenu extends Menu {
   constructor(scene: MenuScene, params) {
     super(scene, width)
 
-    const title = params.title || 'Select Card'
+    const title = params.title || 'Choose Starting Deck'
     this.createHeader(title)
 
-    const s = params.s || 'Select a card from your deck:'
+    const s =
+      params.s || 'Select one of the following decks to start your race:'
     this.createText(s)
 
-    const currentDeck: Deck = params.currentDeck
-    const onCardSelected = params.onCardSelected
+    const deckOptions: number[][] = params.deckOptions || []
+    const onDeckSelected = params.onDeckSelected
 
-    // Show current deck and let user select a card (by index)
-    this.createDeckSelection(currentDeck, onCardSelected)
+    // Show all deck options with select buttons
+    this.createDeckOptions(deckOptions, onDeckSelected)
 
     this.layout()
   }
 
-  private createDeckSelection(
-    currentDeck: Deck,
-    onCardSelected: (index: number) => void,
+  private createDeckOptions(
+    deckOptions: number[][],
+    onDeckSelected: (selectedDeck: number[]) => void,
   ): void {
-    // Create a mapping from card to index
-    const cardToIndex = new Map<Card, number>()
-
-    // Create a decklist to show current deck
-    const decklist = new Decklist(this.scene as any, (cutout) => {
-      return () => {
-        // When a card is clicked, select it by index (to track specific copy)
-        const index = cardToIndex.get(cutout.card)
-        if (index !== undefined) {
-          onCardSelected(index)
-          this.close()
-        }
-      }
+    // Create horizontal sizer for all deck options
+    const decksSizer = this.scene.rexUI.add.sizer({
+      orientation: 'horizontal',
+      space: { item: Space.pad },
     })
 
-    // Set the deck - get Card objects with their versions
-    const deckCards = currentDeck.cards
-      .map((cardId, index) => {
-        const version = currentDeck.cardUpgrades?.[index] || 0
-        const card = getCardWithVersion(cardId, version, Catalog)
-        if (card) {
-          cardToIndex.set(card, index)
-        }
-        return card
+    deckOptions.forEach((deckCards, deckIndex) => {
+      // Create a vertical sizer for each deck option (decklist + button)
+      const deckOptionSizer = this.scene.rexUI.add.sizer({
+        orientation: 'vertical',
+        space: { item: Space.padSmall },
       })
-      .filter(Boolean) as Card[]
-    decklist.setDeck(deckCards)
 
-    // Create scrollable panel for the deck
-    const scrollableDeck = newScrollablePanel(this.scene, {
-      width: Space.cutoutWidth + 10,
-      height: Math.min(
-        deckCards.length * (Space.cutoutHeight + Space.padSmall),
-        400,
-      ),
-      panel: {
-        child: decklist.sizer,
-      },
-      scrollMode: 'y',
+      // Convert deck card IDs to Card objects
+      const deckCardObjects = deckCards
+        .map((cardId) => Catalog.getCardById(cardId))
+        .filter(Boolean) as Card[]
+
+      // Create decklist for this deck
+      const decklist = new Decklist(this.scene as any, () => () => {
+        // Cards are not clickable in deck selection
+      })
+      decklist.setDeck(deckCardObjects)
+
+      // Create scrollable panel for the deck
+      const scrollableDeck = newScrollablePanel(this.scene, {
+        width: Space.cutoutWidth + 10,
+        height: Math.min(
+          deckCardObjects.length * (Space.cutoutHeight + Space.padSmall),
+          400,
+        ),
+        panel: {
+          child: decklist.sizer,
+        },
+        scrollMode: 'y',
+      })
+
+      // Create select button
+      const buttonContainer = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        Space.buttonWidth,
+        Space.bigButtonHeight,
+      )
+      new Buttons.Big({
+        within: buttonContainer,
+        text: `Choose`,
+        f: () => {
+          onDeckSelected(deckCards)
+          this.close()
+        },
+        muteClick: true,
+      })
+
+      // Add decklist and button to this deck option
+      deckOptionSizer.add(scrollableDeck).add(buttonContainer)
+
+      // Add this deck option to the horizontal sizer
+      decksSizer.add(deckOptionSizer)
     })
 
     const padding = {
@@ -83,6 +107,6 @@ export default class RaceDeckSelectionMenu extends Menu {
       },
     }
 
-    this.sizer.add(scrollableDeck, padding).addNewLine()
+    this.sizer.add(decksSizer, padding).addNewLine()
   }
 }

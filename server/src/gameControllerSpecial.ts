@@ -33,6 +33,11 @@ class SpecialController extends ServerController {
       this.model.maxBreath = [3, 3]
       this.model.breath = [3, 3]
     }
+
+    // Debugging
+    if (process.argv.includes('--force-win')) {
+      this.model.winner = 0
+    }
   }
 
   protected doUpkeepDraws(): void {

@@ -14,6 +14,12 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 import Catalog from '../../../shared/state/catalog'
 import { raceData, raceNode } from '../data/raceData'
+import {
+  generateRaceMap,
+  RaceMap,
+  MapNode,
+  NodeType,
+} from '../data/raceMapGenerator'
 import { Deck } from '../../../shared/types/deck'
 import Decklist from '../lib/decklist'
 import Card from '../../../shared/state/card'
@@ -36,6 +42,12 @@ export default class RaceScene extends BaseScene {
 
   // Deck display on the right side
   deckDisplay: Decklist
+
+  // Race map structure
+  raceMap: RaceMap
+
+  // Graphics layer for drawing paths
+  pathGraphics: Phaser.GameObjects.Graphics
 
   // User's current deck that changes over time
   get currentDeck(): Deck {
@@ -67,18 +79,64 @@ export default class RaceScene extends BaseScene {
     })
   }
 
-  create(params): void {
+  create(params?: any): void {
     super.create()
+
+    // Check if returning from a match - complete the node if won
+    if (params?.raceNodeId && params?.matchWon) {
+      this.completeNode(params.raceNodeId)
+      // Show card replacement if needed (after match nodes)
+      const node = this.raceMap.nodes.get(params.raceNodeId)
+      if (
+        node &&
+        (node.type === NodeType.MATCH || node.type === NodeType.BOSS)
+      ) {
+        // Show card choice after match
+        setTimeout(() => {
+          this.showCardChoice()
+        }, 500)
+      }
+    }
 
     // Create the background
     this.map = this.add.image(0, 0, 'journey-Map').setOrigin(0).setInteractive()
     this.enableDrag()
 
-    // Bound camera on this map
-    this.cameras.main.setBounds(0, 0, this.map.width, this.map.height)
+    // Generate or load the race map
+    this.raceMap = generateRaceMap()
+
+    // Load saved progress
+    this.loadRaceProgress()
+
+    // Calculate map bounds based on node positions
+    let minX = 0,
+      minY = 0,
+      maxX = this.map.width,
+      maxY = this.map.height
+    this.raceMap.nodes.forEach((node) => {
+      minX = Math.min(minX, node.x - 100)
+      minY = Math.min(minY, node.y - 100)
+      maxX = Math.max(maxX, node.x + 100)
+      maxY = Math.max(maxY, node.y + 100)
+    })
+
+    // Bound camera on this map (use larger of calculated bounds or map image)
+    this.cameras.main.setBounds(
+      0,
+      0,
+      Math.max(maxX, this.map.width),
+      Math.max(maxY, this.map.height),
+    )
 
     // Create deck display on the right side
     this.createDeckDisplay()
+
+    // Create graphics layer for paths (draw behind nodes)
+    this.pathGraphics = this.add.graphics()
+    this.pathGraphics.setDepth(1)
+
+    // Draw paths between connected nodes
+    this.drawPaths()
 
     // Add all of the available nodes
     this.addRaceData()
@@ -226,6 +284,34 @@ export default class RaceScene extends BaseScene {
     })
     infoContainer.add(infoButtonContainer)
 
+    // Restart button (stacked below Info button)
+    const restartContainer = this.add.container(
+      Space.windowWidth -
+        Space.cutoutWidth -
+        Space.pad * 2 -
+        Space.buttonWidth -
+        Space.pad,
+      Space.pad * 2 + yOffset + (50 + Space.pad) * 3,
+    )
+    restartContainer.setDepth(6)
+
+    const restartButtonContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      50,
+    )
+    new Buttons.Basic({
+      within: restartButtonContainer,
+      text: 'Restart',
+      f: () => {
+        this.restartRace()
+      },
+      muteClick: true,
+    })
+    restartContainer.add(restartButtonContainer)
+
     // Title
     const title = this.add
       .text(
@@ -294,25 +380,52 @@ export default class RaceScene extends BaseScene {
     })
   }
 
+  // Draw paths between connected nodes
+  private drawPaths(): void {
+    this.pathGraphics.clear()
+    this.pathGraphics.lineStyle(3, 0x888888, 0.5)
+
+    // Draw paths from each node to its children
+    this.raceMap.nodes.forEach((node) => {
+      node.children.forEach((childId) => {
+        const childNode = this.raceMap.nodes.get(childId)
+        if (childNode) {
+          // Draw line from parent to child
+          this.pathGraphics.lineBetween(
+            node.x,
+            node.y,
+            childNode.x,
+            childNode.y,
+          )
+        }
+      })
+    })
+  }
+
   // Add all of the race nodes to the map
   private addRaceData(): void {
-    // All nodes are unlocked in Race mode
     this.animatedBtns = []
-    raceData.forEach((node: raceNode) => {
-      // Skip cardChoices and info nodes - they're handled by buttons in the UI
-      if ('cardChoices' in node || 'info' in node) {
-        return
-      }
 
+    // Create buttons for each node in the map
+    this.raceMap.nodes.forEach((node) => {
       // Determine node type icon
       let nodeType = 'QuestionMark'
-      if ('deck' in node) {
+      if (node.type === NodeType.START_DECK_SELECTION) {
         nodeType = 'QuestionMark'
-      } else if ('opponent' in node) {
+      } else if (node.type === NodeType.MATCH || node.type === NodeType.BOSS) {
         nodeType = 'Mission'
+      } else if (node.type === NodeType.CARD_CHOICE) {
+        nodeType = 'QuestionMark' // Could use different icon
+      } else if (node.type === NodeType.UPGRADE) {
+        nodeType = 'QuestionMark' // Could use different icon
       }
 
-      let btn = new Buttons.Mission(
+      // Check if node is accessible
+      const isAccessible = this.raceMap.accessibleNodeIds.has(node.id)
+      const isCompleted = this.raceMap.completedNodes.has(node.id)
+
+      // Create button with appropriate styling
+      const btn = new Buttons.Mission(
         this,
         node.x,
         node.y,
@@ -320,52 +433,206 @@ export default class RaceScene extends BaseScene {
         nodeType,
       )
 
+      // Dim inaccessible nodes
+      if (!isAccessible && !isCompleted) {
+        btn.icon.setAlpha(0.3)
+      }
+
+      // Store node reference on button for later use
+      ;(btn as any).nodeId = node.id
+
       // Animate all nodes
       this.animatedBtns.push(btn)
     })
   }
 
   // Return the function for what happens when the given node is clicked on
-  private nodeOnClick(node: raceNode): () => void {
+  private nodeOnClick(node: MapNode): () => void {
     return () => {
-      if ('deck' in node) {
-        // Type 1: Show decklist and let user confirm to set to that deck
-        this.showDecklistConfirm(node.deck)
-      } else if ('opponent' in node) {
-        // Type 2: Start a PVE match with current deck
-        this.startPVEMatch(node.opponent, node.cardUpgrades)
-      } else if ('cardChoices' in node) {
-        // Type 3: Show choice of 3 random cards, click one to replace a card in deck
-        this.showCardChoice()
-      } else if ('info' in node) {
-        // Type 4: Show informational message
-        this.showInfoMessage(node.info)
+      // Check if node is accessible
+      if (!this.raceMap.accessibleNodeIds.has(node.id)) {
+        this.signalError(
+          'This node is not yet accessible. Complete nodes above it first.',
+        )
+        return
+      }
+
+      // Check if already completed
+      if (this.raceMap.completedNodes.has(node.id)) {
+        return // Already completed, do nothing
+      }
+
+      // Handle different node types
+      switch (node.type) {
+        case NodeType.START_DECK_SELECTION:
+          // Show deck selection menu with 3 options
+          this.showDeckSelection(node.deckOptions || [])
+          break
+
+        case NodeType.MATCH:
+        case NodeType.BOSS:
+          // Start a PVE match with current deck
+          if (node.opponent) {
+            this.startPVEMatch(node, node.opponent, node.cardUpgrades)
+          }
+          break
+
+        case NodeType.CARD_CHOICE:
+          // Show choice of 3 random cards, click one to replace a card in deck
+          this.showCardChoice()
+          break
+
+        case NodeType.UPGRADE:
+          // Show upgrade interface (could be handled differently)
+          this.showInfoMessage(
+            'Upgrade node - select a card to upgrade from your deck.',
+          )
+          break
       }
     }
   }
 
-  // Type 1: Show decklist and let user confirm to set to that deck
-  private showDecklistConfirm(deckCode: number[]): void {
+  // Show deck selection menu with multiple deck options
+  private showDeckSelection(deckOptions: number[][]): void {
     this.scene.launch('MenuScene', {
-      menu: 'message',
-      title: 'Set Deck?',
-      s: 'This will replace your current deck. Are you sure?',
-      deck: deckCode,
-      onConfirm: () => {
+      menu: 'raceDeckSelection',
+      title: 'Choose Starting Deck',
+      s: 'Select one of the following decks to start your race:',
+      deckOptions: deckOptions,
+      onDeckSelected: (selectedDeck: number[]) => {
         const newDeck: Deck = {
           name: 'Race Deck',
-          cards: [...deckCode],
-          cardUpgrades: new Array(deckCode.length).fill(0),
+          cards: [...selectedDeck],
+          cardUpgrades: new Array(selectedDeck.length).fill(0),
           cosmeticSet: this.currentDeck.cosmeticSet,
         }
         this.currentDeck = newDeck
         this.updateDeckDisplay()
+
+        // Mark start node as completed and unlock child nodes
+        this.completeNode(this.raceMap.startNodeId)
       },
     })
   }
 
+  // Mark a node as completed and unlock its children
+  private completeNode(nodeId: string): void {
+    if (this.raceMap.completedNodes.has(nodeId)) {
+      return // Already completed
+    }
+
+    // Mark as completed
+    this.raceMap.completedNodes.add(nodeId)
+
+    // Unlock child nodes
+    const node = this.raceMap.nodes.get(nodeId)
+    if (node) {
+      node.children.forEach((childId) => {
+        this.raceMap.accessibleNodeIds.add(childId)
+      })
+
+      // Update current level if needed
+      this.raceMap.currentLevel = Math.max(
+        this.raceMap.currentLevel,
+        node.level,
+      )
+    }
+
+    // Update node visuals
+    this.updateNodeVisuals()
+
+    // Save progress
+    this.saveRaceProgress()
+  }
+
+  // Update node visuals based on accessibility and completion
+  private updateNodeVisuals(): void {
+    this.animatedBtns.forEach((btn) => {
+      const nodeId = (btn as any).nodeId
+      if (!nodeId) return
+
+      const node = this.raceMap.nodes.get(nodeId)
+      if (!node) return
+
+      const isAccessible = this.raceMap.accessibleNodeIds.has(nodeId)
+      const isCompleted = this.raceMap.completedNodes.has(nodeId)
+
+      if (isCompleted) {
+        btn.icon.setAlpha(0.7) // Dim completed nodes
+      } else if (isAccessible) {
+        btn.icon.setAlpha(1.0) // Full opacity for accessible nodes
+      } else {
+        btn.icon.setAlpha(0.3) // Dim inaccessible nodes
+      }
+    })
+  }
+
+  // Save race progress to UserSettings
+  private saveRaceProgress(): void {
+    UserSettings._set('raceMapProgress', {
+      completedNodes: Array.from(this.raceMap.completedNodes),
+      accessibleNodes: Array.from(this.raceMap.accessibleNodeIds),
+      currentLevel: this.raceMap.currentLevel,
+    })
+  }
+
+  // Restart the race from the beginning
+  private restartRace(): void {
+    this.scene.launch('MenuScene', {
+      menu: 'confirm',
+      title: 'Restart Race?',
+      hint: 'restart from the beginning',
+      callback: () => {
+        // Clear completed and accessible nodes (reset to just start node)
+        this.raceMap.completedNodes.clear()
+        this.raceMap.accessibleNodeIds.clear()
+        this.raceMap.accessibleNodeIds.add(this.raceMap.startNodeId)
+        this.raceMap.currentLevel = 0
+
+        // Clear saved progress
+        UserSettings._set('raceMapProgress', null)
+
+        // Clear saved race deck so user can select a new starting deck
+        UserSettings._set('raceDeck', null)
+
+        // Reset deck to empty/default so first node can be used to select deck
+        this.currentDeck = {
+          name: 'Race Deck',
+          cards: [],
+          cardUpgrades: [],
+          cosmeticSet: this.currentDeck.cosmeticSet,
+        }
+        this.updateDeckDisplay()
+
+        // Update node visuals
+        this.updateNodeVisuals()
+
+        // Scroll back to start
+        const startNode = this.raceMap.nodes.get(this.raceMap.startNodeId)
+        if (startNode) {
+          this.cameras.main.centerOn(startNode.x, startNode.y)
+          RaceScene.rememberCoordinates(this.cameras.main)
+        }
+      },
+    })
+  }
+
+  // Load race progress from UserSettings
+  private loadRaceProgress(): void {
+    const saved = UserSettings._get('raceMapProgress')
+    if (saved) {
+      this.raceMap.completedNodes = new Set(saved.completedNodes || [])
+      this.raceMap.accessibleNodeIds = new Set(saved.accessibleNodes || [])
+      this.raceMap.currentLevel = saved.currentLevel || 0
+    }
+  }
+
   // Type 2: Start a PVE match with current deck
-  private startPVEMatch(opponentDeck: number[], cardUpgrades?: number[]): void {
+  private startPVEMatch(
+    node: MapNode,
+    opponentDeck: number[],
+    cardUpgrades?: number[],
+  ): void {
     if (!server || !server.isOpen()) {
       this.signalError('Server is disconnected.')
       return
@@ -402,11 +669,15 @@ export default class RaceScene extends BaseScene {
     // Get enabled modes from UserSettings, default to empty array
     const enabledModes = UserSettings._get('raceEnabledModes') || []
 
+    // Store the node ID to complete it after match
+    ;(this as any).pendingNodeCompletion = node.id
+
     this.scene.start('RaceMatchScene', {
       isPvp: false,
       deck: playerDeck,
       aiDeck: aiDeck,
       enabledModes: enabledModes,
+      raceNodeId: node.id, // Pass node ID to match scene
     })
   }
 
