@@ -814,13 +814,40 @@ export class MapJourneyMatchScene extends MatchScene {
 }
 
 export class RaceMatchScene extends MatchScene {
+  winSeen: boolean
+  matchWon: boolean
+
   constructor(args = { key: 'RaceMatchScene', lastScene: 'RaceScene' }) {
     super(args)
   }
 
+  create() {
+    super.create()
+    // Must be reset each time this scene is run
+    this.winSeen = false
+    this.matchWon = false
+  }
+
+  // Track when the player wins
+  queueState(state: GameModel): void {
+    if (!this.winSeen && state.winner === 0) {
+      this.winSeen = true
+      this.matchWon = true
+    } else if (!this.winSeen && state.winner === 1) {
+      this.winSeen = true
+      this.matchWon = false
+    }
+    super.queueState(state)
+  }
+
   doExit(): () => void {
     return () => {
-      this.doBack()
+      this.beforeExit()
+      // Pass back the race node ID and whether the match was won
+      this.scene.start('RaceScene', {
+        raceNodeId: this.params.raceNodeId,
+        matchWon: this.matchWon,
+      })
     }
   }
 }

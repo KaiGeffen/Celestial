@@ -94,12 +94,10 @@ export function generateRaceMap(): RaceMap {
         // Final level before boss - all lead to boss
         nodeType = NodeType.MATCH
       } else {
-        // Mix of match, card choice, and upgrade nodes
-        const rand = (i + level) % 7 // Deterministic based on position
-        if (rand < 4) {
+        // Mix of match and upgrade nodes (no card choice nodes)
+        const rand = (i + level) % 5 // Deterministic based on position
+        if (rand < 3) {
           nodeType = NodeType.MATCH
-        } else if (rand < 6) {
-          nodeType = NodeType.CARD_CHOICE
         } else {
           nodeType = NodeType.UPGRADE
         }
@@ -159,6 +157,52 @@ export function generateRaceMap(): RaceMap {
     }
 
     levelNodes.push(currentLevelNodes)
+  }
+
+  // Ensure every node has at least 2 children (except nodes in the final level before boss)
+  // This guarantees there's always branching paths downward to the end
+  for (let level = 0; level < LEVELS; level++) {
+    const currentLevelNodes = levelNodes[level]
+    const nextLevelNodes = levelNodes[level + 1]
+
+    // Ensure every node in current level has at least 2 children
+    currentLevelNodes.forEach((nodeId) => {
+      const node = nodes.get(nodeId)!
+      const existingChildren = new Set(node.children)
+      
+      // Add children until we have at least 2
+      while (node.children.length < 2 && nextLevelNodes.length > 0) {
+        // Find a child that isn't already connected
+        let childId: string | null = null
+        let attempts = 0
+        while (attempts < nextLevelNodes.length * 2) {
+          const randomIndex = Math.floor(Math.random() * nextLevelNodes.length)
+          const candidateId = nextLevelNodes[randomIndex]
+          if (!existingChildren.has(candidateId)) {
+            childId = candidateId
+            break
+          }
+          attempts++
+        }
+        
+        // If we can't find an unconnected child, just pick any child
+        if (!childId && nextLevelNodes.length > 0) {
+          childId = nextLevelNodes[Math.floor(Math.random() * nextLevelNodes.length)]
+        }
+        
+        if (childId) {
+          node.children.push(childId)
+          existingChildren.add(childId)
+          const childNode = nodes.get(childId)!
+          // Avoid duplicate parent entries
+          if (!childNode.parents.includes(nodeId)) {
+            childNode.parents.push(nodeId)
+          }
+        } else {
+          break // No more children available
+        }
+      }
+    })
   }
 
   // Create final boss node

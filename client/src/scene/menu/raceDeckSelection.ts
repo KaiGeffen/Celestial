@@ -12,24 +12,28 @@ import { Deck } from '../../../../shared/types/deck'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 
-const width = 1200
-
 export default class RaceDeckSelectionMenu extends Menu {
   constructor(scene: MenuScene, params) {
+    // Use wider width for deck options (starting deck), narrower for current deck selection (upgrade)
+    const width = params.deckOptions 
+      ? 1200 
+      : Space.cutoutWidth + Space.pad * 2
     super(scene, width)
 
     const title = params.title || 'Choose Starting Deck'
     this.createHeader(title)
 
-    const s =
-      params.s || 'Select one of the following decks to start your race:'
+    const s = params.s || 'Select one of the following decks to start your race:'
     this.createText(s)
 
-    const deckOptions: number[][] = params.deckOptions || []
-    const onDeckSelected = params.onDeckSelected
-
-    // Show all deck options with select buttons
-    this.createDeckOptions(deckOptions, onDeckSelected)
+    // Handle two cases: deck options (starting deck) or current deck (upgrade/replacement)
+    if (params.deckOptions && params.onDeckSelected) {
+      // Case 1: Selecting from multiple deck options (starting deck)
+      this.createDeckOptions(params.deckOptions, params.onDeckSelected)
+    } else if (params.currentDeck && params.onCardSelected) {
+      // Case 2: Selecting a card from current deck (upgrade)
+      this.createCurrentDeckSelection(params.currentDeck, params.onCardSelected)
+    }
 
     this.layout()
   }
@@ -108,5 +112,61 @@ export default class RaceDeckSelectionMenu extends Menu {
     }
 
     this.sizer.add(decksSizer, padding).addNewLine()
+  }
+
+  // Show current deck and let user select a card (by index) for upgrade
+  private createCurrentDeckSelection(
+    currentDeck: Deck,
+    onCardSelected: (index: number) => void,
+  ): void {
+    // Create a mapping from card to index
+    const cardToIndex = new Map<Card, number>()
+
+    // Create a decklist to show current deck
+    const decklist = new Decklist(this.scene as any, (cutout) => {
+      return () => {
+        // When a card is clicked, select it by index
+        const index = cardToIndex.get(cutout.card)
+        if (index !== undefined) {
+          onCardSelected(index)
+          this.close()
+        }
+      }
+    })
+
+    // Set the deck - get Card objects with their versions
+    const deckCards = currentDeck.cards
+      .map((cardId, index) => {
+        const version = currentDeck.cardUpgrades?.[index] || 0
+        const card = getCardWithVersion(cardId, version, Catalog)
+        if (card) {
+          cardToIndex.set(card, index)
+        }
+        return card
+      })
+      .filter(Boolean) as Card[]
+    decklist.setDeck(deckCards)
+
+    // Create scrollable panel for the deck
+    const scrollableDeck = newScrollablePanel(this.scene, {
+      width: Space.cutoutWidth + 10,
+      height: Math.min(
+        deckCards.length * (Space.cutoutHeight + Space.padSmall),
+        400,
+      ),
+      panel: {
+        child: decklist.sizer,
+      },
+      scrollMode: 'y',
+    })
+
+    const padding = {
+      padding: {
+        left: Space.pad,
+        right: Space.pad,
+      },
+    }
+
+    this.sizer.add(scrollableDeck, padding).addNewLine()
   }
 }

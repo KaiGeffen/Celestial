@@ -82,22 +82,6 @@ export default class RaceScene extends BaseScene {
   create(params?: any): void {
     super.create()
 
-    // Check if returning from a match - complete the node if won
-    if (params?.raceNodeId && params?.matchWon) {
-      this.completeNode(params.raceNodeId)
-      // Show card replacement if needed (after match nodes)
-      const node = this.raceMap.nodes.get(params.raceNodeId)
-      if (
-        node &&
-        (node.type === NodeType.MATCH || node.type === NodeType.BOSS)
-      ) {
-        // Show card choice after match
-        setTimeout(() => {
-          this.showCardChoice()
-        }, 500)
-      }
-    }
-
     // Create the background
     this.map = this.add.image(0, 0, 'journey-Map').setOrigin(0).setInteractive()
     this.enableDrag()
@@ -121,6 +105,7 @@ export default class RaceScene extends BaseScene {
     })
 
     // Bound camera on this map (use larger of calculated bounds or map image)
+    // Must set bounds after map is created
     this.cameras.main.setBounds(
       0,
       0,
@@ -140,6 +125,23 @@ export default class RaceScene extends BaseScene {
 
     // Add all of the available nodes
     this.addRaceData()
+
+    // Check if returning from a match - complete the node if won
+    // Must do this after map is generated, loaded, and buttons are created
+    if (params?.raceNodeId && params?.matchWon) {
+      this.completeNode(params.raceNodeId)
+      // Show card replacement if needed (after match nodes)
+      const node = this.raceMap.nodes.get(params.raceNodeId)
+      if (
+        node &&
+        (node.type === NodeType.MATCH || node.type === NodeType.BOSS)
+      ) {
+        // Show card choice after match
+        setTimeout(() => {
+          this.showCardChoice()
+        }, 500)
+      }
+    }
 
     // Add scroll functionality
     this.enableScrolling()
@@ -383,7 +385,7 @@ export default class RaceScene extends BaseScene {
   // Draw paths between connected nodes
   private drawPaths(): void {
     this.pathGraphics.clear()
-    this.pathGraphics.lineStyle(3, 0x888888, 0.5)
+    this.pathGraphics.lineStyle(4, 0xcccccc, 0.8)
 
     // Draw paths from each node to its children
     this.raceMap.nodes.forEach((node) => {
@@ -446,20 +448,38 @@ export default class RaceScene extends BaseScene {
     })
   }
 
+  // Check if any node at the same level has been completed
+  private hasCompletedNodeAtLevel(level: number): boolean {
+    for (const [nodeId, node] of this.raceMap.nodes) {
+      if (node.level === level && this.raceMap.completedNodes.has(nodeId)) {
+        return true
+      }
+    }
+    return false
+  }
+
   // Return the function for what happens when the given node is clicked on
   private nodeOnClick(node: MapNode): () => void {
     return () => {
+      // Check if already completed
+      if (this.raceMap.completedNodes.has(node.id)) {
+        return // Already completed, do nothing
+      }
+
+      // Check if another node at the same level has been completed (check this early)
+      if (this.hasCompletedNodeAtLevel(node.level)) {
+        this.signalError(
+          'This level has already been completed. You can only complete one node per level.',
+        )
+        return
+      }
+
       // Check if node is accessible
       if (!this.raceMap.accessibleNodeIds.has(node.id)) {
         this.signalError(
           'This node is not yet accessible. Complete nodes above it first.',
         )
         return
-      }
-
-      // Check if already completed
-      if (this.raceMap.completedNodes.has(node.id)) {
-        return // Already completed, do nothing
       }
 
       // Handle different node types
@@ -477,16 +497,9 @@ export default class RaceScene extends BaseScene {
           }
           break
 
-        case NodeType.CARD_CHOICE:
-          // Show choice of 3 random cards, click one to replace a card in deck
-          this.showCardChoice()
-          break
-
         case NodeType.UPGRADE:
-          // Show upgrade interface (could be handled differently)
-          this.showInfoMessage(
-            'Upgrade node - select a card to upgrade from your deck.',
-          )
+          // Show deck selection to choose which card to upgrade
+          this.showUpgradeCardSelection(node.id)
           break
       }
     }
@@ -536,17 +549,71 @@ export default class RaceScene extends BaseScene {
         this.raceMap.currentLevel,
         node.level,
       )
+
+      // Remove all other nodes at this level from accessible nodes
+      // (they can no longer be accessed once this level is completed)
+      this.raceMap.nodes.forEach((otherNode, otherNodeId) => {
+        if (
+          otherNode.level === node.level &&
+          otherNodeId !== nodeId &&
+          !this.raceMap.completedNodes.has(otherNodeId)
+        ) {
+          this.raceMap.accessibleNodeIds.delete(otherNodeId)
+        }
+      })
     }
 
-    // Update node visuals
-    this.updateNodeVisuals()
+    // Update node visuals if buttons are already created
+    if (this.animatedBtns.length > 0) {
+      this.updateNodeVisuals()
+    }
 
     // Save progress
     this.saveRaceProgress()
   }
 
-  // Update node visuals based on accessibility and completion
+  // Find completed ancestor nodes in the path from start to current accessible nodes
+  // Returns only nodes that are both ancestors AND completed
+  private getAncestorPath(): Set<string> {
+    const path = new Set<string>()
+    
+    // Start from all accessible nodes and trace backwards to start through completed nodes only
+    const visited = new Set<string>()
+    const traceBackwards = (nodeId: string): void => {
+      if (visited.has(nodeId)) return
+      visited.add(nodeId)
+      
+      const node = this.raceMap.nodes.get(nodeId)
+      if (!node) return
+      
+      // Trace to all parents that are completed (only add completed ancestors)
+      node.parents.forEach((parentId) => {
+        if (this.raceMap.completedNodes.has(parentId)) {
+          // Only add completed parent nodes to the path
+          path.add(parentId)
+          traceBackwards(parentId)
+        }
+      })
+    }
+    
+    // Trace backwards from all accessible nodes
+    this.raceMap.accessibleNodeIds.forEach((nodeId) => {
+      traceBackwards(nodeId)
+    })
+    
+    // Always include start node if it's completed
+    if (this.raceMap.completedNodes.has(this.raceMap.startNodeId)) {
+      path.add(this.raceMap.startNodeId)
+    }
+    
+    return path
+  }
+
+  // Update node visuals based on accessibility, completion, and position
   private updateNodeVisuals(): void {
+    const ancestorPath = this.getAncestorPath()
+    const currentLevel = this.raceMap.currentLevel
+    
     this.animatedBtns.forEach((btn) => {
       const nodeId = (btn as any).nodeId
       if (!nodeId) return
@@ -556,13 +623,49 @@ export default class RaceScene extends BaseScene {
 
       const isAccessible = this.raceMap.accessibleNodeIds.has(nodeId)
       const isCompleted = this.raceMap.completedNodes.has(nodeId)
+      const isAboveCurrentLevel = node.level < currentLevel
+      // Check if another node at the same level has been completed
+      const levelHasCompletedNode = this.hasCompletedNodeAtLevel(node.level)
+      // Only apply red tint to completed nodes that are in the ancestor path
+      const isCompletedAncestor = ancestorPath.has(nodeId) && isCompleted
 
-      if (isCompleted) {
-        btn.icon.setAlpha(0.7) // Dim completed nodes
-      } else if (isAccessible) {
-        btn.icon.setAlpha(1.0) // Full opacity for accessible nodes
+      // Disable button interaction if another node at this level is completed (and this one isn't)
+      // Also disable if not accessible (unless completed, which we handle separately)
+      if ((levelHasCompletedNode && !isCompleted) || (!isAccessible && !isCompleted)) {
+        btn.disable()
+      } else if (isAccessible || isCompleted) {
+        // Only enable if accessible or completed
+        btn.enable()
       } else {
-        btn.icon.setAlpha(0.3) // Dim inaccessible nodes
+        btn.disable()
+      }
+
+      // Reset tint
+      btn.icon.clearTint()
+      
+      // Grey out nodes above current level
+      if (isAboveCurrentLevel) {
+        btn.icon.setAlpha(0.3)
+        // Add red tint to completed ancestor nodes above current level
+        if (isCompletedAncestor) {
+          btn.icon.setTint(0xff6666) // Red tint
+        }
+      } else if (isCompleted) {
+        // Completed nodes at or below current level
+        btn.icon.setAlpha(0.7)
+        // Add red tint to completed ancestor nodes
+        if (isCompletedAncestor) {
+          btn.icon.setTint(0xff6666) // Red tint
+        }
+      } else if (levelHasCompletedNode && !isCompleted) {
+        // Another node at this level has been completed, grey this one out
+        btn.icon.setAlpha(0.3)
+      } else if (isAccessible) {
+        // Accessible nodes
+        btn.icon.setAlpha(1.0)
+      } else {
+        // Inaccessible nodes
+        btn.icon.setAlpha(0.3)
       }
     })
   }
@@ -681,6 +784,23 @@ export default class RaceScene extends BaseScene {
     })
   }
 
+  // Show deck selection to choose which card to upgrade
+  private showUpgradeCardSelection(nodeId: string): void {
+    this.scene.launch('MenuScene', {
+      menu: 'raceDeckSelection',
+      title: 'Select Card to Upgrade',
+      s: 'Select a card from your deck to upgrade:',
+      currentDeck: this.currentDeck,
+      onCardSelected: (index: number) => {
+        // Show upgrade versions for the selected card
+        const cardId = this.currentDeck.cards[index]
+        if (cardId !== undefined) {
+          this.showCardUpgradeVersions(cardId, index, nodeId)
+        }
+      },
+    })
+  }
+
   // Type 3: Show choice of 3 random cards, click one to replace a card in deck
   private showCardChoice(): void {
     this.scene.launch('MenuScene', {
@@ -766,7 +886,12 @@ export default class RaceScene extends BaseScene {
   }
 
   // Show 3 versions of a card to choose from
-  private showCardUpgradeVersions(cardId: number, index: number): void {
+  // nodeId is optional - if provided, the node will be marked as completed after upgrade
+  private showCardUpgradeVersions(
+    cardId: number,
+    index: number,
+    nodeId?: string,
+  ): void {
     const card = Catalog.getCardById(cardId)
     if (!card) return
 
@@ -791,6 +916,11 @@ export default class RaceScene extends BaseScene {
           deck.cardUpgrades[index] = selectedCard.upgradeVersion || 0
           this.currentDeck = deck
           this.updateDeckDisplay()
+
+          // If this was from an upgrade node, mark it as completed
+          if (nodeId) {
+            this.completeNode(nodeId)
+          }
         }
       },
     })
