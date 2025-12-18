@@ -136,10 +136,8 @@ export default class RaceScene extends BaseScene {
         node &&
         (node.type === NodeType.MATCH || node.type === NodeType.BOSS)
       ) {
-        // Show card choice after match
-        setTimeout(() => {
-          this.showCardChoice()
-        }, 500)
+        // Show card choice after match (pass node ID for deterministic generation)
+        this.showCardChoice(params.raceNodeId)
       }
     }
 
@@ -415,7 +413,7 @@ export default class RaceScene extends BaseScene {
   // Draw paths between connected nodes based on actual accessibility rules (position-based)
   private drawPaths(): void {
     this.pathGraphics.clear()
-    const ancestorPath = this.getAncestorPath()
+    this.pathGraphics.lineStyle(4, 0xcccccc, 0.8) // Default color for all paths
 
     // Draw paths from each node to nodes it can access on the next level (based on position)
     this.raceMap.nodes.forEach((node) => {
@@ -426,21 +424,6 @@ export default class RaceScene extends BaseScene {
       const accessibleNodes = this.getAccessibleNodesFromPosition(node)
 
       accessibleNodes.forEach((childNode) => {
-        // Check if both parent and child are in the traveled path (ancestor path)
-        // A path is traveled if both nodes are completed and in the ancestor path
-        const isTraveledPath =
-          ancestorPath.has(node.id) &&
-          ancestorPath.has(childNode.id) &&
-          this.raceMap.completedNodes.has(node.id) &&
-          this.raceMap.completedNodes.has(childNode.id)
-
-        // Draw traveled paths in red, others in default color
-        if (isTraveledPath) {
-          this.pathGraphics.lineStyle(4, 0xff6666, 0.9) // Red for traveled path
-        } else {
-          this.pathGraphics.lineStyle(4, 0xcccccc, 0.8) // Default color for other paths
-        }
-
         // Draw line from parent to child
         this.pathGraphics.lineBetween(node.x, node.y, childNode.x, childNode.y)
       })
@@ -542,6 +525,27 @@ export default class RaceScene extends BaseScene {
         }
       }
 
+      // Store hover handlers to preserve hover even when button is disabled
+      const hoverOn = btn.onHover
+      const hoverOff = btn.onExit
+      if (btn.icon && hoverOn && hoverOff) {
+        // Override disable to preserve hover functionality
+        const originalDisable = btn.disable.bind(btn)
+        btn.disable = function () {
+          originalDisable()
+          // Re-enable icon for hover events only (prevent clicks)
+          if (this.icon) {
+            this.icon.setInteractive()
+            // Remove ALL click handlers to prevent clicks
+            this.icon.removeAllListeners('pointerdown')
+            // Re-add hover handlers
+            this.icon.on('pointerover', hoverOn)
+            this.icon.on('pointerout', hoverOff)
+          }
+          return this
+        }
+      }
+
       // Animate all nodes
       this.animatedBtns.push(btn)
     })
@@ -560,7 +564,7 @@ export default class RaceScene extends BaseScene {
   // Return the function for what happens when the given node is clicked on
   private nodeOnClick(node: MapNode): () => void {
     return () => {
-      // Check if already completed
+      // Check if already completed (prevent clicks on completed nodes)
       if (this.raceMap.completedNodes.has(node.id)) {
         return // Already completed, do nothing
       }
@@ -713,7 +717,6 @@ export default class RaceScene extends BaseScene {
 
   // Update node visuals based on accessibility, completion, and position
   private updateNodeVisuals(): void {
-    const ancestorPath = this.getAncestorPath()
     const currentLevel = this.raceMap.currentLevel
 
     this.animatedBtns.forEach((btn) => {
@@ -728,21 +731,19 @@ export default class RaceScene extends BaseScene {
       const isAboveCurrentLevel = node.level < currentLevel
       // Check if another node at the same level has been completed
       const levelHasCompletedNode = this.hasCompletedNodeAtLevel(node.level)
-      // Only apply red tint to completed nodes that are in the ancestor path
-      const isCompletedAncestor = ancestorPath.has(nodeId) && isCompleted
 
-      // Disable button interaction if another node at this level is completed (and this one isn't)
-      // Also disable if not accessible (unless completed, which we handle separately)
+      // Disable button interaction if completed, another node at this level is completed, or not accessible
       if (
+        isCompleted ||
         (levelHasCompletedNode && !isCompleted) ||
         (!isAccessible && !isCompleted)
       ) {
-        btn.disable()
-      } else if (isAccessible || isCompleted) {
-        // Only enable if accessible or completed
+        btn.disable() // This will preserve hover via our override
+      } else if (isAccessible) {
+        // Only enable if accessible and not completed
         btn.enable()
       } else {
-        btn.disable()
+        btn.disable() // This will preserve hover via our override
       }
 
       // Reset tint
@@ -751,17 +752,9 @@ export default class RaceScene extends BaseScene {
       // Grey out nodes above current level
       if (isAboveCurrentLevel) {
         btn.icon.setAlpha(0.3)
-        // Add red tint to completed ancestor nodes above current level
-        if (isCompletedAncestor) {
-          btn.icon.setTint(0xff6666) // Red tint
-        }
       } else if (isCompleted) {
-        // Completed nodes at or below current level
-        btn.icon.setAlpha(0.7)
-        // Add red tint to completed ancestor nodes
-        if (isCompletedAncestor) {
-          btn.icon.setTint(0xff6666) // Red tint
-        }
+        // Completed nodes at or below current level - grey them out
+        btn.icon.setAlpha(0.5)
       } else if (levelHasCompletedNode && !isCompleted) {
         // Another node at this level has been completed, grey this one out
         btn.icon.setAlpha(0.3)
@@ -914,21 +907,71 @@ export default class RaceScene extends BaseScene {
   }
 
   // Type 3: Show choice of 3 random cards, click one to replace a card in deck
-  private showCardChoice(): void {
+  private showCardChoice(nodeId?: string, cardIds?: number[]): void {
+    // Generate deterministic card choices based on node ID if not provided
+    let choicesToShow = cardIds
+    if (!choicesToShow && nodeId) {
+      choicesToShow = this.generateDeterministicCardChoices(nodeId, 3)
+    }
+
     this.scene.launch('MenuScene', {
       menu: 'raceCardChoice',
       title: 'Choose a Card',
       s: 'Select a card to add to your deck. Then choose a card to replace.',
       currentDeck: this.currentDeck,
+      cardIds: choicesToShow, // Pass the card IDs to the menu
       onCardSelected: (selectedCardId: number) => {
         // Show deck selection to replace a card
-        this.showDeckReplacement(selectedCardId)
+        this.showDeckReplacement(selectedCardId, nodeId, choicesToShow)
+      },
+      onSkip: () => {
+        // Skip card replacement - node is already completed, deck stays as is
       },
     })
   }
 
+  // Generate deterministic card choices based on node ID
+  private generateDeterministicCardChoices(
+    nodeId: string,
+    numChoices: number,
+  ): number[] {
+    const collectibleCards = Catalog.collectibleCards
+    if (collectibleCards.length === 0) return []
+
+    // Simple deterministic hash function based on node ID
+    const hash = (str: string): number => {
+      let hash = 0
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i)
+        hash = (hash << 5) - hash + char
+        hash = hash & hash // Convert to 32-bit integer
+      }
+      return Math.abs(hash)
+    }
+
+    // Use node ID as seed for deterministic selection
+    const seed = hash(nodeId)
+
+    // Create a shuffled array deterministically
+    const shuffled = [...collectibleCards]
+    let currentSeed = seed
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      // Use a simple LCG-like approach for deterministic "randomness"
+      currentSeed = (currentSeed * 1103515245 + 12345) & 0x7fffffff
+      const j = currentSeed % (i + 1)
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+
+    // Return the first numChoices card IDs
+    return shuffled.slice(0, numChoices).map((card) => card.id)
+  }
+
   // Show the current deck and let user select a card to replace
-  private showDeckReplacement(newCardId: number): void {
+  private showDeckReplacement(
+    newCardId: number,
+    nodeId?: string,
+    cardIds?: number[],
+  ): void {
     this.scene.launch('MenuScene', {
       menu: 'raceDeckReplacement',
       title: 'Replace Card',
@@ -956,6 +999,10 @@ export default class RaceScene extends BaseScene {
         }
         this.currentDeck = deck
         this.updateDeckDisplay()
+      },
+      onBack: () => {
+        // Go back to card choice selection with the same cards
+        this.showCardChoice(nodeId, cardIds)
       },
     })
   }

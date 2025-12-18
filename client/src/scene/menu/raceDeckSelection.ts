@@ -15,15 +15,14 @@ import Buttons from '../../lib/buttons/buttons'
 export default class RaceDeckSelectionMenu extends Menu {
   constructor(scene: MenuScene, params) {
     // Use wider width for deck options (starting deck), narrower for current deck selection (upgrade)
-    const width = params.deckOptions 
-      ? 1200 
-      : Space.cutoutWidth + Space.pad * 2
+    const width = params.deckOptions ? 1200 : 600
     super(scene, width)
 
     const title = params.title || 'Choose Starting Deck'
     this.createHeader(title)
 
-    const s = params.s || 'Select one of the following decks to start your race:'
+    const s =
+      params.s || 'Select one of the following decks to start your race:'
     this.createText(s)
 
     // Handle two cases: deck options (starting deck) or current deck (upgrade/replacement)

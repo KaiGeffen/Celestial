@@ -6,6 +6,7 @@ import { CardImage } from '../../lib/cardImage'
 import { Style, Space } from '../../settings/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Catalog from '../../../../shared/state/catalog'
+import Buttons from '../../lib/buttons/buttons'
 
 const numCards = 3
 const width = Space.cardWidth * numCards + Space.pad * (numCards + 1)
@@ -20,9 +21,46 @@ export default class RaceCardChoiceMenu extends Menu {
     const s = params.s || 'Select a card to add to your deck:'
     this.createText(s)
 
-    // If cardIds provided, use them. Otherwise, generate 3 random choices
-    const cardIds: number[] = this.generateRandomChoices(numCards)
+    // Use provided cardIds if available, otherwise generate random choices
+    const cardIds: number[] = params.cardIds || this.generateRandomChoices(numCards)
     this.createCardChoices(cardIds, params.onCardSelected)
+
+    // Add skip button if callback provided
+    const onSkip = params.onSkip
+    if (onSkip) {
+      const buttonSizer = this.scene.rexUI.add.sizer({
+        width: width - Space.pad * 2,
+        space: { item: Space.pad },
+      })
+
+      const skipButtonContainer = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        Space.buttonWidth,
+        50,
+      )
+      new Buttons.Basic({
+        within: skipButtonContainer,
+        text: 'Skip',
+        f: () => {
+          onSkip()
+          this.close()
+        },
+        muteClick: true,
+      })
+
+      buttonSizer.addSpace().add(skipButtonContainer).addSpace()
+
+      const padding = {
+        padding: {
+          left: Space.pad,
+          right: Space.pad,
+        },
+      }
+
+      this.sizer.add(buttonSizer, padding).addNewLine()
+    }
 
     this.layout()
   }

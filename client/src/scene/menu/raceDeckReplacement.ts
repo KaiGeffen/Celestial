@@ -10,6 +10,7 @@ import Decklist from '../../lib/decklist'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import { getCardWithVersion } from '../../../../shared/state/cardUpgrades'
 import { Deck } from '../../../../shared/types/deck'
+import Buttons from '../../lib/buttons/buttons'
 
 const width = 900
 
@@ -23,6 +24,7 @@ export default class RaceDeckReplacementMenu extends Menu {
     const newCardId: number = params.newCardId
     const currentDeck: Deck = params.currentDeck
     const onReplacement = params.onReplacement
+    const onBack = params.onBack
 
     // Create horizontal sizer for new card and decklist side by side
     const horizontalSizer = this.scene.rexUI.add.sizer({
@@ -53,6 +55,42 @@ export default class RaceDeckReplacementMenu extends Menu {
     horizontalSizer.add(deckSelection)
 
     this.sizer.add(horizontalSizer)
+
+    // Add back button if callback provided
+    if (onBack) {
+      const buttonSizer = this.scene.rexUI.add.sizer({
+        width: width - Space.pad * 2,
+        space: { item: Space.pad },
+      })
+
+      const backButtonContainer = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        Space.buttonWidth,
+        50,
+      )
+      new Buttons.Basic({
+        within: backButtonContainer,
+        text: 'Back',
+        f: () => {
+          onBack()
+          this.close()
+        },
+        muteClick: true,
+      })
+
+      buttonSizer.addSpace().add(backButtonContainer).addSpace()
+
+      const padding = {
+        padding: {
+          left: Space.pad,
+          right: Space.pad,
+        },
+      }
+
+      this.sizer.add(buttonSizer, padding).addNewLine()
+    }
 
     this.layout()
   }

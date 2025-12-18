@@ -38,15 +38,9 @@ export interface RaceMap {
   accessibleNodeIds: Set<string> // IDs of nodes player can currently access
 }
 
-// Generate a race map with connected nodes
+// Static race map definition
 export function generateRaceMap(): RaceMap {
   const nodes = new Map<string, MapNode>()
-  const nodeIdCounter = { count: 0 }
-  const getNodeId = () => `node_${nodeIdCounter.count++}`
-
-  // Configuration
-  const LEVELS = 6 // Number of levels before boss
-  const NODES_PER_LEVEL = [3, 4, 5, 4, 3, 2] // Number of nodes per level (branches)
   const LEVEL_SPACING = 150 // Vertical spacing between levels
   const NODE_HORIZONTAL_SPACING = 200 // Horizontal spacing between nodes
 
@@ -57,8 +51,37 @@ export function generateRaceMap(): RaceMap {
     [1, 1, 1, 1, 1, 1, 19, 19, 19, 19, 68, 68, 68, 35, 35],
   ]
 
+  // Default opponent deck for match nodes
+  const defaultOpponentDeck = decodeShareableDeckCode(
+    '00500500500502202202200B00B00B00E00E049049033',
+  )
+  const defaultCardUpgrades = new Array(15).fill(0)
+
+  // Helper to calculate x position for a node in a level
+  const getNodeX = (levelIndex: number, numNodes: number): number => {
+    const totalWidth = (numNodes - 1) * NODE_HORIZONTAL_SPACING
+    const startX = (Space.windowWidth - totalWidth) / 2
+    return startX + levelIndex * NODE_HORIZONTAL_SPACING
+  }
+
+  // Level definitions: [numNodes, nodeType, specialRules?]
+  // Each level is either all MATCH or all UPGRADE nodes
+  type LevelDef = {
+    numNodes: number
+    type: NodeType.MATCH | NodeType.UPGRADE
+    specialRules?: number[] // Optional special rules for each node (indexed by position)
+  }
+  const levelDefs: LevelDef[] = [
+    { numNodes: 3, type: NodeType.MATCH }, // Level 1: 3 match nodes
+    { numNodes: 4, type: NodeType.UPGRADE }, // Level 2: 4 upgrade nodes
+    { numNodes: 5, type: NodeType.MATCH }, // Level 3: 5 match nodes
+    { numNodes: 4, type: NodeType.UPGRADE }, // Level 4: 4 upgrade nodes
+    { numNodes: 3, type: NodeType.MATCH }, // Level 5: 3 match nodes
+    { numNodes: 2, type: NodeType.MATCH }, // Level 6: 2 match nodes (final before boss)
+  ]
+
   // Create start node (deck selection)
-  const startNodeId = getNodeId()
+  const startNodeId = 'node_start'
   const startNode: MapNode = {
     id: startNodeId,
     type: NodeType.START_DECK_SELECTION,
@@ -71,175 +94,119 @@ export function generateRaceMap(): RaceMap {
   }
   nodes.set(startNodeId, startNode)
 
-  // Generate levels
+  // Create nodes for each level
   const levelNodes: string[][] = [[startNodeId]] // Level 0: just start node
 
-  for (let level = 1; level <= LEVELS; level++) {
-    const numNodes = NODES_PER_LEVEL[level - 1] || 3
+  for (let level = 1; level <= levelDefs.length; level++) {
+    const levelDef = levelDefs[level - 1]
     const currentLevelNodes: string[] = []
-    const previousLevelNodes = levelNodes[level - 1]
 
-    // Calculate horizontal spread
-    const totalWidth = (numNodes - 1) * NODE_HORIZONTAL_SPACING
-    const startX = (Space.windowWidth - totalWidth) / 2
-
-    for (let i = 0; i < numNodes; i++) {
-      const nodeId = getNodeId()
-      const x = startX + i * NODE_HORIZONTAL_SPACING
+    for (let i = 0; i < levelDef.numNodes; i++) {
+      const nodeId = `node_${level}_${i}`
+      const x = getNodeX(i, levelDef.numNodes)
       const y = 100 + level * LEVEL_SPACING
-
-      // Determine node type based on level and position
-      let nodeType: NodeType
-      if (level === LEVELS) {
-        // Final level before boss - all lead to boss
-        nodeType = NodeType.MATCH
-      } else {
-        // Mix of match and upgrade nodes (no card choice nodes)
-        const rand = (i + level) % 5 // Deterministic based on position
-        if (rand < 3) {
-          nodeType = NodeType.MATCH
-        } else {
-          nodeType = NodeType.UPGRADE
-        }
-      }
 
       const node: MapNode = {
         id: nodeId,
-        type: nodeType,
+        type: levelDef.type,
         level: level,
         x: x,
         y: y,
         children: [],
         parents: [],
-        // Default opponent deck for match nodes (can be customized)
-        ...(nodeType === NodeType.MATCH && {
-          opponent: decodeShareableDeckCode(
-            '00500500500502202202200B00B00B00E00E049049033',
-          ),
-          cardUpgrades: new Array(15).fill(0),
-          // Assign special rules to some later mission nodes (levels 3 and above)
-          // Special rules are stored as mode indices (numbers)
-          // Each node gets at most 1 special mode
-          ...(level >= 3 && Math.random() < 0.4 && {
-            specialRules: (() => {
-              // Randomly assign 1 special rule
-              const availableModes = [0, 1, 2, 3, 4]
-              const randomIndex = Math.floor(Math.random() * availableModes.length)
-              return [availableModes[randomIndex]]
-            })(),
-          }),
+        // Add opponent deck for match nodes
+        ...(levelDef.type === NodeType.MATCH && {
+          opponent: defaultOpponentDeck,
+          cardUpgrades: defaultCardUpgrades,
+          // Add special rules if specified for this node position
+          ...(levelDef.specialRules && levelDef.specialRules[i] !== undefined
+            ? { specialRules: [levelDef.specialRules[i]] }
+            : {}),
         }),
       }
 
       nodes.set(nodeId, node)
       currentLevelNodes.push(nodeId)
-
-      // Connect to parent nodes (from previous level)
-      // Each node connects to 1-2 random parent nodes
-      const numParents = previousLevelNodes.length === 1 ? 1 : Math.random() < 0.7 ? 1 : 2
-      const parentIndices = new Set<number>()
-      
-      // Ensure each node has at least one parent
-      if (previousLevelNodes.length > 0) {
-        // Connect to closest parent(s)
-        const closestParentIndex = Math.min(
-          Math.floor((i / numNodes) * previousLevelNodes.length),
-          previousLevelNodes.length - 1,
-        )
-        parentIndices.add(closestParentIndex)
-
-        // Add a second parent randomly if applicable
-        if (numParents === 2 && previousLevelNodes.length > 1) {
-          let secondParent = closestParentIndex
-          while (secondParent === closestParentIndex || parentIndices.has(secondParent)) {
-            secondParent = Math.floor(Math.random() * previousLevelNodes.length)
-          }
-          parentIndices.add(secondParent)
-        }
-      }
-
-      // Create bidirectional connections
-      parentIndices.forEach((parentIdx) => {
-        const parentId = previousLevelNodes[parentIdx]
-        const parentNode = nodes.get(parentId)!
-        parentNode.children.push(nodeId)
-        node.parents.push(parentId)
-      })
     }
 
     levelNodes.push(currentLevelNodes)
   }
 
-  // Ensure every node has at least 2 children (except nodes in the final level before boss)
-  // This guarantees there's always branching paths downward to the end
-  for (let level = 0; level < LEVELS; level++) {
+  // Connect nodes: each node connects to nodes on the next level
+  // Each node should have at least 2 children (including diagonal connections)
+  for (let level = 0; level < levelDefs.length; level++) {
     const currentLevelNodes = levelNodes[level]
     const nextLevelNodes = levelNodes[level + 1]
 
-    // Ensure every node in current level has at least 2 children
-    currentLevelNodes.forEach((nodeId) => {
+    if (nextLevelNodes.length === 0) continue
+
+    currentLevelNodes.forEach((nodeId, nodeIndex) => {
       const node = nodes.get(nodeId)!
-      const existingChildren = new Set(node.children)
-      
-      // Add children until we have at least 2
-      while (node.children.length < 2 && nextLevelNodes.length > 0) {
-        // Find a child that isn't already connected
-        let childId: string | null = null
-        let attempts = 0
-        while (attempts < nextLevelNodes.length * 2) {
-          const randomIndex = Math.floor(Math.random() * nextLevelNodes.length)
-          const candidateId = nextLevelNodes[randomIndex]
-          if (!existingChildren.has(candidateId)) {
-            childId = candidateId
-            break
-          }
-          attempts++
-        }
-        
-        // If we can't find an unconnected child, just pick any child
-        if (!childId && nextLevelNodes.length > 0) {
-          childId = nextLevelNodes[Math.floor(Math.random() * nextLevelNodes.length)]
-        }
-        
-        if (childId) {
-          node.children.push(childId)
-          existingChildren.add(childId)
-          const childNode = nodes.get(childId)!
-          // Avoid duplicate parent entries
-          if (!childNode.parents.includes(nodeId)) {
-            childNode.parents.push(nodeId)
-          }
+
+      // Calculate which nodes on the next level this node should connect to
+      // Map current node index proportionally to next level indices
+      const ratio =
+        currentLevelNodes.length > 1
+          ? nodeIndex / (currentLevelNodes.length - 1)
+          : 0.5
+      const targetIndex = ratio * (nextLevelNodes.length - 1)
+
+      // Connect to at least 2 nodes: the closest one(s) including diagonals
+      const connections = new Set<number>()
+
+      // Calculate the closest node index
+      const closestIndex = Math.round(targetIndex)
+      connections.add(closestIndex)
+
+      // Add a second connection (diagonal/neighboring node)
+      if (nextLevelNodes.length >= 2) {
+        // Determine which neighbor to connect to based on position
+        if (closestIndex === 0) {
+          // Leftmost node: connect to the next one (index 1)
+          connections.add(1)
+        } else if (closestIndex === nextLevelNodes.length - 1) {
+          // Rightmost node: connect to the previous one
+          connections.add(closestIndex - 1)
         } else {
-          break // No more children available
+          // Middle node: connect to the neighbor that maintains better diagonal flow
+          // If we're on the left side, prefer left neighbor; right side prefers right neighbor
+          if (ratio < 0.5) {
+            connections.add(closestIndex - 1) // Connect to left neighbor
+          } else {
+            connections.add(closestIndex + 1) // Connect to right neighbor
+          }
         }
       }
+
+      // Create bidirectional connections
+      connections.forEach((childIndex) => {
+        const childId = nextLevelNodes[childIndex]
+        node.children.push(childId)
+        const childNode = nodes.get(childId)!
+        if (!childNode.parents.includes(nodeId)) {
+          childNode.parents.push(nodeId)
+        }
+      })
     })
   }
 
   // Create final boss node
-  const bossNodeId = getNodeId()
+  const bossNodeId = 'node_boss'
   const bossNode: MapNode = {
     id: bossNodeId,
     type: NodeType.BOSS,
-    level: LEVELS + 1,
+    level: levelDefs.length + 1,
     x: Space.windowWidth / 2,
-    y: 100 + (LEVELS + 1) * LEVEL_SPACING,
-    opponent: [
-      50, 27, 27, 27, 27, 25, 88, 88, 31, 39, 11, 13, 91, 45, 45,
-    ], // Strong boss deck
+    y: 100 + (levelDefs.length + 1) * LEVEL_SPACING,
+    opponent: [50, 27, 27, 27, 27, 25, 88, 88, 31, 39, 11, 13, 91, 45, 45], // Strong boss deck
     cardUpgrades: [2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    // Boss node always has 1 special rule
-    specialRules: (() => {
-      const availableModes = [0, 1, 2, 3, 4]
-      const randomIndex = Math.floor(Math.random() * availableModes.length)
-      return [availableModes[randomIndex]]
-    })(),
+    specialRules: [0], // Boss has special rule mode 0
     children: [],
     parents: [],
   }
 
   // Connect all nodes from final level to boss
-  const finalLevelNodes = levelNodes[LEVELS]
+  const finalLevelNodes = levelNodes[levelDefs.length]
   finalLevelNodes.forEach((nodeId) => {
     const node = nodes.get(nodeId)!
     node.children.push(bossNodeId)
@@ -260,4 +227,3 @@ export function generateRaceMap(): RaceMap {
     accessibleNodeIds,
   }
 }
-
