@@ -22,7 +22,7 @@ export interface MapNode {
   deckOptions?: number[][] // For START_DECK_SELECTION: array of 3 deck arrays
   opponent?: number[] // For MATCH: opponent deck
   cardUpgrades?: number[] // For MATCH: opponent card upgrades
-  specialRules?: string[] // For MATCH: special rules/modes
+  specialRules?: number[] // For MATCH: special rules/modes (array of mode indices)
 
   // Connections
   children: string[] // IDs of nodes that can be reached from this node
@@ -117,6 +117,17 @@ export function generateRaceMap(): RaceMap {
             '00500500500502202202200B00B00B00E00E049049033',
           ),
           cardUpgrades: new Array(15).fill(0),
+          // Assign special rules to some later mission nodes (levels 3 and above)
+          // Special rules are stored as mode indices (numbers)
+          // Each node gets at most 1 special mode
+          ...(level >= 3 && Math.random() < 0.4 && {
+            specialRules: (() => {
+              // Randomly assign 1 special rule
+              const availableModes = [0, 1, 2, 3, 4]
+              const randomIndex = Math.floor(Math.random() * availableModes.length)
+              return [availableModes[randomIndex]]
+            })(),
+          }),
         }),
       }
 
@@ -217,6 +228,12 @@ export function generateRaceMap(): RaceMap {
       50, 27, 27, 27, 27, 25, 88, 88, 31, 39, 11, 13, 91, 45, 45,
     ], // Strong boss deck
     cardUpgrades: [2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    // Boss node always has 1 special rule
+    specialRules: (() => {
+      const availableModes = [0, 1, 2, 3, 4]
+      const randomIndex = Math.floor(Math.random() * availableModes.length)
+      return [availableModes[randomIndex]]
+    })(),
     children: [],
     parents: [],
   }

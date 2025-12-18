@@ -32,7 +32,11 @@ export default class RaceDeckSelectionMenu extends Menu {
       this.createDeckOptions(params.deckOptions, params.onDeckSelected)
     } else if (params.currentDeck && params.onCardSelected) {
       // Case 2: Selecting a card from current deck (upgrade)
-      this.createCurrentDeckSelection(params.currentDeck, params.onCardSelected)
+      this.createCurrentDeckSelection(
+        params.currentDeck,
+        params.onCardSelected,
+        params.onSkip,
+      )
     }
 
     this.layout()
@@ -118,6 +122,7 @@ export default class RaceDeckSelectionMenu extends Menu {
   private createCurrentDeckSelection(
     currentDeck: Deck,
     onCardSelected: (index: number) => void,
+    onSkip?: () => void,
   ): void {
     // Create a mapping from card to index
     const cardToIndex = new Map<Card, number>()
@@ -135,9 +140,14 @@ export default class RaceDeckSelectionMenu extends Menu {
     })
 
     // Set the deck - get Card objects with their versions
+    // Filter out cards that are already upgraded (version 1 or 2)
     const deckCards = currentDeck.cards
       .map((cardId, index) => {
         const version = currentDeck.cardUpgrades?.[index] || 0
+        // Skip cards that are already upgraded (version 1 or 2)
+        if (version > 0) {
+          return null
+        }
         const card = getCardWithVersion(cardId, version, Catalog)
         if (card) {
           cardToIndex.set(card, index)
@@ -168,5 +178,34 @@ export default class RaceDeckSelectionMenu extends Menu {
     }
 
     this.sizer.add(scrollableDeck, padding).addNewLine()
+
+    // Add skip button if callback provided
+    if (onSkip) {
+      const buttonSizer = this.scene.rexUI.add.sizer({
+        width: this.width - Space.pad * 2,
+        space: { item: Space.pad },
+      })
+
+      const skipButtonContainer = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        Space.buttonWidth,
+        50,
+      )
+      new Buttons.Basic({
+        within: skipButtonContainer,
+        text: 'Skip',
+        f: () => {
+          onSkip()
+          this.close()
+        },
+        muteClick: true,
+      })
+
+      buttonSizer.addSpace().add(skipButtonContainer).addSpace()
+
+      this.sizer.add(buttonSizer, padding).addNewLine()
+    }
   }
 }

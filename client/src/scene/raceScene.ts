@@ -382,24 +382,67 @@ export default class RaceScene extends BaseScene {
     })
   }
 
-  // Draw paths between connected nodes
+  // Get nodes that can be accessed from a given node based on horizontal position (±1)
+  private getAccessibleNodesFromPosition(node: MapNode): MapNode[] {
+    const accessibleNodes: MapNode[] = []
+    const nextLevel = node.level + 1
+
+    // Find all nodes on the next level
+    const nextLevelNodes: MapNode[] = []
+    this.raceMap.nodes.forEach((n) => {
+      if (n.level === nextLevel) {
+        nextLevelNodes.push(n)
+      }
+    })
+
+    // Sort by x position to find which nodes are within ±1 position
+    nextLevelNodes.sort((a, b) => a.x - b.x)
+
+    // Find the index of nodes that are within horizontal distance
+    // Calculate based on horizontal spacing (approximately ±200 pixels)
+    const HORIZONTAL_RANGE = 250 // Slightly more than NODE_HORIZONTAL_SPACING to account for variance
+
+    nextLevelNodes.forEach((childNode) => {
+      const horizontalDistance = Math.abs(childNode.x - node.x)
+      if (horizontalDistance <= HORIZONTAL_RANGE) {
+        accessibleNodes.push(childNode)
+      }
+    })
+
+    return accessibleNodes
+  }
+
+  // Draw paths between connected nodes based on actual accessibility rules (position-based)
   private drawPaths(): void {
     this.pathGraphics.clear()
-    this.pathGraphics.lineStyle(4, 0xcccccc, 0.8)
+    const ancestorPath = this.getAncestorPath()
 
-    // Draw paths from each node to its children
+    // Draw paths from each node to nodes it can access on the next level (based on position)
     this.raceMap.nodes.forEach((node) => {
-      node.children.forEach((childId) => {
-        const childNode = this.raceMap.nodes.get(childId)
-        if (childNode) {
-          // Draw line from parent to child
-          this.pathGraphics.lineBetween(
-            node.x,
-            node.y,
-            childNode.x,
-            childNode.y,
-          )
+      // Skip boss node (no children)
+      if (node.type === NodeType.BOSS) return
+
+      // Get accessible nodes based on position
+      const accessibleNodes = this.getAccessibleNodesFromPosition(node)
+
+      accessibleNodes.forEach((childNode) => {
+        // Check if both parent and child are in the traveled path (ancestor path)
+        // A path is traveled if both nodes are completed and in the ancestor path
+        const isTraveledPath =
+          ancestorPath.has(node.id) &&
+          ancestorPath.has(childNode.id) &&
+          this.raceMap.completedNodes.has(node.id) &&
+          this.raceMap.completedNodes.has(childNode.id)
+
+        // Draw traveled paths in red, others in default color
+        if (isTraveledPath) {
+          this.pathGraphics.lineStyle(4, 0xff6666, 0.9) // Red for traveled path
+        } else {
+          this.pathGraphics.lineStyle(4, 0xcccccc, 0.8) // Default color for other paths
         }
+
+        // Draw line from parent to child
+        this.pathGraphics.lineBetween(node.x, node.y, childNode.x, childNode.y)
       })
     })
   }
@@ -442,6 +485,62 @@ export default class RaceScene extends BaseScene {
 
       // Store node reference on button for later use
       ;(btn as any).nodeId = node.id
+
+      // Add hover tooltips for different node types
+      if (node.type === NodeType.START_DECK_SELECTION) {
+        // Show hint for starting deck selection
+        btn.setOnHover(
+          () => {
+            this.hint.showText('Choose a starting deck')
+          },
+          () => {
+            this.hint.hide()
+          },
+        )
+      } else if (node.type === NodeType.UPGRADE) {
+        // Show hint for upgrade nodes
+        btn.setOnHover(
+          () => {
+            this.hint.showText('Upgrade a card')
+          },
+          () => {
+            this.hint.hide()
+          },
+        )
+      } else if (node.type === NodeType.MATCH || node.type === NodeType.BOSS) {
+        // Show special rules for mission nodes
+        const modeNames: string[] = [
+          'Start at 3 breath',
+          'Instead of normal draws as the round starts, discard hand and draw 5',
+          'When a card is added to the story, increase its points by 1 permanently',
+          'At the end of each round, discard a card',
+          "At the end of each round, add cards removed from the game back to their owner's discard pile",
+        ]
+
+        // Get special rules from node (node.specialRules contains mode indices)
+        let rulesText = ''
+        if (node.specialRules && node.specialRules.length > 0) {
+          // Convert mode indices to mode names
+          rulesText = node.specialRules
+            .map((modeIndex: number) => {
+              return modeNames[modeIndex] || `Mode ${modeIndex}`
+            })
+            .join('\n')
+        } else {
+          rulesText = 'No special rules'
+        }
+
+        if (rulesText) {
+          btn.setOnHover(
+            () => {
+              this.hint.showText(rulesText)
+            },
+            () => {
+              this.hint.hide()
+            },
+          )
+        }
+      }
 
       // Animate all nodes
       this.animatedBtns.push(btn)
@@ -528,7 +627,7 @@ export default class RaceScene extends BaseScene {
     })
   }
 
-  // Mark a node as completed and unlock its children
+  // Mark a node as completed and unlock its children based on position
   private completeNode(nodeId: string): void {
     if (this.raceMap.completedNodes.has(nodeId)) {
       return // Already completed
@@ -537,11 +636,12 @@ export default class RaceScene extends BaseScene {
     // Mark as completed
     this.raceMap.completedNodes.add(nodeId)
 
-    // Unlock child nodes
+    // Unlock child nodes based on horizontal position (±1 from current node)
     const node = this.raceMap.nodes.get(nodeId)
     if (node) {
-      node.children.forEach((childId) => {
-        this.raceMap.accessibleNodeIds.add(childId)
+      const accessibleNodes = this.getAccessibleNodesFromPosition(node)
+      accessibleNodes.forEach((childNode) => {
+        this.raceMap.accessibleNodeIds.add(childNode.id)
       })
 
       // Update current level if needed
@@ -566,6 +666,8 @@ export default class RaceScene extends BaseScene {
     // Update node visuals if buttons are already created
     if (this.animatedBtns.length > 0) {
       this.updateNodeVisuals()
+      // Redraw paths to update traveled path color
+      this.drawPaths()
     }
 
     // Save progress
@@ -576,16 +678,16 @@ export default class RaceScene extends BaseScene {
   // Returns only nodes that are both ancestors AND completed
   private getAncestorPath(): Set<string> {
     const path = new Set<string>()
-    
+
     // Start from all accessible nodes and trace backwards to start through completed nodes only
     const visited = new Set<string>()
     const traceBackwards = (nodeId: string): void => {
       if (visited.has(nodeId)) return
       visited.add(nodeId)
-      
+
       const node = this.raceMap.nodes.get(nodeId)
       if (!node) return
-      
+
       // Trace to all parents that are completed (only add completed ancestors)
       node.parents.forEach((parentId) => {
         if (this.raceMap.completedNodes.has(parentId)) {
@@ -595,17 +697,17 @@ export default class RaceScene extends BaseScene {
         }
       })
     }
-    
+
     // Trace backwards from all accessible nodes
     this.raceMap.accessibleNodeIds.forEach((nodeId) => {
       traceBackwards(nodeId)
     })
-    
+
     // Always include start node if it's completed
     if (this.raceMap.completedNodes.has(this.raceMap.startNodeId)) {
       path.add(this.raceMap.startNodeId)
     }
-    
+
     return path
   }
 
@@ -613,7 +715,7 @@ export default class RaceScene extends BaseScene {
   private updateNodeVisuals(): void {
     const ancestorPath = this.getAncestorPath()
     const currentLevel = this.raceMap.currentLevel
-    
+
     this.animatedBtns.forEach((btn) => {
       const nodeId = (btn as any).nodeId
       if (!nodeId) return
@@ -631,7 +733,10 @@ export default class RaceScene extends BaseScene {
 
       // Disable button interaction if another node at this level is completed (and this one isn't)
       // Also disable if not accessible (unless completed, which we handle separately)
-      if ((levelHasCompletedNode && !isCompleted) || (!isAccessible && !isCompleted)) {
+      if (
+        (levelHasCompletedNode && !isCompleted) ||
+        (!isAccessible && !isCompleted)
+      ) {
         btn.disable()
       } else if (isAccessible || isCompleted) {
         // Only enable if accessible or completed
@@ -642,7 +747,7 @@ export default class RaceScene extends BaseScene {
 
       // Reset tint
       btn.icon.clearTint()
-      
+
       // Grey out nodes above current level
       if (isAboveCurrentLevel) {
         btn.icon.setAlpha(0.3)
@@ -769,8 +874,11 @@ export default class RaceScene extends BaseScene {
       },
     }
 
-    // Get enabled modes from UserSettings, default to empty array
-    const enabledModes = UserSettings._get('raceEnabledModes') || []
+    // Use node's special rules if available, otherwise fall back to UserSettings
+    const enabledModes =
+      node.specialRules && node.specialRules.length > 0
+        ? node.specialRules
+        : UserSettings._get('raceEnabledModes') || []
 
     // Store the node ID to complete it after match
     ;(this as any).pendingNodeCompletion = node.id
@@ -797,6 +905,10 @@ export default class RaceScene extends BaseScene {
         if (cardId !== undefined) {
           this.showCardUpgradeVersions(cardId, index, nodeId)
         }
+      },
+      onSkip: () => {
+        // Skip upgrade - mark node as completed without upgrading
+        this.completeNode(nodeId)
       },
     })
   }
@@ -923,6 +1035,12 @@ export default class RaceScene extends BaseScene {
           }
         }
       },
+      onBack: nodeId
+        ? () => {
+            // Go back to card selection
+            this.showUpgradeCardSelection(nodeId)
+          }
+        : undefined,
     })
   }
 
