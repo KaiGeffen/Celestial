@@ -64,20 +64,25 @@ export function generateRaceMap(): RaceMap {
     return startX + levelIndex * NODE_HORIZONTAL_SPACING
   }
 
-  // Level definitions: [numNodes, nodeType, specialRules?]
-  // Each level is either all MATCH or all UPGRADE nodes
+  // Level definitions: [numNodes, upgradeIndices, specialRules?]
+  // upgradeIndices: array of node indices (0-based) that should be UPGRADE nodes
+  // All other nodes in the level will be MATCH nodes
   type LevelDef = {
     numNodes: number
-    type: NodeType.MATCH | NodeType.UPGRADE
+    upgradeIndices: number[] // Indices of nodes that should be UPGRADE type
     specialRules?: number[] // Optional special rules for each node (indexed by position)
   }
   const levelDefs: LevelDef[] = [
-    { numNodes: 3, type: NodeType.MATCH }, // Level 1: 3 match nodes
-    { numNodes: 4, type: NodeType.UPGRADE }, // Level 2: 4 upgrade nodes
-    { numNodes: 5, type: NodeType.MATCH }, // Level 3: 5 match nodes
-    { numNodes: 4, type: NodeType.UPGRADE }, // Level 4: 4 upgrade nodes
-    { numNodes: 3, type: NodeType.MATCH }, // Level 5: 3 match nodes
-    { numNodes: 2, type: NodeType.MATCH }, // Level 6: 2 match nodes (final before boss)
+    { numNodes: 5, upgradeIndices: [1] }, // Level 1: 5 nodes, 1 upgrade at index 1
+    { numNodes: 4, upgradeIndices: [0, 3] }, // Level 2: 4 nodes, 2 upgrades at indices 0 and 3
+    { numNodes: 5, upgradeIndices: [2] }, // Level 3: 5 nodes, 1 upgrade at index 2
+    { numNodes: 4, upgradeIndices: [1, 2] }, // Level 4: 4 nodes, 2 upgrades at indices 1 and 2
+    { numNodes: 5, upgradeIndices: [0, 4] }, // Level 5: 5 nodes, 2 upgrades at indices 0 and 4
+    { numNodes: 4, upgradeIndices: [1] }, // Level 6: 4 nodes, 1 upgrade at index 1
+    { numNodes: 5, upgradeIndices: [2] }, // Level 7: 5 nodes, 1 upgrade at index 2
+    { numNodes: 4, upgradeIndices: [0, 3] }, // Level 8: 4 nodes, 2 upgrades at indices 0 and 3
+    { numNodes: 5, upgradeIndices: [1, 3] }, // Level 9: 5 nodes, 2 upgrades at indices 1 and 3
+    { numNodes: 3, upgradeIndices: [] }, // Level 10: 3 match nodes (final before boss)
   ]
 
   // Create start node (deck selection)
@@ -100,22 +105,26 @@ export function generateRaceMap(): RaceMap {
   for (let level = 1; level <= levelDefs.length; level++) {
     const levelDef = levelDefs[level - 1]
     const currentLevelNodes: string[] = []
+    const upgradeSet = new Set(levelDef.upgradeIndices)
 
     for (let i = 0; i < levelDef.numNodes; i++) {
       const nodeId = `node_${level}_${i}`
       const x = getNodeX(i, levelDef.numNodes)
       const y = 100 + level * LEVEL_SPACING
 
+      // Determine node type: UPGRADE if in upgradeIndices, otherwise MATCH
+      const nodeType = upgradeSet.has(i) ? NodeType.UPGRADE : NodeType.MATCH
+
       const node: MapNode = {
         id: nodeId,
-        type: levelDef.type,
+        type: nodeType,
         level: level,
         x: x,
         y: y,
         children: [],
         parents: [],
         // Add opponent deck for match nodes
-        ...(levelDef.type === NodeType.MATCH && {
+        ...(nodeType === NodeType.MATCH && {
           opponent: defaultOpponentDeck,
           cardUpgrades: defaultCardUpgrades,
           // Add special rules if specified for this node position
@@ -187,6 +196,29 @@ export function generateRaceMap(): RaceMap {
           childNode.parents.push(nodeId)
         }
       })
+    })
+
+    // Ensure every node in the next level has at least one parent
+    nextLevelNodes.forEach((childId, childIndex) => {
+      const childNode = nodes.get(childId)!
+      if (childNode.parents.length === 0 && currentLevelNodes.length > 0) {
+        // Connect to the closest parent node
+        const ratio =
+          currentLevelNodes.length > 1
+            ? childIndex / (nextLevelNodes.length - 1 || 1)
+            : 0.5
+        const targetParentIndex = Math.round(
+          ratio * (currentLevelNodes.length - 1),
+        )
+        const parentId = currentLevelNodes[targetParentIndex]
+        const parentNode = nodes.get(parentId)!
+        
+        // Create bidirectional connection
+        if (!parentNode.children.includes(childId)) {
+          parentNode.children.push(childId)
+        }
+        childNode.parents.push(parentId)
+      }
     })
   }
 
