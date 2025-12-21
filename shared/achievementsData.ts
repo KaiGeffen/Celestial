@@ -125,7 +125,7 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
   // Manually unlocked
   1001: {
     title: 'Secret Garden',
-    description: 'A special prize for those who seek it...',
+    description: 'A prize held by tournament winners.',
     image: 'border-Grape',
     borderUnlock: 2,
   },
@@ -172,7 +172,7 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
   },
   1009: {
     title: 'Stars Border',
-    description: 'The constellations',
+    description: 'Earned by helping out with feedback.',
     image: 'border-Stars',
     borderUnlock: 9,
   },
