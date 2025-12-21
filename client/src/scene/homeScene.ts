@@ -364,7 +364,7 @@ export default class HomeScene extends BaseScene {
 
     // Title with line below
     const title = this.add
-      .text(0, 0, 'New Update [0.7.10]', Style.announcement)
+      .text(0, 0, 'New Update [0.7.11]', Style.announcement)
       .setOrigin(0.5, 0)
     panelSizer.add(title)
 
@@ -396,20 +396,19 @@ export default class HomeScene extends BaseScene {
     contentSizer.add(image, { align: 'top' })
 
     // Make news content as BBCode to have hoverable card names and links
-    const updateText = `This is your first look at our interstitial UI! While we'd love your feedback, know that we plan to overhaul it in the not too distant future.
+    const updateText = `Happy holidays everyone!
+    
+Our latest tournament has wrapped up, with Sherlock taking home top prize!
 
-Join us December 20th at noon EST for the 7th Celestial tournament! Play in person or remote for the chance to take home some exclusive cosmetic and cash prizes!
-[area=_link_register][color=#FABD5D]Register here[/color][/area]
+Keep an eye out for next month's tournament, and a new single player mode rolling out soon!
 
 Card changes:
-☝️ [area=_Phoenix][color=#FABD5D]Phoenix[/color][/area] cost 6 > 5
-☝️ [area=_Pride][color=#FABD5D]Pride[/color][/area] Exhale cost 2 > 1
-☝️ [area=_Pet][color=#FABD5D]Pet[/color][/area] points 1 > 2
-☝️ [area=_Overflow][color=#FABD5D]Overflow[/color][/area] points -1 > 0
-☝️ [area=_Hug][color=#FABD5D]Hug[/color][/area] points 1 > 2, bonus 2 > 1
-☝️ [area=_Balance][color=#FABD5D]Balance[/color][/area] points 1 > 2, bonus 3 > 2
+☝️ [area=_Gentle Rain][color=#FABD5D]Gentle Rain[/color][/area] cost 4 > 3, points 2 > 1
+☝️ [area=_Fishing Boat][color=#FABD5D]Fishing Boat[/color][/area] points 0 > 1
+☝️ [area=_Imprison][color=#FABD5D]Imprison[/color][/area] threshold to trigger 2 > 3
+☝️ [area=_Possibility][color=#FABD5D]Possibility[/color][/area] cost 4 > 3
 
-Thanks so much for playing! We couldn't do this without you 😊`
+Thank you for all your support, looking forward to more games in 2026 🕊️`
 
     const text = this.rexUI.add
       .BBCodeText(0, 0, updateText, BBStyle.description)

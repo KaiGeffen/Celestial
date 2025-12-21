@@ -199,7 +199,7 @@ class Possibility extends Card {
 const possibility = new Possibility({
   name: 'Possibility',
   id: 95,
-  cost: 4,
+  cost: 3,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nIncrease your max breath by 1 permanently.',
 })
