@@ -1,3 +1,5 @@
+const heeralColor = '#FFFFAB'
+
 // The base colors used throughout this app
 const CoreColors: Record<string, number | string> = {
   white: 0xf5f2eb,
@@ -81,8 +83,8 @@ export const Color: Record<string, any> = {
   cardGreyed: CoreColors.lightGrey,
   // The color of either stat if it has been changed
   cardText: CoreColors.goldS,
-  cardCost: '#B9F2FF',
-  cardPoints: CoreColors.goldS,
+  cardCost: heeralColor,
+  cardPoints: heeralColor,
   cardStatChanged: '#00aa00',
   cardTextBackground: 0x000000,
 

@@ -6,6 +6,10 @@ import { Space, Color, Flags } from './settings'
 const mainFont = 'Mulish'
 const altFont = 'Cinzel'
 
+const heeralFont = 'GrandCentral'
+const heeralTitle = 'Priory'
+const heeralColor = '#FFFFAB'
+
 // Settings for the font sizes
 const FontSettings: Record<string, Record<string, string>> = {
   standard: { size: Flags.mobile ? '20px' : '24px' },
@@ -159,9 +163,9 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     color: Color.todoSubtext,
   },
   cardTitle: {
-    fontFamily: altFont,
-    fontSize: '26px',
-    color: Color.cardText,
+    fontFamily: heeralTitle,
+    fontSize: '20px',
+    color: heeralColor,
   },
   homeSceneButton: {
     fontFamily: altFont,
@@ -199,16 +203,16 @@ export const BBStyle: Record<string, any> = {
   },
   // Cost / Points stats that are shown above each card
   cardCost: {
-    fontFamily: mainFont,
-    fontSize: '30px',
+    fontFamily: heeralFont,
+    fontSize: '26px',
     color: Color.cardCost,
     stroke: Color.blackS,
     strokeThickness: 3,
     // TODO Add letter spacing after at least Phaser 3.6.0
   },
   cardPoints: {
-    fontFamily: mainFont,
-    fontSize: '30px',
+    fontFamily: heeralFont,
+    fontSize: '26px',
     color: Color.cardPoints,
     stroke: Color.blackS,
     strokeThickness: 3,
@@ -217,14 +221,14 @@ export const BBStyle: Record<string, any> = {
   // The textbox for the card
   cardText: {
     fontFamily: mainFont,
-    fontSize: '16px',
-    color: 0xffffff,
-    backgroundColor: 0x111111a0,
+    fontSize: '14px',
+    color: heeralColor,
+    // backgroundColor: 0x111111a0,
     wrap: {
       mode: 'word',
-      width: 224,
+      width: 180,
     },
-    fixedWidth: 232,
+    // fixedWidth: 232,
     halign: 'center',
     padding: {
       left: 5,

@@ -8,8 +8,9 @@ import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 import { Keywords } from '../../../shared/state/keyword'
 
 // The offset of cost / points
-const statOffset1 = 27
-const statOffset2 = 77
+const statXOffset = 29
+const statYOffset1 = 44
+const statYOffset2 = 82
 
 const COLOR_BETTER = '#55dd55'
 const COLOR_WORSE = '#e45555'
@@ -195,7 +196,7 @@ export class CardImage {
     this.cost = cost
 
     if (cost !== null) {
-      this.txtCost.setText(cost)
+      this.txtCost.setText(`[stroke=#353F4E]${cost}[/stroke]`)
 
       if (this.card.cost > cost) {
         this.txtCost.setColor(COLOR_BETTER)
@@ -238,7 +239,7 @@ export class CardImage {
 
   setPoints(amt: number): this {
     this.points = amt
-    this.txtPoints.setText(amt)
+    this.txtPoints.setText(`[stroke=#353F4E]${amt}[/stroke]`)
 
     // Use the correct color
     if (amt < this.card.basePoints) {
@@ -246,7 +247,7 @@ export class CardImage {
     } else if (amt > this.card.basePoints) {
       this.txtPoints.setColor(COLOR_BETTER)
     } else {
-      this.txtPoints.setColor(Color.cardText)
+      this.txtPoints.setColor(Color.cardPoints)
     }
 
     return this
@@ -293,8 +294,8 @@ export class CardImage {
     // Cost
     this.txtCost = this.scene.add
       .rexBBCodeText(
-        -Space.cardWidth / 2 + statOffset1,
-        -Space.cardHeight / 2 + statOffset1,
+        -Space.cardWidth / 2 + statXOffset,
+        -Space.cardHeight / 2 + statYOffset1,
         `[stroke=#353F4E]${this.card.cost}[/stroke]`,
         BBStyle.cardCost,
       )
@@ -316,8 +317,8 @@ export class CardImage {
     // Points
     this.txtPoints = this.scene.add
       .rexBBCodeText(
-        -Space.cardWidth / 2 + statOffset1,
-        -Space.cardHeight / 2 + statOffset2,
+        -Space.cardWidth / 2 + statXOffset,
+        -Space.cardHeight / 2 + statYOffset2,
         `[stroke=#353F4E]${this.card.points}[/stroke]`,
         BBStyle.cardPoints,
       )
@@ -378,9 +379,8 @@ export class CardImage {
 
     // Create the text
     this.txtText = this.scene.add
-      .rexBBCodeText(0, 156, s, BBStyle.cardText)
-      .setOrigin(0.5, 1)
-      .setWordWrapWidth(Space.cardWidth)
+      .rexBBCodeText(0, 130, s, BBStyle.cardText)
+      .setOrigin(0.5)
       .setVisible(s !== '')
 
     // Enable hovering to get hint
@@ -413,13 +413,8 @@ export class CardImage {
     const displayName = this.card.name + upgradeSuffix
 
     this.txtTitle = this.scene.add
-      .text(
-        -Space.cardWidth / 2 + 56,
-        -Space.cardHeight / 2 + 3,
-        displayName,
-        Style.cardTitle,
-      )
-      .setOrigin(0)
+      .text(0, -Space.cardHeight / 2 + 20, displayName, Style.cardTitle)
+      .setOrigin(0.5)
 
     this.container.add(this.txtTitle)
   }
