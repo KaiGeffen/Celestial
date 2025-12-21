@@ -150,7 +150,6 @@ import ChoosePremade from './choosePremade'
 import CreditsMenu from './credits'
 import RulebookMenu from './rulebook'
 import { NewDeckMenu, EditDeckMenu } from './alterDeck'
-import ModeMenu from './mode'
 import ConfirmMenu from './confirm'
 import MessageMenu from './message'
 import FocusMenu from './focus'
@@ -174,7 +173,6 @@ const menus = {
   credits: CreditsMenu,
   rulebook: RulebookMenu,
   newDeck: NewDeckMenu,
-  mode: ModeMenu,
   editDeck: EditDeckMenu,
   confirm: ConfirmMenu,
   message: MessageMenu,

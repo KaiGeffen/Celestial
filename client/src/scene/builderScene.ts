@@ -420,10 +420,8 @@ export class BuilderScene extends BuilderBase {
 
       // Open the mode menu to select what mode to play in with the given deck
       this.scene.launch('MenuScene', {
-        menu: 'mode',
+        menu: 'play',
         activeScene: this,
-        deck: this.deckRegion.getDeck(),
-        cosmeticSet: this.deckRegion.cosmeticSet,
       })
     }
   }
