@@ -206,10 +206,13 @@ export default class BaseScene extends SharedBaseScene {
         hasShownDisconnectError = true
       }
 
-      // Flip twice per second (every 500ms)
+      // Flip twice per second (every 500ms) and attempt reconnect
       if (time - this.lastFlipTime >= 500) {
         icon.setScale(-icon.scaleX, 1)
         this.lastFlipTime = time
+
+        // Attempt reconnect
+        Server.reconnect()
       }
     } else {
       // Server is connected - hide the icon

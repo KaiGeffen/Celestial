@@ -10,6 +10,7 @@ import {
   UUID_NAMESPACE,
 } from '../../shared/network/settings'
 import type { GoogleJwtPayload } from './types/google'
+import jwt_decode from 'jwt-decode'
 import { ClientWS } from '../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../shared/types/deck'
 import { CosmeticSet } from '../../shared/types/cosmeticSet'
@@ -428,6 +429,51 @@ export default class Server {
 
     // Emit event so scenes can refresh if needed
     game.events.emit('userDataUpdated')
+  }
+
+  // Attempt to reconnect by sending stored token or guest UUID
+  static reconnect(): void {
+    // Close existing server connection if it exists
+    if (server) {
+      server.close()
+      server = undefined
+    }
+
+    // Create a new socket connection
+    server = Server.getSocket()
+
+    const storedToken = localStorage.getItem(Url.gsi_token)
+    if (storedToken !== null) {
+      // User signed in with OAuth - decode token and send signIn
+      try {
+        const payload = jwt_decode<GoogleJwtPayload>(storedToken)
+        const email = payload.email
+        const uuid = uuidv5(payload.sub, UUID_NAMESPACE)
+        const jti = payload.jti
+
+        server.onOpen(() => {
+          server.send({
+            type: 'signIn',
+            email,
+            uuid,
+            jti,
+          })
+        })
+      } catch (e) {
+        console.error('Failed to decode token during reconnect:', e)
+      }
+    } else {
+      // User signed in as guest - get guest UUID and send signIn
+      const guestUuid = localStorage.getItem('guest_uuid')
+      if (guestUuid) {
+        server.onOpen(() => {
+          server.send({
+            type: 'signIn',
+            uuid: guestUuid,
+          })
+        })
+      }
+    }
   }
 
   // Get a websocket right for the current environment
