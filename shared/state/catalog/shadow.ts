@@ -181,29 +181,17 @@ class WingClipping extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    if (game.hand[player ^ 1].length > 0) {
-      const card = game.hand[player ^ 1].shift()
-      game.deck[player ^ 1].push(card)
-
-      // game.animations[player ^ 1].push(
-      //   new Animation({
-      //     from: Zone.Hand,
-      //     to: Zone.Deck,
-      //     card: card,
-      //     index: 0,
-      //     index2: 0,
-      //     visibility: Visibility.KnowItOccurred,
-      //   }),
-      // )
+    if (game.score[player] < game.score[player ^ 1]) {
+      game.discard(player ^ 1)
     }
   }
 }
 const wingClipping = new WingClipping({
   name: 'Wing Clipping',
   id: 16,
-  cost: 5,
+  cost: 4,
   points: 4,
-  text: 'Your opponent puts the leftmost card of their hand on top of their deck.',
+  text: 'If your opponent has more points than you, they discard a card.',
   story:
     'We walked and ran and played then\nYou leave me behind\nI gasp as the space between us grows',
 })
