@@ -353,10 +353,10 @@ export default class PlayMenu extends Menu {
     titleSizer.add(txtTitle)
     contentSizer.add(titleSizer).addNewLine()
 
-    // Practice (vs AI)
+    // Versus Computer
     contentSizer
       .add(
-        this.createPlayOption('Practice (vs AI)', 'Go', () => {
+        this.createPlayOption('Versus Computer', 'Go', () => {
           if (!server || !server.isOpen()) {
             this.scene.signalError(Messages.disconnectError)
             return
@@ -375,10 +375,10 @@ export default class PlayMenu extends Menu {
       )
       .addNewLine()
 
-    // Ranked Match
+    // Versus Human
     contentSizer
       .add(
-        this.createPlayOption('Ranked Match', 'Go', () => {
+        this.createPlayOption('Versus Human', 'Go', () => {
           if (!server || !server.isOpen()) {
             this.scene.signalError(Messages.disconnectError)
             return
@@ -397,9 +397,9 @@ export default class PlayMenu extends Menu {
       )
       .addNewLine()
 
-    // Friendly Match (pw)
+    // Password Match
     const friendlyMatchOption = this.createPlayOption(
-      'Friendly Match (pw)',
+      'Password Match',
       'Go',
       () => {
         if (!server || !server.isOpen()) {
