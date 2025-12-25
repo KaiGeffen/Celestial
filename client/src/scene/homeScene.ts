@@ -400,7 +400,7 @@ export default class HomeScene extends BaseScene {
     
 Our latest tournament has wrapped up, with Sherlock taking home top prize!
 
-Keep an eye out for next month's tournament, and a new single player mode rolling out soon!
+Keep an eye out for next month's tournament, and a new card which just dropped in the store!
 
 Card changes:
 ☝️ [area=_Gentle Rain][color=#FABD5D]Gentle Rain[/color][/area] cost 4 > 3, points 2 > 1

@@ -160,7 +160,7 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
   },
   1007: {
     title: 'Vision Border',
-    description: 'All four season',
+    description: 'Unlocked early for the holidays!',
     image: 'border-Vision',
     borderUnlock: 7,
   },

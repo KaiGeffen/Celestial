@@ -125,7 +125,7 @@ export default class PlayMenu extends Menu {
   }
 
   private createContent() {
-    // Create main horizontal sizer for left (deck) and right (play options + garden) panels
+    // Create main horizontal sizer for left (play options + garden) and right (deck) panels
     const mainSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
       width: menuWidth - Space.pad * 2,
@@ -136,13 +136,13 @@ export default class PlayMenu extends Menu {
       },
     })
 
-    // Left panel: Deck
-    const deckPanel = this.createDeckPanel()
-    mainSizer.add(deckPanel, { align: 'top' })
-
-    // Right panel: Play options with garden at bottom - align to top
+    // Left panel: Play options with garden at bottom - align to top
     const playPanel = this.createPlayPanel()
     mainSizer.add(playPanel, { align: 'top' })
+
+    // Right panel: Deck
+    const deckPanel = this.createDeckPanel()
+    mainSizer.add(deckPanel, { align: 'top' })
 
     this.sizer.add(mainSizer).addNewLine()
   }

@@ -327,11 +327,10 @@ class BeginnersMind extends Card {
 }
 const beginnersMind = new BeginnersMind({
   name: "Beginner's Mind",
-  id: 5024,
+  id: 105,
   cost: 1,
   points: 1,
   text: 'When this is shuffled, move it to the top of your deck.',
-  beta: true,
 })
 
 export {
