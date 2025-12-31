@@ -211,6 +211,8 @@ class ServerController {
 
     // Hand triggers
     for (const player of players) {
+      const handSizeAtStart = this.model.hand[player].length
+
       // Do any effects that activate in hand
       let index = 0
       while (index < this.model.hand[player].length) {
@@ -219,6 +221,7 @@ class ServerController {
           player,
           this.model,
           index,
+          handSizeAtStart,
         )
 
         if (somethingActivated) {

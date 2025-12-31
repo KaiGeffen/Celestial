@@ -359,8 +359,9 @@ class Starfall extends Card {
     player: number,
     game: GameModel,
     index: number,
+    handSizeAtStart: number,
   ): [boolean, boolean] {
-    if (game.hand[player].length >= 5) {
+    if (handSizeAtStart >= 5) {
       game.discard(player, 1, index)
       this.inspired(1, game, player)
       return [true, true]

@@ -173,6 +173,7 @@ export default class Card {
     player: number,
     game: GameModel,
     index: number,
+    handSizeAtStart?: number,
   ): [boolean, boolean] {
     return [false, false]
   }
