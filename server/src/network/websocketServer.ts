@@ -45,8 +45,8 @@ let searchingPlayers: { [key: string]: WaitingPlayer } = {}
 // List of active player connections
 let activePlayers: { [key: string]: ServerWS } = {}
 
-// Dictionary of players that could reconnect, and the match they were in
-let usersAwaitingReconnect: { [key: string]: ActiveGame } = {}
+// Dictionary from players to games they're in, for reconnect purposes
+let userGameReconnectMap: { [key: string]: ActiveGame } = {}
 
 // Create the websocket server
 export default function createWebSocketServer() {
@@ -100,12 +100,15 @@ export default function createWebSocketServer() {
           await sendUserData(ws, id)
 
           // If user is in a match, reconnect them
-          if (usersAwaitingReconnect[uuid]) {
+          if (
+            userGameReconnectMap[uuid] &&
+            !userGameReconnectMap[uuid].match.isOver()
+          ) {
             // Set the active game for this connection
-            activeGame = usersAwaitingReconnect[uuid]
+            activeGame = userGameReconnectMap[uuid]
 
-            // Remove them from the reconnect queue
-            delete usersAwaitingReconnect[uuid]
+            // NOTE Don't delete to avoid client not successfully loading the state (Due to network issues etc)
+            // delete usersAwaitingReconnect[uuid]
 
             // Reconnect the user
             activeGame.match.reconnectUser(ws, activeGame.playerNumber)
@@ -440,7 +443,7 @@ export default function createWebSocketServer() {
 
           // Queue them to be reconnected (Unless tutorial)
           if (!(activeGame.match instanceof TutorialMatch)) {
-            usersAwaitingReconnect[id] = activeGame
+            userGameReconnectMap[id] = activeGame
           }
         }
       })
