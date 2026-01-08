@@ -194,6 +194,22 @@ export default class BaseScene extends SharedBaseScene {
   update(time: number, delta: number): void {
     super.update(time, delta)
 
+    // Check for pending reconnect - if so, start the match scene
+    const reconnect = Server.pendingReconnect
+    if (reconnect) {
+      // Clear the pending reconnect
+      Server.pendingReconnect = null
+
+      // Stop current scenes and start the match scene for the reconnected match
+      this.scene.start('StandardMatchScene', {
+        isPvp: true,
+        deck: [],
+        aiDeck: [],
+        gameStartState: reconnect.state,
+      })
+      return
+    }
+
     // Check server connection status
     const icon = this.btnNetworkStatus.icon
     if (server && !server.isOpen()) {
