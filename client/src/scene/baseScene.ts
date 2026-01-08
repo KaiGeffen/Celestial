@@ -228,7 +228,7 @@ export default class BaseScene extends SharedBaseScene {
         this.lastFlipTime = time
 
         // Attempt reconnect
-        Server.reconnect()
+        Server.reconnect(this.game)
       }
     } else {
       // Server is connected - hide the icon

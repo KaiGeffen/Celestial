@@ -432,7 +432,7 @@ export default class Server {
   }
 
   // Attempt to reconnect by sending stored token or guest UUID
-  static reconnect(): void {
+  static reconnect(game: Phaser.Game): void {
     // Close existing server connection if it exists
     if (server) {
       server.close()
@@ -444,6 +444,7 @@ export default class Server {
 
     const storedToken = localStorage.getItem(Url.gsi_token)
     if (storedToken !== null) {
+      console.log('Reconnecting with stored token')
       // User signed in with OAuth - decode token and send signIn
       try {
         const payload = jwt_decode<GoogleJwtPayload>(storedToken)
@@ -459,6 +460,9 @@ export default class Server {
             jti,
           })
         })
+
+        // Register handlers
+        this.registerCommonHandlers(uuid, game, () => {})
       } catch (e) {
         console.error('Failed to decode token during reconnect:', e)
       }
@@ -472,6 +476,9 @@ export default class Server {
             uuid: guestUuid,
           })
         })
+
+        // Register handlers
+        this.registerCommonHandlers(guestUuid, game, () => {})
       }
     }
   }
