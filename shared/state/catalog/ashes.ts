@@ -1,5 +1,5 @@
 import Card from '../card'
-import { ashes } from './tokens'
+import { ashes, condemnation } from './tokens'
 import { Quality } from '../quality'
 import { Animation } from '../../animation'
 import { Zone } from '../zone'
@@ -479,6 +479,22 @@ const finale = new Finale({
   text: '.',
 })
 
+class Prometheus extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    game.maxBreath[player] += 1
+    game.createInPile(player, condemnation)
+  }
+}
+const prometheus = new Prometheus({
+  name: 'Prometheus',
+  id: 2073,
+  cost: 4,
+  points: 4,
+  text: 'Inspire 2.\nCreate a Condemnation in your discard pile.',
+})
+
 export {
   dash,
   impulse,
@@ -500,4 +516,5 @@ export {
   // dyingLight,
   // momentum,
   // finale,
+  prometheus,
 }

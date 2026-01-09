@@ -92,4 +92,21 @@ const heirloom = new Card({
   points: 4,
 })
 
-export { seen, ashes, child, predator, wound, heirloom }
+class Condemnation extends Card {
+  onShuffle(player: number, game: GameModel, index: number) {
+    super.onShuffle(player, game, index)
+
+    game.deck[player].splice(index, 1)
+    game.story.addAct(this, player, 0)
+  }
+}
+const condemnation = new Condemnation({
+  name: 'Condemnation',
+  id: 1007,
+  cost: 9,
+  points: -3,
+  qualities: [Quality.VISIBLE],
+  text: 'Visible\nWhen this is shuffled, add it to the story.',
+})
+
+export { seen, ashes, child, predator, wound, heirloom, condemnation }
