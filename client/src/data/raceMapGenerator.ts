@@ -12,7 +12,7 @@ export enum NodeType {
 
 // Node with connections for path structure
 export interface MapNode {
-  id: string
+  id: number
   type: NodeType
   level: number // Level/row in the map (0 = start, higher = further down)
   x: number // X position for rendering
@@ -25,22 +25,20 @@ export interface MapNode {
   specialRules?: number[] // For MATCH: special rules/modes (array of mode indices)
 
   // Connections
-  children: string[] // IDs of nodes that can be reached from this node
-  parents: string[] // IDs of nodes that lead to this node
+  children: number[] // IDs of nodes that can be reached from this node
+  parents: number[] // IDs of nodes that lead to this node
 }
 
 export interface RaceMap {
-  nodes: Map<string, MapNode>
-  startNodeId: string
-  bossNodeId: string
-  currentLevel: number // Current level the player has reached
-  completedNodes: Set<string> // IDs of completed nodes
-  accessibleNodeIds: Set<string> // IDs of nodes player can currently access
+  nodes: Map<number, MapNode>
+  startNodeId: number
+  bossNodeId: number
+  completedNodes: Set<number> // IDs of completed nodes
 }
 
 // Static race map definition
 export function generateRaceMap(): RaceMap {
-  const nodes = new Map<string, MapNode>()
+  const nodes = new Map<number, MapNode>()
   const LEVEL_SPACING = 150 // Vertical spacing between levels
   const NODE_HORIZONTAL_SPACING = 200 // Horizontal spacing between nodes
 
@@ -85,8 +83,8 @@ export function generateRaceMap(): RaceMap {
     { numNodes: 3, upgradeIndices: [] }, // Level 10: 3 match nodes (final before boss)
   ]
 
-  // Create start node (deck selection)
-  const startNodeId = 'node_start'
+  // Create start node (deck selection) - ID 0
+  const startNodeId = 0
   const startNode: MapNode = {
     id: startNodeId,
     type: NodeType.START_DECK_SELECTION,
@@ -100,15 +98,17 @@ export function generateRaceMap(): RaceMap {
   nodes.set(startNodeId, startNode)
 
   // Create nodes for each level
-  const levelNodes: string[][] = [[startNodeId]] // Level 0: just start node
+  // Use numeric IDs: start with 1, increment for each node
+  let nextNodeId = 1
+  const levelNodes: number[][] = [[startNodeId]] // Level 0: just start node
 
   for (let level = 1; level <= levelDefs.length; level++) {
     const levelDef = levelDefs[level - 1]
-    const currentLevelNodes: string[] = []
+    const currentLevelNodes: number[] = []
     const upgradeSet = new Set(levelDef.upgradeIndices)
 
     for (let i = 0; i < levelDef.numNodes; i++) {
-      const nodeId = `node_${level}_${i}`
+      const nodeId = nextNodeId++
       const x = getNodeX(i, levelDef.numNodes)
       const y = 100 + level * LEVEL_SPACING
 
@@ -160,29 +160,64 @@ export function generateRaceMap(): RaceMap {
           : 0.5
       const targetIndex = ratio * (nextLevelNodes.length - 1)
 
-      // Connect to at least 2 nodes: the closest one(s) including diagonals
+      // Connect to 2 nodes (or as many as possible if next level is small)
       const connections = new Set<number>()
 
       // Calculate the closest node index
       const closestIndex = Math.round(targetIndex)
       connections.add(closestIndex)
 
-      // Add a second connection (diagonal/neighboring node)
+      // Always try to add a second connection
       if (nextLevelNodes.length >= 2) {
+        let secondConnection: number | null = null
+
         // Determine which neighbor to connect to based on position
         if (closestIndex === 0) {
-          // Leftmost node: connect to the next one (index 1)
-          connections.add(1)
+          // Leftmost: connect to index 1 (right neighbor)
+          secondConnection = 1
         } else if (closestIndex === nextLevelNodes.length - 1) {
-          // Rightmost node: connect to the previous one
-          connections.add(closestIndex - 1)
+          // Rightmost: connect to previous one (left neighbor)
+          secondConnection = closestIndex - 1
         } else {
           // Middle node: connect to the neighbor that maintains better diagonal flow
-          // If we're on the left side, prefer left neighbor; right side prefers right neighbor
+          // Connect to left neighbor if on left side, right neighbor if on right side
           if (ratio < 0.5) {
-            connections.add(closestIndex - 1) // Connect to left neighbor
+            // On left side: connect to left neighbor
+            secondConnection = closestIndex - 1
           } else {
-            connections.add(closestIndex + 1) // Connect to right neighbor
+            // On right side or middle: connect to right neighbor
+            secondConnection = closestIndex + 1
+          }
+        }
+
+        // Add second connection if valid and different from first
+        if (
+          secondConnection !== null &&
+          secondConnection >= 0 &&
+          secondConnection < nextLevelNodes.length &&
+          secondConnection !== closestIndex
+        ) {
+          connections.add(secondConnection)
+        }
+      }
+
+      // If we still don't have 2 connections and there are more nodes available, try to get another
+      // This handles edge cases where the above logic didn't add a second connection
+      if (connections.size < 2 && nextLevelNodes.length > connections.size) {
+        // Find any node we haven't connected to yet, prioritizing neighbors
+        const triedIndices = Array.from(connections)
+        for (let offset = 1; offset < nextLevelNodes.length && connections.size < 2; offset++) {
+          // Try left neighbor first
+          const leftIndex = closestIndex - offset
+          if (leftIndex >= 0 && !connections.has(leftIndex)) {
+            connections.add(leftIndex)
+            break
+          }
+          // Then try right neighbor
+          const rightIndex = closestIndex + offset
+          if (rightIndex < nextLevelNodes.length && !connections.has(rightIndex)) {
+            connections.add(rightIndex)
+            break
           }
         }
       }
@@ -190,7 +225,10 @@ export function generateRaceMap(): RaceMap {
       // Create bidirectional connections
       connections.forEach((childIndex) => {
         const childId = nextLevelNodes[childIndex]
-        node.children.push(childId)
+        // Only add if not already present (avoid duplicates)
+        if (!node.children.includes(childId)) {
+          node.children.push(childId)
+        }
         const childNode = nodes.get(childId)!
         if (!childNode.parents.includes(nodeId)) {
           childNode.parents.push(nodeId)
@@ -222,8 +260,8 @@ export function generateRaceMap(): RaceMap {
     })
   }
 
-  // Create final boss node
-  const bossNodeId = 'node_boss'
+  // Create final boss node - ID 100 (high number to avoid conflicts)
+  const bossNodeId = 100
   const bossNode: MapNode = {
     id: bossNodeId,
     type: NodeType.BOSS,
@@ -247,15 +285,43 @@ export function generateRaceMap(): RaceMap {
 
   nodes.set(bossNodeId, bossNode)
 
-  // Initialize accessible nodes (just the start node initially)
-  const accessibleNodeIds = new Set<string>([startNodeId])
+  // Debug: Verify all nodes have 2 children (except boss and nodes connecting to boss)
+  console.log('=== Race Map Generation Debug ===')
+  console.log(`Start node ID: ${startNodeId}, Boss node ID: ${bossNodeId}`)
+  console.log(`Total nodes: ${nodes.size}`)
+  
+  let nodesWithLessThan2Children = 0
+  nodes.forEach((node) => {
+    // Skip boss node (no children) and nodes that only connect to boss
+    if (node.type === NodeType.BOSS) return
+    if (node.children.length === 1 && node.children[0] === bossNodeId) return
+    
+    if (node.children.length < 2) {
+      nodesWithLessThan2Children++
+      console.warn(`Node ${node.id} (level ${node.level}, type ${node.type}) has only ${node.children.length} children:`, node.children)
+    }
+  })
+  
+  if (nodesWithLessThan2Children > 0) {
+    console.warn(`Warning: ${nodesWithLessThan2Children} nodes have less than 2 children!`)
+  } else {
+    console.log('✓ All nodes (except boss connections) have 2 children')
+  }
+  
+  // Verify only one start node at level 0
+  const level0Nodes = Array.from(nodes.values()).filter(n => n.level === 0)
+  if (level0Nodes.length !== 1) {
+    console.error(`ERROR: Expected 1 node at level 0, found ${level0Nodes.length}:`, level0Nodes.map(n => ({ id: n.id, type: n.type })))
+  } else {
+    console.log('✓ Only one start node at level 0')
+  }
+  
+  console.log('=== End Race Map Generation Debug ===')
 
   return {
     nodes,
     startNodeId,
     bossNodeId,
-    currentLevel: 0,
-    completedNodes: new Set<string>(),
-    accessibleNodeIds,
+    completedNodes: new Set<number>(),
   }
 }

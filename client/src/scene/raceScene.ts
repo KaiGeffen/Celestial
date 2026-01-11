@@ -49,8 +49,8 @@ export default class RaceScene extends BaseScene {
   // Graphics layer for drawing paths
   pathGraphics: Phaser.GameObjects.Graphics
 
-  // User's current deck that changes over time
-  get currentDeck(): Deck {
+  // User's current deck that changes over time (simplified - only cards and upgrades)
+  get currentDeck(): { cards: number[]; cardUpgrades: number[] } {
     const saved = UserSettings._get('raceDeck')
     if (saved) {
       return saved
@@ -58,19 +58,89 @@ export default class RaceScene extends BaseScene {
     // Default deck
     const defaultCards = [4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     return {
-      name: 'Race Deck',
       cards: defaultCards,
       cardUpgrades: new Array(defaultCards.length).fill(0),
-      cosmeticSet: {
-        avatar: 0,
-        border: 0,
-        relic: 0,
-      },
     }
   }
 
-  set currentDeck(deck: Deck) {
+  set currentDeck(deck: { cards: number[]; cardUpgrades: number[] }) {
     UserSettings._set('raceDeck', deck)
+  }
+
+  // Helper to get accessible nodes from completed nodes
+  private getAccessibleNodes(): Set<number> {
+    const accessible = new Set<number>()
+    
+    // Start node is always accessible if not completed
+    if (!this.raceMap.completedNodes.has(this.raceMap.startNodeId)) {
+      accessible.add(this.raceMap.startNodeId)
+      return accessible
+    }
+
+    // Find the highest completed level (including level 0 for start node)
+    let highestCompletedLevel = -1
+    let highestCompletedNode: MapNode | null = null
+    this.raceMap.completedNodes.forEach((completedNodeId) => {
+      const node = this.raceMap.nodes.get(completedNodeId)
+      if (node && node.level > highestCompletedLevel) {
+        highestCompletedLevel = node.level
+        highestCompletedNode = node
+      }
+    })
+
+    // If we have a completed node, unlock ONE child on the next level
+    if (highestCompletedNode) {
+      const nextLevel = highestCompletedNode.level + 1
+      
+      // Check if next level hasn't been completed yet
+      if (!this.hasCompletedNodeAtLevel(nextLevel)) {
+        // Get all nodes on the next level that are children of this completed node
+        const childNodes: MapNode[] = []
+        highestCompletedNode.children.forEach((childId) => {
+          const childNode = this.raceMap.nodes.get(childId)
+          if (childNode && childNode.level === nextLevel) {
+            childNodes.push(childNode)
+          }
+        })
+
+        // Only unlock ONE child (the closest one to the parent)
+        if (childNodes.length > 0) {
+          // Find the child closest to the parent's x position
+          let closestChild = childNodes[0]
+          let minDistance = Math.abs(closestChild.x - highestCompletedNode.x)
+          
+          childNodes.forEach((child) => {
+            const distance = Math.abs(child.x - highestCompletedNode!.x)
+            if (distance < minDistance) {
+              minDistance = distance
+              closestChild = child
+            }
+          })
+          
+          accessible.add(closestChild.id)
+        } else {
+          // Debug: log if no children found
+          console.warn(`No children found for node ${highestCompletedNode.id} at level ${highestCompletedNode.level}, next level ${nextLevel}. Children array:`, highestCompletedNode.children)
+        }
+      }
+    } else {
+      // Debug: log if no highest completed node found
+      console.warn('No highest completed node found, completed nodes:', Array.from(this.raceMap.completedNodes))
+    }
+
+    return accessible
+  }
+
+  // Helper to get current level from completed nodes
+  private getCurrentLevel(): number {
+    let maxLevel = 0
+    this.raceMap.completedNodes.forEach((nodeId) => {
+      const node = this.raceMap.nodes.get(nodeId)
+      if (node) {
+        maxLevel = Math.max(maxLevel, node.level)
+      }
+    })
+    return maxLevel
   }
 
   constructor() {
@@ -380,34 +450,41 @@ export default class RaceScene extends BaseScene {
     })
   }
 
-  // Get nodes that can be accessed from a given node based on horizontal position (±1)
+  // Get nodes that can be accessed from a given node based on horizontal position
+  // Returns only ONE node (the closest child on the next level)
   private getAccessibleNodesFromPosition(node: MapNode): MapNode[] {
-    const accessibleNodes: MapNode[] = []
     const nextLevel = node.level + 1
 
-    // Find all nodes on the next level
-    const nextLevelNodes: MapNode[] = []
-    this.raceMap.nodes.forEach((n) => {
-      if (n.level === nextLevel) {
-        nextLevelNodes.push(n)
+    // Find all nodes on the next level that are children of this node
+    const childNodes: MapNode[] = []
+    node.children.forEach((childId) => {
+      const childNode = this.raceMap.nodes.get(childId)
+      if (childNode && childNode.level === nextLevel) {
+        childNodes.push(childNode)
       }
     })
 
-    // Sort by x position to find which nodes are within ±1 position
-    nextLevelNodes.sort((a, b) => a.x - b.x)
+    if (childNodes.length === 0) {
+      return []
+    }
 
-    // Find the index of nodes that are within horizontal distance
-    // Calculate based on horizontal spacing (approximately ±200 pixels)
-    const HORIZONTAL_RANGE = 250 // Slightly more than NODE_HORIZONTAL_SPACING to account for variance
+    // Sort by x position to find the closest child
+    childNodes.sort((a, b) => a.x - b.x)
 
-    nextLevelNodes.forEach((childNode) => {
-      const horizontalDistance = Math.abs(childNode.x - node.x)
-      if (horizontalDistance <= HORIZONTAL_RANGE) {
-        accessibleNodes.push(childNode)
+    // Find the child closest to the parent's x position
+    let closestChild = childNodes[0]
+    let minDistance = Math.abs(closestChild.x - node.x)
+
+    childNodes.forEach((child) => {
+      const distance = Math.abs(child.x - node.x)
+      if (distance < minDistance) {
+        minDistance = distance
+        closestChild = child
       }
     })
 
-    return accessibleNodes
+    // Return only the closest child (one node per level)
+    return [closestChild]
   }
 
   // Draw paths between connected nodes based on actual accessibility rules (position-based)
@@ -449,7 +526,8 @@ export default class RaceScene extends BaseScene {
       }
 
       // Check if node is accessible
-      const isAccessible = this.raceMap.accessibleNodeIds.has(node.id)
+      const accessibleNodes = this.getAccessibleNodes()
+      const isAccessible = accessibleNodes.has(node.id)
       const isCompleted = this.raceMap.completedNodes.has(node.id)
 
       // Create button with appropriate styling
@@ -598,7 +676,8 @@ export default class RaceScene extends BaseScene {
       }
 
       // Check if node is accessible
-      if (!this.raceMap.accessibleNodeIds.has(node.id)) {
+      const accessibleNodes = this.getAccessibleNodes()
+      if (!accessibleNodes.has(node.id)) {
         this.signalError(
           'This node is not yet accessible. Complete nodes above it first.',
         )
@@ -636,11 +715,9 @@ export default class RaceScene extends BaseScene {
       s: 'Select one of the following decks to start your race:',
       deckOptions: deckOptions,
       onDeckSelected: (selectedDeck: number[]) => {
-        const newDeck: Deck = {
-          name: 'Race Deck',
+        const newDeck = {
           cards: [...selectedDeck],
           cardUpgrades: new Array(selectedDeck.length).fill(0),
-          cosmeticSet: this.currentDeck.cosmeticSet,
         }
         this.currentDeck = newDeck
         this.updateDeckDisplay()
@@ -652,40 +729,13 @@ export default class RaceScene extends BaseScene {
   }
 
   // Mark a node as completed and unlock its children based on position
-  private completeNode(nodeId: string): void {
+  private completeNode(nodeId: number): void {
     if (this.raceMap.completedNodes.has(nodeId)) {
       return // Already completed
     }
 
     // Mark as completed
     this.raceMap.completedNodes.add(nodeId)
-
-    // Unlock child nodes based on horizontal position (±1 from current node)
-    const node = this.raceMap.nodes.get(nodeId)
-    if (node) {
-      const accessibleNodes = this.getAccessibleNodesFromPosition(node)
-      accessibleNodes.forEach((childNode) => {
-        this.raceMap.accessibleNodeIds.add(childNode.id)
-      })
-
-      // Update current level if needed
-      this.raceMap.currentLevel = Math.max(
-        this.raceMap.currentLevel,
-        node.level,
-      )
-
-      // Remove all other nodes at this level from accessible nodes
-      // (they can no longer be accessed once this level is completed)
-      this.raceMap.nodes.forEach((otherNode, otherNodeId) => {
-        if (
-          otherNode.level === node.level &&
-          otherNodeId !== nodeId &&
-          !this.raceMap.completedNodes.has(otherNodeId)
-        ) {
-          this.raceMap.accessibleNodeIds.delete(otherNodeId)
-        }
-      })
-    }
 
     // Update node visuals if buttons are already created
     if (this.animatedBtns.length > 0) {
@@ -700,12 +750,13 @@ export default class RaceScene extends BaseScene {
 
   // Find completed ancestor nodes in the path from start to current accessible nodes
   // Returns only nodes that are both ancestors AND completed
-  private getAncestorPath(): Set<string> {
-    const path = new Set<string>()
+  private getAncestorPath(): Set<number> {
+    const path = new Set<number>()
 
     // Start from all accessible nodes and trace backwards to start through completed nodes only
-    const visited = new Set<string>()
-    const traceBackwards = (nodeId: string): void => {
+    const accessibleNodes = this.getAccessibleNodes()
+    const visited = new Set<number>()
+    const traceBackwards = (nodeId: number): void => {
       if (visited.has(nodeId)) return
       visited.add(nodeId)
 
@@ -723,7 +774,7 @@ export default class RaceScene extends BaseScene {
     }
 
     // Trace backwards from all accessible nodes
-    this.raceMap.accessibleNodeIds.forEach((nodeId) => {
+    accessibleNodes.forEach((nodeId) => {
       traceBackwards(nodeId)
     })
 
@@ -737,7 +788,8 @@ export default class RaceScene extends BaseScene {
 
   // Update node visuals based on accessibility, completion, and position
   private updateNodeVisuals(): void {
-    const currentLevel = this.raceMap.currentLevel
+    const currentLevel = this.getCurrentLevel()
+    const accessibleNodes = this.getAccessibleNodes()
 
     this.animatedBtns.forEach((btn) => {
       const nodeId = (btn as any).nodeId
@@ -746,7 +798,7 @@ export default class RaceScene extends BaseScene {
       const node = this.raceMap.nodes.get(nodeId)
       if (!node) return
 
-      const isAccessible = this.raceMap.accessibleNodeIds.has(nodeId)
+      const isAccessible = accessibleNodes.has(nodeId)
       const isCompleted = this.raceMap.completedNodes.has(nodeId)
       const isAboveCurrentLevel = node.level < currentLevel
       // Check if another node at the same level has been completed
@@ -792,8 +844,6 @@ export default class RaceScene extends BaseScene {
   private saveRaceProgress(): void {
     UserSettings._set('raceMapProgress', {
       completedNodes: Array.from(this.raceMap.completedNodes),
-      accessibleNodes: Array.from(this.raceMap.accessibleNodeIds),
-      currentLevel: this.raceMap.currentLevel,
     })
   }
 
@@ -804,11 +854,8 @@ export default class RaceScene extends BaseScene {
       title: 'Restart Race?',
       hint: 'restart from the beginning',
       callback: () => {
-        // Clear completed and accessible nodes (reset to just start node)
+        // Clear completed nodes
         this.raceMap.completedNodes.clear()
-        this.raceMap.accessibleNodeIds.clear()
-        this.raceMap.accessibleNodeIds.add(this.raceMap.startNodeId)
-        this.raceMap.currentLevel = 0
 
         // Clear saved progress
         UserSettings._set('raceMapProgress', null)
@@ -818,10 +865,8 @@ export default class RaceScene extends BaseScene {
 
         // Reset deck to empty/default so first node can be used to select deck
         this.currentDeck = {
-          name: 'Race Deck',
           cards: [],
           cardUpgrades: [],
-          cosmeticSet: this.currentDeck.cosmeticSet,
         }
         this.updateDeckDisplay()
 
@@ -842,9 +887,32 @@ export default class RaceScene extends BaseScene {
   private loadRaceProgress(): void {
     const saved = UserSettings._get('raceMapProgress')
     if (saved) {
-      this.raceMap.completedNodes = new Set(saved.completedNodes || [])
-      this.raceMap.accessibleNodeIds = new Set(saved.accessibleNodes || [])
-      this.raceMap.currentLevel = saved.currentLevel || 0
+      // Convert saved array to Set<number>
+      // Handle migration from string IDs to numeric IDs
+      const completedNodes = new Set<number>()
+      if (Array.isArray(saved.completedNodes)) {
+        saved.completedNodes.forEach((id: any) => {
+          if (typeof id === 'number') {
+            completedNodes.add(id)
+          } else if (typeof id === 'string') {
+            // Migration: convert old string IDs to numeric IDs
+            if (id === 'node_start') {
+              completedNodes.add(0)
+            } else if (id === 'node_boss') {
+              completedNodes.add(100)
+            } else {
+              // Try to parse node_1_0 format or similar
+              const match = id.match(/node_(\d+)_(\d+)/)
+              if (match) {
+                // For old format, we can't perfectly map back, so skip
+                // The user will need to restart their race progress
+                console.warn(`Cannot migrate old node ID: ${id}. Please restart race.`)
+              }
+            }
+          }
+        })
+      }
+      this.raceMap.completedNodes = completedNodes
     }
   }
 
@@ -860,13 +928,14 @@ export default class RaceScene extends BaseScene {
     }
 
     const playerDeck: Deck = {
-      name: this.currentDeck.name,
+      name: 'Race Deck',
       cards: [...this.currentDeck.cards],
-      cosmeticSet: this.currentDeck.cosmeticSet,
-    }
-    // Only include cardUpgrades if they exist
-    if (this.currentDeck.cardUpgrades) {
-      playerDeck.cardUpgrades = [...this.currentDeck.cardUpgrades]
+      cardUpgrades: this.currentDeck.cardUpgrades ? [...this.currentDeck.cardUpgrades] : [],
+      cosmeticSet: {
+        avatar: 0,
+        border: 0,
+        relic: 0,
+      },
     }
 
     console.log('playerDeck', playerDeck)
@@ -906,12 +975,16 @@ export default class RaceScene extends BaseScene {
   }
 
   // Show deck selection to choose which card to upgrade
-  private showUpgradeCardSelection(nodeId: string): void {
+  private showUpgradeCardSelection(nodeId: number): void {
     this.scene.launch('MenuScene', {
       menu: 'raceDeckSelection',
       title: 'Select Card to Upgrade',
       s: 'Select a card from your deck to upgrade:',
-      currentDeck: this.currentDeck,
+      currentDeck: {
+        ...this.currentDeck,
+        name: 'Race Deck',
+        cosmeticSet: { avatar: 0, border: 0, relic: 0 },
+      },
       onCardSelected: (index: number) => {
         // Show upgrade versions for the selected card
         const cardId = this.currentDeck.cards[index]
@@ -927,7 +1000,7 @@ export default class RaceScene extends BaseScene {
   }
 
   // Type 3: Show choice of 3 random cards, click one to replace a card in deck
-  private showCardChoice(nodeId?: string, cardIds?: number[]): void {
+  private showCardChoice(nodeId?: number, cardIds?: number[]): void {
     // Generate deterministic card choices based on node ID if not provided
     let choicesToShow = cardIds
     if (!choicesToShow && nodeId) {
@@ -938,7 +1011,11 @@ export default class RaceScene extends BaseScene {
       menu: 'raceCardChoice',
       title: 'Choose a Card',
       s: 'Select a card to add to your deck. Then choose a card to replace.',
-      currentDeck: this.currentDeck,
+      currentDeck: {
+        ...this.currentDeck,
+        name: 'Race Deck',
+        cosmeticSet: { avatar: 0, border: 0, relic: 0 },
+      },
       cardIds: choicesToShow, // Pass the card IDs to the menu
       onCardSelected: (selectedCardId: number) => {
         // Show deck selection to replace a card
@@ -952,25 +1029,14 @@ export default class RaceScene extends BaseScene {
 
   // Generate deterministic card choices based on node ID
   private generateDeterministicCardChoices(
-    nodeId: string,
+    nodeId: number,
     numChoices: number,
   ): number[] {
     const collectibleCards = Catalog.collectibleCards
     if (collectibleCards.length === 0) return []
 
-    // Simple deterministic hash function based on node ID
-    const hash = (str: string): number => {
-      let hash = 0
-      for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i)
-        hash = (hash << 5) - hash + char
-        hash = hash & hash // Convert to 32-bit integer
-      }
-      return Math.abs(hash)
-    }
-
     // Use node ID as seed for deterministic selection
-    const seed = hash(nodeId)
+    const seed = nodeId
 
     // Create a shuffled array deterministically
     const shuffled = [...collectibleCards]
@@ -989,7 +1055,7 @@ export default class RaceScene extends BaseScene {
   // Show the current deck and let user select a card to replace
   private showDeckReplacement(
     newCardId: number,
-    nodeId?: string,
+    nodeId?: number,
     cardIds?: number[],
   ): void {
     this.scene.launch('MenuScene', {
@@ -997,7 +1063,11 @@ export default class RaceScene extends BaseScene {
       title: 'Replace Card',
       s: 'Select a card from your deck to replace:',
       newCardId: newCardId,
-      currentDeck: this.currentDeck,
+      currentDeck: {
+        ...this.currentDeck,
+        name: 'Race Deck',
+        cosmeticSet: { avatar: 0, border: 0, relic: 0 },
+      },
       onReplacement: (index: number) => {
         // Replace the card at the given index
         const deck = { ...this.currentDeck }
@@ -1069,7 +1139,7 @@ export default class RaceScene extends BaseScene {
   private showCardUpgradeVersions(
     cardId: number,
     index: number,
-    nodeId?: string,
+    nodeId?: number,
   ): void {
     const card = Catalog.getCardById(cardId)
     if (!card) return
@@ -1097,12 +1167,15 @@ export default class RaceScene extends BaseScene {
           this.updateDeckDisplay()
 
           // If this was from an upgrade node, mark it as completed
-          if (nodeId) {
-            this.completeNode(nodeId)
+          if (nodeId !== undefined) {
+            const node = Array.from(this.raceMap.nodes.values()).find(n => n.id === nodeId)
+            if (node) {
+              this.completeNode(node.id)
+            }
           }
         }
       },
-      onBack: nodeId
+      onBack: nodeId !== undefined
         ? () => {
             // Go back to card selection
             this.showUpgradeCardSelection(nodeId)
