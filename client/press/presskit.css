@@ -111,7 +111,7 @@
   font-family: 'Recoleta', serif;
   font-size: 42px;
   color: #bc6c31;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
   font-weight: 400;
 }
 
@@ -245,6 +245,17 @@
   display: block;
 }
 
+.presskit-image-placeholder {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.presskit-image-placeholder.placeholder-hidden {
+  display: none;
+}
+
 .presskit-text-small a {
   color: #bc6c31;
   text-decoration: none;
@@ -267,9 +278,16 @@
   text-align: center;
 }
 
+.presskit-logo-item a {
+  display: block;
+  cursor: pointer;
+}
+
 .presskit-logo-preview {
   max-width: 100%;
+  max-height: 300px;
   height: auto;
+  width: auto;
   margin-bottom: 15px;
   background: white;
   padding: 20px;
@@ -356,7 +374,7 @@
 
   .presskit-subtitle {
     font-size: 28px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
   }
 
   .presskit-subtitle-small {
@@ -444,4 +462,16 @@
   .presskit-list {
     font-size: 15px;
   }
+}
+
+.social-section {
+  position: relative;
+  background: url('../about/assets/footer.webp') center bottom/100% auto no-repeat;
+  background-color: #8a4f23;
+  padding: 32px 10%;
+  text-align: center;
+  width: 100%;
+  aspect-ratio: 360/125;
+  min-height: 200px;
+  margin-top: 0;
 }

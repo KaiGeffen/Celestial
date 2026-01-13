@@ -124,3 +124,4 @@
 - Website: celestialdecks.gg (link)
 - Twitter: @CelestialDecks (link)
 - Discord: Join our Discord server (link to https://discord.gg/UXWswspB8S)
+- YouTube: @CelestialDecks (link to https://www.youtube.com/@CelestialDecks)
