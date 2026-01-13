@@ -94,45 +94,11 @@ class AlterDeckMenu extends Menu {
     this.createHeader(this.titleString, width)
 
     this.sizer
-      .add(this.createName())
-      .addNewLine()
-      .add(this.createCosmeticTabs())
+      .add(this.createNameWithTabs())
       .addNewLine()
       .add(this.createCosmeticOptions())
       .addNewLine()
       .add(this.createFooter(createCallback))
-  }
-
-  private createCosmeticTabs() {
-    const sizer = this.scene.rexUI.add.sizer({
-      width: width - Space.pad * 2,
-    })
-
-    const tabs = ['Icon', 'Border']
-    tabs.forEach((tabText, index) => {
-      const container = new ContainerLite(
-        this.scene,
-        0,
-        0,
-        Space.buttonWidth,
-        Space.buttonHeight,
-      )
-      new Buttons.Basic({
-        within: container,
-        text: tabText,
-        f: () => {
-          this.currentTab = tabText === 'Icon' ? tab.ICON : tab.BORDER
-          this.updateCosmeticGrid()
-        },
-      })
-      sizer.add(container)
-      // Add space after all but the last button
-      if (index < tabs.length - 1) {
-        sizer.addSpace()
-      }
-    })
-
-    return sizer
   }
 
   private createCosmeticOptions() {
@@ -242,9 +208,29 @@ class AlterDeckMenu extends Menu {
     this.cosmeticChoicesSizer.layout()
   }
 
-  private createName() {
-    let sizer = this.scene.rexUI.add.sizer()
+  private createNameWithTabs() {
+    let sizer = this.scene.rexUI.add.sizer({
+      width: width - Space.pad * 2,
+    })
 
+    // Create Icon button
+    const iconContainer = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: iconContainer,
+      text: 'Icon',
+      f: () => {
+        this.currentTab = tab.ICON
+        this.updateCosmeticGrid()
+      },
+    })
+
+    // Create name input field
     this.nameInputText = this.scene.add
       .rexInputText(0, 0, inputTextWidth, 40, {
         type: 'text',
@@ -267,7 +253,7 @@ class AlterDeckMenu extends Menu {
     const chrome = this.scene.add.image(0, 0, 'icon-InputText')
 
     // Container with textbox and chrome
-    let container = new ContainerLite(
+    let nameContainer = new ContainerLite(
       this.scene,
       0,
       0,
@@ -276,8 +262,30 @@ class AlterDeckMenu extends Menu {
       [this.nameInputText, chrome],
     )
 
-    // Add the objects centered
-    sizer.addSpace().add(container).addSpace()
+    // Create Border button
+    const borderContainer = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: borderContainer,
+      text: 'Border',
+      f: () => {
+        this.currentTab = tab.BORDER
+        this.updateCosmeticGrid()
+      },
+    })
+
+    // Add Icon button, name field, and Border button to sizer
+    sizer
+      .add(iconContainer)
+      .addSpace()
+      .add(nameContainer)
+      .addSpace()
+      .add(borderContainer)
 
     return sizer
   }
