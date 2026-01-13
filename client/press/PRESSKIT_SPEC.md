@@ -49,7 +49,6 @@
 - Developer & Publisher: Celestial TCG Inc.
 - Genre: Strategy card game
 - Platform: Web (link to game), Steam (planned), Mobile (planned)
-- Engine: Phaser
 - Release date: Available in beta, 1.0 planned for December 1st 2026
 - Price: Free to Play
 

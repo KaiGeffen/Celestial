@@ -42,7 +42,7 @@
 .presskit-hero {
   position: relative;
   min-height: 250px;
-  background: url('../about/assets/background.webp') center/cover no-repeat;
+  background: url('../about/assets/background-sub.webp') center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,7 +65,7 @@
 
 .presskit-section {
   position: relative;
-  padding: 60px 10%;
+  padding: 60px 10% 20px 10%;
   background: rgba(255, 255, 255, 0.95);
   min-height: 100vh;
 }
@@ -105,6 +105,10 @@
 .presskit-subsection#factsheet {
   margin-bottom: 50px;
   scroll-margin-top: 200px;
+}
+
+.presskit-subsection#credits {
+  margin-bottom: 0;
 }
 
 .presskit-subtitle {
@@ -186,13 +190,8 @@
   font-size: 18px;
   font-weight: 300;
   color: var(--color-navy);
-  line-height: 2;
   margin-left: 20px;
   margin-bottom: 20px;
-}
-
-.presskit-list li {
-  margin-bottom: 12px;
 }
 
 .presskit-videos {
@@ -306,6 +305,10 @@
 .presskit-contact-column {
   display: flex;
   flex-direction: column;
+}
+
+.presskit-contact-column {
+  scroll-margin-top: 150px;
 }
 
 .presskit-credits-column .presskit-subtitle,
@@ -429,6 +432,10 @@
   .presskit-video-title {
     font-size: 20px;
   }
+
+  .social-section {
+    padding: 2rem 1rem;
+  }
 }
 
 /* Additional fixes for very small screens */
@@ -462,16 +469,12 @@
   .presskit-list {
     font-size: 15px;
   }
-}
 
-.social-section {
-  position: relative;
-  background: url('../about/assets/footer.webp') center bottom/100% auto no-repeat;
-  background-color: #8a4f23;
-  padding: 32px 10%;
-  text-align: center;
-  width: 100%;
-  aspect-ratio: 360/125;
-  min-height: 200px;
-  margin-top: 0;
+  .social-section {
+    background: none;
+    aspect-ratio: auto;
+    min-height: auto;
+    margin-top: 20px;
+    padding: 20px 10%;
+  }
 }
