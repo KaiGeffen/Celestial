@@ -10,7 +10,7 @@ import showTooltip from '../utils/tooltips'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 const NAVIGATION_BUTTON_WIDTH = 278
-const URL = 'https://luma.com/og92agfp'
+const URL = 'https://luma.com/ycusi6al'
 
 export default class HomeScene extends BaseScene {
   constructor() {
@@ -363,14 +363,14 @@ export default class HomeScene extends BaseScene {
     this.addShadow(background)
 
     // Title with line below
-    const title = this.add
-      .text(0, 0, 'New Update [0.7.11]', Style.announcement)
-      .setOrigin(0.5, 0)
-    panelSizer.add(title)
+    // const title = this.add
+    //   .text(0, 0, 'New Update [0.7.11]', Style.announcement)
+    //   .setOrigin(0.5, 0)
+    // panelSizer.add(title)
 
     // Line below title (using a thin rectangle)
-    const line = this.add.rectangle(0, 0, 1, 3, 0x353f4e).setOrigin(0, 0)
-    panelSizer.add(line, { expand: true })
+    // const line = this.add.rectangle(0, 0, 1, 3, 0x353f4e).setOrigin(0, 0)
+    // panelSizer.add(line, { expand: true })
 
     // Create horizontal sizer for image and text side by side
     const contentSizer = this.rexUI.add.sizer({
@@ -396,19 +396,12 @@ export default class HomeScene extends BaseScene {
     contentSizer.add(image, { align: 'top' })
 
     // Make news content as BBCode to have hoverable card names and links
-    const updateText = `Happy holidays everyone!
-    
-Our latest tournament has wrapped up, with Sherlock taking home top prize!
+    const updateText = `This month's tournament approaches!
 
-Keep an eye out for next month's tournament, and a new card which just dropped in the store!
+Sign up [area=_link_register][color=#FABD5D]here[/color][/area] to play on Saturday, January 17th at noon EST!
 
-Card changes:
-☝️ [area=_Gentle Rain][color=#FABD5D]Gentle Rain[/color][/area] cost 4 > 3, points 2 > 1
-☝️ [area=_Fishing Boat][color=#FABD5D]Fishing Boat[/color][/area] points 0 > 1
-☝️ [area=_Imprison][color=#FABD5D]Imprison[/color][/area] threshold to trigger 2 > 3
-☝️ [area=_Possibility][color=#FABD5D]Possibility[/color][/area] cost 4 > 3
-
-Thank you for all your support, looking forward to more games in 2026 🕊️`
+[b]Jules 1[/b]
+    [i]It was a hot day towards the end of fifth grade when I suddenly turned off from my typical route home. My bookbag repeatedly thumped against my back as the bicycle rumbled down the uneven dirt road, approaching the abandoned home I’d heard whispers about in school. After stopping in the lot’s front yard I leaned my belongings against the wide trunk of an old oak tree. A simple wood plank swing hung from its sturdiest branch. When I sat on it my toes dangled just above the blades of overgrown grass. I dug around my pockets for my IPod and opened my “Ballroom” playlist. “Sing, Sing, Sing” came on- the song our dance instructor used to teach us the swing. The fitting coincidence brought a brief smile to my face as I pumped my legs to pick up momentum on the actual swing. [/i]`
 
     const text = this.rexUI.add
       .BBCodeText(0, 0, updateText, BBStyle.description)
