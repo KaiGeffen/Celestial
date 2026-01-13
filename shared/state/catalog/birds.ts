@@ -371,6 +371,31 @@ const birdsong = new Birdsong({
   beta: true,
 })
 
+class Sudden extends Card {
+  onPlay(player: number, game: GameModel): void {
+    // If there is a card, transform it into a version with no text/qualities
+    if (game.hand[player].length > 0) {
+      const oldCard = game.hand[player][0]
+
+      const newCard = new Card({
+        name: oldCard.name,
+        id: oldCard.id,
+        cost: oldCard.cost,
+        points: oldCard.points,
+      })
+
+      game.hand[player][0] = newCard
+    }
+  }
+}
+const sudden = new Sudden({
+  name: 'Sudden',
+  id: 1036,
+  cost: 3,
+  points: 3,
+  text: 'When played, remove all card text from a card in your hand.',
+})
+
 export {
   dove,
   starling,
@@ -387,5 +412,5 @@ export {
   letGo,
   // NEW
   updraft,
-  birdsong as eclipse,
+  sudden,
 }
