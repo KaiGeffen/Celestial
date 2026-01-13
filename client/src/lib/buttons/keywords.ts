@@ -13,7 +13,12 @@ function getHint(btn: Button, status: string): string {
   s = s.replace(' X', '')
 
   // Get the value from the given status button
-  s = s.split(/\bX\b/).join(btn.getText())
+  const value = btn.getText()
+  s = s.split(/\bX\b/).join(value)
+
+  // Fix: Special case for occurrences of +X, where X could be -N, so you want -N instead of +-N
+  // This matches the logic in hint.ts showKeyword function
+  s = s.split(/\+\-/).join('-')
 
   return s
 }
