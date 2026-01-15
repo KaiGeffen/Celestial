@@ -102,6 +102,7 @@ export default function createWebSocketServer() {
           // If user is in a match, reconnect them
           if (
             userGameReconnectMap[uuid] &&
+            userGameReconnectMap[uuid].match &&
             !userGameReconnectMap[uuid].match.isOver()
           ) {
             // Set the active game for this connection
