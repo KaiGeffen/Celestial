@@ -1,0 +1,6 @@
+export default `     That accident broke my arm. I thought it would be devastating to miss out on so much, like the ballroom dance show and Twelfth Night production preceding our graduation ceremony. After all, I'd been cast as the fairy queen Tatiana, a role that all the other girls in my class coveted. I had diligently memorized my lines outside of class time, determined to prove I was the right choice. Everyone knew I loved dance, so I had to master the ballroom routines as well- hence the playlist I often listened to on repeat. In the end all my effort amounted to nothing, and at first I was just as frustrated as Mom.
+
+     I sat in the audience of the auditorium during dance and theater class, watching my peers rehearse. The new Tatiana looked so graceful as she skipped onto stage in her glittering wings. But strangely, I didn't feel all that bitter or disappointed. Instead, I settled into strange and private peace. As skirts twirled and familiar ballroom tracks played I felt every expectation, every role that clung to my skin and tangled in my hair shed away.
+
+     Once my cast was removed, I often found myself returning to the swing I had fallen from. With the wind rushing past me and the sky closer than ever, I could almost relive that fleeting contentment.
+`

@@ -11,7 +11,7 @@ import { getUnlockedAvatars } from '../utils/cosmetics'
 import avatarBios from '../journey/avatarBios'
 import newScrollablePanel from '../lib/scrollablePanel'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
-import avatarStories from '../journey/avatarStories'
+import avatarStories from '../data/avatarStories/avatarStories'
 
 export default class CharacterProfileScene extends BaseScene {
   // Character details

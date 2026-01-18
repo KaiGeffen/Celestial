@@ -1,0 +1,1 @@
+export default `Coming soon...`
