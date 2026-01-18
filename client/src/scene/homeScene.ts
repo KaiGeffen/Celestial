@@ -363,18 +363,26 @@ export default class HomeScene extends BaseScene {
     this.addShadow(background)
 
     // Title with line below
-    // const title = this.add
-    //   .text(0, 0, 'New Update [0.7.11]', Style.announcement)
-    //   .setOrigin(0.5, 0)
-    // panelSizer.add(title)
+    const title = this.add
+      .text(0, 0, `New Update [${PATCH_NUMBER}]`, Style.announcement)
+      .setOrigin(0.5, 0)
+    panelSizer.add(title)
 
     // Line below title (using a thin rectangle)
-    // const line = this.add.rectangle(0, 0, 1, 3, 0x353f4e).setOrigin(0, 0)
-    // panelSizer.add(line, { expand: true })
+    const line = this.add.rectangle(0, 0, 1, 3, 0x353f4e).setOrigin(0, 0)
+    panelSizer.add(line, { expand: true })
 
     // Create horizontal sizer for image and text side by side
     const contentSizer = this.rexUI.add.sizer({
       orientation: 'horizontal',
+      space: {
+        item: Space.pad,
+      },
+    })
+
+    // Image container - vertical sizer for image and button
+    const imageContainer = this.rexUI.add.sizer({
+      orientation: 'vertical',
       space: {
         item: Space.pad,
       },
@@ -393,18 +401,37 @@ export default class HomeScene extends BaseScene {
     ]
     const newsImageName = newsImages[dayOfWeek]
     const image = this.add.image(0, 0, `news-${newsImageName}`).setOrigin(0, 0)
-    contentSizer.add(image, { align: 'top' })
+    imageContainer.add(image, { align: 'top' })
+
+    // Add button underneath the image to open Character Profile Scene
+    const buttonContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    const characterButton = new Buttons.Basic({
+      within: buttonContainer,
+      text: 'Read Stories',
+      f: () => {
+        this.scene.start('CharacterProfileScene')
+      },
+    })
+    // Center the button
+    const buttonRowSizer = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+    })
+    buttonRowSizer.addSpace().add(buttonContainer).addSpace()
+    buttonRowSizer.layout()
+    imageContainer.add(buttonRowSizer)
+
+    // Add the image container to contentSizer
+    contentSizer.add(imageContainer, { align: 'top' })
 
     // Make news content as BBCode to have hoverable card names and links
-    const updateText = `This month's tournament approaches!
-
-Sign up [area=_link_register][color=#FABD5D]here[/color][/area] to play on Saturday, January 17th at noon EST!
-
-[b]Jules 1[/b]
-    [i]It was a hot day towards the end of fifth grade when I suddenly turned off from my typical route home. My bookbag repeatedly thumped against my back as the bicycle rumbled down the uneven dirt road, approaching the abandoned home I’d heard whispers about in school. After stopping in the lot’s front yard I leaned my belongings against the wide trunk of an old oak tree. A simple wood plank swing hung from its sturdiest branch. When I sat on it my toes dangled just above the blades of overgrown grass. I dug around my pockets for my IPod and opened my “Ballroom” playlist. “Sing, Sing, Sing” came on- the song our dance instructor used to teach us the swing. The fitting coincidence brought a brief smile to my face as I pumped my legs to pick up momentum on the actual swing. [/i]`
-
     const text = this.rexUI.add
-      .BBCodeText(0, 0, updateText, BBStyle.description)
+      .BBCodeText(0, 0, NEWS_TEXT, BBStyle.description)
       .setInteractive()
       .on('areaover', (key: string) => {
         if (key === '_link_register') {
@@ -494,3 +521,10 @@ Sign up [area=_link_register][color=#FABD5D]here[/color][/area] to play on Satur
     super.beforeExit()
   }
 }
+
+const PATCH_NUMBER = '0.7.12'
+
+const NEWS_TEXT = `The 8th tournament concludes, with Sherlock defending his crown!
+
+TODO More text
+`
