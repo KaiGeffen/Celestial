@@ -10,7 +10,7 @@ class Seen extends Card {
     game: GameModel,
     index: number,
   ): [boolean, boolean] {
-    game.status[player ^ 1].vision += 3
+    game.status[player ^ 1].vision += 4
     return [true, false]
   }
 }
@@ -19,7 +19,7 @@ const seen = new Seen({
   id: 1001,
   cost: 2,
   qualities: [Quality.FLEETING],
-  text: 'Fleeting\nAt the start of each round, if this is in your hand, give your opponent Sight 3.',
+  text: 'Fleeting\nAt the start of each round, if this is in your hand, give your opponent Sight 4.',
 })
 
 class Ashes extends Card {

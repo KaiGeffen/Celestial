@@ -137,12 +137,12 @@ class Timid extends SightCard {
     }
   }
 }
-const timid = new Timid(3, {
+const timid = new Timid(4, {
   name: 'Timid',
   id: 87,
   cost: 1,
   points: 1,
-  text: 'When played, gain Sight 3.\nExhale 1: Return your cards later in the story to your hand.',
+  text: 'When played, gain Sight 4.\nExhale 1: Return your cards later in the story to your hand.',
 })
 
 class Balance extends Card {

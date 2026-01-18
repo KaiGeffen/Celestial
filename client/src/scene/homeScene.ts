@@ -526,5 +526,14 @@ const PATCH_NUMBER = '0.7.12'
 
 const NEWS_TEXT = `The 8th tournament concludes, with Sherlock defending his crown!
 
+
 TODO More text
+
+
+👇 [area=_Ecology][color=#FABD5D]Ecology[/color][/area] points 2 > 0
+☝️ [area=_Storytime][color=#FABD5D]Storytime[/color][/area] points 3 > 4
+☝️ [area=_Parch][color=#FABD5D]Parch[/color][/area] points per card +1 > +2
+☝️ [area=_Night Vision][color=#FABD5D]Night Vision[/color][/area] Sight 3 > 4
+☝️ [area=_Clear View][color=#FABD5D]Clear View[/color][/area] Sight 3 > 4
+☝️ [area=_Timid][color=#FABD5D]Timid[/color][/area] Sight 3 > 4
 `
