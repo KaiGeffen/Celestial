@@ -1,2 +1,1 @@
-export default `Coming soon...
-`
+export default `Coming soon...`
