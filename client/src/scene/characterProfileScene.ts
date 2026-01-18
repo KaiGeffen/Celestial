@@ -1,6 +1,6 @@
 import 'phaser'
 import BaseScene from './baseScene'
-import { Style, Space, Color, UserSettings } from '../settings/settings'
+import { Style, Space, Color } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -9,8 +9,6 @@ import avatarNames from '../data/avatarNames'
 import AvatarButton from '../lib/buttons/avatar'
 import { getUnlockedAvatars } from '../utils/cosmetics'
 import avatarBios from '../journey/avatarBios'
-import { createExpBar } from '../lib/expBar'
-import ExpBar from 'phaser3-rex-plugins/templates/ui/expbar/ExpBar'
 import newScrollablePanel from '../lib/scrollablePanel'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import avatarStories from '../journey/avatarStories'
@@ -22,7 +20,6 @@ export default class CharacterProfileScene extends BaseScene {
   avatar: AvatarButton
   txtCharacterName: Phaser.GameObjects.Text
   txtCharacterDescription: Phaser.GameObjects.Text
-  expBar: ExpBar
   scrollablePanel: ScrollablePanel
   storyButtons: Button[]
 
@@ -96,14 +93,11 @@ export default class CharacterProfileScene extends BaseScene {
     // Create character description
     const descriptionSizer = this.createDescription()
 
-    // Create exp bar
-    this.expBar = createExpBar(this, this.selectedAvatar)
-
     // Create slider
     const slider = this.createSlider()
 
     // Add all elements to the right sizer
-    sizer.add(avatarSizer).add(descriptionSizer).add(this.expBar).add(slider)
+    sizer.add(avatarSizer).add(descriptionSizer).add(slider)
 
     return sizer
   }
@@ -192,19 +186,9 @@ export default class CharacterProfileScene extends BaseScene {
     // Update the text
     this.updateCharacterText()
 
-    // Update progress bar
-    this.expBar.resetExp(
-      UserSettings._get('avatar_experience')[this.selectedAvatar] || 0,
-    )
-
-    // TODO Scroll to the right position to center the current level
-    // Update which buttons disabled
+    // All buttons are always enabled
     for (let i = 0; i < this.storyButtons.length; i++) {
-      if (i < this.expBar.level - 1) {
-        this.storyButtons[i].enable()
-      } else {
-        this.storyButtons[i].disable()
-      }
+      this.storyButtons[i].enable()
     }
   }
 
@@ -253,7 +237,7 @@ export default class CharacterProfileScene extends BaseScene {
       )
       this.storyButtons.push(
         new Buttons.Basic({
-          text: `Level ${i}`,
+          text: `Chapter ${i}`,
           muteClick: true,
           within: cont,
           f: () => {
