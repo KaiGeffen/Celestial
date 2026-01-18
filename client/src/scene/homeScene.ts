@@ -524,12 +524,12 @@ export default class HomeScene extends BaseScene {
 
 const PATCH_NUMBER = '0.7.12'
 
-const NEWS_TEXT = `The 8th tournament concludes, with Sherlock defending his crown!
+const NEWS_TEXT = `The 8th tournament concludes, with Sherlock winning first place! Stay tuned for next month's tournament.
 
+Features:
+Added character stories to the home screen.
 
-TODO More text
-
-
+Card changes:
 👇 [area=_Ecology][color=#FABD5D]Ecology[/color][/area] points 2 > 0
 ☝️ [area=_Storytime][color=#FABD5D]Storytime[/color][/area] points 3 > 4
 ☝️ [area=_Parch][color=#FABD5D]Parch[/color][/area] points per card +1 > +2
