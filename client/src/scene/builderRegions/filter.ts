@@ -245,7 +245,7 @@ export default class FilterRegion {
 
       // Parse search query into tokens (handling quotes)
       const tokens = this.parseSearchQuery(this.searchText)
-      tokens.filter((token) => token.field !== 'deck')
+      .filter((token) => token.field !== 'deck')
 
       // Check each token against the card
       for (const token of tokens) {
@@ -425,7 +425,7 @@ interface SearchToken {
   text: string
   isPhrase: boolean
   negated: boolean
-  field: string | null // 'cost', 'points', 'name', 'text', or null
+  field: string | null // 'cost', 'points', 'name', 'text', 'deck', or null
   rangeMin: number | null
   rangeMax: number | null
 }

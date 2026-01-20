@@ -418,39 +418,41 @@ export default class DecklistsRegion {
     }
   }
 
-  // Filter deck buttons based on deck: filter query string
-  // Called from BuilderScene.filter() similar to how catalogRegion.filter() is called
-  // cardNameQuery: the substring from "deck:foo" (e.g., "foo"), or null if no deck filter
+  // Filter which decks are visible based on the string
   filter(s: string): void {
+    const panel = this.scrollablePanel.getElement('panel') as FixWidthSizer
+    
+    // Make all decks invisible first
+    this.decklistContainers.forEach((container) => {
+      container.setVisible(false)
+    })
+
+    // Remove all items from the panel (without destroying)
+    panel.removeAll(false)
+
     if (!s) {
-      // No deck filter - show all buttons
+      // No deck filter - add all deck buttons and make them visible
       this.decklistContainers.forEach((container) => {
         container.setVisible(true)
+        panel.add(container)
       })
-      // Re-layout the panel sizer
-      const panel = this.scrollablePanel.getElement('panel') as FixWidthSizer
-      panel.layout()
       this.scrollablePanel.layout()
       return
     }
 
-    const lowerQuery = s.toLowerCase()
     const decks = UserSettings._get('decks')
 
-    // For each deck button, check if the deck contains a card matching the query
+    // Add and show only decks that contain a card matching the query
     this.decklistContainers.forEach((container, index) => {
       const deck = decks[index]
-      if (!deck) {
-        container.setVisible(false)
-        return
-      }
+      if (!deck) return
 
       // Check if this deck contains a card with a name matching the query
       let deckContainsCard = false
       for (const cardId of deck.cards) {
         try {
           const card = Catalog.getCardById(cardId)
-          if (card.name.toLowerCase().includes(lowerQuery)) {
+          if (card.name.toLowerCase().includes(s)) {
             deckContainsCard = true
             break
           }
@@ -460,13 +462,13 @@ export default class DecklistsRegion {
         }
       }
 
-      // Show/hide button based on whether deck contains the card
-      container.setVisible(deckContainsCard)
+      // Add button to panel and make it visible if deck contains the card
+      if (deckContainsCard) {
+        container.setVisible(true)
+        panel.add(container)
+      }
     })
 
-    // Re-layout the panel sizer after filtering
-    const panel = this.scrollablePanel.getElement('panel') as FixWidthSizer
-    panel.layout()
     this.scrollablePanel.layout()
   }
 

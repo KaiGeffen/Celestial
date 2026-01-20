@@ -49,8 +49,8 @@ export class BuilderBase extends BaseScene {
     this.catalogRegion.filter(filterFunction)
 
     // Filter which decks are shown
-    const deckFilter = this.filterRegion.getDeckFilter()
-    if (deckFilter) {
+    if (this.decklistsRegion) {
+      const deckFilter = this.filterRegion.getDeckFilter()
       this.decklistsRegion.filter(deckFilter)
     }
   }
