@@ -535,5 +535,4 @@ Card changes:
 ☝️ [area=_Parch][color=#FABD5D]Parch[/color][/area] points per card +1 > +2
 ☝️ [area=_Night Vision][color=#FABD5D]Night Vision[/color][/area] Sight 3 > 4
 ☝️ [area=_Clear View][color=#FABD5D]Clear View[/color][/area] Sight 3 > 4
-☝️ [area=_Timid][color=#FABD5D]Timid[/color][/area] Sight 3 > 4
-`
+☝️ [area=_Timid][color=#FABD5D]Timid[/color][/area] Sight 3 > 4`

@@ -40,6 +40,7 @@ export default class PlayMenu extends Menu {
   gardenPlants: (Phaser.GameObjects.Image | null)[] // Fixed-length array, some indices may be null
   gardenTimers: (Phaser.GameObjects.Text | null)[] // Fixed-length array, some indices may be null
   plantSizers: (any | null)[] // Fixed-length array of plant sizers
+  plantGlowTweens: (Phaser.Tweens.Tween | null)[] // Fixed-length array of glow tweens for each plant
   clickedHarvestIndex: number | null = null // Track which index was clicked for harvest
   txtDeckName: RexUIPlugin.BBCodeText
   avatar: Button
@@ -552,6 +553,7 @@ export default class PlayMenu extends Menu {
   private createGarden(): any {
     const gardenSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
+      width: playPanelWidth - Space.pad * 2,
       space: { item: Space.pad },
     })
 
@@ -561,9 +563,13 @@ export default class PlayMenu extends Menu {
     this.gardenPlants = new Array(maxPlants).fill(null)
     this.gardenTimers = new Array(maxPlants).fill(null)
     this.plantSizers = new Array(maxPlants).fill(null)
+    this.plantGlowTweens = new Array(maxPlants).fill(null)
 
     // Get garden data from server
     const serverGarden = Server.getUserData().garden || []
+
+    // Add space at the beginning to help center plants
+    gardenSizer.addSpace()
 
     // Create all plant slots (MAX_PLANTS), some may be empty
     for (let i = 0; i < maxPlants; i++) {
@@ -587,6 +593,14 @@ export default class PlayMenu extends Menu {
         plant.setFrame(growthStage)
         this.gardenPlants[i] = plant
 
+        // Add glow to all plants (will be animated when ready)
+        const plugin = this.scene.plugins.get('rexOutlinePipeline')
+        plugin['add'](plant, {
+          thickness: 3,
+          outlineColor: Color.outline,
+          quality: 0.3,
+        })
+
         // Create timer text below plant - will be updated in update loop
         const timer = this.scene.add
           .text(0, 0, this.formatTimer(plantTime), Style.basic)
@@ -596,10 +610,13 @@ export default class PlayMenu extends Menu {
         // Store the index in a closure for the click handler
         const plantIndex = i
 
-        // Hover behavior - always show "Click to harvest" hint
+        // Hover behavior - only show hint when plant is ready to harvest
         plant
           .on('pointerover', () => {
-            this.scene.hint.showText('Click to harvest')
+            const hoursRemaining = this.timeUntilFullyGrown(plantTime)
+            if (hoursRemaining <= 0) {
+              this.scene.hint.showText('Click to harvest')
+            }
           })
           .on('pointerout', () => {
             this.scene.hint.hide()
@@ -630,6 +647,9 @@ export default class PlayMenu extends Menu {
       gardenSizer.add(plantSizer)
       this.plantSizers[i] = plantSizer
     }
+
+    // Add space at the end to help center plants
+    gardenSizer.addSpace()
 
     // Store reference to garden sizer for updates
     this.gardenSizer = gardenSizer
@@ -744,6 +764,42 @@ export default class PlayMenu extends Menu {
           // Update plant frame based on current growth stage
           const growthStage = this.getGrowthStage(this.gardenTimes[i])
           this.gardenPlants[i].setFrame(growthStage)
+
+          // Check if plant is ready to harvest and animate glow
+          const hoursRemaining = this.timeUntilFullyGrown(this.gardenTimes[i])
+          const isReady = hoursRemaining <= 0
+          const plant = this.gardenPlants[i]
+          
+          if (isReady) {
+            // Plant is ready - start pulsing glow animation if not already running
+            if (!this.plantGlowTweens[i] || !this.plantGlowTweens[i].isActive()) {
+              // Stop any existing tween first
+              if (this.plantGlowTweens[i]) {
+                this.plantGlowTweens[i].stop()
+              }
+              
+              // Reset alpha to 1 before starting
+              plant.setAlpha(1)
+              
+              // Create pulsing tween
+              this.plantGlowTweens[i] = this.scene.tweens.add({
+                targets: plant,
+                delay: i * 200,
+                alpha: 0.5,
+                duration: 800,
+                ease: 'Sine.easeInOut',
+                yoyo: true,
+                repeat: -1, // Repeat forever
+              })
+            }
+          } else {
+            // Plant is not ready - stop tween and reset alpha
+            if (this.plantGlowTweens[i]) {
+              this.plantGlowTweens[i].stop()
+              this.plantGlowTweens[i] = null
+            }
+            plant.setAlpha(1)
+          }
         }
       }
     }
