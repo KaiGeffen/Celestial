@@ -7,6 +7,7 @@ import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import Buttons from '../../lib/buttons/buttons'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 const height = (Space.windowHeight * 2) / 3
 const width = 600
@@ -19,8 +20,7 @@ interface OnlinePlayer {
 export default class OnlinePlayersMenu extends Menu {
   private playersData: OnlinePlayer[] = []
   private scrollablePanel: ScrollablePanel
-  private headerSizer: any
-  private line: any
+  private refreshTimer: Phaser.Time.TimerEvent | null = null
 
   constructor(scene: MenuScene, params) {
     super(scene, width, params)
@@ -32,14 +32,71 @@ export default class OnlinePlayersMenu extends Menu {
     this.createHeader('Online Players')
     this.createContent()
 
-    // Listen for online players updates
-    this.scene.game.events.on('onlinePlayersUpdate', this.updatePlayers, this)
+    // Start polling Server.activePlayers every second
+    this.startPolling()
   }
 
   close() {
-    // Clean up event listener
-    this.scene.game.events.off('onlinePlayersUpdate', this.updatePlayers, this)
+    // Clean up polling timer
+    this.stopPolling()
     super.close()
+  }
+
+  private startPolling() {
+    // Check immediately
+    this.checkForUpdates()
+    
+    // Then check every second
+    this.refreshTimer = this.scene.time.addEvent({
+      delay: 1000,
+      callback: this.checkForUpdates,
+      callbackScope: this,
+      loop: true,
+    })
+  }
+
+  private stopPolling() {
+    if (this.refreshTimer) {
+      this.scene.time.removeEvent(this.refreshTimer)
+      this.refreshTimer = null
+    }
+  }
+
+  private checkForUpdates() {
+    const currentPlayers = Server.activePlayers
+    
+    // Check if the list has changed by comparing lengths and content
+    if (this.hasPlayersChanged(currentPlayers)) {
+      this.updatePlayers(currentPlayers)
+    }
+  }
+
+  private hasPlayersChanged(newPlayers: OnlinePlayer[]): boolean {
+    // Quick length check
+    if (this.playersData.length !== newPlayers.length) {
+      return true
+    }
+
+    // Deep comparison of players
+    if (this.playersData.length === 0 && newPlayers.length === 0) {
+      return false
+    }
+
+    // Compare each player's username and cosmeticSet
+    for (let i = 0; i < newPlayers.length; i++) {
+      const newPlayer = newPlayers[i]
+      const oldPlayer = this.playersData[i]
+      
+      if (!oldPlayer || 
+          oldPlayer.username !== newPlayer.username ||
+          oldPlayer.cosmeticSet.avatar !== newPlayer.cosmeticSet.avatar ||
+          oldPlayer.cosmeticSet.border !== newPlayer.cosmeticSet.border ||
+          oldPlayer.cosmeticSet.relic !== newPlayer.cosmeticSet.relic) {
+        return true
+      }
+    }
+
+    return false
   }
 
   public updatePlayers(players: OnlinePlayer[]) {
@@ -47,7 +104,7 @@ export default class OnlinePlayersMenu extends Menu {
     // Update panel content if it already exists
     if (this.scrollablePanel) {
       // Get the panel sizer and clear it
-      const panelSizer = this.scrollablePanel.getElement('panel')
+      const panelSizer = this.scrollablePanel.getElement('panel') as Sizer
       if (panelSizer && panelSizer.removeAll) {
         panelSizer.removeAll(true)
       }
@@ -67,21 +124,6 @@ export default class OnlinePlayersMenu extends Menu {
   }
 
   private createContent() {
-    // Create a header that lists each column name
-    this.headerSizer = this.scene.rexUI.add.sizer({
-      orientation: 'horizontal',
-      width: width,
-    })
-
-    const avatarText = this.scene.add.text(0, 0, '', Style.basic)
-    let usernameText = this.scene.add.text(0, 0, 'Username', Style.basic)
-
-    this.headerSizer.add(avatarText, { proportion: 1.5 }).add(usernameText, {
-      proportion: 3,
-    })
-
-    this.line = this.scene.add.line(0, 0, 0, 0, width, 0, Color.line)
-
     // Create scrollable panel for all player rows
     this.scrollablePanel = this.scene.rexUI.add.scrollablePanel({
       width: width,
@@ -96,7 +138,7 @@ export default class OnlinePlayersMenu extends Menu {
       },
     })
 
-    this.sizer.add(this.headerSizer).add(this.line).add(this.scrollablePanel)
+    this.sizer.add(this.scrollablePanel)
 
     // Layout everything
     this.scrollablePanel.layout()

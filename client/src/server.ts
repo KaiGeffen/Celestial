@@ -209,7 +209,7 @@ export default class Server {
         // Store reconnect data for PreloadScene to handle after assets load
         this.pendingReconnect = { state: data.state }
       })
-      .on('broadcastOnlinePlayersList', (data) => {
+      .on('broadcastOnlinePlayersList', (data: messagesToClient['broadcastOnlinePlayersList']) => {
         // Store the list of players in a static field
         this.activePlayers = data.players
       })

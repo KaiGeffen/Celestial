@@ -426,37 +426,6 @@ export default class HomeScene extends BaseScene {
     buttonRowSizer.layout()
     imageContainer.add(buttonRowSizer)
 
-    // Add Online Players button below Read Stories
-    const onlinePlayersButtonContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    const onlinePlayersButton = new Buttons.Basic({
-      within: onlinePlayersButtonContainer,
-      text: 'Online Players',
-      f: () => {
-        this.scene.launch('MenuScene', {
-          menu: 'onlinePlayers',
-          activeScene: this,
-        })
-        logEvent('view_online_players')
-      },
-      muteClick: true,
-    })
-    // Center the button
-    const onlinePlayersButtonRowSizer = this.rexUI.add.sizer({
-      orientation: 'horizontal',
-    })
-    onlinePlayersButtonRowSizer
-      .addSpace()
-      .add(onlinePlayersButtonContainer)
-      .addSpace()
-    onlinePlayersButtonRowSizer.layout()
-    imageContainer.add(onlinePlayersButtonRowSizer)
-
     // Add the image container to contentSizer
     contentSizer.add(imageContainer, { align: 'top' })
 
