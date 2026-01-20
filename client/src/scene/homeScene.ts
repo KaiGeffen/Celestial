@@ -10,7 +10,6 @@ import showTooltip from '../utils/tooltips'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 const NAVIGATION_BUTTON_WIDTH = 278
-const URL = 'https://luma.com/ycusi6al'
 
 export default class HomeScene extends BaseScene {
   constructor() {
@@ -522,11 +521,16 @@ export default class HomeScene extends BaseScene {
   }
 }
 
-const PATCH_NUMBER = '0.7.12'
+const PATCH_NUMBER = '0.7.12.1'
 
-const NEWS_TEXT = `The 8th tournament concludes, with Sherlock winning first place! Stay tuned for next month's tournament.
+const URL = 'https://luma.com/56pnappq'
+
+const NEWS_TEXT = `The exciting 9th tournament approaches! Register [area=_link_register][color=#FABD5D]here[/color][/area] to join February 7th (Saturday) at 12:00 PM EST.
+
+Compete for a chance to win an exclusive border and cash prizes!
 
 Features:
+Added an option to see online players.
 Added character stories to the home screen.
 
 Card changes:
