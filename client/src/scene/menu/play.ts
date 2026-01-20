@@ -593,13 +593,17 @@ export default class PlayMenu extends Menu {
         plant.setFrame(growthStage)
         this.gardenPlants[i] = plant
 
-        // Add glow to all plants (will be animated when ready)
-        const plugin = this.scene.plugins.get('rexOutlinePipeline')
-        plugin['add'](plant, {
-          thickness: 3,
-          outlineColor: Color.outline,
-          quality: 0.3,
-        })
+        // Only add glow outline if plant is ready to harvest
+        const hoursRemaining = this.timeUntilFullyGrown(plantTime)
+        const isReady = hoursRemaining <= 0
+        if (isReady) {
+          const plugin = this.scene.plugins.get('rexOutlinePipeline')
+          plugin['add'](plant, {
+            thickness: 3,
+            outlineColor: Color.outline,
+            quality: 0.3,
+          })
+        }
 
         // Create timer text below plant - will be updated in update loop
         const timer = this.scene.add
