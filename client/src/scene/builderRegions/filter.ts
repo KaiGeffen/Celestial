@@ -217,6 +217,15 @@ export default class FilterRegion {
     }
   }
 
+  // Get the deck filter token if one exists in the search query
+  getDeckFilter(): string {
+    if (!this.searchText.trim()) return null
+
+    const tokens = this.parseSearchQuery(this.searchText)
+    const deckToken = tokens.find((token) => token.field === 'deck')
+    return deckToken?.text
+  }
+
   // Returns a function which filters cards to see which are selectable
   getFilterFunction(): (card: Card) => boolean {
     // Filter cards based on their cost
@@ -236,6 +245,7 @@ export default class FilterRegion {
 
       // Parse search query into tokens (handling quotes)
       const tokens = this.parseSearchQuery(this.searchText)
+      tokens.filter((token) => token.field !== 'deck')
 
       // Check each token against the card
       for (const token of tokens) {
@@ -323,7 +333,8 @@ export default class FilterRegion {
     }
 
     // Check for field-specific searches (cost:, points:, name:, text:)
-    const fieldMatch = text.match(/^(cost|points|name|text):(.+)$/i)
+    // NOTE: deck: filter is handled separately for decklists, not for card filtering
+    const fieldMatch = text.match(/^(cost|points|name|text|deck):(.+)$/i)
     if (fieldMatch) {
       token.field = fieldMatch[1].toLowerCase()
       const value = fieldMatch[2]

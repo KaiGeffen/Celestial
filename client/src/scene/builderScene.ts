@@ -39,12 +39,20 @@ export class BuilderBase extends BaseScene {
   }
 
   // Filter which cards are visible and selectable in the catalog
+  // and which decks are visible in the decklists region
   // based on the settings in the filter region
   filter() {
     let filterFunction: (card: Card) => boolean =
       this.filterRegion.getFilterFunction()
 
+    // Filter which cards are shown
     this.catalogRegion.filter(filterFunction)
+
+    // Filter which decks are shown
+    const deckFilter = this.filterRegion.getDeckFilter()
+    if (deckFilter) {
+      this.decklistsRegion.filter(deckFilter)
+    }
   }
 
   // Set the current deck, returns true if deck was valid
