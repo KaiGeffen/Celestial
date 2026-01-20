@@ -49,4 +49,10 @@ export default interface messagesToClient {
   opponentDisconnected: {}
   opponentReconnected: {}
   opponentEmote: {}
+  broadcastOnlinePlayersList: {
+    players: {
+      username: string
+      cosmeticSet: CosmeticSet
+    }[]
+  }
 }

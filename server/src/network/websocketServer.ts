@@ -5,7 +5,7 @@ import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 
 import { db } from '../db/db'
 import { players } from '../db/schema'
-import { eq, sql } from 'drizzle-orm'
+import { eq, sql, inArray } from 'drizzle-orm'
 import { ServerWS } from '../../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../../shared/types/deck'
 import { AchievementManager } from '../achievementManager'
@@ -454,6 +454,56 @@ export default function createWebSocketServer() {
   })
 
   console.log('User-data server is running on port: ', USER_DATA_PORT)
+
+  // Broadcast online players list every 2 seconds
+  setInterval(async () => {
+    try {
+      const activeUserIds = Object.keys(activePlayers).filter(
+        (id) => activePlayers[id] && activePlayers[id].isOpen(),
+      )
+
+      let playersList: Array<{ username: string; cosmeticSet: any }> = []
+
+      if (activeUserIds.length > 0) {
+        // Get player data from database
+        const playerData = await db
+          .select({
+            id: players.id,
+            username: players.username,
+            cosmetic_set: players.cosmetic_set,
+          })
+          .from(players)
+          .where(inArray(players.id, activeUserIds))
+
+        // Build the players list with username and cosmetic set
+        playersList = playerData.map((player) => {
+          let cosmeticSet
+          try {
+            cosmeticSet = JSON.parse(player.cosmetic_set)
+          } catch (e) {
+            cosmeticSet = { avatar: 0, border: 0, relic: 0 }
+          }
+          return {
+            username: player.username,
+            cosmeticSet,
+          }
+        })
+      }
+
+      // Send to all active websockets
+      activeUserIds.forEach((id) => {
+        const ws = activePlayers[id]
+        if (ws && ws.isOpen()) {
+          ws.send({
+            type: 'broadcastOnlinePlayersList',
+            players: playersList,
+          })
+        }
+      })
+    } catch (e) {
+      console.error('Error broadcasting online players:', e)
+    }
+  }, 2000)
 
   // Debug: Print active users every 2 seconds
   // setInterval(() => {

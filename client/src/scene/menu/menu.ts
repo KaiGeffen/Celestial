@@ -155,6 +155,7 @@ import MessageMenu from './message'
 import FocusMenu from './focus'
 import SearchMenu from './search'
 import LeaderboardMenu from './leaderboard'
+import OnlinePlayersMenu from './onlinePlayers'
 import { RegisterUsernameMenu } from './registerUsername'
 import PurchaseGemsMenu from './purchaseGems'
 import PurchaseItemMenu from './purchaseItem'
@@ -179,6 +180,7 @@ const menus = {
   focus: FocusMenu,
   search: SearchMenu,
   leaderboard: LeaderboardMenu,
+  onlinePlayers: OnlinePlayersMenu,
   registerUsername: RegisterUsernameMenu,
   purchaseGems: PurchaseGemsMenu,
   purchaseItem: PurchaseItemMenu,

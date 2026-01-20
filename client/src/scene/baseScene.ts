@@ -121,6 +121,7 @@ class SharedBaseScene extends Phaser.Scene {
 export default class BaseScene extends SharedBaseScene {
   private btnOptions: Button
   private btnNetworkStatus: Button
+  private btnFriends: Button
 
   // The last scene before this one
   private lastScene: string
@@ -139,6 +140,23 @@ export default class BaseScene extends SharedBaseScene {
         ensureMusic(this)
       })
     }
+
+    // Friends list button (to the left of options)
+    this.btnFriends = new Buttons.Icon({
+      name: 'Friends',
+      within: this,
+      f: this.openFriendsList(),
+      muteClick: true,
+    })
+      .setOrigin(1, 0.5)
+      .setDepth(10)
+      .setNoScroll()
+
+    // Anchor to the left of options button
+    this.plugins.get('rexAnchor')['add'](this.btnFriends.icon, {
+      x: `100%-${Space.pad + Space.iconSize + Space.pad}`,
+      y: `0%+${Space.pad + Space.iconSize / 2}`,
+    })
 
     // Menu button
     this.btnOptions = new Buttons.Icon({
@@ -271,6 +289,15 @@ export default class BaseScene extends SharedBaseScene {
       })
     }
   }
+
+  private openFriendsList(): () => void {
+    return () => {
+      this.scene.launch('MenuScene', {
+        menu: 'onlinePlayers',
+        activeScene: this,
+      })
+    }
+  }
 }
 
 export class BaseSceneWithHeader extends BaseScene {
@@ -337,9 +364,10 @@ export class BaseSceneWithHeader extends BaseScene {
 
   private createUserStatsDisplay(): void {
     // Create the text object displaying user stats
+    // Position accounts for: friends icon + padding + options icon + padding
     this.userStatsDisplay = this.add
       .text(
-        Space.windowWidth - (Space.pad * 2 + Space.iconSize),
+        Space.windowWidth - (Space.pad * 3 + Space.iconSize * 2),
         this.headerHeight / 2,
         '',
         Style.basic,

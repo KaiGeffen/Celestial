@@ -43,6 +43,10 @@ type UserData = null | {
 export default class Server {
   private static userData: UserData = null
   static pendingReconnect: { state: GameModel } | null = null
+  static activePlayers: {
+    username: string
+    cosmeticSet: CosmeticSet
+  }[] = []
 
   // Log in with the server for user with given OAuth token
   static login(payload: GoogleJwtPayload, game: Phaser.Game, callback) {
@@ -204,6 +208,10 @@ export default class Server {
       .on('promptReconnect', (data) => {
         // Store reconnect data for PreloadScene to handle after assets load
         this.pendingReconnect = { state: data.state }
+      })
+      .on('broadcastOnlinePlayersList', (data: messagesToClient['broadcastOnlinePlayersList']) => {
+        // Store the list of players in a static field
+        this.activePlayers = data.players
       })
 
     server.ws.onerror = (event: Event) => {
