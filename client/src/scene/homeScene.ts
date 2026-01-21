@@ -521,19 +521,20 @@ export default class HomeScene extends BaseScene {
   }
 }
 
-const PATCH_NUMBER = '0.7.12.1'
+const PATCH_NUMBER = '0.7.12'
 
 const URL = 'https://luma.com/56pnappq'
 
-const NEWS_TEXT = `The exciting 9th tournament approaches! Register [area=_link_register][color=#FABD5D]here[/color][/area] to join February 7th (Saturday) at 12:00 PM EST.
+const NEWS_TEXT = `🕊️ A warm welcome to all our new players!
 
-Compete for a chance to win an exclusive border and cash prizes!
+🏆 Our next tournament is Feb 7th, 12-4 EST. Compete for a chance to win an exclusive border and 120$ in cash prizes!
+[area=_link_register][color=#FABD5D]Register here[/color][/area]
 
-Features:
+📋 Patch notes:
 Added an option to see online players.
 Added character stories to the home screen.
 
-Card changes:
+🎴 Card changes:
 👇 [area=_Ecology][color=#FABD5D]Ecology[/color][/area] points 2 > 0
 ☝️ [area=_Storytime][color=#FABD5D]Storytime[/color][/area] points 3 > 4
 ☝️ [area=_Parch][color=#FABD5D]Parch[/color][/area] points per card +1 > +2
