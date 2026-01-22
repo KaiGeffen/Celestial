@@ -1,5 +1,3 @@
-// TODO Delete this and this dir
-
 import birds from './birds.json'
 import ashes from './ashes.json'
 import shadow from './shadow.json'

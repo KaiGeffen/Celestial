@@ -107,7 +107,7 @@ export class MapJourneyBuilderScene extends BuilderBase {
   constructor() {
     super({
       key: 'MapJourneyBuilderScene',
-      lastScene: 'MapJourneyScene',
+      lastScene: 'JourneyScene',
     })
   }
 
@@ -169,7 +169,7 @@ export class MapJourneyBuilderScene extends BuilderBase {
       }
 
       // Start a match against an ai opponent with the specified deck
-      this.scene.start('MapJourneyMatchScene', {
+      this.scene.start('JourneyMatchScene', {
         deck: this.journeyRegion.getDeck(),
         aiDeck: aiDeck,
         missionID: this.params.id,

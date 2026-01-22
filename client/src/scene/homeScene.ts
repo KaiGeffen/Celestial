@@ -170,7 +170,7 @@ export default class HomeScene extends BaseScene {
       within: this,
       iconName: 'JourneyTab',
       f: () => {
-        this.scene.start('MapJourneyScene', {})
+        this.scene.start('JourneyScene', {})
         logEvent('view_journey')
       },
     })

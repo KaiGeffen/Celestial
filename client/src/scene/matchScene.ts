@@ -666,11 +666,11 @@ export class StandardMatchScene extends MatchScene {
 }
 
 // TODO This is the old map based journey match scene
-export class MapJourneyMatchScene extends MatchScene {
+export class JourneyMatchScene extends MatchScene {
   winSeen: boolean
 
   constructor(
-    args = { key: 'MapJourneyMatchScene', lastScene: 'MapJourneyScene' },
+    args = { key: 'JourneyMatchScene', lastScene: 'JourneyScene' },
   ) {
     super(args)
   }
@@ -678,7 +678,7 @@ export class MapJourneyMatchScene extends MatchScene {
   create() {
     super.create()
 
-    console.log('MapJourneyMatchScene create', this.params)
+    console.log('JourneyMatchScene create', this.params)
 
     // Must be reset each time this scene is run
     this.winSeen = false

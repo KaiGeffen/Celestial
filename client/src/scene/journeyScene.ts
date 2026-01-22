@@ -13,10 +13,9 @@ import Buttons from '../lib/buttons/buttons'
 import Button from '../lib/buttons/button'
 
 import Catalog from '../../../shared/state/catalog'
-import { journeyNode, journeyData } from '../oldJourney/journey'
+import { journeyNode, journeyData } from '../journey/journey'
 
-// TODO Make consistent with Journey (Change journey to journey or vice verca)
-export default class MapJourneyScene extends BaseScene {
+export default class JourneyScene extends BaseScene {
   panDirection
 
   map: Phaser.GameObjects.Image
@@ -29,7 +28,7 @@ export default class MapJourneyScene extends BaseScene {
 
   constructor() {
     super({
-      key: 'MapJourneyScene',
+      key: 'JourneyScene',
     })
   }
 
@@ -87,7 +86,7 @@ export default class MapJourneyScene extends BaseScene {
     }
 
     if (this.panDirection !== undefined) {
-      MapJourneyScene.moveCamera(
+      JourneyScene.moveCamera(
         this.cameras.main,
         this.panDirection[0],
         this.panDirection[1],
@@ -102,7 +101,7 @@ export default class MapJourneyScene extends BaseScene {
       const dx = ((pointer.x - pointer.downX) * delta) / 100
       const dy = ((pointer.y - pointer.downY) * delta) / 100
 
-      MapJourneyScene.moveCamera(camera, dx, dy)
+      JourneyScene.moveCamera(camera, dx, dy)
     }
 
     // Switch the frame of the animated elements every frame
@@ -224,7 +223,7 @@ export default class MapJourneyScene extends BaseScene {
         () => {
           const camera = this.cameras.main
           camera.centerOn(btn.icon.x, btn.icon.y)
-          MapJourneyScene.rememberCoordinates(camera)
+          JourneyScene.rememberCoordinates(camera)
         },
         'mission',
         true,
@@ -393,7 +392,7 @@ export default class MapJourneyScene extends BaseScene {
 
         // Show tip
         if ('tip' in mission) {
-          this.scene.start('MapJourneyScene', { txt: mission.tip })
+          this.scene.start('JourneyScene', { txt: mission.tip })
         }
         // Unlock the card
         else if ('card' in mission) {
@@ -401,11 +400,11 @@ export default class MapJourneyScene extends BaseScene {
 
           const card = Catalog.getCardById(mission.card)
           if (card === undefined) {
-            this.scene.start('MapJourneyScene', {
+            this.scene.start('JourneyScene', {
               txt: 'Error, card undefined',
             })
           } else {
-            this.scene.start('MapJourneyScene', {
+            this.scene.start('JourneyScene', {
               txt: card.story,
               card: card,
             })
@@ -421,7 +420,7 @@ export default class MapJourneyScene extends BaseScene {
     this.input.on(
       'gameobjectwheel',
       (pointer, gameObject, dx, dy, dz, event) => {
-        MapJourneyScene.moveCamera(camera, dx, dy)
+        JourneyScene.moveCamera(camera, dx, dy)
       },
     )
   }
@@ -499,7 +498,7 @@ export default class MapJourneyScene extends BaseScene {
     camera.scrollY = Math.max(0, camera.scrollY + dy)
 
     // Remember the camera position
-    MapJourneyScene.rememberCoordinates(camera)
+    JourneyScene.rememberCoordinates(camera)
   }
 
   // Remember the position of the camera so the next time this scene launches it's in the same place
