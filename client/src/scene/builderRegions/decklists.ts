@@ -427,6 +427,11 @@ export default class DecklistsRegion {
       container.setVisible(false)
     })
 
+    // Remove greying from all decklists
+    this.decklistBtns.forEach((btn) => {
+      btn.enable()
+    })
+
     // Remove all items from the panel (without destroying)
     panel.removeAll(false)
 
