@@ -170,10 +170,10 @@ class Match implements Match {
 
   async signalEmote(player: number, emoteNumber: number) {
     // TODO Use emoteNumber
-    if (player === 0 && this.ws2 !== null) {
+    if (player === 0 && this.ws2) {
       await this.ws2.send({ type: 'opponentEmote' })
     }
-    if (player === 1 && this.ws1 !== null) {
+    if (player === 1 && this.ws1) {
       await this.ws1.send({ type: 'opponentEmote' })
     }
   }
