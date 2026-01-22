@@ -5,19 +5,16 @@ import { PreloadScene, SigninScene } from './scene/preloadScene'
 import HomeScene from './scene/homeScene'
 import {
   StandardMatchScene,
-  JourneyMatchScene,
   MapJourneyMatchScene,
   RaceMatchScene,
 } from './scene/matchScene'
 import TutorialMatchScene from './scene/tutorialScene'
 import {
   BuilderScene,
-  JourneyBuilderScene,
   MapJourneyBuilderScene,
 } from './scene/builderScene'
 import MatchHistoryScene from './scene/matchHistoryScene'
 
-import JourneyScene from './scene/journeyScene'
 import PlaceholderScene from './scene/placeholderScene'
 import MapJourneyScene from './scene/mapJourneyScene'
 import RaceScene from './scene/raceScene'
@@ -61,17 +58,13 @@ const config: Phaser.Types.Core.GameConfig = {
     HomeScene,
     MenuScene,
     StandardMatchScene,
-    JourneyMatchScene,
     TutorialMatchScene,
-    JourneyBuilderScene,
     PlaceholderScene,
     BuilderScene,
     MapScene,
-    JourneyScene,
     MatchHistoryScene,
     StoreScene,
     CharacterProfileScene,
-
     // Allowing old map based journey mode
     MapJourneyScene,
     MapJourneyMatchScene,

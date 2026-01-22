@@ -269,14 +269,3 @@ export default class CatalogRegion {
     this.panel.t = Math.min(0.999999, ratio)
   }
 }
-
-export class CatalogRegionJourney extends CatalogRegion {
-  create(scene: BuilderBase): this {
-    super.create(scene)
-
-    // TODO Don't use this literal
-    this.panel.setMinSize(850)
-
-    return this
-  }
-}
