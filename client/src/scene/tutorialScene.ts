@@ -1,7 +1,7 @@
 import 'phaser'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
-import { JourneyMatchScene } from './matchScene'
+import { MatchScene } from './matchScene'
 import data from '../data/tutorial.json'
 import {
   Space,
@@ -22,7 +22,7 @@ import { Animation } from '../../../shared/animation'
 import { Zone } from '../../../shared/state/zone'
 import GameModel from '../../../shared/state/gameModel'
 
-export default class TutorialMatchScene extends JourneyMatchScene {
+export default class TutorialMatchScene extends MatchScene {
   // How far into the tutorial (How many lines of text you have seen)
   progress: number
 
