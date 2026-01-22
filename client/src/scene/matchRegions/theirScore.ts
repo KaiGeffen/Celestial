@@ -29,7 +29,7 @@ export default class TheirScoreRegion extends Region {
   relic: Phaser.GameObjects.Image
 
   // Move these inside the class as fields so they're set on instantiation
-  private width = Space.iconSize * 3 + Space.pad * 4
+  private width = Space.iconSize * 4 + Space.pad * 5
   private height = Space.todoHandOffset + Space.pad
 
   create(scene: MatchScene): this {
