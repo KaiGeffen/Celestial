@@ -20,6 +20,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
   private filteredMatchHistoryData: MatchHistoryEntry[]
   private searchText: string = ''
   private searchObj
+  private loadingText: Phaser.GameObjects.Text
 
   basePanel: ScrollablePanel
 
@@ -36,6 +37,16 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     this.matchHistoryData = []
     this.filteredMatchHistoryData = []
     this.searchText = ''
+
+    // Show loading message
+    this.loadingText = this.add
+      .text(
+        Space.windowWidth / 2,
+        Space.windowHeight / 2,
+        'Loading matches...',
+        Style.basic,
+      )
+      .setOrigin(0.5, 0.5)
 
     this.fetchMatchHistoryData()
   }
@@ -62,11 +73,22 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       this.createContent()
     } catch (error) {
       console.error('Error fetching match history data:', error)
+      // Hide loading message on error
+      if (this.loadingText) {
+        this.loadingText.destroy()
+        this.loadingText = null
+      }
       this.signalError('Failed to load match history data')
     }
   }
 
   private createContent() {
+    // Hide loading message
+    if (this.loadingText) {
+      this.loadingText.destroy()
+      this.loadingText = null
+    }
+
     // If panel exists, destroy it first
     if (this.basePanel) {
       this.basePanel.destroy()
