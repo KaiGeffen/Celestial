@@ -268,23 +268,27 @@ const death = new Death({
 })
 
 class FromAshes extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
+  onShuffle(player: number, game: GameModel, index: number) {
+    super.onShuffle(player, game, index)
 
-    const amt = game.pile[player]
-      .slice(-3)
-      .filter((card) => card.qualities.includes(Quality.FLEETING)).length
+    // Make a new version of this card with the correct points
+    const countFleetingInDeck = game.deck[player].filter((card) => card.qualities.includes(Quality.FLEETING)).length
+    const countFleetingInHand = game.hand[player].filter((card) => card.qualities.includes(Quality.FLEETING)).length
+    const newPoints = Math.floor((countFleetingInDeck + countFleetingInHand) / 3)
+    
+    const newVersion = this.copy()
+    newVersion.points = newPoints
 
-    game.dig(player, 3)
-    this.nourish(amt, game, player)
+    // Replace this card in the deck with the new version
+    game.deck[player][index] = newVersion
   }
 }
 const fromAshes = new FromAshes({
   name: 'From Ashes',
   id: 74,
   cost: 2,
-  points: 1,
-  text: 'Remove from the game the top three cards of your discard pile. Nourish 1 for each card with Fleeting removed.',
+  points: 0,
+  text: 'When this is shuffled, set its points to 1/3 the number of cards with Fleeting shuffled or in your hand, rounded down.',
   story:
     'Ash carefully tends\nThe green shoot\nLiving on atonement\nTender so close to death and beginning',
 })
