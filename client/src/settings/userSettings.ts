@@ -24,7 +24,14 @@ export class UserSettings {
       hotkeys: false,
 
       // Settings tied to user's account
-      decks: [],
+      decks: [{
+        name: 'Starter Deck',
+        cards: [0, 9, 61, 12, 12, 7, 7, 7, 7, 4, 4, 4, 4, 4, 4],
+        cosmeticSet: {
+          avatar: 0,
+          border: 0,
+        },
+      }],
       // List to use when playing with in development content
       devDecks: [],
       // Index of the currently equipped deck (for play menu)
