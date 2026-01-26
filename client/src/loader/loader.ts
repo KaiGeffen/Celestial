@@ -61,20 +61,6 @@ export default class Loader {
               frameWidth: dims.width,
               frameHeight: dims.height,
             })
-
-            // Set up animations for round sprites
-            if (directory === 'roundResult') {
-              scene.load.once('complete', () => {
-                scene.anims.create({
-                  key: key,
-                  frameRate: 2,
-                  frames: scene.anims.generateFrameNumbers(key, {
-                    start: 0,
-                    end: 3,
-                  }),
-                })
-              })
-            }
           } else {
             // Regular image file
             const filepath = `img/${directory}/${file}.${EXTENSION}`
