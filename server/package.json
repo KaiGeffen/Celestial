@@ -22,7 +22,6 @@
     "nodemon": "^3.1.9",
     "pg": "^8.11.3",
     "pg-native": "^3.3.0",
-    "stripe": "^17.7.0",
     "ts-loader": "^8.0.17",
     "utf-8-validate": "^6.0.5",
     "webpack": "^5.23.0",

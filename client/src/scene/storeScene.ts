@@ -20,7 +20,6 @@ export default class StoreScene extends BaseSceneWithHeader {
   create(): void {
     this.createBackground()
     super.create({ title: 'Store' })
-    // this.createPurchaseGemsButton()
     this.createStoreItems()
 
     // Refresh store when user data is updated (e.g., after purchase)
@@ -36,30 +35,6 @@ export default class StoreScene extends BaseSceneWithHeader {
       width: `100%`,
       height: `100%`,
     })
-  }
-
-  private createPurchaseGemsButton(): void {
-    // Add the purchase gems button to the right of the Back button
-    const container = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: container,
-      text: 'Purchase 💎',
-      f: () => this.scene.launch('MenuScene', { menu: 'purchaseGems' }),
-    })
-
-    // Position to the right of the Back button
-    // Back button is at Space.pad + Space.buttonWidth / 2
-    // So this button's center should be at: Space.pad + Space.buttonWidth + Space.pad + Space.buttonWidth / 2
-    container.setPosition(
-      Space.pad + Space.buttonWidth + Space.pad + Space.buttonWidth / 2,
-      this.headerHeight / 2,
-    )
   }
 
   private createStoreItems() {

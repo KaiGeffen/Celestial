@@ -157,7 +157,6 @@ import SearchMenu from './search'
 import LeaderboardMenu from './leaderboard'
 import OnlinePlayersMenu from './onlinePlayers'
 import { RegisterUsernameMenu } from './registerUsername'
-import PurchaseGemsMenu from './purchaseGems'
 import PurchaseItemMenu from './purchaseItem'
 import UserProfileMenu from './userProfile'
 import AchievementsMenu from './achievements'
@@ -182,7 +181,6 @@ const menus = {
   leaderboard: LeaderboardMenu,
   onlinePlayers: OnlinePlayersMenu,
   registerUsername: RegisterUsernameMenu,
-  purchaseGems: PurchaseGemsMenu,
   purchaseItem: PurchaseItemMenu,
   userProfile: UserProfileMenu,
   achievements: AchievementsMenu,

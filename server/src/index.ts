@@ -2,7 +2,6 @@ import createWebSocketServer from './network/websocketServer'
 import createLeaderboardServer from './network/leaderboardServer'
 import createMatchHistoryServer from './network/matchHistoryServer'
 import createUsernameAvailabilityServer from './network/usernameAvailabilityServer'
-import createPaymentServer from './network/paymentServer'
 
 console.log('Starting server')
 
@@ -18,4 +17,3 @@ createWebSocketServer()
 createLeaderboardServer()
 createMatchHistoryServer()
 createUsernameAvailabilityServer()
-createPaymentServer()
