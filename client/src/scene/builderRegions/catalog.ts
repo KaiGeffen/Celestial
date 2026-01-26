@@ -78,27 +78,7 @@ export default class CatalogRegion {
       slider: Scroll(scene),
     }).setOrigin(1, 0)
 
-    // TODO
-    // Update panel when mousewheel scrolls
-    scene.input.on(
-      'wheel',
-      (pointer: Phaser.Input.Pointer, gameObject, dx, dy, dz, event) => {
-        // Return if the pointer is outside of the panel
-        if (pointer.x < panel.getLeftCenter().x) {
-          return
-        }
 
-        // Hide the hint, which might have been scrolled away from
-        this.scene.hint.hide()
-
-        // Scroll panel down by amount wheel moved
-        this.panel.childOY -= dy
-
-        // Ensure that panel isn't out bounds (Below 0% or above 100% scroll)
-        this.panel.t = Math.max(0, this.panel.t)
-        this.panel.t = Math.min(0.999999, this.panel.t)
-      },
-    )
   }
 
   // Filter which cards can be selected in the catalog based on current filtering parameters
@@ -106,7 +86,7 @@ export default class CatalogRegion {
     let sizer = this.panel.getElement('panel')
     sizer.clear()
 
-    // Get the calendar sorted by currently selected criteria
+    // Get the catalog sorted by currently selected criteria
     const sortedCatalog = [...this.cardCatalog]
     if (this.orderedByCost) {
       // Sort by cost, maintaining color order as secondary sort
