@@ -146,7 +146,6 @@ export class SigninScene extends Phaser.Scene {
   private createGoogleGSIButton(): void {
     google.accounts.id.initialize({
       client_id: Url.oauth,
-      log_level: 'debug',
       ux_mode: 'popup',
       auto_select: true,
       callback: (token: CredentialResponse) => {
