@@ -18,7 +18,7 @@ export default class RoundResultRegion extends Region {
 
     // Image in the center saying if you won/lost/tied
     this.roundResult = scene.add
-      .sprite(0, 0, 'icon-RoundWin', 2)
+      .sprite(0, 0, 'icon-RoundWin', 0)
       .setAlpha(0)
       .setInteractive()
 
