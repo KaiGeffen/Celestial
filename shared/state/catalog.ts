@@ -26,12 +26,6 @@ const fullCatalog = [
 const nonCollectibles = [...Object.values(tokensCatalog)]
 const allCards = [...fullCatalog, ...nonCollectibles]
 
-console.log(
-  'Catalog currently has',
-  fullCatalog.filter((c) => !c.beta).length,
-  'cards',
-)
-
 export default class Catalog {
   static allCards = allCards
   static collectibleCards = fullCatalog.filter((c) => !c.beta)
