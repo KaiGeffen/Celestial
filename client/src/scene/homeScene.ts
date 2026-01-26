@@ -531,7 +531,7 @@ const NEWS_TEXT = `🕊️ A warm welcome to all our new players!
 [area=_link_register][color=#FABD5D]Register here[/color][/area]
 
 📋 Patch notes:
-Added an option to see online players ([i]Top left corner of all screens[/i])
+Added an option to see online players ([i]Top right corner of all screens[/i])
 Added character stories to the home screen
 
 🎴 Card changes:
