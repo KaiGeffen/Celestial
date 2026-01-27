@@ -21,6 +21,10 @@ import { server } from '../server'
 // Whether the user has seen the disconnect error message since their last connection
 let hasShownDisconnectError = false
 
+// Whether user has reported low FPS
+let hasReportedLowFps = false
+const LOW_FPS_THRESHOLD = 300
+
 // Functionality shared between BaseScene and MenuBaseScene
 class SharedBaseScene extends Phaser.Scene {
   // Allows for typing objects in RexUI library
@@ -232,6 +236,15 @@ export default class BaseScene extends SharedBaseScene {
     if (this.txtFPS) {
       const fps = Math.round(this.game.loop.actualFps)
       this.txtFPS.setText(`${fps}`)
+
+      // Send low FPS report to server if FPS drops below threshold
+      if (fps < LOW_FPS_THRESHOLD && !hasReportedLowFps && server && server.isOpen()) {
+        hasReportedLowFps = true
+        server.send({
+          type: 'reportLowFps',
+          scene: this.scene.key,
+        })
+      }
     }
 
     // Check for pending reconnect - if so, start the match scene

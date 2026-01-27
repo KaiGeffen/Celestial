@@ -76,4 +76,7 @@ export default interface messagesToServer {
   surrender: {}
   disconnect: {}
   emote: {}
+  reportLowFps: {
+    scene: string
+  }
 }

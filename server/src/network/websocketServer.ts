@@ -430,6 +430,9 @@ export default function createWebSocketServer() {
           if (!activeGame.match) return
           activeGame.match.signalEmote(activeGame.playerNumber, 0)
         })
+        .on('reportLowFps', async (data) => {
+          console.log(`Low FPS (${id}) ${data.scene}`)
+        })
 
       // Handle disconnect logic
       ws.onClose(() => {
