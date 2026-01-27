@@ -16,6 +16,7 @@ module.exports = (_, argv) => {
       ],
     },
     mode: isProd ? 'production' : 'development',
+    devtool: false, // Explicitly disable source maps to remove eval warning
     resolve: {
       extensions: ['.ts', '.tsx', '.js'],
       alias: {
