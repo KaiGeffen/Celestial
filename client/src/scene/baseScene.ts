@@ -23,7 +23,7 @@ let hasShownDisconnectError = false
 
 // Whether user has reported low FPS
 let hasReportedLowFps = false
-const LOW_FPS_THRESHOLD = 300
+const LOW_FPS_THRESHOLD = 30
 
 // Functionality shared between BaseScene and MenuBaseScene
 class SharedBaseScene extends Phaser.Scene {
