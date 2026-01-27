@@ -122,6 +122,7 @@ export default class BaseScene extends SharedBaseScene {
   private btnOptions: Button
   private btnNetworkStatus: Button
   private btnFriends: Button
+  private txtFPS: Phaser.GameObjects.Text
 
   // The last scene before this one
   private lastScene: string
@@ -133,6 +134,21 @@ export default class BaseScene extends SharedBaseScene {
 
   create(params = {}): void {
     super.create(params)
+
+    // FPS display (top-right corner) - created first so it's behind other UI
+    this.txtFPS = this.add
+      .text(Space.windowWidth, 0, '0', {
+        fontFamily: 'Arial',
+        fontSize: '16px',
+        color: '#009900',
+      })
+      .setOrigin(1, 0)
+      .setDepth(5)
+      .setScrollFactor(0)
+      this.plugins.get('rexAnchor')['add'](this.txtFPS, {
+        x: `100%`,
+        y: `0%`,
+      })
 
     // On mobile, ensure music is playing the first time a click happens
     if (Flags.mobile) {
@@ -211,6 +227,12 @@ export default class BaseScene extends SharedBaseScene {
   private lastFlipTime: number = 0
   update(time: number, delta: number): void {
     super.update(time, delta)
+
+    // Update FPS display
+    if (this.txtFPS) {
+      const fps = Math.round(this.game.loop.actualFps)
+      this.txtFPS.setText(`${fps}`)
+    }
 
     // Check for pending reconnect - if so, start the match scene
     const reconnect = Server.pendingReconnect
