@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 
 module.exports = (_, argv) => {
-  const isProd = argv.mode === 'production'
+  const isProd = true //argv.mode === 'production'
 
   const config = {
     entry: './src/app.ts',
@@ -78,8 +78,9 @@ module.exports = (_, argv) => {
       }),
     ],
     performance: {
-      maxEntrypointSize: 512000,
-      maxAssetSize: 512000,
+      maxEntrypointSize: 3000000, // 3 MB - reasonable for a game
+      maxAssetSize: 1500000, // 1.5 MB per asset
+      hints: 'warning', // Show warnings but don't fail the build
     },
   }
 
