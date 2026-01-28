@@ -229,6 +229,7 @@ export default class BaseScene extends SharedBaseScene {
   }
 
   private lastFlipTime: number = 0
+  private fpsHistory: { fps: number; time: number }[] = []
   update(time: number, delta: number): void {
     super.update(time, delta)
 
@@ -237,8 +238,25 @@ export default class BaseScene extends SharedBaseScene {
       const fps = Math.round(this.game.loop.actualFps)
       this.txtFPS.setText(`${fps}`)
 
-      // Send low FPS report to server if FPS drops below threshold
-      if (fps < LOW_FPS_THRESHOLD && !hasReportedLowFps && server && server.isOpen()) {
+      // Track FPS history over last 2 seconds
+      const twoSecondsAgo = time - 2000
+      this.fpsHistory.push({ fps, time })
+
+      // Check if we have at least 2 seconds of FPS data
+      const oldestEntry = this.fpsHistory.length > 0 ? this.fpsHistory[0] : null
+      const hasTwoSecondsOfData = oldestEntry !== null && (time - oldestEntry.time) >= 2000
+      
+      // Remove entries older than 2 seconds
+      this.fpsHistory = this.fpsHistory.filter((entry) => entry.time > twoSecondsAgo)
+
+      // Send low FPS report if FPS has been below threshold for the last 2 seconds
+      if (
+        !hasReportedLowFps &&
+        server &&
+        server.isOpen() &&
+        hasTwoSecondsOfData &&
+        this.fpsHistory.every((entry) => entry.fps < LOW_FPS_THRESHOLD)
+      ) {
         hasReportedLowFps = true
         server.send({
           type: 'reportLowFps',
