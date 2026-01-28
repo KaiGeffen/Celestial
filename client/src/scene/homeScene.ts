@@ -531,13 +531,10 @@ const NEWS_TEXT = `🕊️ A warm welcome to all our new players!
 [area=_link_register][color=#FABD5D]Register here[/color][/area]
 
 📋 Patch notes:
-Added an option to see online players ([i]Top right corner of all screens[/i])
-Added character stories to the home screen
+Added character stories to the home screen.
+Improved system performance, display user's FPS.
+Added an option to see online players
+([i]Top right corner of all screens[/i])
 
 🎴 Card changes:
-👇 [area=_Ecology][color=#FABD5D]Ecology[/color][/area] points 2 > 0
-☝️ [area=_Storytime][color=#FABD5D]Storytime[/color][/area] points 3 > 4
-☝️ [area=_Parch][color=#FABD5D]Parch[/color][/area] points per card +1 > +2
-☝️ [area=_Night Vision][color=#FABD5D]Night Vision[/color][/area] Sight 3 > 4
-☝️ [area=_Clear View][color=#FABD5D]Clear View[/color][/area] Sight 3 > 4
-☝️ [area=_Timid][color=#FABD5D]Timid[/color][/area] Sight 3 > 4`
+🌱 [area=_From Ashes][color=#FABD5D]From Ashes[/color][/area] Redesigned ability`
