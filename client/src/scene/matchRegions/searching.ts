@@ -209,7 +209,7 @@ export class SearchingRegionTutorial extends Region {
 
   private createImage(scene: Phaser.Scene, tutorialNum: number): void {
     this.img = scene.add
-      .image(0, 0, `journey-Story ${tutorialNum === 0 ? 1 : 3}`)
+      .image(0, 0, `tutorial-${tutorialNum === 0 ? 1 : 3}`)
       .setInteractive()
 
     // Ensure that image fits perfectly in window
@@ -289,7 +289,7 @@ export class SearchingRegionTutorial extends Region {
           // NOTE This is a hack to get the first tutorial to have 2 text per image frame
           if ([3, 5].includes(this.currentFrame)) {
             // Change the background image
-            this.img.setTexture(`journey-Story ${(this.currentFrame + 1) / 2}`)
+            this.img.setTexture(`tutorial-${(this.currentFrame + 1) / 2}`)
 
             this.tweenImage()
           }

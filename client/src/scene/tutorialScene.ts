@@ -21,6 +21,7 @@ import { SearchingRegionTutorial } from './matchRegions/searching'
 import { Animation } from '../../../shared/animation'
 import { Zone } from '../../../shared/state/zone'
 import GameModel from '../../../shared/state/gameModel'
+import Loader from '../loader/loader'
 
 export default class TutorialMatchScene extends MatchScene {
   // How far into the tutorial (How many lines of text you have seen)
@@ -42,6 +43,10 @@ export default class TutorialMatchScene extends MatchScene {
 
   constructor(args = { key: 'TutorialMatchScene', lastScene: 'HomeScene' }) {
     super(args)
+  }
+
+  preload(): void {
+    Loader.loadTutorialCutscenes(this)
   }
 
   create(): void {

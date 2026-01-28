@@ -14,6 +14,7 @@ import Button from '../lib/buttons/button'
 
 import Catalog from '../../../shared/state/catalog'
 import { journeyNode, journeyData } from '../journey/journey'
+import Loader from '../loader/loader'
 
 export default class JourneyScene extends BaseScene {
   panDirection
@@ -30,6 +31,10 @@ export default class JourneyScene extends BaseScene {
     super({
       key: 'JourneyScene',
     })
+  }
+
+  preload(): void {
+    Loader.loadJourneyMapAndMission(this)
   }
 
   create(params): void {

@@ -53,7 +53,6 @@ export const assetLists = {
       "Balance",
       "Begging Bowl",
       "Beginner's Mind",
-      "Beginner's Mind",
       "Birth",
       "Boa",
       "Bounty",
@@ -333,41 +332,12 @@ export const assetLists = {
     },
     "pixelArt": false
   },
-  "store": {
-    "files": [
-      "Butterfly-full",
-      "Butterfly",
-      "DandelionRelic-full",
-      "DandelionRelic",
-      "Imani-full",
-      "Imani",
-      "JadeCardback-full",
-      "JadeCardback",
-      "Jules-full",
-      "Jules",
-      "ThornBorder-full",
-      "ThornBorder"
-    ],
-    "pixelArt": true
-  },
   "background": {
     "files": [
       "Dark",
       "Light"
     ],
     "pixelArt": false
-  },
-  "journey": {
-    "files": [
-      "Map",
-      "Match",
-      "Mission",
-      "Story 1",
-      "Story 2",
-      "Story 3",
-      "Story 4"
-    ],
-    "pixelArt": true
   },
   "border": {
     "files": [
@@ -395,12 +365,6 @@ export const assetLists = {
       }
     },
     "pixelArt": true
-  },
-  "pet": {
-    "files": [
-      "Butterfly"
-    ],
-    "pixelArt": false
   },
   "roundResult": {
     "files": [
