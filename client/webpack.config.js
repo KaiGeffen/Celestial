@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 
 module.exports = (_, argv) => {
-  const isProd = true //argv.mode === 'production'
+  const isProd = argv.mode === 'production'
 
   const config = {
     entry: './src/app.ts',
