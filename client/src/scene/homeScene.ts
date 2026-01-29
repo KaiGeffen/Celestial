@@ -452,7 +452,7 @@ export default class HomeScene extends BaseScene {
         }
       })
       .setOrigin(0, 0)
-    contentSizer.add(text, { align: 'top', expand: true })
+    contentSizer.add(text, { align: 'top' })
 
     panelSizer.add(contentSizer)
 
@@ -521,7 +521,7 @@ export default class HomeScene extends BaseScene {
   }
 }
 
-const PATCH_NUMBER = '0.7.12'
+const PATCH_NUMBER = '0.7.13'
 
 const URL = 'https://luma.com/56pnappq'
 
@@ -532,7 +532,7 @@ const NEWS_TEXT = `🕊️ A warm welcome to all our new players!
 
 📋 Patch notes:
 Improved system performance, added a display for user's FPS.
-([i]Top right corner of all screens[/i])
+Added option to choose deck from play menu.
 
 🎴 Card changes:
 🌱 [area=_From Ashes][color=#FABD5D]From Ashes[/color][/area] Redesigned ability`
