@@ -2,6 +2,7 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
+import AvatarButton from '../../lib/buttons/avatar'
 import {
   Color,
   Messages,
@@ -32,8 +33,7 @@ const playPanelWidth = 500
 export default class PlayMenu extends Menu {
   password: string
   inputText
-  btnPwd: Button
-  friendlyMatchButton: Button
+  pwdBtn: Button
   decklist: Decklist
   deck: Deck
   gardenTimes: (Date | null)[] // Fixed-length array, some indices may be null
@@ -43,10 +43,12 @@ export default class PlayMenu extends Menu {
   plantGlowTweens: (Phaser.Tweens.Tween | null)[] // Fixed-length array of glow tweens for each plant
   clickedHarvestIndex: number | null = null // Track which index was clicked for harvest
   txtDeckName: RexUIPlugin.BBCodeText
-  avatar: Button
+  avatar: AvatarButton
   txtDeckValidation: Phaser.GameObjects.Text
   playOptionButtons: Button[] = []
   gardenSizer: any // Store reference to garden sizer for updates
+  btnPrevDeck: Button
+  btnNextDeck: Button
 
   private activeScene: Phaser.Scene
 
@@ -64,28 +66,24 @@ export default class PlayMenu extends Menu {
       }
     }
 
-    // Get the deck from params or use the equipped deck
+    // Get the equipped deck from UserSettings
     this.activeScene = params.activeScene
-    if (params.deck) {
-      this.deck = params.deck
-    } else {
-      const decks = UserSettings._get('decks')
-      const equippedDeckIndex = UserSettings._get('equippedDeckIndex') || 0
+    const decks = UserSettings._get('decks')
+    const equippedDeckIndex = UserSettings._get('equippedDeckIndex') || 0
 
-      if (decks && decks.length > 0) {
-        // Use equipped deck index, or fall back to 0 if index is invalid
-        const validIndex = Math.min(equippedDeckIndex, decks.length - 1)
-        this.deck = decks[validIndex] || decks[0]
-      } else {
-        // Default empty deck
-        this.deck = {
-          name: 'No Deck',
-          cards: [],
-          cosmeticSet: Server.getUserData().cosmeticSet || {
-            avatar: 0,
-            border: 0,
-          },
-        }
+    if (decks && decks.length > 0) {
+      // Use equipped deck index, or fall back to 0 if index is invalid
+      const validIndex = Math.min(equippedDeckIndex, decks.length - 1)
+      this.deck = decks[validIndex] || decks[0]
+    } else {
+      // Default empty deck
+      this.deck = {
+        name: 'No Deck',
+        cards: [],
+        cosmeticSet: Server.getUserData().cosmeticSet || {
+          avatar: 0,
+          border: 0,
+        },
       }
     }
 
@@ -105,6 +103,76 @@ export default class PlayMenu extends Menu {
 
     // Listen for garden harvest events
     this.scene.game.events.on('gardenHarvested', this.onGardenHarvested, this)
+  }
+
+  private switchToPreviousDeck(): void {
+    const decks = UserSettings._get('decks')
+    if (!decks || decks.length <= 1) return
+
+    const currentIndex = UserSettings._get('equippedDeckIndex') || 0
+    const newIndex = (currentIndex - 1 + decks.length) % decks.length
+    UserSettings._set('equippedDeckIndex', newIndex)
+    this.updateDeck(decks[newIndex])
+  }
+
+  private switchToNextDeck(): void {
+    const decks = UserSettings._get('decks')
+    if (!decks || decks.length <= 1) return
+
+    const currentIndex = UserSettings._get('equippedDeckIndex') || 0
+    const newIndex = (currentIndex + 1) % decks.length
+    UserSettings._set('equippedDeckIndex', newIndex)
+    this.updateDeck(decks[newIndex])
+  }
+
+  private updateDeck(newDeck: Deck): void {
+    this.deck = newDeck
+
+    // Update deck name
+    this.txtDeckName.setText(this.deck.name || '')
+
+    // Update avatar
+    if (this.avatar) {
+      this.avatar.setAvatar(this.deck.cosmeticSet?.avatar || 0)
+      this.avatar.setBorder(this.deck.cosmeticSet?.border || 0)
+    }
+
+    // Update decklist
+    const deckCards: Card[] = this.deck.cards
+      .map((id) => {
+        try {
+          return Catalog.getCardById(id)
+        } catch (e) {
+          return null
+        }
+      })
+      .filter((card) => card !== null && card !== undefined)
+
+    this.decklist.setDeck(deckCards, false)
+    
+    // Update validation message
+    const deckSize = this.deck.cards ? this.deck.cards.length : 0
+    const isValid = deckSize === MechanicsSettings.DECK_SIZE
+
+    if (this.txtDeckValidation) {
+      if (!isValid) {
+        this.txtDeckValidation.setVisible(true)
+      } else {
+        this.txtDeckValidation.setVisible(false)
+      }
+    }
+
+    // Enable/disable play buttons based on deck validity
+    this.playOptionButtons.forEach((button) => {
+      if (isValid) {
+        button.enable()
+      } else {
+        button.disable()
+      }
+    })
+
+    // Update PWD button (depends on both password and deck validity)
+    this.updatePwdButton()
   }
 
   close() {
@@ -173,9 +241,9 @@ export default class PlayMenu extends Menu {
       .setInteractive()
     this.scene.addShadow(deckNameBackground, -90)
 
-    const deckNameSizer = this.scene.rexUI.add.fixWidthSizer({
+    const deckNameSizer = this.scene.rexUI.add.sizer({
+      orientation: 'horizontal',
       width: deckPanelWidth,
-      align: 'center',
       space: {
         top: Space.pad,
         bottom: Space.pad,
@@ -183,16 +251,49 @@ export default class PlayMenu extends Menu {
     })
     deckNameSizer.addBackground(deckNameBackground)
 
+    // Previous deck button (<)
+    const decks = UserSettings._get('decks')
+    const hasMultipleDecks = decks && decks.length > 1
+    
+    this.btnPrevDeck = new Buttons.Text(
+      this.scene,
+      0,
+      0,
+      '<',
+      () => this.switchToPreviousDeck(),
+    )
+    if (!hasMultipleDecks) {
+      this.btnPrevDeck.txt.setAlpha(0.5)
+      this.btnPrevDeck.txt.disableInteractive()
+    }
+    deckNameSizer.add(this.btnPrevDeck.txt)
+
+    // Deck name
     this.txtDeckName = this.scene.rexUI.add
       .BBCodeText()
       .setStyle({
         ...BBStyle.deckName,
         fixedHeight: 50 + Space.padSmall,
-        fixedWidth: deckPanelWidth - Space.pad * 2,
+        fixedWidth: deckPanelWidth - 25,
       })
       .setOrigin(0.5)
       .setText(this.deck.name || '')
-    deckNameSizer.add(this.txtDeckName)
+    deckNameSizer.add(this.txtDeckName, { expand: true })
+
+    // Next deck button (>)
+    this.btnNextDeck = new Buttons.Text(
+      this.scene,
+      0,
+      0,
+      '>',
+      () => this.switchToNextDeck(),
+    )
+    if (!hasMultipleDecks) {
+      this.btnNextDeck.txt.setAlpha(0.5)
+      this.btnNextDeck.txt.disableInteractive()
+    }
+    deckNameSizer.add(this.btnNextDeck.txt)
+
     panelSizer.add(deckNameSizer).addNewLine()
 
     // Change Deck button and Avatar side by side, centered
@@ -423,11 +524,11 @@ export default class PlayMenu extends Menu {
         logEvent('queue_pwd')
       },
     )
-    // Store reference to the Friendly Match button
-    this.friendlyMatchButton =
+    // Store reference to the PWD button
+    this.pwdBtn =
       this.playOptionButtons[this.playOptionButtons.length - 1]
-    // Initially disable since password field is empty (updateFriendlyMatchButton will handle this)
-    this.updateFriendlyMatchButton()
+    // Initially disable since password field is empty (updatePwdButton will handle this)
+    this.updatePwdButton()
 
     contentSizer.add(friendlyMatchOption).addNewLine()
 
@@ -448,8 +549,8 @@ export default class PlayMenu extends Menu {
       })
       .on('textchange', (inputText) => {
         this.password = inputText.text
-        // Enable/disable Friendly Match button based on password and deck validity
-        this.updateFriendlyMatchButton()
+        // Enable/disable PWD button based on password and deck validity
+        this.updatePwdButton()
       })
     contentSizer.add(this.inputText).addNewLine()
 
@@ -537,15 +638,15 @@ export default class PlayMenu extends Menu {
     return deckSize === MechanicsSettings.DECK_SIZE
   }
 
-  private updateFriendlyMatchButton(): void {
-    if (this.friendlyMatchButton) {
+  private updatePwdButton(): void {
+    if (this.pwdBtn) {
       const hasPassword = this.password && this.password.trim() !== ''
       const deckValid = this.isDeckValid()
       // Button is enabled only if both password exists and deck is valid
       if (hasPassword && deckValid) {
-        this.friendlyMatchButton.enable()
+        this.pwdBtn.enable()
       } else {
-        this.friendlyMatchButton.disable()
+        this.pwdBtn.disable()
       }
     }
   }
