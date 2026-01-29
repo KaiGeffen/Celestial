@@ -531,9 +531,7 @@ const NEWS_TEXT = `🕊️ A warm welcome to all our new players!
 [area=_link_register][color=#FABD5D]Register here[/color][/area]
 
 📋 Patch notes:
-Added character stories to the home screen.
-Improved system performance, display user's FPS.
-Added an option to see online players
+Improved system performance, added a display for user's FPS.
 ([i]Top right corner of all screens[/i])
 
 🎴 Card changes:

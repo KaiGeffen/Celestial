@@ -149,6 +149,7 @@ export default class PlayMenu extends Menu {
       .filter((card) => card !== null && card !== undefined)
 
     this.decklist.setDeck(deckCards, false)
+    this.decklist.sizer.layout()
     
     // Update validation message
     const deckSize = this.deck.cards ? this.deck.cards.length : 0
