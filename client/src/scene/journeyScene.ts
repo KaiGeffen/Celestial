@@ -47,11 +47,9 @@ export default class JourneyScene extends BaseScene {
     // Bound camera on this map
     this.cameras.main.setBounds(0, 0, this.map.width, this.map.height)
 
-    // Add button for help menu
+    // Add buttons
     this.createHelpButton()
-
-    // Add button to switch back to new journey mode
-    this.createStoryModeButton()
+    this.createBackButton()
 
     // Add race button if dev mode is enabled
     if (Flags.devCardsEnabled) {
@@ -125,7 +123,7 @@ export default class JourneyScene extends BaseScene {
     const x =
       Space.windowWidth -
       Space.buttonWidth / 2 -
-      (Space.iconSize + Space.pad * 2)
+      (Space.iconSize * 2 + Space.pad * 3)
     const y = Space.buttonHeight / 2 + Space.pad
     new Buttons.Basic({
       within: this,
@@ -149,22 +147,14 @@ export default class JourneyScene extends BaseScene {
     }).setNoScroll()
   }
 
-  private createStoryModeButton(): void {
-    const x =
-      Space.windowWidth -
-      Space.buttonWidth / 2 -
-      (Space.iconSize + Space.pad * 2) -
-      Space.buttonWidth -
-      Space.pad
-    const y = Space.buttonHeight / 2 + Space.pad
+  private createBackButton(): void {
     new Buttons.Basic({
       within: this,
-      text: 'Old Version',
-      x,
-      y,
+      text: 'Back',
+      x: Space.pad + Space.buttonWidth / 2,
+      y: Space.buttonHeight / 2 + Space.pad,
       f: () => {
-        // Switch to new journey (story) mode
-        this.scene.start('JourneyScene')
+        this.scene.start('HomeScene')
       },
       depth: 10,
     }).setNoScroll()
