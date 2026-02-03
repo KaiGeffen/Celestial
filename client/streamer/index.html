@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Celestial | Streamer overlay</title>
+
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap"
+    />
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/recoleta" />
+    <link rel="stylesheet" href="streamer.css" />
+  </head>
+  <body>
+    <div class="streamer-1x1">
+      <div class="streamer-logo-wrap">
+        <img
+          src="../assets/logo.svg"
+          alt="CELESTIAL Decks"
+          class="streamer-logo"
+        />
+      </div>
+      <p class="streamer-count-label">Sign ups</p>
+      <p id="referral-count" class="streamer-count">—</p>
+    </div>
+
+    <script>
+      ;(function () {
+        var el = document.getElementById('referral-count')
+        var streamerId =
+          new URLSearchParams(window.location.search).get('id') || 'default'
+
+        function setCount(n) {
+          if (el)
+            el.textContent = typeof n === 'number' ? n.toLocaleString() : n
+        }
+
+        // Optional: fetch count from API when you add one (e.g. GET /api/streamer-referral-count?id=...)
+        // var api = '/api/streamer-referral-count?id=' + encodeURIComponent(streamerId)
+        // fetch(api).then(function (r) { return r.json() }).then(function (d) { setCount(d.count) }).catch(function () { setCount(0) })
+
+        setCount(0)
+      })()
+    </script>
+  </body>
+</html>

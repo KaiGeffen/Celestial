@@ -1,0 +1,85 @@
+/* Streamer overlay – 1:1 aspect ratio, logo + sign-up count */
+
+:root {
+  --color-navy: #353f4e;
+  --color-gold: #fabd5d;
+  --color-white: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url('../assets/img/background/Light.webp') center/cover no-repeat;
+}
+
+.streamer-1x1 {
+  width: 100vmin;
+  height: 100vmin;
+  min-width: 100vmin;
+  min-height: 100vmin;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.4vmin;
+  padding: 2%;
+}
+
+.streamer-logo-wrap {
+  flex: 0 1 72%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.streamer-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  animation: logoBreathe 4s ease-in-out infinite;
+}
+
+@keyframes logoBreathe {
+  0%,
+  100% {
+    transform: scale(1.38);
+  }
+  50% {
+    transform: scale(1.46);
+  }
+}
+
+.streamer-count-label {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 15vmin;
+  font-weight: 300;
+  color: var(--color-navy);
+  flex-shrink: 0;
+  text-align: center;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.streamer-count {
+  font-family: 'Recoleta', serif;
+  font-size: 14vmin;
+  font-weight: 500;
+  color: var(--color-navy);
+  line-height: 1.1;
+  flex-shrink: 0;
+  text-align: center;
+  margin: 0;
+}
