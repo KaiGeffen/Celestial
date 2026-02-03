@@ -13,6 +13,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://celestialdecks.gg/press/</loc>
+    <lastmod>2026-02-03</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://celestialdecks.gg/streamer/</loc>
+    <lastmod>2026-02-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.0</priority>
+  </url>
+  <url>
     <loc>https://celestialdecks.gg/privacy/</loc>
     <lastmod>2025-06-27</lastmod>
     <changefreq>daily</changefreq>

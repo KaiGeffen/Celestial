@@ -64,7 +64,7 @@ body {
 
 .streamer-count-label {
   font-family: 'Josefin Sans', sans-serif;
-  font-size: 15vmin;
+  font-size: 12vmin;
   font-weight: 300;
   color: var(--color-navy);
   flex-shrink: 0;
