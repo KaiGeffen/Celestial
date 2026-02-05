@@ -144,7 +144,7 @@ export default class Server {
         const decks = UserSettings._get('decks')
         const inventory = UserSettings._get('inventory')
         const missions = UserSettings._get('completedMissions')
-        const referrer = Server.getReferralCode()
+        const ref = Server.getReferralCode()
 
         server.send({
           type: 'sendInitialUserData',
@@ -152,7 +152,7 @@ export default class Server {
           decks: decks,
           inventory: Server.convertBoolArrayToBitString(inventory),
           missions: Server.convertBoolArrayToBitString(missions),
-          referrer: referrer || undefined,
+          ref,
         })
       })
       .on('invalidToken', () => {
@@ -330,7 +330,7 @@ export default class Server {
       return
     }
 
-    const referrer = this.getReferralCode()
+    const ref = this.getReferralCode()
 
     server.send({
       type: 'sendInitialUserData',
@@ -342,7 +342,7 @@ export default class Server {
       missions: this.convertBoolArrayToBitString(
         UserSettings._get('completedMissions'),
       ),
-      referrer: referrer,
+      ref,
     })
   }
 

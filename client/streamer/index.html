@@ -51,7 +51,7 @@
 
         // Show the message when the ref code is invalid
         function showReferrerInvalid() {
-          if (labelEl) labelEl.textContent = 'Invalid ref code'
+          if (labelEl) labelEl.textContent = `Invalid ref code: "${referrer}"`
           if (el) el.textContent = ''
         }
 

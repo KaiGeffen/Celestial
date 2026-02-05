@@ -24,7 +24,7 @@ export default function createReferralCountServer() {
       const result = await db
         .select({ count: sql<number>`count(*)::int` })
         .from(players)
-        .where(sql`LOWER(${players.referrer}) = LOWER(${referrer})`)
+        .where(sql`LOWER(${players.ref}) = LOWER(${referrer})`)
       const count = result[0]?.count ?? 0
       res.json({ count })
     } catch (error) {

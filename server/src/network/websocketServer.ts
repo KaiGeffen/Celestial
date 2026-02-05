@@ -145,7 +145,7 @@ export default function createWebSocketServer() {
         })
         .on(
           'sendInitialUserData',
-          async ({ username, decks, inventory, missions, referrer }) => {
+          async ({ username, decks, inventory, missions, ref }) => {
             if (!id) {
               throw new Error('User sent initial user data before signing in')
             }
@@ -166,13 +166,13 @@ export default function createWebSocketServer() {
             }
 
             // Check if the referrer is valid, throw out if not
-            referrer = referrer ? referrer.toLowerCase() : null
-            if (referrer && !APPROVED_REFERRERS.includes(referrer)) {
-              console.log('Invalid referrer', referrer)
-              referrer = null
+            ref = ref ? ref.toLowerCase() : null
+            if (ref && !APPROVED_REFERRERS.includes(ref)) {
+              console.log('Invalid referrer', ref)
+              ref = null
             }
             // Assign bonus gold for a referred account
-            const bonusGold = referrer ? REFERRAL_BONUS_GOLD : 0
+            const bonusGold = ref ? REFERRAL_BONUS_GOLD : 0
 
             // Create new user entry in database
             const data = {
@@ -198,7 +198,7 @@ export default function createWebSocketServer() {
                 border: 0,
                 relic: 0,
               }),
-              referrer: referrer || null,
+              ref: ref || null,
             }
             await db.insert(players).values(data)
 

@@ -73,7 +73,7 @@ export const players = pgTable(
     cosmetic_set: varchar('cosmetic_set', { length: 1000 }).notNull(),
 
     // Referral
-    referrer: varchar('referrer', { length: 255 }),
+    ref: varchar('ref', { length: 255 }),
   },
   (table) => ({
     emailIdx: uniqueIndex('email_idx').on(table.email),
