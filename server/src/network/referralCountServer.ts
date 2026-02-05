@@ -4,8 +4,7 @@ import { sql } from 'drizzle-orm'
 
 import { REFERRAL_COUNT_PORT } from '../../../shared/network/settings'
 import { db } from '../db/db'
-import { players } from '../db/schema'
-import { APPROVED_REFERRERS } from '../approvedReferrers'
+import { players, approvedRefs } from '../db/schema'
 
 export default function createReferralCountServer() {
   const app = express()
@@ -14,12 +13,23 @@ export default function createReferralCountServer() {
 
   app.get('/ref-count', async (req, res) => {
     const referrer = (req.query.ref as string)?.trim()
-    // If the given ref isn't in the approved list, return -1
-    const referrerLower = referrer.toLowerCase()
-    if (!APPROVED_REFERRERS.includes(referrerLower)) {
+
+    // No ref given
+    if (!referrer) {
       res.json({ count: -1 })
       return
     }
+    const allowed = await db
+      .select({ code: approvedRefs.code })
+      .from(approvedRefs)
+      .where(sql`LOWER(${approvedRefs.code}) = LOWER(${referrer})`)
+      .limit(1)
+    // Given ref isn't in the approved list
+    if (allowed.length === 0) {
+      res.json({ count: -1 })
+      return
+    }
+    // Otherwise, fetch the count of sign ups for the given ref code
     try {
       const result = await db
         .select({ count: sql<number>`count(*)::int` })

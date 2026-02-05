@@ -80,6 +80,10 @@ export const players = pgTable(
   }),
 )
 
+export const approvedRefs = pgTable('approved_refs', {
+  code: varchar('code', { length: 255 }).primaryKey(),
+})
+
 export const matchHistory = pgTable(
   'match_history',
   {

@@ -18,7 +18,7 @@
           class="streamer-logo"
         />
       </div>
-      <p class="streamer-count-label">!celestial sign ups</p>
+      <p class="streamer-count-label"></p>
       <p id="ref-count" class="streamer-count"></p>
     </div>
 
@@ -38,6 +38,7 @@
 
         // Set the count of sign ups for the given ref code
         function setCount(n) {
+          if (labelEl) labelEl.textContent = '!celestial sign ups'
           if (el)
             el.textContent = typeof n === 'number' ? n.toLocaleString() : n
         }

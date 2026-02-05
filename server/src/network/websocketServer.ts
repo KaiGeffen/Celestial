@@ -4,7 +4,7 @@ import { USER_DATA_PORT } from '../../../shared/network/settings'
 import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 
 import { db } from '../db/db'
-import { players } from '../db/schema'
+import { players, approvedRefs } from '../db/schema'
 import { eq, sql, inArray } from 'drizzle-orm'
 import { ServerWS } from '../../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../../shared/types/deck'
@@ -21,7 +21,6 @@ import TutorialMatch from './match/tutorialMatch'
 import sendUserData from './sendUserData'
 import { getStartingInventoryBitString } from '../startingInventory'
 import PveSpecialMatch from './match/pveSpecialMatch'
-import { APPROVED_REFERRERS } from '../approvedReferrers'
 
 // An ongoing match
 class ActiveGame {
@@ -165,13 +164,16 @@ export default function createWebSocketServer() {
               }
             }
 
-            // Check if the referrer is valid, throw out if not
+            // Check if the ref is valid, and award bonus gold if so
             ref = ref ? ref.toLowerCase() : null
-            if (ref && !APPROVED_REFERRERS.includes(ref)) {
-              console.log('Invalid referrer', ref)
-              ref = null
+            if (ref) {
+              const allowed = await db
+                .select({ code: approvedRefs.code })
+                .from(approvedRefs)
+                .where(sql`LOWER(${approvedRefs.code}) = LOWER(${ref})`)
+                .limit(1)
+              if (allowed.length === 0) ref = null
             }
-            // Assign bonus gold for a referred account
             const bonusGold = ref ? REFERRAL_BONUS_GOLD : 0
 
             // Create new user entry in database
@@ -198,7 +200,7 @@ export default function createWebSocketServer() {
                 border: 0,
                 relic: 0,
               }),
-              ref: ref || null,
+              ref,
             }
             await db.insert(players).values(data)
 
