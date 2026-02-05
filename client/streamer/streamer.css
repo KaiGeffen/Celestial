@@ -63,8 +63,8 @@ body {
 }
 
 .streamer-count-label {
-  font-family: 'Josefin Sans', sans-serif;
-  font-size: 12vmin;
+  font-family: sans-serif;
+  font-size: 10vmin;
   font-weight: 300;
   color: var(--color-navy);
   flex-shrink: 0;
@@ -74,7 +74,7 @@ body {
 }
 
 .streamer-count {
-  font-family: 'Recoleta', serif;
+  font-family: sans-serif;
   font-size: 14vmin;
   font-weight: 500;
   color: var(--color-navy);

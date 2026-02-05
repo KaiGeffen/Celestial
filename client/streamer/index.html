@@ -7,13 +7,6 @@
     <title>Celestial | Streamer overlay</title>
 
     <link rel="icon" type="image/x-icon" href="../assets/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap"
-    />
-    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/recoleta" />
     <link rel="stylesheet" href="streamer.css" />
   </head>
   <body>
@@ -26,25 +19,62 @@
         />
       </div>
       <p class="streamer-count-label">!celestial sign ups</p>
-      <p id="referral-count" class="streamer-count">—</p>
+      <p id="ref-count" class="streamer-count"></p>
     </div>
 
     <script>
       ;(function () {
-        var el = document.getElementById('referral-count')
-        var streamerId =
-          new URLSearchParams(window.location.search).get('id') || 'default'
+        var el = document.getElementById('ref-count')
+        var labelEl = document.querySelector('.streamer-count-label')
+        var params = new URLSearchParams(window.location.search)
+        var referrer = params.get('ref')
 
+        const REFERRAL_COUNT_PORT = 5560
+        var apiBase =
+          window.location.hostname === 'localhost' ||
+          window.location.hostname === '127.0.0.1'
+            ? `http://localhost:${REFERRAL_COUNT_PORT}`
+            : ''
+
+        // Set the count of sign ups for the given ref code
         function setCount(n) {
           if (el)
             el.textContent = typeof n === 'number' ? n.toLocaleString() : n
         }
 
-        // Optional: fetch count from API when you add one (e.g. GET /api/streamer-referral-count?id=...)
-        // var api = '/api/streamer-referral-count?id=' + encodeURIComponent(streamerId)
-        // fetch(api).then(function (r) { return r.json() }).then(function (d) { setCount(d.count) }).catch(function () { setCount(0) })
+        // Show the message when no ref code is provided
+        function showNoReferrer() {
+          if (labelEl)
+            labelEl.textContent = 'Include ref code:   .../?ref=yourcode'
+          if (el) el.textContent = ''
+        }
 
-        setCount(0)
+        // Show the message when the ref code is invalid
+        function showReferrerInvalid() {
+          if (labelEl) labelEl.textContent = 'Invalid ref code'
+          if (el) el.textContent = ''
+        }
+
+        if (!referrer) {
+          showNoReferrer()
+          return
+        }
+
+        fetch(apiBase + '/ref-count?ref=' + encodeURIComponent(referrer))
+          .then(function (r) {
+            console.log('The response is:', r)
+            return r.json()
+          })
+          .then(function (d) {
+            if (d && d.count === -1) {
+              showReferrerInvalid()
+            } else {
+              setCount(typeof d.count === 'number' ? d.count : 0)
+            }
+          })
+          .catch(function () {
+            if (labelEl) labelEl.textContent = 'Error fetching count'
+          })
       })()
     </script>
   </body>
