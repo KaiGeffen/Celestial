@@ -144,6 +144,7 @@ export default class Server {
         const decks = UserSettings._get('decks')
         const inventory = UserSettings._get('inventory')
         const missions = UserSettings._get('completedMissions')
+        const referrer = Server.getReferralCode()
 
         server.send({
           type: 'sendInitialUserData',
@@ -151,6 +152,7 @@ export default class Server {
           decks: decks,
           inventory: Server.convertBoolArrayToBitString(inventory),
           missions: Server.convertBoolArrayToBitString(missions),
+          referrer: referrer || undefined,
         })
       })
       .on('invalidToken', () => {
@@ -209,10 +211,13 @@ export default class Server {
         // Store reconnect data for PreloadScene to handle after assets load
         this.pendingReconnect = { state: data.state }
       })
-      .on('broadcastOnlinePlayersList', (data: messagesToClient['broadcastOnlinePlayersList']) => {
-        // Store the list of players in a static field
-        this.activePlayers = data.players
-      })
+      .on(
+        'broadcastOnlinePlayersList',
+        (data: messagesToClient['broadcastOnlinePlayersList']) => {
+          // Store the list of players in a static field
+          this.activePlayers = data.players
+        },
+      )
 
     server.ws.onerror = (event: Event) => {
       console.error(`WebSocket error: ${event}`)
@@ -312,12 +317,20 @@ export default class Server {
     })
   }
 
+  // Get the referral code
+  private static getReferralCode(): string | undefined {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('ref')
+  }
+
   // Send all data necessary to initialize a user
   static sendInitialUserData(username: string): void {
     if (!server || !server.isOpen()) {
       console.error('Sending initial user data when server ws doesnt exist.')
       return
     }
+
+    const referrer = this.getReferralCode()
 
     server.send({
       type: 'sendInitialUserData',
@@ -329,6 +342,7 @@ export default class Server {
       missions: this.convertBoolArrayToBitString(
         UserSettings._get('completedMissions'),
       ),
+      referrer: referrer,
     })
   }
 

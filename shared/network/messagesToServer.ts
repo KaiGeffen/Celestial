@@ -26,6 +26,7 @@ export default interface messagesToServer {
     decks: Deck[]
     inventory: string
     missions: string
+    referrer?: string
   }
   purchaseItem: {
     id: number

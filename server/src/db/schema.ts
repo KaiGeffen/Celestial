@@ -71,6 +71,9 @@ export const players = pgTable(
 
     // Cosmetic set
     cosmetic_set: varchar('cosmetic_set', { length: 1000 }).notNull(),
+
+    // Referral
+    referrer: varchar('referrer', { length: 255 }),
   },
   (table) => ({
     emailIdx: uniqueIndex('email_idx').on(table.email),

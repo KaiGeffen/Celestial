@@ -21,6 +21,7 @@ import TutorialMatch from './match/tutorialMatch'
 import sendUserData from './sendUserData'
 import { getStartingInventoryBitString } from '../startingInventory'
 import PveSpecialMatch from './match/pveSpecialMatch'
+import { APPROVED_REFERRERS } from '../approvedReferrers'
 
 // An ongoing match
 class ActiveGame {
@@ -38,6 +39,7 @@ interface WaitingPlayer {
 }
 
 const CARD_COST = 1000
+const REFERRAL_BONUS_GOLD = 1000
 
 // Players searching for a match with password as key
 let searchingPlayers: { [key: string]: WaitingPlayer } = {}
@@ -143,7 +145,7 @@ export default function createWebSocketServer() {
         })
         .on(
           'sendInitialUserData',
-          async ({ username, decks, inventory, missions }) => {
+          async ({ username, decks, inventory, missions, referrer }) => {
             if (!id) {
               throw new Error('User sent initial user data before signing in')
             }
@@ -163,6 +165,15 @@ export default function createWebSocketServer() {
               }
             }
 
+            // Check if the referrer is valid, throw out if not
+            referrer = referrer ? referrer.toLowerCase() : null
+            if (referrer && !APPROVED_REFERRERS.includes(referrer)) {
+              console.log('Invalid referrer', referrer)
+              referrer = null
+            }
+            // Assign bonus gold for a referred account
+            const bonusGold = referrer ? REFERRAL_BONUS_GOLD : 0
+
             // Create new user entry in database
             const data = {
               id: id,
@@ -181,12 +192,13 @@ export default function createWebSocketServer() {
               lastactive: new Date().toISOString(),
               garden: [],
               gems: 0,
-              coins: 0,
+              coins: bonusGold,
               cosmetic_set: JSON.stringify({
                 avatar: 0,
                 border: 0,
                 relic: 0,
               }),
+              referrer: referrer || null,
             }
             await db.insert(players).values(data)
 
