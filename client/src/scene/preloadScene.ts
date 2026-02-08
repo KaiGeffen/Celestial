@@ -105,18 +105,25 @@ export class SigninScene extends Phaser.Scene {
 
   // Create buttons for each of the signin options (Guest, OAuth)
   private createButtons(): void {
+    // Guest button with confirmation
     const guestButtonContainer = this.add.container()
     this.guestButton = new Buttons.Basic({
       within: guestButtonContainer,
       text: 'Guest',
       f: () => {
-        // Log in as guest
-        Server.loginGuest(this.game, () => this.onOptionClick())
+        this.scene.launch('MenuScene', {
+          menu: 'confirm',
+          text: 'Playing as Guest:\nYour progress is saved on this device only and is not tied to an account.\n\nSign in with Google to save progress across devices and access additional features.',
+          hint: 'Play as Guest',
+          callback: () => {
+            Server.loginGuest(this.game, () => this.onOptionClick())
+          },
+        })
       },
       depth: -1,
     })
-      // Hide the guest button if user is already signed in
-      .setVisible(localStorage.getItem(Url.gsi_token) === null)
+    // Hide the guest button if user is already signed in
+    this.guestButton.setVisible(localStorage.getItem(Url.gsi_token) === null)
 
     this.plugins.get('rexAnchor')['add'](guestButtonContainer, {
       x: `50%`,
