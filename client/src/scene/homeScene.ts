@@ -436,6 +436,9 @@ export default class HomeScene extends BaseScene {
         if (key === '_link_register') {
           // Show cursor as pointer for link
           this.input.setDefaultCursor('pointer')
+        } else if (key === '_link_discord') {
+          // Show cursor as pointer for link
+          this.input.setDefaultCursor('pointer')
         } else if (key[0] === '_') {
           this.hint.showCard(key.slice(1))
         }
@@ -444,11 +447,17 @@ export default class HomeScene extends BaseScene {
         if (key === '_link_register') {
           this.input.setDefaultCursor('default')
         }
+        if (key === '_link_discord') {
+          this.input.setDefaultCursor('default')
+        }
         this.hint.hide()
       })
       .on('areadown', (key: string) => {
         if (key === '_link_register') {
           window.open(URL, '_blank')
+        }
+        if (key === '_link_discord') {
+          openDiscord()
         }
       })
       .setOrigin(0, 0)
@@ -521,18 +530,20 @@ export default class HomeScene extends BaseScene {
   }
 }
 
-const PATCH_NUMBER = '0.7.13'
+const PATCH_NUMBER = '0.7.14'
 
-const URL = 'https://luma.com/56pnappq'
+const URL = 'https://luma.com/9be9v74v'
 
 const NEWS_TEXT = `🕊️ A warm welcome to all our new players!
 
-🏆 Our next tournament is Feb 7th, 12-4 EST. Compete for a chance to win an exclusive border and 120$ in cash prizes!
+🏆 Congrats [b]Sherlock[/b] on his recent win!
+Our next tournament is March 7th, 12-4 EST. Compete for a chance to win an exclusive border and 120$ in cash prizes!
 [area=_link_register][color=#FABD5D]Register here[/color][/area]
 
-📋 Patch notes:
-Improved system performance, added a display for user's FPS.
-Added option to choose deck from play menu.
+🌤️ Upcoming changes:
+Card borders are getting a visual redesign!
+Join the [area=_link_discord][color=#FABD5D]Discord[/color][/area] for the latest updates and let us know what you think!
 
 🎴 Card changes:
-🌱 [area=_From Ashes][color=#FABD5D]From Ashes[/color][/area] Redesigned ability`
+👆 [area=_Shadow][color=#FABD5D]Shadow[/color][/area] Points 3 > 4
+👇 [area=_Paramountcy][color=#FABD5D]Paramountcy[/color][/area] Cards added 5 > 4`

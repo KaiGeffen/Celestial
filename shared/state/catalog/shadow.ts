@@ -45,7 +45,7 @@ const shadow = new Shadow({
   name: 'Shadow',
   id: 19,
   cost: 6,
-  points: 3,
+  points: 4,
   text: "Costs X, where X is the number of cards in your opponent's hand.",
   story:
     'Your pain blooms like flowers on a misty day.\nI breathe it in.\nPerhaps I can rest now.',
