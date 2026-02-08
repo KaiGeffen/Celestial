@@ -30,11 +30,11 @@
         var referrer = params.get('ref')
 
         const REFERRAL_COUNT_PORT = 5560
-        var apiBase =
+        var refCountUrl =
           window.location.hostname === 'localhost' ||
           window.location.hostname === '127.0.0.1'
-            ? `http://localhost:${REFERRAL_COUNT_PORT}`
-            : ''
+            ? 'http://localhost:' + REFERRAL_COUNT_PORT + '/ref-count'
+            : 'https://celestialdecks.gg/ref-count'
 
         // Set the count of sign ups for the given ref code
         function setCount(n) {
@@ -61,7 +61,7 @@
           return
         }
 
-        fetch(apiBase + '/ref-count?ref=' + encodeURIComponent(referrer))
+        fetch(refCountUrl + '/' + encodeURIComponent(referrer))
           .then(function (r) {
             console.log('The response is:', r)
             return r.json()

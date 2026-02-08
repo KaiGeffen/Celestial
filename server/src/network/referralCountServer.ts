@@ -11,8 +11,9 @@ export default function createReferralCountServer() {
 
   app.use(cors())
 
-  app.get('/ref-count', async (req, res) => {
-    const referrer = (req.query.ref as string)?.trim()
+  // GET endpoint for referral count (public)
+  app.get('/ref-count/:streamerCode', async (req, res) => {
+    const referrer = (req.params.streamerCode as string)?.trim()
 
     // No ref given
     if (!referrer) {
