@@ -24,7 +24,7 @@ import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/Sc
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 import { Scroll } from '../settings/settings'
 
-const OVERLAY_WIDTH = 380
+const OVERLAY_WIDTH = 540
 const OVERLAY_PAD = 14
 const OVERLAY_TOP = 100
 
@@ -150,56 +150,53 @@ export default class JourneyScene extends BaseScene {
       Space.windowWidth - OVERLAY_WIDTH / 2 - Space.pad,
       OVERLAY_TOP + overlayHeight / 2,
     )
-    container.setScrollFactor(0).setDepth(20)
+    container.setScrollFactor(0)
     this.overlayContainer = container
 
-    // Main vertical sizer: parchment bg, header, line, scrollable panel (like leaderboard/achievements)
     const mainSizer = this.rexUI.add.fixWidthSizer({
       x: 0,
       y: 0,
       width: OVERLAY_WIDTH,
       height: overlayHeight,
-      space: { top: OVERLAY_PAD, bottom: OVERLAY_PAD, left: OVERLAY_PAD, right: OVERLAY_PAD, line: 4 },
+      space: {
+        top: OVERLAY_PAD,
+        bottom: OVERLAY_PAD,
+        left: OVERLAY_PAD,
+        right: OVERLAY_PAD,
+        line: 4,
+      },
     })
+    const mainBg = this.add.rectangle(0, 0, 1, 1, 0xcbc1a8, 0.96).setOrigin(0)
+    mainSizer.addBackground(mainBg)
 
-    const parchmentBg = this.add
-      .rectangle(0, 0, 1, 1, 0xcbc1a8, 0.96)
-      .setOrigin(0)
-    parchmentBg.setInteractive(false)
-    this.plugins.get('rexDropShadowPipeline')['add'](parchmentBg, {
-      distance: 4,
-      shadowColor: 0x000000,
-    })
-    mainSizer.addBackground(parchmentBg)
-
-    // Header: distinct bar with [ < ] Theme (n/total) [ > ] - use announcement style so it reads as a header
     const headerSizer = this.rexUI.add.sizer({
       orientation: 'horizontal',
       width: OVERLAY_WIDTH - OVERLAY_PAD * 2,
       space: { left: 12, right: 12, top: 14, bottom: 14 },
     })
-    const headerBg = this.add
-      .rectangle(0, 0, 1, 1, 0x353f4e, 1)
-      .setOrigin(0)
-    headerBg.setInteractive(false)
+    const headerBg = this.add.rectangle(0, 0, 1, 1, 0x353f4e, 1).setOrigin(0)
     headerSizer.addBackground(headerBg)
+
+    this.overlayHeaderText = this.add
+      .text(0, 0, '', {
+        ...Style.announcement,
+        fontSize: '24px',
+        color: '#f5f2eb',
+      })
+      .setOrigin(0.5, 0.5)
 
     const leftArrow = this.add
       .text(0, 0, '‹', { ...Style.basic, fontSize: '32px', color: '#f5f2eb' })
       .setOrigin(0.5, 0.5)
-      .setInteractive({ useHandCursor: true })
     leftArrow.on('pointerdown', () => {
       this.sound.play('click')
-      this.selectedThemeIndex = (this.selectedThemeIndex - 1 + themes.length) % themes.length
+      this.selectedThemeIndex =
+        (this.selectedThemeIndex - 1 + themes.length) % themes.length
       this.refreshOverlayContent()
     })
-    this.overlayHeaderText = this.add
-      .text(0, 0, '', { ...Style.announcement, fontSize: '24px', color: '#f5f2eb' })
-      .setOrigin(0.5, 0.5)
     const rightArrow = this.add
       .text(0, 0, '›', { ...Style.basic, fontSize: '32px', color: '#f5f2eb' })
       .setOrigin(0.5, 0.5)
-      .setInteractive({ useHandCursor: true })
     rightArrow.on('pointerdown', () => {
       this.sound.play('click')
       this.selectedThemeIndex = (this.selectedThemeIndex + 1) % themes.length
@@ -215,15 +212,24 @@ export default class JourneyScene extends BaseScene {
     headerSizer.layout()
 
     mainSizer.add(headerSizer)
-
-    const line = this.add.line(0, 0, 0, 0, OVERLAY_WIDTH - OVERLAY_PAD * 2, 0, 0x353f4e, 0.5)
-    mainSizer.add(line, { padding: { top: 4, bottom: 4 } })
+    mainSizer.add(
+      this.add.line(
+        0,
+        0,
+        0,
+        0,
+        OVERLAY_WIDTH - OVERLAY_PAD * 2,
+        0,
+        0x353f4e,
+        0.5,
+      ),
+      { padding: { top: 4, bottom: 4 } },
+    )
 
     const contentSizer = this.rexUI.add.fixWidthSizer({
       width: OVERLAY_WIDTH - OVERLAY_PAD * 4,
       space: { item: 6 },
     })
-
     this.overlayPanel = this.rexUI.add.scrollablePanel({
       width: OVERLAY_WIDTH - OVERLAY_PAD * 2,
       height: panelHeight,
@@ -235,7 +241,6 @@ export default class JourneyScene extends BaseScene {
 
     mainSizer.add(this.overlayPanel)
     mainSizer.layout()
-
     container.add(mainSizer)
     this.refreshOverlayContent()
   }
@@ -244,10 +249,18 @@ export default class JourneyScene extends BaseScene {
     const overlayLeft = Space.windowWidth - OVERLAY_WIDTH - Space.pad
     this.input.on(
       'wheel',
-      (pointer: Phaser.Input.Pointer, _go: unknown, _dx: number, dy: number) => {
+      (
+        pointer: Phaser.Input.Pointer,
+        _go: unknown,
+        _dx: number,
+        dy: number,
+      ) => {
         if (pointer.x < overlayLeft || pointer.y < OVERLAY_TOP) return
         this.overlayPanel.childOY -= dy
-        this.overlayPanel.t = Math.max(0, Math.min(0.999999, this.overlayPanel.t))
+        this.overlayPanel.t = Math.max(
+          0,
+          Math.min(0.999999, this.overlayPanel.t),
+        )
       },
     )
   }
@@ -258,7 +271,9 @@ export default class JourneyScene extends BaseScene {
     const completed: boolean[] = UserSettings._get('completedMissions')
 
     const completedCount = theme.missions.filter((m) => completed[m.id]).length
-    this.overlayHeaderText.setText(`${theme.displayName} (${completedCount}/${theme.missions.length})`)
+    this.overlayHeaderText.setText(
+      `${theme.displayName} (${completedCount}/${theme.missions.length})`,
+    )
 
     const panel = this.overlayPanel.getElement('panel') as FixWidthSizer
     panel.removeAll(true)
@@ -272,7 +287,10 @@ export default class JourneyScene extends BaseScene {
     this.overlayPanel.layout()
   }
 
-  private isMissionUnlocked(mission: journeyNode, completed: boolean[]): boolean {
+  private isMissionUnlocked(
+    mission: journeyNode,
+    completed: boolean[],
+  ): boolean {
     return mission.prereq.some((prereqs) =>
       prereqs.every((id) => completed[id]),
     )
@@ -295,7 +313,6 @@ export default class JourneyScene extends BaseScene {
     })
 
     const rowBg = this.add.rectangle(0, 0, 1, 1, 0xf5f2eb, 0.5).setOrigin(0)
-    rowBg.setInteractive(false)
     row.addBackground(rowBg)
 
     const isCompleted = completed[mission.id]
@@ -303,21 +320,33 @@ export default class JourneyScene extends BaseScene {
 
     // Checkmark or empty space
     const checkText = this.add
-      .text(0, 0, isCompleted ? '✓' : ' ', { ...Style.basic, fontSize: '20px', color: isCompleted ? '#2d5a27' : 'transparent' })
+      .text(0, 0, isCompleted ? '✓' : ' ', {
+        ...Style.basic,
+        fontSize: '20px',
+        color: isCompleted ? '#2d5a27' : 'transparent',
+      })
       .setOrigin(0, 0.5)
     row.add(checkText, { align: 'center' })
 
     // Mission name
     const nameText = this.add
-      .text(0, 0, this.getMissionDisplayName(mission), { ...Style.basic, fontSize: '18px' })
+      .text(0, 0, this.getMissionDisplayName(mission), {
+        ...Style.basic,
+        fontSize: '18px',
+      })
       .setOrigin(0, 0.5)
       .setWordWrapWidth(rowWidth - 120)
       .setLineSpacing(2)
     row.add(nameText, { proportion: 1, align: 'left-center' })
 
-    // Start button or Locked
     if (isUnlocked) {
-      const btnContainer = new ContainerLite(this, 0, 0, 70, 32)
+      const btnContainer = new ContainerLite(
+        this,
+        0,
+        0,
+        Space.buttonWidth,
+        Space.buttonHeight,
+      )
       new Buttons.Basic({
         within: btnContainer,
         text: 'Start',
@@ -327,7 +356,11 @@ export default class JourneyScene extends BaseScene {
       row.add(btnContainer, { align: 'center' })
     } else {
       const lockedText = this.add
-        .text(0, 0, 'Locked', { ...Style.basic, fontSize: '16px', color: Color.grey })
+        .text(0, 0, 'Locked', {
+          ...Style.basic,
+          fontSize: '16px',
+          color: Color.grey,
+        })
         .setOrigin(0.5, 0.5)
       row.add(lockedText, { align: 'center' })
     }
