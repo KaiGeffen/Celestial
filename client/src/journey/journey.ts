@@ -6,10 +6,7 @@ import birth from './birth.json'
 import vision from './vision.json'
 import water from './water.json'
 
-import intro from './intro.json'
-
 export const journeyData: journeyNode[] = [
-  ...intro,
   ...birds,
   ...ashes,
   ...shadow,
@@ -18,6 +15,49 @@ export const journeyData: journeyNode[] = [
   ...vision,
   ...water,
 ]
+
+// Theme order and display names for the journey overlay (birds = Jules, etc.)
+export const THEME_KEYS = [
+  'birds',
+  'ashes',
+  'shadow',
+  'pet',
+  'birth',
+  'vision',
+  'water',
+] as const
+
+export const THEME_DISPLAY_NAMES: Record<string, string> = {
+  birds: 'Jules',
+  ashes: 'Adonis',
+  shadow: 'Mia',
+  pet: 'Kitz',
+  birth: 'Imani',
+  vision: 'Mitra',
+  water: 'Water',
+}
+
+const THEME_ARRAYS: journeyNode[][] = [
+  birds,
+  ashes,
+  shadow,
+  pet,
+  birth,
+  vision,
+  water,
+]
+
+export function getMissionsByTheme(): {
+  key: string
+  displayName: string
+  missions: journeyNode[]
+}[] {
+  return THEME_KEYS.map((key, i) => ({
+    key,
+    displayName: THEME_DISPLAY_NAMES[key] || key,
+    missions: THEME_ARRAYS[i],
+  }))
+}
 
 // Base interface with common properties
 interface JourneyBase {

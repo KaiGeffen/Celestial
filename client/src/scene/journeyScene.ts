@@ -13,8 +13,20 @@ import Buttons from '../lib/buttons/buttons'
 import Button from '../lib/buttons/button'
 
 import Catalog from '../../../shared/state/catalog'
-import { journeyNode, journeyData } from '../journey/journey'
+import {
+  journeyNode,
+  journeyData,
+  getMissionsByTheme,
+} from '../journey/journey'
 import Loader from '../loader/loader'
+import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
+import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
+import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
+import { Scroll } from '../settings/settings'
+
+const OVERLAY_WIDTH = 380
+const OVERLAY_PAD = 14
+const OVERLAY_TOP = 100
 
 export default class JourneyScene extends BaseScene {
   panDirection
@@ -26,6 +38,11 @@ export default class JourneyScene extends BaseScene {
   incompleteIndicators: Button[] = []
 
   isDragging = false
+
+  private selectedThemeIndex = 0
+  private overlayContainer: Phaser.GameObjects.Container
+  private overlayHeaderText: Phaser.GameObjects.Text
+  private overlayPanel: ScrollablePanel
 
   constructor() {
     super({
@@ -80,6 +97,9 @@ export default class JourneyScene extends BaseScene {
 
     // Create indicators for where incomplete missions are
     this.createIncompleteIndicators()
+
+    // Mission list overlay on the right
+    this.createJourneyOverlay()
   }
 
   update(time, delta): void {
@@ -117,6 +137,204 @@ export default class JourneyScene extends BaseScene {
 
     // Adjust alpha/location of each indicator
     this.adjustIndicators()
+  }
+
+  private createJourneyOverlay(): void {
+    const themes = getMissionsByTheme()
+    const headerHeight = 52
+    const linePad = 8
+    const overlayHeight = Space.windowHeight - OVERLAY_TOP - Space.pad
+    const panelHeight = overlayHeight - OVERLAY_PAD * 2 - headerHeight - linePad
+
+    const container = this.add.container(
+      Space.windowWidth - OVERLAY_WIDTH / 2 - Space.pad,
+      OVERLAY_TOP + overlayHeight / 2,
+    )
+    container.setScrollFactor(0).setDepth(20)
+    this.overlayContainer = container
+
+    // Main vertical sizer: parchment bg, header, line, scrollable panel (like leaderboard/achievements)
+    const mainSizer = this.rexUI.add.fixWidthSizer({
+      x: 0,
+      y: 0,
+      width: OVERLAY_WIDTH,
+      height: overlayHeight,
+      space: { top: OVERLAY_PAD, bottom: OVERLAY_PAD, left: OVERLAY_PAD, right: OVERLAY_PAD, line: 4 },
+    })
+
+    const parchmentBg = this.add
+      .rectangle(0, 0, 1, 1, 0xcbc1a8, 0.96)
+      .setOrigin(0)
+    parchmentBg.setInteractive(false)
+    this.plugins.get('rexDropShadowPipeline')['add'](parchmentBg, {
+      distance: 4,
+      shadowColor: 0x000000,
+    })
+    mainSizer.addBackground(parchmentBg)
+
+    // Header: distinct bar with [ < ] Theme (n/total) [ > ] - use announcement style so it reads as a header
+    const headerSizer = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      width: OVERLAY_WIDTH - OVERLAY_PAD * 2,
+      space: { left: 12, right: 12, top: 14, bottom: 14 },
+    })
+    const headerBg = this.add
+      .rectangle(0, 0, 1, 1, 0x353f4e, 1)
+      .setOrigin(0)
+    headerBg.setInteractive(false)
+    headerSizer.addBackground(headerBg)
+
+    const leftArrow = this.add
+      .text(0, 0, '‹', { ...Style.basic, fontSize: '32px', color: '#f5f2eb' })
+      .setOrigin(0.5, 0.5)
+      .setInteractive({ useHandCursor: true })
+    leftArrow.on('pointerdown', () => {
+      this.sound.play('click')
+      this.selectedThemeIndex = (this.selectedThemeIndex - 1 + themes.length) % themes.length
+      this.refreshOverlayContent()
+    })
+    this.overlayHeaderText = this.add
+      .text(0, 0, '', { ...Style.announcement, fontSize: '24px', color: '#f5f2eb' })
+      .setOrigin(0.5, 0.5)
+    const rightArrow = this.add
+      .text(0, 0, '›', { ...Style.basic, fontSize: '32px', color: '#f5f2eb' })
+      .setOrigin(0.5, 0.5)
+      .setInteractive({ useHandCursor: true })
+    rightArrow.on('pointerdown', () => {
+      this.sound.play('click')
+      this.selectedThemeIndex = (this.selectedThemeIndex + 1) % themes.length
+      this.refreshOverlayContent()
+    })
+
+    headerSizer
+      .add(leftArrow, { align: 'center' })
+      .addSpace()
+      .add(this.overlayHeaderText, { proportion: 1, align: 'center' })
+      .addSpace()
+      .add(rightArrow, { align: 'center' })
+    headerSizer.layout()
+
+    mainSizer.add(headerSizer)
+
+    const line = this.add.line(0, 0, 0, 0, OVERLAY_WIDTH - OVERLAY_PAD * 2, 0, 0x353f4e, 0.5)
+    mainSizer.add(line, { padding: { top: 4, bottom: 4 } })
+
+    const contentSizer = this.rexUI.add.fixWidthSizer({
+      width: OVERLAY_WIDTH - OVERLAY_PAD * 4,
+      space: { item: 6 },
+    })
+
+    this.overlayPanel = this.rexUI.add.scrollablePanel({
+      width: OVERLAY_WIDTH - OVERLAY_PAD * 2,
+      height: panelHeight,
+      panel: { child: contentSizer },
+      slider: Scroll(this),
+      scrollMode: 0,
+    })
+    this.setUpOverlayPanelWheelScroll(panelHeight)
+
+    mainSizer.add(this.overlayPanel)
+    mainSizer.layout()
+
+    container.add(mainSizer)
+    this.refreshOverlayContent()
+  }
+
+  private setUpOverlayPanelWheelScroll(panelHeight: number): void {
+    const overlayLeft = Space.windowWidth - OVERLAY_WIDTH - Space.pad
+    this.input.on(
+      'wheel',
+      (pointer: Phaser.Input.Pointer, _go: unknown, _dx: number, dy: number) => {
+        if (pointer.x < overlayLeft || pointer.y < OVERLAY_TOP) return
+        this.overlayPanel.childOY -= dy
+        this.overlayPanel.t = Math.max(0, Math.min(0.999999, this.overlayPanel.t))
+      },
+    )
+  }
+
+  private refreshOverlayContent(): void {
+    const themes = getMissionsByTheme()
+    const theme = themes[this.selectedThemeIndex]
+    const completed: boolean[] = UserSettings._get('completedMissions')
+
+    const completedCount = theme.missions.filter((m) => completed[m.id]).length
+    this.overlayHeaderText.setText(`${theme.displayName} (${completedCount}/${theme.missions.length})`)
+
+    const panel = this.overlayPanel.getElement('panel') as FixWidthSizer
+    panel.removeAll(true)
+
+    theme.missions.forEach((mission) => {
+      const row = this.createMissionOverlayRow(mission, completed)
+      panel.add(row)
+    })
+
+    panel.layout()
+    this.overlayPanel.layout()
+  }
+
+  private isMissionUnlocked(mission: journeyNode, completed: boolean[]): boolean {
+    return mission.prereq.some((prereqs) =>
+      prereqs.every((id) => completed[id]),
+    )
+  }
+
+  private getMissionDisplayName(mission: journeyNode): string {
+    if ('deck' in mission && mission.storyTitle) return mission.storyTitle
+    return mission.name
+  }
+
+  private createMissionOverlayRow(
+    mission: journeyNode,
+    completed: boolean[],
+  ): Phaser.GameObjects.GameObject {
+    const rowWidth = OVERLAY_WIDTH - OVERLAY_PAD * 4
+    const row = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      width: rowWidth,
+      space: { left: 4, right: 4, top: 4, bottom: 4 },
+    })
+
+    const rowBg = this.add.rectangle(0, 0, 1, 1, 0xf5f2eb, 0.5).setOrigin(0)
+    rowBg.setInteractive(false)
+    row.addBackground(rowBg)
+
+    const isCompleted = completed[mission.id]
+    const isUnlocked = this.isMissionUnlocked(mission, completed)
+
+    // Checkmark or empty space
+    const checkText = this.add
+      .text(0, 0, isCompleted ? '✓' : ' ', { ...Style.basic, fontSize: '20px', color: isCompleted ? '#2d5a27' : 'transparent' })
+      .setOrigin(0, 0.5)
+    row.add(checkText, { align: 'center' })
+
+    // Mission name
+    const nameText = this.add
+      .text(0, 0, this.getMissionDisplayName(mission), { ...Style.basic, fontSize: '18px' })
+      .setOrigin(0, 0.5)
+      .setWordWrapWidth(rowWidth - 120)
+      .setLineSpacing(2)
+    row.add(nameText, { proportion: 1, align: 'left-center' })
+
+    // Start button or Locked
+    if (isUnlocked) {
+      const btnContainer = new ContainerLite(this, 0, 0, 70, 32)
+      new Buttons.Basic({
+        within: btnContainer,
+        text: 'Start',
+        f: this.missionOnClick(mission),
+        muteClick: true,
+      })
+      row.add(btnContainer, { align: 'center' })
+    } else {
+      const lockedText = this.add
+        .text(0, 0, 'Locked', { ...Style.basic, fontSize: '16px', color: Color.grey })
+        .setOrigin(0.5, 0.5)
+      row.add(lockedText, { align: 'center' })
+    }
+
+    row.layout()
+
+    return row
   }
 
   private createHelpButton(): void {
