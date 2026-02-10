@@ -308,6 +308,8 @@ class AlterDeckMenu extends Menu {
       x: 0,
       y: 0,
       f: () => {
+        console.log('share deck code', this.deckCode.toString())
+
         // Copy the deck's code to clipboard
         const encodedDeck = encodeShareableDeckCode(this.deckCode)
         navigator.clipboard.writeText(encodedDeck)
