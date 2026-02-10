@@ -28,13 +28,13 @@ export const THEME_KEYS = [
 ] as const
 
 export const THEME_DISPLAY_NAMES: Record<string, string> = {
-  birds: 'Jules',
-  ashes: 'Adonis',
-  shadow: 'Mia',
-  pet: 'Kitz',
-  birth: 'Imani',
-  vision: 'Mitra',
-  water: 'Water',
+  birds: 'Jules Learns to Fly',
+  ashes: 'Adonis Blazes a Path',
+  shadow: 'Mia Battles her Shadows',
+  pet: 'Kitz Finds his Love ',
+  birth: 'Imani Births the Future',
+  vision: 'Mitra Seeks the Truth',
+  water: 'Tales Carried on the Rivers',
 }
 
 const THEME_ARRAYS: journeyNode[][] = [

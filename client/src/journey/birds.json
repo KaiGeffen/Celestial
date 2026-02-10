@@ -7,11 +7,11 @@
     "prereq": [[]],
     "deck": [0, 0, 4, 4, 4, 4, 9, 6, 7, 7, 12, 12, 13, 18, 18],
     "opponent": [3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 11, 11, 14, 14, 17],
-    "storyTitle": "Blank Canvas",
+    "storyTitle": "Falling Apart",
     "storyText": "I remember from pretty early on coming home from school and feeling so empty. Like nothing I had done throughout the day, and nothing I was going to do that night, really mattered to me. That was a hard time in my life - preserving this blank canvas because all the colors around me were so repulsive. All that I had back then was a little voice, telling me to get through this."
   },
   {
-    "name": "Starling",
+    "name": "🎴 Starling",
     "id": 101,
     "x": 4360,
     "y": 393,
@@ -26,11 +26,11 @@
     "prereq": [[101]],
     "deck": [0, 0, 4, 4, 4, 4, 9, 7, 7, 61, 61, 18],
     "opponent": [3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 11, 11, 14, 14, 17],
-    "storyTitle": "Rebirth",
+    "storyTitle": "Packing Up",
     "storyText": "When I turned 16, I remember my routine of keeping my head down and shutting up, was starting to break apart. I didn't know why, but I couldn't help but cry, or yell at my teachers. Seeing myself so out of control was a new kind of scary, and it didn't go away until I moved out from my parents. In every way you could see things were worse: I was a high-school dropout, living on people's couches, I ate much less, but inside I felt reborn. Light for the first time in years. That was the first time I started going by 'Jules'."
   },
   {
-    "name": "Truth",
+    "name": "🎴 Truth",
     "id": 103,
     "x": 3857,
     "y": 265,
@@ -45,11 +45,11 @@
     "prereq": [[103]],
     "deck": [65, 65, 7, 7, 7, 4, 4, 4, 4, 4],
     "opponent": [21, 61, 61, 14, 14, 11, 11, 6, 7, 7, 3, 3, 4, 4, 5],
-    "storyTitle": "Finding Peace",
+    "storyTitle": "Taking Flight",
     "storyText": "When I finally left the city I had grown up in, I traveled around for a couple years, not spending more than a couple months in any one spot. There was so much to see, so many different colors for me to try on. Each place I would land, I would introduce myself with no reservations, 'I am Jules'. This was either accepted or not, but not once did I hold onto the response. After everything, I was free."
   },
   {
-    "name": "Heron",
+    "name": "🎴 Heron",
     "id": 105,
     "x": 3042,
     "y": 728,
@@ -63,10 +63,11 @@
     "y": 270,
     "prereq": [[105]],
     "deck": [56, 65, 12],
-    "opponent": [21, 20, 20, 17, 14, 14, 14, 6, 3, 3, 3, 3, 0, 0, 0]
+    "opponent": [21, 20, 20, 17, 14, 14, 14, 6, 3, 3, 3, 3, 0, 0, 0],
+    "storyTitle": "Constant Companion"
   },
   {
-    "name": "Sun",
+    "name": "🎴 Sun",
     "id": 121,
     "x": 4110,
     "y": 155,
@@ -83,10 +84,11 @@
       [121, 207]
     ],
     "deck": [21, 20, 61, 63, 63],
-    "opponent": [12, 12, 12, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+    "opponent": [12, 12, 12, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+    "storyTitle": "A New Day"
   },
   {
-    "name": "Morning Dew",
+    "name": "🎴 Morning Dew",
     "id": 123,
     "x": 4142,
     "y": 845,
@@ -100,31 +102,15 @@
     "y": 1050,
     "prereq": [[105, 306, 123]],
     "deck": [61, 40, 40, 32, 63, 1, 3],
-    "opponent": [12, 12, 12, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+    "opponent": [12, 12, 12, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+    "storyTitle": "The Skylark's Song"
   },
   {
-    "name": "Gamecock",
+    "name": "🎴 Gamecock",
     "id": 125,
     "x": 4073,
     "y": 1080,
     "prereq": [[124]],
     "card": 40
-  },
-  {
-    "name": "Birds Bonus 4 - Ecology TODO impossible",
-    "id": 126,
-    "x": 2300,
-    "y": 1400,
-    "prereq": [[105, 420]],
-    "deck": [56, 71, 71, 69, 69],
-    "opponent": [12, 12, 12, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
-  },
-  {
-    "name": "Ecology",
-    "id": 127,
-    "x": 2300,
-    "y": 1400,
-    "prereq": [[126]],
-    "card": 44
   }
 ]

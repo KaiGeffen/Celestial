@@ -196,7 +196,7 @@ export default class JourneyScene extends BaseScene {
     return headerSizer
   }
 
-  private refreshOverlayContent(): void {
+  private refreshOverlayContent(moveCamera = true): void {
     const themes = getMissionsByTheme()
     const theme = themes[this.selectedThemeIndex]
     const completed: boolean[] = UserSettings._get('completedMissions')
@@ -212,7 +212,9 @@ export default class JourneyScene extends BaseScene {
     })
     panel.layout()
     this.overlayPanel.layout()
-    this.moveCameraToTheme(this.selectedThemeIndex)
+    if (moveCamera) {
+      this.moveCameraToTheme(this.selectedThemeIndex)
+    }
   }
 
   private moveCameraToTheme(themeIndex: number): void {
@@ -553,25 +555,39 @@ export default class JourneyScene extends BaseScene {
         // Complete the mission
         UserSettings._setIndex('completedMissions', mission.id, true)
 
-        // Show tip
-        if ('tip' in mission) {
-          this.scene.start('JourneyScene', { txt: mission.tip })
+        const onMenuClosed = () => {
+          this.refreshOverlayContent(false)
         }
-        // Unlock the card
+
+        // Show tip (launch popup; do not restart scene)
+        if ('tip' in mission) {
+          this.scene.launch('MenuScene', {
+            menu: 'message',
+            title: 'Tip',
+            s: mission.tip,
+          })
+          this.scene.get('MenuScene').events.once('shutdown', onMenuClosed)
+        }
+        // Unlock the card (launch popup; do not restart scene)
         else if ('card' in mission) {
           UserSettings._setIndex('inventory', mission.card, true)
 
           const card = Catalog.getCardById(mission.card)
           if (card === undefined) {
-            this.scene.start('JourneyScene', {
-              txt: 'Error, card undefined',
+            this.scene.launch('MenuScene', {
+              menu: 'message',
+              title: 'Card Unlocked!',
+              s: 'Error, card undefined',
             })
           } else {
-            this.scene.start('JourneyScene', {
-              txt: card.story,
+            this.scene.launch('MenuScene', {
+              menu: 'message',
+              title: 'Card Unlocked!',
+              s: card.story,
               card: card,
             })
           }
+          this.scene.get('MenuScene').events.once('shutdown', onMenuClosed)
         }
       }
     }
