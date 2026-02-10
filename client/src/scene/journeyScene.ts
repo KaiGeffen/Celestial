@@ -69,7 +69,7 @@ export default class JourneyScene extends BaseScene {
     // Make up pop-up for the card you just received, if there is one
     if (params.card) {
       this.createCardPopup(params)
-    } else     if (params.txt) {
+    } else if (params.txt) {
       this.createTipPopup(params)
     }
 
@@ -120,9 +120,7 @@ export default class JourneyScene extends BaseScene {
       width: OVERLAY_WIDTH,
       height: overlayHeight,
       scrollMode: 0,
-      background: this.add
-        .rectangle(0, 0, 1, 1, 0xcbc1a8, 0.96)
-        .setOrigin(0),
+      background: this.add.rectangle(0, 0, 1, 1, 0xcbc1a8, 0.96).setOrigin(0),
       header: this.createOverlayHeader(themes),
       panel: { child: contentSizer },
       space: { header: 0 },
@@ -270,6 +268,13 @@ export default class JourneyScene extends BaseScene {
       })
       row.add(btnContainer, { align: 'center' })
     } else {
+      const lockedContainer = new ContainerLite(
+        this,
+        0,
+        0,
+        Space.buttonWidth,
+        Space.buttonHeight,
+      )
       const lockedText = this.add
         .text(0, 0, 'Locked', {
           ...Style.basic,
@@ -277,7 +282,8 @@ export default class JourneyScene extends BaseScene {
           color: Color.grey,
         })
         .setOrigin(0.5, 0.5)
-      row.add(lockedText, { align: 'center' })
+      lockedContainer.add(lockedText)
+      row.add(lockedContainer, { align: 'center' })
     }
 
     row.layout()
