@@ -26,12 +26,17 @@ const OVERLAY_TOP = 100
 const THEME_CAMERA_POSITIONS: { x: number; y: number }[] = [
   { x: 4000, y: 700 }, // birds (Jules)
   { x: 2100, y: 1270 }, // ashes (Adonis)
-  { x: 4860, y: 2030 }, // shadow (Mia)
+  { x: 4860, y: 1940 }, // shadow (Mia)
   { x: 1260, y: 2250 }, // pet (Kitz)
   { x: 1590, y: 4140 }, // birth (Imani)
   { x: 4850, y: 4170 }, // vision (Mitra)
   { x: 3180, y: 3140 }, // water
 ]
+
+const DRIFT_RADIUS_X = 120
+const DRIFT_RADIUS_Y = 80
+const DRIFT_SPEED = 0.0003
+const DRIFT_PHASE = 1.3
 
 export default class JourneyScene extends BaseScene {
   panDirection: [number, number] | undefined
@@ -39,6 +44,10 @@ export default class JourneyScene extends BaseScene {
   map: Phaser.GameObjects.Image
 
   isDragging = false
+
+  /** Center point the camera drifts around (theme position or last position after drag) */
+  private driftCenterX = 0
+  private driftCenterY = 0
 
   private selectedThemeIndex = 0
   private overlayHeaderText: Phaser.GameObjects.Text
@@ -84,8 +93,11 @@ export default class JourneyScene extends BaseScene {
     }
 
     const coords = UserSettings._get('journeyCoordinates')
-    this.cameras.main.scrollX = coords.x
-    this.cameras.main.scrollY = coords.y
+    const camera = this.cameras.main
+    camera.scrollX = coords.x
+    camera.scrollY = coords.y
+    this.driftCenterX = camera.scrollX + camera.width / 2
+    this.driftCenterY = camera.scrollY + camera.height / 2
 
     this.enableScrolling()
 
@@ -93,7 +105,7 @@ export default class JourneyScene extends BaseScene {
     this.createJourneyOverlay()
   }
 
-  update(_time: number, delta: number): void {
+  update(time: number, delta: number): void {
     if (!this.input.activePointer.isDown) {
       this.panDirection = undefined
     }
@@ -104,15 +116,33 @@ export default class JourneyScene extends BaseScene {
         this.panDirection[0],
         this.panDirection[1],
       )
-    }
-
-    if (this.isDragging && this.panDirection === undefined) {
+    } else if (this.isDragging) {
       const camera = this.cameras.main
       const pointer = this.input.activePointer
       const dx = ((pointer.x - pointer.downX) * delta) / 100
       const dy = ((pointer.y - pointer.downY) * delta) / 100
       JourneyScene.moveCamera(camera, dx, dy)
+    } else {
+      this.applyDrift(time)
     }
+  }
+
+  private applyDrift(time: number): void {
+    const camera = this.cameras.main
+    const offsetX = Math.sin(time * DRIFT_SPEED) * DRIFT_RADIUS_X
+    const offsetY =
+      Math.sin(time * DRIFT_SPEED * 0.7 + DRIFT_PHASE) * DRIFT_RADIUS_Y
+    camera.scrollX = Phaser.Math.Clamp(
+      this.driftCenterX - camera.width / 2 + offsetX,
+      0,
+      Math.max(0, this.map.width - camera.width),
+    )
+    camera.scrollY = Phaser.Math.Clamp(
+      this.driftCenterY - camera.height / 2 + offsetY,
+      0,
+      Math.max(0, this.map.height - camera.height),
+    )
+    JourneyScene.rememberCoordinates(camera)
   }
 
   private createJourneyOverlay(): void {
@@ -214,6 +244,8 @@ export default class JourneyScene extends BaseScene {
   private moveCameraToTheme(themeIndex: number): void {
     const pos = THEME_CAMERA_POSITIONS[themeIndex]
     if (!pos) return
+    this.driftCenterX = pos.x
+    this.driftCenterY = pos.y
     const camera = this.cameras.main
     camera.centerOn(pos.x, pos.y)
     camera.scrollX = Phaser.Math.Clamp(
@@ -521,6 +553,8 @@ export default class JourneyScene extends BaseScene {
     const camera = this.cameras.main
     this.input.on('gameobjectwheel', (_pointer, _go, dx, dy) => {
       JourneyScene.moveCamera(camera, dx, dy)
+      this.driftCenterX = camera.scrollX + camera.width / 2
+      this.driftCenterY = camera.scrollY + camera.height / 2
     })
   }
 
@@ -550,6 +584,9 @@ export default class JourneyScene extends BaseScene {
       .on('dragend', () => {
         this.isDragging = false
         arrow.setAlpha(0)
+        const cam = this.cameras.main
+        this.driftCenterX = cam.scrollX + cam.width / 2
+        this.driftCenterY = cam.scrollY + cam.height / 2
       })
   }
 
