@@ -10,37 +10,27 @@ import {
   Flags,
 } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
-import Button from '../lib/buttons/button'
 
 import Catalog from '../../../shared/state/catalog'
-import {
-  journeyNode,
-  journeyData,
-  getMissionsByTheme,
-} from '../journey/journey'
+import { journeyNode, getMissionsByTheme } from '../journey/journey'
 import Loader from '../loader/loader'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
-import { Scroll } from '../settings/settings'
+import newScrollablePanel from '../lib/scrollablePanel'
 
 const OVERLAY_WIDTH = 540
 const OVERLAY_PAD = 14
 const OVERLAY_TOP = 100
 
 export default class JourneyScene extends BaseScene {
-  panDirection
+  panDirection: [number, number] | undefined
 
   map: Phaser.GameObjects.Image
-
-  animatedBtns: Button[]
-
-  incompleteIndicators: Button[] = []
 
   isDragging = false
 
   private selectedThemeIndex = 0
-  private overlayContainer: Phaser.GameObjects.Container
   private overlayHeaderText: Phaser.GameObjects.Text
   private overlayPanel: ScrollablePanel
 
@@ -61,7 +51,6 @@ export default class JourneyScene extends BaseScene {
     this.map = this.add.image(0, 0, 'journey-Map').setOrigin(0).setInteractive()
     this.enableDrag()
 
-    // Bound camera on this map
     this.cameras.main.setBounds(0, 0, this.map.width, this.map.height)
 
     // Add buttons
@@ -73,37 +62,28 @@ export default class JourneyScene extends BaseScene {
       this.createRaceButton()
     }
 
-    // Add all of the available nodes
-    this.addJourneyData()
-
     if (params.stillframe !== undefined) {
       this.createStillframe(params)
-    } else {
-      // Add scroll functionality by default if not showing a stillframe
-      this.enableScrolling()
     }
 
     // Make up pop-up for the card you just received, if there is one
     if (params.card) {
       this.createCardPopup(params)
-    } else if (params.txt) {
+    } else     if (params.txt) {
       this.createTipPopup(params)
     }
 
-    // Scroll to the given position
     const coords = UserSettings._get('journeyCoordinates')
     this.cameras.main.scrollX = coords.x
     this.cameras.main.scrollY = coords.y
 
-    // Create indicators for where incomplete missions are
-    this.createIncompleteIndicators()
+    this.enableScrolling()
 
     // Mission list overlay on the right
     this.createJourneyOverlay()
   }
 
-  update(time, delta): void {
-    // If pointer is released, stop panning
+  update(_time: number, delta: number): void {
     if (!this.input.activePointer.isDown) {
       this.panDirection = undefined
     }
@@ -116,66 +96,55 @@ export default class JourneyScene extends BaseScene {
       )
     }
 
-    // Dragging
     if (this.isDragging && this.panDirection === undefined) {
       const camera = this.cameras.main
       const pointer = this.input.activePointer
-
       const dx = ((pointer.x - pointer.downX) * delta) / 100
       const dy = ((pointer.y - pointer.downY) * delta) / 100
-
       JourneyScene.moveCamera(camera, dx, dy)
     }
-
-    // Switch the frame of the animated elements every frame
-    // Go back and forth from frame 0 to 1
-    ;[...this.animatedBtns, ...this.incompleteIndicators].forEach((btn) => {
-      // Switch every half second, roughly
-      let frame = Math.floor((2 * time) / 1000) % 2 === 0 ? 0 : 1
-      btn.setFrame(frame)
-    })
-
-    // Adjust alpha/location of each indicator
-    this.adjustIndicators()
   }
 
   private createJourneyOverlay(): void {
     const themes = getMissionsByTheme()
-    const headerHeight = 52
-    const linePad = 8
     const overlayHeight = Space.windowHeight - OVERLAY_TOP - Space.pad
-    const panelHeight = overlayHeight - OVERLAY_PAD * 2 - headerHeight - linePad
 
-    const container = this.add.container(
-      Space.windowWidth - OVERLAY_WIDTH / 2 - Space.pad,
-      OVERLAY_TOP + overlayHeight / 2,
-    )
-    container.setScrollFactor(0)
-    this.overlayContainer = container
+    const contentSizer = this.rexUI.add.fixWidthSizer({
+      width: OVERLAY_WIDTH - OVERLAY_PAD * 4,
+      space: { item: 6 },
+    })
 
-    const mainSizer = this.rexUI.add.fixWidthSizer({
-      x: 0,
-      y: 0,
+    this.overlayPanel = newScrollablePanel(this, {
+      x: Space.windowWidth - OVERLAY_WIDTH - Space.pad,
+      y: OVERLAY_TOP,
       width: OVERLAY_WIDTH,
       height: overlayHeight,
-      space: {
-        top: OVERLAY_PAD,
-        bottom: OVERLAY_PAD,
-        left: OVERLAY_PAD,
-        right: OVERLAY_PAD,
-        line: 4,
-      },
+      scrollMode: 0,
+      background: this.add
+        .rectangle(0, 0, 1, 1, 0xcbc1a8, 0.96)
+        .setOrigin(0),
+      header: this.createOverlayHeader(themes),
+      panel: { child: contentSizer },
+      space: { header: 0 },
     })
-    const mainBg = this.add.rectangle(0, 0, 1, 1, 0xcbc1a8, 0.96).setOrigin(0)
-    mainSizer.addBackground(mainBg)
+    this.overlayPanel.setScrollFactor(0)
+    this.refreshOverlayContent()
+  }
 
-    const headerSizer = this.rexUI.add.sizer({
-      orientation: 'horizontal',
-      width: OVERLAY_WIDTH - OVERLAY_PAD * 2,
-      space: { left: 12, right: 12, top: 14, bottom: 14 },
-    })
-    const headerBg = this.add.rectangle(0, 0, 1, 1, 0x353f4e, 1).setOrigin(0)
-    headerSizer.addBackground(headerBg)
+  private createOverlayHeader(
+    themes: ReturnType<typeof getMissionsByTheme>,
+  ): Phaser.GameObjects.GameObject {
+    const headerBg = this.add
+      .rectangle(0, 0, 420, 420, 0x353f4e, 1)
+      .setOrigin(0)
+      .setInteractive()
+    const headerSizer = this.rexUI.add
+      .sizer({
+        orientation: 'horizontal',
+        width: OVERLAY_WIDTH - OVERLAY_PAD * 2,
+        space: { left: 12, right: 12, top: 14, bottom: 14 },
+      })
+      .addBackground(headerBg)
 
     this.overlayHeaderText = this.add
       .text(0, 0, '', {
@@ -188,6 +157,7 @@ export default class JourneyScene extends BaseScene {
     const leftArrow = this.add
       .text(0, 0, '‹', { ...Style.basic, fontSize: '32px', color: '#f5f2eb' })
       .setOrigin(0.5, 0.5)
+      .setInteractive({ useHandCursor: true })
     leftArrow.on('pointerdown', () => {
       this.sound.play('click')
       this.selectedThemeIndex =
@@ -197,6 +167,7 @@ export default class JourneyScene extends BaseScene {
     const rightArrow = this.add
       .text(0, 0, '›', { ...Style.basic, fontSize: '32px', color: '#f5f2eb' })
       .setOrigin(0.5, 0.5)
+      .setInteractive({ useHandCursor: true })
     rightArrow.on('pointerdown', () => {
       this.sound.play('click')
       this.selectedThemeIndex = (this.selectedThemeIndex + 1) % themes.length
@@ -210,79 +181,23 @@ export default class JourneyScene extends BaseScene {
       .addSpace()
       .add(rightArrow, { align: 'center' })
     headerSizer.layout()
-
-    mainSizer.add(headerSizer)
-    mainSizer.add(
-      this.add.line(
-        0,
-        0,
-        0,
-        0,
-        OVERLAY_WIDTH - OVERLAY_PAD * 2,
-        0,
-        0x353f4e,
-        0.5,
-      ),
-      { padding: { top: 4, bottom: 4 } },
-    )
-
-    const contentSizer = this.rexUI.add.fixWidthSizer({
-      width: OVERLAY_WIDTH - OVERLAY_PAD * 4,
-      space: { item: 6 },
-    })
-    this.overlayPanel = this.rexUI.add.scrollablePanel({
-      width: OVERLAY_WIDTH - OVERLAY_PAD * 2,
-      height: panelHeight,
-      panel: { child: contentSizer },
-      slider: Scroll(this),
-      scrollMode: 0,
-    })
-    this.setUpOverlayPanelWheelScroll(panelHeight)
-
-    mainSizer.add(this.overlayPanel)
-    mainSizer.layout()
-    container.add(mainSizer)
-    this.refreshOverlayContent()
-  }
-
-  private setUpOverlayPanelWheelScroll(panelHeight: number): void {
-    const overlayLeft = Space.windowWidth - OVERLAY_WIDTH - Space.pad
-    this.input.on(
-      'wheel',
-      (
-        pointer: Phaser.Input.Pointer,
-        _go: unknown,
-        _dx: number,
-        dy: number,
-      ) => {
-        if (pointer.x < overlayLeft || pointer.y < OVERLAY_TOP) return
-        this.overlayPanel.childOY -= dy
-        this.overlayPanel.t = Math.max(
-          0,
-          Math.min(0.999999, this.overlayPanel.t),
-        )
-      },
-    )
+    return headerSizer
   }
 
   private refreshOverlayContent(): void {
     const themes = getMissionsByTheme()
     const theme = themes[this.selectedThemeIndex]
     const completed: boolean[] = UserSettings._get('completedMissions')
-
     const completedCount = theme.missions.filter((m) => completed[m.id]).length
     this.overlayHeaderText.setText(
       `${theme.displayName} (${completedCount}/${theme.missions.length})`,
     )
-
     const panel = this.overlayPanel.getElement('panel') as FixWidthSizer
     panel.removeAll(true)
-
     theme.missions.forEach((mission) => {
       const row = this.createMissionOverlayRow(mission, completed)
       panel.add(row)
     })
-
     panel.layout()
     this.overlayPanel.layout()
   }
@@ -458,27 +373,6 @@ export default class JourneyScene extends BaseScene {
     params.card = undefined
   }
 
-  // Create indicators for any incomplete nodes on the map out of the camera's view
-  private createIncompleteIndicators(): void {
-    this.incompleteIndicators = []
-    this.animatedBtns.forEach((btn) => {
-      const indicator = new Buttons.Mission(
-        this,
-        0,
-        0,
-        () => {
-          const camera = this.cameras.main
-          camera.centerOn(btn.icon.x, btn.icon.y)
-          JourneyScene.rememberCoordinates(camera)
-        },
-        'mission',
-        true,
-      ).setNoScroll()
-
-      this.incompleteIndicators.push(indicator)
-    })
-  }
-
   // Create a stillframe animation specified in params
   private createStillframe(params): void {
     // TODO Make dry with the searching tutorial class implementation
@@ -564,9 +458,7 @@ export default class JourneyScene extends BaseScene {
             },
           })
 
-          // Allow scrolling once the stillframe is gone
           this.enableScrolling()
-
           this.scene.start('PlaceholderScene')
         }
       },
@@ -586,48 +478,66 @@ export default class JourneyScene extends BaseScene {
     // Set the param to undefined so it doesn't persist
     params.stillframe = undefined
 
-    // Reposition the stillframe to be visible to the camera
     const coords = UserSettings._get('journeyCoordinates')
     container.setPosition(coords.x, coords.y)
   }
 
-  // Add all of the missions to the panel
-  private addJourneyData(): void {
-    let completed: boolean[] = UserSettings._get('completedMissions')
-
-    let unlockedMissions = journeyData.filter(function (mission) {
-      // Return whether any of the necessary conditions have been met
-      // Prereqs are in CNF (Or of sets of Ands)
-      return mission.prereq.some(function (prereqs, _) {
-        return prereqs.every(function (id, _) {
-          return completed[id]
-        })
-      })
-    })
-
-    // Add each of the journeys as its own line
-    this.animatedBtns = []
-    unlockedMissions.forEach((mission: journeyNode) => {
-      // For now, it's all either the waving figure or ? icon
-      const nodeType = 'deck' in mission ? 'Mission' : 'QuestionMark'
-      let btn = new Buttons.Mission(
-        this,
-        mission.x,
-        mission.y,
-        this.missionOnClick(mission),
-        nodeType,
-      )
-
-      // If user hasn't completed this mission, animate it
-      if (!completed[mission.id]) {
-        this.animatedBtns.push(btn)
-      } else {
-        btn.setAlpha(0.5)
-      }
+  private enableScrolling(): void {
+    const camera = this.cameras.main
+    this.input.on('gameobjectwheel', (_pointer, _go, dx, dy) => {
+      JourneyScene.moveCamera(camera, dx, dy)
     })
   }
 
-  // Return the function for what happens when the given mission node is clicked on
+  private enableDrag(): void {
+    const arrow = this.scene.scene.add
+      .image(0, 0, 'icon-Arrow')
+      .setAlpha(0)
+      .setScrollFactor(0)
+
+    this.input
+      .setDraggable(this.map)
+      .on('dragstart', () => {
+        this.isDragging = true
+      })
+      .on('drag', (event: Phaser.Input.Pointer) => {
+        const angle = Phaser.Math.Angle.Between(
+          event.downX,
+          event.downY,
+          event.x,
+          event.y,
+        )
+        arrow
+          .setPosition(event.downX, event.downY)
+          .setRotation(angle + Phaser.Math.DegToRad(90))
+          .setAlpha(1)
+      })
+      .on('dragend', () => {
+        this.isDragging = false
+        arrow.setAlpha(0)
+      })
+  }
+
+  private static moveCamera(
+    camera: Phaser.Cameras.Scene2D.Camera,
+    dx: number,
+    dy: number,
+  ): void {
+    camera.scrollX = Math.max(0, camera.scrollX + dx)
+    camera.scrollY = Math.max(0, camera.scrollY + dy)
+    JourneyScene.rememberCoordinates(camera)
+  }
+
+  private static rememberCoordinates(
+    camera: Phaser.Cameras.Scene2D.Camera,
+  ): void {
+    UserSettings._set('journeyCoordinates', {
+      x: camera.scrollX,
+      y: camera.scrollY,
+    })
+  }
+
+  // Return the function for what happens when the given mission node is clicked on (from overlay Start button)
   private missionOnClick(mission: journeyNode): () => void {
     return () => {
       if ('deck' in mission) {
@@ -658,100 +568,5 @@ export default class JourneyScene extends BaseScene {
         }
       }
     }
-  }
-
-  private enableScrolling(): void {
-    let camera = this.cameras.main
-
-    this.input.on(
-      'gameobjectwheel',
-      (pointer, gameObject, dx, dy, dz, event) => {
-        JourneyScene.moveCamera(camera, dx, dy)
-      },
-    )
-  }
-
-  private enableDrag(): void {
-    // Arrow pointing from the start of the drag to current position
-    const arrow = this.scene.scene.add
-      .image(0, 0, 'icon-Arrow')
-      .setAlpha(0)
-      .setScrollFactor(0)
-
-    // Map can be dragged
-    this.input
-      .setDraggable(this.map)
-      .on('dragstart', (event) => {
-        this.isDragging = true
-      })
-      .on('drag', (event) => {
-        const angle = Phaser.Math.Angle.Between(
-          event.downX,
-          event.downY,
-          event.x,
-          event.y,
-        )
-        arrow
-          .setPosition(event.downX, event.downY)
-          .setRotation(angle + Phaser.Math.DegToRad(90))
-          .setAlpha(1)
-      })
-      .on('dragend', () => {
-        this.isDragging = false
-        arrow.setAlpha(0)
-      })
-  }
-
-  private adjustIndicators(): void {
-    // Find the intersection between a line from the btn to camer's center
-    const camera = this.cameras.main
-    const rect = camera.worldView
-
-    // Adjust each indicator
-    for (let i = 0; i < this.animatedBtns.length; i++) {
-      const btn = this.animatedBtns[i]
-
-      // TODO Use set bounds of camera to lock it to the map image instead of math
-      const line = new Phaser.Geom.Line(
-        btn.icon.x,
-        btn.icon.y,
-        camera.scrollX + camera.centerX,
-        camera.scrollY + camera.centerY,
-      )
-
-      const intersects = Phaser.Geom.Intersects.GetLineToRectangle(line, rect)
-
-      // If btn is on screen, hide this button's indicator indicator
-      if (intersects.length === 0) {
-        this.incompleteIndicators[i].setAlpha(0)
-      }
-      // Otherwise, place the indicator at the intersection of worldview and line to camera's center
-      else {
-        const intersect = intersects[0]
-
-        this.incompleteIndicators[i]
-          .setAlpha(1)
-          .setPosition(
-            intersect.x - camera.scrollX,
-            intersect.y - camera.scrollY,
-          )
-      }
-    }
-  }
-
-  private static moveCamera(camera, dx, dy): void {
-    camera.scrollX = Math.max(0, camera.scrollX + dx)
-    camera.scrollY = Math.max(0, camera.scrollY + dy)
-
-    // Remember the camera position
-    JourneyScene.rememberCoordinates(camera)
-  }
-
-  // Remember the position of the camera so the next time this scene launches it's in the same place
-  private static rememberCoordinates(camera): void {
-    UserSettings._set('journeyCoordinates', {
-      x: camera.scrollX,
-      y: camera.scrollY,
-    })
   }
 }
