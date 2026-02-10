@@ -20,7 +20,6 @@ import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWid
 import newScrollablePanel from '../lib/scrollablePanel'
 
 const OVERLAY_WIDTH = 540
-const OVERLAY_PAD = 14
 const OVERLAY_TOP = 100
 
 /** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Imani, Mitra, Water */
@@ -121,7 +120,7 @@ export default class JourneyScene extends BaseScene {
     const overlayHeight = Space.windowHeight - OVERLAY_TOP - Space.pad
 
     const contentSizer = this.rexUI.add.fixWidthSizer({
-      width: OVERLAY_WIDTH - OVERLAY_PAD * 4,
+      width: OVERLAY_WIDTH,
       space: { item: 6 },
     })
 
@@ -150,7 +149,7 @@ export default class JourneyScene extends BaseScene {
     const headerSizer = this.rexUI.add
       .sizer({
         orientation: 'horizontal',
-        width: OVERLAY_WIDTH - OVERLAY_PAD * 2,
+        width: OVERLAY_WIDTH,
         space: { left: 12, right: 12, top: 14, bottom: 14 },
       })
       .addBackground(headerBg)
@@ -248,7 +247,7 @@ export default class JourneyScene extends BaseScene {
     mission: journeyNode,
     completed: boolean[],
   ): Phaser.GameObjects.GameObject {
-    const rowWidth = OVERLAY_WIDTH - OVERLAY_PAD * 4
+    const rowWidth = OVERLAY_WIDTH
     const row = this.rexUI.add.sizer({
       orientation: 'horizontal',
       width: rowWidth,
