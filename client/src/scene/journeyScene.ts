@@ -37,6 +37,7 @@ const DRIFT_RADIUS_X = 150
 const DRIFT_RADIUS_Y = 80
 const DRIFT_SPEED = 0.0003
 const DRIFT_PHASE = 1.3
+const THEME_CAMERA_TWEEN_DURATION = 400
 
 export default class JourneyScene extends BaseScene {
   map: Phaser.GameObjects.Image
@@ -45,6 +46,7 @@ export default class JourneyScene extends BaseScene {
   private driftCenterX = 0
   private driftCenterY = 0
 
+  private isTweeningCamera = false
   private selectedThemeIndex = 0
   private overlayHeaderText: Phaser.GameObjects.Text
   private overlayPanel: ScrollablePanel
@@ -99,6 +101,7 @@ export default class JourneyScene extends BaseScene {
   }
 
   update(time: number, _delta: number): void {
+    if (this.isTweeningCamera) return
     const camera = this.cameras.main
     const offsetX = Math.sin(time * DRIFT_SPEED) * DRIFT_RADIUS_X
     const offsetY =
@@ -218,18 +221,31 @@ export default class JourneyScene extends BaseScene {
     this.driftCenterX = pos.x
     this.driftCenterY = pos.y
     const camera = this.cameras.main
-    camera.centerOn(pos.x, pos.y)
-    camera.scrollX = Phaser.Math.Clamp(
-      camera.scrollX,
+    const maxScrollX = Math.max(0, this.map.width - camera.width)
+    const maxScrollY = Math.max(0, this.map.height - camera.height)
+    const targetScrollX = Phaser.Math.Clamp(
+      pos.x - camera.width / 2,
       0,
-      Math.max(0, this.map.width - camera.width),
+      maxScrollX,
     )
-    camera.scrollY = Phaser.Math.Clamp(
-      camera.scrollY,
+    const targetScrollY = Phaser.Math.Clamp(
+      pos.y - camera.height / 2,
       0,
-      Math.max(0, this.map.height - camera.height),
+      maxScrollY,
     )
-    JourneyScene.rememberCoordinates(camera)
+    this.tweens.killTweensOf(camera)
+    this.isTweeningCamera = true
+    this.tweens.add({
+      targets: camera,
+      scrollX: targetScrollX,
+      scrollY: targetScrollY,
+      duration: THEME_CAMERA_TWEEN_DURATION,
+      ease: 'Power2.Out',
+      onComplete: () => {
+        this.isTweeningCamera = false
+        JourneyScene.rememberCoordinates(camera)
+      },
+    })
   }
 
   private isMissionUnlocked(
