@@ -89,12 +89,9 @@ export default class JourneyScene extends BaseScene {
       this.createTipPopup(params)
     }
 
-    const coords = UserSettings._get('journeyCoordinates')
     const camera = this.cameras.main
-    camera.scrollX = coords.x
-    camera.scrollY = coords.y
-    this.driftCenterX = camera.scrollX + camera.width / 2
-    this.driftCenterY = camera.scrollY + camera.height / 2
+    // Start at selected theme position immediately (no transition on open)
+    this.snapCameraToTheme(this.selectedThemeIndex)
 
     // Mission list overlay on the right
     this.createJourneyOverlay()
@@ -140,7 +137,7 @@ export default class JourneyScene extends BaseScene {
       space: { header: 0 },
     })
     this.overlayPanel.setScrollFactor(0)
-    this.refreshOverlayContent()
+    this.refreshOverlayContent(false) // already at theme position; no tween on open
   }
 
   private createOverlayHeader(
@@ -215,6 +212,28 @@ export default class JourneyScene extends BaseScene {
     if (moveCamera) {
       this.moveCameraToTheme(this.selectedThemeIndex)
     }
+  }
+
+  /** Set camera and drift center to theme position without tweening */
+  private snapCameraToTheme(themeIndex: number): void {
+    const pos = THEME_CAMERA_POSITIONS[themeIndex]
+    if (!pos) return
+    this.driftCenterX = pos.x
+    this.driftCenterY = pos.y
+    const camera = this.cameras.main
+    const maxScrollX = Math.max(0, this.map.width - camera.width)
+    const maxScrollY = Math.max(0, this.map.height - camera.height)
+    camera.scrollX = Phaser.Math.Clamp(
+      pos.x - camera.width / 2,
+      0,
+      maxScrollX,
+    )
+    camera.scrollY = Phaser.Math.Clamp(
+      pos.y - camera.height / 2,
+      0,
+      maxScrollY,
+    )
+    JourneyScene.rememberCoordinates(camera)
   }
 
   private moveCameraToTheme(themeIndex: number): void {
