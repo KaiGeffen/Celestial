@@ -23,6 +23,17 @@ const OVERLAY_WIDTH = 540
 const OVERLAY_PAD = 14
 const OVERLAY_TOP = 100
 
+/** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Imani, Mitra, Water */
+const THEME_CAMERA_POSITIONS: { x: number; y: number }[] = [
+  { x: 4000, y: 700 }, // birds (Jules)
+  { x: 2100, y: 1270 }, // ashes (Adonis)
+  { x: 4860, y: 2030 }, // shadow (Mia)
+  { x: 1260, y: 2250 }, // pet (Kitz)
+  { x: 1590, y: 4140 }, // birth (Imani)
+  { x: 4850, y: 4170 }, // vision (Mitra)
+  { x: 3180, y: 3140 }, // water
+]
+
 export default class JourneyScene extends BaseScene {
   panDirection: [number, number] | undefined
 
@@ -198,6 +209,25 @@ export default class JourneyScene extends BaseScene {
     })
     panel.layout()
     this.overlayPanel.layout()
+    this.moveCameraToTheme(this.selectedThemeIndex)
+  }
+
+  private moveCameraToTheme(themeIndex: number): void {
+    const pos = THEME_CAMERA_POSITIONS[themeIndex]
+    if (!pos) return
+    const camera = this.cameras.main
+    camera.centerOn(pos.x, pos.y)
+    camera.scrollX = Phaser.Math.Clamp(
+      camera.scrollX,
+      0,
+      Math.max(0, this.map.width - camera.width),
+    )
+    camera.scrollY = Phaser.Math.Clamp(
+      camera.scrollY,
+      0,
+      Math.max(0, this.map.height - camera.height),
+    )
+    JourneyScene.rememberCoordinates(camera)
   }
 
   private isMissionUnlocked(
