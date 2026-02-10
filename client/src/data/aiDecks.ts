@@ -1,7 +1,9 @@
 import { Deck } from '../../../shared/types/deck'
+import Server from '../server'
 
-/** 0 = easy, 1 = medium, 2 = hard */
-export type AiDifficulty = 0 | 1 | 2
+/*
+  Serves user a random deck based on their elo
+*/
 
 const easyDecks: Deck[] = [
   {
@@ -156,10 +158,18 @@ const hardDecks: Deck[] = [
   },
 ]
 
-const decksByDifficulty: Deck[][] = [easyDecks, mediumDecks, hardDecks]
+/** Difficulty from PvE wins: 0–4 easy, 5–14 medium, 15+ hard */
+function difficultyFromPveWins(pveWins: number): 0 | 1 | 2 {
+  if (pveWins < 10) return 0
+  if (pveWins < 20) return 1
+  return 2
+}
 
-export default function getRandomAiDeck(difficulty: number = 1): Deck {
-  const index = Math.max(0, Math.min(2, Math.floor(difficulty))) as AiDifficulty
-  const decks = decksByDifficulty[index]
+export default function getRandomAiDeck(): Deck {
+  const userData = Server.getUserData()
+  const pveWins = userData?.pveWins ?? 0
+  const difficulty = difficultyFromPveWins(pveWins)
+  const decks =
+    difficulty === 0 ? easyDecks : difficulty === 1 ? mediumDecks : hardDecks
   return decks[Math.floor(Math.random() * decks.length)]
 }

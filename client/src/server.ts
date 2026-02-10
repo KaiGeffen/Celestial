@@ -32,6 +32,7 @@ type UserData = null | {
   uuid: string
   username: string
   elo: number
+  pveWins: number
   garden: Date[]
   gems: number
   coins: number
@@ -352,6 +353,7 @@ export default class Server {
         uuid: null,
         username: null,
         elo: null,
+        pveWins: 0,
         garden: [],
         gems: null,
         coins: null,

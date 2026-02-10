@@ -48,6 +48,7 @@ export default async function sendUserData(ws: ServerWS, id: string) {
     decks,
     username: data.username,
     elo: data.elo,
+    pveWins: data.pve_wins,
     garden: data.garden,
     gems: data.gems,
     coins: data.coins,

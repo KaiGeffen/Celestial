@@ -13,6 +13,7 @@ export default interface messagesToClient {
     decks: Deck[]
     username: string
     elo: number
+    pveWins: number
     garden: Date[]
     gems: number
     coins: number
