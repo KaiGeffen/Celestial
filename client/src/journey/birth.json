@@ -1,10 +1,10 @@
 [
   {
-    "name": "Birth 1 - Nascence",
+    "name": "What Could Be",
     "id": 500,
     "x": 1555,
     "y": 4450,
-    "prereq": [],
+    "prereq": [[]],
     "deck": [2, 2, 2, 9, 9, 11, 13, 18, 18],
     "opponent": [18, 18, 61, 61, 15, 15, 48, 48, 48, 7, 7, 33, 33, 4, 4]
   },
@@ -17,7 +17,7 @@
     "card": 2
   },
   {
-    "name": "Birth 2 - Posterity",
+    "name": "When I First Held You",
     "id": 502,
     "x": 1200,
     "y": 4355,
@@ -34,7 +34,7 @@
     "card": 53
   },
   {
-    "name": "Birth 3 - Birth",
+    "name": "A Part of Everything",
     "id": 504,
     "x": 960,
     "y": 4200,
@@ -51,7 +51,7 @@
     "card": 8
   },
   {
-    "name": "Birth 4 - Cradle",
+    "name": "Watching You Grow",
     "id": 506,
     "x": 1388,
     "y": 4227,
@@ -68,7 +68,7 @@
     "card": 60
   },
   {
-    "name": "Birth 5 - The Future",
+    "name": "I Leave Everything to You",
     "id": 508,
     "x": 1603,
     "y": 3932,
@@ -85,7 +85,7 @@
     "card": 22
   },
   {
-    "name": "Birth 6 - Ancestry",
+    "name": "The Ones Who Came Before",
     "id": 510,
     "x": 2218,
     "y": 4046,
@@ -103,7 +103,7 @@
   },
 
   {
-    "name": "Birth Bonus 1 - Rebirth",
+    "name": "A New Beginning",
     "id": 520,
     "x": 1836,
     "y": 4279,

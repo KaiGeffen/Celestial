@@ -1,6 +1,6 @@
 [
   {
-    "name": "Ashes 1",
+    "name": "Surprise visit",
     "id": 200,
     "x": 2497,
     "y": 1484,
@@ -33,7 +33,7 @@
     "card": 17
   },
   {
-    "name": "Ashes 2",
+    "name": "Burning Out",
     "id": 204,
     "x": 1688,
     "y": 1573,
@@ -50,7 +50,7 @@
     "card": 21
   },
   {
-    "name": "Ashes 3",
+    "name": "I Won't Let Go",
     "id": 206,
     "x": 1225,
     "y": 1425,
@@ -67,7 +67,7 @@
     "card": 20
   },
   {
-    "name": "Ashes Bonus 1 - Drown, after 2",
+    "name": "Deep Underwater",
     "id": 208,
     "x": 2110,
     "y": 1070,
@@ -84,7 +84,7 @@
     "card": 5
   },
   {
-    "name": "Ashes Bonus 2 - Mine, after 3",
+    "name": "My Source of Strength",
     "id": 210,
     "x": 2085,
     "y": 1660,
@@ -101,7 +101,7 @@
     "card": 15
   },
   {
-    "name": "Ashes Bonus 3 - Parch, after Mia",
+    "name": "Live Through Hell",
     "id": 212,
     "x": 2690,
     "y": 1580,
@@ -118,7 +118,7 @@
     "card": 64
   },
   {
-    "name": "Ashes Bonus 4 - Jude",
+    "name": "Fruit of My Ambition",
     "id": 214,
     "x": 1370,
     "y": 1005,

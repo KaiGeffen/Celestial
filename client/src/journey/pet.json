@@ -1,10 +1,10 @@
 [
   {
-    "name": "Pet 1",
+    "name": "Finding Her",
     "id": 400,
     "x": 1435,
     "y": 2415,
-    "prereq": [],
+    "prereq": [[]],
     "deck": [11, 11, 11, 34, 34, 33, 33, 33, 4, 0, 0, 0],
     "opponent": [21, 20, 19, 19, 19, 17, 14, 12, 6, 6, 63, 63, 5, 5, 5]
   },
@@ -25,7 +25,7 @@
     "card": 33
   },
   {
-    "name": "Pet 2 - Oak",
+    "name": "Keeping Her Safe",
     "id": 403,
     "x": 1240,
     "y": 2627,
@@ -42,7 +42,7 @@
     "card": 23
   },
   {
-    "name": "Pet 3 - Gentle Rain",
+    "name": "Becoming Her Everything",
     "id": 405,
     "x": 400,
     "y": 2273,
@@ -59,7 +59,7 @@
     "card": 71
   },
   {
-    "name": "Pet Bonus 1 - Bounty, after 1",
+    "name": "Keeping Everyone Happy",
     "id": 407,
     "x": 830,
     "y": 2605,
@@ -76,7 +76,7 @@
     "card": 48
   },
   {
-    "name": "Pet Bonus 2 - Hollow, after 2",
+    "name": "Empty Without Her",
     "id": 409,
     "x": 1900,
     "y": 2640,
@@ -93,7 +93,7 @@
     "card": 76
   },
   {
-    "name": "Pet Bonus 3 - Night Vision, after 3",
+    "name": "Eyes in the Dark",
     "id": 411,
     "x": 360,
     "y": 2405,
@@ -110,7 +110,7 @@
     "card": 28
   },
   {
-    "name": "Pet Bonus 4 - Sunflower, after Sun",
+    "name": "What I'd Give",
     "id": 413,
     "x": 530,
     "y": 2546,

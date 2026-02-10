@@ -1,10 +1,10 @@
 [
   {
-    "name": "Shadow 1",
+    "name": "In a Hole",
     "id": 300,
     "x": 4640,
     "y": 2180,
-    "prereq": [],
+    "prereq": [[]],
     "deck": [1, 1, 1, 1, 1, 19, 19, 19, 19],
     "opponent": [18, 18, 61, 61, 15, 15, 48, 48, 48, 7, 7, 33, 33, 4, 4]
   },
@@ -25,7 +25,7 @@
     "card": 19
   },
   {
-    "name": "Shadow 2",
+    "name": "The Price of Truth",
     "id": 303,
     "x": 4953,
     "y": 2140,
@@ -42,7 +42,7 @@
     "card": 68
   },
   {
-    "name": "Shadow 3 - Imprison",
+    "name": "Where it All Began",
     "id": 305,
     "x": 4720,
     "y": 1730,
@@ -59,7 +59,7 @@
     "card": 35
   },
   {
-    "name": "Shadow Bonus 1 - Clip, after 1",
+    "name": "Don't Leave Me",
     "id": 307,
     "x": 4100,
     "y": 1910,
@@ -76,7 +76,7 @@
     "card": 16
   },
   {
-    "name": "Shadow Bonus 2 - Hungry Ghost, after 2",
+    "name": "Can Never Be Saved",
     "id": 309,
     "x": 5440,
     "y": 2100,
@@ -93,7 +93,7 @@
     "card": 31
   },
   {
-    "name": "Shadow Bonus 3 - Sickness, after 3",
+    "name": "Tale of the Jackal",
     "id": 311,
     "x": 4830,
     "y": 1394,
@@ -110,7 +110,7 @@
     "card": 58
   },
   {
-    "name": "Shadow Bonus 4 - Boa, after Jude",
+    "name": "What I've Done",
     "id": 313,
     "x": 5040,
     "y": 2432,

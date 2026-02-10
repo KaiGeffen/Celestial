@@ -1,10 +1,10 @@
 [
   {
-    "name": "Vision 1 - Clear View",
+    "name": "Right View",
     "id": 600,
     "x": 3807,
     "y": 4273,
-    "prereq": [],
+    "prereq": [[]],
     "deck": [27, 27, 27, 27, 12, 12, 12, 13],
     "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22]
   },
@@ -17,7 +17,7 @@
     "card": 27
   },
   {
-    "name": "Vision 2 - Enlightenment",
+    "name": "Right Thought",
     "id": 602,
     "x": 4226,
     "y": 4234,
@@ -34,7 +34,7 @@
     "card": 45
   },
   {
-    "name": "Vision 3 - Awakening",
+    "name": "Right Speech",
     "id": 604,
     "x": 5093,
     "y": 4205,
@@ -51,7 +51,7 @@
     "card": 39
   },
   {
-    "name": "Vision 4 - Nectar",
+    "name": "Right Action",
     "id": 606,
     "x": 5315,
     "y": 4223,
@@ -68,7 +68,7 @@
     "card": 25
   },
   {
-    "name": "Vision 5 - Conquer",
+    "name": "Right Livelihood",
     "id": 608,
     "x": 5507,
     "y": 4252,
@@ -86,7 +86,7 @@
   },
 
   {
-    "name": "Vision 1 Alt - Prey",
+    "name": "Right Effort",
     "id": 650,
     "x": 4144,
     "y": 3892,
@@ -103,7 +103,7 @@
     "card": 26
   },
   {
-    "name": "Vision 2 Alt - Dawn",
+    "name": "Right Mindfulness",
     "id": 652,
     "x": 5270,
     "y": 3784,
@@ -117,6 +117,23 @@
     "x": 5270,
     "y": 3681,
     "prereq": [[652]],
+    "card": 50
+  },
+  {
+    "name": "Right Meditation",
+    "id": 654,
+    "x": 5370,
+    "y": 3784,
+    "prereq": [[653]],
+    "deck": [],
+    "opponent": [2, 63, 3, 3, 8, 8, 8, 31, 48, 48, 60, 15, 18, 22, 22]
+  },
+  {
+    "name": "🎴 Coming Soon",
+    "id": 655,
+    "x": 5370,
+    "y": 3681,
+    "prereq": [[654]],
     "card": 50
   }
 ]
