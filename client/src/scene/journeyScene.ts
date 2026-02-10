@@ -24,28 +24,24 @@ const OVERLAY_TOP = 100
 
 /** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Imani, Mitra, Water */
 const THEME_CAMERA_POSITIONS: { x: number; y: number }[] = [
-  { x: 4000, y: 700 }, // birds (Jules)
+  { x: 4000, y: 670 }, // birds (Jules)
   { x: 2100, y: 1270 }, // ashes (Adonis)
   { x: 4860, y: 1940 }, // shadow (Mia)
   { x: 1260, y: 2250 }, // pet (Kitz)
   { x: 1590, y: 4140 }, // birth (Imani)
-  { x: 4850, y: 4170 }, // vision (Mitra)
-  { x: 3180, y: 3140 }, // water
+  { x: 4850, y: 4130 }, // vision (Mitra)
+  { x: 3180, y: 3100 }, // water
 ]
 
-const DRIFT_RADIUS_X = 120
+const DRIFT_RADIUS_X = 150
 const DRIFT_RADIUS_Y = 80
 const DRIFT_SPEED = 0.0003
 const DRIFT_PHASE = 1.3
 
 export default class JourneyScene extends BaseScene {
-  panDirection: [number, number] | undefined
-
   map: Phaser.GameObjects.Image
 
-  isDragging = false
-
-  /** Center point the camera drifts around (theme position or last position after drag) */
+  /** Center point the camera drifts around (theme position) */
   private driftCenterX = 0
   private driftCenterY = 0
 
@@ -67,8 +63,7 @@ export default class JourneyScene extends BaseScene {
     super.create()
 
     // Create the background
-    this.map = this.add.image(0, 0, 'journey-Map').setOrigin(0).setInteractive()
-    this.enableDrag()
+    this.map = this.add.image(0, 0, 'journey-Map').setOrigin(0)
 
     this.cameras.main.setBounds(0, 0, this.map.width, this.map.height)
 
@@ -99,35 +94,11 @@ export default class JourneyScene extends BaseScene {
     this.driftCenterX = camera.scrollX + camera.width / 2
     this.driftCenterY = camera.scrollY + camera.height / 2
 
-    this.enableScrolling()
-
     // Mission list overlay on the right
     this.createJourneyOverlay()
   }
 
-  update(time: number, delta: number): void {
-    if (!this.input.activePointer.isDown) {
-      this.panDirection = undefined
-    }
-
-    if (this.panDirection !== undefined) {
-      JourneyScene.moveCamera(
-        this.cameras.main,
-        this.panDirection[0],
-        this.panDirection[1],
-      )
-    } else if (this.isDragging) {
-      const camera = this.cameras.main
-      const pointer = this.input.activePointer
-      const dx = ((pointer.x - pointer.downX) * delta) / 100
-      const dy = ((pointer.y - pointer.downY) * delta) / 100
-      JourneyScene.moveCamera(camera, dx, dy)
-    } else {
-      this.applyDrift(time)
-    }
-  }
-
-  private applyDrift(time: number): void {
+  update(time: number, _delta: number): void {
     const camera = this.cameras.main
     const offsetX = Math.sin(time * DRIFT_SPEED) * DRIFT_RADIUS_X
     const offsetY =
@@ -525,7 +496,6 @@ export default class JourneyScene extends BaseScene {
             },
           })
 
-          this.enableScrolling()
           this.scene.start('PlaceholderScene')
         }
       },
@@ -547,57 +517,6 @@ export default class JourneyScene extends BaseScene {
 
     const coords = UserSettings._get('journeyCoordinates')
     container.setPosition(coords.x, coords.y)
-  }
-
-  private enableScrolling(): void {
-    const camera = this.cameras.main
-    this.input.on('gameobjectwheel', (_pointer, _go, dx, dy) => {
-      JourneyScene.moveCamera(camera, dx, dy)
-      this.driftCenterX = camera.scrollX + camera.width / 2
-      this.driftCenterY = camera.scrollY + camera.height / 2
-    })
-  }
-
-  private enableDrag(): void {
-    const arrow = this.scene.scene.add
-      .image(0, 0, 'icon-Arrow')
-      .setAlpha(0)
-      .setScrollFactor(0)
-
-    this.input
-      .setDraggable(this.map)
-      .on('dragstart', () => {
-        this.isDragging = true
-      })
-      .on('drag', (event: Phaser.Input.Pointer) => {
-        const angle = Phaser.Math.Angle.Between(
-          event.downX,
-          event.downY,
-          event.x,
-          event.y,
-        )
-        arrow
-          .setPosition(event.downX, event.downY)
-          .setRotation(angle + Phaser.Math.DegToRad(90))
-          .setAlpha(1)
-      })
-      .on('dragend', () => {
-        this.isDragging = false
-        arrow.setAlpha(0)
-        const cam = this.cameras.main
-        this.driftCenterX = cam.scrollX + cam.width / 2
-        this.driftCenterY = cam.scrollY + cam.height / 2
-      })
-  }
-
-  private static moveCamera(
-    camera: Phaser.Cameras.Scene2D.Camera,
-    dx: number,
-    dy: number,
-  ): void {
-    camera.scrollX = Math.max(0, camera.scrollX + dx)
-    camera.scrollY = Math.max(0, camera.scrollY + dy)
-    JourneyScene.rememberCoordinates(camera)
   }
 
   private static rememberCoordinates(
