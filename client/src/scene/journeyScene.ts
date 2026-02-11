@@ -11,7 +11,6 @@ import {
 } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
 
-import Catalog from '../../../shared/state/catalog'
 import { journeyNode, getMissionsByTheme } from '../journey/journey'
 import Loader from '../loader/loader'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -570,44 +569,18 @@ export default class JourneyScene extends BaseScene {
     return () => {
       if ('deck' in mission) {
         this.scene.start('MapJourneyBuilderScene', mission)
-      } else {
-        // Complete the mission
+      } else if ('tip' in mission) {
+        // Tip node: mark complete and show tip popup
         UserSettings._setIndex('completedMissions', mission.id, true)
-
         const onMenuClosed = () => {
           this.refreshOverlayContent(false)
         }
-
-        // Show tip (launch popup; do not restart scene)
-        if ('tip' in mission) {
-          this.scene.launch('MenuScene', {
-            menu: 'message',
-            title: 'Tip',
-            s: mission.tip,
-          })
-          this.scene.get('MenuScene').events.once('shutdown', onMenuClosed)
-        }
-        // Unlock the card (launch popup; do not restart scene)
-        else if ('card' in mission) {
-          UserSettings._setIndex('inventory', mission.card, true)
-
-          const card = Catalog.getCardById(mission.card)
-          if (card === undefined) {
-            this.scene.launch('MenuScene', {
-              menu: 'message',
-              title: 'Card Unlocked!',
-              s: 'Error, card undefined',
-            })
-          } else {
-            this.scene.launch('MenuScene', {
-              menu: 'message',
-              title: 'Card Unlocked!',
-              s: card.story,
-              card: card,
-            })
-          }
-          this.scene.get('MenuScene').events.once('shutdown', onMenuClosed)
-        }
+        this.scene.launch('MenuScene', {
+          menu: 'message',
+          title: 'Tip',
+          s: mission.tip,
+        })
+        this.scene.get('MenuScene').events.once('shutdown', onMenuClosed)
       }
     }
   }

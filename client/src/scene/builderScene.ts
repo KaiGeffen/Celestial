@@ -173,6 +173,7 @@ export class MapJourneyBuilderScene extends BuilderBase {
         deck: this.journeyRegion.getDeck(),
         aiDeck: aiDeck,
         missionID: this.params.id,
+        missionCards: this.params.cards || [],
       })
     }
   }

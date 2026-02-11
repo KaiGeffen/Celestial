@@ -73,15 +73,13 @@ interface MissionNode extends JourneyBase {
   opponent: number[]
   storyTitle?: string
   storyText?: string
-}
-
-interface CardNode extends JourneyBase {
-  card: number
+  /** Card ids unlocked when this mission is completed (replaces former card nodes) */
+  cards?: number[]
 }
 
 interface TipNode extends JourneyBase {
   tip: string
 }
 
-// Journey is the union of all node types
-export type journeyNode = MissionNode | CardNode | TipNode
+// Journey is the union of all node types (no card nodes; missions unlock cards via .cards)
+export type journeyNode = MissionNode | TipNode

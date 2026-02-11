@@ -45,6 +45,7 @@ export class MatchScene extends BaseScene {
   init(params: {
     deck?: Deck
     missionID?: number
+    missionCards?: number[]
     isPvp?: boolean
     password?: string
     aiDeck?: Deck
@@ -701,11 +702,14 @@ export class JourneyMatchScene extends MatchScene {
   ): void {}
 
   private unlockMissionRewards(): void {
-    // Set that user has completed the missions with this id
     if (this.params.missionID !== undefined) {
       // NOTE This is a hack to prevent the server sending the mission to overwrite our local completed missions change
       setTimeout(() => {
         UserSettings._setIndex('completedMissions', this.params.missionID, true)
+        const cards: number[] = this.params.missionCards || []
+        cards.forEach((cardId) => {
+          UserSettings._setIndex('inventory', cardId, true)
+        })
       }, 200)
     }
   }
