@@ -22,7 +22,11 @@ export default class Hint {
   private referencedCard: CardImage
 
   constructor(scene: Phaser.Scene) {
-    this.container = scene.add.container().setDepth(40).setVisible(false)
+    this.container = scene.add
+      .container()
+      .setDepth(40)
+      .setVisible(false)
+      .setScrollFactor(0, 0)
 
     // Textual part of hint
     this.txt = scene['rexUI'].add

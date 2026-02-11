@@ -8,9 +8,11 @@ import {
   Time,
   Ease,
   Flags,
+  BBStyle,
 } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
 
+import Catalog from '../../../shared/state/catalog'
 import { journeyNode, getMissionsByTheme } from '../journey/journey'
 import Loader from '../loader/loader'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -222,16 +224,8 @@ export default class JourneyScene extends BaseScene {
     const camera = this.cameras.main
     const maxScrollX = Math.max(0, this.map.width - camera.width)
     const maxScrollY = Math.max(0, this.map.height - camera.height)
-    camera.scrollX = Phaser.Math.Clamp(
-      pos.x - camera.width / 2,
-      0,
-      maxScrollX,
-    )
-    camera.scrollY = Phaser.Math.Clamp(
-      pos.y - camera.height / 2,
-      0,
-      maxScrollY,
-    )
+    camera.scrollX = Phaser.Math.Clamp(pos.x - camera.width / 2, 0, maxScrollX)
+    camera.scrollY = Phaser.Math.Clamp(pos.y - camera.height / 2, 0, maxScrollY)
     JourneyScene.rememberCoordinates(camera)
   }
 
@@ -309,16 +303,35 @@ export default class JourneyScene extends BaseScene {
       .setOrigin(0, 0.5)
     row.add(checkText, { align: 'center' })
 
-    // Mission name
-    const nameText = this.add
-      .text(0, 0, this.getMissionDisplayName(mission), {
-        ...Style.basic,
+    // Mission name + card emojis as BBCode (hover areas show card)
+    let nameBBCode = this.getMissionDisplayName(mission)
+    if ('deck' in mission && mission.cards?.length) {
+      for (const cardId of mission.cards) {
+        if (Catalog.getCardById(cardId)) {
+          nameBBCode += ` [area=card_${cardId}]🎴[/area]`
+        }
+      }
+    }
+    const nameText = this.rexUI.add
+      .BBCodeText(0, 0, nameBBCode, {
+        ...BBStyle.basic,
         fontSize: '18px',
+        wrap: { mode: 'word', width: rowWidth - 120 },
       })
       .setOrigin(0, 0.5)
-      .setWordWrapWidth(rowWidth - 120)
-      .setLineSpacing(2)
-    row.add(nameText, { proportion: 1, align: 'left-center' })
+      .setInteractive()
+      .on('areaover', (key: string) => {
+        if (key.startsWith('card_')) {
+          const cardId = parseInt(key.replace('card_', ''), 10)
+          const card = Catalog.getCardById(cardId)
+          console.log('card', card)
+          console.log('hint', this.hint)
+          if (card) this.hint.showCard(card)
+        }
+      })
+      .on('areaout', () => this.hint.hide())
+    row.add(nameText, { align: 'left-center' })
+    row.addSpace() // pushes Start/Locked to the right
 
     if (isUnlocked) {
       const btnContainer = new ContainerLite(

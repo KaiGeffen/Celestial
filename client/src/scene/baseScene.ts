@@ -149,10 +149,10 @@ export default class BaseScene extends SharedBaseScene {
       .setOrigin(1, 0)
       .setDepth(5)
       .setScrollFactor(0)
-      this.plugins.get('rexAnchor')['add'](this.txtFPS, {
-        x: `100%`,
-        y: `0%`,
-      })
+    this.plugins.get('rexAnchor')['add'](this.txtFPS, {
+      x: `100%`,
+      y: `0%`,
+    })
 
     // On mobile, ensure music is playing the first time a click happens
     if (Flags.mobile) {
@@ -244,10 +244,13 @@ export default class BaseScene extends SharedBaseScene {
 
       // Check if we have at least 2 seconds of FPS data
       const oldestEntry = this.fpsHistory.length > 0 ? this.fpsHistory[0] : null
-      const hasTwoSecondsOfData = oldestEntry !== null && (time - oldestEntry.time) >= 2000
-      
+      const hasTwoSecondsOfData =
+        oldestEntry !== null && time - oldestEntry.time >= 2000
+
       // Remove entries older than 2 seconds
-      this.fpsHistory = this.fpsHistory.filter((entry) => entry.time > twoSecondsAgo)
+      this.fpsHistory = this.fpsHistory.filter(
+        (entry) => entry.time > twoSecondsAgo,
+      )
 
       // Send low FPS report if FPS has been below threshold for the last 2 seconds
       if (

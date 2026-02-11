@@ -73,7 +73,6 @@ interface MissionNode extends JourneyBase {
   opponent: number[]
   storyTitle?: string
   storyText?: string
-  /** Card ids unlocked when this mission is completed (replaces former card nodes) */
   cards?: number[]
 }
 
