@@ -13,6 +13,7 @@ import Garden from '../db/garden'
 import Catalog from '../../../shared/state/catalog'
 
 import PveMatch from './match/pveMatch'
+import PveMatchMission from './match/pveMatchMission'
 import PvpMatch from './match/pvpMatch'
 import Match from './match/match'
 import { MechanicsSettings } from '../../../shared/settings'
@@ -298,6 +299,20 @@ export default function createWebSocketServer() {
             .where(eq(players.id, id))
         })
         // Connect to match
+        .on('initMission', async ({ uuid, deck, missionID }) => {
+          if (!id) return
+          try {
+            activeGame.match = new PveMatchMission(ws, uuid, deck, missionID)
+          } catch (e) {
+            console.error('initMission:', e)
+            return
+          }
+          activeGame.playerNumber = 0
+
+          logFunnelEvent(uuid, 'play_mode', 'journey')
+
+          await activeGame.match.notifyState()
+        })
         .on('initPve', async ({ aiDeck, uuid, deck }) => {
           if (!id) return
           console.log(

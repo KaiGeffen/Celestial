@@ -50,6 +50,11 @@ export default interface messagesToServer {
     uuid: string
     deck: Deck
   }
+  initMission: {
+    uuid: string
+    deck: Deck
+    missionID: number
+  }
   initTutorial: {
     num: number
     uuid: string

@@ -324,8 +324,6 @@ export default class JourneyScene extends BaseScene {
         if (key.startsWith('card_')) {
           const cardId = parseInt(key.replace('card_', ''), 10)
           const card = Catalog.getCardById(cardId)
-          console.log('card', card)
-          console.log('hint', this.hint)
           if (card) this.hint.showCard(card)
         }
       })

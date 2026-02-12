@@ -88,12 +88,21 @@ export class MatchScene extends BaseScene {
         enabledModes: params.enabledModes,
       })
     } else {
-      server.send({
-        type: 'initPve',
-        aiDeck: params.aiDeck,
-        uuid: Server.getUserData().uuid,
-        deck: params.deck,
-      })
+      if (params.missionID !== undefined) {
+        server.send({
+          type: 'initMission',
+          uuid: Server.getUserData().uuid,
+          deck: params.deck,
+          missionID: params.missionID,
+        })
+      } else {
+        server.send({
+          type: 'initPve',
+          aiDeck: params.aiDeck,
+          uuid: Server.getUserData().uuid,
+          deck: params.deck,
+        })
+      }
     }
 
     // Create the view
@@ -666,32 +675,10 @@ export class StandardMatchScene extends MatchScene {
   }
 }
 
-// TODO This is the old map based journey match scene
+// TODO Consider removing this if it's not adding anything
 export class JourneyMatchScene extends MatchScene {
-  winSeen: boolean
-
-  constructor(
-    args = { key: 'JourneyMatchScene', lastScene: 'JourneyScene' },
-  ) {
+  constructor(args = { key: 'JourneyMatchScene', lastScene: 'JourneyScene' }) {
     super(args)
-  }
-
-  create() {
-    super.create()
-
-    console.log('JourneyMatchScene create', this.params)
-
-    // Must be reset each time this scene is run
-    this.winSeen = false
-  }
-
-  // When the player wins for the first time, unlock appropriately
-  queueState(state: GameModel): void {
-    if (!this.winSeen && state.winner === 0) {
-      this.winSeen = true
-      this.unlockMissionRewards()
-    }
-    super.queueState(state)
   }
 
   signalMatchFound(
@@ -700,19 +687,6 @@ export class JourneyMatchScene extends MatchScene {
     elo1: number,
     elo2: number,
   ): void {}
-
-  private unlockMissionRewards(): void {
-    if (this.params.missionID !== undefined) {
-      // NOTE This is a hack to prevent the server sending the mission to overwrite our local completed missions change
-      setTimeout(() => {
-        UserSettings._setIndex('completedMissions', this.params.missionID, true)
-        const cards: number[] = this.params.missionCards || []
-        cards.forEach((cardId) => {
-          UserSettings._setIndex('inventory', cardId, true)
-        })
-      }, 200)
-    }
-  }
 
   doExit(): () => void {
     return () => {
