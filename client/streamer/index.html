@@ -61,21 +61,25 @@
           return
         }
 
-        fetch(refCountUrl + '/' + encodeURIComponent(referrer))
-          .then(function (r) {
-            console.log('The response is:', r)
-            return r.json()
-          })
-          .then(function (d) {
-            if (d && d.count === -1) {
-              showReferrerInvalid()
-            } else {
-              setCount(typeof d.count === 'number' ? d.count : 0)
-            }
-          })
-          .catch(function () {
-            if (labelEl) labelEl.textContent = 'Error fetching count'
-          })
+        function fetchCount() {
+          fetch(refCountUrl + '/' + encodeURIComponent(referrer))
+            .then(function (r) {
+              return r.json()
+            })
+            .then(function (d) {
+              if (d && d.count === -1) {
+                showReferrerInvalid()
+              } else {
+                setCount(typeof d.count === 'number' ? d.count : 0)
+              }
+            })
+            .catch(function () {
+              if (labelEl) labelEl.textContent = 'Error fetching count'
+            })
+        }
+
+        fetchCount()
+        setInterval(fetchCount, 3000)
       })()
     </script>
   </body>
