@@ -13,7 +13,10 @@ import {
 import Buttons from '../lib/buttons/buttons'
 
 import Catalog from '../../../shared/state/catalog'
-import { journeyNode, getMissionsByTheme } from '../journey/journey'
+import {
+  getMissionsByTheme,
+  MissionDetails,
+} from '../../../shared/journey/journey'
 import Loader from '../loader/loader'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
@@ -263,7 +266,7 @@ export default class JourneyScene extends BaseScene {
   }
 
   private isMissionUnlocked(
-    mission: journeyNode,
+    mission: MissionDetails,
     completed: boolean[],
   ): boolean {
     return mission.prereq.some((prereqs) =>
@@ -271,13 +274,13 @@ export default class JourneyScene extends BaseScene {
     )
   }
 
-  private getMissionDisplayName(mission: journeyNode): string {
+  private getMissionDisplayName(mission: MissionDetails): string {
     if ('deck' in mission && mission.storyTitle) return mission.storyTitle
     return mission.name
   }
 
   private createMissionOverlayRow(
-    mission: journeyNode,
+    mission: MissionDetails,
     completed: boolean[],
   ): Phaser.GameObjects.GameObject {
     const rowWidth = OVERLAY_WIDTH
@@ -576,7 +579,7 @@ export default class JourneyScene extends BaseScene {
   }
 
   // Return the function for what happens when the given mission node is clicked on (from overlay Start button)
-  private missionOnClick(mission: journeyNode): () => void {
+  private missionOnClick(mission: MissionDetails): () => void {
     return () => {
       if ('deck' in mission) {
         this.scene.start('MapJourneyBuilderScene', mission)

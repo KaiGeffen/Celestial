@@ -7,14 +7,26 @@ import vision from './vision.json'
 import water from './water.json'
 import { Deck } from '../types/deck'
 
-export const journeyData: JourneyNode[] = [
-  ...(birds as JourneyNode[]),
-  ...(ashes as JourneyNode[]),
-  ...(shadow as JourneyNode[]),
-  ...(pet as JourneyNode[]),
-  ...(birth as JourneyNode[]),
-  ...(vision as JourneyNode[]),
-  ...(water as JourneyNode[]),
+export interface MissionDetails {
+  id: number
+  name: string
+  prereq: number[][]
+  deck?: number[]
+  opponent?: number[]
+  cards?: number[]
+  // TODO Remove or support these
+  storyTitle?: string
+  storyText?: string
+}
+
+export const journeyData: MissionDetails[] = [
+  ...(birds as MissionDetails[]),
+  ...(ashes as MissionDetails[]),
+  ...(shadow as MissionDetails[]),
+  ...(pet as MissionDetails[]),
+  ...(birth as MissionDetails[]),
+  ...(vision as MissionDetails[]),
+  ...(water as MissionDetails[]),
 ]
 
 // Theme order and display names for the journey overlay (birds = Jules, etc.)
@@ -38,20 +50,20 @@ export const THEME_DISPLAY_NAMES: Record<string, string> = {
   water: 'Tales Carried on the Rivers',
 }
 
-const THEME_ARRAYS: JourneyNode[][] = [
-  birds as JourneyNode[],
-  ashes as JourneyNode[],
-  shadow as JourneyNode[],
-  pet as JourneyNode[],
-  birth as JourneyNode[],
-  vision as JourneyNode[],
-  water as JourneyNode[],
+const THEME_ARRAYS: MissionDetails[][] = [
+  birds as MissionDetails[],
+  ashes as MissionDetails[],
+  shadow as MissionDetails[],
+  pet as MissionDetails[],
+  birth as MissionDetails[],
+  vision as MissionDetails[],
+  water as MissionDetails[],
 ]
 
 export function getMissionsByTheme(): {
   key: string
   displayName: string
-  missions: JourneyNode[]
+  missions: MissionDetails[]
 }[] {
   return THEME_KEYS.map((key, i) => ({
     key,
@@ -60,15 +72,16 @@ export function getMissionsByTheme(): {
   }))
 }
 
-/** Get mission by id; returns undefined if not found or not a mission node (has no deck). */
-export function getMissionById(id: number): MissionNode | undefined {
+/** Get mission by id; returns undefined if not found or not playable (has no deck). */
+export function getMissionById(id: number): MissionDetails | undefined {
   const node = journeyData.find((n) => n.id === id)
-  if (node == null || !('deck' in node)) return undefined
-  return node as MissionNode
+  if (node == null || node.deck == null) return undefined
+  return node
 }
 
 /** Build an AI Deck from a mission's opponent list (for server PvE). */
-export function missionToAiDeck(mission: MissionNode): Deck {
+export function missionToAiDeck(mission: MissionDetails): Deck {
+  if (mission.opponent == null) throw new Error('Mission has no opponent')
   return {
     name: 'AI Deck',
     cards: mission.opponent,
@@ -79,27 +92,3 @@ export function missionToAiDeck(mission: MissionNode): Deck {
     },
   }
 }
-
-// Base interface with common properties
-interface JourneyBase {
-  name: string
-  x: number
-  y: number
-  id: number
-  prereq: number[][]
-}
-
-export interface MissionNode extends JourneyBase {
-  deck: number[]
-  opponent: number[]
-  storyTitle?: string
-  storyText?: string
-  cards?: number[]
-}
-
-interface TipNode extends JourneyBase {
-  tip: string
-}
-
-// Journey is the union of all node types (no card nodes; missions unlock cards via .cards)
-export type JourneyNode = MissionNode | TipNode
