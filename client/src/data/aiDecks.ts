@@ -59,6 +59,7 @@ const easyDecks: Deck[] = [
 const mediumDecks: Deck[] = [
   {
     name: 'Birds medium',
+    // TODO This is too strong
     cards: [4, 4, 4, 4, 4, 4, 7, 7, 7, 7, 101, 101, 12, 51, 51],
     cosmeticSet: {
       avatar: 0,
