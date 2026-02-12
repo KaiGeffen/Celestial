@@ -135,7 +135,6 @@ export default class JourneyScene extends BaseScene {
       width: OVERLAY_WIDTH,
       height: overlayHeight,
       scrollMode: 0,
-      background: this.add.rectangle(0, 0, 1, 1, 0xcbc1a8, 0.96).setOrigin(0),
       header: this.createOverlayHeader(themes),
       panel: { child: contentSizer },
       space: { header: 0 },
@@ -211,7 +210,6 @@ export default class JourneyScene extends BaseScene {
       const row = this.createMissionOverlayRow(mission, completed)
       panel.add(row)
     })
-    panel.layout()
     this.overlayPanel.layout()
     if (moveCamera) {
       this.moveCameraToTheme(this.selectedThemeIndex)
@@ -290,7 +288,7 @@ export default class JourneyScene extends BaseScene {
       space: { left: 4, right: 4, top: 4, bottom: 4 },
     })
 
-    const rowBg = this.add.rectangle(0, 0, 1, 1, 0xf5f2eb, 0.5).setOrigin(0)
+    const rowBg = this.add.rectangle(0, 0, 1, 1, 0xf5f2eb).setOrigin(0)
     row.addBackground(rowBg)
 
     const isCompleted = completed[mission.id]
@@ -489,7 +487,6 @@ export default class JourneyScene extends BaseScene {
         Color.backgroundLight,
       )
       .setOrigin(0)
-      .setAlpha(0.8)
     this.plugins.get('rexDropShadowPipeline')['add'](background, {
       distance: 3,
       shadowColor: 0x000000,
