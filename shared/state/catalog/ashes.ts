@@ -272,10 +272,16 @@ class FromAshes extends Card {
     super.onShuffle(player, game, index)
 
     // Make a new version of this card with the correct points
-    const countFleetingInDeck = game.deck[player].filter((card) => card.qualities.includes(Quality.FLEETING)).length
-    const countFleetingInHand = game.hand[player].filter((card) => card.qualities.includes(Quality.FLEETING)).length
-    const newPoints = Math.floor((countFleetingInDeck + countFleetingInHand) / 3)
-    
+    const countFleetingInDeck = game.deck[player].filter((card) =>
+      card.qualities.includes(Quality.FLEETING),
+    ).length
+    const countFleetingInHand = game.hand[player].filter((card) =>
+      card.qualities.includes(Quality.FLEETING),
+    ).length
+    const newPoints = Math.floor(
+      (countFleetingInDeck + countFleetingInHand) / 3,
+    )
+
     const newVersion = this.copy()
     newVersion.points = newPoints
 
@@ -499,6 +505,24 @@ const prometheus = new Prometheus({
   text: 'Inspire 2.\nCreate a Condemnation in your discard pile.',
 })
 
+class SuddenDraw extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    game.discard(player, 2)
+  }
+
+  onPlay(player: number, game: GameModel) {
+    game.draw(player, 2)
+  }
+}
+const suddenDraw = new Prometheus({
+  name: 'Sudden Draw',
+  id: 2075,
+  cost: 1,
+  text: 'When played, draw 2 cards.\nDiscard 2 cards.',
+})
+
 export {
   dash,
   impulse,
@@ -521,4 +545,5 @@ export {
   // momentum,
   // finale,
   prometheus,
+  suddenDraw,
 }
