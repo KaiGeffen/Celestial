@@ -17,6 +17,7 @@ import ensureMusic from '../loader/audioManager'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
 import { server } from '../server'
+import Loader from '../loader/loader'
 
 // Whether the user has seen the disconnect error message since their last connection
 let hasShownDisconnectError = false
@@ -41,6 +42,9 @@ class SharedBaseScene extends Phaser.Scene {
 
     // Text for when user does something and gets a message
     this.txtMessage = this.createMessageText()
+
+    // Load the journey material, in case it's not already loaded
+    Loader.loadJourneyMapAndMission(this)
   }
 
   private createMessageText(): RexUIPlugin.BBCodeText {
