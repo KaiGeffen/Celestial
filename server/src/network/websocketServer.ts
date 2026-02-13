@@ -301,6 +301,7 @@ export default function createWebSocketServer() {
         // Connect to match
         .on('initMission', async ({ uuid, deck, missionID }) => {
           if (!id) return
+          console.log('Mission:', missionID)
           try {
             activeGame.match = new PveMatchMission(ws, uuid, deck, missionID)
           } catch (e) {
