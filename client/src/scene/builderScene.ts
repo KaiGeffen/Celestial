@@ -129,7 +129,7 @@ export class MapJourneyBuilderScene extends BuilderBase {
       this.params.storyTitle,
       this.params.storyText,
     )
-    this.journeyRegion.addRequiredCards(params.deck)
+    this.journeyRegion.addRequiredCards(params.deck, params.opponent)
 
     this.filterRegion = new FilterRegion().create(this, true)
 

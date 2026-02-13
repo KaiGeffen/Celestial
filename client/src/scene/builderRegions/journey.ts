@@ -13,6 +13,7 @@ import newScrollablePanel from '../../lib/scrollablePanel'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
+import Decklist from '../../lib/decklist'
 import BaseScene from '../baseScene'
 
 const width = Space.cutoutWidth // + Space.pad * 2
@@ -291,9 +292,9 @@ export default class DeckRegion {
     }
   }
 
-  // Add cards to the deck that must be in the deck
-  addRequiredCards(cards: number[]): void {
-    const amt = cards.length
+  // Add cards to the deck that must be in the deck; optionally show opponent's deck below
+  addRequiredCards(requiredCards: number[], opponentCards?: number[]): void {
+    const amt = requiredCards.length
 
     // Hint for the cards user's can choose to complete the deck
     this.txtChoice = this.scene.add
@@ -330,7 +331,23 @@ export default class DeckRegion {
     this.panel.add(containerRequired.add(txtRequired))
 
     // Add in a scrollable panel of the required cards
-    this.panel.add(this.createRequiredCardList(cards))
+    this.panel.add(this.createRequiredCardList(requiredCards))
+
+    // Opponent's deck (display only) below required cards
+    if (opponentCards && opponentCards.length > 0) {
+      let txtOpponent = this.scene.add
+        .text(0, 0, `Opponent's deck: ${opponentCards.length}`, Style.basic)
+        .setOrigin(0.5)
+      let containerOpponent = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        width,
+        txtOpponent.height + Space.pad,
+      )
+      this.panel.add(containerOpponent.add(txtOpponent))
+      this.panel.add(this.createOpponentCardList(opponentCards))
+    }
 
     this.updateText()
 
@@ -359,6 +376,16 @@ export default class DeckRegion {
     })
 
     return sizer
+  }
+
+  // Create a display-only list of the opponent's deck (grouped like required cards)
+  private createOpponentCardList(cardIds: number[]) {
+    const cards = cardIds
+      .map((id) => Catalog.getCardById(id))
+      .filter(Boolean) as Card[]
+    const decklist = new Decklist(this.scene, () => () => {})
+    decklist.setJourneyDeck(cards)
+    return decklist.sizer
   }
 
   // Remove the card from deck which has given index
