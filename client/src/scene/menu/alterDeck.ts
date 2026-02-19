@@ -3,7 +3,7 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
-import { Color, Space } from '../../settings/settings'
+import { Color, Space, Flags } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import {
@@ -308,11 +308,14 @@ class AlterDeckMenu extends Menu {
       x: 0,
       y: 0,
       f: () => {
-        console.log('share deck code', this.deckCode.toString())
-
         // Copy the deck's code to clipboard
-        const encodedDeck = encodeShareableDeckCode(this.deckCode)
+        let encodedDeck = encodeShareableDeckCode(this.deckCode)
         navigator.clipboard.writeText(encodedDeck)
+
+        // On local, copy the deck code as an array
+        if (Flags.local) {
+          navigator.clipboard.writeText(this.deckCode.toString())
+        }
 
         // Inform user deck code was copied
         this.scene.showMessage('Deck code copied to clipboard.')
