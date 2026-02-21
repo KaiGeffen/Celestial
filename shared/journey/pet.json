@@ -8,7 +8,7 @@
     "cards": [34, 33]
   },
   {
-    "name": "Keeping Her Safe",
+    "name": "Keeping Her safe",
     "id": 401,
     "prereq": [[400]],
     "deck": [0, 0, 4, 9, 33, 34, 11, 11, 11, 15, 18, 23],
@@ -16,15 +16,15 @@
     "cards": [23]
   },
   {
-    "name": "Becoming Her Everything",
+    "name": "Flowers for Her eyes",
     "id": 402,
     "prereq": [[401]],
-    "deck": [0, 4, 78, 78, 78, 33, 34, 7, 7, 12, 12],
+    "deck": [0, 4, 4, 78, 78, 78, 34, 7, 7, 11, 12],
     "opponent": [23, 46, 61, 15, 40, 12, 9, 6, 7, 7, 63, 63, 63, 63, 0],
     "cards": [78]
   },
   {
-    "name": "Hollow, Keeping Everyone Happy",
+    "name": "Empty without Her",
     "id": 403,
     "prereq": [[402]],
     "deck": [76, 76, 0, 78, 31, 31, 34, 36, 36, 23],
@@ -32,7 +32,7 @@
     "cards": [76]
   },
   {
-    "name": "Yearn, Empty Without Her",
+    "name": "Needing Her",
     "id": 404,
     "prereq": [[403]],
     "deck": [75, 75, 75, 75, 33, 33, 33, 34, 34],
@@ -40,7 +40,7 @@
     "cards": [75]
   },
   {
-    "name": "Sensualist,Eyes in the Dark",
+    "name": "Becoming Her everything",
     "id": 405,
     "prereq": [[404]],
     "deck": [0, 0, 78, 78, 12, 12, 81, 81],
@@ -48,7 +48,7 @@
     "cards": [81]
   },
   {
-    "name": "Bounty, What I'd Give",
+    "name": "Giving Her my all",
     "id": 406,
     "prereq": [[405]],
     "deck": [76, 0, 31, 34, 48, 48, 48],
@@ -56,7 +56,7 @@
     "cards": [48]
   },
   {
-    "name": "Pomegranate, What I'd Give",
+    "name": "My heart in Her hands",
     "id": 407,
     "prereq": [[406]],
     "deck": [4, 4, 34, 7, 7, 52],
