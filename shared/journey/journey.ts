@@ -47,7 +47,7 @@ export const THEME_DISPLAY_NAMES: Record<string, string> = {
   pet: 'Kitz Finds his Love ',
   birth: 'Imani Births the Future',
   vision: 'Mitra Seeks the Truth',
-  water: 'Tales Carried on the Rivers',
+  water: 'Tales Carried on the River',
 }
 
 const THEME_ARRAYS: MissionDetails[][] = [
