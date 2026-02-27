@@ -108,11 +108,15 @@ export default class Hint {
     if (keywords.length === 0) {
       const width =
         refs.length > 0
-          ? Space.maxTextWidth + Space.pad
-          : Space.cardWidth + Space.pad
+          ? Space.maxTextWidth +
+            BBStyle.hint.padding.left +
+            BBStyle.hint.padding.right
+          : Space.cardWidth +
+            BBStyle.hint.padding.left +
+            BBStyle.hint.padding.right
       this.txt
         .setText(`\n\n\n\n\n\n\n\n\n\n`)
-        .setFixedSize(width, Space.cardHeight + Space.pad)
+        .setFixedSize(width, Space.cardHeight + BBStyle.hint.padding.top * 2)
     } else {
       this.txt
         .setText(`\n\n\n\n\n\n\n\n\n\n\n\n${getKeywordsText(keywords)}`)
@@ -150,7 +154,7 @@ export default class Hint {
       this.txt.setX(x).setOrigin(0.5, 1).setY(y)
 
       // Adjust y for cards
-      y = y - this.txt.height + Space.cardHeight / 2 + Space.padSmall
+      y = y - this.txt.height + Space.cardHeight / 2 + BBStyle.hint.padding.top
     }
     // If there is a pin, go just to the right of that
     else if (this.leftPin !== undefined) {
@@ -160,7 +164,11 @@ export default class Hint {
 
       // Adjust x,y for the cards
       x += this.txt.width / 2
-      y = y - this.txt.height / 2 + Space.padSmall + Space.cardHeight / 2
+      y =
+        y -
+        this.txt.height / 2 +
+        BBStyle.hint.padding.top +
+        Space.cardHeight / 2
     } else if (this.rightPin !== undefined) {
       x = this.rightPin - Space.pad
       y = pointer.position.y
@@ -168,7 +176,11 @@ export default class Hint {
 
       // Adjust x,y for the cards
       x -= this.txt.width / 2
-      y = y - this.txt.height / 2 + Space.padSmall + Space.cardHeight / 2
+      y =
+        y -
+        this.txt.height / 2 +
+        BBStyle.hint.padding.top +
+        Space.cardHeight / 2
     }
 
     // Position main and referenced card images above text
