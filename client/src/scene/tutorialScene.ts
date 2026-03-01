@@ -41,7 +41,7 @@ export default class TutorialMatchScene extends MatchScene {
 
   isTutorial = true
 
-  constructor(args = { key: 'TutorialMatchScene', lastScene: 'HomeScene' }) {
+  constructor(args = { key: 'TutorialMatchScene', lastScene: 'JourneyScene' }) {
     super(args)
   }
 

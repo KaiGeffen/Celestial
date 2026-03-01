@@ -449,9 +449,9 @@ export default class OptionsMenu extends Menu {
         activeScene.beforeExit()
         activeScene.scene.stop()
 
-        // Stop this menu scene and start the home scene
+        // Stop this menu scene and start the journey scene
         this.scene.scene.stop()
-        this.scene.scene.start('HomeScene')
+        this.scene.scene.start('JourneyScene')
       }
     } else {
       // TODO This is super hacky - refactor searching to be a scene not a region

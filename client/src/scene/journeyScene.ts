@@ -23,6 +23,7 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 import newScrollablePanel from '../lib/scrollablePanel'
+import showTooltip from '../utils/tooltips'
 
 const OVERLAY_WIDTH = 540
 const OVERLAY_TOP = 100
@@ -146,6 +147,8 @@ export default class JourneyScene extends BaseScene {
     if (this.selectedThemeIndex === STARS_THEME_INDEX) {
       this.altMap.alpha = 1
     }
+
+    showTooltip(this)
   }
 
   update(time: number, _delta: number): void {
