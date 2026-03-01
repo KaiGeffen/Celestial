@@ -117,7 +117,6 @@ export default class JourneyScene extends BaseScene {
     this.cameras.main.setBounds(0, 0, this.map.width, this.map.height)
 
     // Add buttons
-    this.createHelpButton()
     this.createBackButton()
 
     // Add race button if dev mode is enabled
@@ -183,12 +182,16 @@ export default class JourneyScene extends BaseScene {
 
   private createJourneyOverlay(): void {
     const themes = getMissionsByTheme()
-    const overlayHeight = Space.windowHeight - OVERLAY_TOP - Space.pad
+    const overlayHeight = 660
 
     const contentSizer = this.rexUI.add.fixWidthSizer({
       width: OVERLAY_WIDTH,
       space: { item: 6 },
     })
+
+    const overlayBackground = this.add
+      .rectangle(0, 0, OVERLAY_WIDTH, overlayHeight, Color.backgroundLight)
+      .setOrigin(0)
 
     this.overlayPanel = newScrollablePanel(this, {
       x: Space.windowWidth - OVERLAY_WIDTH - Space.pad,
@@ -196,6 +199,7 @@ export default class JourneyScene extends BaseScene {
       width: OVERLAY_WIDTH,
       height: overlayHeight,
       scrollMode: 0,
+      background: overlayBackground,
       header: this.createOverlayHeader(themes),
       panel: { child: contentSizer },
       space: { header: 0 },
@@ -530,34 +534,6 @@ export default class JourneyScene extends BaseScene {
     row.layout()
 
     return row
-  }
-
-  private createHelpButton(): void {
-    const x =
-      Space.windowWidth -
-      Space.buttonWidth / 2 -
-      (Space.iconSize * 2 + Space.pad * 3)
-    const y = Space.buttonHeight / 2 + Space.pad
-    new Buttons.Basic({
-      within: this,
-      text: 'Help',
-      x,
-      y,
-      f: () => {
-        this.scene.launch('MenuScene', {
-          menu: 'message',
-          title: 'Help',
-          s: `Explore the city, learning about each of the travelers who was called here.
-
-          Each character has a neighborhood, where the missions revolve around their unique mechanics and delve into their backstory.
-          
-          Each mission has a set of cards that you must use for the match, plus whatever cards you choose to include from your inventory.
-          
-          Completing a mission unlocks new cards and missions. Completing the core missions for a character will often unlock additional neighborhoods.`,
-        })
-      },
-      depth: 10,
-    }).setNoScroll()
   }
 
   private createBackButton(): void {
