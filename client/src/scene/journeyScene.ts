@@ -71,7 +71,10 @@ export default class JourneyScene extends BaseScene {
   private overlayPanel: ScrollablePanel
   private missionTipContainer: Phaser.GameObjects.Container
   private missionTipBg: Phaser.GameObjects.Rectangle
-  private missionTipText: Phaser.GameObjects.Text
+  private missionTipTextBox: Phaser.GameObjects.GameObject & {
+    start: (s: string, speed: number) => void
+    stop: (showAll: boolean) => void
+  }
 
   constructor() {
     super({
@@ -215,17 +218,41 @@ export default class JourneyScene extends BaseScene {
     this.missionTipBg = this.add
       .rectangle(0, 0, boxWidth, boxHeight, 0x353f4e, 0.92)
       .setOrigin(0)
-    this.missionTipText = this.add
-      .text(padding, padding, DEFAULT_MISSION_TIP, {
-        ...Style.basic,
-        fontSize: '16px',
-        color: '#f5f2eb',
-        wordWrap: { width: boxWidth - padding * 2 },
-        lineSpacing: 4,
+
+    const hintStyle = {
+      fontFamily:
+        'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      fontSize: '16px',
+      color: Color.whiteS,
+      lineSpacing: 4,
+    }
+    const txt = this.add
+      .text(0, 0, '', hintStyle)
+      .setWordWrapWidth(boxWidth - padding * 2)
+      .setOrigin(0)
+
+    this.missionTipTextBox = this.rexUI.add
+      .textBox({
+        text: txt,
+        x: padding,
+        y: padding,
+        space: {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+        },
+        page: {
+          maxLines: 0,
+        },
       })
       .setOrigin(0)
 
-    this.missionTipContainer.add([this.missionTipBg, this.missionTipText])
+    this.missionTipContainer.add([
+      this.missionTipBg,
+      txt,
+      this.missionTipTextBox,
+    ])
     this.missionTipContainer.setScrollFactor(0)
     this.missionTipContainer.setAlpha(0)
   }
@@ -236,7 +263,7 @@ export default class JourneyScene extends BaseScene {
   }
 
   private showMissionTip(text: string): void {
-    this.missionTipText.setText(text)
+    this.missionTipTextBox.start(text, 5)
     this.tweens.add({
       targets: this.missionTipContainer,
       alpha: 1,
