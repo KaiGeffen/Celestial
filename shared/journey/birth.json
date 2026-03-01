@@ -5,7 +5,8 @@
     "prereq": [[100], [200]],
     "deck": [2, 2, 2, 2, 4, 4, 4, 4, 9, 86, 11, 12, 13, 18, 18],
     "opponent": [18, 18, 61, 61, 15, 15, 48, 48, 48, 7, 7, 33, 33, 4, 4],
-    "cards": [2, 86]
+    "cards": [2, 86],
+    "tip": "When you Birth, first it creates a Child in hand if you don't have one, then raises the Children in your hand by that many points."
   },
   {
     "name": "When I First Held You",
@@ -13,7 +14,8 @@
     "prereq": [[500]],
     "deck": [2, 2, 2, 2, 78, 78, 78, 78, 8, 8, 8, 86, 18],
     "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
-    "cards": [8]
+    "cards": [8],
+    "tip": "Because Birth adds the Child to hand when it resolves, you can't use their points until the next round."
   },
   {
     "name": "The Future",
@@ -21,7 +23,8 @@
     "prereq": [[501]],
     "deck": [2, 2, 2, 2, 8, 8, 8, 11, 66, 22, 22],
     "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
-    "cards": [22]
+    "cards": [22],
+    "tip": "Grow a Child too big and it stops getting better: 10 points and 20 points aren't that different."
   },
   {
     "name": "Posterity",
@@ -29,7 +32,8 @@
     "prereq": [[502]],
     "deck": [2, 2, 2, 0, 86, 86, 11, 53, 53, 18],
     "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
-    "cards": [53]
+    "cards": [53],
+    "tip": "A Child can take up space in your hand, preventing you from drawing."
   },
   {
     "name": "Ancestry",
@@ -37,7 +41,8 @@
     "prereq": [[503]],
     "deck": [2, 2, 2, 8, 8, 10, 22, 22],
     "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
-    "cards": [8]
+    "cards": [8],
+    "tip": "Ancestry is often better played on a much later round, don’t let the 3-cost fool you."
   },
   {
     "name": "Pregnant",
@@ -45,7 +50,8 @@
     "prereq": [[504]],
     "deck": [2, 2, 2, 83, 83, 8, 8],
     "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
-    "cards": [83]
+    "cards": [83],
+    "tip": "If you have 2 Children in hand, Birth will boost BOTH of their points."
   },
   {
     "name": "Cradle",
@@ -53,7 +59,8 @@
     "prereq": [[505]],
     "deck": [2, 2, 78, 8, 8, 60, 60],
     "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
-    "cards": [60]
+    "cards": [60],
+    "tip": "Playing a Child to win a round, instead of holding onto it forever, is often better in the long run."
   },
   {
     "name": "Pass On",
@@ -61,7 +68,8 @@
     "prereq": [[506]],
     "deck": [4, 4, 4, 84, 53],
     "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
-    "cards": [84]
+    "cards": [84],
+    "tip": "In a small deck, the Heirloom value can be huge."
   },
   {
     "name": "Rebirth",
@@ -69,6 +77,7 @@
     "prereq": [[507]],
     "deck": [55, 55, 55, 49, 49],
     "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
-    "cards": [55]
+    "cards": [55],
+    "tip": "Rebirth combines well with cards that reduce their cost."
   }
 ]

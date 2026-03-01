@@ -5,7 +5,8 @@
     "prereq": [[100], [200]],
     "deck": [50, 0, 0, 4, 4, 4, 6, 11, 11, 12, 12, 67, 67, 67, 18],
     "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
-    "cards": [50, 67]
+    "cards": [50, 67],
+    "tip": "Sight 4 means the first 4 cards (Your AND your opponents) are Visible to you."
   },
   {
     "name": "Prey",
@@ -13,7 +14,8 @@
     "prereq": [[600]],
     "deck": [50, 0, 26, 26, 33, 33, 33, 12, 12, 66, 66, 67, 18],
     "opponent": [2, 0, 5, 3, 3, 3, 8, 8, 60, 60, 14, 17, 17, 20, 21],
-    "cards": [26]
+    "cards": [26],
+    "tip": "If the Prey is removed from the discard pile, the Predator will be worthless."
   },
   {
     "name": "Clear View",
@@ -21,7 +23,8 @@
     "prereq": [[601]],
     "deck": [0, 27, 27, 27, 27, 26, 33, 12, 12, 67, 18],
     "opponent": [0, 0, 3, 3, 3, 3, 28, 28, 33, 33, 34, 11, 11, 11, 71],
-    "cards": [27]
+    "cards": [27],
+    "tip": "Cards that fill the opponent’s hand become better the more you have, since you end up denying the opponent from drawing cards."
   },
   {
     "name": "Enlightenment",
@@ -29,7 +32,8 @@
     "prereq": [[602]],
     "deck": [27, 27, 27, 27, 26, 12, 12, 67, 67, 45],
     "opponent": [63, 63, 5, 5, 3, 6, 6, 12, 12, 14, 14, 17, 17, 20, 56],
-    "cards": [67]
+    "cards": [67],
+    "tip": "Enlightenment comes easiest to the one who knows when to Pass."
   },
   {
     "name": "Balance",
@@ -37,7 +41,8 @@
     "prereq": [[603]],
     "deck": [50, 50, 27, 27, 27, 88, 88, 67, 67],
     "opponent": [0, 0, 26, 26, 26, 26, 6, 33, 33, 33, 12, 15, 40, 40, 46],
-    "cards": [88]
+    "cards": [88],
+    "tip": "Balance works best when you can see if the opponent is out of cards, and you can throw cheap cards after it."
   },
   {
     "name": "Awakening",
@@ -45,7 +50,8 @@
     "prereq": [[604]],
     "deck": [27, 26, 39, 39, 67, 67, 45, 45],
     "opponent": [2, 2, 1, 1, 63, 63, 8, 8, 6, 60, 60, 40, 40, 61, 46],
-    "cards": [39]
+    "cards": [39],
+    "tip": "Awakening pairs nicely with cards that cost nothing, like Child, since you can see if you need to play them or can save them instead."
   },
   {
     "name": "Timid",
@@ -53,7 +59,8 @@
     "prereq": [[605]],
     "deck": [87, 87, 87, 9, 67, 67, 67],
     "opponent": [2, 63, 3, 3, 8, 8, 8, 31, 48, 48, 60, 15, 18, 22, 22],
-    "cards": [87]
+    "cards": [87],
+    "tip": "Triggering Timid's effect lets you keep your cards in rounds that you know you'll lose."
   },
   {
     "name": "Riddle",
@@ -61,7 +68,8 @@
     "prereq": [[606]],
     "deck": [87, 89, 89, 89, 89, 51],
     "opponent": [4, 4, 4, 4, 4, 59, 65, 7, 7, 7, 58, 54, 54, 84, 84],
-    "cards": [89]
+    "cards": [89],
+    "tip": "Return riddle to hand, then play it again to double its points each time."
   },
   {
     "name": "Lantern",
@@ -69,6 +77,7 @@
     "prereq": [[607]],
     "deck": [50, 0, 27, 91, 91],
     "opponent": [2, 63, 63, 63, 97, 97, 68, 68, 7, 7, 98, 98, 84, 46, 46],
-    "cards": [50]
+    "cards": [50],
+    "tip": "Pass whenever you can, and play Lantern as your last card to keep the fire burning."
   }
 ]

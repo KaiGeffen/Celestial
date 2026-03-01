@@ -5,7 +5,8 @@
     "prereq": [[100], [200]],
     "deck": [0, 0, 4, 4, 4, 33, 33, 33, 33, 34, 34, 11, 11, 11, 11],
     "opponent": [21, 20, 19, 19, 19, 17, 14, 12, 6, 6, 63, 63, 5, 5, 5],
-    "cards": [34, 33]
+    "cards": [34, 33],
+    "tip": "A nourished Pet can be returned to hand with Hold Tight, as long as you don’t put another card on top of it!"
   },
   {
     "name": "Keeping Her safe",
@@ -13,7 +14,8 @@
     "prereq": [[400]],
     "deck": [0, 0, 4, 9, 33, 34, 11, 11, 11, 15, 18, 23],
     "opponent": [63, 63, 3, 3, 6, 86, 86, 15, 15, 15, 14, 14, 17, 19, 21],
-    "cards": [23]
+    "cards": [23],
+    "tip": "If you're nourished the round you play Oak it becomes extra effective."
   },
   {
     "name": "Flowers for Her eyes",
@@ -21,7 +23,8 @@
     "prereq": [[401]],
     "deck": [0, 4, 4, 78, 78, 78, 34, 7, 7, 11, 12],
     "opponent": [23, 46, 61, 15, 40, 12, 9, 6, 7, 7, 63, 63, 63, 63, 0],
-    "cards": [78]
+    "cards": [78],
+    "tip": "If you remove enough cards from the game with Fleeting, drawing Pet every round becomes easy."
   },
   {
     "name": "Empty without Her",
@@ -29,7 +32,8 @@
     "prereq": [[402]],
     "deck": [76, 76, 0, 78, 31, 31, 34, 36, 36, 23],
     "opponent": [21, 17, 17, 14, 68, 68, 6, 31, 31, 3, 3, 3, 3, 3, 76],
-    "cards": [76]
+    "cards": [76],
+    "tip": "When Hollow sets your points to 0, it takes away the downside of negative Nourish."
   },
   {
     "name": "Needing Her",
@@ -37,7 +41,8 @@
     "prereq": [[403]],
     "deck": [75, 75, 75, 75, 33, 33, 33, 34, 34],
     "opponent": [4, 4, 4, 4, 4, 4, 7, 7, 7, 7, 101, 101, 12, 12, 51],
-    "cards": [75]
+    "cards": [75],
+    "tip": "Exhale happens when the story resolves only if you have breath left over."
   },
   {
     "name": "Becoming Her everything",
@@ -45,7 +50,8 @@
     "prereq": [[404]],
     "deck": [0, 0, 78, 78, 12, 12, 81, 81],
     "opponent": [21, 20, 20, 17, 14, 14, 14, 6, 3, 3, 3, 3, 0, 0, 0],
-    "cards": [81]
+    "cards": [81],
+    "tip": "Can give you extra points on a round when you have carryover from Nourish or Inspire, so try not to go overkill."
   },
   {
     "name": "Giving Her my all",
@@ -53,7 +59,8 @@
     "prereq": [[405]],
     "deck": [76, 0, 31, 34, 48, 48, 48],
     "opponent": [41, 41, 42, 42, 42, 42, 42, 42, 42, 32, 103, 103, 64, 64, 38],
-    "cards": [48]
+    "cards": [48],
+    "tip": "Can effectively give 5 points in a round if you use the Nourish and your opponent doesn’t."
   },
   {
     "name": "My heart in Her hands",
@@ -61,7 +68,8 @@
     "prereq": [[406]],
     "deck": [4, 4, 34, 7, 7, 52],
     "opponent": [2, 2, 2, 2, 105, 8, 8, 8, 8, 10, 60, 53, 53, 22, 22],
-    "cards": [52]
+    "cards": [52],
+    "tip": "Pomegranate coudld be the only Nourish you need for Pet."
   },
   {
     "name": "Me and Her",
@@ -69,6 +77,7 @@
     "prereq": [[407]],
     "deck": [2, 25, 80, 80],
     "opponent": [105, 4, 4, 89, 89, 89, 89, 89, 95, 95, 95, 58, 51, 51, 51],
-    "cards": [80]
+    "cards": [80],
+    "tip": "Me & Her can also double other types of carryover you play before it, like Nourish or a big Child"
   }
 ]

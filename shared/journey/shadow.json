@@ -5,7 +5,8 @@
     "prereq": [[100], [200]],
     "deck": [0, 0, 1, 1, 1, 1, 6, 11, 11, 13, 20, 19, 19, 19, 56],
     "opponent": [0, 78, 78, 78, 78, 86, 86, 7, 7, 48, 48, 11, 66, 52, 18],
-    "cards": [1, 19]
+    "cards": [1, 19],
+    "tip": "Daggers earn 0 points, so rounds you play them you probably can't win.\n\nShadow is best if you play it as late in a round as possible, since it gets cheaper."
   },
   {
     "name": "The Price of Truth",
@@ -13,7 +14,8 @@
     "prereq": [[300]],
     "deck": [0, 0, 1, 1, 1, 4, 31, 31, 11, 11, 13, 13, 19],
     "opponent": [0, 0, 3, 3, 3, 3, 3, 6, 6, 15, 14, 14, 14, 17, 21],
-    "cards": [31]
+    "cards": [31],
+    "tip": "Playing a card after Hungry Ghost makes it effectively worth 0 points (4 - 4). But if you don't, the negative Nourish will stay until the next round."
   },
   {
     "name": "Where it All Began",
@@ -21,7 +23,8 @@
     "prereq": [[301]],
     "deck": [0, 0, 0, 1, 1, 1, 35, 35, 35, 13, 23],
     "opponent": [4, 4, 4, 4, 59, 33, 33, 7, 39, 39, 39, 67, 67, 18, 23],
-    "cards": [35]
+    "cards": [35],
+    "tip": "Once Imprison gives the opponent negative Nourish, it makes it harder for them to escape the next round."
   },
   {
     "name": "Nightmare",
@@ -29,7 +32,8 @@
     "prereq": [[302]],
     "deck": [1, 1, 1, 32, 68, 68, 35, 19, 19, 56],
     "opponent": [27, 27, 27, 4, 4, 4, 7, 7, 7, 48, 48, 66, 67, 67, 23],
-    "cards": [68]
+    "cards": [68],
+    "tip": "Try to play fewer cards than the opponent so that Nightmare can trigger and come back."
   },
   {
     "name": "Sickness",
@@ -37,7 +41,8 @@
     "prereq": [[303]],
     "deck": [4, 4, 4, 4, 65, 65, 12, 12, 58, 58],
     "opponent": [63, 63, 78, 78, 33, 33, 33, 34, 34, 101, 11, 11, 54, 54, 46],
-    "cards": [58]
+    "cards": [58],
+    "tip": "Sickness won't cover your Morning abilities or make Heron more expensive, and it gives you something to play if the opponent gives it back to you."
   },
   {
     "name": "Victim",
@@ -45,7 +50,8 @@
     "prereq": [[304]],
     "deck": [0, 78, 78, 31, 31, 43, 43, 58],
     "opponent": [63, 63, 63, 63, 68, 68, 7, 7, 48, 48, 66, 66, 73, 57, 23],
-    "cards": [43]
+    "cards": [43],
+    "tip": "Play on a round where you have negative Nourish for maximum effect."
   },
   {
     "name": "Vampire",
@@ -53,7 +59,8 @@
     "prereq": [[305]],
     "deck": [31, 43, 35, 58, 49, 49, 49],
     "opponent": [2, 2, 2, 2, 105, 8, 8, 86, 86, 10, 12, 12, 53, 53, 22],
-    "cards": [49]
+    "cards": [49],
+    "tip": "If the opponent has negative points, Vampire becomes worth more than normal."
   },
   {
     "name": "Boa",
@@ -61,7 +68,8 @@
     "prereq": [[306]],
     "deck": [0, 25, 78, 58, 57],
     "opponent": [4, 4, 4, 4, 4, 4, 65, 7, 7, 7, 7, 101, 12, 12, 56],
-    "cards": [57]
+    "cards": [57],
+    "tip": "Negative Nourish can also trigger Boa's condition."
   },
   {
     "name": "Lost in Shadow",
@@ -69,6 +77,7 @@
     "prereq": [[307]],
     "deck": [47, 47, 19, 19],
     "opponent": [2, 2, 2, 0, 3, 3, 3, 3, 86, 86, 14, 17, 20, 19, 21],
-    "cards": [47]
+    "cards": [47],
+    "tip": "Cards like Shadow still have base-cost 6 even if they reduce the cost to play them."
   }
 ]

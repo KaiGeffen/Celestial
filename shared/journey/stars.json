@@ -5,7 +5,8 @@
     "prereq": [[102]],
     "deck": [4, 4, 4, 4, 4, 65, 7, 7, 7, 12, 56],
     "opponent": [1, 1, 1, 1, 6, 6, 33, 33, 11, 12, 14, 14, 16, 21, 21],
-    "cards": [56]
+    "cards": [56],
+    "tip": "Inspire means you have extra breath next round, Inspired means you have it this round."
   },
   {
     "name": "Moon",
@@ -13,7 +14,8 @@
     "prereq": [[105]],
     "deck": [37, 37, 37, 24, 7, 73, 73, 73],
     "opponent": [0, 63, 63, 4, 4, 7, 7, 7, 48, 48, 40, 61, 57, 57, 23],
-    "cards": [73]
+    "cards": [73],
+    "tip": "If a Rooster is on top of a Morning card, Moon gets to trigger it twice. And 2 Moons can trigger it 3 times!"
   },
   {
     "name": "Sunflower",
@@ -21,7 +23,8 @@
     "prereq": [[402]],
     "deck": [78, 78, 78, 78, 69, 69, 69, 57, 23],
     "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
-    "cards": [69]
+    "cards": [69],
+    "tip": "Nourishing a Sunflower lets you ramp into strong cards early."
   },
   {
     "name": "Pride",
@@ -29,7 +32,8 @@
     "prereq": [[204]],
     "deck": [3, 3, 98, 98, 14, 20, 20, 20, 21],
     "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
-    "cards": [98]
+    "cards": [98],
+    "tip": "Pride will always discard the leftmost card and cost 1 breath, so try to stack your hand so you get rid of what you don't want."
   },
   {
     "name": "Fates",
@@ -37,7 +41,8 @@
     "prereq": [[502]],
     "deck": [93, 2, 2, 86, 86, 86, 31, 13, 22],
     "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
-    "cards": [93]
+    "cards": [93],
+    "tip": "Since Exhale happens when a card resolves not when it's played, you could choose to play more cards instead of leaving the Breath up depending on if the opponent plays more cards or not."
   },
   {
     "name": "Cloak of Stars",
@@ -45,7 +50,8 @@
     "prereq": [[106]],
     "deck": [37, 37, 96, 96, 96, 73, 73],
     "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
-    "cards": [96]
+    "cards": [96],
+    "tip": "The Breath that Cloak of Stars adds can be used for Exhale effects, or will carry over to the next round if the Morning trigger occurs."
   },
   {
     "name": "Night Vision",
@@ -53,7 +59,8 @@
     "prereq": [[600]],
     "deck": [28, 78, 33, 33, 33, 34, 34, 81],
     "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
-    "cards": [28]
+    "cards": [28],
+    "tip": "Make sure you have a card with base-cost 2 in your deck or Night Vision won't draw anything."
   },
   {
     "name": "Dreamer",
@@ -61,7 +68,8 @@
     "prereq": [[100, 200, 300, 400, 500, 600]],
     "deck": [41, 97, 97, 97, 97, 47, 47],
     "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
-    "cards": [97]
+    "cards": [97],
+    "tip": "As long as your hand is empty when Dreamer resolves, it will draw a card."
   },
   {
     "name": "Possibility",
@@ -69,6 +77,7 @@
     "prereq": [[602]],
     "deck": [50, 27, 27, 31, 24, 95, 58, 58],
     "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
-    "cards": [95]
+    "cards": [95],
+    "tip": "Your breath naturally goes up from 1 to 10 each round, but with Possibility it can go up to 11!"
   }
 ]

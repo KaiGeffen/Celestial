@@ -5,7 +5,8 @@
     "prereq": [[]],
     "deck": [0, 0, 4, 4, 4, 4, 9, 6, 7, 7, 12, 12, 13, 18, 18],
     "opponent": [3, 3, 3, 3, 3, 3, 6, 6, 6, 11, 11, 11, 14, 14, 82],
-    "cards": [7]
+    "cards": [7],
+    "tip": "Playing cheap cards with Fleeting means your deck will be better after you shuffle."
   },
   {
     "name": "Heron",
@@ -13,7 +14,8 @@
     "prereq": [[100]],
     "deck": [4, 4, 4, 4, 4, 65, 65, 7, 7, 7, 12, 12, 18],
     "opponent": [4, 4, 4, 5, 5, 33, 33, 33, 11, 11, 11, 14, 14, 51, 51],
-    "cards": [65]
+    "cards": [65],
+    "tip": "Try to play Heron before you play too many cards without Fleeting, or hold onto it until after you shuffle."
   },
   {
     "name": "Vulture",
@@ -21,7 +23,8 @@
     "prereq": [[101]],
     "deck": [0, 4, 4, 4, 4, 65, 65, 7, 36, 36, 36],
     "opponent": [0, 5, 5, 5, 5, 86, 86, 86, 11, 11, 12, 12, 14, 14, 52],
-    "cards": [36]
+    "cards": [36],
+    "tip": "Vulture gives you Nourish when it's played instead of when it resolves, meaning an earlier Heron can get rid of it."
   },
   {
     "name": "Phoenix",
@@ -29,7 +32,8 @@
     "prereq": [[102]],
     "deck": [0, 0, 4, 4, 4, 4, 4, 7, 51, 51],
     "opponent": [0, 3, 3, 3, 3, 3, 86, 86, 11, 11, 14, 14, 14, 17, 17],
-    "cards": [51]
+    "cards": [51],
+    "tip": "Phoenix is best when played early, so try to ramp into it."
   },
   {
     "name": "Truth",
@@ -37,7 +41,8 @@
     "prereq": [[103]],
     "deck": [0, 4, 4, 4, 9, 6, 12, 36, 61],
     "opponent": [0, 3, 3, 3, 3, 3, 6, 6, 15, 15, 14, 14, 14, 17, 17],
-    "cards": [61]
+    "cards": [61],
+    "tip": "Sometimes you just need a card worth lots of points."
   },
   {
     "name": "Nest",
@@ -45,7 +50,8 @@
     "prereq": [[104]],
     "deck": [4, 4, 4, 4, 24, 7, 7, 36],
     "opponent": [5, 5, 3, 3, 3, 3, 3, 32, 86, 86, 15, 15, 17, 18, 18],
-    "cards": [24]
+    "cards": [24],
+    "tip": "Don't cover up the Nest, and it will keep making Doves round after round."
   },
   {
     "name": "Rooster",
@@ -53,7 +59,8 @@
     "prereq": [[105]],
     "deck": [5, 5, 37, 37, 37, 56, 56],
     "opponent": [3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 11, 11, 14, 14, 17],
-    "cards": [37]
+    "cards": [37],
+    "tip": "Rooster doesn't need to be immediately on top of a card to trigger its Morning ability."
   },
   {
     "name": "Fledgling",
@@ -61,7 +68,8 @@
     "prereq": [[106]],
     "deck": [59, 7, 7, 7, 51],
     "opponent": [3, 3, 3, 3, 3, 15, 15, 14, 14, 14, 51, 51, 17, 20, 21],
-    "cards": [59]
+    "cards": [59],
+    "tip": "If your deck is full of Fleeting cards, Fledgling won't get covered and can come out more often after you shuffle."
   },
   {
     "name": "Let Go",
@@ -69,6 +77,7 @@
     "prereq": [[107]],
     "deck": [26, 26, 26, 66],
     "opponent": [2, 2, 2, 105, 4, 4, 6, 31, 31, 71, 71, 12, 12, 54, 54],
-    "cards": [66]
+    "cards": [66],
+    "tip": "Getting rid of lower cost cards can turn any deck into a hyperthin list."
   }
 ]

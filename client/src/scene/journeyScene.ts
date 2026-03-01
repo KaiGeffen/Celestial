@@ -218,16 +218,14 @@ export default class JourneyScene extends BaseScene {
     this.missionTipBg = this.add
       .rectangle(0, 0, boxWidth, boxHeight, 0x353f4e, 0.92)
       .setOrigin(0)
+      .setStrokeStyle(2, Color.black)
 
-    const hintStyle = {
-      fontFamily:
-        'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      fontSize: '16px',
+    const tipStyle = {
+      ...Style.basic,
       color: Color.whiteS,
-      lineSpacing: 4,
     }
     const txt = this.add
-      .text(0, 0, '', hintStyle)
+      .text(0, 0, '', tipStyle)
       .setWordWrapWidth(boxWidth - padding * 2)
       .setOrigin(0)
 
@@ -258,8 +256,7 @@ export default class JourneyScene extends BaseScene {
   }
 
   private getMissionTip(mission: MissionDetails): string {
-    const m = mission as MissionDetails & { tip?: string }
-    return m.tip ?? DEFAULT_MISSION_TIP
+    return mission.tip ?? DEFAULT_MISSION_TIP
   }
 
   private showMissionTip(text: string): void {

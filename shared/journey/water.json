@@ -1,1 +1,83 @@
-[{"name":"Drown","id":700,"prereq":[[202]],"deck":[5,5,14,14,14,20,20,21,21],"opponent":[1,1,1,1,6,6,33,33,11,12,14,14,16,21,21],"cards":[5]},{"name":"Dew","id":701,"prereq":[[300]],"deck":[1,1,1,63,63,13,19,19],"opponent":[0,63,63,4,4,7,7,7,48,48,40,61,57,57,23],"cards":[63]},{"name":"Fishing Boat","id":702,"prereq":[[303]],"deck":[1,1,1,1,32,68,68],"opponent":[2,2,2,2,4,4,8,8,8,10,60,11,15,22,22],"cards":[32]},{"name":"Gentle Rain","id":703,"prereq":[[404]],"deck":[75,75,75,103,103,71,71],"opponent":[2,2,2,2,4,4,8,8,8,10,60,11,15,22,22],"cards":[71]},{"name":"Excess","id":704,"prereq":[[500]],"deck":[2,2,2,63,86,46],"opponent":[2,2,2,2,4,4,8,8,8,10,60,11,15,22,22],"cards":[46]},{"name":"Iceberg","id":705,"prereq":[[305]],"deck":[1,1,68,68,54,54,17],"opponent":[2,2,2,2,4,4,8,8,8,10,60,11,15,22,22],"cards":[54]},{"name":"Gain and Loss","id":706,"prereq":[[208]],"deck":[42,42,42,42,42,103,103,64],"opponent":[2,2,2,2,4,4,8,8,8,10,60,11,15,22,22],"cards":[103]},{"name":"Fish","id":707,"prereq":[[400]],"deck":[0,0,4,4,4,33,33,33,101,101],"opponent":[2,2,2,2,4,4,8,8,8,10,60,11,15,22,22],"cards":[101]},{"name":"Cloud","id":708,"prereq":[[108],[208],[308],[408],[508],[608]],"deck":[102,102],"opponent":[2,2,2,2,4,4,8,8,8,10,60,11,15,22,22],"cards":[102]}]
+[
+  {
+    "name": "Drown",
+    "id": 700,
+    "prereq": [[202]],
+    "deck": [5, 5, 14, 14, 14, 20, 20, 21, 21],
+    "opponent": [1, 1, 1, 1, 6, 6, 33, 33, 11, 12, 14, 14, 16, 21, 21],
+    "cards": [5],
+    "tip": "Filling up your discard pile, providing Rooster targets, and keeping you from drawing cards you know you don't want - Drown does it all."
+  },
+  {
+    "name": "Dew",
+    "id": 701,
+    "prereq": [[300]],
+    "deck": [1, 1, 1, 63, 63, 13, 19, 19],
+    "opponent": [0, 63, 63, 4, 4, 7, 7, 7, 48, 48, 40, 61, 57, 57, 23],
+    "cards": [63],
+    "tip": "Dew provides a reliable source of 1 point every round, but be careful of stuffing you hand too full."
+  },
+  {
+    "name": "Fishing Boat",
+    "id": 702,
+    "prereq": [[303]],
+    "deck": [1, 1, 1, 1, 32, 68, 68],
+    "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
+    "cards": [32],
+    "tip": "Honestly try to play Fishing Boat after you shuffle, it's better that way."
+  },
+  {
+    "name": "Gentle Rain",
+    "id": 703,
+    "prereq": [[404]],
+    "deck": [75, 75, 75, 103, 103, 71, 71],
+    "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
+    "cards": [71],
+    "tip": "Gentle Rain gets worse if your hand is too full for you to draw cards."
+  },
+  {
+    "name": "Excess",
+    "id": 704,
+    "prereq": [[500]],
+    "deck": [2, 2, 2, 63, 86, 46],
+    "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
+    "cards": [46],
+    "tip": "While it forces you to commit hard to a round, Excess is a huge amount of points for the right low-curve deck."
+  },
+  {
+    "name": "Iceberg",
+    "id": 705,
+    "prereq": [[305]],
+    "deck": [1, 1, 68, 68, 54, 54, 17],
+    "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
+    "cards": [54],
+    "tip": "You can pass more often if you start a round with priority, or play a high-points card."
+  },
+  {
+    "name": "Gain and Loss",
+    "id": 706,
+    "prereq": [[208]],
+    "deck": [42, 42, 42, 42, 42, 103, 103, 64],
+    "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
+    "cards": [103],
+    "tip": "Getting rid of cards you don't want in the matchup, or cards that are too cheap once you get to the late game can help you win with ease."
+  },
+  {
+    "name": "Fish",
+    "id": 707,
+    "prereq": [[400]],
+    "deck": [0, 0, 4, 4, 4, 33, 33, 33, 101, 101],
+    "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
+    "cards": [101],
+    "tip": "Fish only triggers at the start of the game if you choose not to mulligan it."
+  },
+  {
+    "name": "Cloud",
+    "id": 708,
+    "prereq": [[108], [208], [308], [408], [508], [608]],
+    "deck": [102, 102],
+    "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
+    "cards": [102],
+    "tip": "The Exhale abilities trigger from top to bottom, and multiple can trigger as long as you have enough breath."
+  }
+]
