@@ -5,6 +5,7 @@ import pet from './pet.json'
 import birth from './birth.json'
 import vision from './vision.json'
 import water from './water.json'
+import stars from './stars.json'
 import { Deck } from '../types/deck'
 
 export interface MissionDetails {
@@ -27,6 +28,7 @@ export const journeyData: MissionDetails[] = [
   ...(birth as MissionDetails[]),
   ...(vision as MissionDetails[]),
   ...(water as MissionDetails[]),
+  ...(stars as MissionDetails[]),
 ]
 
 // Theme order and display names for the journey overlay (birds = Jules, etc.)
@@ -38,6 +40,7 @@ export const THEME_KEYS = [
   'birth',
   'vision',
   'water',
+  'stars',
 ] as const
 
 export const THEME_DISPLAY_NAMES: Record<string, string> = {
@@ -48,6 +51,7 @@ export const THEME_DISPLAY_NAMES: Record<string, string> = {
   birth: 'Imani Births the Future',
   vision: 'Mitra Seeks the Truth',
   water: 'Tales Carried on the River',
+  stars: 'Written in the Stars',
 }
 
 const THEME_ARRAYS: MissionDetails[][] = [
@@ -58,6 +62,7 @@ const THEME_ARRAYS: MissionDetails[][] = [
   birth as MissionDetails[],
   vision as MissionDetails[],
   water as MissionDetails[],
+  stars as MissionDetails[],
 ]
 
 export function getMissionsByTheme(): {

@@ -16,6 +16,7 @@ import Catalog from '../../../shared/state/catalog'
 import {
   getMissionsByTheme,
   MissionDetails,
+  THEME_KEYS,
 } from '../../../shared/journey/journey'
 import Loader from '../loader/loader'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -26,7 +27,7 @@ import newScrollablePanel from '../lib/scrollablePanel'
 const OVERLAY_WIDTH = 540
 const OVERLAY_TOP = 100
 
-/** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Imani, Mitra, Water */
+/** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Imani, Mitra, Water, Stars */
 const THEME_CAMERA_POSITIONS: { x: number; y: number }[] = [
   { x: 4000, y: 670 }, // birds (Jules)
   { x: 2100, y: 1270 }, // ashes (Adonis)
@@ -35,6 +36,7 @@ const THEME_CAMERA_POSITIONS: { x: number; y: number }[] = [
   { x: 1590, y: 4140 }, // birth (Imani)
   { x: 4850, y: 4130 }, // vision (Mitra)
   { x: 3180, y: 3100 }, // water
+  { x: 3080, y: 2800 }, // stars
 ]
 
 const DRIFT_RADIUS_X = 150
@@ -43,8 +45,15 @@ const DRIFT_SPEED = 0.0003
 const DRIFT_PHASE = 1.3
 const THEME_CAMERA_TWEEN_DURATION = 400
 
+const STARS_THEME_INDEX = THEME_KEYS.indexOf('stars')
+const ALT_MAP_FADE_DURATION = 400
+const ALT_MAP_SWAY_SPEED = 0.0004
+const ALT_MAP_SWAY_PHASE = 1.5
+const ALT_MAP_SWAY_RADIUS = 18
+
 export default class JourneyScene extends BaseScene {
   map: Phaser.GameObjects.Image
+  private altMap: Phaser.GameObjects.Image
 
   /** Center point the camera drifts around (theme position) */
   private driftCenterX = 0
@@ -52,6 +61,7 @@ export default class JourneyScene extends BaseScene {
 
   private isTweeningCamera = false
   private selectedThemeIndex = 0
+  private previousThemeIndex = 0
   private overlayHeaderText: Phaser.GameObjects.Text
   private overlayPanel: ScrollablePanel
 
@@ -70,6 +80,18 @@ export default class JourneyScene extends BaseScene {
 
     // Create the background
     this.map = this.add.image(0, 0, 'journey-Map').setOrigin(0)
+
+    this.altMap = this.add
+      .image(0, 0, 'journey-AltMap')
+      .setOrigin(0.5, 0.5)
+      .setAlpha(0)
+      .setScrollFactor(0)
+    this.plugins.get('rexAnchor')['add'](this.altMap, {
+      x: '50%',
+      y: '50%',
+      width: '110%',
+      height: '110%',
+    })
 
     this.cameras.main.setBounds(0, 0, this.map.width, this.map.height)
 
@@ -118,6 +140,17 @@ export default class JourneyScene extends BaseScene {
       Math.max(0, this.map.height - camera.height),
     )
     JourneyScene.rememberCoordinates(camera)
+
+    // Gentle sway on alt map when visible (stars theme)
+    if (this.altMap.alpha > 0) {
+      this.altMap.x =
+        camera.width / 2 +
+        Math.sin(time * ALT_MAP_SWAY_SPEED) * ALT_MAP_SWAY_RADIUS
+      this.altMap.y =
+        camera.height / 2 +
+        Math.sin(time * ALT_MAP_SWAY_SPEED * 0.7 + ALT_MAP_SWAY_PHASE) *
+          ALT_MAP_SWAY_RADIUS
+    }
   }
 
   private createJourneyOverlay(): void {
@@ -211,9 +244,28 @@ export default class JourneyScene extends BaseScene {
       panel.add(row)
     })
     this.overlayPanel.layout()
-    if (moveCamera) {
-      this.moveCameraToTheme(this.selectedThemeIndex)
+    if (moveCamera && this.selectedThemeIndex !== STARS_THEME_INDEX) {
+      const leavingStars = this.previousThemeIndex === STARS_THEME_INDEX
+      if (leavingStars) {
+        this.snapCameraToTheme(this.selectedThemeIndex)
+      } else {
+        this.moveCameraToTheme(this.selectedThemeIndex)
+      }
     }
+    this.previousThemeIndex = this.selectedThemeIndex
+    this.updateAltMapFade()
+  }
+
+  private updateAltMapFade(): void {
+    const showAltMap = this.selectedThemeIndex === STARS_THEME_INDEX
+    const targetAlpha = showAltMap ? 1 : 0
+    if (this.altMap.alpha === targetAlpha) return
+    this.tweens.add({
+      targets: this.altMap,
+      alpha: targetAlpha,
+      duration: ALT_MAP_FADE_DURATION,
+      ease: 'Power2.InOut',
+    })
   }
 
   /** Set camera and drift center to theme position without tweening */

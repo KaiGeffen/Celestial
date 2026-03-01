@@ -410,6 +410,14 @@ export const assetLists = {
     ],
     "pixelArt": true
   },
+  "journey": {
+    "files": [
+      "AltMap",
+      "Map",
+      "Mission"
+    ],
+    "pixelArt": true
+  },
   "sfx": {
     "files": [
       "click",
