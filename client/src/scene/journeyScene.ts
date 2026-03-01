@@ -47,6 +47,11 @@ const THEME_CAMERA_TWEEN_DURATION = 400
 
 const STARS_THEME_INDEX = THEME_KEYS.indexOf('stars')
 const ALT_MAP_FADE_DURATION = 400
+const MISSION_TIP_FADE_DURATION = 200
+/** Tip box width: from left pad to just left of the overlay panel (one extra pad) */
+const MISSION_TIP_BOX_WIDTH = Space.windowWidth - OVERLAY_WIDTH - Space.pad * 3
+const DEFAULT_MISSION_TIP =
+  'This mission will challenge your deck-building and strategy.\n\nComplete the required cards, then choose the rest to fill your deck.\n\nGood luck.'
 const ALT_MAP_SWAY_SPEED = 0.0004
 const ALT_MAP_SWAY_PHASE = 1.5
 const ALT_MAP_SWAY_RADIUS = 80
@@ -64,6 +69,9 @@ export default class JourneyScene extends BaseScene {
   private previousThemeIndex = 0
   private overlayHeaderText: Phaser.GameObjects.Text
   private overlayPanel: ScrollablePanel
+  private missionTipContainer: Phaser.GameObjects.Container
+  private missionTipBg: Phaser.GameObjects.Rectangle
+  private missionTipText: Phaser.GameObjects.Text
 
   constructor() {
     super({
@@ -187,7 +195,63 @@ export default class JourneyScene extends BaseScene {
       space: { header: 0 },
     })
     this.overlayPanel.setScrollFactor(0)
+
+    this.createMissionTipBox()
+
     this.refreshOverlayContent(false) // already at theme position; no tween on open
+  }
+
+  private createMissionTipBox(): void {
+    const padding = Space.pad
+    const lineHeight = 22
+    const maxLines = 6
+    const boxHeight = padding * 2 + lineHeight * maxLines
+    const boxWidth = MISSION_TIP_BOX_WIDTH
+    const x = Space.pad
+    const y = Space.windowHeight - boxHeight - Space.pad
+
+    this.missionTipContainer = this.add.container(x, y)
+
+    this.missionTipBg = this.add
+      .rectangle(0, 0, boxWidth, boxHeight, 0x353f4e, 0.92)
+      .setOrigin(0)
+    this.missionTipText = this.add
+      .text(padding, padding, DEFAULT_MISSION_TIP, {
+        ...Style.basic,
+        fontSize: '16px',
+        color: '#f5f2eb',
+        wordWrap: { width: boxWidth - padding * 2 },
+        lineSpacing: 4,
+      })
+      .setOrigin(0)
+
+    this.missionTipContainer.add([this.missionTipBg, this.missionTipText])
+    this.missionTipContainer.setScrollFactor(0)
+    this.missionTipContainer.setAlpha(0)
+  }
+
+  private getMissionTip(mission: MissionDetails): string {
+    const m = mission as MissionDetails & { tip?: string }
+    return m.tip ?? DEFAULT_MISSION_TIP
+  }
+
+  private showMissionTip(text: string): void {
+    this.missionTipText.setText(text)
+    this.tweens.add({
+      targets: this.missionTipContainer,
+      alpha: 1,
+      duration: MISSION_TIP_FADE_DURATION,
+      ease: 'Power2.Out',
+    })
+  }
+
+  private hideMissionTip(): void {
+    this.tweens.add({
+      targets: this.missionTipContainer,
+      alpha: 0,
+      duration: MISSION_TIP_FADE_DURATION,
+      ease: 'Power2.In',
+    })
   }
 
   private createOverlayHeader(
@@ -406,12 +470,16 @@ export default class JourneyScene extends BaseScene {
         Space.buttonWidth,
         Space.buttonHeight,
       )
-      new Buttons.Basic({
+      const startBtn = new Buttons.Basic({
         within: btnContainer,
         text: 'Start',
         f: this.missionOnClick(mission),
         muteClick: true,
       })
+      startBtn.setOnHover(
+        () => this.showMissionTip(this.getMissionTip(mission)),
+        () => this.hideMissionTip(),
+      )
       row.add(btnContainer, { align: 'center' })
     } else {
       const lockedContainer = new ContainerLite(
