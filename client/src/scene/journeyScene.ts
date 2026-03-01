@@ -49,7 +49,7 @@ const STARS_THEME_INDEX = THEME_KEYS.indexOf('stars')
 const ALT_MAP_FADE_DURATION = 400
 const ALT_MAP_SWAY_SPEED = 0.0004
 const ALT_MAP_SWAY_PHASE = 1.5
-const ALT_MAP_SWAY_RADIUS = 18
+const ALT_MAP_SWAY_RADIUS = 80
 
 export default class JourneyScene extends BaseScene {
   map: Phaser.GameObjects.Image
@@ -78,6 +78,15 @@ export default class JourneyScene extends BaseScene {
   create(params): void {
     super.create()
 
+    // Allow starting on a specific theme (e.g. stars after a mission)
+    if (params.themeIndex !== undefined) {
+      this.selectedThemeIndex = params.themeIndex
+      this.previousThemeIndex = params.themeIndex
+    } else if (params.theme === 'stars') {
+      this.selectedThemeIndex = STARS_THEME_INDEX
+      this.previousThemeIndex = STARS_THEME_INDEX
+    }
+
     // Create the background
     this.map = this.add.image(0, 0, 'journey-Map').setOrigin(0)
 
@@ -89,8 +98,8 @@ export default class JourneyScene extends BaseScene {
     this.plugins.get('rexAnchor')['add'](this.altMap, {
       x: '50%',
       y: '50%',
-      width: '110%',
-      height: '110%',
+      width: '120%',
+      height: '120%',
     })
 
     this.cameras.main.setBounds(0, 0, this.map.width, this.map.height)
@@ -121,6 +130,11 @@ export default class JourneyScene extends BaseScene {
 
     // Mission list overlay on the right
     this.createJourneyOverlay()
+
+    // If we started on stars, show alt map immediately (no fade-in delay)
+    if (this.selectedThemeIndex === STARS_THEME_INDEX) {
+      this.altMap.alpha = 1
+    }
   }
 
   update(time: number, _delta: number): void {
