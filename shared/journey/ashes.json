@@ -13,9 +13,9 @@
     "id": 201,
     "prereq": [[200]],
     "deck": [0, 0, 3, 3, 3, 3, 6, 14, 14, 14, 17, 17, 21],
-    "opponent": [5, 5, 5, 3, 3, 3, 6, 12, 14, 14, 13, 13, 17, 17, 17],
+    "opponent": [5, 5, 5, 3, 3, 3, 6, 12, 14, 14, 14, 13, 13, 17, 17],
     "cards": [21],
-    "tip": "Get a larger enough discard pile to play Death before you shuffle."
+    "tip": "Get 12 cards in your discard pile to play Death for free before you shuffle."
   },
   {
     "name": "Cling",
@@ -31,7 +31,7 @@
     "id": 203,
     "prereq": [[202]],
     "deck": [3, 3, 3, 3, 6, 15, 15, 17, 17, 17],
-    "opponent": [4, 4, 4, 4, 4, 4, 65, 33, 33, 7, 7, 7, 101, 12, 12],
+    "opponent": [4, 4, 4, 4, 4, 4, 33, 33, 7, 7, 7, 11, 11, 12, 12],
     "cards": [15],
     "tip": "If you don't play the Ashes from Mine, it effectively delays your shuffle a full round."
   },

@@ -51,7 +51,7 @@
     "deck": [0, 78, 78, 31, 31, 43, 43, 58],
     "opponent": [63, 63, 63, 63, 68, 68, 7, 7, 48, 48, 66, 66, 73, 57, 23],
     "cards": [43],
-    "tip": "Play on a round where you have negative Nourish for maximum effect."
+    "tip": "Play Victim on a round where you have negative Nourish for maximum effect."
   },
   {
     "name": "Vampire",
@@ -69,7 +69,7 @@
     "deck": [0, 25, 78, 58, 57],
     "opponent": [4, 4, 4, 4, 4, 4, 65, 7, 7, 7, 7, 101, 12, 12, 56],
     "cards": [57],
-    "tip": "Negative Nourish can also trigger Boa's condition."
+    "tip": "Negative Nourish still counts for Boa's effect."
   },
   {
     "name": "Lost in Shadow",
