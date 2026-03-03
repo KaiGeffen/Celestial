@@ -484,26 +484,30 @@ export default class JourneyScene extends BaseScene {
     row.add(nameText, { align: 'left-center' })
     row.addSpace() // right-justify stars and button
 
-    // 2) Stars (difficulty), with Clear stamp when completed — stamp then stars, all in sizer
+    // 2) Stars (difficulty), with Clear stamp behind the stars when completed
     const starSize = 23
     const starGap = 2
     const starsAndStampSizer = this.rexUI.add.sizer({
-      width: 230,
       orientation: 'horizontal',
-      origin: 0.5,
       space: { item: starGap },
     })
     starsAndStampSizer.addSpace()
-    if (isCompleted) {
-      const stamp = this.add.image(0, 0, 'icon-JourneyClearStamp')
-      stamp.setOrigin(0.5, 0.5)
-      starsAndStampSizer.add(stamp, { align: 'center' })
-    }
+    // One cell: container draws stamp first (behind), then stars on top; stamp at fixed center
+    const overlayCell = this.add.container(1, 0)
+    overlayCell.width = 240
     for (let i = 0; i < difficulty; i++) {
-      const star = this.add.image(0, 0, 'icon-JourneyStar')
-      star.setOrigin(0.5, 0.5)
-      starsAndStampSizer.add(star, { align: 'center' })
+      const star = this.add.image(
+        i * (starSize + starGap),
+        0,
+        'icon-JourneyStar',
+      )
+      overlayCell.add(star)
     }
+    if (isCompleted) {
+      const stamp = this.add.image(50, 0, 'icon-JourneyClearStamp')
+      overlayCell.add(stamp)
+    }
+    starsAndStampSizer.add(overlayCell, { align: 'center' })
     starsAndStampSizer.addSpace()
     row.add(starsAndStampSizer)
 
