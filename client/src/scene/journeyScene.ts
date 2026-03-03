@@ -454,16 +454,19 @@ export default class JourneyScene extends BaseScene {
 
     const isCompleted = completed[mission.id]
     const isUnlocked = this.isMissionUnlocked(mission, completed)
+    const difficulty = Phaser.Math.Clamp(mission.difficulty ?? 3, 1, 5)
 
-    // Checkmark or empty space
-    const checkText = this.add
-      .text(0, 0, isCompleted ? '✓' : ' ', {
-        ...Style.basic,
-        fontSize: '20px',
-        color: isCompleted ? '#2d5a27' : 'transparent',
-      })
-      .setOrigin(0, 0.5)
-    row.add(checkText, { align: 'center' })
+    // Clear stamp for completed missions (or spacer if not)
+    if (isCompleted) {
+      const stamp = this.add
+        .image(0, 0, 'JourneyClearStamp')
+        .setOrigin(0, 0.5)
+        .setScale(0.6)
+      row.add(stamp, { align: 'center' })
+    } else {
+      const spacer = this.add.rectangle(0, 0, 24, 24, 0x000000, 0).setOrigin(0)
+      row.add(spacer, { align: 'center' })
+    }
 
     // Mission name + card emojis as BBCode (hover areas show card)
     let nameBBCode = this.getMissionDisplayName(mission)
@@ -478,7 +481,7 @@ export default class JourneyScene extends BaseScene {
       .BBCodeText(0, 0, nameBBCode, {
         ...BBStyle.basic,
         fontSize: '18px',
-        wrap: { mode: 'word', width: rowWidth - 120 },
+        wrap: { mode: 'word', width: rowWidth - 180 },
       })
       .setOrigin(0, 0.5)
       .setInteractive()
@@ -491,6 +494,17 @@ export default class JourneyScene extends BaseScene {
       })
       .on('areaout', () => this.hint.hide())
     row.add(nameText, { align: 'left-center' })
+
+    // Difficulty stars
+    const starsSizer = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      space: { item: 2 },
+    })
+    for (let i = 0; i < difficulty; i++) {
+      const star = this.add.image(0, 0, 'icon-JourneyStar').setOrigin(0, 0.5)
+      starsSizer.add(star)
+    }
+    row.add(starsSizer, { align: 'center' })
     row.addSpace() // pushes Start/Locked to the right
 
     if (isUnlocked) {

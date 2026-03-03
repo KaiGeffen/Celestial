@@ -293,6 +293,8 @@ export const assetLists = {
       "HomeButton",
       "InputText",
       "Inspire",
+      "JourneyClearStamp",
+      "JourneyStar",
       "JourneyTab",
       "Leaderboard",
       "LeaderboardTab",
@@ -407,14 +409,6 @@ export const assetLists = {
       "Nightmare",
       "Possibilities",
       "Refresh"
-    ],
-    "pixelArt": true
-  },
-  "journey": {
-    "files": [
-      "AltMap",
-      "Map",
-      "Mission"
     ],
     "pixelArt": true
   },

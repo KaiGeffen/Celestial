@@ -15,6 +15,8 @@ export interface MissionDetails {
   deck?: number[]
   opponent?: number[]
   cards?: number[]
+  /** Difficulty 1–5 used for journey UI stars. */
+  difficulty?: number
   /** Hint text shown when hovering the mission's Start button (journey overlay). */
   tip?: string
   // TODO Remove or support these
