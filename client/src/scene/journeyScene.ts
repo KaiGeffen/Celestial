@@ -469,9 +469,7 @@ export default class JourneyScene extends BaseScene {
       .BBCodeText(0, 0, nameBBCode, {
         ...BBStyle.basic,
         fontSize: '18px',
-        wrap: { mode: 'word', width: rowWidth - 160 },
       })
-      .setOrigin(0, 0.5)
       .setInteractive()
       .on('areaover', (key: string) => {
         if (key.startsWith('card_')) {
@@ -487,6 +485,7 @@ export default class JourneyScene extends BaseScene {
     // 2) Stars (difficulty), with Clear stamp behind the stars when completed
     const starSize = 23
     const starGap = 2
+    const width = 120
     const starsAndStampSizer = this.rexUI.add.sizer({
       orientation: 'horizontal',
       space: { item: starGap },
@@ -494,17 +493,17 @@ export default class JourneyScene extends BaseScene {
     starsAndStampSizer.addSpace()
     // One cell: container draws stamp first (behind), then stars on top; stamp at fixed center
     const overlayCell = this.add.container(1, 0)
-    overlayCell.width = 240
+    overlayCell.width = width
     for (let i = 0; i < difficulty; i++) {
       const star = this.add.image(
-        i * (starSize + starGap),
+        (5 - i) * (starSize + starGap) - width / 2 - 20,
         0,
         'icon-JourneyStar',
       )
       overlayCell.add(star)
     }
     if (isCompleted) {
-      const stamp = this.add.image(50, 0, 'icon-JourneyClearStamp')
+      const stamp = this.add.image(-10, 0, 'icon-JourneyClearStamp')
       overlayCell.add(stamp)
     }
     starsAndStampSizer.add(overlayCell, { align: 'center' })
