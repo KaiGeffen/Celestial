@@ -446,7 +446,7 @@ export default class JourneyScene extends BaseScene {
     const row = this.rexUI.add.sizer({
       orientation: 'horizontal',
       width: rowWidth,
-      space: { left: 4, right: 4, top: 4, bottom: 4 },
+      space: { left: 4, right: 4, top: 4, bottom: 4, item: 8 },
     })
 
     const rowBg = this.add.rectangle(0, 0, 1, 1, 0xf5f2eb).setOrigin(0)
@@ -456,19 +456,7 @@ export default class JourneyScene extends BaseScene {
     const isUnlocked = this.isMissionUnlocked(mission, completed)
     const difficulty = Phaser.Math.Clamp(mission.difficulty ?? 3, 1, 5)
 
-    // Clear stamp for completed missions (or spacer if not)
-    if (isCompleted) {
-      const stamp = this.add
-        .image(0, 0, 'JourneyClearStamp')
-        .setOrigin(0, 0.5)
-        .setScale(0.6)
-      row.add(stamp, { align: 'center' })
-    } else {
-      const spacer = this.add.rectangle(0, 0, 24, 24, 0x000000, 0).setOrigin(0)
-      row.add(spacer, { align: 'center' })
-    }
-
-    // Mission name + card emojis as BBCode (hover areas show card)
+    // 1) Mission name + card emojis
     let nameBBCode = this.getMissionDisplayName(mission)
     if ('deck' in mission && mission.cards?.length) {
       for (const cardId of mission.cards) {
@@ -481,7 +469,7 @@ export default class JourneyScene extends BaseScene {
       .BBCodeText(0, 0, nameBBCode, {
         ...BBStyle.basic,
         fontSize: '18px',
-        wrap: { mode: 'word', width: rowWidth - 180 },
+        wrap: { mode: 'word', width: rowWidth - 160 },
       })
       .setOrigin(0, 0.5)
       .setInteractive()
@@ -494,19 +482,32 @@ export default class JourneyScene extends BaseScene {
       })
       .on('areaout', () => this.hint.hide())
     row.add(nameText, { align: 'left-center' })
+    row.addSpace() // right-justify stars and button
 
-    // Difficulty stars
-    const starsSizer = this.rexUI.add.sizer({
+    // 2) Stars (difficulty), with Clear stamp when completed — stamp then stars, all in sizer
+    const starSize = 23
+    const starGap = 2
+    const starsAndStampSizer = this.rexUI.add.sizer({
+      width: 230,
       orientation: 'horizontal',
-      space: { item: 2 },
+      origin: 0.5,
+      space: { item: starGap },
     })
-    for (let i = 0; i < difficulty; i++) {
-      const star = this.add.image(0, 0, 'icon-JourneyStar').setOrigin(0, 0.5)
-      starsSizer.add(star)
+    starsAndStampSizer.addSpace()
+    if (isCompleted) {
+      const stamp = this.add.image(0, 0, 'icon-JourneyClearStamp')
+      stamp.setOrigin(0.5, 0.5)
+      starsAndStampSizer.add(stamp, { align: 'center' })
     }
-    row.add(starsSizer, { align: 'center' })
-    row.addSpace() // pushes Start/Locked to the right
+    for (let i = 0; i < difficulty; i++) {
+      const star = this.add.image(0, 0, 'icon-JourneyStar')
+      star.setOrigin(0.5, 0.5)
+      starsAndStampSizer.add(star, { align: 'center' })
+    }
+    starsAndStampSizer.addSpace()
+    row.add(starsAndStampSizer)
 
+    // 3) Start or Locked button
     if (isUnlocked) {
       const btnContainer = new ContainerLite(
         this,
