@@ -25,7 +25,7 @@ import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWid
 import newScrollablePanel from '../lib/scrollablePanel'
 import showTooltip from '../utils/tooltips'
 
-const OVERLAY_WIDTH = 540
+const OVERLAY_WIDTH = 550
 const OVERLAY_TOP = 100
 
 /** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Imani, Mitra, Water, Stars */
@@ -186,7 +186,7 @@ export default class JourneyScene extends BaseScene {
 
     const contentSizer = this.rexUI.add.fixWidthSizer({
       width: OVERLAY_WIDTH,
-      space: { item: 6 },
+      space: { left: Space.padSmall },
     })
 
     const overlayBackground = this.add
@@ -303,7 +303,7 @@ export default class JourneyScene extends BaseScene {
     this.overlayHeaderText = this.add
       .text(0, 0, '', {
         ...Style.announcement,
-        fontSize: '24px',
+        fontSize: '30px',
         color: '#f5f2eb',
       })
       .setOrigin(0.5, 0.5)
