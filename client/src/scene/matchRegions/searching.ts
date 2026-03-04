@@ -15,6 +15,7 @@ export default class SearchingRegion extends Region {
   txtTitle: Phaser.GameObjects.Text
   txtTime: Phaser.GameObjects.Text
   matchFound: boolean
+  cancelButton: Button
   password: string
 
   create(scene: MatchScene, avatarId: number, password: string): Region {
@@ -71,6 +72,11 @@ export default class SearchingRegion extends Region {
 
   displayState(state: GameModel): void {
     this.matchFound = true
+
+    // Once a match is found, prevent further cancel attempts
+    if (this.cancelButton) {
+      this.cancelButton.disable()
+    }
 
     // If player has been waiting trivial time, don't bother
     if (parseInt(this.txtTime.text.replace(':', '')) <= 3) {
@@ -150,7 +156,7 @@ export default class SearchingRegion extends Region {
   }
 
   private addButtons(scene: MatchScene): void {
-    new Buttons.Basic({
+    this.cancelButton = new Buttons.Basic({
       within: this.container,
       text: 'Cancel',
       y: 100,
