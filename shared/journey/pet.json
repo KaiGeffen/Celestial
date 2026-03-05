@@ -1,6 +1,6 @@
 [
   {
-    "name": "Finding Her",
+    "name": "Neglected",
     "id": 400,
     "prereq": [[100], [200]],
     "difficulty": 2,
@@ -10,7 +10,7 @@
     "tip": "A nourished Pet can be returned to hand with Hold Tight, as long as you don’t put another card on top of it!"
   },
   {
-    "name": "Keeping Her safe",
+    "name": "Kitz’s Diner",
     "id": 401,
     "prereq": [[400]],
     "difficulty": 2,
@@ -20,7 +20,7 @@
     "tip": "If you're nourished the round you play Oak it becomes extra effective."
   },
   {
-    "name": "Flowers for Her eyes",
+    "name": "Unforgiving Nature",
     "id": 402,
     "prereq": [[401]],
     "difficulty": 3,
@@ -30,7 +30,7 @@
     "tip": "If you remove enough cards from the game with Fleeting, drawing Pet every round becomes easy."
   },
   {
-    "name": "Empty without Her",
+    "name": "Alone Again",
     "id": 403,
     "prereq": [[402]],
     "difficulty": 3,
@@ -40,7 +40,7 @@
     "tip": "When Hollow sets your points to 0, it takes away the downside of negative Nourish."
   },
   {
-    "name": "Needing Her",
+    "name": "Stray",
     "id": 404,
     "prereq": [[403]],
     "difficulty": 3,
@@ -50,7 +50,7 @@
     "tip": "Exhale happens when the story resolves only if you have breath left over."
   },
   {
-    "name": "Becoming Her everything",
+    "name": "Imprint",
     "id": 405,
     "prereq": [[404]],
     "difficulty": 4,
@@ -60,7 +60,7 @@
     "tip": "Sensualist gives you lots of points on a round when you already have carryover from Nourish or Inspire, so try not to go carried away."
   },
   {
-    "name": "Giving Her my all",
+    "name": "Protector",
     "id": 406,
     "prereq": [[405]],
     "difficulty": 4,
@@ -70,7 +70,7 @@
     "tip": "Bounty can effectively give 5 points in a round if you use the Nourish and your opponent doesn’t."
   },
   {
-    "name": "My heart in Her hands",
+    "name": "Outgrown",
     "id": 407,
     "prereq": [[406]],
     "difficulty": 4,
@@ -80,7 +80,7 @@
     "tip": "Pomegranate could be the fruit you need to feed your Pet."
   },
   {
-    "name": "Me and Her",
+    "name": "Inward",
     "id": 408,
     "prereq": [[407]],
     "difficulty": 4,

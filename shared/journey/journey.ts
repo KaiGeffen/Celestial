@@ -50,8 +50,8 @@ export const THEME_KEYS = [
 export const THEME_DISPLAY_NAMES: Record<string, string> = {
   birds: 'Jules Learns to Fly',
   ashes: 'Adonis Blazes a Path',
-  shadow: 'Mia Battles her Shadows',
-  pet: 'Kitz Finds his Love ',
+  shadow: 'Mia Survives her Shadows',
+  pet: 'Kitz Finds his Love',
   birth: 'Imani Births the Future',
   vision: 'Mitra Seeks the Truth',
   water: 'Tales Carried on the River',

@@ -1,6 +1,6 @@
 [
   {
-    "name": "In a Hole",
+    "name": "Ends are Beginnings",
     "id": 300,
     "prereq": [[100], [200]],
     "difficulty": 2,
@@ -10,7 +10,7 @@
     "tip": "Daggers earn 0 points, so rounds you play them you probably can't win.\n\nShadow is best if you play it as late in a round as possible, since it gets cheaper."
   },
   {
-    "name": "The Price of Truth",
+    "name": "Toppled Pedestal",
     "id": 301,
     "prereq": [[300]],
     "difficulty": 2,
@@ -20,7 +20,7 @@
     "tip": "Playing a card after Hungry Ghost makes it effectively worth 0 points (4 - 4). But if you don't, the negative Nourish will stay until the next round."
   },
   {
-    "name": "Where it All Began",
+    "name": "Doormat",
     "id": 302,
     "prereq": [[301]],
     "difficulty": 2,
@@ -30,7 +30,7 @@
     "tip": "Once Imprison gives the opponent negative Nourish, it makes it harder for them to escape the next round."
   },
   {
-    "name": "Nightmare",
+    "name": "Through the Window",
     "id": 303,
     "prereq": [[302]],
     "difficulty": 3,
@@ -40,7 +40,7 @@
     "tip": "Try to play fewer cards than the opponent so that Nightmare can trigger and come back."
   },
   {
-    "name": "Sickness",
+    "name": "Always Fight Back",
     "id": 304,
     "prereq": [[303]],
     "difficulty": 3,
@@ -50,7 +50,7 @@
     "tip": "Sickness won't cover your Morning abilities or make Heron more expensive, and it gives you something to play if the opponent gives it back to you."
   },
   {
-    "name": "Victim",
+    "name": "Snake Pit",
     "id": 305,
     "prereq": [[304]],
     "difficulty": 3,
@@ -60,7 +60,7 @@
     "tip": "Play Victim on a round where you have negative Nourish for maximum effect."
   },
   {
-    "name": "Vampire",
+    "name": "Caked Grease",
     "id": 306,
     "prereq": [[305]],
     "difficulty": 4,
@@ -70,7 +70,7 @@
     "tip": "If the opponent has negative points, Vampire becomes worth more than normal."
   },
   {
-    "name": "Boa",
+    "name": "Hidden Pinches",
     "id": 307,
     "prereq": [[306]],
     "difficulty": 4,
@@ -80,7 +80,7 @@
     "tip": "Negative Nourish still counts for Boa's effect."
   },
   {
-    "name": "Lost in Shadow",
+    "name": "Perspective",
     "id": 308,
     "prereq": [[307]],
     "difficulty": 4,

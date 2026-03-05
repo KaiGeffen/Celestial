@@ -1,6 +1,6 @@
 [
   {
-    "name": "Surprise visit",
+    "name": "Closed Doors",
     "id": 200,
     "prereq": [[]],
     "difficulty": 1,
@@ -10,7 +10,7 @@
     "tip": "Ashes are generally a bad card, but they can fill up your discard pile to make Veteran worth extra points."
   },
   {
-    "name": "Death",
+    "name": "Never Fast Enough",
     "id": 201,
     "prereq": [[200]],
     "difficulty": 1,
@@ -20,7 +20,7 @@
     "tip": "Get 12 cards in your discard pile to play Death for free before you shuffle."
   },
   {
-    "name": "Cling",
+    "name": "Out of Breath",
     "id": 202,
     "prereq": [[201]],
     "difficulty": 1,
@@ -30,7 +30,7 @@
     "tip": "Because after you shuffle you'll have to deal with the Ashes you've created, it can help to Cling onto your deck - prolonging the time until the consequences of your actions hit you."
   },
   {
-    "name": "Mine",
+    "name": "Ignition",
     "id": 203,
     "prereq": [[202]],
     "difficulty": 2,
@@ -40,7 +40,7 @@
     "tip": "If you don't play the Ashes from Mine, it effectively delays your shuffle a full round."
   },
   {
-    "name": "Firebug",
+    "name": "Still Running",
     "id": 204,
     "prereq": [[202]],
     "difficulty": 2,
@@ -50,7 +50,7 @@
     "tip": "Firebug and similar effects always discard the leftmost card from your hand."
   },
   {
-    "name": "Parch",
+    "name": "In Their Eyes",
     "id": 205,
     "prereq": [[204]],
     "difficulty": 2,
@@ -60,7 +60,7 @@
     "tip": "Parch can trade cheap cards for lots of points - winning early rounds by a lot."
   },
   {
-    "name": "Immolant",
+    "name": "Cost of Change",
     "id": 206,
     "prereq": [[205]],
     "difficulty": 3,
@@ -70,7 +70,7 @@
     "tip": "Immolant effectively makes your self-discard effects earn you an extra point."
   },
   {
-    "name": "Spark",
+    "name": "Worth",
     "id": 207,
     "prereq": [[206]],
     "difficulty": 3,
@@ -80,7 +80,7 @@
     "tip": "Spark can discard other copies of spark with its effect, removing the downside."
   },
   {
-    "name": "Goliath",
+    "name": "Finish Line",
     "id": 208,
     "prereq": [[207]],
     "difficulty": 3,

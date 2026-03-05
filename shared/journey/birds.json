@@ -1,6 +1,6 @@
 [
   {
-    "name": "Starling",
+    "name": "Lost Footing",
     "id": 100,
     "prereq": [[]],
     "difficulty": 1,
@@ -10,7 +10,7 @@
     "tip": "Playing cheap cards with Fleeting means your deck will be better after you shuffle."
   },
   {
-    "name": "Heron",
+    "name": "Out of Reach",
     "id": 101,
     "prereq": [[100]],
     "difficulty": 1,
@@ -20,7 +20,7 @@
     "tip": "Try to play Heron before you play too many cards without Fleeting, since it will cost 1 more breath for each card in your discard pile.\n\n You can also hold it until after you shuffle to make it cheap again."
   },
   {
-    "name": "Vulture",
+    "name": "The Cage",
     "id": 102,
     "prereq": [[101]],
     "difficulty": 1,
@@ -30,7 +30,7 @@
     "tip": "Vulture gives you Nourish when it's played instead of when it resolves.\n\nThis means if your points are set to 0 earlier in the round, Vulture can be worth 5 points."
   },
   {
-    "name": "Phoenix",
+    "name": "Hit the Ground",
     "id": 103,
     "prereq": [[102]],
     "difficulty": 2,
@@ -40,7 +40,7 @@
     "tip": "Phoenix is best when played early, so try to ramp into it."
   },
   {
-    "name": "Truth",
+    "name": "Take Flight",
     "id": 104,
     "prereq": [[103]],
     "difficulty": 2,
@@ -50,7 +50,7 @@
     "tip": "Sometimes you just need a card worth lots of points."
   },
   {
-    "name": "Nest",
+    "name": "Turbulence",
     "id": 105,
     "prereq": [[104]],
     "difficulty": 2,
@@ -60,7 +60,7 @@
     "tip": "Don't cover up the Nest, and it will keep making Doves round after round."
   },
   {
-    "name": "Rooster",
+    "name": "Open Skies",
     "id": 106,
     "prereq": [[105]],
     "difficulty": 3,
@@ -70,7 +70,7 @@
     "tip": "Rooster doesn't need to be immediately on top of a card in the discard pile to trigger its Morning ability."
   },
   {
-    "name": "Fledgling",
+    "name": "A Fleeting Doubt",
     "id": 107,
     "prereq": [[106]],
     "difficulty": 3,
@@ -80,7 +80,7 @@
     "tip": "If your deck is full of Fleeting cards, Fledgling won't get covered and can come out more often after you shuffle."
   },
   {
-    "name": "Let Go",
+    "name": "Beyond the Clouds",
     "id": 108,
     "prereq": [[107]],
     "difficulty": 3,
