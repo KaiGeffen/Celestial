@@ -280,6 +280,24 @@ const drip = new Drip({
 
 // TODO
 
+class Ouroboros extends Card {
+  onRoundEndIfThisResolved(player: number, game: GameModel) {
+    // If we won, discard a card
+    if (game.score[player] >= game.score[player ^ 1]) {
+      game.discard(player, 1)
+    } else if (game.score[player] <= game.score[player ^ 1]) {
+      game.draw(player, 1)
+    }
+  }
+}
+const ouroboros = new Ouroboros({
+  name: 'Ouroboros',
+  id: 7035,
+  cost: 2,
+  points: 3,
+  text: 'When you win this round, discard a card.\nWhen you lose this round, draw a card.',
+})
+
 export {
   mercy,
   excess,
@@ -296,4 +314,5 @@ export {
   overflow,
   // NEW
   drip,
+  ouroboros,
 }

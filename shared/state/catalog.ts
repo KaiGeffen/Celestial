@@ -10,9 +10,12 @@ import * as starsCatalog from './catalog/stars'
 import * as waterCatalog from './catalog/water'
 import * as tokensCatalog from './catalog/tokens'
 import * as specialCardsCatalog from './catalog/specialCards'
+import * as groundCatalog from './catalog/ground'
 import { Keyword, Keywords } from './keyword'
 
 const fullCatalog = [
+  // TODO This theme is all beta
+  ...Object.values(groundCatalog).sort((a, b) => a.cost - b.cost),
   ...Object.values(birdsCatalog).sort((a, b) => a.cost - b.cost),
   ...Object.values(ashesCatalog).sort((a, b) => a.cost - b.cost),
   ...Object.values(petCatalog).sort((a, b) => a.cost - b.cost),
