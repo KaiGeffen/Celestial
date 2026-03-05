@@ -378,19 +378,19 @@ const starfall = new Starfall({
   beta: true,
 })
 
-class Inbreath extends Card {
+class Boreas extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
     game.breath[player] += 2
   }
 }
-const inbreath = new Inbreath({
-  name: 'Inbreath',
+const boreas = new Boreas({
+  name: 'Boreas',
   id: 8096,
   cost: 2,
   points: 2,
-  text: 'Gain 2 breath.',
+  text: 'Worth +1 if you returned a card to hand this round TODO Implement.\nGain 2 breath.',
 })
 
 export {
@@ -411,5 +411,5 @@ export {
   rocketship,
   // fable,
   starfall,
-  inbreath,
+  boreas as inbreath,
 }

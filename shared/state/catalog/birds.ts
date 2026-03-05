@@ -396,6 +396,21 @@ const sudden = new Sudden({
   text: 'When played, remove all card text from a card in your hand.',
 })
 
+class SkyBurial extends Card {
+  onPlay(player: number, game: GameModel) {
+    const i = game.story.acts.length
+    game.createInStory(player ^ 1, vulture, i - 1)
+  }
+}
+const skyBurial = new SkyBurial({
+  name: 'Sky Burial',
+  id: 1070,
+  cost: 2,
+  points: 7,
+  qualities: [Quality.VISIBLE],
+  text: 'Visible\nWhen played, create a Vulture before this in the story for your opponent.',
+})
+
 export {
   dove,
   starling,
@@ -413,4 +428,5 @@ export {
   // NEW
   updraft,
   sudden,
+  skyBurial,
 }
