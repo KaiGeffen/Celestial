@@ -245,7 +245,7 @@ const damBreaks = new DamBreaks({
   text: 'Exhale 1: Discard 3 cards. Add your hand to the story after this.',
 })
 
-class Drip extends Card {
+class Ice extends Card {
   onDraw(player: number, game: GameModel): void {
     // Remove from hand
     game.hand[player].splice(game.hand[player].length - 1, 1)
@@ -268,8 +268,8 @@ class Drip extends Card {
     )
   }
 }
-const drip = new Drip({
-  name: 'Drip',
+const ice = new Ice({
+  name: 'Ice',
   id: 8005,
   cost: 1,
   points: 1,
@@ -279,7 +279,6 @@ const drip = new Drip({
 })
 
 // TODO
-
 class Ouroboros extends Card {
   onRoundEndIfThisResolved(player: number, game: GameModel) {
     // If we won, discard a card
@@ -298,6 +297,23 @@ const ouroboros = new Ouroboros({
   text: 'When you win this round, discard a card.\nWhen you lose this round, draw a card.',
 })
 
+class Rime extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    for (let i = 0; i < 2; i++) {
+      game.createOnDeckBottom(player, ice)
+    }
+  }
+}
+const rime = new Rime({
+  name: 'Rime',
+  id: 7036,
+  cost: 4,
+  points: 4,
+  text: 'Add 2 copies of Ice to the bottom of your deck.',
+})
+
 export {
   mercy,
   excess,
@@ -313,6 +329,7 @@ export {
   damBreaks,
   overflow,
   // NEW
-  drip,
+  ice,
   ouroboros,
+  rime,
 }

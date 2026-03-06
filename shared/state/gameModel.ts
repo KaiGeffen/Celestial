@@ -339,6 +339,20 @@ export default class GameModel {
     this.deck[player].push(card)
   }
 
+  createOnDeckBottom(player: number, card: Card) {
+    this.animations[player].push(
+      new Animation({
+        from: Zone.Gone,
+        to: Zone.Deck,
+        card: card,
+        index2: 0,
+      }),
+    )
+
+    // Add the card at the bottom of the deck
+    this.deck[player].unshift(card)
+  }
+
   createInStory(player: number, card: Card, i?: number) {
     this.story.addAct(card, player, i)
   }
