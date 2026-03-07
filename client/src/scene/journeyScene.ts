@@ -465,21 +465,29 @@ export default class JourneyScene extends BaseScene {
       Space.iconSize,
       Space.iconSize,
     )
-    if (isCompleted && mission.id < 700) {
-      const avatarIndex = Math.floor(mission.id / 100) - 1
-      const chapterIndex = mission.id % 100
+    if (isCompleted) {
       new Buttons.Icon({
         within: iconCell,
         name: 'Quest',
         muteClick: true,
         f: () => {
-          const storyText =
-            avatarStories[avatarIndex]?.[chapterIndex] ?? 'Coming soon'
-          this.scene.launch('MenuScene', {
-            menu: 'message',
-            title: `${avatarNames[avatarIndex]} — ${mission.name}`,
-            s: storyText,
-          })
+          if (mission.id < 700) {
+            const avatarIndex = Math.floor(mission.id / 100) - 1
+            const chapterIndex = mission.id % 100
+            const storyText =
+              avatarStories[avatarIndex]?.[chapterIndex] ?? 'Coming soon'
+            this.scene.launch('MenuScene', {
+              menu: 'message',
+              title: `${avatarNames[avatarIndex]} — ${mission.name}`,
+              s: storyText,
+            })
+          } else {
+            this.scene.launch('MenuScene', {
+              menu: 'message',
+              title: mission.name,
+              s: 'Writing coming soon.',
+            })
+          }
         },
       })
     }
