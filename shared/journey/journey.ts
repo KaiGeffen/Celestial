@@ -19,9 +19,6 @@ export interface MissionDetails {
   difficulty?: number
   /** Hint text shown when hovering the mission's Start button (journey overlay). */
   tip?: string
-  // TODO Remove or support these
-  storyTitle?: string
-  storyText?: string
 }
 
 export const journeyData: MissionDetails[] = [

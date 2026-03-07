@@ -436,7 +436,6 @@ export default class JourneyScene extends BaseScene {
   }
 
   private getMissionDisplayName(mission: MissionDetails): string {
-    if ('deck' in mission && mission.storyTitle) return mission.storyTitle
     return mission.name
   }
 
@@ -469,7 +468,6 @@ export default class JourneyScene extends BaseScene {
     if (isCompleted && mission.id < 700) {
       const avatarIndex = Math.floor(mission.id / 100) - 1
       const chapterIndex = mission.id % 100
-      const chapterNum = chapterIndex + 1
       new Buttons.Icon({
         within: iconCell,
         name: 'Quest',
@@ -479,7 +477,7 @@ export default class JourneyScene extends BaseScene {
             avatarStories[avatarIndex]?.[chapterIndex] ?? 'Coming soon'
           this.scene.launch('MenuScene', {
             menu: 'message',
-            title: `${avatarNames[avatarIndex]} — Chapter ${chapterNum}`,
+            title: `${avatarNames[avatarIndex]} — ${mission.name}`,
             s: storyText,
           })
         },

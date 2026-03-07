@@ -2,7 +2,6 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
-import avatarNames from '../../data/avatarNames'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import Cutout from '../../lib/buttons/cutout'
@@ -44,8 +43,6 @@ export default class DeckRegion {
     scene: BaseScene,
     startCallback: () => void,
     avatarID: number,
-    storyTitle: string,
-    storyText: string,
   ) {
     this.scene = scene
 
@@ -59,13 +56,7 @@ export default class DeckRegion {
         child: this.createPanel(startCallback),
       },
 
-      header: this.createHeader(
-        startCallback,
-        undefined,
-        avatarID,
-        storyTitle,
-        storyText,
-      ),
+      header: this.createHeader(startCallback, undefined, avatarID),
 
       space: {
         top: Space.filterBarHeight,
@@ -89,8 +80,6 @@ export default class DeckRegion {
     startCallback: () => void,
     sizer,
     avatarID: number,
-    storyTitle?: string,
-    storyText?: string,
   ): Phaser.GameObjects.GameObject {
     if (sizer === undefined) {
       let background = this.scene.add.rectangle(
@@ -184,20 +173,6 @@ export default class DeckRegion {
       emotive: true,
     })
 
-    // If this mission has text, show that when avatar is clicked
-    if (storyText !== undefined) {
-      this.btnAvatar.setOnClick(
-        () => {
-          this.scene.scene.launch('MenuScene', {
-            menu: 'message',
-            title: storyTitle,
-            s: storyText,
-          })
-        },
-        false,
-        false,
-      )
-    }
     sizer.add(containerAvatar)
 
     return sizer

@@ -126,8 +126,6 @@ export class MapJourneyBuilderScene extends BuilderBase {
       this,
       this.startCallback(),
       avatar,
-      this.params.storyTitle,
-      this.params.storyText,
     )
     this.journeyRegion.addRequiredCards(params.deck, params.opponent)
 
