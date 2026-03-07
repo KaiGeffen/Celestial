@@ -24,8 +24,10 @@ import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/Sc
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 import newScrollablePanel from '../lib/scrollablePanel'
 import showTooltip from '../utils/tooltips'
+import avatarNames from '../data/avatarNames'
+import avatarStories from '../data/avatarStories/avatarStories'
 
-const OVERLAY_WIDTH = 550
+const OVERLAY_WIDTH = 575
 const OVERLAY_TOP = 100
 
 /** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Imani, Mitra, Water, Stars */
@@ -186,7 +188,7 @@ export default class JourneyScene extends BaseScene {
 
     const contentSizer = this.rexUI.add.fixWidthSizer({
       width: OVERLAY_WIDTH,
-      space: { left: Space.padSmall },
+      space: { item: 6 },
     })
 
     const overlayBackground = this.add
@@ -456,6 +458,35 @@ export default class JourneyScene extends BaseScene {
     const isUnlocked = this.isMissionUnlocked(mission, completed)
     const difficulty = Phaser.Math.Clamp(mission.difficulty ?? 3, 1, 5)
 
+    // 0) Leftmost: quest icon when completed (opens character story)
+    const iconCell = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.iconSize,
+      Space.iconSize,
+    )
+    if (isCompleted && mission.id < 700) {
+      const avatarIndex = Math.floor(mission.id / 100) - 1
+      const chapterIndex = mission.id % 100
+      const chapterNum = chapterIndex + 1
+      new Buttons.Icon({
+        within: iconCell,
+        name: 'Quest',
+        muteClick: true,
+        f: () => {
+          const storyText =
+            avatarStories[avatarIndex]?.[chapterIndex] ?? 'Coming soon'
+          this.scene.launch('MenuScene', {
+            menu: 'message',
+            title: `${avatarNames[avatarIndex]} — Chapter ${chapterNum}`,
+            s: storyText,
+          })
+        },
+      })
+    }
+    row.add(iconCell, { align: 'center' })
+
     // 1) Mission name + card emojis
     let nameBBCode = this.getMissionDisplayName(mission)
     if ('deck' in mission && mission.cards?.length) {
@@ -482,7 +513,7 @@ export default class JourneyScene extends BaseScene {
     row.add(nameText, { align: 'left-center' })
     row.addSpace() // right-justify stars and button
 
-    // 2) Stars (difficulty), with Clear stamp behind the stars when completed
+    // 2) Stars (difficulty)
     const starSize = 23
     const starGap = 2
     const width = 120
@@ -491,7 +522,6 @@ export default class JourneyScene extends BaseScene {
       space: { item: starGap },
     })
     starsAndStampSizer.addSpace()
-    // One cell: container draws stamp first (behind), then stars on top; stamp at fixed center
     const overlayCell = this.add.container(1, 0)
     overlayCell.width = width
     for (let i = 0; i < difficulty; i++) {
@@ -501,10 +531,6 @@ export default class JourneyScene extends BaseScene {
         'icon-JourneyStar',
       )
       overlayCell.add(star)
-    }
-    if (isCompleted) {
-      const stamp = this.add.image(-10, 0, 'icon-JourneyClearStamp')
-      overlayCell.add(stamp)
     }
     starsAndStampSizer.add(overlayCell, { align: 'center' })
     starsAndStampSizer.addSpace()
