@@ -350,6 +350,7 @@ export default class JourneyScene extends BaseScene {
       .setInteractive({ useHandCursor: true })
     leftArrow.on('pointerdown', () => {
       this.sound.play('click')
+      this.showOverlayCharacterView = false
       this.selectedThemeIndex =
         (this.selectedThemeIndex - 1 + themes.length) % themes.length
       this.refreshOverlayContent()
@@ -360,6 +361,7 @@ export default class JourneyScene extends BaseScene {
       .setInteractive({ useHandCursor: true })
     rightArrow.on('pointerdown', () => {
       this.sound.play('click')
+      this.showOverlayCharacterView = false
       this.selectedThemeIndex = (this.selectedThemeIndex + 1) % themes.length
       this.refreshOverlayContent()
     })
@@ -380,7 +382,6 @@ export default class JourneyScene extends BaseScene {
           this.refreshOverlayContent(false)
         }
       },
-      muteClick: true,
     })
     overlayArtButton.icon.setTintFill(Color.backgroundLight)
 

@@ -14,4 +14,4 @@ Jas sips her coffee silently for a moment. The ends of her scarf flutter in the 
 The bus screeches to a slow halt in front of us and the door pops open with a mechanical hiss. 
 I’ve known Ty and Noah my whole life, we’re each other’s closest friends. We all have family here, people we can’t bring ourselves to leave behind. Noah is a few years older, he hasn’t gone to college but he’s set on joining the city council. Honestly, it’s possible. He knows everyone, has connections in both the brightest and darkest ends of this community, including the people that Jas can never forgive. 
 As I sit down with her, I answer carefully, “We’ve been talking. It’s just talk, as always.”
-	Jas doesn’t respond. She leans her head against the window and closes her eyes.`
+Jas doesn’t respond. She leans her head against the window and closes her eyes.`

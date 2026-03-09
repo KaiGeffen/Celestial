@@ -14,5 +14,4 @@ I reach over Kierra to place a hand on Gavin’s shoulder. “You did the right 
 My anger was for my namesake, a man who didn’t know how to hustle. Mom, who doesn’t even have a work Visa, has a better work ethic than him and is always finding better paying families to work for. Dad, a citizen, has just maintained his mid-level position at a factory with a 2 hour commute for the past decade. Whenever he’s around he smiles like we’re rich and acts like a caring father, but he can’t even get the twins their life-saving medicine. 
 “Andy? Andy that kinda… hurts.” Gavin’s voice pulls me back and I release the grip I unconsciously tightened.
 “Sorry Gav, I got distracted.”
-
 When they finally took Kierra in after two hours of waiting, a nurse emerged just fifteen minutes later to tell us our sister was dead.`

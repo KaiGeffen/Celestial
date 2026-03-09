@@ -6,6 +6,5 @@ Today I have a lot to unload: everything about Simon. Not just our last fight, b
 “Yes.”
 “Just as you find complementary strengths in Simon, you need to discover where your gifts lie. What do you have that he doesn’t?”
 The question repeats in my head on the way home. Usually, I’m not keen on that kind of self-evaluation, but today I’m ready to try it. What do I have that Simon doesn’t? Bravery, for one. Spontaneity, a willingness to take risks. Resilience. I’ve been through so much, survived so much. And what about him? I thought he was what I should want to be. But really, he’s just ordinary. And maybe I can’t become that, I’m far beyond that point. What is so admirable about ordinariness, anyway?
-
 When I step through our front door, the sight of Simon with a subdued hopeful glint in his eyes, makes me hesitate for a moment.
 Still, I manage to get the words out: “Let’s end this.”`

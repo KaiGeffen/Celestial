@@ -7,7 +7,6 @@ I was supposed to be anonymous, but it was obvious to the others. I was the only
 “But you’re both adults, and nothing even happened. Why do you need to get him fired?”
 “Zoe, he grabbed me! I ran and didn’t look back!” I cried out. It sounded like pleading.
 She let a sigh escape, “Hey, I’m sorry you went through something that felt… triggering, in that way. You’re a hurt person.”
-
 The group chat was dead for the rest of the semester. My former friends gave me dirty looks whenever the new substitute professor stumbled over words or assigned tedious work. 
 Sometimes they would brush past me in the hall and whisper in an exasperated, mocking tone: “Hurt people, hurt people.” 
 The worst part was not knowing what exactly Zoe had told them. She practically knew my whole life, I poured my heart out to her, and now she wasn’t on my side.`
