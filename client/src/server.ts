@@ -37,6 +37,7 @@ type UserData = null | {
   gems: number
   coins: number
   ownedItems: number[]
+  missionsGoldClaimed: number[]
   cosmeticSet: CosmeticSet
   achievements: Achievement[]
 }
@@ -303,6 +304,24 @@ export default class Server {
     })
   }
 
+  static claimMissionGold(missionId: number): void {
+    if (!server || !server.isOpen()) {
+      console.error('Claiming mission gold when server ws doesnt exist.')
+      return
+    }
+    if (this.userData) {
+      this.userData.missionsGoldClaimed =
+        this.userData.missionsGoldClaimed || []
+      if (!this.userData.missionsGoldClaimed.includes(missionId)) {
+        this.userData.missionsGoldClaimed.push(missionId)
+      }
+    }
+    server.send({
+      type: 'claimMissionGold',
+      missionId,
+    })
+  }
+
   static setCosmeticSet(cosmeticSet: CosmeticSet): void {
     if (!server || !server.isOpen()) {
       console.error('Setting cosmetic set when server ws doesnt exist.')
@@ -358,6 +377,7 @@ export default class Server {
         gems: null,
         coins: null,
         ownedItems: [],
+        missionsGoldClaimed: [],
         cosmeticSet: {
           avatar: 0,
           border: 0,

@@ -39,6 +39,9 @@ export default interface messagesToServer {
   harvestGarden: {
     index: number
   }
+  claimMissionGold: {
+    missionId: number
+  }
   // Queueing events
   initPvp: {
     password: string
