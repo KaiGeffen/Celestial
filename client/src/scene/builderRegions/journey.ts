@@ -363,9 +363,16 @@ export default class DeckRegion {
     return decklist.sizer
   }
 
-  // Remove the card from deck which has given index
+  // Left click removes a copy, right click adds one
   private removeCardFromDeck(cutout: Cutout): () => void {
     return () => {
+      const pointer: Phaser.Input.Pointer = this.scene.input.activePointer
+
+      if (pointer.rightButtonDown()) {
+        this.addCardToDeck(cutout.card)
+        return
+      }
+
       // Decrement, if fully gone, remove from deck list
       if (cutout.decrement().count === 0) {
         // Find the index of it within the deck list, remove that after
