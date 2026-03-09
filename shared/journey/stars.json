@@ -3,9 +3,9 @@
     "name": "Sun",
     "id": 800,
     "prereq": [[102]],
-    "difficulty": 1,
+    "difficulty": 2,
     "deck": [4, 4, 4, 4, 4, 65, 7, 7, 7, 12, 56],
-    "opponent": [1, 1, 1, 1, 6, 6, 33, 33, 11, 12, 14, 14, 16, 21, 21],
+    "opponent": [1, 1, 3, 3, 3, 3, 86, 31, 31, 12, 13, 73, 73, 23, 23],
     "cards": [56],
     "tip": "Inspire means you have extra breath next round, Inspired means you have it this round."
   },
@@ -13,8 +13,8 @@
     "name": "Moon",
     "id": 801,
     "prereq": [[105]],
-    "difficulty": 1,
-    "deck": [37, 37, 37, 24, 7, 73, 73, 73],
+    "difficulty": 2,
+    "deck": [37, 37, 37, 24, 24, 7, 73, 73, 73],
     "opponent": [0, 63, 63, 4, 4, 7, 7, 7, 48, 48, 40, 61, 57, 57, 23],
     "cards": [73],
     "tip": "If a Rooster is on top of a Morning card, Moon gets to trigger it twice. And 2 Moons can trigger it 3 times!"
@@ -23,9 +23,9 @@
     "name": "Sunflower",
     "id": 802,
     "prereq": [[402]],
-    "difficulty": 1,
+    "difficulty": 2,
     "deck": [78, 78, 78, 78, 69, 69, 69, 57, 23],
-    "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
+    "opponent": [37, 37, 37, 37, 37, 24, 24, 7, 7, 35, 35, 35, 14, 14, 73],
     "cards": [69],
     "tip": "Nourishing a Sunflower lets you ramp into strong cards early."
   },
@@ -35,7 +35,7 @@
     "prereq": [[204]],
     "difficulty": 2,
     "deck": [3, 3, 98, 98, 14, 20, 20, 20, 21],
-    "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
+    "opponent": [4, 4, 4, 4, 4, 33, 33, 33, 35, 35, 35, 80, 80, 73, 73],
     "cards": [98],
     "tip": "Pride will always discard the leftmost card and cost 1 breath, so try to stack your hand so you get rid of what you don't want."
   },
@@ -45,7 +45,7 @@
     "prereq": [[502]],
     "difficulty": 3,
     "deck": [93, 2, 2, 86, 86, 86, 31, 13, 22],
-    "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
+    "opponent": [78, 78, 75, 75, 75, 33, 33, 33, 34, 34, 48, 11, 11, 80, 52],
     "cards": [93],
     "tip": "Since Exhale happens when a card resolves not when it's played, you could choose to play more cards instead of leaving the Breath up depending on if the opponent plays more cards or not."
   },
@@ -53,9 +53,9 @@
     "name": "Cloak of Stars",
     "id": 805,
     "prereq": [[106]],
-    "difficulty": 3,
+    "difficulty": 4,
     "deck": [37, 37, 96, 96, 96, 73, 73],
-    "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
+    "opponent": [4, 4, 4, 37, 37, 37, 7, 7, 7, 98, 98, 58, 36, 73, 56],
     "cards": [96],
     "tip": "The Breath that Cloak of Stars adds can be used for Exhale effects, or will carry over to the next round if the Morning trigger occurs."
   },
@@ -75,7 +75,7 @@
     "prereq": [[100, 200, 300, 400, 500, 600]],
     "difficulty": 5,
     "deck": [41, 97, 97, 97, 97, 47, 47],
-    "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
+    "opponent": [2, 2, 2, 78, 78, 78, 8, 86, 86, 86, 60, 60, 53, 53, 22],
     "cards": [97],
     "tip": "As long as your hand is empty when Dreamer resolves, it will draw a card."
   },
@@ -85,7 +85,7 @@
     "prereq": [[602]],
     "difficulty": 5,
     "deck": [50, 27, 27, 31, 24, 95, 58, 58],
-    "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
+    "opponent": [4, 4, 4, 4, 4, 4, 65, 65, 7, 7, 7, 7, 101, 12, 54],
     "cards": [95],
     "tip": "Your breath naturally goes up from 1 to 10 each round, but with Possibility it can go up to 11!"
   }
