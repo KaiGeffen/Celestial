@@ -29,6 +29,7 @@ import avatarStories from '../data/avatarStories/avatarStories'
 import Server from '../server'
 
 const OVERLAY_WIDTH = 575
+const OVERLAY_HEIGHT = 680
 const OVERLAY_TOP = 100
 
 /** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Imani, Mitra, Water, Stars */
@@ -63,6 +64,9 @@ const ALT_MAP_SWAY_RADIUS = 80
 export default class JourneyScene extends BaseScene {
   map: Phaser.GameObjects.Image
   private altMap: Phaser.GameObjects.Image
+
+  // The character art
+  private overlayCharacterImage: Phaser.GameObjects.Image
 
   /** Center point the camera drifts around (theme position) */
   private driftCenterX = 0
@@ -144,6 +148,7 @@ export default class JourneyScene extends BaseScene {
 
     // Mission list overlay on the right
     this.createJourneyOverlay()
+    this.createOverlayCharacterArt()
 
     // If we started on stars, show alt map immediately (no fade-in delay)
     if (this.selectedThemeIndex === STARS_THEME_INDEX) {
@@ -194,7 +199,6 @@ export default class JourneyScene extends BaseScene {
 
   private createJourneyOverlay(): void {
     const themes = getMissionsByTheme()
-    const overlayHeight = 660
 
     const contentSizer = this.rexUI.add.fixWidthSizer({
       width: OVERLAY_WIDTH,
@@ -202,14 +206,14 @@ export default class JourneyScene extends BaseScene {
     })
 
     const overlayBackground = this.add
-      .rectangle(0, 0, OVERLAY_WIDTH, overlayHeight, Color.backgroundLight)
+      .rectangle(0, 0, OVERLAY_WIDTH, OVERLAY_HEIGHT, Color.backgroundLight)
       .setOrigin(0)
 
     this.overlayPanel = newScrollablePanel(this, {
       x: Space.windowWidth - OVERLAY_WIDTH - Space.pad,
       y: OVERLAY_TOP,
       width: OVERLAY_WIDTH,
-      height: overlayHeight,
+      height: OVERLAY_HEIGHT,
       scrollMode: 0,
       background: overlayBackground,
       header: this.createOverlayHeader(themes),
@@ -221,6 +225,21 @@ export default class JourneyScene extends BaseScene {
     this.createMissionTipBox()
 
     this.refreshOverlayContent(false) // already at theme position; no tween on open
+  }
+
+  private createOverlayCharacterArt(): void {
+    const topPad = Space.buttonHeight + Space.pad * 2
+    const availableHeight = Space.windowHeight - topPad * 2
+
+    this.overlayCharacterImage = this.add
+      .image(Space.pad, topPad, 'avatar-JulesFull')
+      .setOrigin(0, 0)
+      .setScrollFactor(0)
+      .setDepth(100)
+      .setScale(
+        availableHeight /
+          this.textures.get('avatar-JulesFull').getSourceImage().height,
+      )
   }
 
   private createMissionTipBox(): void {
