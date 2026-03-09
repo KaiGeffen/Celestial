@@ -207,7 +207,7 @@ class JustLikeDad extends Card {
       if (game.story.acts.length > 0) {
         card = game.story.acts[game.story.acts.length - 1].card
       } else {
-        card = this.copy()
+        card = this
       }
       game.create(player, card)
     }
