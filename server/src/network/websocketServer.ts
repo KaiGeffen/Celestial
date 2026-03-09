@@ -22,6 +22,8 @@ import TutorialMatch from './match/tutorialMatch'
 import sendUserData from './sendUserData'
 import { getStartingInventoryBitString } from '../startingInventory'
 import PveSpecialMatch from './match/pveSpecialMatch'
+import REWARD_AMOUNTS from '../../../shared/config/rewardAmounts'
+import { journeyData } from '../../../shared/journey/journey'
 
 // An ongoing match
 class ActiveGame {
@@ -190,6 +192,7 @@ export default function createWebSocketServer() {
               pve_losses: 0,
               inventory: inventory,
               completedmissions: missions,
+              missiongoldclaimed: '',
               avatar_experience: [0, 0, 0, 0, 0, 0],
               card_inventory: getStartingInventoryBitString(),
               lastactive: new Date().toISOString(),
@@ -234,6 +237,50 @@ export default function createWebSocketServer() {
             reward: harvestResult.reward,
             goldReward: harvestResult.goldReward,
           })
+        })
+        .on('claimMissionGold', async ({ missionId }) => {
+          if (!id) return
+
+          const missionExists = journeyData.some(
+            (mission) => mission.id === missionId,
+          )
+          if (!missionExists) {
+            ws.send({ type: 'signalError' })
+            return
+          }
+
+          await db.transaction(async (tx) => {
+            const [playerData] = await tx
+              .select({
+                missiongoldclaimed: players.missiongoldclaimed,
+              })
+              .from(players)
+              .where(eq(players.id, id))
+              .limit(1)
+
+            if (!playerData) return
+
+            let missiongoldclaimed = playerData.missiongoldclaimed ?? ''
+            // The mission gold has already been claimed
+            if (missiongoldclaimed?.[missionId] === '1') {
+              return
+            }
+
+            const claimArray = missiongoldclaimed.split('')
+            while (claimArray.length <= missionId) claimArray.push('0')
+            claimArray[missionId] = '1'
+            missiongoldclaimed = claimArray.join('')
+
+            await tx
+              .update(players)
+              .set({
+                missiongoldclaimed,
+                coins: sql`${players.coins} + ${REWARD_AMOUNTS.missionComplete}`,
+              })
+              .where(eq(players.id, id))
+          })
+
+          await sendUserData(ws, id)
         })
         // Store
         .on('purchaseItem', async ({ id: itemId }) => {

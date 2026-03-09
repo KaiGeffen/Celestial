@@ -53,6 +53,7 @@ export default class SearchingRegion extends Region {
 
       const i = Math.floor(Math.random() * 6)
       this.mysteryAvatar.setTexture(`avatar-${avatarNames[i]}Full`)
+      this.fitFullAvatar(this.mysteryAvatar)
     }
 
     // Format the timer text
@@ -121,36 +122,47 @@ export default class SearchingRegion extends Region {
   }
 
   private createAvatars(scene: Phaser.Scene, avatarId: number): void {
-    const scale = Math.min(1, Space.windowHeight / 600)
     let avatar = scene.add
       .image(-Space.windowWidth / 2, 0, `avatar-${avatarNames[avatarId]}Full`)
-      .setScale(scale)
       .setOrigin(0, 0.5)
+    this.fitFullAvatar(avatar)
 
     this.mysteryAvatar = scene.add
       .image(Space.windowWidth / 2, 0, `avatar-${avatarNames[0]}Full`)
-      .setScale(scale)
       .setTint(Color.grey)
       .setOrigin(1, 0.5)
+    this.fitFullAvatar(this.mysteryAvatar)
 
     this.container.add([avatar, this.mysteryAvatar])
+  }
+
+  private fitFullAvatar(avatar: Phaser.GameObjects.Image): void {
+    const source = this.scene.textures.get(avatar.texture.key).getSourceImage()
+    const availableHeight = Space.windowHeight
+    const scale = availableHeight / source.height
+    avatar.setScale(scale)
   }
 
   private createText(scene: Phaser.Scene): void {
     this.txtTitle = scene.add
       .text(0, -100, 'Searching for an opponent', Style.announcement)
+      .setStroke(Color.backgroundLightS, 4)
       .setOrigin(0.5)
 
     // Password text
     if (this.password) {
       const txtPassword = scene.add
         .text(0, -50, `Password: ${this.password}`, Style.basic)
+        .setStroke(Color.backgroundLightS, 2)
         .setOrigin(0.5)
       this.container.add(txtPassword)
     }
 
     // Time text
-    this.txtTime = scene.add.text(0, 0, '', Style.announcement).setOrigin(0.5)
+    this.txtTime = scene.add
+      .text(0, 0, '', Style.announcement)
+      .setStroke(Color.backgroundLightS, 4)
+      .setOrigin(0.5)
 
     this.container.add([this.txtTitle, this.txtTime])
   }

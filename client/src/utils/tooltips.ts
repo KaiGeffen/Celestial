@@ -1,23 +1,24 @@
 import { UserSettings } from '../settings/userSettings'
 
+// TODO Remove this or reintegrate it with user onboarding
+
 // Mapping of scene names to their tooltip data (title and message)
 const SCENE_TOOLTIPS: Record<string, { title: string; message: string }> = {
-  HomeScene: {
-    title: 'Welcome to Celestial!',
-    message: `From here, you can play the single-player Journey mode to learn about the game as you unlock new cards.
-    
-Or hop into Play mode to access the full card collection and play against other players or the computer.
-    
-Click the icons in the top right to explore different features!`,
-  },
-
-  BuilderScene: {
-    title: 'Deck Builder Guide',
-    message: `Select a premade deck from the button in the top left.
-    
-Or make a custom deck from scratch.
-
-Hit play to get into a match, or customize your avatar by clicking on it.`,
+  //   HomeScene: {
+  //     title: 'Welcome to Celestial!',
+  //     message: `From here, you can play the single-player Journey mode to learn about the game as you unlock new cards.
+  // Or hop into Play mode to access the full card collection and play against other players or the computer.
+  // Click the icons in the top right to explore different features!`,
+  //   },
+  //   BuilderScene: {
+  //     title: 'Deck Builder Guide',
+  //     message: `Select a premade deck from the button in the top left.
+  // Or make a custom deck from scratch.
+  // Hit play to get into a match, or customize your avatar by clicking on it.`,
+  //   },
+  JourneyScene: {
+    title: 'Journey Mode',
+    message: `Unlock new cards as you play through missions in the Journey mode.\n\nFor more features, such as PvP, exit to the main menu with the Back button.`,
   },
 }
 

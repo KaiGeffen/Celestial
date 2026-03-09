@@ -31,6 +31,7 @@ const DIRECTORIES = [
 
 // Directories that should not use pixel art
 const NON_PIXEL_ART_DIRS = [
+  'avatar',
   'sfx',
   'dialog',
   'roundResult',

@@ -3,20 +3,29 @@ import MenuScene from '../menuScene'
 import Menu from './menu'
 import Card from '../../../../shared/state/card'
 import { CardImage } from '../../lib/cardImage'
-import { Style, Space } from '../../settings/settings'
+import { Style, Space, Scroll } from '../../settings/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import Catalog from '../../../../shared/state/catalog'
 import Buttons from '../../lib/buttons/buttons'
 import Decklist from '../../lib/decklist'
+import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
 // A message to the user
 const width = 900
 
 export default class ConfirmMenu extends Menu {
+  protected textScrollablePanel: ScrollablePanel
+
   constructor(scene: MenuScene, params) {
     super(scene, width)
 
+    this.createContent(params)
+
+    this.layout()
+  }
+
+  protected createContent(params): void {
     const title = params.title
     this.createHeader(title)
 
@@ -31,8 +40,6 @@ export default class ConfirmMenu extends Menu {
     } else {
       this.createText(s)
     }
-
-    this.layout()
   }
 
   private createTextAndCard(card: Card, s: string): void {
@@ -63,6 +70,7 @@ export default class ConfirmMenu extends Menu {
         child: textPanel,
       },
       scrollMode: 'y',
+      slider: Scroll(this.scene, true),
     })
 
     sizer.add(container).add(scrollableText)
@@ -80,6 +88,7 @@ export default class ConfirmMenu extends Menu {
 
   protected createText(s: string): void {
     const width = this.width - Space.pad * 2
+    const maxTextHeight = Space.windowHeight - 300
 
     // Create scrollable text panel
     const textPanel = this.scene.rexUI.add.sizer({
@@ -90,15 +99,18 @@ export default class ConfirmMenu extends Menu {
       .text(0, 0, s, Style.basic)
       .setWordWrapWidth(width)
     textPanel.add(text)
+    const textNeedsScroll = text.height > maxTextHeight
 
     const scrollableText = newScrollablePanel(this.scene, {
       width: width,
-      height: Math.min(text.height, Space.windowHeight - 200),
+      height: Math.min(text.height, maxTextHeight),
       panel: {
         child: textPanel,
       },
       scrollMode: 'y',
+      slider: textNeedsScroll ? Scroll(this.scene, true) : false,
     })
+    this.textScrollablePanel = scrollableText
 
     // Add this new sizer to the main sizer
     const padding = {

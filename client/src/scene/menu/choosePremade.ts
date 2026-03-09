@@ -19,6 +19,7 @@ import newScrollablePanel from '../../lib/scrollablePanel'
 
 export default class ChoosePremade extends Menu {
   selectedAvatar = 0
+  headerHeight = 0
 
   avatarsSmall: Button[]
   avatarFull: Phaser.GameObjects.Image
@@ -146,6 +147,8 @@ export default class ChoosePremade extends Menu {
 
     // Give the background a drop shadow
     this.scene.addShadow(background, -90)
+    panel.layout()
+    this.headerHeight = panel.height
 
     return panel
   }
@@ -165,6 +168,7 @@ export default class ChoosePremade extends Menu {
       0,
       `avatar-${avatarDetails[0].name}Full`,
     )
+    this.fitFullAvatar(this.avatarFull)
 
     panel
       .add(this.avatarFull, { align: 'top' })
@@ -188,7 +192,7 @@ export default class ChoosePremade extends Menu {
 
     const width = Math.min(
       Space.maxTextWidth + Space.padSmall * 2,
-      Space.windowWidth - Space.avatarWidth - Space.pad * 3,
+      Space.windowWidth - this.avatarFull.displayWidth - Space.pad * 3,
     )
     this.txtDescription = this.scene.rexUI.add
       .BBCodeText(0, 0, '', BBStyle.description)
@@ -356,6 +360,7 @@ export default class ChoosePremade extends Menu {
   private setContent(details): void {
     // Image
     this.avatarFull.setTexture(`avatar-${details.name}Full`)
+    this.fitFullAvatar(this.avatarFull)
 
     // Text
     this.txtName.setText(`${details.name}`)
@@ -369,5 +374,12 @@ export default class ChoosePremade extends Menu {
       }
       this.chart.updateChart()
     }
+  }
+
+  private fitFullAvatar(avatar: Phaser.GameObjects.Image): void {
+    const source = this.scene.textures.get(avatar.texture.key).getSourceImage()
+    const availableHeight = Space.windowHeight - this.headerHeight
+    const scale = availableHeight / source.height
+    avatar.setScale(scale)
   }
 }

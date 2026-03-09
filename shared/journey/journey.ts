@@ -5,6 +5,7 @@ import pet from './pet.json'
 import birth from './birth.json'
 import vision from './vision.json'
 import water from './water.json'
+import stars from './stars.json'
 import { Deck } from '../types/deck'
 
 export interface MissionDetails {
@@ -14,9 +15,10 @@ export interface MissionDetails {
   deck?: number[]
   opponent?: number[]
   cards?: number[]
-  // TODO Remove or support these
-  storyTitle?: string
-  storyText?: string
+  /** Difficulty 1–5 used for journey UI stars. */
+  difficulty?: number
+  /** Hint text shown when hovering the mission's Start button (journey overlay). */
+  tip?: string
 }
 
 export const journeyData: MissionDetails[] = [
@@ -27,6 +29,7 @@ export const journeyData: MissionDetails[] = [
   ...(birth as MissionDetails[]),
   ...(vision as MissionDetails[]),
   ...(water as MissionDetails[]),
+  ...(stars as MissionDetails[]),
 ]
 
 // Theme order and display names for the journey overlay (birds = Jules, etc.)
@@ -38,16 +41,18 @@ export const THEME_KEYS = [
   'birth',
   'vision',
   'water',
+  'stars',
 ] as const
 
 export const THEME_DISPLAY_NAMES: Record<string, string> = {
   birds: 'Jules Learns to Fly',
   ashes: 'Adonis Blazes a Path',
-  shadow: 'Mia Battles her Shadows',
-  pet: 'Kitz Finds his Love ',
+  shadow: 'Mia Survives her Shadows',
+  pet: 'Kitz Finds his Love',
   birth: 'Imani Births the Future',
   vision: 'Mitra Seeks the Truth',
-  water: 'Tales Carried on the Rivers',
+  water: 'Tales Carried on the River',
+  stars: 'Written in the Stars',
 }
 
 const THEME_ARRAYS: MissionDetails[][] = [
@@ -58,6 +63,7 @@ const THEME_ARRAYS: MissionDetails[][] = [
   birth as MissionDetails[],
   vision as MissionDetails[],
   water as MissionDetails[],
+  stars as MissionDetails[],
 ]
 
 export function getMissionsByTheme(): {

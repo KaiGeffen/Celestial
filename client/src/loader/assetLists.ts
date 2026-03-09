@@ -9,10 +9,16 @@ export const assetLists = {
       "Mia",
       "Mitra",
       "AdonisFull",
+      "AdonisFull",
+      "ImaniFull",
       "ImaniFull",
       "JulesFull",
+      "JulesFull",
+      "KitzFull",
       "KitzFull",
       "MiaFull",
+      "MiaFull",
+      "MitraFull",
       "MitraFull"
     ],
     "dimensions": {
@@ -41,7 +47,7 @@ export const assetLists = {
         "height": 130
       }
     },
-    "pixelArt": true
+    "pixelArt": false
   },
   "card": {
     "files": [
@@ -293,6 +299,8 @@ export const assetLists = {
       "HomeButton",
       "InputText",
       "Inspire",
+      "JourneyClearStamp",
+      "JourneyStar",
       "JourneyTab",
       "Leaderboard",
       "LeaderboardTab",

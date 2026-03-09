@@ -10,6 +10,7 @@ import {
   Style,
   BBStyle,
   UserSettings,
+  Ease,
 } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
@@ -150,7 +151,7 @@ export default class PlayMenu extends Menu {
 
     this.decklist.setDeck(deckCards, false)
     this.decklist.sizer.layout()
-    
+
     // Update validation message
     const deckSize = this.deck.cards ? this.deck.cards.length : 0
     const isValid = deckSize === MechanicsSettings.DECK_SIZE
@@ -255,13 +256,9 @@ export default class PlayMenu extends Menu {
     // Previous deck button (<)
     const decks = UserSettings._get('decks')
     const hasMultipleDecks = decks && decks.length > 1
-    
-    this.btnPrevDeck = new Buttons.Text(
-      this.scene,
-      0,
-      0,
-      '<',
-      () => this.switchToPreviousDeck(),
+
+    this.btnPrevDeck = new Buttons.Text(this.scene, 0, 0, '<', () =>
+      this.switchToPreviousDeck(),
     )
     if (!hasMultipleDecks) {
       this.btnPrevDeck.txt.setAlpha(0.5)
@@ -282,12 +279,8 @@ export default class PlayMenu extends Menu {
     deckNameSizer.add(this.txtDeckName, { expand: true })
 
     // Next deck button (>)
-    this.btnNextDeck = new Buttons.Text(
-      this.scene,
-      0,
-      0,
-      '>',
-      () => this.switchToNextDeck(),
+    this.btnNextDeck = new Buttons.Text(this.scene, 0, 0, '>', () =>
+      this.switchToNextDeck(),
     )
     if (!hasMultipleDecks) {
       this.btnNextDeck.txt.setAlpha(0.5)
@@ -526,8 +519,7 @@ export default class PlayMenu extends Menu {
       },
     )
     // Store reference to the PWD button
-    this.pwdBtn =
-      this.playOptionButtons[this.playOptionButtons.length - 1]
+    this.pwdBtn = this.playOptionButtons[this.playOptionButtons.length - 1]
     // Initially disable since password field is empty (updatePwdButton will handle this)
     this.updatePwdButton()
 
@@ -783,6 +775,11 @@ export default class PlayMenu extends Menu {
       return
     }
 
+    const harvestedPlant = this.gardenPlants[harvestedIndex]
+    const rewardPosition = harvestedPlant
+      ? harvestedPlant.getCenter()
+      : { x: 0, y: 0 }
+
     // Clear the plant data at this index
     if (this.gardenPlants[harvestedIndex]) {
       this.gardenPlants[harvestedIndex].destroy()
@@ -797,28 +794,22 @@ export default class PlayMenu extends Menu {
     // Remove the plant and timer from the plant sizer
     plantSizer.removeAll(true)
 
-    // Create gold display to replace the plant
     const goldText = this.scene.add
-      .text(0, 0, `+${data.goldReward} 💰`, {
-        ...Style.basic,
-        color: Color.gold,
-        fontSize: '24px',
-      })
-      .setOrigin(0.5)
+      .text(
+        rewardPosition.x,
+        rewardPosition.y + 40,
+        `+${data.goldReward}💰`,
+        Style.homeSceneButton,
+      )
+      .setOrigin(0.5, 1)
 
-    // Add gold display to plant sizer
-    plantSizer.add(goldText)
-    plantSizer.layout()
-
-    // Fade out the gold text after 1 second
     this.scene.tweens.add({
       targets: goldText,
+      y: rewardPosition.y,
       alpha: 0,
-      duration: 500,
-      delay: 1000,
-      onComplete: () => {
-        goldText.destroy()
-      },
+      duration: 800,
+      ease: Ease.basic,
+      onComplete: () => goldText.destroy(),
     })
   }
 
@@ -875,18 +866,21 @@ export default class PlayMenu extends Menu {
           const hoursRemaining = this.timeUntilFullyGrown(this.gardenTimes[i])
           const isReady = hoursRemaining <= 0
           const plant = this.gardenPlants[i]
-          
+
           if (isReady) {
             // Plant is ready - start pulsing glow animation if not already running
-            if (!this.plantGlowTweens[i] || !this.plantGlowTweens[i].isActive()) {
+            if (
+              !this.plantGlowTweens[i] ||
+              !this.plantGlowTweens[i].isActive()
+            ) {
               // Stop any existing tween first
               if (this.plantGlowTweens[i]) {
                 this.plantGlowTweens[i].stop()
               }
-              
+
               // Reset alpha to 1 before starting
               plant.setAlpha(1)
-              
+
               // Create pulsing tween
               this.plantGlowTweens[i] = this.scene.tweens.add({
                 targets: plant,

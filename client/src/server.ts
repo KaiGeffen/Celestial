@@ -37,6 +37,7 @@ type UserData = null | {
   gems: number
   coins: number
   ownedItems: number[]
+  missionGoldClaimed: boolean[]
   cosmeticSet: CosmeticSet
   achievements: Achievement[]
 }
@@ -177,6 +178,10 @@ export default class Server {
           uuid,
           ...data,
           garden: data.garden.map((dateStr) => new Date(dateStr)),
+          missionGoldClaimed: data.missionGoldClaimed
+            .toString()
+            .split('')
+            .map((char) => char === '1'),
         }
 
         this.loadUserData(data, game)
@@ -303,6 +308,21 @@ export default class Server {
     })
   }
 
+  static claimMissionGold(missionId: number): void {
+    if (!server || !server.isOpen()) {
+      console.error('Claiming mission gold when server ws doesnt exist.')
+      return
+    }
+    if (this.userData) {
+      this.userData.missionGoldClaimed = this.userData.missionGoldClaimed || []
+      this.userData.missionGoldClaimed[missionId] = true
+    }
+    server.send({
+      type: 'claimMissionGold',
+      missionId,
+    })
+  }
+
   static setCosmeticSet(cosmeticSet: CosmeticSet): void {
     if (!server || !server.isOpen()) {
       console.error('Setting cosmetic set when server ws doesnt exist.')
@@ -358,6 +378,7 @@ export default class Server {
         gems: null,
         coins: null,
         ownedItems: [],
+        missionGoldClaimed: [],
         cosmeticSet: {
           avatar: 0,
           border: 0,
@@ -444,7 +465,6 @@ export default class Server {
           .map((char) => char === '1'),
       ),
     )
-
     sessionStorage.setItem('decks', JSON.stringify(data.decks))
     sessionStorage.setItem(
       'avatar_experience',

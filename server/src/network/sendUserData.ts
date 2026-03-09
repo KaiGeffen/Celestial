@@ -56,6 +56,7 @@ export default async function sendUserData(ws: ServerWS, id: string) {
     cosmeticSet: JSON.parse(data.cosmetic_set),
     achievements,
     cardInventory: data.card_inventory,
+    missionGoldClaimed: data.missiongoldclaimed,
   })
 
   // Update last active time

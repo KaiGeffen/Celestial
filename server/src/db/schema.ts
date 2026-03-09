@@ -57,6 +57,7 @@ export const players = pgTable(
     pve_losses: integer('pve_losses').notNull(),
     inventory: varchar('inventory', { length: 1000 }).notNull(),
     completedmissions: varchar('completedmissions', { length: 1000 }).notNull(),
+    missiongoldclaimed: varchar('missiongoldclaimed', { length: 1000 }).notNull(),
     avatar_experience: integer('avatar_experience').array().notNull(),
 
     // TODO Rename this inventory after the map journey mode is removed

@@ -1,58 +1,92 @@
 [
   {
-    "name": "In a Hole",
+    "name": "Ends are Beginnings",
     "id": 300,
     "prereq": [[100], [200]],
-    "deck": [1, 1, 1, 1, 1, 19, 19, 19, 19],
-    "opponent": [18, 18, 61, 61, 15, 15, 48, 48, 48, 7, 7, 33, 33, 4, 4],
-    "cards": [1, 19]
+    "difficulty": 2,
+    "deck": [0, 0, 1, 1, 1, 1, 6, 11, 11, 13, 20, 19, 19, 19, 56],
+    "opponent": [0, 78, 78, 78, 78, 86, 86, 7, 7, 48, 48, 11, 66, 52, 18],
+    "cards": [1, 19],
+    "tip": "Daggers earn 0 points, so rounds you play them you probably can't win.\n\nShadow is best if you play it as late in a round as possible, since it gets cheaper."
   },
   {
-    "name": "The Price of Truth",
+    "name": "Toppled Pedestal",
+    "id": 301,
+    "prereq": [[300]],
+    "difficulty": 2,
+    "deck": [0, 0, 1, 1, 1, 4, 31, 31, 11, 11, 13, 13, 19],
+    "opponent": [0, 0, 3, 3, 3, 3, 3, 6, 6, 15, 14, 14, 14, 17, 21],
+    "cards": [31],
+    "tip": "Playing a card after Hungry Ghost makes it effectively worth 0 points (4 - 4). But if you don't, the negative Nourish will stay until the next round."
+  },
+  {
+    "name": "Doormat",
+    "id": 302,
+    "prereq": [[301]],
+    "difficulty": 2,
+    "deck": [0, 0, 0, 1, 1, 1, 35, 35, 35, 13, 23],
+    "opponent": [4, 4, 4, 4, 59, 33, 33, 7, 39, 39, 39, 67, 67, 18, 23],
+    "cards": [35],
+    "tip": "Once Imprison gives the opponent negative Nourish, it makes it harder for them to escape the next round."
+  },
+  {
+    "name": "Through the Window",
     "id": 303,
-    "prereq": [[300]],
-    "deck": [1, 1, 1, 3, 12, 68, 68, 17],
-    "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
-    "cards": [68]
+    "prereq": [[302]],
+    "difficulty": 3,
+    "deck": [1, 1, 1, 32, 68, 68, 35, 19, 19, 56],
+    "opponent": [27, 27, 27, 4, 4, 4, 7, 7, 7, 48, 48, 66, 67, 67, 23],
+    "cards": [68],
+    "tip": "Try to play fewer cards than the opponent so that Nightmare can trigger and come back."
   },
   {
-    "name": "Where it All Began",
+    "name": "Always Fight Back",
+    "id": 304,
+    "prereq": [[303]],
+    "difficulty": 3,
+    "deck": [4, 4, 4, 4, 65, 65, 12, 12, 58, 58],
+    "opponent": [63, 63, 78, 78, 33, 33, 33, 34, 34, 101, 11, 11, 54, 54, 46],
+    "cards": [58],
+    "tip": "Sickness won't cover your Morning abilities or make Heron more expensive, and it gives you something to play if the opponent gives it back to you."
+  },
+  {
+    "name": "Snake Pit",
     "id": 305,
-    "prereq": [[303]],
-    "deck": [1, 1, 1, 1, 35, 35],
-    "opponent": [56, 56, 57, 57, 61, 61, 14, 11, 11, 11, 6, 1, 1, 1, 1],
-    "cards": [35]
+    "prereq": [[304]],
+    "difficulty": 3,
+    "deck": [0, 78, 78, 31, 31, 43, 43, 58],
+    "opponent": [63, 63, 63, 63, 68, 68, 7, 7, 48, 48, 66, 66, 73, 57, 23],
+    "cards": [43],
+    "tip": "Play Victim on a round where you have negative Nourish for maximum effect."
   },
   {
-    "name": "Don't Leave Me",
-    "id": 307,
-    "prereq": [[300]],
-    "deck": [20, 19, 19, 19, 16, 16, 1, 1],
-    "opponent": [18, 18, 15, 15, 48, 48, 12, 12, 6, 6, 3, 3, 3, 0, 0],
-    "cards": [16]
-  },
-  {
-    "name": "Can Never Be Saved",
-    "id": 309,
-    "prereq": [[303]],
-    "deck": [13, 13, 11, 68, 31, 31, 31, 1, 1, 0, 0],
-    "opponent": [46, 57, 14, 11, 11, 11, 8, 8, 31, 31, 3, 3, 3, 2, 2],
-    "cards": [31]
-  },
-  {
-    "name": "Tale of the Jackal",
-    "id": 311,
+    "name": "Caked Grease",
+    "id": 306,
     "prereq": [[305]],
-    "deck": [65, 65, 58, 58, 7, 4, 4, 4],
-    "opponent": [23, 57, 65, 61, 61, 11, 11, 69, 7, 7, 4, 4, 4, 4, 4],
-    "cards": [58]
+    "difficulty": 4,
+    "deck": [31, 43, 35, 58, 49, 49, 49],
+    "opponent": [2, 2, 2, 2, 105, 8, 8, 86, 86, 10, 12, 12, 53, 53, 22],
+    "cards": [49],
+    "tip": "If the opponent has negative points, Vampire becomes worth more than normal."
   },
   {
-    "name": "What I've Done",
-    "id": 313,
-    "prereq": [[305, 405]],
-    "deck": [20, 19, 57, 71],
-    "opponent": [23, 20, 20, 19, 19, 17, 17, 11, 12, 7, 7, 5, 5, 5, 5],
-    "cards": [57]
+    "name": "Hidden Pinches",
+    "id": 307,
+    "prereq": [[306]],
+    "difficulty": 4,
+    "deck": [0, 25, 78, 58, 57],
+    "opponent": [4, 4, 4, 4, 4, 4, 65, 7, 7, 7, 7, 101, 12, 12, 56],
+    "cards": [57],
+    "tip": "Negative Nourish still counts for Boa's effect."
+  },
+  {
+    "name": "Perspective",
+    "id": 308,
+    "prereq": [[307]],
+    "difficulty": 4,
+    "deck": [47, 47, 19, 19],
+    "opponent": [2, 2, 2, 0, 3, 3, 3, 3, 86, 86, 14, 17, 20, 19, 21],
+    "cards": [47],
+    "tip": "Cards like Shadow still have base-cost 6 even if they reduce the cost to play them."
   }
 ]

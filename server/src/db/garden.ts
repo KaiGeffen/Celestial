@@ -2,6 +2,7 @@ import { db } from './db'
 import { players } from './schema'
 import { eq, sql } from 'drizzle-orm'
 import { GardenSettings } from '../../../shared/settings'
+import REWARD_AMOUNTS from '../../../shared/config/rewardAmounts'
 
 export default class Garden {
   /** Index of the first plant ready to harvest, or -1. */
@@ -99,8 +100,9 @@ export default class Garden {
     // Randomly select a reward from the distribution
     const reward = Math.floor(100 * Math.random())
 
-    // Random gold reward between 50-80 (inclusive)
-    const goldReward = Math.floor(Math.random() * 31) + 50
+    const goldReward =
+      Math.floor(Math.random() * REWARD_AMOUNTS.harvestVariance) +
+      REWARD_AMOUNTS.harvestConstant
 
     // Update the database with new garden state and add gold reward to coins
     await db
