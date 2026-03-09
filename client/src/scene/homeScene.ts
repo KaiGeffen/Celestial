@@ -506,20 +506,19 @@ export default class HomeScene extends BaseScene {
   }
 }
 
-const PATCH_NUMBER = '0.7.14'
+const PATCH_NUMBER = '0.7.15'
 
-const URL = 'https://luma.com/9be9v74v'
+const URL = 'https://luma.com/1lsziprm'
 
 const NEWS_TEXT = `🕊️ A warm welcome to all our new players!
+Please consider joining our [area=_link_discord][color=#FABD5D]Discord server[/color][/area] to collect a one-time reward, receive strategy tips, and play excellent matches with excellent people.
 
-🏆 Congrats [b]Sherlock[/b] on his recent win!
-Our next tournament is March 7th, 12-4 EST. Compete for a chance to win an exclusive border and 120$ in cash prizes!
-[area=_link_register][color=#FABD5D]Register here[/color][/area]
+🏆 Our 11th tournament approaches!
+On April 4th, play for the chance to win 120$ in cash prizes, plus exclusive cosmetic rewards! [area=_link_register][color=#FABD5D]Register here[/color][/area]
 
-🌤️ Upcoming changes:
-Card borders are getting a visual redesign!
-Join the [area=_link_discord][color=#FABD5D]Discord[/color][/area] for the latest updates and let us know what you think!
+🌄 Journey Mode
+An all new Journey mode unfolds before you.
+Complete new missions with an ever-growing collection of cards as you learn about the characters who have arrived in the city. Earn gold as you learn to play the game!
 
-🎴 Card changes:
-👆 [area=_Shadow][color=#FABD5D]Shadow[/color][/area] Points 3 > 4
-👇 [area=_Paramountcy][color=#FABD5D]Paramountcy[/color][/area] Cards added 5 > 4`
+🌊 Card Borders
+Coming in March, a brand new visual redesign for the cards will go live!`
