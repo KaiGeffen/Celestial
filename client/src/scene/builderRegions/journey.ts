@@ -39,11 +39,7 @@ export default class DeckRegion {
   private txtChoice: Phaser.GameObjects.Text
   private txtCount: Phaser.GameObjects.Text
 
-  create(
-    scene: BaseScene,
-    startCallback: () => void,
-    avatarID: number,
-  ) {
+  create(scene: BaseScene, startCallback: () => void, avatarID: number) {
     this.scene = scene
 
     this.scrollablePanel = newScrollablePanel(scene, {
@@ -331,7 +327,10 @@ export default class DeckRegion {
 
   // Create a scrollable panel with all of the cards user has chosen
   private createChosenCardList() {
-    this.chosenPanel = this.scene.rexUI.add.fixWidthSizer()
+    this.chosenPanel = this.scene.rexUI.add.fixWidthSizer({
+      // NOTE Necessary to prevent invisible cutout bug
+      width: width,
+    })
 
     return this.chosenPanel
   }

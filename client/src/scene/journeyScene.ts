@@ -30,7 +30,7 @@ import avatarStories from '../data/avatarStories/avatarStories'
 import Server from '../server'
 
 const OVERLAY_WIDTH = 575
-const OVERLAY_HEIGHT = 680
+const OVERLAY_HEIGHT = 660
 const OVERLAY_TOP = 100
 
 /** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Imani, Mitra, Water, Stars */
