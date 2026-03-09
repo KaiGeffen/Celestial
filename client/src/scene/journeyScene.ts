@@ -700,6 +700,9 @@ export default class JourneyScene extends BaseScene {
         0,
         'icon-JourneyStar',
       )
+      if (!isCompleted) {
+        star.setTint(0x000080)
+      }
       overlayCell.add(star)
     }
     starsAndStampSizer.add(overlayCell, { align: 'center' })
