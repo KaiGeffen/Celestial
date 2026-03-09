@@ -1,2 +1,1 @@
-export default `
-`
+export default `I only grasped half of what she said. The grief struck me instantly, like she had already left and I was hearing her ghost. When she actually did leave, that very ghost attached itself to me, invading my mind throughout my life to whisper those words I still couldn’t quite understand.`

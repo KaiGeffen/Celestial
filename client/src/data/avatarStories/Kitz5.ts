@@ -1,30 +1,16 @@
-export default `    That evening I recognized her silhouette in the restaurant parking lot immediately. I tried to get a little closer before calling out to her, but once I was within a yard of her, she spun around with her right hand clenching something in her purse.
-    “Woah, just wanted to say hi.”
-    “You’re that guy…” she muttered. Her expression showed a hint of relief, before becoming even stonier. “Have you been following me?”
-    “What? No, never.”
-    She lifted the spray bottle out of her bag.
-    “I moved to the area recently. After my mom passed nearby,” I blurted out.
-    “Oh, oh I’m so sorry—” she gasped and fumbled with her belongings, trying to shove the pepper spray away. The top clattered onto the pavement. We both reached down to grab it when the spray tube slid out from her purse, hitting the ground right on the nozzle. The hiss of spray releasing sent us both running.
-
-    “Come, just put your eyes under a faucet… that one looks free.”
-    “Are you sure? What about you?” I asked, my eyes still squeezed shut as she guided me into the restaurant kitchen.
-    “ I’m fine, I’ve got a wet towel for my eyes.”
-    After a few seconds under the water I pulled my head back and blinked
-    “Am I crazy or is pepper spray pretty mild?” I asked while drying off my face.
-    “Well, actually it’s just some cooking oil mixed with water. I don’t trust myself with the real thing,” she admitted. “But, still, I’m really sorry some got on you.”
-    “You said you work here?”
-    “For the time being…”
-    I blinked my eyes open and asked,“Have you tried the bar’s tasting menu?” She shook her head. “Come split it with me. My friends are never game. Always saying they’re ‘too full’ after dinner.”
-    “You mean like, the uh, wine and cheese thing? That’s a little…”
-    “My treat.” 
-    
-    She swirled the wine glass and took a deep inhale, just as I taught her.
-    “The aroma is… citrus-y?” she looked up at me for approval, her rosy cheek leaned lazily against the glass.
-    “Good, what else?”
-    She sighed, steadied the glass under her nose and closed her eyes.
-    “Something, what did you call it earlier? When there’s greens—Ah! Vegetal, and maybe herbaceous notes?”
-    “Look at you! Cheers!” I applauded, and she eagerly took a sip of the wine. Even this far into the tasting menu, I didn’t grow tired of watching her face light up, relax, and contemplate (or even scrunch up in disgust) as she tried each delicacy for the first time. 
-    “So, I don’t mean to pry, but as your victim I think I deserve to know: why carry around the fake pepper spray?” I finally asked. I really wanted to ask how she can be so defensive yet vulnerable at once, so stubborn yet incompetent, in a way that made my heart pound in my head. She avoided my gaze and smacked her lips as if still savoring her sip of wine. 
-I lowered my voice and looked off wistfully, “We're in a pretty nice area. My mom wouldn’t have settled for anything unsafe,” I added. I could feel her sympathetic eyes land on me.
-    “I’ve had some bad experiences in the past. Some impulsive exes and pushy strangers. I’m new here, too. Still getting used to ‘letting my guard down’, I guess,” she explained with an awkward smile. “I think you’ve already helped with that, a bit.”
-`
+export default `The young lawyer seated across from me recounted her road to success and next ambitions with a little too much enthusiasm. As I took my final sip of coffee, her neglected cup was still nearly full. I leaned back and let my gaze wander over her shoulder, to the window behind her. It had an especially beautiful copper frame that transformed the rainy street into a live painting. 
+That was when I first laid eyes on her. She walked into the framed view slowly, as if she wasn’t soaked to the bone. The rain made her dark hair even darker, which in turn made the pale skin it clung to even paler. The yellow dress that hung awkwardly on her thin frame made her complexion appear sickly, like a risen corpse. 
+“Excuse me for a moment,” I said, finally interrupting my date’s monologue. I grabbed the umbrella and jacket from the back of my chair and raced outside. She had only just made it past the next storefront, and I quickly caught up with her. 
+“Uh, hello,” I called out. She turned around, her unfocused eyes suddenly sharpening with caution. 
+“What do you want?” She asked, taking a step back. There was an unexpected steadiness to her hostile voice that left me flustered.
+“Nothing! I mean, I don’t want anything… from you, I just—well I guess I wanted—to offer you an umbrella,” I stammered like a fool. “You looked like you could use one.”
+As I watched the realization flicker across her stiff face, I thought I shouldn’t have said the last part aloud. She quickly crossed her arms over her chest and turned away, glancing around at other pedestrians nervously. I pulled off my jacket and draped it onto her. Her shoulders jumped, and she looked back at me, still wary.
+“It’s long. You can keep it, or throw it away once you get inside, up to you,” I said. She didn’t respond, but she slipped her arms into the sleeves and zipped up the front. I held out the open umbrella, letting the rain hit me. “You don’t need to return this, either. So just take it.”
+When I returned to the cafe a bit wet, my date smiled.
+“That was kind of you, running out there to give someone an umbrella,” she said, “I think I’d like to see you again sometime.”
+“I’m sorry, I don’t think we’re a good fit.”
+“Really? I like you, though. You don’t… you don’t feel the same?” she muttered, sounding genuinely hurt. My heart twinged.
+“Hey, it’s not that you’re unlikable, you’re just too good for me.”
+“That’s the least believable excuse a man can give,” she sighed.
+“I know it’s tossed around a lot, but I really mean it. You’re too… put-together, capable, confident. You don’t need me.”
+And I really did mean it.`

@@ -345,9 +345,7 @@ export default class JourneyScene extends BaseScene {
     const theme = themes[this.selectedThemeIndex]
     const completed: boolean[] = UserSettings._get('completedMissions')
     const completedCount = theme.missions.filter((m) => completed[m.id]).length
-    this.overlayHeaderText.setText(
-      `${theme.displayName} (${completedCount}/${theme.missions.length})`,
-    )
+    this.overlayHeaderText.setText(`${theme.displayName}`)
     const panel = this.overlayPanel.getElement('panel') as FixWidthSizer
     panel.removeAll(true)
     theme.missions.forEach((mission) => {
@@ -475,7 +473,10 @@ export default class JourneyScene extends BaseScene {
             const avatarIndex = Math.floor(mission.id / 100) - 1
             const chapterIndex = mission.id % 100
             const storyText =
-              avatarStories[avatarIndex]?.[chapterIndex] ?? 'Coming soon'
+              '      ' +
+              (avatarStories[avatarIndex]?.[chapterIndex] ?? 'Coming soon')
+                .replace(/\n/g, '\n\n      ')
+                .trim()
             this.scene.launch('MenuScene', {
               menu: 'message',
               title: `${avatarNames[avatarIndex]} — ${mission.name}`,
