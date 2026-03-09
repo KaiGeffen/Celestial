@@ -24,6 +24,7 @@ import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/Sc
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 import newScrollablePanel from '../lib/scrollablePanel'
 import showTooltip from '../utils/tooltips'
+import avatarBios from '../data/avatarBios/index'
 import avatarNames from '../data/avatarNames'
 import avatarStories from '../data/avatarStories/avatarStories'
 import Server from '../server'
@@ -462,7 +463,7 @@ export default class JourneyScene extends BaseScene {
       })
       .setOrigin(0)
 
-    textBox.start(Array(100).fill('foo').join(' '), 5)
+    textBox.start(avatarBios[this.selectedThemeIndex] ?? 'Bio coming soon.', 5)
 
     return this.rexUI.add
       .sizer({
