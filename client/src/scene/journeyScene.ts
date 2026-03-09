@@ -390,9 +390,11 @@ export default class JourneyScene extends BaseScene {
       width: sideControlsWidth,
       space: { item: Space.pad },
     })
-    leftControls.add(leftArrow, { align: 'center' }).add(this.overlayArtButtonContainer, {
-      align: 'center',
-    })
+    leftControls
+      .add(leftArrow, { align: 'center' })
+      .add(this.overlayArtButtonContainer, {
+        align: 'center',
+      })
 
     const rightControls = this.rexUI.add.sizer({
       orientation: 'horizontal',
@@ -417,7 +419,10 @@ export default class JourneyScene extends BaseScene {
     this.overlayHeaderText.setText(`${theme.displayName}`)
     const panel = this.overlayPanel.getElement('panel') as FixWidthSizer
     panel.removeAll(true)
-    if (this.showOverlayCharacterView && this.selectedThemeIndex < avatarNames.length) {
+    if (
+      this.showOverlayCharacterView &&
+      this.selectedThemeIndex < avatarNames.length
+    ) {
       panel.add(this.createOverlayCharacterText())
     } else {
       theme.missions.forEach((mission) => {
@@ -463,12 +468,16 @@ export default class JourneyScene extends BaseScene {
       })
       .setOrigin(0)
 
-    textBox.start(avatarBios[this.selectedThemeIndex] ?? 'Bio coming soon.', 5)
+    const bioText =
+      '    ' +
+      (avatarBios[this.selectedThemeIndex] ?? 'Bio coming soon.')
+        .replace(/\n/g, '\n\n    ')
+        .trim()
+    textBox.start(bioText, 5)
 
     return this.rexUI.add
       .sizer({
         orientation: 'vertical',
-        width: OVERLAY_WIDTH,
         space: {
           left: padding,
           right: padding,
