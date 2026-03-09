@@ -1,6 +1,6 @@
 [
   {
-    "name": "What Could Be",
+    "name": "Lush Origins",
     "id": 500,
     "prereq": [[100], [200]],
     "difficulty": 2,
@@ -10,7 +10,7 @@
     "tip": "When you Birth, first it creates a Child in hand if you don't have one, then raises the Children in your hand by that many points."
   },
   {
-    "name": "When I First Held You",
+    "name": "Dry Earth",
     "id": 501,
     "prereq": [[500]],
     "difficulty": 2,
@@ -20,7 +20,7 @@
     "tip": "Because Birth adds the Child to hand when it resolves, you can't use their points until the next round."
   },
   {
-    "name": "The Future",
+    "name": "Bloodied Hands",
     "id": 502,
     "prereq": [[501]],
     "difficulty": 3,
@@ -30,7 +30,7 @@
     "tip": "Grow a Child too big and it stops getting much better: 10 points and 20 points aren't that different."
   },
   {
-    "name": "Posterity",
+    "name": "Boundaries",
     "id": 503,
     "prereq": [[502]],
     "difficulty": 3,
@@ -40,7 +40,7 @@
     "tip": "A Child can take up space in your hand, preventing you from drawing."
   },
   {
-    "name": "Ancestry",
+    "name": "Mirror",
     "id": 504,
     "prereq": [[503]],
     "difficulty": 3,
@@ -50,7 +50,7 @@
     "tip": "Ancestry is often better played on a much later round, don’t let the 3-cost fool you."
   },
   {
-    "name": "Pregnant",
+    "name": "Enduring Hope",
     "id": 505,
     "prereq": [[504]],
     "difficulty": 4,
@@ -60,7 +60,7 @@
     "tip": "If you have 2 Children in hand, Birth will boost BOTH of their points."
   },
   {
-    "name": "Cradle",
+    "name": "Shoot Forth",
     "id": 506,
     "prereq": [[505]],
     "difficulty": 4,
@@ -70,7 +70,7 @@
     "tip": "Playing a Child to win a round, instead of holding onto it forever, is often better in the long run."
   },
   {
-    "name": "Pass On",
+    "name": "Green Branches",
     "id": 507,
     "prereq": [[506]],
     "difficulty": 5,
@@ -80,7 +80,7 @@
     "tip": "In a small deck, the Heirloom value can be huge."
   },
   {
-    "name": "Rebirth",
+    "name": "Roots",
     "id": 508,
     "prereq": [[507]],
     "difficulty": 5,
