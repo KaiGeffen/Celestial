@@ -70,6 +70,7 @@ export default class ChapterMessageMenu extends MessageMenu {
           })
 
           Server.claimMissionGold(this.claimGoldMissionId)
+          this.scene.game.events.emit('missionGoldClaimed')
           this.claimGoldButton.setText('Gold Claimed').disable()
         }
       },

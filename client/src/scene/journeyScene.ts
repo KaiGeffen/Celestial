@@ -26,6 +26,7 @@ import newScrollablePanel from '../lib/scrollablePanel'
 import showTooltip from '../utils/tooltips'
 import avatarNames from '../data/avatarNames'
 import avatarStories from '../data/avatarStories/avatarStories'
+import Server from '../server'
 
 const OVERLAY_WIDTH = 575
 const OVERLAY_TOP = 100
@@ -148,6 +149,15 @@ export default class JourneyScene extends BaseScene {
     if (this.selectedThemeIndex === STARS_THEME_INDEX) {
       this.altMap.alpha = 1
     }
+
+    this.game.events.on('missionGoldClaimed', this.onMissionGoldClaimed, this)
+    this.events.once('shutdown', () => {
+      this.game.events.off(
+        'missionGoldClaimed',
+        this.onMissionGoldClaimed,
+        this,
+      )
+    })
 
     showTooltip(this)
   }
@@ -377,6 +387,10 @@ export default class JourneyScene extends BaseScene {
     })
   }
 
+  private onMissionGoldClaimed(): void {
+    this.refreshOverlayContent(false)
+  }
+
   /** Set camera and drift center to theme position without tweening */
   private snapCameraToTheme(themeIndex: number): void {
     const pos = THEME_CAMERA_POSITIONS[themeIndex]
@@ -464,6 +478,8 @@ export default class JourneyScene extends BaseScene {
       Space.iconSize,
     )
     if (isCompleted) {
+      const hasClaimedMissionGold =
+        Server.getUserData().missionGoldClaimed?.[mission.id] ?? false
       new Buttons.Icon({
         within: iconCell,
         name: 'Quest',
@@ -493,6 +509,15 @@ export default class JourneyScene extends BaseScene {
           }
         },
       })
+      if (!hasClaimedMissionGold) {
+        const badge = this.add.circle(
+          Space.iconSize / 2 - 5,
+          -Space.iconSize / 2 + 5,
+          5,
+          0xd64045,
+        )
+        iconCell.add(badge)
+      }
     }
     row.add(iconCell, { align: 'center' })
 
