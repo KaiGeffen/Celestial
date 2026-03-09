@@ -134,12 +134,12 @@ export class MapJourneyBuilderScene extends BuilderBase {
     // Must filter out cards that you don't have access to
     this.filter()
 
-    this.catalogRegion.resize(Space.cutoutWidth)
+    this.catalogRegion.resize(Space.cutoutWidth + Space.pad)
   }
 
   onWindowResize(): void {
     this.journeyRegion.onWindowResize()
-    this.catalogRegion.resize(Space.cutoutWidth)
+    this.catalogRegion.resize(Space.cutoutWidth + Space.pad)
   }
 
   addCardToDeck(card: Card): void {
