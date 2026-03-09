@@ -9,14 +9,23 @@ import newScrollablePanel from '../../lib/scrollablePanel'
 import Catalog from '../../../../shared/state/catalog'
 import Buttons from '../../lib/buttons/buttons'
 import Decklist from '../../lib/decklist'
+import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
 // A message to the user
 const width = 900
 
 export default class ConfirmMenu extends Menu {
+  protected textScrollablePanel: ScrollablePanel
+
   constructor(scene: MenuScene, params) {
     super(scene, width)
 
+    this.createContent(params)
+
+    this.layout()
+  }
+
+  protected createContent(params): void {
     const title = params.title
     this.createHeader(title)
 
@@ -31,8 +40,6 @@ export default class ConfirmMenu extends Menu {
     } else {
       this.createText(s)
     }
-
-    this.layout()
   }
 
   private createTextAndCard(card: Card, s: string): void {
@@ -81,7 +88,7 @@ export default class ConfirmMenu extends Menu {
 
   protected createText(s: string): void {
     const width = this.width - Space.pad * 2
-    const maxTextHeight = Space.windowHeight - 200
+    const maxTextHeight = Space.windowHeight - 300
 
     // Create scrollable text panel
     const textPanel = this.scene.rexUI.add.sizer({
@@ -103,6 +110,7 @@ export default class ConfirmMenu extends Menu {
       scrollMode: 'y',
       slider: textNeedsScroll ? Scroll(this.scene, true) : false,
     })
+    this.textScrollablePanel = scrollableText
 
     // Add this new sizer to the main sizer
     const padding = {

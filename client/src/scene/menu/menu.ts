@@ -152,6 +152,7 @@ import RulebookMenu from './rulebook'
 import { NewDeckMenu, EditDeckMenu } from './alterDeck'
 import ConfirmMenu from './confirm'
 import MessageMenu from './message'
+import ChapterMessageMenu from './chapterMessage'
 import FocusMenu from './focus'
 import SearchMenu from './search'
 import LeaderboardMenu from './leaderboard'
@@ -176,6 +177,7 @@ const menus = {
   editDeck: EditDeckMenu,
   confirm: ConfirmMenu,
   message: MessageMenu,
+  chapterMessage: ChapterMessageMenu,
   focus: FocusMenu,
   search: SearchMenu,
   leaderboard: LeaderboardMenu,

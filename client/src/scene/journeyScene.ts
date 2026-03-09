@@ -478,15 +478,17 @@ export default class JourneyScene extends BaseScene {
                 .replace(/\n/g, '\n\n      ')
                 .trim()
             this.scene.launch('MenuScene', {
-              menu: 'message',
+              menu: 'chapterMessage',
               title: `${avatarNames[avatarIndex]} — ${mission.name}`,
               s: storyText,
+              claimGoldMissionId: mission.id,
             })
           } else {
             this.scene.launch('MenuScene', {
-              menu: 'message',
+              menu: 'chapterMessage',
               title: mission.name,
               s: 'Writing coming soon.',
+              claimGoldMissionId: mission.id,
             })
           }
         },
