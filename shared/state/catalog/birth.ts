@@ -203,10 +203,13 @@ class JustLikeDad extends Card {
     super.play(player, game, index, bonus)
 
     if (super.exhale(2, game, player)) {
+      let card
       if (game.story.acts.length > 0) {
-        const card = game.story.acts[game.story.acts.length - 1].card
-        game.create(player, card)
+        card = game.story.acts[game.story.acts.length - 1].card
+      } else {
+        card = this.copy()
       }
+      game.create(player, card)
     }
   }
 }
