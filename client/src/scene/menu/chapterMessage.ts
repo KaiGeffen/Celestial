@@ -6,7 +6,8 @@ import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
 import Server from '../../server'
-import { Space } from '../../settings/settings'
+import { Ease, Space, Style } from '../../settings/settings'
+import REWARD_AMOUNTS from '../../../../shared/config/rewardAmounts'
 
 export default class ChapterMessageMenu extends MessageMenu {
   private claimGoldMissionId: number | undefined
@@ -48,6 +49,26 @@ export default class ChapterMessageMenu extends MessageMenu {
           this.isClaimButtonUnlocked() &&
           !this.isMissionGoldClaimed()
         ) {
+          let [x, y] = this.claimGoldButton.getGlobalPosition()
+          y -= Space.buttonHeight / 4
+          const rewardText = this.scene.add
+            .text(
+              x,
+              y,
+              `+${REWARD_AMOUNTS.missionComplete}💰`,
+              Style.homeSceneButton,
+            )
+            .setOrigin(0.5, 1)
+
+          this.scene.tweens.add({
+            targets: rewardText,
+            y: y - 40,
+            alpha: 0,
+            duration: 800,
+            ease: Ease.basic,
+            onComplete: () => rewardText.destroy(),
+          })
+
           Server.claimMissionGold(this.claimGoldMissionId)
           this.claimGoldButton.setText('Gold Claimed').disable()
         }
