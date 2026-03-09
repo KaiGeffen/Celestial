@@ -35,10 +35,7 @@ export default class MatchResultsRegion extends Region {
   panel: ScrollablePanel
 
   WIDTH = 300
-  HEIGHT = Math.min(
-    Space.avatarHeight,
-    Space.windowHeight - (Space.buttonHeight + Space.pad * 2) * 2,
-  )
+  HEIGHT = Space.windowHeight - (Space.buttonHeight + Space.pad * 2) * 2
 
   create(scene: MatchScene): this {
     this.scene = scene
@@ -172,12 +169,14 @@ export default class MatchResultsRegion extends Region {
 
     // Your avatar
     this.ourAvatar = this.scene.add
-      .image(-this.WIDTH, 0, 'avatar-JulesFull')
+      .image(-this.WIDTH / 2, 0, 'avatar-JulesFull')
       .setInteractive()
+      .setOrigin(1, 0.5)
     this.setFullAvatarTexture(this.ourAvatar, 'avatar-JulesFull')
     this.theirAvatar = this.scene.add
-      .image(this.WIDTH, 0, 'avatar-MiaFull')
+      .image(this.WIDTH / 2, 0, 'avatar-MiaFull')
       .setInteractive()
+      .setOrigin(0, 0.5)
     this.setFullAvatarTexture(this.theirAvatar, 'avatar-MiaFull')
 
     // Create the panel with more details about the results
