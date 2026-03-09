@@ -77,6 +77,7 @@ export default class JourneyScene extends BaseScene {
   private previousThemeIndex = 0
   private overlayHeaderText: Phaser.GameObjects.Text
   private overlayPanel: ScrollablePanel
+  private overlayArtButtonContainer: ContainerLite
   private missionTipContainer: Phaser.GameObjects.Container
   private missionTipBg: Phaser.GameObjects.Rectangle
   private missionTipTextBox: Phaser.GameObjects.GameObject & {
@@ -147,8 +148,8 @@ export default class JourneyScene extends BaseScene {
     this.snapCameraToTheme(this.selectedThemeIndex)
 
     // Mission list overlay on the right
-    this.createJourneyOverlay()
     this.createOverlayCharacterArt()
+    this.createJourneyOverlay()
 
     // If we started on stars, show alt map immediately (no fade-in delay)
     if (this.selectedThemeIndex === STARS_THEME_INDEX) {
@@ -235,6 +236,7 @@ export default class JourneyScene extends BaseScene {
       .image(Space.pad, topPad, 'avatar-JulesFull')
       .setOrigin(0, 0)
       .setScrollFactor(0)
+      .setVisible(false)
       .setDepth(100)
       .setScale(
         availableHeight /
@@ -359,12 +361,49 @@ export default class JourneyScene extends BaseScene {
       this.refreshOverlayContent()
     })
 
+    this.overlayArtButtonContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.iconSize,
+      Space.iconSize,
+    )
+    const overlayArtButton = new Buttons.Icon({
+      within: this.overlayArtButtonContainer,
+      name: 'Quest',
+      f: () => {
+        if (this.selectedThemeIndex < avatarNames.length) {
+          this.overlayCharacterImage.setVisible(
+            !this.overlayCharacterImage.visible,
+          )
+        }
+      },
+      muteClick: true,
+    })
+    overlayArtButton.icon.setTintFill(Color.backgroundLight)
+
+    const sideControlsWidth = leftArrow.width + Space.pad + Space.iconSize
+    const leftControls = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      width: sideControlsWidth,
+      space: { item: Space.pad },
+    })
+    leftControls.add(leftArrow, { align: 'center' }).add(this.overlayArtButtonContainer, {
+      align: 'center',
+    })
+
+    const rightControls = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      width: sideControlsWidth,
+    })
+    rightControls.addSpace().add(rightArrow, { align: 'center' })
+
     headerSizer
-      .add(leftArrow, { align: 'center' })
+      .add(leftControls, { align: 'center' })
       .addSpace()
       .add(this.overlayHeaderText, { proportion: 1, align: 'center' })
       .addSpace()
-      .add(rightArrow, { align: 'center' })
+      .add(rightControls, { align: 'center' })
     headerSizer.layout()
     return headerSizer
   }
@@ -381,6 +420,7 @@ export default class JourneyScene extends BaseScene {
       const row = this.createMissionOverlayRow(mission, completed)
       panel.add(row)
     })
+    this.refreshOverlayCharacterArt()
     this.overlayPanel.layout()
     if (moveCamera && this.selectedThemeIndex !== STARS_THEME_INDEX) {
       const leavingStars = this.previousThemeIndex === STARS_THEME_INDEX
@@ -404,6 +444,19 @@ export default class JourneyScene extends BaseScene {
       duration: ALT_MAP_FADE_DURATION,
       ease: 'Power2.InOut',
     })
+  }
+
+  private refreshOverlayCharacterArt(): void {
+    const hasCharacterArt = this.selectedThemeIndex < avatarNames.length
+    this.overlayArtButtonContainer.setVisible(hasCharacterArt)
+
+    if (!hasCharacterArt) {
+      this.overlayCharacterImage.setVisible(false)
+      return
+    }
+
+    const avatarName = avatarNames[this.selectedThemeIndex]
+    this.overlayCharacterImage.setTexture(`avatar-${avatarName}Full`)
   }
 
   private onMissionGoldClaimed(): void {
