@@ -345,7 +345,11 @@ export default class JourneyScene extends BaseScene {
       .setOrigin(0.5, 0.5)
 
     const leftArrow = this.add
-      .text(0, 0, '‹', { ...Style.basic, fontSize: '32px', color: '#f5f2eb' })
+      .text(0, 0, '‹', {
+        ...Style.announcement,
+        fontSize: '30px',
+        color: '#f5f2eb',
+      })
       .setOrigin(0.5, 0.5)
       .setInteractive({ useHandCursor: true })
     leftArrow.on('pointerdown', () => {
@@ -356,7 +360,11 @@ export default class JourneyScene extends BaseScene {
       this.refreshOverlayContent()
     })
     const rightArrow = this.add
-      .text(0, 0, '›', { ...Style.basic, fontSize: '32px', color: '#f5f2eb' })
+      .text(0, 0, '›', {
+        ...Style.announcement,
+        fontSize: '30px',
+        color: '#f5f2eb',
+      })
       .setOrigin(0.5, 0.5)
       .setInteractive({ useHandCursor: true })
     rightArrow.on('pointerdown', () => {
