@@ -75,10 +75,8 @@ export default class CatalogRegion {
         slider: { top: Space.filterBarHeight },
       },
 
-      slider: Scroll(scene),
+      slider: Scroll(scene, false),
     }).setOrigin(1, 0)
-
-
   }
 
   // Filter which cards can be selected in the catalog based on current filtering parameters

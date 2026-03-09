@@ -165,7 +165,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
             child: this.createMatchRows(),
           },
 
-          slider: Scroll(this),
+          slider: Scroll(this, false),
         })
         .setOrigin(0.5, 0)
         .layout()

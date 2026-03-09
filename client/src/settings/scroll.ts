@@ -1,10 +1,14 @@
 import 'phaser'
 import { Color, Space } from './settings'
-import BaseScene from '../scene/baseScene'
+import BaseScene, { BaseMenuScene } from '../scene/baseScene'
 
 const ROUNDING = Space.sliderWidth / 2
 
-export const Scroll: (scene: BaseScene) => any = (scene: BaseScene) => {
+// TODO Super weird to export a const function like this
+export const Scroll: (
+  scene: BaseScene | BaseMenuScene,
+  invertColor: Boolean,
+) => any = (scene: BaseScene | BaseMenuScene, invertColor: Boolean) => {
   return {
     input: 'click',
     track: scene.rexUI.add.roundRectangle(
@@ -13,7 +17,7 @@ export const Scroll: (scene: BaseScene) => any = (scene: BaseScene) => {
       Space.sliderWidth,
       0,
       0,
-      Color.sliderTrack,
+      invertColor ? Color.backgroundLight : Color.sliderTrack,
     ),
     thumb: scene.add.image(0, 0, 'icon-Thumb'),
   }
