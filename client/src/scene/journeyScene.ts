@@ -75,6 +75,7 @@ export default class JourneyScene extends BaseScene {
   private isTweeningCamera = false
   private selectedThemeIndex = 0
   private previousThemeIndex = 0
+  private showOverlayCharacterView = false
   private overlayHeaderText: Phaser.GameObjects.Text
   private overlayPanel: ScrollablePanel
   private overlayArtButtonContainer: ContainerLite
@@ -242,6 +243,7 @@ export default class JourneyScene extends BaseScene {
         availableHeight /
           this.textures.get('avatar-JulesFull').getSourceImage().height,
       )
+    this.addShadow(this.overlayCharacterImage)
   }
 
   private createMissionTipBox(): void {
@@ -373,9 +375,8 @@ export default class JourneyScene extends BaseScene {
       name: 'Quest',
       f: () => {
         if (this.selectedThemeIndex < avatarNames.length) {
-          this.overlayCharacterImage.setVisible(
-            !this.overlayCharacterImage.visible,
-          )
+          this.showOverlayCharacterView = !this.showOverlayCharacterView
+          this.refreshOverlayContent(false)
         }
       },
       muteClick: true,
@@ -412,14 +413,17 @@ export default class JourneyScene extends BaseScene {
     const themes = getMissionsByTheme()
     const theme = themes[this.selectedThemeIndex]
     const completed: boolean[] = UserSettings._get('completedMissions')
-    const completedCount = theme.missions.filter((m) => completed[m.id]).length
     this.overlayHeaderText.setText(`${theme.displayName}`)
     const panel = this.overlayPanel.getElement('panel') as FixWidthSizer
     panel.removeAll(true)
-    theme.missions.forEach((mission) => {
-      const row = this.createMissionOverlayRow(mission, completed)
-      panel.add(row)
-    })
+    if (this.showOverlayCharacterView && this.selectedThemeIndex < avatarNames.length) {
+      panel.add(this.createOverlayCharacterText())
+    } else {
+      theme.missions.forEach((mission) => {
+        const row = this.createMissionOverlayRow(mission, completed)
+        panel.add(row)
+      })
+    }
     this.refreshOverlayCharacterArt()
     this.overlayPanel.layout()
     if (moveCamera && this.selectedThemeIndex !== STARS_THEME_INDEX) {
@@ -432,6 +436,46 @@ export default class JourneyScene extends BaseScene {
     }
     this.previousThemeIndex = this.selectedThemeIndex
     this.updateAltMapFade()
+  }
+
+  private createOverlayCharacterText(): Phaser.GameObjects.GameObject {
+    const padding = Space.padSmall
+    const text = this.add
+      .text(0, 0, '', Style.basic)
+      .setWordWrapWidth(OVERLAY_WIDTH - padding * 2)
+      .setOrigin(0)
+
+    const textBox = this.rexUI.add
+      .textBox({
+        text,
+        x: 0,
+        y: 0,
+        space: {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+        },
+        page: {
+          maxLines: 0,
+        },
+      })
+      .setOrigin(0)
+
+    textBox.start(Array(100).fill('foo').join(' '), 5)
+
+    return this.rexUI.add
+      .sizer({
+        orientation: 'vertical',
+        width: OVERLAY_WIDTH,
+        space: {
+          left: padding,
+          right: padding,
+          top: padding,
+          bottom: padding,
+        },
+      })
+      .add(textBox)
   }
 
   private updateAltMapFade(): void {
@@ -457,6 +501,7 @@ export default class JourneyScene extends BaseScene {
 
     const avatarName = avatarNames[this.selectedThemeIndex]
     this.overlayCharacterImage.setTexture(`avatar-${avatarName}Full`)
+    this.overlayCharacterImage.setVisible(this.showOverlayCharacterView)
   }
 
   private onMissionGoldClaimed(): void {
