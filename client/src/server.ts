@@ -37,7 +37,7 @@ type UserData = null | {
   gems: number
   coins: number
   ownedItems: number[]
-  missionsGoldClaimed: number[]
+  missionGoldClaimed: boolean[]
   cosmeticSet: CosmeticSet
   achievements: Achievement[]
 }
@@ -178,6 +178,10 @@ export default class Server {
           uuid,
           ...data,
           garden: data.garden.map((dateStr) => new Date(dateStr)),
+          missionGoldClaimed: data.missionGoldClaimed
+            .toString()
+            .split('')
+            .map((char) => char === '1'),
         }
 
         this.loadUserData(data, game)
@@ -310,11 +314,8 @@ export default class Server {
       return
     }
     if (this.userData) {
-      this.userData.missionsGoldClaimed =
-        this.userData.missionsGoldClaimed || []
-      if (!this.userData.missionsGoldClaimed.includes(missionId)) {
-        this.userData.missionsGoldClaimed.push(missionId)
-      }
+      this.userData.missionGoldClaimed = this.userData.missionGoldClaimed || []
+      this.userData.missionGoldClaimed[missionId] = true
     }
     server.send({
       type: 'claimMissionGold',
@@ -377,7 +378,7 @@ export default class Server {
         gems: null,
         coins: null,
         ownedItems: [],
-        missionsGoldClaimed: [],
+        missionGoldClaimed: [],
         cosmeticSet: {
           avatar: 0,
           border: 0,
@@ -464,7 +465,6 @@ export default class Server {
           .map((char) => char === '1'),
       ),
     )
-
     sessionStorage.setItem('decks', JSON.stringify(data.decks))
     sessionStorage.setItem(
       'avatar_experience',

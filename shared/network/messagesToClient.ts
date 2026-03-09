@@ -21,7 +21,7 @@ export default interface messagesToClient {
     cosmeticSet: CosmeticSet
     achievements: Achievement[]
     cardInventory: string
-    missionsGoldClaimed: number[]
+    missionGoldClaimed: string
   }
   purchaseItemSuccess: {
     itemId: number
