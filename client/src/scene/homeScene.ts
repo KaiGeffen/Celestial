@@ -401,30 +401,6 @@ export default class HomeScene extends BaseScene {
     const newsImageName = newsImages[dayOfWeek]
     const image = this.add.image(0, 0, `news-${newsImageName}`).setOrigin(0, 0)
     imageContainer.add(image, { align: 'top' })
-
-    // Add button underneath the image to open Character Profile Scene
-    const buttonContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    const characterButton = new Buttons.Basic({
-      within: buttonContainer,
-      text: 'Read Stories',
-      f: () => {
-        this.scene.start('CharacterProfileScene')
-      },
-    })
-    // Center the button
-    const buttonRowSizer = this.rexUI.add.sizer({
-      orientation: 'horizontal',
-    })
-    buttonRowSizer.addSpace().add(buttonContainer).addSpace()
-    buttonRowSizer.layout()
-    imageContainer.add(buttonRowSizer)
-
     // Add the image container to contentSizer
     contentSizer.add(imageContainer, { align: 'top' })
 
