@@ -83,8 +83,8 @@ export default class MatchResultsRegion extends Region {
     // Avatars
     const av1 = avatarNames[state.cosmeticSets[0].avatar]
     const av2 = avatarNames[state.cosmeticSets[1].avatar]
-    this.ourAvatar.setTexture(`avatar-${av1}Full`)
-    this.theirAvatar.setTexture(`avatar-${av2}Full`)
+    this.setFullAvatarTexture(this.ourAvatar, `avatar-${av1}Full`)
+    this.setFullAvatarTexture(this.theirAvatar, `avatar-${av2}Full`)
 
     // Text saying if you won or lost
     this.txtResult.setText(state.winner === 0 ? 'Victory' : 'Defeat')
@@ -174,9 +174,11 @@ export default class MatchResultsRegion extends Region {
     this.ourAvatar = this.scene.add
       .image(-this.WIDTH, 0, 'avatar-JulesFull')
       .setInteractive()
+    this.setFullAvatarTexture(this.ourAvatar, 'avatar-JulesFull')
     this.theirAvatar = this.scene.add
       .image(this.WIDTH, 0, 'avatar-MiaFull')
       .setInteractive()
+    this.setFullAvatarTexture(this.theirAvatar, 'avatar-MiaFull')
 
     // Create the panel with more details about the results
     this.createResultsPanel()
@@ -187,6 +189,18 @@ export default class MatchResultsRegion extends Region {
       this.theirAvatar,
       // this.panel, NOTE Scrollable panel is bugged with containers
     ])
+  }
+
+  private setFullAvatarTexture(
+    avatar: Phaser.GameObjects.Image,
+    textureKey: string,
+  ): void {
+    avatar.setTexture(textureKey)
+
+    const source = this.scene.textures.get(textureKey).getSourceImage()
+    const scale = this.HEIGHT / source.height
+
+    avatar.setScale(scale)
   }
 
   private createResultsPanel() {
