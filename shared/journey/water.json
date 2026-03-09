@@ -1,6 +1,6 @@
 [
   {
-    "name": "Drown",
+    "name": "Going Under",
     "id": 700,
     "prereq": [[202]],
     "difficulty": 2,
@@ -10,7 +10,7 @@
     "tip": "Filling up your discard pile, providing Rooster targets, and keeping you from drawing cards you know you don't want - Drown does it all."
   },
   {
-    "name": "Dew",
+    "name": "Dependable Friend",
     "id": 701,
     "prereq": [[300]],
     "difficulty": 2,
@@ -20,7 +20,7 @@
     "tip": "Dew provides a reliable source of 1 point every round, but be careful of stuffing you hand too full."
   },
   {
-    "name": "Fishing Boat",
+    "name": "Teach a Man to Fish",
     "id": 702,
     "prereq": [[303]],
     "difficulty": 2,
@@ -30,7 +30,7 @@
     "tip": "Honestly try to play Fishing Boat after you shuffle, it's better that way."
   },
   {
-    "name": "Gentle Rain",
+    "name": "What I Need to Grow",
     "id": 703,
     "prereq": [[404]],
     "difficulty": 3,
@@ -40,7 +40,7 @@
     "tip": "Gentle Rain gets worse if your hand is too full for you to draw cards."
   },
   {
-    "name": "Excess",
+    "name": "Never Enough",
     "id": 704,
     "prereq": [[500]],
     "difficulty": 3,
@@ -50,7 +50,7 @@
     "tip": "While it forces you to commit hard to a round, Excess is a huge amount of points for the right low-curve deck."
   },
   {
-    "name": "Iceberg",
+    "name": "Melting Away",
     "id": 705,
     "prereq": [[305]],
     "difficulty": 4,
@@ -70,7 +70,7 @@
     "tip": "Getting rid of cards you don't want in the matchup, or cards that are too cheap once you get to the late game can help you win with ease."
   },
   {
-    "name": "Fish",
+    "name": "The Water I Live In",
     "id": 707,
     "prereq": [[400]],
     "difficulty": 4,
@@ -80,7 +80,7 @@
     "tip": "Fish only triggers at the start of the game if you choose not to mulligan it."
   },
   {
-    "name": "Cloud",
+    "name": "Rainstorm",
     "id": 708,
     "prereq": [[108], [208], [308], [408], [508], [608]],
     "difficulty": 5,

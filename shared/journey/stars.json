@@ -1,6 +1,6 @@
 [
   {
-    "name": "Sun",
+    "name": "Source of Inspiration",
     "id": 800,
     "prereq": [[102]],
     "difficulty": 2,
@@ -10,7 +10,7 @@
     "tip": "Inspire means you have extra breath next round, Inspired means you have it this round."
   },
   {
-    "name": "Moon",
+    "name": "Pale Reflection",
     "id": 801,
     "prereq": [[105]],
     "difficulty": 2,
@@ -20,7 +20,7 @@
     "tip": "If a Rooster is on top of a Morning card, Moon gets to trigger it twice. And 2 Moons can trigger it 3 times!"
   },
   {
-    "name": "Sunflower",
+    "name": "Patterns Big and Small",
     "id": 802,
     "prereq": [[402]],
     "difficulty": 2,
@@ -30,7 +30,7 @@
     "tip": "Nourishing a Sunflower lets you ramp into strong cards early."
   },
   {
-    "name": "Pride",
+    "name": "The Morning Star",
     "id": 803,
     "prereq": [[204]],
     "difficulty": 3,
@@ -40,7 +40,7 @@
     "tip": "Pride will always discard the leftmost card and cost 1 breath, so try to stack your hand so you get rid of what you don't want."
   },
   {
-    "name": "Fates",
+    "name": "Three Sisters",
     "id": 804,
     "prereq": [[502]],
     "difficulty": 3,
@@ -50,7 +50,7 @@
     "tip": "Since Exhale happens when a card resolves not when it's played, you could choose to play more cards instead of leaving the Breath up depending on if the opponent plays more cards or not."
   },
   {
-    "name": "Cloak of Stars",
+    "name": "Shroud of Heaven",
     "id": 805,
     "prereq": [[106]],
     "difficulty": 4,
@@ -60,7 +60,7 @@
     "tip": "The Breath that Cloak of Stars adds can be used for Exhale effects, or will carry over to the next round if the Morning trigger occurs."
   },
   {
-    "name": "Night Vision",
+    "name": "Eyes in the Dark",
     "id": 806,
     "prereq": [[600]],
     "difficulty": 4,
@@ -70,7 +70,7 @@
     "tip": "Make sure you have a card with base-cost 2 in your deck or Night Vision won't draw anything."
   },
   {
-    "name": "Dreamer",
+    "name": "Morpheus",
     "id": 807,
     "prereq": [[100, 200, 300, 400, 500, 600]],
     "difficulty": 5,
@@ -80,7 +80,7 @@
     "tip": "As long as your hand is empty when Dreamer resolves, it will draw a card."
   },
   {
-    "name": "Possibility",
+    "name": "What Could Be",
     "id": 808,
     "prereq": [[602]],
     "difficulty": 5,
