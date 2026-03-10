@@ -10,7 +10,6 @@ import showTooltip from '../utils/tooltips'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 const NAVIGATION_BUTTON_WIDTH = 278
-const URL = 'https://luma.com/og92agfp'
 
 export default class HomeScene extends BaseScene {
   constructor() {
@@ -171,7 +170,7 @@ export default class HomeScene extends BaseScene {
       within: this,
       iconName: 'JourneyTab',
       f: () => {
-        this.scene.start('MapJourneyScene', {})
+        this.scene.start('JourneyScene', {})
         logEvent('view_journey')
       },
     })
@@ -364,7 +363,7 @@ export default class HomeScene extends BaseScene {
 
     // Title with line below
     const title = this.add
-      .text(0, 0, 'New Update [0.7.10]', Style.announcement)
+      .text(0, 0, `New Update [${PATCH_NUMBER}]`, Style.announcement)
       .setOrigin(0.5, 0)
     panelSizer.add(title)
 
@@ -375,6 +374,14 @@ export default class HomeScene extends BaseScene {
     // Create horizontal sizer for image and text side by side
     const contentSizer = this.rexUI.add.sizer({
       orientation: 'horizontal',
+      space: {
+        item: Space.pad,
+      },
+    })
+
+    // Image container - vertical sizer for image and button
+    const imageContainer = this.rexUI.add.sizer({
+      orientation: 'vertical',
       space: {
         item: Space.pad,
       },
@@ -393,29 +400,19 @@ export default class HomeScene extends BaseScene {
     ]
     const newsImageName = newsImages[dayOfWeek]
     const image = this.add.image(0, 0, `news-${newsImageName}`).setOrigin(0, 0)
-    contentSizer.add(image, { align: 'top' })
+    imageContainer.add(image, { align: 'top' })
+    // Add the image container to contentSizer
+    contentSizer.add(imageContainer, { align: 'top' })
 
     // Make news content as BBCode to have hoverable card names and links
-    const updateText = `This is your first look at our interstitial UI! While we'd love your feedback, know that we plan to overhaul it in the not too distant future.
-
-Join us December 20th at noon EST for the 7th Celestial tournament! Play in person or remote for the chance to take home some exclusive cosmetic and cash prizes!
-[area=_link_register][color=#FABD5D]Register here[/color][/area]
-
-Card changes:
-☝️ [area=_Phoenix][color=#FABD5D]Phoenix[/color][/area] cost 6 > 5
-☝️ [area=_Pride][color=#FABD5D]Pride[/color][/area] Exhale cost 2 > 1
-☝️ [area=_Pet][color=#FABD5D]Pet[/color][/area] points 1 > 2
-☝️ [area=_Overflow][color=#FABD5D]Overflow[/color][/area] points -1 > 0
-☝️ [area=_Hug][color=#FABD5D]Hug[/color][/area] points 1 > 2, bonus 2 > 1
-☝️ [area=_Balance][color=#FABD5D]Balance[/color][/area] points 1 > 2, bonus 3 > 2
-
-Thanks so much for playing! We couldn't do this without you 😊`
-
     const text = this.rexUI.add
-      .BBCodeText(0, 0, updateText, BBStyle.description)
+      .BBCodeText(0, 0, NEWS_TEXT, BBStyle.description)
       .setInteractive()
       .on('areaover', (key: string) => {
         if (key === '_link_register') {
+          // Show cursor as pointer for link
+          this.input.setDefaultCursor('pointer')
+        } else if (key === '_link_discord') {
           // Show cursor as pointer for link
           this.input.setDefaultCursor('pointer')
         } else if (key[0] === '_') {
@@ -426,15 +423,21 @@ Thanks so much for playing! We couldn't do this without you 😊`
         if (key === '_link_register') {
           this.input.setDefaultCursor('default')
         }
+        if (key === '_link_discord') {
+          this.input.setDefaultCursor('default')
+        }
         this.hint.hide()
       })
       .on('areadown', (key: string) => {
         if (key === '_link_register') {
           window.open(URL, '_blank')
         }
+        if (key === '_link_discord') {
+          openDiscord()
+        }
       })
       .setOrigin(0, 0)
-    contentSizer.add(text, { align: 'top', expand: true })
+    contentSizer.add(text, { align: 'top' })
 
     panelSizer.add(contentSizer)
 
@@ -502,3 +505,20 @@ Thanks so much for playing! We couldn't do this without you 😊`
     super.beforeExit()
   }
 }
+
+const PATCH_NUMBER = '0.7.15'
+
+const URL = 'https://luma.com/1lsziprm'
+
+const NEWS_TEXT = `🕊️ A warm welcome to all our new players!
+Please consider joining our [area=_link_discord][color=#FABD5D]Discord server[/color][/area] to collect a one-time reward, receive strategy tips, and play excellent matches with excellent people.
+
+🏆 Our 11th tournament approaches!
+On April 4th, play for the chance to win 120$ in cash prizes, plus exclusive cosmetic rewards! [area=_link_register][color=#FABD5D]Register here[/color][/area]
+
+🌄 Journey Mode
+An all new Journey mode unfolds before you.
+Complete new missions with an ever-growing collection of cards as you learn about the characters who have arrived in the city. Earn gold as you learn to play the game!
+
+🌊 Card Borders
+Coming in March, a brand new visual redesign for the cards will go live!`

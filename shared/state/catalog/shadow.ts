@@ -45,7 +45,7 @@ const shadow = new Shadow({
   name: 'Shadow',
   id: 19,
   cost: 6,
-  points: 3,
+  points: 4,
   text: "Costs X, where X is the number of cards in your opponent's hand.",
   story:
     'Your pain blooms like flowers on a misty day.\nI breathe it in.\nPerhaps I can rest now.',
@@ -59,8 +59,8 @@ class Imprison extends Card {
         game.status[player ^ 1].nourish += -2
       }
     } else {
-      // If opponent had 2 or fewer points, give them nourish -1
-      if (game.score[player ^ 1] <= 2) {
+      // If opponent had 3 or fewer points, give them nourish -1
+      if (game.score[player ^ 1] <= 3) {
         game.status[player ^ 1].nourish += -1
       }
     }
@@ -71,7 +71,7 @@ const imprison = new Imprison({
   id: 35,
   cost: 3,
   points: 3,
-  text: 'At the end of this round, if your opponent has two or fewer points, they Nourish -1.',
+  text: 'At the end of this round, if your opponent has three or fewer points, they Nourish -1.',
   story:
     "All tied up\ncan't even stand\nAm I lethal to you and yours\nMy tight bonds calm me.",
 })

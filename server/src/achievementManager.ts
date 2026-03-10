@@ -26,6 +26,12 @@ export class AchievementManager {
     for (let i = 1; i <= 6; i++) {
       await this.unlockIf24hSincePrevious(playerId, i)
     }
+
+    // 1007: Sign in during December
+    const now = new Date()
+    if (now.getMonth() === 11) {
+      await this.unlock(playerId, 1007)
+    }
   }
 
   // Called after a game is played

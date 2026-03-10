@@ -19,12 +19,9 @@ const DIRECTORIES = [
   'img/card',
   'img/cutout',
   'img/icon',
-  'img/store',
   'img/background',
-  'img/journey',
   'img/border',
   'img/relic',
-  'img/pet',
   'img/roundResult',
   'img/chrome',
   'img/news',
@@ -34,9 +31,9 @@ const DIRECTORIES = [
 
 // Directories that should not use pixel art
 const NON_PIXEL_ART_DIRS = [
+  'avatar',
   'sfx',
   'dialog',
-  'pet',
   'roundResult',
   'background',
   'chrome',

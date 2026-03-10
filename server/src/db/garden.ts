@@ -2,8 +2,21 @@ import { db } from './db'
 import { players } from './schema'
 import { eq, sql } from 'drizzle-orm'
 import { GardenSettings } from '../../../shared/settings'
+import REWARD_AMOUNTS from '../../../shared/config/rewardAmounts'
 
 export default class Garden {
+  /** Index of the first plant ready to harvest, or -1. */
+  private static findReadyPlotIndex(gardenState: Date[]): number {
+    const now = new Date()
+    for (let i = 0; i < gardenState.length; i++) {
+      const plantedTime = gardenState[i]
+      const hoursElapsed =
+        (now.getTime() - plantedTime.getTime()) / (1000 * 60 * 60)
+      if (hoursElapsed >= GardenSettings.GROWTH_TIME_HOURS) return i
+    }
+    return -1
+  }
+
   // Plant a seed in an open plot in given player's garden
   static async plantSeed(playerId: string): Promise<boolean> {
     // Get current garden state
@@ -17,8 +30,13 @@ export default class Garden {
 
     const gardenState = [...player[0].garden]
 
-    // Don't plant if the garden is full
+    // If garden is full but has a plant ready to harvest, harvest it then plant
     if (gardenState.length >= GardenSettings.MAX_PLANTS) {
+      const readyIndex = Garden.findReadyPlotIndex(gardenState)
+      if (readyIndex !== -1) {
+        await Garden.harvest(playerId, readyIndex)
+        return Garden.plantSeed(playerId)
+      }
       return false
     }
 
@@ -82,8 +100,9 @@ export default class Garden {
     // Randomly select a reward from the distribution
     const reward = Math.floor(100 * Math.random())
 
-    // Random gold reward between 50-80 (inclusive)
-    const goldReward = Math.floor(Math.random() * 31) + 50
+    const goldReward =
+      Math.floor(Math.random() * REWARD_AMOUNTS.harvestVariance) +
+      REWARD_AMOUNTS.harvestConstant
 
     // Update the database with new garden state and add gold reward to coins
     await db

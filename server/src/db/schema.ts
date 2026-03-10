@@ -57,6 +57,7 @@ export const players = pgTable(
     pve_losses: integer('pve_losses').notNull(),
     inventory: varchar('inventory', { length: 1000 }).notNull(),
     completedmissions: varchar('completedmissions', { length: 1000 }).notNull(),
+    missiongoldclaimed: varchar('missiongoldclaimed', { length: 1000 }).notNull(),
     avatar_experience: integer('avatar_experience').array().notNull(),
 
     // TODO Rename this inventory after the map journey mode is removed
@@ -71,11 +72,18 @@ export const players = pgTable(
 
     // Cosmetic set
     cosmetic_set: varchar('cosmetic_set', { length: 1000 }).notNull(),
+
+    // Referral
+    ref: varchar('ref', { length: 255 }),
   },
   (table) => ({
     emailIdx: uniqueIndex('email_idx').on(table.email),
   }),
 )
+
+export const approvedRefs = pgTable('approved_refs', {
+  code: varchar('code', { length: 255 }).primaryKey(),
+})
 
 export const matchHistory = pgTable(
   'match_history',

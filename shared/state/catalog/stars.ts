@@ -49,11 +49,11 @@ class NightVision extends SightCard {
     game.tutor(player, 2)
   }
 }
-const nightVision = new NightVision(3, {
+const nightVision = new NightVision(4, {
   name: 'Night Vision',
   id: 28,
   cost: 1,
-  text: 'Put the top card with base cost 2 from your deck into your hand.\nWhen played, gain Sight 3.',
+  text: 'Put the top card with base cost 2 from your deck into your hand.\nWhen played, gain Sight 4.',
 })
 
 class Ecology extends Card {
@@ -65,7 +65,6 @@ const ecology = new Ecology({
   name: 'Ecology',
   id: 44,
   cost: 7,
-  points: 2,
   text: 'When played, gain 10 breath.',
 })
 
@@ -199,7 +198,7 @@ class Possibility extends Card {
 const possibility = new Possibility({
   name: 'Possibility',
   id: 95,
-  cost: 4,
+  cost: 3,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nIncrease your max breath by 1 permanently.',
 })

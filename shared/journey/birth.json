@@ -1,0 +1,92 @@
+[
+  {
+    "name": "Lush Origins",
+    "id": 500,
+    "prereq": [[100], [200]],
+    "difficulty": 2,
+    "deck": [2, 2, 2, 2, 4, 4, 4, 4, 9, 86, 11, 12, 13, 18, 18],
+    "opponent": [18, 18, 61, 61, 15, 15, 48, 48, 48, 7, 7, 33, 33, 4, 4],
+    "cards": [2, 86],
+    "tip": "When you Birth, first it creates a Child in hand if you don't have one, then raises the Children in your hand by that many points."
+  },
+  {
+    "name": "Dry Earth",
+    "id": 501,
+    "prereq": [[500]],
+    "difficulty": 2,
+    "deck": [2, 2, 2, 2, 78, 78, 78, 78, 8, 8, 8, 86, 18],
+    "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
+    "cards": [8],
+    "tip": "Because Birth adds the Child to hand when it resolves, you can't use their points until the next round."
+  },
+  {
+    "name": "Bloodied Hands",
+    "id": 502,
+    "prereq": [[501]],
+    "difficulty": 3,
+    "deck": [2, 2, 2, 2, 8, 8, 8, 11, 66, 22, 22],
+    "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
+    "cards": [22],
+    "tip": "Grow a Child too big and it stops getting much better: 10 points and 20 points aren't that different."
+  },
+  {
+    "name": "Boundaries",
+    "id": 503,
+    "prereq": [[502]],
+    "difficulty": 3,
+    "deck": [2, 2, 2, 0, 86, 86, 11, 53, 53, 18],
+    "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
+    "cards": [53],
+    "tip": "A Child can take up space in your hand, preventing you from drawing."
+  },
+  {
+    "name": "Mirror",
+    "id": 504,
+    "prereq": [[503]],
+    "difficulty": 3,
+    "deck": [2, 2, 2, 8, 8, 10, 22, 22],
+    "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
+    "cards": [8],
+    "tip": "Ancestry is often better played on a much later round, don’t let the 3-cost fool you."
+  },
+  {
+    "name": "Enduring Hope",
+    "id": 505,
+    "prereq": [[504]],
+    "difficulty": 4,
+    "deck": [2, 2, 2, 83, 83, 8, 8],
+    "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
+    "cards": [83],
+    "tip": "If you have 2 Children in hand, Birth will boost BOTH of their points."
+  },
+  {
+    "name": "Shoot Forth",
+    "id": 506,
+    "prereq": [[505]],
+    "difficulty": 4,
+    "deck": [2, 2, 78, 8, 8, 60, 60],
+    "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
+    "cards": [60],
+    "tip": "Playing a Child to win a round, instead of holding onto it forever, is often better in the long run."
+  },
+  {
+    "name": "Green Branches",
+    "id": 507,
+    "prereq": [[506]],
+    "difficulty": 5,
+    "deck": [4, 4, 4, 84, 53],
+    "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
+    "cards": [84],
+    "tip": "In a small deck, the Heirloom value can be huge."
+  },
+  {
+    "name": "Roots",
+    "id": 508,
+    "prereq": [[507]],
+    "difficulty": 5,
+    "deck": [55, 55, 55, 49, 49],
+    "opponent": [21, 17, 17, 14, 14, 14, 12, 12, 6, 3, 3, 3, 3, 3, 0],
+    "cards": [55],
+    "tip": "Rebirth combines well with cards that reduce their cost."
+  }
+]

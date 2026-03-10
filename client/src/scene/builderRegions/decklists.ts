@@ -40,6 +40,9 @@ export default class DecklistsRegion {
 
   // List of buttons for user-defined decks
   decklistBtns: Button[]
+  
+  // List of containers for deck buttons (for filtering visibility)
+  decklistContainers: ContainerLite[]
 
   // Image of the current avatar
   avatar: Phaser.GameObjects.Image
@@ -358,6 +361,7 @@ export default class DecklistsRegion {
       .setOnClick(this.decklistOnClick(i))
 
     this.decklistBtns.push(btn)
+    this.decklistContainers.push(container)
 
     return container
   }
@@ -404,13 +408,73 @@ export default class DecklistsRegion {
     // Remove any existing content in this panel
     panel.removeAll(true)
 
-    // Instantiate list of deck buttons
+    // Instantiate list of deck buttons and containers
     this.decklistBtns = []
+    this.decklistContainers = []
 
     // Create the preexisting decks
     for (var i = 0; i < UserSettings._get('decks').length; i++) {
       panel.add(this.createDeckBtn(i))
     }
+  }
+
+  // Filter which decks are visible based on the string
+  filter(s: string): void {
+    const panel = this.scrollablePanel.getElement('panel') as FixWidthSizer
+    
+    // Make all decks invisible first
+    this.decklistContainers.forEach((container) => {
+      container.setVisible(false)
+    })
+
+    // Remove greying from all decklists
+    this.decklistBtns.forEach((btn) => {
+      btn.enable()
+    })
+
+    // Remove all items from the panel (without destroying)
+    panel.removeAll(false)
+
+    if (!s) {
+      // No deck filter - add all deck buttons and make them visible
+      this.decklistContainers.forEach((container) => {
+        container.setVisible(true)
+        panel.add(container)
+      })
+      this.scrollablePanel.layout()
+      return
+    }
+
+    const decks = UserSettings._get('decks')
+
+    // Add and show only decks that contain a card matching the query
+    this.decklistContainers.forEach((container, index) => {
+      const deck = decks[index]
+      if (!deck) return
+
+      // Check if this deck contains a card with a name matching the query
+      let deckContainsCard = false
+      for (const cardId of deck.cards) {
+        try {
+          const card = Catalog.getCardById(cardId)
+          if (card.name.toLowerCase().includes(s)) {
+            deckContainsCard = true
+            break
+          }
+        } catch (e) {
+          // Skip invalid card IDs
+          continue
+        }
+      }
+
+      // Add button to panel and make it visible if deck contains the card
+      if (deckContainsCard) {
+        container.setVisible(true)
+        panel.add(container)
+      }
+    })
+
+    this.scrollablePanel.layout()
   }
 
   // Create the "New" button which prompts user to make a new deck

@@ -66,7 +66,7 @@ const pet = new Pet({
   id: 34,
   cost: 2,
   points: 2,
-  text: 'This permanently retains all changes to its points',
+  text: 'This permanently retains all changes to its points.',
 })
 
 class Hollow extends Card {

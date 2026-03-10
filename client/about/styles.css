@@ -222,6 +222,12 @@ p {
   color: #f0e3ca;
 }
 
+/* Mobile Discord button - uses same button1.png as Play Free */
+#mobile-message .signup-button {
+  background-image: url('assets/button1.png');
+  color: #f0e3ca;
+}
+
 /* Discord button - uses button2.png */
 .discord-section .signup-button {
   background-image: url('assets/button2.png');
@@ -236,8 +242,18 @@ p {
   text-decoration: none;
 }
 
+#mobile-message a {
+  text-decoration: none;
+}
+
 /* Play Free button hover */
 #play-free-container .signup-button:hover {
+  filter: brightness(1.15) contrast(1.05);
+  transition: all 0.2s ease;
+}
+
+/* Mobile Discord button hover */
+#mobile-message .signup-button:hover {
   filter: brightness(1.15) contrast(1.05);
   transition: all 0.2s ease;
 }

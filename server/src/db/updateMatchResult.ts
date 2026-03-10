@@ -138,6 +138,45 @@ export async function updateMatchResultPVE(
   }
 }
 
+/** Set bit at index to 1; pad with '0' if needed. */
+function setBitInBitstring(bitstring: string, index: number): string {
+  const arr = bitstring.split('')
+  while (arr.length <= index) arr.push('0')
+  arr[index] = '1'
+  return arr.join('')
+}
+
+/** When player wins a journey mission, mark mission complete and unlock cards on the server. */
+export async function updateJourneyProgress(
+  playerId: string,
+  missionID: number,
+  missionCards: number[],
+): Promise<void> {
+  const [row] = await db
+    .select({
+      completedmissions: players.completedmissions,
+      inventory: players.inventory,
+    })
+    .from(players)
+    .where(eq(players.id, playerId))
+    .limit(1)
+
+  if (row == null) return
+
+  let completedmissions = row.completedmissions ?? ''
+  let inventory = row.inventory ?? ''
+
+  completedmissions = setBitInBitstring(completedmissions, missionID)
+  for (const cardId of missionCards) {
+    inventory = setBitInBitstring(inventory, cardId)
+  }
+
+  await db
+    .update(players)
+    .set({ completedmissions, inventory })
+    .where(eq(players.id, playerId))
+}
+
 // Insert this match into the match history table
 async function insertMatchHistory(
   winnerId: string | null,

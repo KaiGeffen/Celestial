@@ -1,0 +1,92 @@
+[
+  {
+    "name": "Lost Footing",
+    "id": 100,
+    "prereq": [[]],
+    "difficulty": 1,
+    "deck": [0, 0, 4, 4, 4, 4, 6, 6, 7, 7, 12, 12, 13, 18, 18],
+    "opponent": [3, 3, 3, 3, 3, 3, 6, 6, 6, 11, 11, 11, 14, 14, 82],
+    "cards": [7],
+    "tip": "Playing cheap cards with Fleeting means your deck will be better after you shuffle."
+  },
+  {
+    "name": "Out of Reach",
+    "id": 101,
+    "prereq": [[100]],
+    "difficulty": 1,
+    "deck": [4, 4, 4, 4, 4, 65, 65, 7, 7, 7, 12, 12, 18],
+    "opponent": [4, 4, 4, 5, 5, 33, 33, 33, 11, 11, 11, 14, 14, 51, 51],
+    "cards": [65],
+    "tip": "Try to play Heron before you play too many cards without Fleeting, since it will cost 1 more breath for each card in your discard pile.\n\n You can also hold it until after you shuffle to make it cheap again."
+  },
+  {
+    "name": "The Cage",
+    "id": 102,
+    "prereq": [[101]],
+    "difficulty": 1,
+    "deck": [0, 4, 4, 4, 4, 65, 65, 7, 36, 36, 36],
+    "opponent": [5, 5, 5, 5, 5, 86, 86, 86, 11, 11, 12, 12, 14, 14, 14],
+    "cards": [36],
+    "tip": "Vulture gives you Nourish when it's played instead of when it resolves.\n\nThis means if your points are set to 0 earlier in the round, Vulture can be worth 5 points."
+  },
+  {
+    "name": "Hit the Ground",
+    "id": 103,
+    "prereq": [[102]],
+    "difficulty": 2,
+    "deck": [0, 4, 4, 4, 4, 4, 7, 11, 51, 51],
+    "opponent": [0, 3, 3, 3, 3, 3, 86, 86, 11, 11, 14, 14, 14, 17, 17],
+    "cards": [51],
+    "tip": "Phoenix is best when played early, so try to ramp into it."
+  },
+  {
+    "name": "Take Flight",
+    "id": 104,
+    "prereq": [[103]],
+    "difficulty": 2,
+    "deck": [0, 4, 4, 4, 9, 6, 12, 36, 61],
+    "opponent": [3, 3, 3, 3, 3, 6, 6, 64, 64, 64, 14, 14, 14, 17, 17],
+    "cards": [61],
+    "tip": "Sometimes you just need a card worth lots of points."
+  },
+  {
+    "name": "Turbulence",
+    "id": 105,
+    "prereq": [[104]],
+    "difficulty": 2,
+    "deck": [4, 4, 4, 4, 24, 24, 7, 36],
+    "opponent": [5, 5, 3, 3, 3, 3, 3, 32, 86, 86, 15, 15, 17, 18, 18],
+    "cards": [24],
+    "tip": "Don't cover up the Nest, and it will keep making Doves round after round."
+  },
+  {
+    "name": "Open Skies",
+    "id": 106,
+    "prereq": [[105]],
+    "difficulty": 3,
+    "deck": [5, 5, 37, 37, 37, 56, 56],
+    "opponent": [3, 3, 3, 3, 3, 3, 6, 6, 6, 6, 11, 11, 14, 14, 17],
+    "cards": [37],
+    "tip": "Rooster doesn't need to be immediately on top of a card in the discard pile to trigger its Morning ability."
+  },
+  {
+    "name": "A Fleeting Doubt",
+    "id": 107,
+    "prereq": [[106]],
+    "difficulty": 3,
+    "deck": [7, 7, 7, 59, 59],
+    "opponent": [3, 3, 3, 3, 3, 15, 15, 14, 14, 51, 51, 17, 20],
+    "cards": [59],
+    "tip": "If your deck is full of Fleeting cards, Fledgling won't get covered and can come out more often after you shuffle."
+  },
+  {
+    "name": "Beyond the Clouds",
+    "id": 108,
+    "prereq": [[107]],
+    "difficulty": 3,
+    "deck": [26, 26, 26, 66],
+    "opponent": [2, 2, 2, 105, 4, 4, 6, 31, 31, 71, 71, 12, 12, 54, 54],
+    "cards": [66],
+    "tip": "Getting rid of lower cost cards can turn any deck into a hyperthin list."
+  }
+]

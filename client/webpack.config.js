@@ -16,6 +16,7 @@ module.exports = (_, argv) => {
       ],
     },
     mode: isProd ? 'production' : 'development',
+    devtool: false, // Explicitly disable source maps to remove eval warning
     resolve: {
       extensions: ['.ts', '.tsx', '.js'],
       alias: {
@@ -77,8 +78,9 @@ module.exports = (_, argv) => {
       }),
     ],
     performance: {
-      maxEntrypointSize: 512000,
-      maxAssetSize: 512000,
+      maxEntrypointSize: 3000000, // 3 MB - reasonable for a game
+      maxAssetSize: 1500000, // 1.5 MB per asset
+      hints: 'warning', // Show warnings but don't fail the build
     },
   }
 

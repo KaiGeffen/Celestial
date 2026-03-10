@@ -6,20 +6,14 @@ import HomeScene from './scene/homeScene'
 import {
   StandardMatchScene,
   JourneyMatchScene,
-  MapJourneyMatchScene,
   RaceMatchScene,
 } from './scene/matchScene'
 import TutorialMatchScene from './scene/tutorialScene'
-import {
-  BuilderScene,
-  JourneyBuilderScene,
-  MapJourneyBuilderScene,
-} from './scene/builderScene'
+import { BuilderScene, MapJourneyBuilderScene } from './scene/builderScene'
 import MatchHistoryScene from './scene/matchHistoryScene'
 
-import JourneyScene from './scene/journeyScene'
 import PlaceholderScene from './scene/placeholderScene'
-import MapJourneyScene from './scene/mapJourneyScene'
+import JourneyScene from './scene/journeyScene'
 import RaceScene from './scene/raceScene'
 
 import { Space } from './settings/settings'
@@ -39,7 +33,6 @@ import ContainerLitePlugin from 'phaser3-rex-plugins/plugins/containerlite-plugi
 import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
 import StoreScene from './scene/storeScene'
 import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin.js'
-import CharacterProfileScene from './scene/characterProfileScene'
 import MapScene from './scene/MapScene'
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -61,20 +54,15 @@ const config: Phaser.Types.Core.GameConfig = {
     HomeScene,
     MenuScene,
     StandardMatchScene,
-    JourneyMatchScene,
     TutorialMatchScene,
-    JourneyBuilderScene,
     PlaceholderScene,
     BuilderScene,
     MapScene,
-    JourneyScene,
     MatchHistoryScene,
     StoreScene,
-    CharacterProfileScene,
-
     // Allowing old map based journey mode
-    MapJourneyScene,
-    MapJourneyMatchScene,
+    JourneyScene,
+    JourneyMatchScene,
     MapJourneyBuilderScene,
     // Race mode
     RaceScene,

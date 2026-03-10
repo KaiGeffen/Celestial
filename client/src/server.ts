@@ -10,6 +10,7 @@ import {
   UUID_NAMESPACE,
 } from '../../shared/network/settings'
 import type { GoogleJwtPayload } from './types/google'
+import jwt_decode from 'jwt-decode'
 import { ClientWS } from '../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../shared/types/deck'
 import { CosmeticSet } from '../../shared/types/cosmeticSet'
@@ -31,10 +32,12 @@ type UserData = null | {
   uuid: string
   username: string
   elo: number
+  pveWins: number
   garden: Date[]
   gems: number
   coins: number
   ownedItems: number[]
+  missionGoldClaimed: boolean[]
   cosmeticSet: CosmeticSet
   achievements: Achievement[]
 }
@@ -42,6 +45,10 @@ type UserData = null | {
 export default class Server {
   private static userData: UserData = null
   static pendingReconnect: { state: GameModel } | null = null
+  static activePlayers: {
+    username: string
+    cosmeticSet: CosmeticSet
+  }[] = []
 
   // Log in with the server for user with given OAuth token
   static login(payload: GoogleJwtPayload, game: Phaser.Game, callback) {
@@ -139,6 +146,7 @@ export default class Server {
         const decks = UserSettings._get('decks')
         const inventory = UserSettings._get('inventory')
         const missions = UserSettings._get('completedMissions')
+        const ref = Server.getReferralCode()
 
         server.send({
           type: 'sendInitialUserData',
@@ -146,6 +154,7 @@ export default class Server {
           decks: decks,
           inventory: Server.convertBoolArrayToBitString(inventory),
           missions: Server.convertBoolArrayToBitString(missions),
+          ref,
         })
       })
       .on('invalidToken', () => {
@@ -169,6 +178,10 @@ export default class Server {
           uuid,
           ...data,
           garden: data.garden.map((dateStr) => new Date(dateStr)),
+          missionGoldClaimed: data.missionGoldClaimed
+            .toString()
+            .split('')
+            .map((char) => char === '1'),
         }
 
         this.loadUserData(data, game)
@@ -204,6 +217,13 @@ export default class Server {
         // Store reconnect data for PreloadScene to handle after assets load
         this.pendingReconnect = { state: data.state }
       })
+      .on(
+        'broadcastOnlinePlayersList',
+        (data: messagesToClient['broadcastOnlinePlayersList']) => {
+          // Store the list of players in a static field
+          this.activePlayers = data.players
+        },
+      )
 
     server.ws.onerror = (event: Event) => {
       console.error(`WebSocket error: ${event}`)
@@ -288,6 +308,21 @@ export default class Server {
     })
   }
 
+  static claimMissionGold(missionId: number): void {
+    if (!server || !server.isOpen()) {
+      console.error('Claiming mission gold when server ws doesnt exist.')
+      return
+    }
+    if (this.userData) {
+      this.userData.missionGoldClaimed = this.userData.missionGoldClaimed || []
+      this.userData.missionGoldClaimed[missionId] = true
+    }
+    server.send({
+      type: 'claimMissionGold',
+      missionId,
+    })
+  }
+
   static setCosmeticSet(cosmeticSet: CosmeticSet): void {
     if (!server || !server.isOpen()) {
       console.error('Setting cosmetic set when server ws doesnt exist.')
@@ -303,12 +338,20 @@ export default class Server {
     })
   }
 
+  // Get the referral code
+  private static getReferralCode(): string | undefined {
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('ref')
+  }
+
   // Send all data necessary to initialize a user
   static sendInitialUserData(username: string): void {
     if (!server || !server.isOpen()) {
       console.error('Sending initial user data when server ws doesnt exist.')
       return
     }
+
+    const ref = this.getReferralCode()
 
     server.send({
       type: 'sendInitialUserData',
@@ -320,6 +363,7 @@ export default class Server {
       missions: this.convertBoolArrayToBitString(
         UserSettings._get('completedMissions'),
       ),
+      ref,
     })
   }
 
@@ -329,10 +373,12 @@ export default class Server {
         uuid: null,
         username: null,
         elo: null,
+        pveWins: 0,
         garden: [],
         gems: null,
         coins: null,
         ownedItems: [],
+        missionGoldClaimed: [],
         cosmeticSet: {
           avatar: 0,
           border: 0,
@@ -419,7 +465,6 @@ export default class Server {
           .map((char) => char === '1'),
       ),
     )
-
     sessionStorage.setItem('decks', JSON.stringify(data.decks))
     sessionStorage.setItem(
       'avatar_experience',
@@ -428,6 +473,58 @@ export default class Server {
 
     // Emit event so scenes can refresh if needed
     game.events.emit('userDataUpdated')
+  }
+
+  // Attempt to reconnect by sending stored token or guest UUID
+  static reconnect(game: Phaser.Game): void {
+    // Close existing server connection if it exists
+    if (server) {
+      server.close()
+      server = undefined
+    }
+
+    // Create a new socket connection
+    server = Server.getSocket()
+
+    const storedToken = localStorage.getItem(Url.gsi_token)
+    if (storedToken !== null) {
+      console.log('Reconnecting with stored token')
+      // User signed in with OAuth - decode token and send signIn
+      try {
+        const payload = jwt_decode<GoogleJwtPayload>(storedToken)
+        const email = payload.email
+        const uuid = uuidv5(payload.sub, UUID_NAMESPACE)
+        const jti = payload.jti
+
+        server.onOpen(() => {
+          server.send({
+            type: 'signIn',
+            email,
+            uuid,
+            jti,
+          })
+        })
+
+        // Register handlers
+        this.registerCommonHandlers(uuid, game, () => {})
+      } catch (e) {
+        console.error('Failed to decode token during reconnect:', e)
+      }
+    } else {
+      // User signed in as guest - get guest UUID and send signIn
+      const guestUuid = localStorage.getItem('guest_uuid')
+      if (guestUuid) {
+        server.onOpen(() => {
+          server.send({
+            type: 'signIn',
+            uuid: guestUuid,
+          })
+        })
+
+        // Register handlers
+        this.registerCommonHandlers(guestUuid, game, () => {})
+      }
+    }
   }
 
   // Get a websocket right for the current environment

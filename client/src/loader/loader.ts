@@ -61,20 +61,6 @@ export default class Loader {
               frameWidth: dims.width,
               frameHeight: dims.height,
             })
-
-            // Set up animations for round sprites
-            if (directory === 'roundResult') {
-              scene.load.once('complete', () => {
-                scene.anims.create({
-                  key: key,
-                  frameRate: 2,
-                  frames: scene.anims.generateFrameNumbers(key, {
-                    start: 0,
-                    end: 3,
-                  }),
-                })
-              })
-            }
           } else {
             // Regular image file
             const filepath = `img/${directory}/${file}.${EXTENSION}`
@@ -135,5 +121,24 @@ export default class Loader {
   // Loads all video textures
   private static loadVideos(scene: Phaser.Scene): void {
     // scene.load.video('priorityHighlight', 'priority.mp4')
+  }
+
+  // Load tutorial cutscenes
+  static loadTutorialCutscenes(scene: Phaser.Scene): void {
+    scene.load.path = 'assets/'
+    scene.load.image('tutorial-1', 'img/tutorial/1.webp')
+    scene.load.image('tutorial-2', 'img/tutorial/2.webp')
+    scene.load.image('tutorial-3', 'img/tutorial/3.webp')
+    scene.load.image('tutorial-4', 'img/tutorial/4.webp')
+  }
+
+  // Load journey map and mission images
+  static loadJourneyMapAndMission(scene: Phaser.Scene): void {
+    scene.load.path = 'assets/'
+    scene.load.image('journey-Map', 'img/journey/Map.webp')
+    scene.load.image('journey-Mission', 'img/journey/Mission.webp')
+    scene.load.image('journey-AltMap', 'img/journey/AltMap.webp')
+
+    scene.load.start()
   }
 }

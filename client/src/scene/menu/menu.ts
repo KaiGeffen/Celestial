@@ -150,14 +150,14 @@ import ChoosePremade from './choosePremade'
 import CreditsMenu from './credits'
 import RulebookMenu from './rulebook'
 import { NewDeckMenu, EditDeckMenu } from './alterDeck'
-import ModeMenu from './mode'
 import ConfirmMenu from './confirm'
 import MessageMenu from './message'
+import ChapterMessageMenu from './chapterMessage'
 import FocusMenu from './focus'
 import SearchMenu from './search'
 import LeaderboardMenu from './leaderboard'
+import OnlinePlayersMenu from './onlinePlayers'
 import { RegisterUsernameMenu } from './registerUsername'
-import PurchaseGemsMenu from './purchaseGems'
 import PurchaseItemMenu from './purchaseItem'
 import UserProfileMenu from './userProfile'
 import AchievementsMenu from './achievements'
@@ -174,15 +174,15 @@ const menus = {
   credits: CreditsMenu,
   rulebook: RulebookMenu,
   newDeck: NewDeckMenu,
-  mode: ModeMenu,
   editDeck: EditDeckMenu,
   confirm: ConfirmMenu,
   message: MessageMenu,
+  chapterMessage: ChapterMessageMenu,
   focus: FocusMenu,
   search: SearchMenu,
   leaderboard: LeaderboardMenu,
+  onlinePlayers: OnlinePlayersMenu,
   registerUsername: RegisterUsernameMenu,
-  purchaseGems: PurchaseGemsMenu,
   purchaseItem: PurchaseItemMenu,
   userProfile: UserProfileMenu,
   achievements: AchievementsMenu,

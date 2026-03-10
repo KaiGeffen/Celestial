@@ -61,6 +61,7 @@ const fishingBoat = new FishingBoat({
   name: 'Fishing Boat',
   id: 32,
   cost: 2,
+  points: 1,
   text: 'Put the top 3 cards with base cost 1 from your deck into your hand.',
 })
 
@@ -123,8 +124,8 @@ class GentleRain extends Card {
 const gentleRain = new GentleRain({
   name: 'Gentle Rain',
   id: 71,
-  cost: 4,
-  points: 2,
+  cost: 3,
+  points: 1,
   text: "Nourish 1 for each card you've drawn this round.",
 })
 

@@ -20,7 +20,6 @@ export default class StoreScene extends BaseSceneWithHeader {
   create(): void {
     this.createBackground()
     super.create({ title: 'Store' })
-    // this.createPurchaseGemsButton()
     this.createStoreItems()
 
     // Refresh store when user data is updated (e.g., after purchase)
@@ -36,30 +35,6 @@ export default class StoreScene extends BaseSceneWithHeader {
       width: `100%`,
       height: `100%`,
     })
-  }
-
-  private createPurchaseGemsButton(): void {
-    // Add the purchase gems button to the right of the Back button
-    const container = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: container,
-      text: 'Purchase 💎',
-      f: () => this.scene.launch('MenuScene', { menu: 'purchaseGems' }),
-    })
-
-    // Position to the right of the Back button
-    // Back button is at Space.pad + Space.buttonWidth / 2
-    // So this button's center should be at: Space.pad + Space.buttonWidth + Space.pad + Space.buttonWidth / 2
-    container.setPosition(
-      Space.pad + Space.buttonWidth + Space.pad + Space.buttonWidth / 2,
-      this.headerHeight / 2,
-    )
   }
 
   private createStoreItems() {
@@ -93,10 +68,28 @@ export default class StoreScene extends BaseSceneWithHeader {
       return !cardInventory[card.id]
     })
 
-    // Create store items for each card
-    cards.forEach((card) => {
-      sizer.add(this.createCardItem(card))
-    })
+    // If all cards are owned, show a message instead
+    if (cards.length === 0) {
+      // Use a vertical sizer to center the message
+      const messageSizer = this.rexUI.add.sizer({
+        orientation: 'vertical',
+        width: Space.windowWidth,
+        height: Space.windowHeight - this.headerHeight,
+      })
+      const messageText = this.add
+        .text(0, 0, 'All cards owned', Style.announcement)
+        .setOrigin(0.5)
+      messageSizer.addSpace()
+      messageSizer.add(messageText)
+      messageSizer.addSpace()
+      messageSizer.layout()
+      sizer.add(messageSizer)
+    } else {
+      // Create store items for each card
+      cards.forEach((card) => {
+        sizer.add(this.createCardItem(card))
+      })
+    }
 
     sizer.layout()
 

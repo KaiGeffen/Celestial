@@ -37,7 +37,6 @@
     "webpack-cli": "^4.5.0"
   },
   "dependencies": {
-    "@stripe/stripe-js": "^6.1.0",
     "@types/facebook-js-sdk": "^3.3.6",
     "@types/gapi": "^0.0.41",
     "@types/gapi.auth2": "^0.0.55",

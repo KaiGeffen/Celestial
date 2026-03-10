@@ -1,0 +1,92 @@
+[
+  {
+    "name": "Going Under",
+    "id": 700,
+    "prereq": [[202]],
+    "difficulty": 2,
+    "deck": [5, 5, 14, 14, 14, 20, 20, 21, 21],
+    "opponent": [4, 4, 4, 4, 4, 86, 86, 86, 71, 71, 71, 14, 14, 14, 56],
+    "cards": [5],
+    "tip": "Filling up your discard pile, providing Rooster targets, and keeping you from drawing cards you know you don't want - Drown does it all."
+  },
+  {
+    "name": "Dependable Friend",
+    "id": 701,
+    "prereq": [[300]],
+    "difficulty": 2,
+    "deck": [1, 1, 1, 63, 63, 13, 19, 19],
+    "opponent": [4, 4, 4, 4, 65, 65, 6, 33, 33, 36, 36, 36, 36, 51, 51],
+    "cards": [63],
+    "tip": "Dew provides a reliable source of 1 point every round, but be careful of stuffing you hand too full."
+  },
+  {
+    "name": "Teach a Man to Fish",
+    "id": 702,
+    "prereq": [[303]],
+    "difficulty": 2,
+    "deck": [1, 1, 1, 1, 32, 68, 68],
+    "opponent": [0, 4, 78, 78, 78, 78, 69, 69, 69, 48, 48, 101, 52, 81, 57],
+    "cards": [32],
+    "tip": "Honestly try to play Fishing Boat after you shuffle, it's better that way."
+  },
+  {
+    "name": "What I Need to Grow",
+    "id": 703,
+    "prereq": [[404]],
+    "difficulty": 3,
+    "deck": [75, 75, 75, 103, 103, 71, 71],
+    "opponent": [0, 105, 78, 6, 31, 31, 69, 69, 48, 48, 11, 11, 80, 80, 52],
+    "cards": [71],
+    "tip": "Gentle Rain gets worse if your hand is too full for you to draw cards."
+  },
+  {
+    "name": "Never Enough",
+    "id": 704,
+    "prereq": [[500]],
+    "difficulty": 3,
+    "deck": [2, 2, 2, 63, 86, 46],
+    "opponent": [63, 63, 63, 8, 8, 68, 68, 48, 58, 58, 13, 49, 49, 49, 23],
+    "cards": [46],
+    "tip": "While it forces you to commit hard to a round, Excess is a huge amount of points for the right low-curve deck."
+  },
+  {
+    "name": "Melting Away",
+    "id": 705,
+    "prereq": [[305]],
+    "difficulty": 4,
+    "deck": [1, 1, 68, 68, 54, 54, 17],
+    "opponent": [1, 1, 1, 4, 4, 86, 86, 86, 48, 48, 13, 13, 19, 19, 19],
+    "cards": [54],
+    "tip": "You can pass more often if you start a round with priority, or play a high-points card."
+  },
+  {
+    "name": "Gain and Loss",
+    "id": 706,
+    "prereq": [[208]],
+    "difficulty": 4,
+    "deck": [42, 42, 42, 42, 42, 103, 103, 64],
+    "opponent": [0, 0, 63, 63, 3, 3, 3, 6, 6, 31, 14, 14, 17, 20, 21],
+    "cards": [103],
+    "tip": "Getting rid of cards you don't want in the matchup, or cards that are too cheap once you get to the late game can help you win with ease."
+  },
+  {
+    "name": "The Water I Live In",
+    "id": 707,
+    "prereq": [[400]],
+    "difficulty": 4,
+    "deck": [0, 0, 4, 4, 4, 33, 33, 33, 101, 101],
+    "opponent": [0, 0, 63, 63, 63, 25, 6, 86, 86, 15, 15, 15, 18, 18, 23],
+    "cards": [101],
+    "tip": "Fish only triggers at the start of the game if you choose not to mulligan it."
+  },
+  {
+    "name": "Rainstorm",
+    "id": 708,
+    "prereq": [[108], [208], [308], [408], [508], [608]],
+    "difficulty": 5,
+    "deck": [102, 102],
+    "opponent": [2, 2, 2, 2, 4, 4, 8, 8, 8, 10, 60, 11, 15, 22, 22],
+    "cards": [102],
+    "tip": "The Exhale abilities trigger from top to bottom, and multiple can trigger as long as you have enough breath."
+  }
+]

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Celestial | Streamer overlay</title>
+
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.svg" />
+    <link rel="stylesheet" href="streamer.css" />
+  </head>
+  <body>
+    <div class="streamer-1x1">
+      <div class="streamer-logo-wrap">
+        <img
+          src="../assets/logo.svg"
+          alt="CELESTIAL Decks"
+          class="streamer-logo"
+        />
+      </div>
+      <p class="streamer-count-label"></p>
+      <p id="ref-count" class="streamer-count"></p>
+    </div>
+
+    <script>
+      ;(function () {
+        var el = document.getElementById('ref-count')
+        var labelEl = document.querySelector('.streamer-count-label')
+        var params = new URLSearchParams(window.location.search)
+        var referrer = params.get('ref')
+
+        const REFERRAL_COUNT_PORT = 5560
+        var refCountUrl =
+          window.location.hostname === 'localhost' ||
+          window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:' + REFERRAL_COUNT_PORT + '/ref-count'
+            : 'https://celestialdecks.gg/ref-count'
+
+        // Set the count of sign ups for the given ref code
+        function setCount(n) {
+          if (labelEl) labelEl.textContent = '!celestial sign ups'
+          if (el)
+            el.textContent = typeof n === 'number' ? n.toLocaleString() : n
+        }
+
+        // Show the message when no ref code is provided
+        function showNoReferrer() {
+          if (labelEl)
+            labelEl.textContent = 'Include ref code:   .../?ref=yourcode'
+          if (el) el.textContent = ''
+        }
+
+        // Show the message when the ref code is invalid
+        function showReferrerInvalid() {
+          if (labelEl) labelEl.textContent = `Invalid ref code: "${referrer}"`
+          if (el) el.textContent = ''
+        }
+
+        if (!referrer) {
+          showNoReferrer()
+          return
+        }
+
+        function fetchCount() {
+          fetch(refCountUrl + '/' + encodeURIComponent(referrer))
+            .then(function (r) {
+              return r.json()
+            })
+            .then(function (d) {
+              if (d && d.count === -1) {
+                showReferrerInvalid()
+              } else {
+                setCount(typeof d.count === 'number' ? d.count : 0)
+              }
+            })
+            .catch(function () {
+              if (labelEl) labelEl.textContent = 'Error fetching count'
+            })
+        }
+
+        fetchCount()
+        setInterval(fetchCount, 3000)
+      })()
+    </script>
+  </body>
+</html>

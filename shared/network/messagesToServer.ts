@@ -26,6 +26,7 @@ export default interface messagesToServer {
     decks: Deck[]
     inventory: string
     missions: string
+    ref?: string
   }
   purchaseItem: {
     id: number
@@ -38,6 +39,9 @@ export default interface messagesToServer {
   harvestGarden: {
     index: number
   }
+  claimMissionGold: {
+    missionId: number
+  }
   // Queueing events
   initPvp: {
     password: string
@@ -48,6 +52,11 @@ export default interface messagesToServer {
     aiDeck: Deck
     uuid: string
     deck: Deck
+  }
+  initMission: {
+    uuid: string
+    deck: Deck
+    missionID: number
   }
   initTutorial: {
     num: number

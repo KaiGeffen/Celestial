@@ -248,10 +248,10 @@ export const BBStyle: Record<string, any> = {
     },
     // strokeThickness: 3,
     padding: {
-      left: Space.padSmall,
-      right: Space.padSmall,
-      top: Space.padSmall,
-      bottom: Space.padSmall,
+      left: 20,
+      right: 20,
+      top: 20,
+      bottom: 20,
     },
     // lineSpacing: Space.cardHeight - Space.pad,
   }, // Error text that appears in the center of the screen

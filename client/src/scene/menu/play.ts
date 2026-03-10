@@ -2,6 +2,7 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
+import AvatarButton from '../../lib/buttons/avatar'
 import {
   Color,
   Messages,
@@ -9,6 +10,7 @@ import {
   Style,
   BBStyle,
   UserSettings,
+  Ease,
 } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
@@ -32,20 +34,22 @@ const playPanelWidth = 500
 export default class PlayMenu extends Menu {
   password: string
   inputText
-  btnPwd: Button
-  friendlyMatchButton: Button
+  pwdBtn: Button
   decklist: Decklist
   deck: Deck
   gardenTimes: (Date | null)[] // Fixed-length array, some indices may be null
   gardenPlants: (Phaser.GameObjects.Image | null)[] // Fixed-length array, some indices may be null
   gardenTimers: (Phaser.GameObjects.Text | null)[] // Fixed-length array, some indices may be null
   plantSizers: (any | null)[] // Fixed-length array of plant sizers
+  plantGlowTweens: (Phaser.Tweens.Tween | null)[] // Fixed-length array of glow tweens for each plant
   clickedHarvestIndex: number | null = null // Track which index was clicked for harvest
   txtDeckName: RexUIPlugin.BBCodeText
-  avatar: Button
+  avatar: AvatarButton
   txtDeckValidation: Phaser.GameObjects.Text
   playOptionButtons: Button[] = []
   gardenSizer: any // Store reference to garden sizer for updates
+  btnPrevDeck: Button
+  btnNextDeck: Button
 
   private activeScene: Phaser.Scene
 
@@ -63,28 +67,24 @@ export default class PlayMenu extends Menu {
       }
     }
 
-    // Get the deck from params or use the equipped deck
+    // Get the equipped deck from UserSettings
     this.activeScene = params.activeScene
-    if (params.deck) {
-      this.deck = params.deck
-    } else {
-      const decks = UserSettings._get('decks')
-      const equippedDeckIndex = UserSettings._get('equippedDeckIndex') || 0
+    const decks = UserSettings._get('decks')
+    const equippedDeckIndex = UserSettings._get('equippedDeckIndex') || 0
 
-      if (decks && decks.length > 0) {
-        // Use equipped deck index, or fall back to 0 if index is invalid
-        const validIndex = Math.min(equippedDeckIndex, decks.length - 1)
-        this.deck = decks[validIndex] || decks[0]
-      } else {
-        // Default empty deck
-        this.deck = {
-          name: 'No Deck',
-          cards: [],
-          cosmeticSet: Server.getUserData().cosmeticSet || {
-            avatar: 0,
-            border: 0,
-          },
-        }
+    if (decks && decks.length > 0) {
+      // Use equipped deck index, or fall back to 0 if index is invalid
+      const validIndex = Math.min(equippedDeckIndex, decks.length - 1)
+      this.deck = decks[validIndex] || decks[0]
+    } else {
+      // Default empty deck
+      this.deck = {
+        name: 'No Deck',
+        cards: [],
+        cosmeticSet: Server.getUserData().cosmeticSet || {
+          avatar: 0,
+          border: 0,
+        },
       }
     }
 
@@ -106,6 +106,77 @@ export default class PlayMenu extends Menu {
     this.scene.game.events.on('gardenHarvested', this.onGardenHarvested, this)
   }
 
+  private switchToPreviousDeck(): void {
+    const decks = UserSettings._get('decks')
+    if (!decks || decks.length <= 1) return
+
+    const currentIndex = UserSettings._get('equippedDeckIndex') || 0
+    const newIndex = (currentIndex - 1 + decks.length) % decks.length
+    UserSettings._set('equippedDeckIndex', newIndex)
+    this.updateDeck(decks[newIndex])
+  }
+
+  private switchToNextDeck(): void {
+    const decks = UserSettings._get('decks')
+    if (!decks || decks.length <= 1) return
+
+    const currentIndex = UserSettings._get('equippedDeckIndex') || 0
+    const newIndex = (currentIndex + 1) % decks.length
+    UserSettings._set('equippedDeckIndex', newIndex)
+    this.updateDeck(decks[newIndex])
+  }
+
+  private updateDeck(newDeck: Deck): void {
+    this.deck = newDeck
+
+    // Update deck name
+    this.txtDeckName.setText(this.deck.name || '')
+
+    // Update avatar
+    if (this.avatar) {
+      this.avatar.setAvatar(this.deck.cosmeticSet?.avatar || 0)
+      this.avatar.setBorder(this.deck.cosmeticSet?.border || 0)
+    }
+
+    // Update decklist
+    const deckCards: Card[] = this.deck.cards
+      .map((id) => {
+        try {
+          return Catalog.getCardById(id)
+        } catch (e) {
+          return null
+        }
+      })
+      .filter((card) => card !== null && card !== undefined)
+
+    this.decklist.setDeck(deckCards, false)
+    this.decklist.sizer.layout()
+
+    // Update validation message
+    const deckSize = this.deck.cards ? this.deck.cards.length : 0
+    const isValid = deckSize === MechanicsSettings.DECK_SIZE
+
+    if (this.txtDeckValidation) {
+      if (!isValid) {
+        this.txtDeckValidation.setVisible(true)
+      } else {
+        this.txtDeckValidation.setVisible(false)
+      }
+    }
+
+    // Enable/disable play buttons based on deck validity
+    this.playOptionButtons.forEach((button) => {
+      if (isValid) {
+        button.enable()
+      } else {
+        button.disable()
+      }
+    })
+
+    // Update PWD button (depends on both password and deck validity)
+    this.updatePwdButton()
+  }
+
   close() {
     // Clean up event listener
     if (this.scene && this.scene.game) {
@@ -125,7 +196,7 @@ export default class PlayMenu extends Menu {
   }
 
   private createContent() {
-    // Create main horizontal sizer for left (deck) and right (play options + garden) panels
+    // Create main horizontal sizer for left (play options + garden) and right (deck) panels
     const mainSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
       width: menuWidth - Space.pad * 2,
@@ -136,13 +207,13 @@ export default class PlayMenu extends Menu {
       },
     })
 
-    // Left panel: Deck
-    const deckPanel = this.createDeckPanel()
-    mainSizer.add(deckPanel, { align: 'top' })
-
-    // Right panel: Play options with garden at bottom - align to top
+    // Left panel: Play options with garden at bottom - align to top
     const playPanel = this.createPlayPanel()
     mainSizer.add(playPanel, { align: 'top' })
+
+    // Right panel: Deck
+    const deckPanel = this.createDeckPanel()
+    mainSizer.add(deckPanel, { align: 'top' })
 
     this.sizer.add(mainSizer).addNewLine()
   }
@@ -172,9 +243,9 @@ export default class PlayMenu extends Menu {
       .setInteractive()
     this.scene.addShadow(deckNameBackground, -90)
 
-    const deckNameSizer = this.scene.rexUI.add.fixWidthSizer({
+    const deckNameSizer = this.scene.rexUI.add.sizer({
+      orientation: 'horizontal',
       width: deckPanelWidth,
-      align: 'center',
       space: {
         top: Space.pad,
         bottom: Space.pad,
@@ -182,16 +253,41 @@ export default class PlayMenu extends Menu {
     })
     deckNameSizer.addBackground(deckNameBackground)
 
+    // Previous deck button (<)
+    const decks = UserSettings._get('decks')
+    const hasMultipleDecks = decks && decks.length > 1
+
+    this.btnPrevDeck = new Buttons.Text(this.scene, 0, 0, '<', () =>
+      this.switchToPreviousDeck(),
+    )
+    if (!hasMultipleDecks) {
+      this.btnPrevDeck.txt.setAlpha(0.5)
+      this.btnPrevDeck.txt.disableInteractive()
+    }
+    deckNameSizer.add(this.btnPrevDeck.txt)
+
+    // Deck name
     this.txtDeckName = this.scene.rexUI.add
       .BBCodeText()
       .setStyle({
         ...BBStyle.deckName,
         fixedHeight: 50 + Space.padSmall,
-        fixedWidth: deckPanelWidth - Space.pad * 2,
+        fixedWidth: deckPanelWidth - 25,
       })
       .setOrigin(0.5)
       .setText(this.deck.name || '')
-    deckNameSizer.add(this.txtDeckName)
+    deckNameSizer.add(this.txtDeckName, { expand: true })
+
+    // Next deck button (>)
+    this.btnNextDeck = new Buttons.Text(this.scene, 0, 0, '>', () =>
+      this.switchToNextDeck(),
+    )
+    if (!hasMultipleDecks) {
+      this.btnNextDeck.txt.setAlpha(0.5)
+      this.btnNextDeck.txt.disableInteractive()
+    }
+    deckNameSizer.add(this.btnNextDeck.txt)
+
     panelSizer.add(deckNameSizer).addNewLine()
 
     // Change Deck button and Avatar side by side, centered
@@ -353,10 +449,10 @@ export default class PlayMenu extends Menu {
     titleSizer.add(txtTitle)
     contentSizer.add(titleSizer).addNewLine()
 
-    // Practice (vs AI)
+    // Versus Computer
     contentSizer
       .add(
-        this.createPlayOption('Practice (vs AI)', 'Go', () => {
+        this.createPlayOption('Versus Computer', 'Go', () => {
           if (!server || !server.isOpen()) {
             this.scene.signalError(Messages.disconnectError)
             return
@@ -375,10 +471,10 @@ export default class PlayMenu extends Menu {
       )
       .addNewLine()
 
-    // Ranked Match
+    // Versus Human
     contentSizer
       .add(
-        this.createPlayOption('Ranked Match', 'Go', () => {
+        this.createPlayOption('Versus Human', 'Go', () => {
           if (!server || !server.isOpen()) {
             this.scene.signalError(Messages.disconnectError)
             return
@@ -397,9 +493,9 @@ export default class PlayMenu extends Menu {
       )
       .addNewLine()
 
-    // Friendly Match (pw)
+    // Password Match
     const friendlyMatchOption = this.createPlayOption(
-      'Friendly Match (pw)',
+      'Password Match',
       'Go',
       () => {
         if (!server || !server.isOpen()) {
@@ -422,11 +518,10 @@ export default class PlayMenu extends Menu {
         logEvent('queue_pwd')
       },
     )
-    // Store reference to the Friendly Match button
-    this.friendlyMatchButton =
-      this.playOptionButtons[this.playOptionButtons.length - 1]
-    // Initially disable since password field is empty (updateFriendlyMatchButton will handle this)
-    this.updateFriendlyMatchButton()
+    // Store reference to the PWD button
+    this.pwdBtn = this.playOptionButtons[this.playOptionButtons.length - 1]
+    // Initially disable since password field is empty (updatePwdButton will handle this)
+    this.updatePwdButton()
 
     contentSizer.add(friendlyMatchOption).addNewLine()
 
@@ -447,8 +542,8 @@ export default class PlayMenu extends Menu {
       })
       .on('textchange', (inputText) => {
         this.password = inputText.text
-        // Enable/disable Friendly Match button based on password and deck validity
-        this.updateFriendlyMatchButton()
+        // Enable/disable PWD button based on password and deck validity
+        this.updatePwdButton()
       })
     contentSizer.add(this.inputText).addNewLine()
 
@@ -536,15 +631,15 @@ export default class PlayMenu extends Menu {
     return deckSize === MechanicsSettings.DECK_SIZE
   }
 
-  private updateFriendlyMatchButton(): void {
-    if (this.friendlyMatchButton) {
+  private updatePwdButton(): void {
+    if (this.pwdBtn) {
       const hasPassword = this.password && this.password.trim() !== ''
       const deckValid = this.isDeckValid()
       // Button is enabled only if both password exists and deck is valid
       if (hasPassword && deckValid) {
-        this.friendlyMatchButton.enable()
+        this.pwdBtn.enable()
       } else {
-        this.friendlyMatchButton.disable()
+        this.pwdBtn.disable()
       }
     }
   }
@@ -552,6 +647,7 @@ export default class PlayMenu extends Menu {
   private createGarden(): any {
     const gardenSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
+      width: playPanelWidth - Space.pad * 2,
       space: { item: Space.pad },
     })
 
@@ -561,9 +657,13 @@ export default class PlayMenu extends Menu {
     this.gardenPlants = new Array(maxPlants).fill(null)
     this.gardenTimers = new Array(maxPlants).fill(null)
     this.plantSizers = new Array(maxPlants).fill(null)
+    this.plantGlowTweens = new Array(maxPlants).fill(null)
 
     // Get garden data from server
     const serverGarden = Server.getUserData().garden || []
+
+    // Add space at the beginning to help center plants
+    gardenSizer.addSpace()
 
     // Create all plant slots (MAX_PLANTS), some may be empty
     for (let i = 0; i < maxPlants; i++) {
@@ -587,6 +687,18 @@ export default class PlayMenu extends Menu {
         plant.setFrame(growthStage)
         this.gardenPlants[i] = plant
 
+        // Only add glow outline if plant is ready to harvest
+        const hoursRemaining = this.timeUntilFullyGrown(plantTime)
+        const isReady = hoursRemaining <= 0
+        if (isReady) {
+          const plugin = this.scene.plugins.get('rexOutlinePipeline')
+          plugin['add'](plant, {
+            thickness: 3,
+            outlineColor: Color.outline,
+            quality: 0.3,
+          })
+        }
+
         // Create timer text below plant - will be updated in update loop
         const timer = this.scene.add
           .text(0, 0, this.formatTimer(plantTime), Style.basic)
@@ -596,10 +708,13 @@ export default class PlayMenu extends Menu {
         // Store the index in a closure for the click handler
         const plantIndex = i
 
-        // Hover behavior - always show "Click to harvest" hint
+        // Hover behavior - only show hint when plant is ready to harvest
         plant
           .on('pointerover', () => {
-            this.scene.hint.showText('Click to harvest')
+            const hoursRemaining = this.timeUntilFullyGrown(plantTime)
+            if (hoursRemaining <= 0) {
+              this.scene.hint.showText('Click to harvest')
+            }
           })
           .on('pointerout', () => {
             this.scene.hint.hide()
@@ -631,6 +746,9 @@ export default class PlayMenu extends Menu {
       this.plantSizers[i] = plantSizer
     }
 
+    // Add space at the end to help center plants
+    gardenSizer.addSpace()
+
     // Store reference to garden sizer for updates
     this.gardenSizer = gardenSizer
 
@@ -657,6 +775,11 @@ export default class PlayMenu extends Menu {
       return
     }
 
+    const harvestedPlant = this.gardenPlants[harvestedIndex]
+    const rewardPosition = harvestedPlant
+      ? harvestedPlant.getCenter()
+      : { x: 0, y: 0 }
+
     // Clear the plant data at this index
     if (this.gardenPlants[harvestedIndex]) {
       this.gardenPlants[harvestedIndex].destroy()
@@ -671,28 +794,22 @@ export default class PlayMenu extends Menu {
     // Remove the plant and timer from the plant sizer
     plantSizer.removeAll(true)
 
-    // Create gold display to replace the plant
     const goldText = this.scene.add
-      .text(0, 0, `+${data.goldReward} 💰`, {
-        ...Style.basic,
-        color: Color.gold,
-        fontSize: '24px',
-      })
-      .setOrigin(0.5)
+      .text(
+        rewardPosition.x,
+        rewardPosition.y + 40,
+        `+${data.goldReward}💰`,
+        Style.homeSceneButton,
+      )
+      .setOrigin(0.5, 1)
 
-    // Add gold display to plant sizer
-    plantSizer.add(goldText)
-    plantSizer.layout()
-
-    // Fade out the gold text after 1 second
     this.scene.tweens.add({
       targets: goldText,
+      y: rewardPosition.y,
       alpha: 0,
-      duration: 500,
-      delay: 1000,
-      onComplete: () => {
-        goldText.destroy()
-      },
+      duration: 800,
+      ease: Ease.basic,
+      onComplete: () => goldText.destroy(),
     })
   }
 
@@ -744,6 +861,45 @@ export default class PlayMenu extends Menu {
           // Update plant frame based on current growth stage
           const growthStage = this.getGrowthStage(this.gardenTimes[i])
           this.gardenPlants[i].setFrame(growthStage)
+
+          // Check if plant is ready to harvest and animate glow
+          const hoursRemaining = this.timeUntilFullyGrown(this.gardenTimes[i])
+          const isReady = hoursRemaining <= 0
+          const plant = this.gardenPlants[i]
+
+          if (isReady) {
+            // Plant is ready - start pulsing glow animation if not already running
+            if (
+              !this.plantGlowTweens[i] ||
+              !this.plantGlowTweens[i].isActive()
+            ) {
+              // Stop any existing tween first
+              if (this.plantGlowTweens[i]) {
+                this.plantGlowTweens[i].stop()
+              }
+
+              // Reset alpha to 1 before starting
+              plant.setAlpha(1)
+
+              // Create pulsing tween
+              this.plantGlowTweens[i] = this.scene.tweens.add({
+                targets: plant,
+                delay: i * 200,
+                alpha: 0.5,
+                duration: 800,
+                ease: 'Sine.easeInOut',
+                yoyo: true,
+                repeat: -1, // Repeat forever
+              })
+            }
+          } else {
+            // Plant is not ready - stop tween and reset alpha
+            if (this.plantGlowTweens[i]) {
+              this.plantGlowTweens[i].stop()
+              this.plantGlowTweens[i] = null
+            }
+            plant.setAlpha(1)
+          }
         }
       }
     }

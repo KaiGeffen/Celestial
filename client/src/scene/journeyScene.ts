@@ -5,67 +5,87 @@ import {
   Space,
   Color,
   UserSettings,
-  Flags,
+  Time,
   Ease,
-  Messages,
+  Flags,
+  BBStyle,
 } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
-import { server } from '../server'
+
 import Catalog from '../../../shared/state/catalog'
-import Cutout from '../lib/buttons/cutout'
+import {
+  getMissionsByTheme,
+  MissionDetails,
+  THEME_KEYS,
+} from '../../../shared/journey/journey'
+import Loader from '../loader/loader'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import {
-  JOURNEY_MISSIONS,
-  JourneyMission,
-} from '../journey/missions/journeyMissions'
-import Decklist from '../lib/decklist'
-import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
-import { Deck } from '../../../shared/types/deck'
-import avatarNames from '../data/avatarNames'
-import AvatarButton from '../lib/buttons/avatar'
+import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
+import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 import newScrollablePanel from '../lib/scrollablePanel'
-import { MechanicsSettings } from '../../../shared/settings'
-import Button from '../lib/buttons/button'
-import { CatalogRegionJourney } from './builderRegions/catalog'
-import {
-  getCharacterLevel,
-  getCharacterLevelProgress,
-  getCharacterExpToNextLevel,
-  MAX_LEVEL,
-} from '../journey/levelProgression'
-import Card from '../../../shared/state/card'
-import getUnlockedCards, {
-  getUnlocksAtLevel,
-} from '../journey/unlockedInventories'
-import { createExpBar } from '../lib/expBar'
-import { CardImage } from '../lib/cardImage'
-import logEvent from '../utils/analytics'
+import showTooltip from '../utils/tooltips'
+import avatarBios from '../data/avatarBios/index'
+import avatarNames from '../data/avatarNames'
+import avatarStories from '../data/avatarStories/avatarStories'
+import Server from '../server'
+
+const OVERLAY_WIDTH = 575
+const OVERLAY_HEIGHT = 660
+const OVERLAY_TOP = 100
+
+/** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Imani, Mitra, Water, Stars */
+const THEME_CAMERA_POSITIONS: { x: number; y: number }[] = [
+  { x: 4000, y: 670 }, // birds (Jules)
+  { x: 2100, y: 1270 }, // ashes (Adonis)
+  { x: 4860, y: 1940 }, // shadow (Mia)
+  { x: 1260, y: 2250 }, // pet (Kitz)
+  { x: 1590, y: 4140 }, // birth (Imani)
+  { x: 4850, y: 4130 }, // vision (Mitra)
+  { x: 3180, y: 3100 }, // water
+  { x: 3080, y: 2800 }, // stars
+]
+
+const DRIFT_RADIUS_X = 150
+const DRIFT_RADIUS_Y = 80
+const DRIFT_SPEED = 0.0003
+const DRIFT_PHASE = 1.3
+const THEME_CAMERA_TWEEN_DURATION = 400
+
+const STARS_THEME_INDEX = THEME_KEYS.indexOf('stars')
+const ALT_MAP_FADE_DURATION = 400
+const MISSION_TIP_FADE_DURATION = 200
+/** Tip box width: from left pad to just left of the overlay panel (one extra pad) */
+const MISSION_TIP_BOX_WIDTH = Space.windowWidth - OVERLAY_WIDTH - Space.pad * 3
+const DEFAULT_MISSION_TIP =
+  'This mission will challenge your deck-building and strategy.\n\nComplete the required cards, then choose the rest to fill your deck.\n\nGood luck.'
+const ALT_MAP_SWAY_SPEED = 0.0004
+const ALT_MAP_SWAY_PHASE = 1.5
+const ALT_MAP_SWAY_RADIUS = 80
 
 export default class JourneyScene extends BaseScene {
-  // Mission details
-  selectedMission: JourneyMission
-  selectedAvatar: number
-  txtMissionTitle: Phaser.GameObjects.Text
-  txtMissionDescription: Phaser.GameObjects.Text
-  decklist: Decklist
-  // The catalog region with all collectible cards
-  catalogRegion: CatalogRegionJourney
-  startBtn: Button
+  map: Phaser.GameObjects.Image
+  private altMap: Phaser.GameObjects.Image
 
-  // Timer until next journey available
-  txtTimer: Phaser.GameObjects.Text
+  // The character art
+  private overlayCharacterImage: Phaser.GameObjects.Image
 
-  // Views
-  characterSelectView: Phaser.GameObjects.Container
-  missionDetailsView: Sizer
-  postMatchView: Phaser.GameObjects.Container
-  waitingView: Sizer
+  /** Center point the camera drifts around (theme position) */
+  private driftCenterX = 0
+  private driftCenterY = 0
 
-  // Card pool sizer
-  cardPoolSizer: Sizer
-
-  // Card pool text reference
-  cardPoolText: Phaser.GameObjects.Text
+  private isTweeningCamera = false
+  private selectedThemeIndex = 0
+  private previousThemeIndex = 0
+  private showOverlayCharacterView = false
+  private overlayHeaderText: Phaser.GameObjects.Text
+  private overlayPanel: ScrollablePanel
+  private overlayArtButtonContainer: ContainerLite
+  private missionTipContainer: Phaser.GameObjects.Container
+  private missionTipBg: Phaser.GameObjects.Rectangle
+  private missionTipTextBox: Phaser.GameObjects.GameObject & {
+    start: (s: string, speed: number) => void
+    stop: (showAll: boolean) => void
+  }
 
   constructor() {
     super({
@@ -73,83 +93,624 @@ export default class JourneyScene extends BaseScene {
     })
   }
 
+  preload(): void {
+    Loader.loadJourneyMapAndMission(this)
+  }
+
   create(params): void {
     super.create()
 
-    // TODO Temporary for testing
-    // this.selectedAvatar = 1
-    // params = {
-    //   ...params,
-    //   postMatch: true,
-    //   expGained: 100,
-    //   postMatchText: 'Test',
-    // }
+    // Allow starting on a specific theme (e.g. stars after a mission)
+    if (params.themeIndex !== undefined) {
+      this.selectedThemeIndex = params.themeIndex
+      this.previousThemeIndex = params.themeIndex
+    } else if (params.theme === 'stars') {
+      this.selectedThemeIndex = STARS_THEME_INDEX
+      this.previousThemeIndex = STARS_THEME_INDEX
+    }
 
-    // Launch map behind this scene
-    this.scene.launch('MapScene')
-    this.scene.sendToBack('MapScene')
+    // Create the background
+    this.map = this.add.image(0, 0, 'journey-Map').setOrigin(0)
 
-    // Create the first screen
-    this.createCharacterSelect()
+    this.altMap = this.add
+      .image(0, 0, 'journey-AltMap')
+      .setOrigin(0.5, 0.5)
+      .setAlpha(0)
+      .setScrollFactor(0)
+    this.plugins.get('rexAnchor')['add'](this.altMap, {
+      x: '50%',
+      y: '50%',
+      width: '120%',
+      height: '120%',
+    })
 
-    // Create the mission screen
-    this.createMissionDetails()
+    this.cameras.main.setBounds(0, 0, this.map.width, this.map.height)
 
-    // Create post match screen
-    this.createPostMatch(params.expGained ?? 0, params.postMatchText ?? '')
+    // Add buttons
+    this.createBackButton()
 
-    // Create waiting notice
-    this.createWaitingNotice()
+    // Add race button if dev mode is enabled
+    if (Flags.devCardsEnabled) {
+      this.createRaceButton()
+    }
 
-    // Show view depending on context
-    if (params.postMatch) {
-      this.postMatchView.setAlpha(1)
-    } else {
-      this.characterSelectView.setAlpha(1)
+    if (params.stillframe !== undefined) {
+      this.createStillframe(params)
+    }
+
+    // Make up pop-up for the card you just received, if there is one
+    if (params.card) {
+      this.createCardPopup(params)
+    } else if (params.txt) {
+      this.createTipPopup(params)
+    }
+
+    const camera = this.cameras.main
+    // Start at selected theme position immediately (no transition on open)
+    this.snapCameraToTheme(this.selectedThemeIndex)
+
+    // Mission list overlay on the right
+    this.createOverlayCharacterArt()
+    this.createJourneyOverlay()
+
+    // If we started on stars, show alt map immediately (no fade-in delay)
+    if (this.selectedThemeIndex === STARS_THEME_INDEX) {
+      this.altMap.alpha = 1
+    }
+
+    this.game.events.on('missionGoldClaimed', this.onMissionGoldClaimed, this)
+    this.events.once('shutdown', () => {
+      this.game.events.off(
+        'missionGoldClaimed',
+        this.onMissionGoldClaimed,
+        this,
+      )
+    })
+
+    showTooltip(this)
+  }
+
+  update(time: number, _delta: number): void {
+    if (this.isTweeningCamera) return
+    const camera = this.cameras.main
+    const offsetX = Math.sin(time * DRIFT_SPEED) * DRIFT_RADIUS_X
+    const offsetY =
+      Math.sin(time * DRIFT_SPEED * 0.7 + DRIFT_PHASE) * DRIFT_RADIUS_Y
+    camera.scrollX = Phaser.Math.Clamp(
+      this.driftCenterX - camera.width / 2 + offsetX,
+      0,
+      Math.max(0, this.map.width - camera.width),
+    )
+    camera.scrollY = Phaser.Math.Clamp(
+      this.driftCenterY - camera.height / 2 + offsetY,
+      0,
+      Math.max(0, this.map.height - camera.height),
+    )
+    JourneyScene.rememberCoordinates(camera)
+
+    // Gentle sway on alt map when visible (stars theme)
+    if (this.altMap.alpha > 0) {
+      this.altMap.x =
+        camera.width / 2 +
+        Math.sin(time * ALT_MAP_SWAY_SPEED) * ALT_MAP_SWAY_RADIUS
+      this.altMap.y =
+        camera.height / 2 +
+        Math.sin(time * ALT_MAP_SWAY_SPEED * 0.7 + ALT_MAP_SWAY_PHASE) *
+          ALT_MAP_SWAY_RADIUS
     }
   }
 
-  private createCharacterSelect() {
-    this.characterSelectView = this.add.container().setAlpha(0)
+  private createJourneyOverlay(): void {
+    const themes = getMissionsByTheme()
 
-    // Get the 2 characters that appear this time
-    const missionTracks = this.getMissionChoices()
+    const contentSizer = this.rexUI.add.fixWidthSizer({
+      width: OVERLAY_WIDTH,
+      space: { item: 6 },
+    })
 
-    // For each character, add the avatar, text, button
-    const sizers = missionTracks.map(([mission, avatarIndex]) => {
-      const name = avatarNames[avatarIndex]
+    const overlayBackground = this.add
+      .rectangle(0, 0, OVERLAY_WIDTH, OVERLAY_HEIGHT, Color.backgroundLight)
+      .setOrigin(0)
 
-      // Form a sizer for this character
-      const sizer = this.rexUI.add.sizer({
-        orientation: 'vertical',
+    this.overlayPanel = newScrollablePanel(this, {
+      x: Space.windowWidth - OVERLAY_WIDTH - Space.pad,
+      y: OVERLAY_TOP,
+      width: OVERLAY_WIDTH,
+      height: OVERLAY_HEIGHT,
+      scrollMode: 0,
+      background: overlayBackground,
+      header: this.createOverlayHeader(themes),
+      panel: { child: contentSizer },
+      space: { header: 0 },
+    })
+    this.overlayPanel.setScrollFactor(0)
+
+    this.createMissionTipBox()
+
+    this.refreshOverlayContent(false) // already at theme position; no tween on open
+  }
+
+  private createOverlayCharacterArt(): void {
+    const topPad = Space.buttonHeight + Space.pad * 2
+    const availableHeight = Space.windowHeight - topPad * 2
+
+    this.overlayCharacterImage = this.add
+      .image(Space.pad, topPad, 'avatar-JulesFull')
+      .setOrigin(0, 0)
+      .setScrollFactor(0)
+      .setVisible(false)
+      .setDepth(100)
+      .setScale(
+        availableHeight /
+          this.textures.get('avatar-JulesFull').getSourceImage().height,
+      )
+    this.addShadow(this.overlayCharacterImage)
+  }
+
+  private createMissionTipBox(): void {
+    const padding = Space.pad
+    const lineHeight = 22
+    const maxLines = 6
+    const boxHeight = padding * 2 + lineHeight * maxLines
+    const boxWidth = MISSION_TIP_BOX_WIDTH
+    const x = Space.pad
+    const y = Space.windowHeight - boxHeight - Space.pad
+
+    this.missionTipContainer = this.add.container(x, y)
+
+    this.missionTipBg = this.add
+      .rectangle(0, 0, boxWidth, boxHeight, 0x353f4e, 0.92)
+      .setOrigin(0)
+      .setStrokeStyle(2, Color.black)
+
+    const tipStyle = {
+      ...Style.basic,
+      color: Color.whiteS,
+    }
+    const txt = this.add
+      .text(0, 0, '', tipStyle)
+      .setWordWrapWidth(boxWidth - padding * 2)
+      .setOrigin(0)
+
+    this.missionTipTextBox = this.rexUI.add
+      .textBox({
+        text: txt,
+        x: padding,
+        y: padding,
         space: {
-          item: Space.pad,
-          left: Space.pad,
-          right: Space.pad,
-          top: Space.pad,
-          bottom: Space.pad,
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+        },
+        page: {
+          maxLines: 0,
         },
       })
+      .setOrigin(0)
 
-      // Background
-      const background = this.add
-        .image(0, 0, 'background-Light')
-        .setInteractive()
-      this.addShadow(background)
+    this.missionTipContainer.add([
+      this.missionTipBg,
+      txt,
+      this.missionTipTextBox,
+    ])
+    this.missionTipContainer.setScrollFactor(0)
+    this.missionTipContainer.setAlpha(0)
+  }
 
-      // Avatar
-      const avatarFull = this.add.image(0, 0, `avatar-${name}Full`)
+  private getMissionTip(mission: MissionDetails): string {
+    return mission.tip ?? DEFAULT_MISSION_TIP
+  }
 
-      // Experience bar
-      const expBar = createExpBar(this, avatarIndex, 0, true)
+  private showMissionTip(text: string): void {
+    this.missionTipTextBox.start(text, 5)
+    this.tweens.add({
+      targets: this.missionTipContainer,
+      alpha: 1,
+      duration: MISSION_TIP_FADE_DURATION,
+      ease: 'Power2.Out',
+    })
+  }
 
-      // Mission title
-      const text = this.add.text(0, 0, mission.selectText, {
-        ...Style.todoJourneyTitle,
-        wordWrap: { width: Space.avatarWidth },
+  private hideMissionTip(): void {
+    this.tweens.add({
+      targets: this.missionTipContainer,
+      alpha: 0,
+      duration: MISSION_TIP_FADE_DURATION,
+      ease: 'Power2.In',
+    })
+  }
+
+  private createOverlayHeader(
+    themes: ReturnType<typeof getMissionsByTheme>,
+  ): Phaser.GameObjects.GameObject {
+    const headerBg = this.add
+      .rectangle(0, 0, 420, 420, 0x353f4e, 1)
+      .setOrigin(0)
+      .setInteractive()
+    const headerSizer = this.rexUI.add
+      .sizer({
+        orientation: 'horizontal',
+        width: OVERLAY_WIDTH,
+        space: { left: 12, right: 12, top: 14, bottom: 14 },
+      })
+      .addBackground(headerBg)
+
+    this.overlayHeaderText = this.add
+      .text(0, 0, '', {
+        ...Style.announcement,
+        fontSize: '30px',
+        color: '#f5f2eb',
+      })
+      .setOrigin(0.5, 0.5)
+
+    const leftArrow = this.add
+      .text(0, 0, '‹', {
+        ...Style.announcement,
+        fontSize: '30px',
+        color: '#f5f2eb',
+      })
+      .setOrigin(0.5, 0.5)
+      .setInteractive({ useHandCursor: true })
+    leftArrow.on('pointerdown', () => {
+      this.sound.play('click')
+      this.showOverlayCharacterView = false
+      this.selectedThemeIndex =
+        (this.selectedThemeIndex - 1 + themes.length) % themes.length
+      this.refreshOverlayContent()
+    })
+    const rightArrow = this.add
+      .text(0, 0, '›', {
+        ...Style.announcement,
+        fontSize: '30px',
+        color: '#f5f2eb',
+      })
+      .setOrigin(0.5, 0.5)
+      .setInteractive({ useHandCursor: true })
+    rightArrow.on('pointerdown', () => {
+      this.sound.play('click')
+      this.showOverlayCharacterView = false
+      this.selectedThemeIndex = (this.selectedThemeIndex + 1) % themes.length
+      this.refreshOverlayContent()
+    })
+
+    this.overlayArtButtonContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.iconSize,
+      Space.iconSize,
+    )
+    const overlayArtButton = new Buttons.Icon({
+      within: this.overlayArtButtonContainer,
+      name: 'Quest',
+      f: () => {
+        if (this.selectedThemeIndex < avatarNames.length) {
+          this.showOverlayCharacterView = !this.showOverlayCharacterView
+          this.refreshOverlayContent(false)
+        }
+      },
+    })
+    overlayArtButton.icon.setTintFill(Color.backgroundLight)
+
+    const sideControlsWidth = leftArrow.width + Space.pad + Space.iconSize
+    const leftControls = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      width: sideControlsWidth,
+      space: { item: Space.pad },
+    })
+    leftControls
+      .add(leftArrow, { align: 'center' })
+      .add(this.overlayArtButtonContainer, {
+        align: 'center',
       })
 
-      // Select button
+    const rightControls = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      width: sideControlsWidth,
+    })
+    rightControls.addSpace().add(rightArrow, { align: 'center' })
+
+    headerSizer
+      .add(leftControls, { align: 'center' })
+      .addSpace()
+      .add(this.overlayHeaderText, { proportion: 1, align: 'center' })
+      .addSpace()
+      .add(rightControls, { align: 'center' })
+    headerSizer.layout()
+    return headerSizer
+  }
+
+  private refreshOverlayContent(moveCamera = true): void {
+    const themes = getMissionsByTheme()
+    const theme = themes[this.selectedThemeIndex]
+    const completed: boolean[] = UserSettings._get('completedMissions')
+    this.overlayHeaderText.setText(`${theme.displayName}`)
+    const panel = this.overlayPanel.getElement('panel') as FixWidthSizer
+    panel.removeAll(true)
+    if (
+      this.showOverlayCharacterView &&
+      this.selectedThemeIndex < avatarNames.length
+    ) {
+      panel.add(this.createOverlayCharacterText())
+    } else {
+      theme.missions.forEach((mission) => {
+        const row = this.createMissionOverlayRow(mission, completed)
+        panel.add(row)
+      })
+    }
+    this.refreshOverlayCharacterArt()
+    this.overlayPanel.layout()
+    if (moveCamera && this.selectedThemeIndex !== STARS_THEME_INDEX) {
+      const leavingStars = this.previousThemeIndex === STARS_THEME_INDEX
+      if (leavingStars) {
+        this.snapCameraToTheme(this.selectedThemeIndex)
+      } else {
+        this.moveCameraToTheme(this.selectedThemeIndex)
+      }
+    }
+    this.previousThemeIndex = this.selectedThemeIndex
+    this.updateAltMapFade()
+  }
+
+  private createOverlayCharacterText(): Phaser.GameObjects.GameObject {
+    const padding = Space.padSmall
+    const text = this.add
+      .text(0, 0, '', Style.basic)
+      .setWordWrapWidth(OVERLAY_WIDTH - padding * 2)
+      .setOrigin(0)
+
+    const textBox = this.rexUI.add
+      .textBox({
+        text,
+        x: 0,
+        y: 0,
+        space: {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+        },
+        page: {
+          maxLines: 0,
+        },
+      })
+      .setOrigin(0)
+
+    const bioText =
+      '    ' +
+      (avatarBios[this.selectedThemeIndex] ?? 'Bio coming soon.')
+        .replace(/\n/g, '\n\n    ')
+        .trim()
+    textBox.start(bioText, 5)
+
+    return this.rexUI.add
+      .sizer({
+        orientation: 'vertical',
+        space: {
+          left: padding,
+          right: padding,
+          top: padding,
+          bottom: padding,
+        },
+      })
+      .add(textBox)
+  }
+
+  private updateAltMapFade(): void {
+    const showAltMap = this.selectedThemeIndex === STARS_THEME_INDEX
+    const targetAlpha = showAltMap ? 1 : 0
+    if (this.altMap.alpha === targetAlpha) return
+    this.tweens.add({
+      targets: this.altMap,
+      alpha: targetAlpha,
+      duration: ALT_MAP_FADE_DURATION,
+      ease: 'Power2.InOut',
+    })
+  }
+
+  private refreshOverlayCharacterArt(): void {
+    const hasCharacterArt = this.selectedThemeIndex < avatarNames.length
+    this.overlayArtButtonContainer.setVisible(hasCharacterArt)
+
+    if (!hasCharacterArt) {
+      this.overlayCharacterImage.setVisible(false)
+      return
+    }
+
+    const avatarName = avatarNames[this.selectedThemeIndex]
+    this.overlayCharacterImage.setTexture(`avatar-${avatarName}Full`)
+    this.overlayCharacterImage.setVisible(this.showOverlayCharacterView)
+  }
+
+  private onMissionGoldClaimed(): void {
+    this.refreshOverlayContent(false)
+  }
+
+  /** Set camera and drift center to theme position without tweening */
+  private snapCameraToTheme(themeIndex: number): void {
+    const pos = THEME_CAMERA_POSITIONS[themeIndex]
+    if (!pos) return
+    this.driftCenterX = pos.x
+    this.driftCenterY = pos.y
+    const camera = this.cameras.main
+    const maxScrollX = Math.max(0, this.map.width - camera.width)
+    const maxScrollY = Math.max(0, this.map.height - camera.height)
+    camera.scrollX = Phaser.Math.Clamp(pos.x - camera.width / 2, 0, maxScrollX)
+    camera.scrollY = Phaser.Math.Clamp(pos.y - camera.height / 2, 0, maxScrollY)
+    JourneyScene.rememberCoordinates(camera)
+  }
+
+  private moveCameraToTheme(themeIndex: number): void {
+    const pos = THEME_CAMERA_POSITIONS[themeIndex]
+    if (!pos) return
+    this.driftCenterX = pos.x
+    this.driftCenterY = pos.y
+    const camera = this.cameras.main
+    const maxScrollX = Math.max(0, this.map.width - camera.width)
+    const maxScrollY = Math.max(0, this.map.height - camera.height)
+    const targetScrollX = Phaser.Math.Clamp(
+      pos.x - camera.width / 2,
+      0,
+      maxScrollX,
+    )
+    const targetScrollY = Phaser.Math.Clamp(
+      pos.y - camera.height / 2,
+      0,
+      maxScrollY,
+    )
+    this.tweens.killTweensOf(camera)
+    this.isTweeningCamera = true
+    this.tweens.add({
+      targets: camera,
+      scrollX: targetScrollX,
+      scrollY: targetScrollY,
+      duration: THEME_CAMERA_TWEEN_DURATION,
+      ease: 'Power2.Out',
+      onComplete: () => {
+        this.isTweeningCamera = false
+        JourneyScene.rememberCoordinates(camera)
+      },
+    })
+  }
+
+  private isMissionUnlocked(
+    mission: MissionDetails,
+    completed: boolean[],
+  ): boolean {
+    return mission.prereq.some((prereqs) =>
+      prereqs.every((id) => completed[id]),
+    )
+  }
+
+  private getMissionDisplayName(mission: MissionDetails): string {
+    return mission.name
+  }
+
+  private createMissionOverlayRow(
+    mission: MissionDetails,
+    completed: boolean[],
+  ): Phaser.GameObjects.GameObject {
+    const rowWidth = OVERLAY_WIDTH
+    const row = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      width: rowWidth,
+      space: { left: 4, right: 4, top: 4, bottom: 4, item: 8 },
+    })
+
+    const rowBg = this.add.rectangle(0, 0, 1, 1, 0xf5f2eb).setOrigin(0)
+    row.addBackground(rowBg)
+
+    const isCompleted = completed[mission.id]
+    const isUnlocked = this.isMissionUnlocked(mission, completed)
+    const difficulty = Phaser.Math.Clamp(mission.difficulty ?? 3, 1, 5)
+
+    // 0) Leftmost: quest icon when completed (opens character story)
+    const iconCell = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.iconSize,
+      Space.iconSize,
+    )
+    if (isCompleted) {
+      const hasClaimedMissionGold =
+        Server.getUserData().missionGoldClaimed?.[mission.id] ?? false
+      new Buttons.Icon({
+        within: iconCell,
+        name: 'Quest',
+        muteClick: true,
+        f: () => {
+          if (mission.id < 700) {
+            const avatarIndex = Math.floor(mission.id / 100) - 1
+            const chapterIndex = mission.id % 100
+            const storyText =
+              '      ' +
+              (avatarStories[avatarIndex]?.[chapterIndex] ?? 'Coming soon')
+                .replace(/\n/g, '\n\n      ')
+                .trim()
+            this.scene.launch('MenuScene', {
+              menu: 'chapterMessage',
+              title: `${avatarNames[avatarIndex]} — ${mission.name}`,
+              s: storyText,
+              claimGoldMissionId: mission.id,
+            })
+          } else {
+            this.scene.launch('MenuScene', {
+              menu: 'chapterMessage',
+              title: mission.name,
+              s: 'Writing coming soon.',
+              claimGoldMissionId: mission.id,
+            })
+          }
+        },
+      })
+      if (!hasClaimedMissionGold) {
+        const badge = this.add.circle(
+          Space.iconSize / 2 - 5,
+          -Space.iconSize / 2 + 5,
+          5,
+          0xd64045,
+        )
+        iconCell.add(badge)
+      }
+    }
+    row.add(iconCell, { align: 'center' })
+
+    // 1) Mission name + card emojis
+    let nameBBCode = this.getMissionDisplayName(mission)
+    if ('deck' in mission && mission.cards?.length) {
+      for (const cardId of mission.cards) {
+        if (Catalog.getCardById(cardId)) {
+          nameBBCode += ` [area=card_${cardId}]🎴[/area]`
+        }
+      }
+    }
+    const nameText = this.rexUI.add
+      .BBCodeText(0, 0, nameBBCode, {
+        ...BBStyle.basic,
+        fontSize: '18px',
+      })
+      .setInteractive()
+      .on('areaover', (key: string) => {
+        if (key.startsWith('card_')) {
+          const cardId = parseInt(key.replace('card_', ''), 10)
+          const card = Catalog.getCardById(cardId)
+          if (card) this.hint.showCard(card)
+        }
+      })
+      .on('areaout', () => this.hint.hide())
+    row.add(nameText, { align: 'left-center' })
+    row.addSpace() // right-justify stars and button
+
+    // 2) Stars (difficulty)
+    const starSize = 23
+    const starGap = 2
+    const width = 120
+    const starsAndStampSizer = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      space: { item: starGap },
+    })
+    starsAndStampSizer.addSpace()
+    const overlayCell = this.add.container(1, 0)
+    overlayCell.width = width
+    for (let i = 0; i < difficulty; i++) {
+      const star = this.add.image(
+        (5 - i) * (starSize + starGap) - width / 2 - 20,
+        0,
+        'icon-JourneyStar',
+      )
+      if (!isCompleted) {
+        star.setTint(0x000080)
+      }
+      overlayCell.add(star)
+    }
+    starsAndStampSizer.add(overlayCell, { align: 'center' })
+    starsAndStampSizer.addSpace()
+    row.add(starsAndStampSizer)
+
+    // 3) Start or Locked button
+    if (isUnlocked) {
       const btnContainer = new ContainerLite(
         this,
         0,
@@ -157,517 +718,235 @@ export default class JourneyScene extends BaseScene {
         Space.buttonWidth,
         Space.buttonHeight,
       )
-      new Buttons.Basic({
+      const startBtn = new Buttons.Basic({
         within: btnContainer,
-        text: 'Select',
-        f: () => {
-          // Set mission info
-          this.setMissionInfo(mission, avatarIndex)
-
-          // Set the right views visible/invisible
-          this.characterSelectView.setAlpha(0)
-          this.missionDetailsView.show().layout()
-        },
+        text: 'Start',
+        f: this.missionOnClick(mission),
+        muteClick: true,
       })
+      startBtn.setOnHover(
+        () => this.showMissionTip(this.getMissionTip(mission)),
+        () => this.hideMissionTip(),
+      )
+      row.add(btnContainer, { align: 'center' })
+    } else {
+      const lockedContainer = new ContainerLite(
+        this,
+        0,
+        0,
+        Space.buttonWidth,
+        Space.buttonHeight,
+      )
+      const lockedText = this.add
+        .text(0, 0, 'Locked', {
+          ...Style.basic,
+          fontSize: '16px',
+          color: Color.grey,
+        })
+        .setOrigin(0.5, 0.5)
+      lockedContainer.add(lockedText)
+      row.add(lockedContainer, { align: 'center' })
+    }
 
-      sizer
-        .addBackground(background)
-        .add(avatarFull)
-        .add(expBar, { padding: { top: -80 } })
-        .add(text)
-        .add(btnContainer)
+    row.layout()
 
-      return sizer.layout()
-    })
-
-    // Anchor the sizers to each side of the screen
-    this.plugins.get('rexAnchor')['add'](sizers[0], {
-      y: `50%`,
-      left: `0%+${Space.pad}`,
-    })
-    this.plugins.get('rexAnchor')['add'](sizers[1], {
-      y: `50%`,
-      right: `100%-${Space.pad}`,
-    })
-
-    // Add center button to switch to old journey mode
-    const centerBtnContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: centerBtnContainer,
-      text: 'Map Mode',
-      f: () => {
-        // Switch to old journey (map) mode
-        this.beforeExit()
-        this.scene.start('MapJourneyScene')
-      },
-    })
-
-    this.plugins.get('rexAnchor')['add'](centerBtnContainer, {
-      x: `50%`,
-      y: `50%`,
-    })
-
-    this.characterSelectView
-      .add(sizers[0])
-      .add(sizers[1])
-      .add(centerBtnContainer)
+    return row
   }
 
-  private createMissionDetails() {
-    // Create a sizer for the mission details
-    this.missionDetailsView = this.rexUI.add
-      .sizer({
+  private createBackButton(): void {
+    new Buttons.Basic({
+      within: this,
+      text: 'Back',
+      x: Space.pad + Space.buttonWidth / 2,
+      y: Space.buttonHeight / 2 + Space.pad,
+      f: () => {
+        this.scene.start('HomeScene')
+      },
+      depth: 10,
+    }).setNoScroll()
+  }
+
+  private createRaceButton(): void {
+    const x =
+      Space.windowWidth -
+      Space.buttonWidth / 2 -
+      (Space.iconSize + Space.pad * 2) -
+      Space.buttonWidth * 2 -
+      Space.pad * 2
+    const y = Space.buttonHeight / 2 + Space.pad
+    new Buttons.Basic({
+      within: this,
+      text: 'Race',
+      x,
+      y,
+      f: () => {
+        this.scene.start('RaceScene', {})
+      },
+      depth: 10,
+    }).setNoScroll()
+  }
+
+  // Create a popup for the card specified in params
+  private createCardPopup(params): void {
+    this.scene.launch('MenuScene', {
+      menu: 'message',
+      title: 'Card Unlocked!',
+      s: params.txt,
+      card: params.card,
+    })
+
+    // Clear params
+    params.txt = ''
+    params.card = undefined
+  }
+
+  // Create a popup for the tip
+  private createTipPopup(params): void {
+    this.scene.launch('MenuScene', {
+      menu: 'message',
+      title: 'Tip',
+      s: params.txt,
+    })
+
+    // Clear params
+    params.txt = ''
+    params.card = undefined
+  }
+
+  // Create a stillframe animation specified in params
+  private createStillframe(params): void {
+    // TODO Make dry with the searching tutorial class implementation
+
+    // Height of the tutorial text
+    const TEXT_HEIGHT = 225
+
+    let container = this.add.container().setDepth(11)
+
+    let img = this.add
+      .image(Space.windowWidth / 2, 0, `journey-Story 4`)
+      .setOrigin(0.5, 0)
+      .setInteractive()
+
+    // Ensure that image fits perfectly in window
+    const scale = Space.windowWidth / img.displayWidth
+    img.setScale(scale)
+
+    // Text background
+    let background = this.add
+      .rectangle(
+        0,
+        Space.windowHeight - TEXT_HEIGHT,
+        Space.windowWidth,
+        TEXT_HEIGHT,
+        Color.backgroundLight,
+      )
+      .setOrigin(0)
+    this.plugins.get('rexDropShadowPipeline')['add'](background, {
+      distance: 3,
+      shadowColor: 0x000000,
+    })
+
+    // Add text
+    let txt = this.add
+      .text(0, 0, '', Style.stillframe)
+      .setWordWrapWidth(Space.stillframeTextWidth)
+
+    const s =
+      "Impressive, all that life, all that wonder. You are welcomed in of course. But if I might share one thing that I've learned in my time here... It's that someday, everything blows away."
+
+    let textbox = this.rexUI.add
+      .textBox({
+        text: txt,
+        x: Space.pad,
+        y: background.y,
         space: {
+          left: Space.pad,
+          right: Space.pad,
           top: Space.pad,
           bottom: Space.pad,
-          left: Space.pad,
-          right: Space.pad,
         },
-        anchor: {
-          left: `0%+${Space.pad}`,
-          top: `0%+${Space.pad}`,
-          height: `100%-${Space.pad * 2}`,
+        page: {
+          maxLines: 0, // 0 = unlimited lines
         },
       })
+      .start(s, 50)
       .setOrigin(0)
 
-    const background = this.add.image(0, 0, 'background-Light').setInteractive()
-    this.addShadow(background)
+    container.add([img, background, txt, textbox])
 
-    // Left side sizer
-    const leftSizer = this.rexUI.add.sizer({
-      orientation: 'vertical',
-      space: { item: Space.pad },
-    })
+    // Add an okay button
+    let btn = new Buttons.Basic({
+      within: container,
+      text: 'Continue',
+      x: Space.windowWidth - Space.pad - Space.buttonWidth / 2,
+      y: Space.windowHeight - Space.pad - Space.buttonHeight / 2,
+      f: () => {
+        // If typing isn't complete, complete it
+        if (textbox.isTyping) {
+          textbox.stop(true)
+        }
+        // Otherwise move on to the next frame
+        else {
+          this.tweens.add({
+            targets: container,
+            alpha: 0,
+            duration: Time.stillframeFade,
+            onComplete: () => {
+              container.setVisible(false)
+              container.alpha = 1
+            },
+          })
 
-    // Add the scrollable section of the left
-    const leftScrolledContentSizer = this.rexUI.add.sizer({
-      orientation: 'vertical',
-      space: { item: Space.pad },
-    })
-    const leftScrollableSizer = newScrollablePanel(this, {
-      width: Space.cutoutWidth,
-      anchor: {
-        height: `100%-${270}`,
+          this.scene.start('PlaceholderScene')
+        }
       },
-      scrollMode: 'vertical',
-      panel: {
-        child: leftScrolledContentSizer,
+    })
+
+    // Scroll the image going down
+    this.add.tween({
+      targets: img,
+      duration: 6000,
+      ease: Ease.stillframe,
+      y: Space.windowHeight - img.displayHeight,
+      onStart: () => {
+        img.y = 0
       },
     })
 
-    // Each item on the left
-    this.txtMissionTitle = this.add.text(0, 0, '', Style.announcement)
-    this.txtMissionDescription = this.add.text(0, 0, '', {
-      ...Style.basic,
-      wordWrap: { width: Space.cutoutWidth },
-      fixedWidth: Space.cutoutWidth,
-    })
-    this.decklist = new Decklist(this, this.onClickCutout())
-    // Hint telling how many cards to add/remove
-    this.cardPoolText = this.add.text(0, 0, '', Style.basic)
-    const btnSizer = this.createButtons()
+    // Set the param to undefined so it doesn't persist
+    params.stillframe = undefined
 
-    // Scrollable section is text, decklist
-    leftScrolledContentSizer
-      .add(this.txtMissionDescription)
-      .add(this.decklist.sizer)
-
-    // Sizer is title, scrollable, hint, buttons
-    leftSizer
-      .add(this.txtMissionTitle)
-      .add(leftScrollableSizer, { expand: true })
-      .add(this.cardPoolText)
-      .add(btnSizer)
-
-    // Create catalog region
-    this.catalogRegion = new CatalogRegionJourney()
-    const catalogRegion = this.catalogRegion.create(this as any) // Cast to BuilderBase type
-    // TODO Fix the cast >n<
-    catalogRegion.filter((card) => {
-      return getUnlockedCards().has(card)
-    })
-
-    this.missionDetailsView
-      .add(leftSizer, { expand: true })
-      .add(catalogRegion.panel, { expand: true })
-      .addBackground(background)
-      .layout()
-
-    this.missionDetailsView.hide()
+    const coords = UserSettings._get('journeyCoordinates')
+    container.setPosition(coords.x, coords.y)
   }
 
-  private createPostMatch(expGained: number, postMatchText: string) {
-    this.postMatchView = this.add.container().setAlpha(0)
-
-    // Avatar image
-    const image = this.add
-      .image(0, 0, `avatar-${avatarNames[this.selectedAvatar]}Full`)
-      .setInteractive()
-    this.addShadow(image)
-
-    // Contents
-    const background = this.add.image(0, 0, 'background-Light').setInteractive()
-    this.addShadow(background)
-
-    const sizer = this.rexUI.add
-      .sizer({
-        orientation: 'vertical',
-        width: Space.cardWidth * 2 + Space.pad * 3,
-        space: {
-          item: Space.pad,
-          left: Space.pad,
-          right: Space.pad,
-        },
-      })
-      .setOrigin(1, 0.5)
-
-    const title = this.add.text(0, 0, 'Story Complete!', Style.announcement)
-
-    const txt = this.add.text(0, 0, postMatchText, Style.basic)
-
-    // Experience gained and associated info
-    const expBar = createExpBar(this, this.selectedAvatar, expGained)
-
-    // Any unlocked cards, revealed when exp bar levels up
-    let cardsSizer: Sizer = this.rexUI.add.sizer({
-      space: { item: Space.pad },
-    })
-    expBar.on('levelup.start', () => {
-      getUnlocksAtLevel(this.selectedAvatar, expBar.level).forEach((card) => {
-        const cont = new ContainerLite(
-          this,
-          0,
-          0,
-          Space.cardWidth,
-          Space.cardHeight,
-        )
-        const cardImage = new CardImage(card, cont)
-        cardsSizer.add(cont)
-      })
-      // sizer.layout()
-
-      // Scale up the contianer and cards
-      cardsSizer.setScale(0)
-      this.tweens.add({
-        targets: cardsSizer,
-        scale: 1,
-        duration: 600,
-        ease: Ease.basic,
-        onUpdate: () => {
-          sizer.layout()
-        },
-      })
-    })
-
-    // Buttons
-    const btnContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.avatarSize,
-      Space.avatarSize,
-    )
-    new Buttons.Basic({
-      within: btnContainer,
-      text: 'Next',
-      f: () => {
-        // NOTE CardImage deleted because bug with containerlite in sizers
-        cardsSizer.destroy()
-        this.postMatchView.setAlpha(0)
-        this.waitingView.show()
-      },
-    })
-
-    sizer
-      .add(title)
-      .add(txt)
-      .add(cardsSizer)
-      .add(expBar)
-      .add(btnContainer)
-      .addBackground(background)
-      .layout()
-    this.postMatchView.add(sizer)
-
-    // Anchors
-    this.plugins.get('rexAnchor')['add'](image, {
-      y: `50%`,
-      left: `0%+${Space.pad}`,
-    })
-    this.plugins.get('rexAnchor')['add'](sizer, {
-      y: `50%`,
-      right: `100%-${Space.pad}`,
-    })
-
-    // Add everything to the container
-    this.postMatchView.add(image).add(sizer)
-  }
-
-  private createWaitingNotice() {
-    this.waitingView = this.rexUI.add.sizer({
-      orientation: 'vertical',
-      space: {
-        item: Space.pad,
-        top: Space.pad,
-        bottom: Space.pad,
-        left: Space.pad,
-        right: Space.pad,
-      },
-    })
-
-    const background = this.add.image(0, 0, 'background-Light').setInteractive()
-    this.addShadow(background)
-
-    const txtNotice = this.add.text(
-      0,
-      0,
-      'Daily journey complete',
-      Style.announcement,
-    )
-    const txtHint = this.add.text(0, 0, 'You can start again!', Style.basic)
-    // this.txtTimer = this.add.text(0, 0, '00:00:00', Style.basic)
-    const btnContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: btnContainer,
-      text: 'Exit',
-      f: () => {
-        this.waitingView.hide()
-        this.characterSelectView.setAlpha(1)
-      },
-    })
-
-    this.waitingView
-      .add(txtNotice)
-      .add(txtHint)
-      // .add(this.txtTimer)
-      .add(btnContainer)
-      .addBackground(background)
-      .layout()
-      .hide()
-
-    this.plugins.get('rexAnchor')['add'](this.waitingView, {
-      x: `50%`,
-      y: `50%`,
+  private static rememberCoordinates(
+    camera: Phaser.Cameras.Scene2D.Camera,
+  ): void {
+    UserSettings._set('journeyCoordinates', {
+      x: camera.scrollX,
+      y: camera.scrollY,
     })
   }
 
-  private createButtons() {
-    const btnSizer = this.rexUI.add.sizer({
-      space: { item: Space.pad },
-    })
-
-    // TODO Buttons should have option to return a containerLite
-    const cont1 = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: cont1,
-      text: 'Back',
-      f: () => {
-        this.characterSelectView.setAlpha(1)
-        this.missionDetailsView.hide()
-      },
-    })
-
-    const cont3 = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    this.startBtn = new Buttons.Basic({
-      within: cont3,
-      text: 'Start',
-      f: () => {
-        if (!server || !server.isOpen()) {
-          this.signalError(Messages.disconnectError)
-          return
+  // Return the function for what happens when the given mission node is clicked on (from overlay Start button)
+  private missionOnClick(mission: MissionDetails): () => void {
+    return () => {
+      if ('deck' in mission) {
+        this.scene.start('MapJourneyBuilderScene', mission)
+      } else if ('tip' in mission) {
+        // Tip node: mark complete and show tip popup
+        UserSettings._setIndex('completedMissions', mission.id, true)
+        const onMenuClosed = () => {
+          this.refreshOverlayContent(false)
         }
-
-        // Start journey
-        const deck: Deck = {
-          name: 'Journey deck',
-          cards: this.decklist.getDeckCode(),
-          cosmeticSet: { avatar: this.selectedAvatar, border: 0 },
-        }
-        const opponentDeck: Deck = {
-          name: 'todo name me',
-          cards: this.selectedMission.opponentDeck,
-          cosmeticSet: { avatar: 0, border: 0 },
-        }
-
-        this.scene.start('JourneyMatchScene', {
-          deck: deck,
-          aiDeck: opponentDeck,
-          avatar: this.selectedAvatar,
-          uponRoundWinText: this.selectedMission.uponRoundWinText,
-          winText: this.selectedMission.winText,
-          loseText: this.selectedMission.loseText,
+        this.scene.launch('MenuScene', {
+          menu: 'message',
+          title: 'Tip',
+          s: mission.tip,
         })
-
-        logEvent('queue_journey')
-      },
-    })
-
-    this.startBtn.enabled = false
-    btnSizer.add(cont1).add(cont3)
-
-    return btnSizer
-  }
-
-  private onClickCutout(): (cutout: Cutout) => () => void {
-    return (cutout: Cutout) => {
-      return () => {
-        this.decklist.removeCard(cutout.card)
-        this.missionDetailsView.layout()
-        this.updateDeckState()
+        this.scene.get('MenuScene').events.once('shutdown', onMenuClosed)
       }
     }
-  }
-
-  private updateDeckState() {
-    const deckSize = this.decklist.getDeckCode().length
-    const targetSize = MechanicsSettings.DECK_SIZE
-
-    // Update the instruction text - hide it when deck is ready
-    if (deckSize < targetSize) {
-      const remainingCards = targetSize - deckSize
-      this.cardPoolText.setText(
-        `Select ${remainingCards} more cards for your deck`,
-      )
-    } else if (deckSize > targetSize) {
-      const excessCards = deckSize - targetSize
-      this.cardPoolText.setText(`Remove ${excessCards} cards from your deck`)
-    } else {
-      // No text when deck is ready (exactly 15 cards)
-      this.cardPoolText.setText('')
-    }
-
-    if (deckSize === targetSize) {
-      this.startBtn.enable()
-    } else {
-      this.startBtn.disable()
-    }
-    this.missionDetailsView.layout()
-  }
-
-  private setMissionInfo(mission: JourneyMission, avatarIndex: number) {
-    this.selectedMission = mission
-    this.selectedAvatar = avatarIndex
-
-    // Update the text / avatar
-    this.txtMissionTitle.setText(`${avatarNames[avatarIndex]}'s Story`)
-    this.txtMissionDescription.setText(mission.missionText)
-
-    // Update the decklist
-    this.decklist.setJourneyDeck(
-      mission.deck.map((id) => Catalog.getCardById(id)),
-    )
-
-    // Update deck state after setting initial deck
-    this.updateDeckState()
-  }
-
-  beforeExit() {
-    // Stop the map scene when exiting journey
-    if (this.scene.isActive('MapScene')) {
-      this.scene.stop('MapScene')
-    }
-  }
-
-  // Methods required by CatalogRegion
-  addCardToDeck(card: Card) {
-    // Don't add if deck is already at maximum size (30 cards)
-    if (this.decklist.getDeckCode().length >= 30) {
-      return
-    }
-
-    this.decklist.addCard(card)
-    this.missionDetailsView.layout()
-    this.updateDeckState()
-  }
-
-  isOverfull(): boolean {
-    return this.decklist.getDeckCode().length >= 30
-  }
-
-  getCount(card: Card): number {
-    return this.decklist.getCards().filter((id) => id === card.id).length
-  }
-
-  // Get the missions that appear this time
-  private getMissionChoices(): [
-    [JourneyMission, number],
-    [JourneyMission, number],
-  ] {
-    // Total exp with all avatars
-    const totalExp = UserSettings._get('avatar_experience').reduce(
-      (acc, curr) => acc + curr,
-      0,
-    )
-
-    // 1. Determine which characters might appear
-    let maxIdx = 5
-    if (totalExp < 2200) maxIdx = 4
-    if (totalExp < 1200) maxIdx = 3
-    if (totalExp < 600) maxIdx = 2
-    if (totalExp < 200) maxIdx = 1
-    const allowed = Array.from({ length: maxIdx + 1 }, (_, i) => i)
-
-    // 2. Deterministic seed from UTC date
-    const now = new Date()
-    const seedStr = `${now.getUTCFullYear()}-${now.getUTCMonth()}-${now.getUTCDate()}`
-    let seed = 0
-    for (let i = 0; i < seedStr.length; i++)
-      seed = (seed * 31 + seedStr.charCodeAt(i)) & 0xffffffff
-
-    // Simple deterministic RNG (mulberry32)
-    function mulberry32(a: number) {
-      return function () {
-        let t = (a += 0x6d2b79f5)
-        t = Math.imul(t ^ (t >>> 15), t | 1)
-        t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-      }
-    }
-    const rand = mulberry32(seed)
-
-    // 3. Randomly pick 2 unique characters
-    const results: [JourneyMission, number][] = []
-    while (results.length < 2) {
-      const idx = allowed[Math.floor(rand() * allowed.length)]
-      if (results.find((result) => result[1] === idx)) continue
-
-      // Get the right mission based off this avatar's exp
-      const level = getCharacterLevel(idx).level
-      const avatarMissionTrack = JOURNEY_MISSIONS[idx]
-
-      // Use level to determine mission index (level 1 = index 0, etc.)
-      // Clamp to available missions
-      const missionIndex = Math.min(level - 1, avatarMissionTrack.length - 1)
-      const mission = avatarMissionTrack[missionIndex]
-
-      results.push([mission, idx])
-    }
-
-    // We are guaranteeing 2 results in the above loop
-    return results as [[JourneyMission, number], [JourneyMission, number]]
   }
 }

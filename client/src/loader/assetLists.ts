@@ -9,10 +9,16 @@ export const assetLists = {
       "Mia",
       "Mitra",
       "AdonisFull",
+      "AdonisFull",
+      "ImaniFull",
       "ImaniFull",
       "JulesFull",
+      "JulesFull",
+      "KitzFull",
       "KitzFull",
       "MiaFull",
+      "MiaFull",
+      "MitraFull",
       "MitraFull"
     ],
     "dimensions": {
@@ -41,7 +47,7 @@ export const assetLists = {
         "height": 130
       }
     },
-    "pixelArt": true
+    "pixelArt": false
   },
   "card": {
     "files": [
@@ -52,6 +58,7 @@ export const assetLists = {
       "Awakening",
       "Balance",
       "Begging Bowl",
+      "Beginner's Mind",
       "Birth",
       "Boa",
       "Bounty",
@@ -169,6 +176,7 @@ export const assetLists = {
       "Awakening",
       "Balance",
       "Begging Bowl",
+      "Beginner's Mind",
       "Birth",
       "Boa",
       "Bounty",
@@ -291,6 +299,8 @@ export const assetLists = {
       "HomeButton",
       "InputText",
       "Inspire",
+      "JourneyClearStamp",
+      "JourneyStar",
       "JourneyTab",
       "Leaderboard",
       "LeaderboardTab",
@@ -301,9 +311,7 @@ export const assetLists = {
       "Nourish",
       "Options",
       "PlayTab",
-      "PlayTab",
       "Pointer",
-      "ProfileTab",
       "ProfileTab",
       "Quest",
       "QuestionMark",
@@ -332,41 +340,12 @@ export const assetLists = {
     },
     "pixelArt": false
   },
-  "store": {
-    "files": [
-      "Butterfly-full",
-      "Butterfly",
-      "DandelionRelic-full",
-      "DandelionRelic",
-      "Imani-full",
-      "Imani",
-      "JadeCardback-full",
-      "JadeCardback",
-      "Jules-full",
-      "Jules",
-      "ThornBorder-full",
-      "ThornBorder"
-    ],
-    "pixelArt": true
-  },
   "background": {
     "files": [
       "Dark",
       "Light"
     ],
     "pixelArt": false
-  },
-  "journey": {
-    "files": [
-      "Map",
-      "Match",
-      "Mission",
-      "Story 1",
-      "Story 2",
-      "Story 3",
-      "Story 4"
-    ],
-    "pixelArt": true
   },
   "border": {
     "files": [
@@ -394,12 +373,6 @@ export const assetLists = {
       }
     },
     "pixelArt": true
-  },
-  "pet": {
-    "files": [
-      "Butterfly"
-    ],
-    "pixelArt": false
   },
   "roundResult": {
     "files": [

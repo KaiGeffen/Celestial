@@ -17,6 +17,7 @@ import ensureMusic from '../loader/audioManager'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
 import { server } from '../server'
+import Loader from '../loader/loader'
 
 // Whether the user has seen the disconnect error message since their last connection
 let hasShownDisconnectError = false
@@ -41,6 +42,9 @@ class SharedBaseScene extends Phaser.Scene {
 
     // Text for when user does something and gets a message
     this.txtMessage = this.createMessageText()
+
+    // Load the journey material, in case it's not already loaded
+    Loader.loadJourneyMapAndMission(this)
   }
 
   private createMessageText(): RexUIPlugin.BBCodeText {
@@ -121,6 +125,8 @@ class SharedBaseScene extends Phaser.Scene {
 export default class BaseScene extends SharedBaseScene {
   private btnOptions: Button
   private btnNetworkStatus: Button
+  private btnFriends: Button
+  private txtFPS: Phaser.GameObjects.Text
 
   // The last scene before this one
   private lastScene: string
@@ -133,12 +139,44 @@ export default class BaseScene extends SharedBaseScene {
   create(params = {}): void {
     super.create(params)
 
+    // FPS display (top-right corner) - created first so it's behind other UI
+    this.txtFPS = this.add
+      .text(Space.windowWidth, 0, '', {
+        fontFamily: 'Arial',
+        fontSize: '16px',
+        color: '#009900',
+      })
+      .setOrigin(1, 0)
+      .setDepth(5)
+      .setScrollFactor(0)
+    this.plugins.get('rexAnchor')['add'](this.txtFPS, {
+      x: `100%`,
+      y: `0%`,
+    })
+
     // On mobile, ensure music is playing the first time a click happens
     if (Flags.mobile) {
       this.input.once('pointerdown', () => {
         ensureMusic(this)
       })
     }
+
+    // Friends list button (to the left of options)
+    this.btnFriends = new Buttons.Icon({
+      name: 'Friends',
+      within: this,
+      f: this.openFriendsList(),
+      muteClick: true,
+    })
+      .setOrigin(1, 0.5)
+      .setDepth(10)
+      .setNoScroll()
+
+    // Anchor to the left of options button
+    this.plugins.get('rexAnchor')['add'](this.btnFriends.icon, {
+      x: `100%-${Space.pad + Space.iconSize + Space.pad}`,
+      y: `0%+${Space.pad + Space.iconSize / 2}`,
+    })
 
     // Menu button
     this.btnOptions = new Buttons.Icon({
@@ -194,6 +232,28 @@ export default class BaseScene extends SharedBaseScene {
   update(time: number, delta: number): void {
     super.update(time, delta)
 
+    // Update FPS display
+    if (this.txtFPS) {
+      const fps = Math.round(this.game.loop.actualFps)
+      this.txtFPS.setText(`${fps}`)
+    }
+
+    // Check for pending reconnect - if so, start the match scene
+    const reconnect = Server.pendingReconnect
+    if (reconnect) {
+      // Clear the pending reconnect
+      Server.pendingReconnect = null
+
+      // Stop current scenes and start the match scene for the reconnected match
+      this.scene.start('StandardMatchScene', {
+        isPvp: true,
+        deck: [],
+        aiDeck: [],
+        gameStartState: reconnect.state,
+      })
+      return
+    }
+
     // Check server connection status
     const icon = this.btnNetworkStatus.icon
     if (server && !server.isOpen()) {
@@ -206,10 +266,13 @@ export default class BaseScene extends SharedBaseScene {
         hasShownDisconnectError = true
       }
 
-      // Flip twice per second (every 500ms)
+      // Flip twice per second (every 500ms) and attempt reconnect
       if (time - this.lastFlipTime >= 500) {
         icon.setScale(-icon.scaleX, 1)
         this.lastFlipTime = time
+
+        // Attempt reconnect
+        Server.reconnect(this.game)
       }
     } else {
       // Server is connected - hide the icon
@@ -248,6 +311,15 @@ export default class BaseScene extends SharedBaseScene {
 
       this.scene.launch('MenuScene', {
         menu: 'options',
+        activeScene: this,
+      })
+    }
+  }
+
+  private openFriendsList(): () => void {
+    return () => {
+      this.scene.launch('MenuScene', {
+        menu: 'onlinePlayers',
         activeScene: this,
       })
     }
@@ -318,9 +390,10 @@ export class BaseSceneWithHeader extends BaseScene {
 
   private createUserStatsDisplay(): void {
     // Create the text object displaying user stats
+    // Position accounts for: friends icon + padding + options icon + padding
     this.userStatsDisplay = this.add
       .text(
-        Space.windowWidth - (Space.pad * 2 + Space.iconSize),
+        Space.windowWidth - (Space.pad * 3 + Space.iconSize * 2),
         this.headerHeight / 2,
         '',
         Style.basic,

@@ -157,7 +157,7 @@ const storytime = new Storytime({
   name: 'Storytime',
   id: 82,
   cost: 6,
-  points: 3,
+  points: 4,
   text: 'Create a copy in hand of each card later in the 	story with base-cost 0.',
 })
 
@@ -203,10 +203,13 @@ class JustLikeDad extends Card {
     super.play(player, game, index, bonus)
 
     if (super.exhale(2, game, player)) {
+      let card
       if (game.story.acts.length > 0) {
-        const card = game.story.acts[game.story.acts.length - 1].card
-        game.create(player, card)
+        card = game.story.acts[game.story.acts.length - 1].card
+      } else {
+        card = this
       }
+      game.create(player, card)
     }
   }
 }
@@ -327,11 +330,10 @@ class BeginnersMind extends Card {
 }
 const beginnersMind = new BeginnersMind({
   name: "Beginner's Mind",
-  id: 5024,
+  id: 105,
   cost: 1,
   points: 1,
   text: 'When this is shuffled, move it to the top of your deck.',
-  beta: true,
 })
 
 class GrowingUp extends Card {

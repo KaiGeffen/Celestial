@@ -4,8 +4,8 @@ import { USER_DATA_PORT } from '../../../shared/network/settings'
 import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 
 import { db } from '../db/db'
-import { players } from '../db/schema'
-import { eq, sql } from 'drizzle-orm'
+import { players, approvedRefs } from '../db/schema'
+import { eq, sql, inArray } from 'drizzle-orm'
 import { ServerWS } from '../../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../../shared/types/deck'
 import { AchievementManager } from '../achievementManager'
@@ -13,6 +13,7 @@ import Garden from '../db/garden'
 import Catalog from '../../../shared/state/catalog'
 
 import PveMatch from './match/pveMatch'
+import PveMatchMission from './match/pveMatchMission'
 import PvpMatch from './match/pvpMatch'
 import Match from './match/match'
 import { MechanicsSettings } from '../../../shared/settings'
@@ -21,6 +22,8 @@ import TutorialMatch from './match/tutorialMatch'
 import sendUserData from './sendUserData'
 import { getStartingInventoryBitString } from '../startingInventory'
 import PveSpecialMatch from './match/pveSpecialMatch'
+import REWARD_AMOUNTS from '../../../shared/config/rewardAmounts'
+import { journeyData } from '../../../shared/journey/journey'
 
 // An ongoing match
 class ActiveGame {
@@ -38,6 +41,7 @@ interface WaitingPlayer {
 }
 
 const CARD_COST = 1000
+const REFERRAL_BONUS_GOLD = 1000
 
 // Players searching for a match with password as key
 let searchingPlayers: { [key: string]: WaitingPlayer } = {}
@@ -45,8 +49,8 @@ let searchingPlayers: { [key: string]: WaitingPlayer } = {}
 // List of active player connections
 let activePlayers: { [key: string]: ServerWS } = {}
 
-// Dictionary of players that could reconnect, and the match they were in
-let usersAwaitingReconnect: { [key: string]: ActiveGame } = {}
+// Dictionary from players to games they're in, for reconnect purposes
+let userGameReconnectMap: { [key: string]: ActiveGame } = {}
 
 // Create the websocket server
 export default function createWebSocketServer() {
@@ -100,12 +104,16 @@ export default function createWebSocketServer() {
           await sendUserData(ws, id)
 
           // If user is in a match, reconnect them
-          if (usersAwaitingReconnect[uuid]) {
+          if (
+            userGameReconnectMap[uuid] &&
+            userGameReconnectMap[uuid].match &&
+            !userGameReconnectMap[uuid].match.isOver()
+          ) {
             // Set the active game for this connection
-            activeGame = usersAwaitingReconnect[uuid]
+            activeGame = userGameReconnectMap[uuid]
 
-            // Remove them from the reconnect queue
-            delete usersAwaitingReconnect[uuid]
+            // NOTE Don't delete to avoid client not successfully loading the state (Due to network issues etc)
+            // delete usersAwaitingReconnect[uuid]
 
             // Reconnect the user
             activeGame.match.reconnectUser(ws, activeGame.playerNumber)
@@ -139,7 +147,7 @@ export default function createWebSocketServer() {
         })
         .on(
           'sendInitialUserData',
-          async ({ username, decks, inventory, missions }) => {
+          async ({ username, decks, inventory, missions, ref }) => {
             if (!id) {
               throw new Error('User sent initial user data before signing in')
             }
@@ -159,6 +167,18 @@ export default function createWebSocketServer() {
               }
             }
 
+            // Check if the ref is valid, and award bonus gold if so
+            ref = ref ? ref.toLowerCase() : null
+            if (ref) {
+              const allowed = await db
+                .select({ code: approvedRefs.code })
+                .from(approvedRefs)
+                .where(sql`LOWER(${approvedRefs.code}) = LOWER(${ref})`)
+                .limit(1)
+              if (allowed.length === 0) ref = null
+            }
+            const bonusGold = ref ? REFERRAL_BONUS_GOLD : 0
+
             // Create new user entry in database
             const data = {
               id: id,
@@ -172,17 +192,19 @@ export default function createWebSocketServer() {
               pve_losses: 0,
               inventory: inventory,
               completedmissions: missions,
+              missiongoldclaimed: '',
               avatar_experience: [0, 0, 0, 0, 0, 0],
               card_inventory: getStartingInventoryBitString(),
               lastactive: new Date().toISOString(),
               garden: [],
               gems: 0,
-              coins: 0,
+              coins: bonusGold,
               cosmetic_set: JSON.stringify({
                 avatar: 0,
                 border: 0,
                 relic: 0,
               }),
+              ref,
             }
             await db.insert(players).values(data)
 
@@ -215,6 +237,50 @@ export default function createWebSocketServer() {
             reward: harvestResult.reward,
             goldReward: harvestResult.goldReward,
           })
+        })
+        .on('claimMissionGold', async ({ missionId }) => {
+          if (!id) return
+
+          const missionExists = journeyData.some(
+            (mission) => mission.id === missionId,
+          )
+          if (!missionExists) {
+            ws.send({ type: 'signalError' })
+            return
+          }
+
+          await db.transaction(async (tx) => {
+            const [playerData] = await tx
+              .select({
+                missiongoldclaimed: players.missiongoldclaimed,
+              })
+              .from(players)
+              .where(eq(players.id, id))
+              .limit(1)
+
+            if (!playerData) return
+
+            let missiongoldclaimed = playerData.missiongoldclaimed ?? ''
+            // The mission gold has already been claimed
+            if (missiongoldclaimed?.[missionId] === '1') {
+              return
+            }
+
+            const claimArray = missiongoldclaimed.split('')
+            while (claimArray.length <= missionId) claimArray.push('0')
+            claimArray[missionId] = '1'
+            missiongoldclaimed = claimArray.join('')
+
+            await tx
+              .update(players)
+              .set({
+                missiongoldclaimed,
+                coins: sql`${players.coins} + ${REWARD_AMOUNTS.missionComplete}`,
+              })
+              .where(eq(players.id, id))
+          })
+
+          await sendUserData(ws, id)
         })
         // Store
         .on('purchaseItem', async ({ id: itemId }) => {
@@ -280,6 +346,21 @@ export default function createWebSocketServer() {
             .where(eq(players.id, id))
         })
         // Connect to match
+        .on('initMission', async ({ uuid, deck, missionID }) => {
+          if (!id) return
+          console.log('Mission:', missionID)
+          try {
+            activeGame.match = new PveMatchMission(ws, uuid, deck, missionID)
+          } catch (e) {
+            console.error('initMission:', e)
+            return
+          }
+          activeGame.playerNumber = 0
+
+          logFunnelEvent(uuid, 'play_mode', 'journey')
+
+          await activeGame.match.notifyState()
+        })
         .on('initPve', async ({ aiDeck, uuid, deck }) => {
           if (!id) return
           console.log(
@@ -440,7 +521,7 @@ export default function createWebSocketServer() {
 
           // Queue them to be reconnected (Unless tutorial)
           if (!(activeGame.match instanceof TutorialMatch)) {
-            usersAwaitingReconnect[id] = activeGame
+            userGameReconnectMap[id] = activeGame
           }
         }
       })
@@ -450,6 +531,56 @@ export default function createWebSocketServer() {
   })
 
   console.log('User-data server is running on port: ', USER_DATA_PORT)
+
+  // Broadcast online players list every 2 seconds
+  setInterval(async () => {
+    try {
+      const activeUserIds = Object.keys(activePlayers).filter(
+        (id) => activePlayers[id] && activePlayers[id].isOpen(),
+      )
+
+      let playersList: Array<{ username: string; cosmeticSet: any }> = []
+
+      if (activeUserIds.length > 0) {
+        // Get player data from database
+        const playerData = await db
+          .select({
+            id: players.id,
+            username: players.username,
+            cosmetic_set: players.cosmetic_set,
+          })
+          .from(players)
+          .where(inArray(players.id, activeUserIds))
+
+        // Build the players list with username and cosmetic set
+        playersList = playerData.map((player) => {
+          let cosmeticSet
+          try {
+            cosmeticSet = JSON.parse(player.cosmetic_set)
+          } catch (e) {
+            cosmeticSet = { avatar: 0, border: 0, relic: 0 }
+          }
+          return {
+            username: player.username,
+            cosmeticSet,
+          }
+        })
+      }
+
+      // Send to all active websockets
+      activeUserIds.forEach((id) => {
+        const ws = activePlayers[id]
+        if (ws && ws.isOpen()) {
+          ws.send({
+            type: 'broadcastOnlinePlayersList',
+            players: playersList,
+          })
+        }
+      })
+    } catch (e) {
+      console.error('Error broadcasting online players:', e)
+    }
+  }, 2000)
 
   // Debug: Print active users every 2 seconds
   // setInterval(() => {

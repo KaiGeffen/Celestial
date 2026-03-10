@@ -18,7 +18,6 @@ import TheirBoardRegion from './matchRegions/theirBoard'
 import StoryRegion from './matchRegions/story'
 import OurScoreRegion from './matchRegions/ourScore'
 import MulliganRegion from './matchRegions/mulliganRegion'
-import { ResultsRegionJourney } from './matchRegions/matchResults'
 
 // TODO Figure out
 import { server } from '../server'
@@ -46,6 +45,7 @@ export class MatchScene extends BaseScene {
   init(params: {
     deck?: Deck
     missionID?: number
+    missionCards?: number[]
     isPvp?: boolean
     password?: string
     aiDeck?: Deck
@@ -88,12 +88,21 @@ export class MatchScene extends BaseScene {
         enabledModes: params.enabledModes,
       })
     } else {
-      server.send({
-        type: 'initPve',
-        aiDeck: params.aiDeck,
-        uuid: Server.getUserData().uuid,
-        deck: params.deck,
-      })
+      if (params.missionID !== undefined) {
+        server.send({
+          type: 'initMission',
+          uuid: Server.getUserData().uuid,
+          deck: params.deck,
+          missionID: params.missionID,
+        })
+      } else {
+        server.send({
+          type: 'initPve',
+          aiDeck: params.aiDeck,
+          uuid: Server.getUserData().uuid,
+          deck: params.deck,
+        })
+      }
     }
 
     // Create the view
@@ -666,145 +675,18 @@ export class StandardMatchScene extends MatchScene {
   }
 }
 
-// TODO Move to another file
-const EXP_ON_LOSS = 0
-const EXP_ON_WIN = 100
-
+// TODO Consider removing this if it's not adding anything
 export class JourneyMatchScene extends MatchScene {
-  expGained: number
-  postMatchText: string
-  uponRoundWinText: [string, string, string, string, string, string]
-
-  // Whether the user has already gained experience from winning the match
-  winExpGained: boolean
-
-  // The avatar that the user is playing as
-  avatar: number
-
   constructor(args = { key: 'JourneyMatchScene', lastScene: 'JourneyScene' }) {
     super(args)
   }
 
-  create() {
-    super.create()
-
-    // Replace the results screen with journey version
-    this.view.results = new ResultsRegionJourney().create(this)
-
-    // Ensure that experience is only gained once
-    this.winExpGained = false
-
-    // Set the avatar that the user is playing as
-    this.avatar = this.params.avatar
-
-    // Set the dialog that shows the first time you have a given number of rounds won
-    this.uponRoundWinText = this.params.uponRoundWinText?.slice() ?? []
-
-    // Set to winText when they win
-    this.postMatchText = this.params.loseText
-
-    // Default exp gained, gain more if they win
-    this.expGained = EXP_ON_LOSS
-    this.grantExp(EXP_ON_LOSS)
-  }
-
-  // Ensure that user gets exp
-  queueState(state: GameModel): void {
-    // Set post match text and exp gained
-    if (state.winner === 0 && !this.winExpGained) {
-      this.postMatchText = this.params.winText
-      this.expGained = EXP_ON_WIN
-      this.grantExp(EXP_ON_WIN - EXP_ON_LOSS)
-      this.winExpGained = true
-    }
-
-    super.queueState(state)
-  }
-
-  protected displayState(state: GameModel): boolean {
-    const result = super.displayState(state)
-    if (!result) return false
-
-    // Display the upon round win text, then ensure it doesn't show again
-    if (!state.isRecap && state.mulligansComplete.every((m) => m)) {
-      // const s = this.uponRoundWinText[state.wins[0]]
-      // if (s) {
-      //   this.signalError(s)
-      //   this.uponRoundWinText[state.wins[0]] = undefined
-      // }
-    }
-
-    return result
-  }
-
   signalMatchFound(
     name1: string,
     name2: string,
     elo1: number,
     elo2: number,
   ): void {}
-
-  doExit(): () => void {
-    return () => {
-      this.beforeExit()
-      this.scene.start('JourneyScene', {
-        postMatch: true,
-        expGained: this.expGained,
-        postMatchText: this.postMatchText,
-      })
-    }
-  }
-
-  // Grant the given amount of experience to the user
-  private grantExp(exp: number): void {
-    UserSettings._increment('avatar_experience', this.avatar, exp)
-  }
-}
-
-// TODO This is the old map based journey match scene
-export class MapJourneyMatchScene extends MatchScene {
-  winSeen: boolean
-
-  constructor(
-    args = { key: 'MapJourneyMatchScene', lastScene: 'MapJourneyScene' },
-  ) {
-    super(args)
-  }
-
-  create() {
-    super.create()
-
-    console.log('MapJourneyMatchScene create', this.params)
-
-    // Must be reset each time this scene is run
-    this.winSeen = false
-  }
-
-  // When the player wins for the first time, unlock appropriately
-  queueState(state: GameModel): void {
-    if (!this.winSeen && state.winner === 0) {
-      this.winSeen = true
-      this.unlockMissionRewards()
-    }
-    super.queueState(state)
-  }
-
-  signalMatchFound(
-    name1: string,
-    name2: string,
-    elo1: number,
-    elo2: number,
-  ): void {}
-
-  private unlockMissionRewards(): void {
-    // Set that user has completed the missions with this id
-    if (this.params.missionID !== undefined) {
-      // NOTE This is a hack to prevent the server sending the mission to overwrite our local completed missions change
-      setTimeout(() => {
-        UserSettings._setIndex('completedMissions', this.params.missionID, true)
-      }, 200)
-    }
-  }
 
   doExit(): () => void {
     return () => {

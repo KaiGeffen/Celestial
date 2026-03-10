@@ -121,7 +121,7 @@ class Parch extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     for (const act of game.story.acts) {
       if (act.owner === player) {
-        bonus += 1
+        bonus += 2
       }
     }
 
@@ -145,7 +145,7 @@ const parch = new Parch({
   id: 64,
   cost: 3,
   points: 3,
-  text: 'Worth +1 for each of your cards later in the story. Discard those cards.',
+  text: 'Worth +2 for each of your cards later in the story. Discard those cards.',
   story:
     'We drank and we drank, then\nWe washed and fed fountains, then\nWe watered and we swam, then\nNow we lick our parched lips',
 })
@@ -272,6 +272,7 @@ class FromAshes extends Card {
     super.onShuffle(player, game, index)
 
     // Make a new version of this card with the correct points
+<<<<<<< HEAD
     const countFleetingInDeck = game.deck[player].filter((card) =>
       card.qualities.includes(Quality.FLEETING),
     ).length
@@ -285,6 +286,15 @@ class FromAshes extends Card {
     const newVersion = this.copy()
     newVersion.points = newPoints
 
+=======
+    const countFleetingInDeck = game.deck[player].filter((card) => card.qualities.includes(Quality.FLEETING)).length
+    const countFleetingInHand = game.hand[player].filter((card) => card.qualities.includes(Quality.FLEETING)).length
+    const newPoints = Math.floor((countFleetingInDeck + countFleetingInHand) / 3)
+    
+    const newVersion = this.copy()
+    newVersion.points = newPoints
+
+>>>>>>> master
     // Replace this card in the deck with the new version
     game.deck[player][index] = newVersion
   }

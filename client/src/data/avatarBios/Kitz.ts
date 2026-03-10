@@ -1,0 +1,4 @@
+export default `You can call me Kitz. Or maybe Kit, I do love a good petname. 
+I’ve lived a comfortable life, thanks to finding success in some areas. And I enjoyed every bit of luxury and indulgence that earned me. The only thing I take greater pleasure in is providing that for someone else, nurturing them by my side. Although I grew up a little lonely, I wound up becoming something of a magnet for people, drawing in countless faces and connections. I treasure them all—even the ones with bittersweet endings. 
+I might sound frivolous, but everyone who knows me can attest to my unexpected dependability. I am quite capable, and if I were more ambitious I’d have probably ended up some famous tech mogul with his own empire. But I prefer a bit of fun, and I prioritize the things that don’t sap my soul. Speaking of soul, I feel like the afterlife was designed for my type. What a pleasure it is to sit around and conversate all day.
+`

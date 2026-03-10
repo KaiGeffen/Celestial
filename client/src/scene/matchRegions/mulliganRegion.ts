@@ -30,11 +30,16 @@ export default class MulliganRegion extends Region {
   // The callback for when the button is clicked
   onButtonClick: () => void
 
+  // If the cards have been displayed (i.e. at start of match, instead of reconnecting after opponent has mulliganed)
+  alreadyDisplayed = false
+
   create(scene: MatchScene): MulliganRegion {
     this.scene = scene
 
     this.cards = []
     this.mulliganChoices = [false, false, false]
+
+    this.alreadyDisplayed = false
 
     this.container = scene.add.container().setDepth(Depth.mulligan)
     this.scene.plugins.get('rexAnchor')['add'](this.container, {
@@ -101,10 +106,11 @@ export default class MulliganRegion extends Region {
       return
     }
 
-    // Don't overwrite after the opponent has mulliganed
-    if (state.mulligansComplete[1]) {
+    // Don't re-display this region after the opponent's mulligan finishes
+    if (this.alreadyDisplayed) {
       return
     }
+    this.alreadyDisplayed = true
 
     this.show()
 

@@ -39,12 +39,20 @@ export class BuilderBase extends BaseScene {
   }
 
   // Filter which cards are visible and selectable in the catalog
+  // and which decks are visible in the decklists region
   // based on the settings in the filter region
   filter() {
     let filterFunction: (card: Card) => boolean =
       this.filterRegion.getFilterFunction()
 
+    // Filter which cards are shown
     this.catalogRegion.filter(filterFunction)
+
+    // Filter which decks are shown
+    if (this.decklistsRegion) {
+      const deckFilter = this.filterRegion.getDeckFilter()
+      this.decklistsRegion.filter(deckFilter)
+    }
   }
 
   // Set the current deck, returns true if deck was valid
@@ -93,99 +101,13 @@ export class BuilderBase extends BaseScene {
   }
 }
 
-export class JourneyBuilderScene extends BuilderBase {
-  journeyRegion: JourneyRegion
-
-  constructor(
-    args = { key: 'JourneyBuilderScene', lastScene: 'MapJourneyScene' },
-  ) {
-    super(args)
-  }
-
-  create(params): void {
-    super.create(params)
-
-    this.catalogRegion = new CatalogRegion().create(this)
-
-    // TODO Not just the 100s digit number
-    const avatar = (Math.floor(params.id / 100) - 1) % 6
-    this.journeyRegion = new JourneyRegion().create(
-      this,
-      this.startCallback(),
-      avatar,
-      this.params.storyTitle,
-      this.params.storyText,
-    )
-    this.journeyRegion.addRequiredCards(params.deck)
-
-    this.filterRegion = new FilterRegion().create(this, true)
-
-    // Must filter out cards that you don't have access to
-    this.filter()
-
-    this.catalogRegion.resize(Space.cutoutWidth)
-  }
-
-  onWindowResize(): void {
-    this.journeyRegion.onWindowResize()
-    this.catalogRegion.resize(Space.cutoutWidth)
-  }
-
-  addCardToDeck(card: Card): void {
-    this.journeyRegion.addCardToDeck(card)
-  }
-
-  getDeckCode(): number[] {
-    return this.journeyRegion.getDeckCode()
-  }
-
-  updateSavedDeck(deck: string): void {}
-
-  protected startCallback(): () => void {
-    return () => {
-      if (!server || !server.isOpen()) {
-        this.signalError(Messages.disconnectError)
-        return
-      }
-
-      // Create a proper deck object using the new type
-      const aiDeck: Deck = {
-        name: 'AI Deck',
-        cards: this.params.opponent,
-        // TODO: Make this is specific to the mission
-        cosmeticSet: {
-          avatar: 0,
-          border: 0,
-          relic: 0,
-        },
-      }
-
-      // Start a match against an ai opponent with the specified deck
-      this.scene.start('JourneyMatchScene', {
-        deck: this.journeyRegion.getDeck(),
-        aiDeck: aiDeck,
-        missionID: this.params.id,
-      })
-    }
-  }
-
-  isOverfull(): boolean {
-    return this.journeyRegion.isOverfull()
-  }
-
-  // Get the amt of a given card in the current deck
-  getCount(card: Card): number {
-    return this.journeyRegion.getCount(card)
-  }
-}
-
 export class MapJourneyBuilderScene extends BuilderBase {
   journeyRegion: JourneyRegion
 
   constructor() {
     super({
       key: 'MapJourneyBuilderScene',
-      lastScene: 'MapJourneyScene',
+      lastScene: 'JourneyScene',
     })
   }
 
@@ -204,22 +126,20 @@ export class MapJourneyBuilderScene extends BuilderBase {
       this,
       this.startCallback(),
       avatar,
-      this.params.storyTitle,
-      this.params.storyText,
     )
-    this.journeyRegion.addRequiredCards(params.deck)
+    this.journeyRegion.addRequiredCards(params.deck, params.opponent)
 
     this.filterRegion = new FilterRegion().create(this, true)
 
     // Must filter out cards that you don't have access to
     this.filter()
 
-    this.catalogRegion.resize(Space.cutoutWidth)
+    this.catalogRegion.resize(Space.cutoutWidth + Space.pad)
   }
 
   onWindowResize(): void {
     this.journeyRegion.onWindowResize()
-    this.catalogRegion.resize(Space.cutoutWidth)
+    this.catalogRegion.resize(Space.cutoutWidth + Space.pad)
   }
 
   addCardToDeck(card: Card): void {
@@ -247,10 +167,11 @@ export class MapJourneyBuilderScene extends BuilderBase {
       }
 
       // Start a match against an ai opponent with the specified deck
-      this.scene.start('MapJourneyMatchScene', {
+      this.scene.start('JourneyMatchScene', {
         deck: this.journeyRegion.getDeck(),
         aiDeck: aiDeck,
         missionID: this.params.id,
+        missionCards: this.params.cards || [],
       })
     }
   }
@@ -264,6 +185,7 @@ export class MapJourneyBuilderScene extends BuilderBase {
     return this.journeyRegion.getCount(card)
   }
 }
+
 
 export class BuilderScene extends BuilderBase {
   lastDecklist: number
@@ -420,10 +342,8 @@ export class BuilderScene extends BuilderBase {
 
       // Open the mode menu to select what mode to play in with the given deck
       this.scene.launch('MenuScene', {
-        menu: 'mode',
+        menu: 'play',
         activeScene: this,
-        deck: this.deckRegion.getDeck(),
-        cosmeticSet: this.deckRegion.cosmeticSet,
       })
     }
   }

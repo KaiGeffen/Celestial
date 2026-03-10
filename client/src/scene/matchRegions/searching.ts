@@ -15,6 +15,7 @@ export default class SearchingRegion extends Region {
   txtTitle: Phaser.GameObjects.Text
   txtTime: Phaser.GameObjects.Text
   matchFound: boolean
+  cancelButton: Button
   password: string
 
   create(scene: MatchScene, avatarId: number, password: string): Region {
@@ -52,6 +53,7 @@ export default class SearchingRegion extends Region {
 
       const i = Math.floor(Math.random() * 6)
       this.mysteryAvatar.setTexture(`avatar-${avatarNames[i]}Full`)
+      this.fitFullAvatar(this.mysteryAvatar)
     }
 
     // Format the timer text
@@ -71,6 +73,11 @@ export default class SearchingRegion extends Region {
 
   displayState(state: GameModel): void {
     this.matchFound = true
+
+    // Once a match is found, prevent further cancel attempts
+    if (this.cancelButton) {
+      this.cancelButton.disable()
+    }
 
     // If player has been waiting trivial time, don't bother
     if (parseInt(this.txtTime.text.replace(':', '')) <= 3) {
@@ -115,42 +122,53 @@ export default class SearchingRegion extends Region {
   }
 
   private createAvatars(scene: Phaser.Scene, avatarId: number): void {
-    const scale = Math.min(1, Space.windowHeight / 600)
     let avatar = scene.add
       .image(-Space.windowWidth / 2, 0, `avatar-${avatarNames[avatarId]}Full`)
-      .setScale(scale)
       .setOrigin(0, 0.5)
+    this.fitFullAvatar(avatar)
 
     this.mysteryAvatar = scene.add
       .image(Space.windowWidth / 2, 0, `avatar-${avatarNames[0]}Full`)
-      .setScale(scale)
       .setTint(Color.grey)
       .setOrigin(1, 0.5)
+    this.fitFullAvatar(this.mysteryAvatar)
 
     this.container.add([avatar, this.mysteryAvatar])
+  }
+
+  private fitFullAvatar(avatar: Phaser.GameObjects.Image): void {
+    const source = this.scene.textures.get(avatar.texture.key).getSourceImage()
+    const availableHeight = Space.windowHeight
+    const scale = availableHeight / source.height
+    avatar.setScale(scale)
   }
 
   private createText(scene: Phaser.Scene): void {
     this.txtTitle = scene.add
       .text(0, -100, 'Searching for an opponent', Style.announcement)
+      .setStroke(Color.backgroundLightS, 4)
       .setOrigin(0.5)
 
     // Password text
     if (this.password) {
       const txtPassword = scene.add
         .text(0, -50, `Password: ${this.password}`, Style.basic)
+        .setStroke(Color.backgroundLightS, 2)
         .setOrigin(0.5)
       this.container.add(txtPassword)
     }
 
     // Time text
-    this.txtTime = scene.add.text(0, 0, '', Style.announcement).setOrigin(0.5)
+    this.txtTime = scene.add
+      .text(0, 0, '', Style.announcement)
+      .setStroke(Color.backgroundLightS, 4)
+      .setOrigin(0.5)
 
     this.container.add([this.txtTitle, this.txtTime])
   }
 
   private addButtons(scene: MatchScene): void {
-    new Buttons.Basic({
+    this.cancelButton = new Buttons.Basic({
       within: this.container,
       text: 'Cancel',
       y: 100,
@@ -209,7 +227,7 @@ export class SearchingRegionTutorial extends Region {
 
   private createImage(scene: Phaser.Scene, tutorialNum: number): void {
     this.img = scene.add
-      .image(0, 0, `journey-Story ${tutorialNum === 0 ? 1 : 3}`)
+      .image(0, 0, `tutorial-${tutorialNum === 0 ? 1 : 3}`)
       .setInteractive()
 
     // Ensure that image fits perfectly in window
@@ -289,7 +307,7 @@ export class SearchingRegionTutorial extends Region {
           // NOTE This is a hack to get the first tutorial to have 2 text per image frame
           if ([3, 5].includes(this.currentFrame)) {
             // Change the background image
-            this.img.setTexture(`journey-Story ${(this.currentFrame + 1) / 2}`)
+            this.img.setTexture(`tutorial-${(this.currentFrame + 1) / 2}`)
 
             this.tweenImage()
           }

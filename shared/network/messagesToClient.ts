@@ -13,6 +13,7 @@ export default interface messagesToClient {
     decks: Deck[]
     username: string
     elo: number
+    pveWins: number
     garden: Date[]
     gems: number
     coins: number
@@ -20,6 +21,7 @@ export default interface messagesToClient {
     cosmeticSet: CosmeticSet
     achievements: Achievement[]
     cardInventory: string
+    missionGoldClaimed: string
   }
   purchaseItemSuccess: {
     itemId: number
@@ -49,4 +51,10 @@ export default interface messagesToClient {
   opponentDisconnected: {}
   opponentReconnected: {}
   opponentEmote: {}
+  broadcastOnlinePlayersList: {
+    players: {
+      username: string
+      cosmeticSet: CosmeticSet
+    }[]
+  }
 }

@@ -2,7 +2,6 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
-import avatarNames from '../../data/avatarNames'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import Cutout from '../../lib/buttons/cutout'
@@ -13,6 +12,7 @@ import newScrollablePanel from '../../lib/scrollablePanel'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
+import Decklist from '../../lib/decklist'
 import BaseScene from '../baseScene'
 
 const width = Space.cutoutWidth // + Space.pad * 2
@@ -39,13 +39,7 @@ export default class DeckRegion {
   private txtChoice: Phaser.GameObjects.Text
   private txtCount: Phaser.GameObjects.Text
 
-  create(
-    scene: BaseScene,
-    startCallback: () => void,
-    avatarID: number,
-    storyTitle: string,
-    storyText: string,
-  ) {
+  create(scene: BaseScene, startCallback: () => void, avatarID: number) {
     this.scene = scene
 
     this.scrollablePanel = newScrollablePanel(scene, {
@@ -58,13 +52,7 @@ export default class DeckRegion {
         child: this.createPanel(startCallback),
       },
 
-      header: this.createHeader(
-        startCallback,
-        undefined,
-        avatarID,
-        storyTitle,
-        storyText,
-      ),
+      header: this.createHeader(startCallback, undefined, avatarID),
 
       space: {
         top: Space.filterBarHeight,
@@ -88,8 +76,6 @@ export default class DeckRegion {
     startCallback: () => void,
     sizer,
     avatarID: number,
-    storyTitle?: string,
-    storyText?: string,
   ): Phaser.GameObjects.GameObject {
     if (sizer === undefined) {
       let background = this.scene.add.rectangle(
@@ -183,20 +169,6 @@ export default class DeckRegion {
       emotive: true,
     })
 
-    // If this mission has text, show that when avatar is clicked
-    if (storyText !== undefined) {
-      this.btnAvatar.setOnClick(
-        () => {
-          this.scene.scene.launch('MenuScene', {
-            menu: 'message',
-            title: storyTitle,
-            s: storyText,
-          })
-        },
-        false,
-        false,
-      )
-    }
     sizer.add(containerAvatar)
 
     return sizer
@@ -291,9 +263,9 @@ export default class DeckRegion {
     }
   }
 
-  // Add cards to the deck that must be in the deck
-  addRequiredCards(cards: number[]): void {
-    const amt = cards.length
+  // Add cards to the deck that must be in the deck; optionally show opponent's deck below
+  addRequiredCards(requiredCards: number[], opponentCards?: number[]): void {
+    const amt = requiredCards.length
 
     // Hint for the cards user's can choose to complete the deck
     this.txtChoice = this.scene.add
@@ -330,7 +302,23 @@ export default class DeckRegion {
     this.panel.add(containerRequired.add(txtRequired))
 
     // Add in a scrollable panel of the required cards
-    this.panel.add(this.createRequiredCardList(cards))
+    this.panel.add(this.createRequiredCardList(requiredCards))
+
+    // Opponent's deck (display only) below required cards
+    if (opponentCards && opponentCards.length > 0) {
+      let txtOpponent = this.scene.add
+        .text(0, 0, `Opponent's deck: ${opponentCards.length}`, Style.basic)
+        .setOrigin(0.5)
+      let containerOpponent = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        width,
+        txtOpponent.height + Space.pad,
+      )
+      this.panel.add(containerOpponent.add(txtOpponent))
+      this.panel.add(this.createOpponentCardList(opponentCards))
+    }
 
     this.updateText()
 
@@ -339,7 +327,10 @@ export default class DeckRegion {
 
   // Create a scrollable panel with all of the cards user has chosen
   private createChosenCardList() {
-    this.chosenPanel = this.scene.rexUI.add.fixWidthSizer()
+    this.chosenPanel = this.scene.rexUI.add.fixWidthSizer({
+      // NOTE Necessary to prevent invisible cutout bug
+      width: width,
+    })
 
     return this.chosenPanel
   }
@@ -361,9 +352,26 @@ export default class DeckRegion {
     return sizer
   }
 
-  // Remove the card from deck which has given index
+  // Create a display-only list of the opponent's deck (grouped like required cards)
+  private createOpponentCardList(cardIds: number[]) {
+    const cards = cardIds
+      .map((id) => Catalog.getCardById(id))
+      .filter(Boolean) as Card[]
+    const decklist = new Decklist(this.scene, () => () => {})
+    decklist.setJourneyDeck(cards)
+    return decklist.sizer
+  }
+
+  // Left click removes a copy, right click adds one
   private removeCardFromDeck(cutout: Cutout): () => void {
     return () => {
+      const pointer: Phaser.Input.Pointer = this.scene.input.activePointer
+
+      if (pointer.rightButtonDown()) {
+        this.addCardToDeck(cutout.card)
+        return
+      }
+
       // Decrement, if fully gone, remove from deck list
       if (cutout.decrement().count === 0) {
         // Find the index of it within the deck list, remove that after
