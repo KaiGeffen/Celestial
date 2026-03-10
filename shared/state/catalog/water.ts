@@ -4,6 +4,7 @@ import { Keywords } from '../keyword'
 import { Animation } from '../../animation'
 import { Zone } from '../zone'
 import { Quality } from '../quality'
+import { ice } from './tokens'
 
 class Mercy extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -246,39 +247,6 @@ const damBreaks = new DamBreaks({
   text: 'Exhale 1: Discard 3 cards. Add your hand to the story after this.',
 })
 
-class Ice extends Card {
-  onDraw(player: number, game: GameModel): void {
-    // Remove from hand
-    game.hand[player].splice(game.hand[player].length - 1, 1)
-
-    // At night, add to the beginning of the story. During the day, add to the end.
-    const index = game.isRecap ? 0 : game.story.acts.length
-    game.story.addAct(this, player, index)
-
-    // TODO Add animation
-    game.animations[player].push(
-      new Animation({
-        from: Zone.Hand,
-        to: Zone.Story,
-        card: this,
-        // Not -1 because it has been removed by this point
-        index: game.hand[player].length,
-        // TODO This goes to where the triggering card is, not to where this ends up, and has bugs with multiple triggers (Fishing Boat)
-        index2: index,
-      }),
-    )
-  }
-}
-const ice = new Ice({
-  name: 'Ice',
-  id: 8005,
-  cost: 1,
-  points: 1,
-  qualities: [Quality.VISIBLE],
-  text: 'Visible\nWhen drawn, add this to the story.',
-  beta: true,
-})
-
 // TODO
 class Ouroboros extends Card {
   onRoundEndIfThisResolved(player: number, game: GameModel) {
@@ -311,7 +279,7 @@ const rime = new Rime({
   name: 'Rime',
   id: 7036,
   cost: 4,
-  points: 4,
+  points: 5,
   text: 'Add 2 copies of Ice to the bottom of your deck.',
 })
 
@@ -330,7 +298,6 @@ export {
   damBreaks,
   overflow,
   // NEW
-  ice,
   ouroboros,
   rime,
 }

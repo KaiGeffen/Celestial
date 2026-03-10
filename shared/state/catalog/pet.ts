@@ -324,7 +324,7 @@ class Heart extends Card {
       return true
     }
 
-    // Otherwise, this card wasn't removed
+    // Otherwise, this card isn't removed
     return false
   }
 }

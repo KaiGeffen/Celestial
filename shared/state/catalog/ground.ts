@@ -31,4 +31,18 @@ const updraft = new Updraft({
   beta: true,
 })
 
+class Groundwork extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    // Bonus +2 for each of your cards before this and after this that aren't interrupted by your opponent's cards
+    super.play(player, game, index, bonus)
+  }
+}
+const groundwork = new Groundwork({
+  name: 'Groundwork',
+  id: 9002,
+  cost: 1,
+  text: 'Worth +2 for each of your cards in a row with this.',
+  beta: true,
+})
+
 export { updraft }

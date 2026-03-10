@@ -272,7 +272,6 @@ class FromAshes extends Card {
     super.onShuffle(player, game, index)
 
     // Make a new version of this card with the correct points
-<<<<<<< HEAD
     const countFleetingInDeck = game.deck[player].filter((card) =>
       card.qualities.includes(Quality.FLEETING),
     ).length
@@ -286,15 +285,6 @@ class FromAshes extends Card {
     const newVersion = this.copy()
     newVersion.points = newPoints
 
-=======
-    const countFleetingInDeck = game.deck[player].filter((card) => card.qualities.includes(Quality.FLEETING)).length
-    const countFleetingInHand = game.hand[player].filter((card) => card.qualities.includes(Quality.FLEETING)).length
-    const newPoints = Math.floor((countFleetingInDeck + countFleetingInHand) / 3)
-    
-    const newVersion = this.copy()
-    newVersion.points = newPoints
-
->>>>>>> master
     // Replace this card in the deck with the new version
     game.deck[player][index] = newVersion
   }
@@ -440,7 +430,7 @@ const remnant = new Remnant({
   id: 2050,
   cost: 2,
   points: 2,
-  text: 'Add an Ashes to your discard pile.\nMorning: Return this to hand. Discard a card.',
+  text: 'Create an Ashes in your discard pile.\nMorning: Return this to hand. Discard a card.',
   beta: true,
 })
 
