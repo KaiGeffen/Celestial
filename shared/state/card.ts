@@ -192,8 +192,15 @@ export default class Card {
 
   onShuffle(player: number, game: GameModel, index: number): void {}
 
-  // Called when a card is played while this is in the story
-  onCardPlayedAfter(player: number, game: GameModel, index: number): void {}
+  // Called when a card is played while this is in the story, return whether the card was removed
+  onCardPlayedAfter(
+    index: number,
+    owner: number,
+    playedCardOwner: number,
+    game: GameModel,
+  ): boolean {
+    return false
+  }
 
   /* Common functions */
   reset(game: GameModel) {

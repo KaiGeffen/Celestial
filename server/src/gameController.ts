@@ -107,9 +107,20 @@ class ServerController {
     this.model.story.addAct(card, player)
 
     // Trigger on-play effects
-    for (let i = 0; i < this.model.story.acts.length - 1; i++) {
+    for (let i = 0; i < this.model.story.acts.length - 1; ) {
       const act = this.model.story.acts[i]
-      act.card.onCardPlayedAfter(player, this.model, i)
+
+      const cardRemoved = act.card.onCardPlayedAfter(
+        i,
+        act.owner,
+        player,
+        this.model,
+      )
+
+      // In the special case in which a card was removed, don't increment i
+      if (!cardRemoved) {
+        i++
+      }
     }
     card.onPlay(player, this.model)
 

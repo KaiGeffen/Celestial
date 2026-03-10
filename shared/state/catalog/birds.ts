@@ -367,6 +367,7 @@ const sudden = new Sudden({
   cost: 3,
   points: 3,
   text: 'When played, remove all card text from a card in your hand.',
+  beta: true,
 })
 
 class SkyBurial extends Card {
@@ -382,6 +383,7 @@ const skyBurial = new SkyBurial({
   points: 7,
   qualities: [Quality.VISIBLE],
   text: 'Visible\nWhen played, create a Vulture before this in the story for your opponent.',
+  beta: true,
 })
 
 export {
