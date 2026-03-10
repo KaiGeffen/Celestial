@@ -86,7 +86,7 @@
     "difficulty": 5,
     "deck": [50, 0, 27, 91, 91],
     "opponent": [2, 63, 63, 63, 97, 97, 68, 68, 7, 7, 98, 98, 84, 46, 46],
-    "cards": [50],
+    "cards": [91],
     "tip": "Pass whenever you can, and play Lantern as your last card to keep the fire burning."
   }
 ]
