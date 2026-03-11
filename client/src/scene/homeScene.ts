@@ -387,19 +387,20 @@ export default class HomeScene extends BaseScene {
       },
     })
 
-    // Image - news asset (deterministic by day of week)
-    const dayOfWeek = new Date().getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-    const newsImages = [
-      'Birth', // Sunday (0)
-      'Goliath', // Monday (1)
-      'LayBare', // Tuesday (2)
-      'MeAndHer', // Wednesday (3)
-      'Nightmare', // Thursday (4)
-      'Possibilities', // Friday (5)
-      'Refresh', // Saturday (6)
-    ]
-    const newsImageName = newsImages[dayOfWeek]
-    const image = this.add.image(0, 0, `news-${newsImageName}`).setOrigin(0, 0)
+    // Image - show CardUpdate (was: deterministic by day of week)
+    // const dayOfWeek = new Date().getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    // const newsImages = [
+    //   'Birth', // Sunday (0)
+    //   'Goliath', // Monday (1)
+    //   'LayBare', // Tuesday (2)
+    //   'MeAndHer', // Wednesday (3)
+    //   'Nightmare', // Thursday (4)
+    //   'Possibilities', // Friday (5)
+    //   'Refresh', // Saturday (6)
+    // ]
+    // const newsImageName = newsImages[dayOfWeek]
+    // const image = this.add.image(0, 0, `news-${newsImageName}`).setOrigin(0, 0)
+    const image = this.add.image(0, 0, 'news-CardUpdate').setOrigin(0, 0)
     imageContainer.add(image, { align: 'top' })
     // Add the image container to contentSizer
     contentSizer.add(imageContainer, { align: 'top' })
@@ -510,7 +511,14 @@ const PATCH_NUMBER = '0.7.15'
 
 const URL = 'https://luma.com/1lsziprm'
 
-const NEWS_TEXT = `🕊️ A warm welcome to all our new players!
+const NEWS_TEXT = `🎴 Card visual redesign nears completion 🎴
+
+We'd love your feedback to help us finalize the look.
+
+Tell us which of 2 version you prefer in the [area=_link_discord][color=#FABD5D]Discord server[/color][/area].`
+
+/*
+`🕊️ A warm welcome to all our new players!
 Please consider joining our [area=_link_discord][color=#FABD5D]Discord server[/color][/area] to collect a one-time reward, receive strategy tips, and play excellent matches with excellent people.
 
 🏆 Our 11th tournament approaches!
@@ -522,3 +530,4 @@ Complete new missions with an ever-growing collection of cards as you learn abou
 
 🌊 Card Borders
 Coming in March, a brand new visual redesign for the cards will go live!`
+*/
