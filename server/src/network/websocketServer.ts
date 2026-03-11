@@ -41,8 +41,6 @@ interface WaitingPlayer {
 }
 
 const CARD_COST = 1000
-const REFERRAL_BONUS_GOLD = 1000
-
 // Players searching for a match with password as key
 let searchingPlayers: { [key: string]: WaitingPlayer } = {}
 
@@ -167,18 +165,6 @@ export default function createWebSocketServer() {
               }
             }
 
-            // Check if the ref is valid, and award bonus gold if so
-            ref = ref ? ref.toLowerCase() : null
-            if (ref) {
-              const allowed = await db
-                .select({ code: approvedRefs.code })
-                .from(approvedRefs)
-                .where(sql`LOWER(${approvedRefs.code}) = LOWER(${ref})`)
-                .limit(1)
-              if (allowed.length === 0) ref = null
-            }
-            const bonusGold = ref ? REFERRAL_BONUS_GOLD : 0
-
             // Create new user entry in database
             const data = {
               id: id,
@@ -198,7 +184,7 @@ export default function createWebSocketServer() {
               lastactive: new Date().toISOString(),
               garden: [],
               gems: 0,
-              coins: bonusGold,
+              coins: 0,
               cosmetic_set: JSON.stringify({
                 avatar: 0,
                 border: 0,
@@ -213,6 +199,20 @@ export default function createWebSocketServer() {
 
             // Handle initial achievement
             await AchievementManager.onConnection(id)
+
+            // Award referral achievement if they used a valid ref
+            ref = ref ? ref.toLowerCase() : null
+            if (ref) {
+              const allowed = await db
+                .select({ code: approvedRefs.code })
+                .from(approvedRefs)
+                .where(sql`LOWER(${approvedRefs.code}) = LOWER(${ref})`)
+                .limit(1)
+              if (allowed.length === 0) ref = null
+            }
+            if (ref) {
+              await AchievementManager.onReferralSignup(id)
+            }
 
             // Send user their data
             await sendUserData(ws, id)

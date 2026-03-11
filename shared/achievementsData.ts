@@ -8,6 +8,8 @@ export interface AchievementMeta {
   iconUnlock?: number
   borderUnlock?: number
   goldReward?: number
+  // If true, hide this achievement in the list until the player has unlocked it (default false)
+  hideIfLocked?: boolean
 }
 
 export const achievementsMeta: Record<number, AchievementMeta> = {
@@ -175,5 +177,11 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
     description: 'Earned by helping out with feedback.',
     image: 'border-Stars',
     borderUnlock: 9,
+  },
+  2000: {
+    title: 'Referred',
+    description: 'You joined via a referral link.',
+    goldReward: 1000,
+    hideIfLocked: true,
   },
 }

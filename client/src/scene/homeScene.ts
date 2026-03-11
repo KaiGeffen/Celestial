@@ -515,7 +515,7 @@ const NEWS_TEXT = `🎴 Card visual redesign nears completion 🎴
 
 We'd love your feedback to help us finalize the look.
 
-Tell us which of 2 version you prefer in the [area=_link_discord][color=#FABD5D]Discord server[/color][/area].`
+Tell us which of 2 versions you prefer in the [area=_link_discord][color=#FABD5D]Discord server[/color][/area].`
 
 /*
 `🕊️ A warm welcome to all our new players!

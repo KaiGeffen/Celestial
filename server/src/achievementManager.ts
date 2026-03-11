@@ -6,6 +6,8 @@ import GameModel from '../../shared/state/gameModel'
 import Card from '../../shared/state/card'
 import { achievementsMeta } from '../../shared/achievementsData'
 
+const REFERRAL_ACHIEVEMENT_ID = 2000
+
 export class AchievementManager {
   // Get all of the achievements for player
   static async getAchievements(playerId: string): Promise<Achievement[]> {
@@ -32,6 +34,11 @@ export class AchievementManager {
     if (now.getMonth() === 11) {
       await this.unlock(playerId, 1007)
     }
+  }
+
+  // Called when a new player registers with a valid referral code
+  static async onReferralSignup(playerId: string): Promise<void> {
+    await this.unlock(playerId, REFERRAL_ACHIEVEMENT_ID)
   }
 
   // Called after a game is played
