@@ -558,7 +558,6 @@ export default class DeckEditorScene extends BaseScene {
       within: backContainer,
       text: 'Back',
       f: () => this.scene.start('DeckSelectorScene'),
-      muteClick: true,
     })
     sizer.add(backContainer)
 
@@ -574,7 +573,6 @@ export default class DeckEditorScene extends BaseScene {
       avatarId: this.cosmeticSet.avatar,
       border: this.cosmeticSet.border ?? 0,
       f: () => {},
-      muteClick: true,
     })
     sizer.add(avatarContainer)
 
@@ -607,7 +605,6 @@ export default class DeckEditorScene extends BaseScene {
         UserSettings._set('equippedDeckIndex', this.deckIndex)
         this.scene.launch('MenuScene', { menu: 'play', activeScene: this })
       },
-      muteClick: true,
     })
     sizer.add(playContainer)
 

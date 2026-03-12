@@ -225,7 +225,6 @@ export default class DeckSelectorScene extends BaseScene {
         within: container,
         text: name,
         f: () => this.onDeckClick(i),
-        muteClick: true,
       })
       this.deckButtons.push(btn)
       this.deckButtonContainers.push(container)
@@ -275,7 +274,7 @@ export default class DeckSelectorScene extends BaseScene {
       },
     } as any)
 
-    const addBtn = (text: string, f: () => void) => {
+    const addBtn = (text: string, f: () => void, muteClick = false) => {
       const container = new ContainerLite(
         this,
         0,
@@ -283,14 +282,14 @@ export default class DeckSelectorScene extends BaseScene {
         Space.buttonWidth,
         Space.buttonHeight,
       )
-      new Buttons.Basic({ within: container, text, f, muteClick: true })
+      new Buttons.Basic({ within: container, text, f, muteClick })
       sizer.add(container)
     }
 
     addBtn('Back', () => this.scene.start('HomeScene'))
     addBtn('Create new+', () => this.onCreateNew())
     addBtn('Import New', () => this.onCreateNew())
-    addBtn('Delete deck', () => this.onDelete())
+    addBtn('Delete deck', () => this.onDelete(), true)
     addBtn('Edit deck', () => this.onEdit())
     addBtn('Share deck', () => this.onShare())
     addBtn('Play Match', () => this.onPlayMatch())
