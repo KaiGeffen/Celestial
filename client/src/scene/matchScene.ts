@@ -652,7 +652,7 @@ export class View {
 }
 
 export class StandardMatchScene extends MatchScene {
-  constructor(args = { key: 'StandardMatchScene', lastScene: 'BuilderScene' }) {
+  constructor(args = { key: 'StandardMatchScene', lastScene: 'DeckSelectorScene' }) {
     super(args)
   }
 
@@ -670,7 +670,7 @@ export class StandardMatchScene extends MatchScene {
   doExit(): () => void {
     return () => {
       this.beforeExit()
-      this.scene.start('BuilderScene')
+      this.scene.start('DeckSelectorScene')
     }
   }
 }

@@ -159,7 +159,7 @@ export default class HomeScene extends BaseScene {
       within: this,
       iconName: 'DeckbuilderTab',
       f: () => {
-        this.scene.start('BuilderScene', { isTutorial: false })
+        this.scene.start('DeckSelectorScene', { isTutorial: false })
         logEvent('view_deckbuilder')
       },
     })

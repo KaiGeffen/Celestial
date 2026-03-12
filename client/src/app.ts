@@ -10,6 +10,8 @@ import {
 } from './scene/matchScene'
 import TutorialMatchScene from './scene/tutorialScene'
 import { BuilderScene, MapJourneyBuilderScene } from './scene/builderScene'
+import DeckSelectorScene from './scene/deckSelectorScene'
+import DeckEditorScene from './scene/deckEditorScene'
 import MatchHistoryScene from './scene/matchHistoryScene'
 
 import PlaceholderScene from './scene/placeholderScene'
@@ -57,6 +59,8 @@ const config: Phaser.Types.Core.GameConfig = {
     TutorialMatchScene,
     PlaceholderScene,
     BuilderScene,
+    DeckSelectorScene,
+    DeckEditorScene,
     MapScene,
     MatchHistoryScene,
     StoreScene,

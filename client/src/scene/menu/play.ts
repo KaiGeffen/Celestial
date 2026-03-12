@@ -317,7 +317,7 @@ export default class PlayMenu extends Menu {
         if (activeScene) {
           activeScene.scene.stop()
         }
-        this.scene.scene.start('BuilderScene', { isTutorial: false })
+        this.scene.scene.start('DeckSelectorScene', { isTutorial: false })
         logEvent('change_deck_from_play_menu')
       },
       muteClick: true,
