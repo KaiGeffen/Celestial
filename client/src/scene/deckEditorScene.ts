@@ -28,6 +28,7 @@ export default class DeckEditorScene extends BaseScene {
   private decklist: Decklist
   private rosterPanel: ScrollablePanel
   private catalogPanel: ScrollablePanel
+  private catalogPanelSizer: FixWidthSizer
   private cardCatalog: CardImage[] = []
   private cardWrappers: ContainerLite[] = []
   private searchText = ''
@@ -155,6 +156,7 @@ export default class DeckEditorScene extends BaseScene {
       footer: this.createFilterFooter(width),
       slider: Scroll(this, false),
     }).setOrigin(0)
+    this.catalogPanelSizer = panel
     scrollable.layout()
     return scrollable
   }
@@ -218,7 +220,6 @@ export default class DeckEditorScene extends BaseScene {
     const row = this.rexUI.add.sizer({
       space: { item: Space.padSmall },
     })
-    row.add(this.add.text(0, 0, 'Cost:', Style.builder).setOrigin(1, 0.5))
     const buttonsSizer = this.rexUI.add.sizer()
     row.add(buttonsSizer)
     this.costFilterBtns = []
@@ -293,8 +294,7 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   private filterCatalog(): void {
-    const sizer = this.catalogPanel.getElement('panel') as FixWidthSizer
-    sizer.clear()
+    this.catalogPanelSizer.clear()
 
     // Hide all card wrappers first (like catalog.ts); only show and add matching ones
     for (const wrapper of this.cardWrappers) {
@@ -311,7 +311,7 @@ export default class DeckEditorScene extends BaseScene {
       const idx = this.cardCatalog.indexOf(cardImage)
       if (idx >= 0 && this.cardWrappers[idx]) {
         this.cardWrappers[idx].setVisible(true)
-        sizer.add(this.cardWrappers[idx])
+        this.catalogPanelSizer.add(this.cardWrappers[idx])
       }
     }
     this.catalogPanel.t = 0

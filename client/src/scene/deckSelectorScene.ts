@@ -6,10 +6,10 @@ import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/Sc
 import BaseScene from './baseScene'
 import Decklist from '../lib/decklist'
 import Buttons from '../lib/buttons/buttons'
-import Button from '../lib/buttons/button'
+import DeckThumbnail from '../lib/deckThumbnail'
 import { Color, Space, Style, UserSettings, Flags } from '../settings/settings'
 import newScrollablePanel from '../lib/scrollablePanel'
-import { DecklistSettings } from '../../../shared/settings'
+import { DecklistSettings, MechanicsSettings } from '../../../shared/settings'
 import { Deck } from '../../../shared/types/deck'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import Catalog from '../../../shared/state/catalog'
@@ -28,8 +28,7 @@ export default class DeckSelectorScene extends BaseScene {
   private mainSizer: any
   private rosterPanel: ScrollablePanel | null
   private centerPanel: ScrollablePanel | null
-  private deckButtons: Button[] = []
-  private deckButtonContainers: ContainerLite[] = []
+  private deckThumbnails: DeckThumbnail[] = []
   private background: Phaser.GameObjects.Image | null
 
   constructor() {
@@ -53,8 +52,7 @@ export default class DeckSelectorScene extends BaseScene {
     }
     this.rosterPanel = null
     this.centerPanel = null
-    this.deckButtons = []
-    this.deckButtonContainers = []
+    this.deckThumbnails = []
     if (this.background) {
       this.background.destroy()
       this.background = null
@@ -207,42 +205,44 @@ export default class DeckSelectorScene extends BaseScene {
 
   private refreshDeckList(panel: FixWidthSizer): void {
     panel.removeAll(true)
-    this.deckButtons = []
-    this.deckButtonContainers = []
+    this.deckThumbnails = []
 
     const decks: Deck[] = UserSettings._get('decks') || []
     for (let i = 0; i < decks.length; i++) {
       const deck = decks[i]
       const name = deck?.name ?? `Deck ${i + 1}`
-      const container = new ContainerLite(
-        this,
-        0,
-        0,
-        CENTER_WIDTH - Space.pad * 2,
-        50,
-      )
-      const btn = new Buttons.Basic({
-        within: container,
-        text: name,
-        f: () => this.onDeckClick(i),
+      const cosmeticSet: CosmeticSet = deck.cosmeticSet ?? {
+        avatar: 0,
+        border: 0,
+      }
+      const isValid =
+        (deck.cards?.length || 0) === MechanicsSettings.DECK_SIZE
+
+      const thumb = new DeckThumbnail({
+        scene: this,
+        width: CENTER_WIDTH - Space.pad * 2,
+        height: Space.cardHeight,
+        name,
+        cosmeticSet,
+        isValid,
+        onClick: () => this.onDeckClick(i),
       })
-      this.deckButtons.push(btn)
-      this.deckButtonContainers.push(container)
-      panel.add(container)
+
+      this.deckThumbnails.push(thumb)
+      panel.add(thumb.container)
     }
     this.centerPanel?.layout()
   }
 
   private onDeckClick(i: number): void {
-    const btn = this.deckButtons[i]
-    if (!btn) return
-    if (this.savedDeckIndex === i && btn.selected) {
+    const thumb = this.deckThumbnails[i]
+    if (!thumb) return
+    if (this.savedDeckIndex === i) {
       this.deselect()
       return
     }
-    this.deckButtons.forEach((b, j) => {
-      if (j !== i) b.deselect()
-      else b.select()
+    this.deckThumbnails.forEach((t, j) => {
+      t.setSelected(j === i)
     })
     this.savedDeckIndex = i
     const deck: Deck = UserSettings._get('decks')[i]
@@ -257,7 +257,7 @@ export default class DeckSelectorScene extends BaseScene {
 
   deselect(): void {
     this.savedDeckIndex = undefined
-    this.deckButtons.forEach((b) => b.deselect())
+    this.deckThumbnails.forEach((t) => t.setSelected(false))
     this.decklist.setDeck([])
   }
 
@@ -292,7 +292,19 @@ export default class DeckSelectorScene extends BaseScene {
     addBtn('Delete deck', () => this.onDelete(), true)
     addBtn('Edit deck', () => this.onEdit())
     addBtn('Share deck', () => this.onShare())
-    addBtn('Play Match', () => this.onPlayMatch())
+    const playContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.bigButtonHeight,
+    )
+    new Buttons.Big({
+      within: playContainer,
+      text: 'Play',
+      f: () => this.onPlayMatch(),
+    })
+    sizer.add(playContainer)
 
     return sizer
   }
