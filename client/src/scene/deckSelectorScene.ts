@@ -26,20 +26,39 @@ export default class DeckSelectorScene extends BaseScene {
 
   private decklist: Decklist
   private mainSizer: any
-  private rosterPanel: ScrollablePanel
-  private centerPanel: ScrollablePanel
+  private rosterPanel: ScrollablePanel | null
+  private centerPanel: ScrollablePanel | null
   private deckButtons: Button[] = []
   private deckButtonContainers: ContainerLite[] = []
+  private background: Phaser.GameObjects.Image | null
 
   constructor() {
     super({
       key: 'DeckSelectorScene',
       lastScene: 'HomeScene',
     })
+    this.mainSizer = null
+    this.rosterPanel = null
+    this.centerPanel = null
+    this.background = null
   }
 
   create(params: { deckIndex?: number } = {}) {
     super.create()
+
+    // Scene is reused: destroy previous layout and anchors so we don't stack or hold stale refs
+    if (this.mainSizer) {
+      this.mainSizer.destroy()
+      this.mainSizer = null
+    }
+    this.rosterPanel = null
+    this.centerPanel = null
+    this.deckButtons = []
+    this.deckButtonContainers = []
+    if (this.background) {
+      this.background.destroy()
+      this.background = null
+    }
 
     this.createBackground()
 
@@ -79,6 +98,7 @@ export default class DeckSelectorScene extends BaseScene {
       width: '100%',
       height: '100%',
       onResizeCallback: (width: number, height: number, go: any) => {
+        if (!this.rosterPanel || !this.centerPanel) return
         go.setMinSize(width, height)
         go.layout()
         this.rosterPanel.setMinSize(ROSTER_WIDTH, height)
@@ -112,11 +132,15 @@ export default class DeckSelectorScene extends BaseScene {
       this.savedDeckIndex = undefined
       this.decklist.setDeck([])
     }
+
+    this.events.once('shutdown', () => {
+      this.input.off('wheel')
+    })
   }
 
   private createBackground(): void {
-    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
-    this.plugins.get('rexAnchor')['add'](background, {
+    this.background = this.add.image(0, 0, 'background-Light').setOrigin(0)
+    this.plugins.get('rexAnchor')['add'](this.background, {
       width: '100%',
       height: '100%',
     })
