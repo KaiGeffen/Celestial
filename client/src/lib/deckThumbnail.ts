@@ -35,11 +35,16 @@ export default class DeckThumbnail {
     this.container = new ContainerLite(scene, 0, 0, width, height)
 
     // CARD BACK – top-left, using default cardback art
-    const cardBack = scene.add
-      .image(-width * 0.15, 0, 'card-Cardback')
-      .setScale(0.5)
-    // scene.addShadow(cardBack, -90)
-    this.container.add(cardBack)
+    const angleStepDeg = 3
+    for (let i = 3; i >= 0; i--) {
+      const cardBack = scene.add
+        .image(-30, 70, 'card-Cardback')
+        .setOrigin(0.5, 1) // rotate around bottom-center
+        .setScale(0.5)
+        .setRotation((angleStepDeg * i * Math.PI) / 180)
+      // scene.addShadow(cardBack, -90)
+      this.container.add(cardBack)
+    }
 
     // AVATAR – top-right
     this.avatarButton = new Buttons.Avatar({
@@ -47,7 +52,7 @@ export default class DeckThumbnail {
       avatarId: opts.cosmeticSet?.avatar ?? 0,
       border: opts.cosmeticSet?.border ?? 0,
       muteClick: true,
-      x: width / 2 - Space.avatarSize / 2,
+      x: Space.avatarSize / 4,
       y: 0,
     })
 
@@ -78,9 +83,9 @@ export default class DeckThumbnail {
       this.nameBackground.setFillStyle(Color.cardGreyed)
     }
 
-    // Click behaviour – click anywhere on the tile
-    this.container.setInteractive()
-    this.container.on('pointerdown', () => opts.onClick())
+    // Click behaviour – click on the name text
+    this.nameText.setInteractive({ useHandCursor: true })
+    this.nameText.on('pointerdown', () => opts.onClick())
   }
 
   setSelected(selected: boolean): void {
