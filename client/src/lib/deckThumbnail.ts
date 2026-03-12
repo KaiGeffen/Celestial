@@ -36,7 +36,7 @@ export default class DeckThumbnail {
 
     // CARD BACK – top-left, using default cardback art
     const angleStepDeg = 3
-    for (let i = 3; i >= 0; i--) {
+    for (let i = 0; i >= 0; i--) {
       const cardBack = scene.add
         .image(-30, 70, 'card-Cardback')
         .setOrigin(0.5, 1) // rotate around bottom-center
