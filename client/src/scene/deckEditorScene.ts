@@ -17,6 +17,7 @@ import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import Catalog from '../../../shared/state/catalog'
 import Card from '../../../shared/state/card'
 import { Scroll } from '../settings/settings'
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 const ROSTER_WIDTH = Space.cutoutWidth + 20
 const RIGHT_WIDTH = Space.buttonWidth + Space.pad * 2
@@ -84,7 +85,6 @@ export default class DeckEditorScene extends BaseScene {
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
       panel: { child: this.decklist.sizer },
       header: this.createRosterHeader(),
-      space: { top: Space.filterBarHeight },
     }).setOrigin(0)
     mainSizer.add(this.rosterPanel)
 
@@ -513,7 +513,8 @@ export default class DeckEditorScene extends BaseScene {
     const sizer = this.rexUI.add
       .fixWidthSizer({
         width: ROSTER_WIDTH,
-        space: { top: Space.padSmall, bottom: Space.padSmall },
+        space: { top: Space.pad, bottom: Space.pad },
+        align: 'center',
       })
       .addBackground(background)
     this.txtCount = this.add
