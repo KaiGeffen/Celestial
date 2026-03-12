@@ -220,8 +220,6 @@ export default class DeckSelectorScene extends BaseScene {
 
       const thumb = new DeckThumbnail({
         scene: this,
-        width: CENTER_WIDTH - Space.pad * 2,
-        height: Space.cardHeight,
         name,
         cosmeticSet,
         isValid,

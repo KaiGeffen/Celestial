@@ -14,47 +14,42 @@ export default class DeckThumbnail {
 
   private nameText: Phaser.GameObjects.Text
   private nameBackground: Phaser.GameObjects.Rectangle
-  private avatarContainer: ContainerLite
   private avatarButton: any
   private selected = false
 
   constructor(opts: {
     scene: BaseScene
-    width: number
-    height: number
     name: string
     cosmeticSet: CosmeticSet
     isValid: boolean
     onClick: () => void
   }) {
-    const { scene, width, height } = opts
+    const { scene } = opts
     this.scene = scene
+
+    // Standard size for all deck thumbnails
+    const width = Space.avatarSize * 2
+    const height = Space.cardHeight * 0.9
 
     // Root container for this tile
     this.container = new ContainerLite(scene, 0, 0, width, height)
 
     // CARD BACK – top-left, using default cardback art
     const cardBack = scene.add
-      .image(-width * 0.25, 0, 'card-Cardback')
+      .image(-width * 0.15, 0, 'card-Cardback')
       .setScale(0.5)
     // scene.addShadow(cardBack, -90)
     this.container.add(cardBack)
 
     // AVATAR – top-right
-    this.avatarContainer = new ContainerLite(
-      scene,
-      width * 10.5,
-      -height * 0.3,
-      Space.avatarSize,
-      Space.avatarSize,
-    )
     this.avatarButton = new Buttons.Avatar({
-      within: this.avatarContainer,
+      within: this.container,
       avatarId: opts.cosmeticSet?.avatar ?? 0,
       border: opts.cosmeticSet?.border ?? 0,
       muteClick: true,
+      x: width / 2 - Space.avatarSize / 2,
+      y: 0,
     })
-    this.container.add(this.avatarContainer)
 
     // DECK NAME – fix width sizer with background bar along the bottom
     const nameBarWidth = width * 0.85
