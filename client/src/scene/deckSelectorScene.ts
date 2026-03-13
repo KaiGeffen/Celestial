@@ -60,19 +60,11 @@ export default class DeckSelectorScene extends BaseScene {
 
     this.createBackground()
 
-    this.mainSizer = this.rexUI.add
-      .sizer({
-        orientation: 0,
-        space: { left: 0, right: 0, top: 0, bottom: 0, item: 0 },
-      })
-      .setOrigin(0, 0)
-      .setPosition(0, 0)
+    this.mainSizer = this.rexUI.add.sizer().setOrigin(0, 0)
 
     // Left: Deck roster (fixed width, full height via anchor)
     this.decklist = new Decklist(this, () => () => {}) // no-op cutout callback
     this.rosterPanel = newScrollablePanel(this, {
-      x: 0,
-      y: 0,
       width: ROSTER_WIDTH,
       height: Space.windowHeight,
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
@@ -163,18 +155,17 @@ export default class DeckSelectorScene extends BaseScene {
   private createCenterPanel(): ScrollablePanel {
     const panel = this.rexUI.add.fixWidthSizer({
       width: CENTER_WIDTH,
+      align: 'center',
       space: {
-        left: Space.pad,
-        right: Space.pad,
-        top: Space.padSmall,
-        bottom: Space.padSmall,
-        line: Space.padSmall,
+        top: Space.pad,
+        bottom: Space.pad,
+        item: Space.pad,
+        line: Space.pad,
       },
     })
 
     const scrollable = newScrollablePanel(this, {
       x: ROSTER_WIDTH,
-      y: 0,
       width: CENTER_WIDTH,
       height: Space.windowHeight,
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
@@ -215,8 +206,7 @@ export default class DeckSelectorScene extends BaseScene {
         avatar: 0,
         border: 0,
       }
-      const isValid =
-        (deck.cards?.length || 0) === MechanicsSettings.DECK_SIZE
+      const isValid = (deck.cards?.length || 0) === MechanicsSettings.DECK_SIZE
 
       const thumb = new DeckThumbnail({
         scene: this,

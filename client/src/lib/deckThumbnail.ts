@@ -15,6 +15,7 @@ export default class DeckThumbnail {
   private nameBackground: Phaser.GameObjects.Rectangle
   private avatarButton: any
   private selected = false
+  private isValid: boolean
 
   constructor(opts: {
     scene: BaseScene
@@ -28,7 +29,7 @@ export default class DeckThumbnail {
 
     // Standard size for all deck thumbnails
     const width = Space.avatarSize * 2
-    const height = Space.cardHeight * 0.9
+    const height = 200
 
     // Root container for this tile
     this.container = new ContainerLite(scene, 0, 0, width, height)
@@ -41,7 +42,7 @@ export default class DeckThumbnail {
         .setOrigin(0.5, 1) // rotate around bottom-center
         .setScale(0.5)
         .setRotation((angleStepDeg * i * Math.PI) / 180)
-      // scene.addShadow(cardBack, -90)
+      scene.addShadow(cardBack)
       this.container.add(cardBack)
     }
 
@@ -52,12 +53,13 @@ export default class DeckThumbnail {
       border: opts.cosmeticSet?.border ?? 0,
       muteClick: true,
       x: Space.avatarSize / 4,
-      y: 0,
+      y: -10,
     })
 
     // DECK NAME – background and text in main container; background is interactive
     const nameBarWidth = width * 0.85
-    const nameBarY = height * 0.25
+    const nameBarY = height / 2 - Space.buttonHeight / 2
+    this.isValid = opts.isValid
     this.nameBackground = scene.add
       .rectangle(
         0,
@@ -69,6 +71,18 @@ export default class DeckThumbnail {
       .setStrokeStyle(2, Color.border)
       .setInteractive({ useHandCursor: true })
       .on('pointerdown', () => opts.onClick())
+      .on('pointerover', () => {
+        if (!this.selected) {
+          this.nameBackground.setFillStyle(Color.gold)
+          this.nameBackground.setStrokeStyle(2, Color.gold)
+        }
+      })
+      .on('pointerout', () => {
+        if (!this.selected) {
+          this.nameBackground.setFillStyle(Color.backgroundLight)
+          this.nameBackground.setStrokeStyle(2, Color.border)
+        }
+      })
     this.container.add(this.nameBackground)
     scene.addShadow(this.nameBackground)
 
