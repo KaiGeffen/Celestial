@@ -69,6 +69,19 @@ export default class DeckThumbnail {
         Color.backgroundLight,
       )
       .setStrokeStyle(2, Color.border)
+    this.container.add(this.nameBackground)
+
+    // Hitbox is the full thumbnail
+    const hitbox = scene.add
+      .rectangle(
+        0,
+        nameBarY + Space.buttonHeight / 2,
+        nameBarWidth,
+        height,
+        0x000000,
+        0,
+      )
+      .setOrigin(0.5, 1)
       .setInteractive({ useHandCursor: true })
       .on('pointerdown', () => opts.onClick())
       .on('pointerover', () => {
@@ -83,7 +96,7 @@ export default class DeckThumbnail {
           this.nameBackground.setStrokeStyle(2, Color.border)
         }
       })
-    this.container.add(this.nameBackground)
+    this.container.add(hitbox)
 
     this.nameText = scene.add
       .text(0, nameBarY, opts.name, (Style as any).deckName ?? Style.builder)
