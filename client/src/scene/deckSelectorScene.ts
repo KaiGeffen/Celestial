@@ -45,19 +45,6 @@ export default class DeckSelectorScene extends BaseScene {
   create(params: { deckIndex?: number } = {}) {
     super.create()
 
-    // Scene is reused: destroy previous layout and anchors so we don't stack or hold stale refs
-    if (this.mainSizer) {
-      this.mainSizer.destroy()
-      this.mainSizer = null
-    }
-    this.rosterPanel = null
-    this.centerPanel = null
-    this.deckThumbnails = []
-    if (this.background) {
-      this.background.destroy()
-      this.background = null
-    }
-
     this.createBackground()
 
     this.mainSizer = this.rexUI.add.sizer().setOrigin(0, 0)
@@ -219,7 +206,6 @@ export default class DeckSelectorScene extends BaseScene {
       this.deckThumbnails.push(thumb)
       panel.add(thumb.container)
     }
-    this.centerPanel?.layout()
   }
 
   private onDeckClick(i: number): void {
