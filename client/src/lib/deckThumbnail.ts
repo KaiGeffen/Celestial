@@ -35,14 +35,14 @@ export default class DeckThumbnail {
     this.container = new ContainerLite(scene, 0, 0, width, height)
 
     // CARD BACK – top-left, using default cardback art
+    const angleFirst = -3
     const angleStepDeg = 3
-    for (let i = 0; i >= 0; i--) {
+    for (let i = 3; i >= 0; i--) {
       const cardBack = scene.add
-        .image(-30, 70, 'card-Cardback')
+        .image(-40, 70, 'card-Cardback')
         .setOrigin(0.5, 1) // rotate around bottom-center
         .setScale(0.5)
-        .setRotation((angleStepDeg * i * Math.PI) / 180)
-      scene.addShadow(cardBack)
+        .setRotation((angleFirst + angleStepDeg * i * Math.PI) / 180)
       this.container.add(cardBack)
     }
 

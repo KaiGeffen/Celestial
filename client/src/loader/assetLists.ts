@@ -58,6 +58,7 @@ export const assetLists = {
       "Bounty",
       "Bull",
       "Cardback",
+      "Cardback",
       "Celebration",
       "Child",
       "Clear View",
