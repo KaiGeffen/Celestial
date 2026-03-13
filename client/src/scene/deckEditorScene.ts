@@ -518,10 +518,7 @@ export default class DeckEditorScene extends BaseScene {
       })
       .addBackground(background)
     this.txtCount = this.add
-      .text(0, 0, `0/${MechanicsSettings.DECK_SIZE}`, {
-        fontSize: '16px',
-        color: '#fff',
-      })
+      .text(0, 0, `0/${MechanicsSettings.DECK_SIZE}`, Style.announcement)
       .setOrigin(0.5)
     sizer.add(this.txtCount)
     return sizer

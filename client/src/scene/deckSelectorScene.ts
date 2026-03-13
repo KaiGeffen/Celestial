@@ -143,11 +143,10 @@ export default class DeckSelectorScene extends BaseScene {
       .fixWidthSizer({
         width: ROSTER_WIDTH,
         space: { top: Space.pad, bottom: Space.pad },
+        align: 'center',
       })
       .addBackground(background)
-    const title = this.add
-      .text(0, 0, 'DECK ROSTER', Style.announcement)
-      .setOrigin(0.5)
+    const title = this.add.text(0, 0, 'DECK', Style.announcement).setOrigin(0.5)
     sizer.add(title)
     return sizer
   }
@@ -185,6 +184,7 @@ export default class DeckSelectorScene extends BaseScene {
       .fixWidthSizer({
         width: CENTER_WIDTH,
         space: { top: Space.pad, bottom: Space.pad },
+        align: 'center',
       })
       .addBackground(background)
     const title = this.add
