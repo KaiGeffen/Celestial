@@ -3,6 +3,8 @@ import Button from './button'
 import avatarNames from '../../data/avatarNames'
 import { Color, Time } from '../../settings/settings'
 
+const noOp = () => {}
+
 // TODO As this grows move it to another file
 const borderNames = [
   'None',
@@ -29,7 +31,7 @@ export default class AvatarButton extends Button {
     border = 0,
     x = 0,
     y = 0,
-    f = () => {},
+    f = noOp,
     emotive = false,
     origin = [0.5, 0.5],
     muteClick = false,
@@ -42,6 +44,7 @@ export default class AvatarButton extends Button {
       icon: {
         name: `avatar-${name}`,
         interactive: true,
+        noGlow: f === noOp && !emotive,
       },
       callbacks: {
         click: f,
