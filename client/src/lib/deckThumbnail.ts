@@ -84,7 +84,6 @@ export default class DeckThumbnail {
         }
       })
     this.container.add(this.nameBackground)
-    scene.addShadow(this.nameBackground)
 
     this.nameText = scene.add
       .text(0, nameBarY, opts.name, (Style as any).deckName ?? Style.builder)
