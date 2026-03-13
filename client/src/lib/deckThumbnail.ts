@@ -1,6 +1,5 @@
 import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 
 import BaseScene from '../scene/baseScene'
 import Buttons from './buttons/buttons'
@@ -56,36 +55,32 @@ export default class DeckThumbnail {
       y: 0,
     })
 
-    // DECK NAME – fix width sizer with background bar along the bottom
+    // DECK NAME – background and text in main container; background is interactive
     const nameBarWidth = width * 0.85
+    const nameBarY = height * 0.25
     this.nameBackground = scene.add
-      .rectangle(0, 0, nameBarWidth, Space.buttonHeight, Color.backgroundLight)
+      .rectangle(
+        0,
+        nameBarY,
+        nameBarWidth,
+        Space.buttonHeight,
+        Color.backgroundLight,
+      )
       .setStrokeStyle(2, Color.border)
-    scene.addShadow(this.nameBackground, -90)
-
-    const nameSizer: FixWidthSizer = scene.rexUI.add
-      .fixWidthSizer({
-        width: nameBarWidth,
-        space: { top: Space.padSmall, bottom: Space.padSmall },
-      })
-      .addBackground(this.nameBackground)
+      .setInteractive({ useHandCursor: true })
+      .on('pointerdown', () => opts.onClick())
+    this.container.add(this.nameBackground)
+    scene.addShadow(this.nameBackground)
 
     this.nameText = scene.add
-      .text(0, 0, opts.name, (Style as any).deckName ?? Style.builder)
-      .setOrigin(0.5)
-    nameSizer.add(this.nameText)
-
-    nameSizer.setPosition(0, height * 0.25)
-    this.container.add(nameSizer)
+      .text(0, nameBarY, opts.name, (Style as any).deckName ?? Style.builder)
+      .setOrigin(0.5, 0.5)
+    this.container.add(this.nameText)
 
     // If deck invalid, slightly grey out the name bar (no extra objects)
     if (!opts.isValid) {
       this.nameBackground.setFillStyle(Color.cardGreyed)
     }
-
-    // Click behaviour – click on the name text
-    this.nameText.setInteractive({ useHandCursor: true })
-    this.nameText.on('pointerdown', () => opts.onClick())
   }
 
   setSelected(selected: boolean): void {
