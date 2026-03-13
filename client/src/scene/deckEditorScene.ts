@@ -37,7 +37,8 @@ export default class DeckEditorScene extends BaseScene {
   private costFilterBtns: UButton[] = []
   private cosmeticSet: CosmeticSet
   private avatarBtn: any
-  private txtCount: Phaser.GameObjects.Text
+  private deckName: string
+  private deckNameInput: any
   private orderedByCost = false
 
   constructor() {
@@ -57,6 +58,7 @@ export default class DeckEditorScene extends BaseScene {
       cards: [],
       cosmeticSet: { avatar: 0, border: 0 },
     }
+    this.deckName = deck.name
     this.cosmeticSet = deck.cosmeticSet ?? { avatar: 0, border: 0 }
 
     this.createBackground()
@@ -445,13 +447,11 @@ export default class DeckEditorScene extends BaseScene {
 
   addCardToDeck(card: Card): void {
     this.decklist.addCard(card)
-    this.updateText()
     this.updateSavedDeck(this.getDeckCode())
   }
 
   private removeCardFromDeck(card: Card): boolean {
     const removed = this.decklist.removeCard(card)
-    this.updateText()
     return removed
   }
 
@@ -477,7 +477,6 @@ export default class DeckEditorScene extends BaseScene {
 
   setDeck(cards: Card[]): void {
     this.decklist.setDeck(cards, Flags.devCardsEnabled ? false : true)
-    this.updateText()
   }
 
   setCosmeticSet(set: CosmeticSet): void {
@@ -517,18 +516,42 @@ export default class DeckEditorScene extends BaseScene {
         align: 'center',
       })
       .addBackground(background)
-    this.txtCount = this.add
-      .text(0, 0, `0/${MechanicsSettings.DECK_SIZE}`, Style.announcement)
-      .setOrigin(0.5)
-    sizer.add(this.txtCount)
+    const nameContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      ROSTER_WIDTH - Space.pad * 2,
+      Space.textboxHeight,
+    )
+    this.deckNameInput = this.add
+      .rexInputText(
+        0,
+        0,
+        ROSTER_WIDTH - Space.pad * 2,
+        Space.textboxHeight,
+        {
+          type: 'text',
+          text: this.deckName,
+          align: 'center',
+          placeholder: 'Deck name',
+          tooltip: 'Click to rename this deck.',
+          fontFamily: 'Mulish',
+          fontSize: '24px',
+          color: Color.textboxText,
+          maxLength: 40,
+          id: 'deck-editor-name',
+        },
+      )
+      .on('textchange', (inputText: any) => {
+        this.deckName = inputText.text
+        this.updateSavedDeck(undefined, this.deckName)
+      })
+    nameContainer.add([
+      this.deckNameInput,
+      this.add.image(0, 0, 'icon-InputText'),
+    ])
+    sizer.add(nameContainer)
     return sizer
-  }
-
-  private updateText(): void {
-    const total = this.decklist.countCards
-    if (this.txtCount) {
-      this.txtCount.setText(`${total}/${MechanicsSettings.DECK_SIZE}`)
-    }
   }
 
   private createRightPanel(): any {
