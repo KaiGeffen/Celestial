@@ -42,8 +42,11 @@ export default class DeckSelectorScene extends BaseScene {
     this.background = null
   }
 
-  create(params: { deckIndex?: number } = {}) {
+  create() {
     super.create()
+
+    // TODO This ai code has issues, more thoroughly fix
+    this.savedDeckIndex = undefined
 
     this.createBackground()
 
@@ -95,9 +98,7 @@ export default class DeckSelectorScene extends BaseScene {
     // Restore selection
     const equippedDeckIndex = UserSettings._get('equippedDeckIndex')
     const decks = UserSettings._get('decks') || []
-    if (params.deckIndex !== undefined && decks.length > params.deckIndex) {
-      this.selectDeck(params.deckIndex)
-    } else if (
+    if (
       equippedDeckIndex !== undefined &&
       equippedDeckIndex !== null &&
       decks.length > equippedDeckIndex
@@ -109,10 +110,6 @@ export default class DeckSelectorScene extends BaseScene {
       this.savedDeckIndex = undefined
       this.decklist.setDeck([])
     }
-
-    this.events.once('shutdown', () => {
-      this.input.off('wheel')
-    })
   }
 
   private createBackground(): void {
