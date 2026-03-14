@@ -415,7 +415,8 @@ export default class GameModel {
     }
   }
 
-  removeAct(index: number) {
+  // Returns whether the act returned to the story (ex: Immolant)
+  removeAct(index: number): boolean {
     if (index >= this.story.acts.length) {
       return
     }
@@ -433,7 +434,7 @@ export default class GameModel {
 
     // Add it to the discard and trigger its on discard effects
     this.pile[act.owner].push(act.card)
-    act.card.onDiscard(act.owner, this)
+    return act.card.onDiscard(act.owner, this)
   }
 
   returnActToHand(i: number) {

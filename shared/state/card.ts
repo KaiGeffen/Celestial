@@ -183,7 +183,10 @@ export default class Card {
 
   onPlay(player: number, game: GameModel): void {}
 
-  onDiscard(player: number, game: GameModel): void {}
+  // Return whether it returned to the story
+  onDiscard(player: number, game: GameModel): boolean {
+    return false
+  }
 
   onRoundEndIfThisResolved(player: number, game: GameModel): void {}
 

@@ -62,7 +62,7 @@ const predator = new Predator({
 })
 
 class Wound extends Card {
-  onDiscard(player: number, game: GameModel) {
+  onDiscard(player: number, game: GameModel): boolean {
     game.animations[player].push(
       new Animation({
         from: Zone.Discard,
@@ -76,6 +76,8 @@ class Wound extends Card {
     game.pile[player].pop()
 
     game.story.addAct(this, player, 0)
+
+    return true
   }
 }
 const wound = new Wound({
