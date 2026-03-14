@@ -61,6 +61,9 @@ export default class TheirAvatarRegion extends Region {
     // Pile sizes
     this.btnDeck.setText(`${state.deck[1].length}`)
     this.btnDiscard.setText(`${state.pile[1].length}`)
+
+    // Usernames and subtitles
+    this.showUsername(state.usernames[1], state.subtitles[1])
   }
 
   private createStacks(): void {
@@ -96,7 +99,7 @@ export default class TheirAvatarRegion extends Region {
     this.btnDiscard.setOnClick(fDiscard)
   }
 
-  showUsername(username: string, elo: number): void {
+  showUsername(username: string, subtitle: string): void {
     const x = this.avatar.icon.x
     const y0 = this.avatar.icon.y + this.avatar.icon.height / 2 + 5
 
@@ -104,7 +107,7 @@ export default class TheirAvatarRegion extends Region {
       .text(x, y0, username, Style.username)
       .setOrigin(0.5, 0)
     const txtUsernameElo = this.scene.add
-      .text(x, y0 + 16 + 5, elo.toString(), Style.usernameElo)
+      .text(x, y0 + 16 + 5, subtitle, Style.usernameElo)
       .setOrigin(0.5, 0)
 
     this.container.add([txtUsername, txtUsernameElo])

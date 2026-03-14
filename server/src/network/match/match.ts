@@ -55,8 +55,8 @@ class Match implements Match {
       this.deck2.cosmeticSet,
       user1.username,
       user2.username,
-      `${user1.elo}`,
-      `${user2.elo}`,
+      user1.elo,
+      user2.elo,
     )
   }
 
@@ -190,8 +190,8 @@ class Match implements Match {
   // Get the name of player with given uuid
   private async getUsernameElo(
     uuid: string | null,
-  ): Promise<{ username: string; elo: number }> {
-    if (!uuid) return { username: '', elo: 0 }
+  ): Promise<{ username: string; elo: string }> {
+    if (!uuid) return { username: '', elo: '' }
 
     try {
       const result = await db
@@ -203,12 +203,12 @@ class Match implements Match {
         .where(eq(players.id, uuid))
         .limit(1)
 
-      if (result.length === 0) return { username: '', elo: 0 }
+      if (result.length === 0) return { username: '', elo: '' }
 
-      return { username: result[0].username, elo: result[0].elo }
+      return { username: result[0].username, elo: result[0].elo.toString() }
     } catch (error) {
       console.error('Error fetching username:', error)
-      return { username: '', elo: 0 }
+      return { username: '', elo: '' }
     }
   }
 
