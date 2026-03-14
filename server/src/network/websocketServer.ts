@@ -349,16 +349,22 @@ export default function createWebSocketServer() {
         .on('initMission', async ({ uuid, deck, missionID }) => {
           if (!id) return
           console.log('Mission:', missionID)
+
+          // This might fail if the mission is invalid
           try {
             activeGame.match = new PveMatchMission(ws, uuid, deck, missionID)
           } catch (e) {
             console.error('initMission:', e)
             return
           }
+
+          // Just like in pve, we are player 1
           activeGame.playerNumber = 0
 
           logFunnelEvent(uuid, 'play_mode', 'journey')
 
+          // Start the match and let user know the starting state
+          await activeGame.match.startMatch()
           await activeGame.match.notifyState()
         })
         .on('initPve', async ({ aiDeck, uuid, deck }) => {
@@ -371,12 +377,16 @@ export default function createWebSocketServer() {
           )
 
           activeGame.match = new PveMatch(ws, uuid, deck, aiDeck)
+          await activeGame.match.startMatch()
+
+          // TODO Explain why to make us player 1
           activeGame.playerNumber = 0
 
           // Analytics
           logFunnelEvent(uuid, 'play_mode', 'pve')
 
           // Start the match
+          await activeGame.match.startMatch()
           await activeGame.match.notifyState()
         })
         .on('initSpecialPve', async ({ aiDeck, uuid, deck, enabledModes }) => {
@@ -400,7 +410,8 @@ export default function createWebSocketServer() {
           // Analytics
           logFunnelEvent(uuid, 'play_mode', 'race')
 
-          // Start the match
+          // Start the match and let user know the starting state
+          await activeGame.match.startMatch()
           await activeGame.match.notifyState()
         })
         .on('initPvp', async (data) => {
@@ -449,10 +460,9 @@ export default function createWebSocketServer() {
             // TODO Maybe just delete the last one? Somehow don't lose to race conditions
             delete searchingPlayers[data.password]
 
-            // Inform players that match started TODO That it's pvp specifically (Change the name of the ws message to clarify that. All of this waits on deciding if elo/username is a part of gameState)
-            await activeGame.match.notifyMatchStart()
-
             // Notify both players that they are connected
+            // Start the match and let both users know the starting state
+            await activeGame.match.startMatch()
             await activeGame.match.notifyState()
           } else {
             // Queue the player with their information
@@ -471,7 +481,8 @@ export default function createWebSocketServer() {
           activeGame.match = new TutorialMatch(ws, data.num, data.uuid)
           activeGame.playerNumber = 0
 
-          // Start the match
+          // Start the match and let user know the starting state
+          await activeGame.match.startMatch()
           await activeGame.match.notifyState()
         })
         .on('cancelQueue', ({ password }) => {

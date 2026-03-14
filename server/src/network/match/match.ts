@@ -39,6 +39,11 @@ class Match implements Match {
 
     this.deck1 = deck1
     this.deck2 = deck2
+  }
+
+  async startMatch() {
+    const user1 = await this.getUsernameElo(this.uuid1)
+    const user2 = await this.getUsernameElo(this.uuid2)
 
     // Make a new game
     // TODO Custom modes (tutorial, race) will overwrite this. Instead they should never make this
@@ -48,34 +53,10 @@ class Match implements Match {
       this.deck2.cards.map((cardId) => Catalog.getCardById(cardId)),
       this.deck1.cosmeticSet,
       this.deck2.cosmeticSet,
-    )
-  }
-
-  // Notify all connected players that the match has started
-  async notifyMatchStart() {
-    const user1 = await this.getUsernameElo(this.uuid1)
-    const user2 = await this.getUsernameElo(this.uuid2)
-
-    await Promise.all(
-      this.getActiveWsList().map((ws) => {
-        if (ws === this.ws1) {
-          ws.send({
-            type: 'matchStart',
-            name1: user1.username,
-            name2: user2.username,
-            elo1: user1.elo,
-            elo2: user2.elo,
-          })
-        } else {
-          ws.send({
-            type: 'matchStart',
-            name1: user2.username,
-            name2: user1.username,
-            elo1: user2.elo,
-            elo2: user1.elo,
-          })
-        }
-      }),
+      user1.username,
+      user2.username,
+      `${user1.elo}`,
+      `${user2.elo}`,
     )
   }
 

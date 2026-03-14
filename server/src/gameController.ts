@@ -16,6 +16,10 @@ class ServerController {
     deck2: Card[],
     cosmeticSet1: CosmeticSet,
     cosmeticSet2: CosmeticSet,
+    username1: string,
+    username2: string,
+    subtitle1: string,
+    subtitle2: string,
     shuffle: boolean = true,
   ): void {
     // Create initial game model
@@ -24,6 +28,10 @@ class ServerController {
       deck2,
       cosmeticSet1,
       cosmeticSet2,
+      username1,
+      username2,
+      subtitle1,
+      subtitle2,
       shuffle,
     )
 

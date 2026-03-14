@@ -37,12 +37,6 @@ export default interface messagesToClient {
     state: GameModel
   }
   // MATCH RELEVANT
-  matchStart: {
-    name1: string
-    name2: string
-    elo1: number
-    elo2: number
-  }
   transmitState: {
     state: GameModel
   }

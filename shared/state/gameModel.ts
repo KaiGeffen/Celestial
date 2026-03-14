@@ -68,14 +68,20 @@ export default class GameModel {
   amtCardsPlayedLastRound: [number, number] = [0, 0]
   amtCardsPlayedThisRound: [number, number] = [0, 0]
 
-  // The cosmetics used in this match
+  // The cosmetics and such TODO Change to 2 cosmsets
   cosmeticSets: CosmeticSet[]
+  usernames: [string, string]
+  subtitles: [string, string]
 
   constructor(
     deck1: Card[],
     deck2: Card[],
     cosmeticSet1: CosmeticSet,
     cosmeticSet2: CosmeticSet,
+    username1: string,
+    username2: string,
+    subtitle1: string,
+    subtitle2: string,
     // Shuffle the deck
     shuffle = true,
   ) {
@@ -89,6 +95,8 @@ export default class GameModel {
       cosmeticSet1 ?? { avatar: 0, border: 0 },
       cosmeticSet2 ?? { avatar: 0, border: 0 },
     ]
+    this.usernames = [username1, username2]
+    this.subtitles = [subtitle1, subtitle2]
 
     // Starting priority is random
     this.priority = Math.floor(Math.random() * 2)
@@ -133,6 +141,10 @@ export default class GameModel {
         avatar: this.cosmeticSets[1].avatar,
         border: this.cosmeticSets[1].border,
       },
+      this.usernames[0],
+      this.usernames[1],
+      this.subtitles[0],
+      this.subtitles[1],
       false,
     )
 
@@ -164,7 +176,9 @@ export default class GameModel {
     copy.amtPasses = [...this.amtPasses]
     copy.amtDrawn = [...this.amtDrawn]
     // Unnecessary since a new own gets init above, but left in for clarity
+    // copy.usernames = [...this.usernames]
     // copy.avatars = [...this.avatars]
+    // copy.elos = [...this.elos]
     copy.roundCount = this.roundCount
     copy.timers = [...this.timers]
     return copy
