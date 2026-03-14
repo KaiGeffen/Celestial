@@ -155,7 +155,7 @@ export default class DeckEditorScene extends BaseScene {
       width,
       height: Space.windowHeight,
       panel: { child: panel },
-      footer: this.createFilterFooter(width),
+      header: this.createFilterFooter(width),
       slider: Scroll(this, false),
     }).setOrigin(0)
     this.catalogPanelSizer = panel
@@ -524,24 +524,18 @@ export default class DeckEditorScene extends BaseScene {
       Space.textboxHeight,
     )
     this.deckNameInput = this.add
-      .rexInputText(
-        0,
-        0,
-        ROSTER_WIDTH - Space.pad * 2,
-        Space.textboxHeight,
-        {
-          type: 'text',
-          text: this.deckName,
-          align: 'center',
-          placeholder: 'Deck name',
-          tooltip: 'Click to rename this deck.',
-          fontFamily: 'Mulish',
-          fontSize: '24px',
-          color: Color.textboxText,
-          maxLength: 40,
-          id: 'deck-editor-name',
-        },
-      )
+      .rexInputText(0, 0, ROSTER_WIDTH - Space.pad * 2, Space.textboxHeight, {
+        type: 'text',
+        text: this.deckName,
+        align: 'center',
+        placeholder: 'Deck name',
+        tooltip: 'Click to rename this deck.',
+        fontFamily: 'Mulish',
+        fontSize: '24px',
+        color: Color.textboxText,
+        maxLength: 40,
+        id: 'deck-editor-name',
+      })
       .on('textchange', (inputText: any) => {
         this.deckName = inputText.text
         this.updateSavedDeck(undefined, this.deckName)
