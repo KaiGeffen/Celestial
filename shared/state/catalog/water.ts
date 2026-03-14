@@ -280,7 +280,7 @@ const rime = new Rime({
   id: 7036,
   cost: 4,
   points: 5,
-  text: 'Add 2 copies of Ice to the bottom of your deck.',
+  text: 'Create 2 copies of Ice on the bottom of your deck.',
 })
 
 export {

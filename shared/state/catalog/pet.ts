@@ -315,17 +315,11 @@ class Heart extends Card {
     playedCardOwner: number,
     game: GameModel,
   ): boolean {
-    // If the opponent played the card
-    if (playedCardOwner === (owner ^ 1)) {
-      // Discard this and nourish 3
-      game.removeAct(index)
-      this.nourish(3, game, owner)
+    // Discard this and nourish 3
+    game.removeAct(index)
+    this.nourish(3, game, owner)
 
-      return true
-    }
-
-    // Otherwise, this card isn't removed
-    return false
+    return true
   }
 }
 const heart = new Heart({
@@ -333,7 +327,7 @@ const heart = new Heart({
   id: 4088,
   cost: 3,
   points: 4,
-  text: 'When your opponent plays a card while this is in the story, discard this and Nourish 3.',
+  text: 'When a card is played while this is in the story, discard this and Nourish 3.',
   beta: true,
 })
 
