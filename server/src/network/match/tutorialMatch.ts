@@ -23,6 +23,10 @@ class TutorialMatch extends PveMatch {
     logTutorialProgress(this.uuid1, `tutorial_${num + 1}`, 0)
   }
 
+  async startMatch() {
+    this.game = new TutorialController(this.tutorialNum)
+  }
+
   protected async opponentActs() {
     // TODO Use ai instead
     ;[0, 1, 2, 3, 4, 5, MechanicsSettings.PASS].forEach((action) => {

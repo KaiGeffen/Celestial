@@ -163,6 +163,8 @@ class TutorialController extends ServerController {
       { avatar: 0, border: 0 },
       'Jules',
       'Umbra',
+      'New Friend',
+      'Curious Spirit',
       false,
     )
 

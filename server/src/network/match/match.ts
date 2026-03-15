@@ -46,7 +46,6 @@ class Match implements Match {
     const user2 = await this.getUsernameElo(this.uuid2)
 
     // Make a new game
-    // TODO Custom modes (tutorial, race) will overwrite this. Instead they should never make this
     this.game = new ServerController()
     this.game.startGame(
       this.deck1.cards.map((cardId) => Catalog.getCardById(cardId)),
