@@ -12,7 +12,7 @@ import {
 } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import GameModel from '../../../../shared/state/gameModel'
-import avatarNames from '../../data/avatarNames'
+import avatarNames from '../../../../shared/data/avatarNames'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import logEvent from '../../utils/analytics'
 import { server } from '../../server'

@@ -188,7 +188,7 @@ class Match implements Match {
   }
 
   // Get the name of player with given uuid
-  private async getUsernameElo(
+  protected async getUsernameElo(
     uuid: string | null,
   ): Promise<{ username: string; elo: string }> {
     if (!uuid) return { username: '', elo: '' }
