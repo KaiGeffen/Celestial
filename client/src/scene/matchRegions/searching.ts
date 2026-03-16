@@ -53,7 +53,6 @@ export default class SearchingRegion extends Region {
 
       const i = Math.floor(Math.random() * 6)
       this.mysteryAvatar.setTexture(`avatar-${avatarNames[i]}Full`)
-      this.fitFullAvatar(this.mysteryAvatar)
     }
 
     // Format the timer text
@@ -115,7 +114,7 @@ export default class SearchingRegion extends Region {
 
     this.scene.plugins.get('rexAnchor')['add'](background, {
       width: `100%`,
-      // height: `100%`,
+      height: `100%`,
     })
 
     this.container.add(background)
@@ -159,16 +158,14 @@ export default class SearchingRegion extends Region {
     this.fitHalfWidthAvatar(avatar)
   }
 
-  private createText(scene: Phaser.Scene): void {
-    const textBlockHeight = 180
+  private createText(scene: MatchScene): void {
+    const textBlockHeight = 280
+    const textBlockWidth = 580
     const textBackground = scene.add
-      .rectangle(0, -50, 1, textBlockHeight, Color.backgroundLight)
+      .rectangle(0, 5, textBlockWidth, textBlockHeight, Color.backgroundLight)
       .setOrigin(0.5, 0.5)
       .setAlpha(0.8)
     scene.addShadow(textBackground)
-    scene.plugins.get('rexAnchor')['add'](textBackground, {
-      width: `100%`,
-    })
     this.container.add(textBackground)
 
     this.txtTitle = scene.add
