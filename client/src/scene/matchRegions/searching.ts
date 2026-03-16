@@ -9,6 +9,7 @@ import GameModel from '../../../../shared/state/gameModel'
 import { server } from '../../server'
 
 export default class SearchingRegion extends Region {
+  playerAvatar: Phaser.GameObjects.Image
   mysteryAvatar: Phaser.GameObjects.Image
 
   startTime: number
@@ -41,6 +42,11 @@ export default class SearchingRegion extends Region {
 
   sum = 0
   update(time, delta): void {
+    // Keep the avatar size ratio right in case window resizes
+    // TODO This should be in a on-resize callback
+    this.fitHalfWidthAvatar(this.playerAvatar)
+    this.fitHalfWidthAvatar(this.mysteryAvatar)
+
     // If a match has been found, stop counting
     if (this.matchFound) {
       return
@@ -132,17 +138,17 @@ export default class SearchingRegion extends Region {
     })
     this.fitHalfWidthAvatar(this.mysteryAvatar)
 
-    const avatar = scene.add
+    this.playerAvatar = scene.add
       .image(0, 0, `avatar-${avatarNames[avatarId]}Full`)
       .setOrigin(1, 0.5)
-    scene.plugins.get('rexAnchor')['add'](avatar, {
+    scene.plugins.get('rexAnchor')['add'](this.playerAvatar, {
       right: '0%',
       width: '50%',
       height: '100%',
     })
-    this.fitHalfWidthAvatar(avatar)
+    this.fitHalfWidthAvatar(this.playerAvatar)
 
-    this.container.add([this.mysteryAvatar, avatar])
+    this.container.add([this.mysteryAvatar, this.playerAvatar])
   }
 
   private fitHalfWidthAvatar(avatar: Phaser.GameObjects.Image): void {
@@ -152,10 +158,6 @@ export default class SearchingRegion extends Region {
     const scaleH = Space.windowHeight / source.height
     const scale = Math.max(scaleW, scaleH)
     avatar.setScale(scale)
-  }
-
-  private fitFullAvatar(avatar: Phaser.GameObjects.Image): void {
-    this.fitHalfWidthAvatar(avatar)
   }
 
   private createText(scene: MatchScene): void {
