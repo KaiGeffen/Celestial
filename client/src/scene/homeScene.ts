@@ -521,5 +521,5 @@ On April 4th, play for the chance to win 120$ in cash prizes, plus exclusive cos
 An all new Journey mode unfolds before you.
 Complete new missions with an ever-growing collection of cards as you learn about the characters who have arrived in the city. Earn gold as you learn to play the game!
 
-🌊 Card Borders
-Thank you all for the feedback! New card border design is coming soon.`
+🎴 Card changes
+👇 [area=_Hero][color=#FABD5D]Hero[/color][/area] bonus points 4 > 3`
