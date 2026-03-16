@@ -372,7 +372,7 @@ const starfall = new Starfall({
   name: 'Starfall',
   id: 8006,
   cost: 6,
-  points: 6,
+  points: 7,
   text: 'At the start of turn, if your hand has at least 5 cards including this, discard this to Inspired 1.',
   beta: true,
 })
@@ -389,7 +389,7 @@ const boreas = new Boreas({
   id: 8096,
   cost: 2,
   points: 2,
-  text: 'Worth +1 if you returned a card to hand this round TODO Implement.\nGain 2 breath.',
+  text: 'Gain 2 breath.',
 })
 
 class Heavens extends Card {
@@ -420,9 +420,9 @@ export {
   dreamer,
   pride,
   // NEW
-  rocketship,
+  // rocketship,
   // fable,
   starfall,
-  boreas as inbreath,
+  boreas,
   heavens,
 }
