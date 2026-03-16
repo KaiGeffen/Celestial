@@ -403,7 +403,6 @@ export const assetLists = {
   "news": {
     "files": [
       "Birth",
-      "CardUpdate",
       "Goliath",
       "LayBare",
       "MeAndHer",
