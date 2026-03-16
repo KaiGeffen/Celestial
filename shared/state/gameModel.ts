@@ -22,6 +22,8 @@ export default class GameModel {
   maxBreath: number[] = [1, 1]
   // TODO This is a hack for Radiant Core, consider other approaches
   endingBreath: number[] = [0, 0]
+  exhaleCountLastRound: number[] = [0, 0]
+
   status: [Statuses, Statuses]
 
   // Resolving specific
@@ -163,6 +165,7 @@ export default class GameModel {
     copy.cardCosts = [...this.cardCosts]
     copy.amtPasses = [...this.amtPasses]
     copy.amtDrawn = [...this.amtDrawn]
+    copy.exhaleCountLastRound = [...this.exhaleCountLastRound]
     // Unnecessary since a new own gets init above, but left in for clarity
     // copy.avatars = [...this.avatars]
     copy.roundCount = this.roundCount

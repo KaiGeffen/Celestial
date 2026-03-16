@@ -289,6 +289,9 @@ class ServerController {
   protected doResolvePhase(): void {
     this.model.score = [0, 0]
 
+    // Reset the exhale count since a new resolution is beginning
+    this.model.exhaleCountLastRound = [0, 0]
+
     this.model.story.run(this.model)
 
     // If a player has more points, they win the round

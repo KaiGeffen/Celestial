@@ -101,6 +101,12 @@ export default class Card {
   exhale(amt: number, game: GameModel, player: number): boolean {
     if (game.breath[player] >= amt) {
       game.breath[player] -= amt
+
+      // Increment the exhale count for the given player
+      if (amt > 0) {
+        game.exhaleCountLastRound[player] += 1
+      }
+
       return true
     } else {
       return false

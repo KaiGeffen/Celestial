@@ -392,6 +392,19 @@ const boreas = new Boreas({
   text: 'Worth +1 if you returned a card to hand this round TODO Implement.\nGain 2 breath.',
 })
 
+class Heavens extends Card {
+  getCost(player: number, game: GameModel): number {
+    return this.cost - game.exhaleCountLastRound[player] * 2
+  }
+}
+const heavens = new Heavens({
+  name: 'Heavens',
+  id: 8019,
+  cost: 9,
+  points: 9,
+  text: "Costs 2 less for each time you've triggered Exhale since the last story began.",
+})
+
 export {
   stars,
   cosmos,
@@ -411,4 +424,5 @@ export {
   // fable,
   starfall,
   boreas as inbreath,
+  heavens,
 }
