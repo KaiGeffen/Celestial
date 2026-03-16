@@ -115,35 +115,62 @@ export default class SearchingRegion extends Region {
 
     this.scene.plugins.get('rexAnchor')['add'](background, {
       width: `100%`,
-      height: `100%`,
+      // height: `100%`,
     })
 
     this.container.add(background)
   }
 
   private createAvatars(scene: Phaser.Scene, avatarId: number): void {
-    let avatar = scene.add
-      .image(-Space.windowWidth / 2, 0, `avatar-${avatarNames[avatarId]}Full`)
-      .setOrigin(0, 0.5)
-    this.fitFullAvatar(avatar)
-
     this.mysteryAvatar = scene.add
-      .image(Space.windowWidth / 2, 0, `avatar-${avatarNames[0]}Full`)
+      .image(0, 0, `avatar-${avatarNames[0]}Full`)
       .setTint(Color.grey)
-      .setOrigin(1, 0.5)
-    this.fitFullAvatar(this.mysteryAvatar)
+      .setOrigin(0, 0.5)
+    scene.plugins.get('rexAnchor')['add'](this.mysteryAvatar, {
+      left: '0%',
+      width: '50%',
+      height: '100%',
+    })
+    this.fitHalfWidthAvatar(this.mysteryAvatar)
 
-    this.container.add([avatar, this.mysteryAvatar])
+    const avatar = scene.add
+      .image(0, 0, `avatar-${avatarNames[avatarId]}Full`)
+      .setOrigin(1, 0.5)
+    scene.plugins.get('rexAnchor')['add'](avatar, {
+      right: '0%',
+      width: '50%',
+      height: '100%',
+    })
+    this.fitHalfWidthAvatar(avatar)
+
+    this.container.add([this.mysteryAvatar, avatar])
   }
 
-  private fitFullAvatar(avatar: Phaser.GameObjects.Image): void {
+  private fitHalfWidthAvatar(avatar: Phaser.GameObjects.Image): void {
     const source = this.scene.textures.get(avatar.texture.key).getSourceImage()
-    const availableHeight = Space.windowHeight
-    const scale = availableHeight / source.height
+    const halfWidth = Space.windowWidth / 2
+    const scaleW = halfWidth / source.width
+    const scaleH = Space.windowHeight / source.height
+    const scale = Math.max(scaleW, scaleH)
     avatar.setScale(scale)
   }
 
+  private fitFullAvatar(avatar: Phaser.GameObjects.Image): void {
+    this.fitHalfWidthAvatar(avatar)
+  }
+
   private createText(scene: Phaser.Scene): void {
+    const textBlockHeight = 180
+    const textBackground = scene.add
+      .rectangle(0, -50, 1, textBlockHeight, Color.backgroundLight)
+      .setOrigin(0.5, 0.5)
+      .setAlpha(0.8)
+    scene.addShadow(textBackground)
+    scene.plugins.get('rexAnchor')['add'](textBackground, {
+      width: `100%`,
+    })
+    this.container.add(textBackground)
+
     this.txtTitle = scene.add
       .text(0, -100, 'Searching for an opponent', Style.announcement)
       .setStroke(Color.backgroundLightS, 4)
