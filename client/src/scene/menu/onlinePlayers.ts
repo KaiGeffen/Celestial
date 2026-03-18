@@ -13,6 +13,7 @@ const height = (Space.windowHeight * 2) / 3
 const width = 600
 
 interface OnlinePlayer {
+  uuid: string
   username: string
   cosmeticSet: CosmeticSet
   status: number

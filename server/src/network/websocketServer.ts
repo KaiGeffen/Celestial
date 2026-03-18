@@ -22,6 +22,7 @@ import TutorialMatch from './match/tutorialMatch'
 import sendUserData from './sendUserData'
 import { getStartingInventoryBitString } from '../startingInventory'
 import PveSpecialMatch from './match/pveSpecialMatch'
+import getClientGameModel from '../../../shared/state/clientGameModel'
 import REWARD_AMOUNTS from '../../../shared/config/rewardAmounts'
 import { journeyData } from '../../../shared/journey/journey'
 
@@ -65,6 +66,10 @@ export default function createWebSocketServer() {
         match: null, // Match if user is in one
         playerNumber: null, // 0 or 1 for current match
       }
+
+      // If this connection is spectating, keep the match reference so we can
+      // unregister on socket close.
+      let spectatingMatch: Match | null = null
 
       ws.on('signIn', async ({ email, uuid, jti }) => {
         // TODO If user has sent an email, check their jti
@@ -487,6 +492,24 @@ export default function createWebSocketServer() {
         .on('cancelQueue', ({ password }) => {
           delete searchingPlayers[password]
         })
+        // Spectator mode: watch another connected user's match
+        .on('spectatePlayer', async ({ targetUuid }) => {
+          const targetActive = userActiveGameMap[targetUuid]
+          if (!targetActive?.match || targetActive.match.isOver()) {
+            ws.send({ type: 'signalError' })
+            return
+          }
+
+          // Only one active spectate subscription per socket for now.
+          if (spectatingMatch) {
+            spectatingMatch.removeSpectator(ws)
+            spectatingMatch = null
+          }
+
+          const perspective = targetActive.playerNumber === 1 ? 1 : 0
+          spectatingMatch = targetActive.match
+          targetActive.match.addSpectator(ws, perspective)
+        })
         // In match events
         .on('playCard', (data) => {
           if (!activeGame.match) return
@@ -526,6 +549,11 @@ export default function createWebSocketServer() {
           delete activePlayers[id]
         }
 
+        if (spectatingMatch) {
+          spectatingMatch.removeSpectator(ws)
+          spectatingMatch = null
+        }
+
         // Disconnect from active match if it hasn't ended
         if (activeGame.match && !activeGame.match.isOver()) {
           activeGame.match.doDisconnect(ws)
@@ -557,6 +585,7 @@ export default function createWebSocketServer() {
       )
 
       let playersList: Array<{
+        uuid: string
         username: string
         cosmeticSet: any
         status: number
@@ -599,6 +628,7 @@ export default function createWebSocketServer() {
           }
 
           return {
+            uuid: player.id,
             username: player.username,
             cosmeticSet,
             status: getStatusForUserId(player.id),

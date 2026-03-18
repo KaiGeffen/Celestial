@@ -46,6 +46,7 @@ export default class Server {
   private static userData: UserData = null
   static pendingReconnect: { state: GameModel } | null = null
   static activePlayers: {
+    uuid: string
     username: string
     cosmeticSet: CosmeticSet
     status: number

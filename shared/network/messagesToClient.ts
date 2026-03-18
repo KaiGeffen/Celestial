@@ -47,6 +47,7 @@ export default interface messagesToClient {
   opponentEmote: {}
   broadcastOnlinePlayersList: {
     players: {
+      uuid: string
       username: string
       cosmeticSet: CosmeticSet
       status: number

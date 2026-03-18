@@ -49,6 +49,16 @@ class Match implements Match {
 
   addSpectator(ws: ServerWS, playerPerspective: 0 | 1): void {
     this.spectators[playerPerspective].add(ws)
+
+    // Send an immediate snapshot so the spectator can render right away.
+    if (this.game) {
+      const game = this.game
+
+      ws.send({
+        type: 'transmitState',
+        state: getClientGameModel(game.model, playerPerspective, false),
+      })
+    }
   }
 
   removeSpectator(ws: ServerWS): void {
