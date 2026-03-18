@@ -51,6 +51,11 @@ class Match implements Match {
     this.spectators[playerPerspective].add(ws)
   }
 
+  removeSpectator(ws: ServerWS): void {
+    this.spectators[0].delete(ws)
+    this.spectators[1].delete(ws)
+  }
+
   async startMatch() {
     const user1 = await this.getUsernameElo(this.uuid1)
     const user2 = await this.getUsernameElo(this.uuid2)
