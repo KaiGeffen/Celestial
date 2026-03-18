@@ -47,6 +47,9 @@ let searchingPlayers: { [key: string]: WaitingPlayer } = {}
 // List of active player connections
 let activePlayers: { [key: string]: ServerWS } = {}
 
+// Map from each active user in a game to that game
+let userActiveGameMap: { [key: string]: ActiveGame } = {}
+
 // Dictionary from players to games they're in, for reconnect purposes
 let userGameReconnectMap: { [key: string]: ActiveGame } = {}
 
@@ -80,6 +83,7 @@ export default function createWebSocketServer() {
 
           // Remove existing ws from active players immediately
           delete activePlayers[uuid]
+          delete userActiveGameMap[uuid]
         }
 
         // Check if user exists in database
@@ -94,6 +98,7 @@ export default function createWebSocketServer() {
         } else {
           // Add to active users
           activePlayers[uuid] = ws
+          userActiveGameMap[uuid] = activeGame
 
           // Handle achievements
           await AchievementManager.onConnection(id)
@@ -109,6 +114,7 @@ export default function createWebSocketServer() {
           ) {
             // Set the active game for this connection
             activeGame = userGameReconnectMap[uuid]
+            userActiveGameMap[uuid] = activeGame
 
             // NOTE Don't delete to avoid client not successfully loading the state (Due to network issues etc)
             // delete usersAwaitingReconnect[uuid]
@@ -521,10 +527,12 @@ export default function createWebSocketServer() {
 
       // Handle disconnect logic
       ws.onClose(() => {
+        // TODO Maybe this check is unnecessary, should delete in all cases
         // Remove them from active players
         if (activePlayers[id] === ws) {
           delete activePlayers[id]
         }
+        delete userActiveGameMap[id]
 
         // Disconnect from active match if it hasn't ended
         if (activeGame.match && !activeGame.match.isOver()) {
@@ -543,6 +551,7 @@ export default function createWebSocketServer() {
 
   console.log('User-data server is running on port: ', USER_DATA_PORT)
 
+  // TODO It's ineffecicient for each user to calculate this themself, instead the server should calculate it once and each thread uses it
   // Broadcast online players list every 2 seconds
   setInterval(async () => {
     try {
@@ -550,7 +559,11 @@ export default function createWebSocketServer() {
         (id) => activePlayers[id] && activePlayers[id].isOpen(),
       )
 
-      let playersList: Array<{ username: string; cosmeticSet: any }> = []
+      let playersList: Array<{
+        username: string
+        cosmeticSet: any
+        status: number
+      }> = []
 
       if (activeUserIds.length > 0) {
         // Get player data from database
@@ -563,7 +576,9 @@ export default function createWebSocketServer() {
           .from(players)
           .where(inArray(players.id, activeUserIds))
 
-        // Build the players list with username and cosmetic set
+        // Build the players list with username, cosmetics, and computed status.
+        // Status encoding (for now):
+        // 0 = none, 2 = inMatch, 3 = inJourney
         playersList = playerData.map((player) => {
           let cosmeticSet
           try {
@@ -571,9 +586,17 @@ export default function createWebSocketServer() {
           } catch (e) {
             cosmeticSet = { avatar: 0, border: 0, relic: 0 }
           }
+
+          let status = 0
+          const active = userActiveGameMap[player.id]
+          if (active?.match) {
+            status = active.match instanceof PveMatchMission ? 3 : 2
+          }
+
           return {
             username: player.username,
             cosmeticSet,
+            status,
           }
         })
       }
