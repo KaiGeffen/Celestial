@@ -327,7 +327,7 @@ export class MatchScene extends BaseScene {
   }
 
   // Return if the user should pass automatically, based on the game state and their settings
-  private shouldPass(state: GameModel): boolean {
+  protected shouldPass(state: GameModel): boolean {
     // Don't pass if mulligans aren't complete
     if (state.mulligansComplete.includes(false)) {
       return false
@@ -397,7 +397,7 @@ export class MatchScene extends BaseScene {
     })
   }
 
-  private registerMatchServerHooks(): void {
+  protected registerMatchServerHooks(): void {
     // Each registered event
     server
       .on('transmitState', (data) => {
