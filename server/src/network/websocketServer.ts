@@ -47,8 +47,8 @@ let searchingPlayers: { [key: string]: WaitingPlayer } = {}
 // List of active player connections
 let activePlayers: { [key: string]: ServerWS } = {}
 
-// Dictionary from players to games they're in, for reconnect purposes
-let userGameReconnectMap: { [key: string]: ActiveGame } = {}
+// Map from each active user in a game to that game
+let userActiveGameMap: { [key: string]: ActiveGame } = {}
 
 // Create the websocket server
 export default function createWebSocketServer() {
@@ -101,20 +101,19 @@ export default function createWebSocketServer() {
           // Send user their data
           await sendUserData(ws, id)
 
-          // If user is in a match, reconnect them
-          if (
-            userGameReconnectMap[uuid] &&
-            userGameReconnectMap[uuid].match &&
-            !userGameReconnectMap[uuid].match.isOver()
-          ) {
-            // Set the active game for this connection
-            activeGame = userGameReconnectMap[uuid]
+          // If user disconnected from a match, assign them back to that match and reconnect below
+          const savedActiveGame = userActiveGameMap[uuid]
+          if (savedActiveGame?.match && !savedActiveGame.match.isOver()) {
+            activeGame = savedActiveGame
+          }
 
-            // NOTE Don't delete to avoid client not successfully loading the state (Due to network issues etc)
-            // delete usersAwaitingReconnect[uuid]
+          // Map this user's entry in the dict to active game
+          // NOTE Changing activeGame then mutates the dict
+          userActiveGameMap[uuid] = activeGame
 
-            // Reconnect the user
-            activeGame.match.reconnectUser(ws, activeGame.playerNumber)
+          // Reconnect to match
+          if (activeGame.match) {
+            await activeGame.match.reconnectUser(ws, activeGame.playerNumber)
           }
         }
       })
@@ -521,6 +520,7 @@ export default function createWebSocketServer() {
 
       // Handle disconnect logic
       ws.onClose(() => {
+        // TODO Maybe this check is unnecessary, should delete in all cases
         // Remove them from active players
         if (activePlayers[id] === ws) {
           delete activePlayers[id]
@@ -530,10 +530,15 @@ export default function createWebSocketServer() {
         if (activeGame.match && !activeGame.match.isOver()) {
           activeGame.match.doDisconnect(ws)
 
-          // Queue them to be reconnected (Unless tutorial)
-          if (!(activeGame.match instanceof TutorialMatch)) {
-            userGameReconnectMap[id] = activeGame
+          // If in a match besides a tutorial, retain the active game for when user reconnects
+          if (activeGame.match instanceof TutorialMatch) {
+            delete userActiveGameMap[id]
+          } else {
+            userActiveGameMap[id] = activeGame
           }
+        } else {
+          // No match (or match already over) => nothing to reconnect to.
+          delete userActiveGameMap[id]
         }
       })
     } catch (e) {
@@ -543,6 +548,7 @@ export default function createWebSocketServer() {
 
   console.log('User-data server is running on port: ', USER_DATA_PORT)
 
+  // TODO It's ineffecicient for each user to calculate this themself, instead the server should calculate it once and each thread uses it
   // Broadcast online players list every 2 seconds
   setInterval(async () => {
     try {
@@ -550,7 +556,11 @@ export default function createWebSocketServer() {
         (id) => activePlayers[id] && activePlayers[id].isOpen(),
       )
 
-      let playersList: Array<{ username: string; cosmeticSet: any }> = []
+      let playersList: Array<{
+        username: string
+        cosmeticSet: any
+        status: number
+      }> = []
 
       if (activeUserIds.length > 0) {
         // Get player data from database
@@ -563,7 +573,23 @@ export default function createWebSocketServer() {
           .from(players)
           .where(inArray(players.id, activeUserIds))
 
-        // Build the players list with username and cosmetic set
+        // Build the players list with username, cosmetics, and computed status.
+        // Status encoding:
+        // 0 = none, 1 = searching, 2 = inMatch, 3 = inJourney
+        const getStatusForUserId = (userId: string): number => {
+          const isSearching = Object.values(searchingPlayers).some(
+            (p) => p?.id === userId && p?.ws?.isOpen(),
+          )
+          if (isSearching) return 1
+
+          const active = userActiveGameMap[userId]
+          if (active?.match && !active.match.isOver()) {
+            return active.match instanceof PveMatchMission ? 3 : 2
+          }
+
+          return 0
+        }
+
         playersList = playerData.map((player) => {
           let cosmeticSet
           try {
@@ -571,9 +597,11 @@ export default function createWebSocketServer() {
           } catch (e) {
             cosmeticSet = { avatar: 0, border: 0, relic: 0 }
           }
+
           return {
             username: player.username,
             cosmeticSet,
+            status: getStatusForUserId(player.id),
           }
         })
       }

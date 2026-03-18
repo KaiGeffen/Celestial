@@ -15,6 +15,7 @@ const width = 600
 interface OnlinePlayer {
   username: string
   cosmeticSet: CosmeticSet
+  status: number
 }
 
 export default class OnlinePlayersMenu extends Menu {
@@ -45,7 +46,7 @@ export default class OnlinePlayersMenu extends Menu {
   private startPolling() {
     // Check immediately
     this.checkForUpdates()
-    
+
     // Then check every second
     this.refreshTimer = this.scene.time.addEvent({
       delay: 1000,
@@ -64,7 +65,7 @@ export default class OnlinePlayersMenu extends Menu {
 
   private checkForUpdates() {
     const currentPlayers = Server.activePlayers
-    
+
     // Check if the list has changed by comparing lengths and content
     if (this.hasPlayersChanged(currentPlayers)) {
       this.updatePlayers(currentPlayers)
@@ -86,12 +87,15 @@ export default class OnlinePlayersMenu extends Menu {
     for (let i = 0; i < newPlayers.length; i++) {
       const newPlayer = newPlayers[i]
       const oldPlayer = this.playersData[i]
-      
-      if (!oldPlayer || 
-          oldPlayer.username !== newPlayer.username ||
-          oldPlayer.cosmeticSet.avatar !== newPlayer.cosmeticSet.avatar ||
-          oldPlayer.cosmeticSet.border !== newPlayer.cosmeticSet.border ||
-          oldPlayer.cosmeticSet.relic !== newPlayer.cosmeticSet.relic) {
+
+      if (
+        !oldPlayer ||
+        oldPlayer.username !== newPlayer.username ||
+        oldPlayer.status !== newPlayer.status ||
+        oldPlayer.cosmeticSet.avatar !== newPlayer.cosmeticSet.avatar ||
+        oldPlayer.cosmeticSet.border !== newPlayer.cosmeticSet.border ||
+        oldPlayer.cosmeticSet.relic !== newPlayer.cosmeticSet.relic
+      ) {
         return true
       }
     }
@@ -108,7 +112,7 @@ export default class OnlinePlayersMenu extends Menu {
       if (panelSizer && panelSizer.removeAll) {
         panelSizer.removeAll(true)
       }
-      
+
       // Create new player rows and add them to the panel
       const newPlayerRows = this.createPlayerRows()
       if (panelSizer) {
@@ -182,6 +186,9 @@ export default class OnlinePlayersMenu extends Menu {
       space: {
         top: Space.padSmall,
         bottom: Space.padSmall,
+        left: Space.pad,
+        right: Space.pad,
+        item: Space.pad,
       },
     })
 
@@ -209,12 +216,34 @@ export default class OnlinePlayersMenu extends Menu {
 
     // Add each text object
     let usernameText = this.scene.add.text(0, 0, player.username, Style.basic)
+    const statusText = this.scene.add.text(
+      0,
+      0,
+      this.getStatusLabel(player.status),
+      Style.basic,
+    )
 
     // Add each text with the right proportion
     rowSizer
-      .add(avatarContainer, { proportion: 1.5 })
-      .add(usernameText, { proportion: 3 })
+      .add(avatarContainer)
+      .add(usernameText, { proportion: 1 })
+      .add(statusText)
 
     return rowSizer
+  }
+
+  private getStatusLabel(status: number): string {
+    // 0 = none, 1 = searching, 2 = inMatch, 3 = inJourney
+    switch (status) {
+      case 1:
+        return 'Searching'
+      case 3:
+        return 'Journeying'
+      case 2:
+        return 'In Game'
+      case 0:
+      default:
+        return ''
+    }
   }
 }
