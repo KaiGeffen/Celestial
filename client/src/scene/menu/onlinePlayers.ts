@@ -2,7 +2,7 @@ import 'phaser'
 import { Color, Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
-import Server from '../../server'
+import Server, { server } from '../../server'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import Buttons from '../../lib/buttons/buttons'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -182,6 +182,13 @@ export default class OnlinePlayersMenu extends Menu {
   }
 
   private createRow(player: OnlinePlayer) {
+    const localUuid = Server.getUserData()?.uuid
+    const localIsInMatch =
+      localUuid &&
+      this.playersData.some(
+        (p) => p.uuid === localUuid && (p.status === 2 || p.status === 3),
+      )
+
     let rowSizer = this.scene.rexUI.add.sizer({
       width: width,
       space: {
@@ -224,11 +231,64 @@ export default class OnlinePlayersMenu extends Menu {
       Style.basic,
     )
 
+    // Right column: vertically center status, then put the Spectate button below it.
+    const rightColumnWidth = 220
+    const rightStack = this.scene.rexUI.add.sizer({
+      orientation: 'vertical',
+      width: rightColumnWidth,
+      height: Space.avatarSize,
+      space: { item: Space.padSmall },
+    })
+
+    const canSpectate =
+      !localIsInMatch &&
+      (player.status === 2 || player.status === 3) &&
+      player.uuid !== localUuid
+
+    let spectateBtnContainer: ContainerLite | null = null
+    if (canSpectate) {
+      spectateBtnContainer = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        Space.buttonWidth,
+        Space.buttonHeight,
+      )
+
+      new Buttons.Text(
+        spectateBtnContainer,
+        0,
+        0,
+        'Spectate',
+        () => {
+          if (!server || !server.isOpen()) return
+
+          this.scene.scene.stop()
+          this.scene.scene.start('SpectatorMatchScene', {
+            spectateTargetUuid: player.uuid,
+            deck: {
+              name: 'Spectate',
+              cards: [],
+              cosmeticSet: player.cosmeticSet,
+            },
+          })
+        },
+        Space.buttonWidth,
+        Space.buttonHeight,
+      )
+    }
+
+    if (spectateBtnContainer) {
+      rightStack.addSpace().add(statusText).add(spectateBtnContainer).addSpace()
+    } else {
+      rightStack.addSpace().add(statusText).addSpace()
+    }
+
     // Add each text with the right proportion
     rowSizer
       .add(avatarContainer)
       .add(usernameText, { proportion: 1 })
-      .add(statusText)
+      .add(rightStack)
 
     return rowSizer
   }
