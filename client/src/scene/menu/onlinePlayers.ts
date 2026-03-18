@@ -266,11 +266,6 @@ export default class OnlinePlayersMenu extends Menu {
           this.scene.scene.stop()
           this.scene.scene.start('SpectatorMatchScene', {
             spectateTargetUuid: player.uuid,
-            deck: {
-              name: 'Spectate',
-              cards: [],
-              cosmeticSet: player.cosmeticSet,
-            },
           })
         },
         Space.buttonWidth,

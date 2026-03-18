@@ -14,7 +14,6 @@ export class SpectatorMatchScene extends MatchScene {
   }
 
   init(params: {
-    deck?: Deck
     spectateTargetUuid: string
     gameStartState?: GameModel
   }): void {
@@ -39,11 +38,7 @@ export class SpectatorMatchScene extends MatchScene {
     }
 
     // Create the view in read-only mode.
-    this.view = new View(
-      this,
-      params.deck?.cosmeticSet?.avatar ?? 0,
-      '', // Spectators have no password context.
-    )
+    this.view = new View(this, 0, '')
 
     // Hide the searching region immediately so the user can't click Cancel.
     this.view.searching.hide()
