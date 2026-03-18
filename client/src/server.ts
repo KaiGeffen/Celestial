@@ -48,6 +48,7 @@ export default class Server {
   static activePlayers: {
     username: string
     cosmeticSet: CosmeticSet
+    status: number
   }[] = []
 
   // Log in with the server for user with given OAuth token

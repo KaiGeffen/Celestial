@@ -49,6 +49,7 @@ export default interface messagesToClient {
     players: {
       username: string
       cosmeticSet: CosmeticSet
+      status: number
     }[]
   }
 }
