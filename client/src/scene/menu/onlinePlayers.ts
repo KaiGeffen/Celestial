@@ -237,7 +237,6 @@ export default class OnlinePlayersMenu extends Menu {
       orientation: 'vertical',
       width: rightColumnWidth,
       height: Space.avatarSize,
-      space: { item: Space.padSmall },
     })
 
     const canSpectate =
@@ -252,7 +251,7 @@ export default class OnlinePlayersMenu extends Menu {
         0,
         0,
         Space.buttonWidth,
-        Space.buttonHeight,
+        0,
       )
 
       new Buttons.Text(
@@ -270,7 +269,7 @@ export default class OnlinePlayersMenu extends Menu {
         },
         Space.buttonWidth,
         Space.buttonHeight,
-      )
+      ).setOrigin(0.5, 0)
     }
 
     if (spectateBtnContainer) {

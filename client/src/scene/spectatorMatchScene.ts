@@ -13,6 +13,9 @@ export class SpectatorMatchScene extends MatchScene {
     super(args)
   }
 
+  // Whether the player has received a "seed" (The first state seen sent by the server, which might not be the first state if joinging after the game has started)
+  private hasSeededInitialVersion: boolean
+
   init(params: {
     spectateTargetUuid: string
     gameStartState?: GameModel
@@ -22,6 +25,7 @@ export class SpectatorMatchScene extends MatchScene {
     // Reset variables (similar to MatchScene.init, but without sending init messages).
     this.queuedStates = {}
     this.currentVersion = this.maxVersion = -1
+    this.hasSeededInitialVersion = false
 
     // Register each hook for a message from the server.
     this.registerMatchServerHooks()
@@ -50,6 +54,14 @@ export class SpectatorMatchScene extends MatchScene {
     this.view.ourBoard.setDisplayCostCallback(() => {})
 
     this.paused = false
+  }
+
+  queueState(state: GameModel): void {
+    if (!this.hasSeededInitialVersion) {
+      this.currentVersion = state.versionNo - 1
+      this.hasSeededInitialVersion = true
+    }
+    super.queueState(state)
   }
 
   protected shouldPass(_state: GameModel): boolean {
