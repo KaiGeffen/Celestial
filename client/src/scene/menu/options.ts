@@ -26,6 +26,7 @@ import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 import { openDiscord } from '../../utils/externalLinks'
 import { server } from '../../server'
 import SearchingRegion from '../matchRegions/searching'
+import { SpectatorMatchScene } from '../spectatorMatchScene'
 
 // TODO Use a non-mock color for the menu background
 const COLOR = Color.backgroundLight
@@ -454,11 +455,15 @@ export default class OptionsMenu extends Menu {
         this.scene.scene.start('JourneyScene')
       }
     } else {
-      // TODO This is super hacky - refactor searching to be a scene not a region
-      if (activeScene instanceof MatchScene) {
-        const region: SearchingRegion = activeScene.view.searching as any
-        if (region.matchFound) {
-          s = 'Surrender'
+      if (activeScene instanceof SpectatorMatchScene) {
+        s = 'Exit'
+      } else {
+        // TODO This is super hacky - refactor searching to be a scene not a region
+        if (activeScene instanceof MatchScene) {
+          const region: SearchingRegion = activeScene.view.searching as any
+          if (region.matchFound) {
+            s = 'Surrender'
+          }
         }
       }
       action = () => {
@@ -470,6 +475,9 @@ export default class OptionsMenu extends Menu {
 
         // Either cancel the search for a match, or forfeit the match
         if (activeScene instanceof MatchScene) {
+          // Spectators should never surrender/cancel matchmaking.
+          if (activeScene instanceof SpectatorMatchScene) return
+
           const searchingRegion: SearchingRegion = activeScene.view
             .searching as any
 
