@@ -255,7 +255,9 @@ export class MatchScene extends BaseScene {
           type: 'passTurn',
           versionNo: this.currentVersion,
         })
+        return true
       }
+      return false
     })
     view.pass.setShowResultsCallback(() => {
       if (!this.view.results.isVisible()) {

@@ -47,11 +47,15 @@ export class SpectatorMatchScene extends MatchScene {
     // Hide the searching region immediately so the user can't click Cancel.
     this.view.searching.hide()
 
-    // Provide no-op callbacks so a spectator can't accidentally trigger actions.
-    this.view.pass.setCallback(() => {})
-    this.view.pass.setShowResultsCallback(() => {})
-    this.view.ourBoard.setCardClickCallback(() => {})
-    this.view.ourBoard.setDisplayCostCallback(() => {})
+    // Callbacks should signal error
+    const m = 'You are spectating.'
+    this.view.pass.setCallback(() => {
+      this.signalError(m)
+      return false
+    })
+    this.view.ourBoard.setCardClickCallback(() => {
+      this.signalError(m)
+    })
 
     this.paused = false
   }
