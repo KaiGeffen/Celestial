@@ -55,7 +55,9 @@ export class SpectatorMatchScene extends MatchScene {
     })
     this.view.ourBoard.setCardClickCallback(() => {
       this.signalError(m)
+      return false
     })
+    this.view.ourBoard.setDisplayCostCallback(() => {})
 
     this.paused = false
   }

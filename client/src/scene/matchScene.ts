@@ -201,6 +201,7 @@ export class MatchScene extends BaseScene {
         cardNum: i,
         versionNo: this.currentVersion,
       })
+      return true
     })
     view.ourBoard.setDisplayCostCallback((cost: number) => {
       this.view.ourScore.displayCost(cost)
