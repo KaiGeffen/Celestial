@@ -169,30 +169,8 @@ export class MatchScene extends BaseScene {
 
   // Set all of the callback functions for the regions in the view
   private setCallbacks(view): void {
-    // Their score region
-    view.theirScore.recapCallback = () => {
-      // Scan backwards through the queued states to find the start of the recap
-      for (let version = this.currentVersion - 1; version >= 0; version--) {
-        if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
-          // Continue backwards until we find where isRecap is false
-          while (version >= 0 && this.queuedStates[version].isRecap) {
-            version--
-          }
-          this.currentVersion = version
-          break
-        }
-      }
-    }
-    view.theirScore.skipCallback = () => {
-      this.tweens.getTweens().forEach((tween) => {
-        tween.complete()
-      })
-
-      // End the pause
-      this.paused = false
-
-      this.currentVersion = this.maxVersion - 1
-    }
+    // Callbacks in this and spectator modes
+    this.setCommonCallbacks(view)
 
     // Hand region
     view.ourBoard.setCardClickCallback((i: number) => {
@@ -202,9 +180,6 @@ export class MatchScene extends BaseScene {
         versionNo: this.currentVersion,
       })
       return true
-    })
-    view.ourBoard.setDisplayCostCallback((cost: number) => {
-      this.view.ourScore.displayCost(cost)
     })
     view.ourAvatar.setEmoteCallback(() => {
       server.send({
@@ -281,6 +256,40 @@ export class MatchScene extends BaseScene {
         type: 'mulligan',
         mulligan: choice,
       })
+    })
+  }
+
+  protected setCommonCallbacks(view: View): void {
+    // Watch recap (Resolutioin of last story)
+    view.theirScore.recapCallback = () => {
+      // Scan backwards through the queued states to find the start of the recap
+      for (let version = this.currentVersion - 1; version >= 0; version--) {
+        if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
+          // Continue backwards until we find where isRecap is false
+          while (version >= 0 && this.queuedStates[version].isRecap) {
+            version--
+          }
+          this.currentVersion = version
+          break
+        }
+      }
+    }
+
+    // Skip watching the story resolve
+    view.theirScore.skipCallback = () => {
+      this.tweens.getTweens().forEach((tween) => {
+        tween.complete()
+      })
+
+      // End the pause
+      this.paused = false
+
+      this.currentVersion = this.maxVersion - 1
+    }
+
+    // Display the cost of each card in our hand
+    view.ourBoard.setDisplayCostCallback((cost: number) => {
+      this.view.ourScore.displayCost(cost)
     })
   }
 

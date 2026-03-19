@@ -26,6 +26,7 @@ export class SpectatorMatchScene extends MatchScene {
     this.queuedStates = {}
     this.currentVersion = this.maxVersion = -1
     this.hasSeededInitialVersion = false
+    this.paused = false
 
     // Register each hook for a message from the server.
     this.registerMatchServerHooks()
@@ -47,7 +48,10 @@ export class SpectatorMatchScene extends MatchScene {
     // Hide the searching region immediately so the user can't click Cancel.
     this.view.searching.hide()
 
-    // Callbacks should signal error
+    // Callbacks common to this and the match scene
+    this.setCommonCallbacks(this.view)
+
+    // Callbacks that signal error
     const m = 'You are spectating.'
     this.view.pass.setCallback(() => {
       this.signalError(m)
@@ -61,11 +65,6 @@ export class SpectatorMatchScene extends MatchScene {
       this.signalError(m)
       return false
     })
-
-    // TODO Show the right costs for each card in our hand
-    this.view.ourBoard.setDisplayCostCallback(() => {})
-
-    this.paused = false
   }
 
   queueState(state: GameModel): void {
