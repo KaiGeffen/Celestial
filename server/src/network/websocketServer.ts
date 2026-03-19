@@ -509,6 +509,23 @@ export default function createWebSocketServer() {
           const perspective = targetActive.playerNumber === 1 ? 1 : 0
           spectatingMatch = targetActive.match
           targetActive.match.addSpectator(ws, perspective)
+
+          // Notify the watched player (not the opponent) that someone is spectating
+          if (!id) return
+          const [watcher] = await db
+            .select({ username: players.username })
+            .from(players)
+            .where(eq(players.id, id))
+            .limit(1)
+
+          const watchedWs =
+            perspective === 0 ? targetActive.match.ws1 : targetActive.match.ws2
+          if (watchedWs?.isOpen()) {
+            watchedWs.send({
+              type: 'spectatorJoined',
+              username: watcher?.username ?? 'Someone',
+            })
+          }
         })
         // In match events
         .on('playCard', (data) => {

@@ -419,6 +419,9 @@ export class MatchScene extends BaseScene {
         this.signalError('Server says that an action was in error.')
         console.log('Server says that an action was in error.')
       })
+      .on('spectatorJoined', ({ username }) => {
+        this.signalError(`${username} began spectating.`)
+      })
       .on('opponentSurrendered', () => {
         this.signalOpponentSurrendered()
       })

@@ -41,6 +41,9 @@ export default interface messagesToClient {
     state: GameModel
   }
   signalError: {}
+  spectatorJoined: {
+    username: string
+  }
   opponentSurrendered: {}
   opponentDisconnected: {}
   opponentReconnected: {}
