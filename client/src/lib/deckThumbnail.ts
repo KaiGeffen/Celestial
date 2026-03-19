@@ -41,7 +41,7 @@ export default class DeckThumbnail {
       const cardBack = scene.add
         .image(-40, 70, 'card-Cardback')
         .setOrigin(0.5, 1) // rotate around bottom-center
-        .setScale(0.5)
+        .setDisplaySize(Space.cardWidth / 2, Space.cardHeight / 2)
         .setRotation((angleFirst + angleStepDeg * i * Math.PI) / 180)
       this.container.add(cardBack)
     }
