@@ -57,6 +57,12 @@ export class SpectatorMatchScene extends MatchScene {
       this.signalError(m)
       return false
     })
+    this.view.mulligan.setCallback(() => {
+      this.signalError(m)
+      return false
+    })
+
+    // TODO Show the right costs for each card in our hand
     this.view.ourBoard.setDisplayCostCallback(() => {})
 
     this.paused = false
