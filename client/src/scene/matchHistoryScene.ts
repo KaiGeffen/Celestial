@@ -19,6 +19,8 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
   private matchHistoryData: MatchHistoryEntry[]
   private filteredMatchHistoryData: MatchHistoryEntry[]
   private searchText: string = ''
+  private matchTypeFilter: 'pvp' | 'pve' = 'pve'
+  private matchTypeBtn
   private searchObj
   private loadingText: Phaser.GameObjects.Text
 
@@ -37,6 +39,41 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     this.matchHistoryData = []
     this.filteredMatchHistoryData = []
     this.searchText = ''
+    this.matchTypeFilter = 'pve'
+
+    // TODO This is insane code LMAO
+    const defaultTitle = this.children.list.find(
+      (obj) =>
+        obj instanceof Phaser.GameObjects.Text && obj.text === 'Match History',
+    ) as Phaser.GameObjects.Text | undefined
+    defaultTitle?.destroy()
+
+    const titleText = this.add.text(0, 0, 'Match History', Style.homeTitle)
+    const matchTypeContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    this.matchTypeBtn = new Buttons.Basic({
+      within: matchTypeContainer,
+      text: this.matchTypeFilter.toUpperCase(),
+      f: () => {
+        this.matchTypeFilter = this.matchTypeFilter === 'pvp' ? 'pve' : 'pvp'
+        this.matchTypeBtn.setText(this.matchTypeFilter.toUpperCase())
+        this.filterAndRefreshContent()
+      },
+    })
+    this.rexUI.add
+      .sizer({
+        orientation: 'horizontal',
+        space: { item: Space.padSmall },
+      })
+      .add(titleText)
+      .add(matchTypeContainer)
+      .setPosition(Space.windowWidth / 2, headerHeight / 2)
+      .layout()
 
     // Show loading message
     this.loadingText = this.add
@@ -68,7 +105,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         throw new Error('Failed to fetch match history data')
       }
       this.matchHistoryData = await response.json()
-      this.filteredMatchHistoryData = this.matchHistoryData
+      this.filterAndRefreshContent()
       console.log('Match history data', this.matchHistoryData)
       this.createContent()
     } catch (error) {
@@ -188,11 +225,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       width: width,
     })
 
-    // Use filteredMatchHistoryData instead of matchHistoryData
-    const dataToUse =
-      this.filteredMatchHistoryData.length > 0 || this.searchText
-        ? this.filteredMatchHistoryData
-        : this.matchHistoryData
+    const dataToUse = this.filteredMatchHistoryData
 
     dataToUse.forEach((entry) => {
       let rowContainer = this.createRow(entry)
@@ -395,18 +428,20 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
 
   private filterAndRefreshContent(): void {
     const searchTerm = this.searchText.toLowerCase()
+    const typeMatches = (entry: MatchHistoryEntry) =>
+      this.matchTypeFilter === 'pve'
+        ? entry.opponentUsername === 'Computer'
+        : entry.opponentUsername !== 'Computer'
 
-    // If search is empty, show all entries
-    if (!searchTerm) {
-      this.filteredMatchHistoryData = this.matchHistoryData
-    } else {
-      // Filter based on opponent name or deck names
-      this.filteredMatchHistoryData = this.matchHistoryData.filter(
-        (entry) =>
-          entry.opponentUsername.toLowerCase().includes(searchTerm) ||
-          entry.deck.name.toLowerCase().includes(searchTerm),
+    this.filteredMatchHistoryData = this.matchHistoryData.filter((entry) => {
+      if (!typeMatches(entry)) return false
+      if (!searchTerm) return true
+
+      return (
+        entry.opponentUsername.toLowerCase().includes(searchTerm) ||
+        entry.deck.name.toLowerCase().includes(searchTerm)
       )
-    }
+    })
 
     // Update the panel content
     if (this.basePanel) {
