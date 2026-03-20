@@ -17,6 +17,7 @@ interface OnlinePlayer {
   username: string
   cosmeticSet: CosmeticSet
   status: number
+  canBeSpectated: boolean
 }
 
 export default class OnlinePlayersMenu extends Menu {
@@ -93,6 +94,7 @@ export default class OnlinePlayersMenu extends Menu {
         !oldPlayer ||
         oldPlayer.username !== newPlayer.username ||
         oldPlayer.status !== newPlayer.status ||
+        oldPlayer.canBeSpectated !== newPlayer.canBeSpectated ||
         oldPlayer.cosmeticSet.avatar !== newPlayer.cosmeticSet.avatar ||
         oldPlayer.cosmeticSet.border !== newPlayer.cosmeticSet.border ||
         oldPlayer.cosmeticSet.relic !== newPlayer.cosmeticSet.relic
@@ -246,6 +248,7 @@ export default class OnlinePlayersMenu extends Menu {
     const canSpectate =
       !localIsInMatch &&
       (player.status === 2 || player.status === 3) &&
+      player.canBeSpectated &&
       player.uuid !== localUuid
 
     let spectateBtnContainer: ContainerLite | null = null

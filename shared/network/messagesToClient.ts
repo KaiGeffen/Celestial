@@ -55,6 +55,8 @@ export default interface messagesToClient {
       username: string
       cosmeticSet: CosmeticSet
       status: number
+      /** Whether this user allows others to spectate their match (when in game or journey). */
+      canBeSpectated: boolean
     }[]
   }
 }

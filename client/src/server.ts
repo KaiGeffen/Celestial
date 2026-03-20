@@ -50,6 +50,7 @@ export default class Server {
     username: string
     cosmeticSet: CosmeticSet
     status: number
+    canBeSpectated: boolean
   }[] = []
 
   // Log in with the server for user with given OAuth token

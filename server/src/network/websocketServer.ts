@@ -646,6 +646,7 @@ export default function createWebSocketServer() {
         username: string
         cosmeticSet: any
         status: number
+        canBeSpectated: boolean
       }> = []
 
       if (activeUserIds.length > 0) {
@@ -691,6 +692,7 @@ export default function createWebSocketServer() {
             username: player.username,
             cosmeticSet,
             status: getStatusForUserId(player.id),
+            canBeSpectated: spectateAllowedByUserId[player.id] !== false,
           }
         })
       }
