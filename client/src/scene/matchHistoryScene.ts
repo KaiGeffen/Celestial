@@ -14,6 +14,7 @@ import { MATCH_HISTORY_PORT } from '../../../shared/network/settings'
 
 const headerHeight = Space.iconSize + Space.pad * 2
 const width = Space.windowWidth - Space.sliderWidth
+const MATCH_HISTORY_FILTER_KEY = 'matchHistoryFilter'
 
 export default class MatchHistoryScene extends BaseSceneWithHeader {
   private matchHistoryData: MatchHistoryEntry[]
@@ -39,7 +40,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     this.matchHistoryData = []
     this.filteredMatchHistoryData = []
     this.searchText = ''
-    this.matchTypeFilter = 'pve'
+    this.matchTypeFilter = this.getSavedMatchTypeFilter()
     this.basePanel = null
     this.searchObj = null
     this.loadingText = null
@@ -64,6 +65,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       text: this.matchTypeFilter.toUpperCase(),
       f: () => {
         this.matchTypeFilter = this.matchTypeFilter === 'pvp' ? 'pve' : 'pvp'
+        localStorage.setItem(MATCH_HISTORY_FILTER_KEY, this.matchTypeFilter)
         this.matchTypeBtn.setText(this.matchTypeFilter.toUpperCase())
         this.filterAndRefreshContent()
       },
@@ -120,6 +122,11 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       }
       this.signalError('Failed to load match history data')
     }
+  }
+
+  private getSavedMatchTypeFilter(): 'pvp' | 'pve' {
+    const saved = localStorage.getItem(MATCH_HISTORY_FILTER_KEY)
+    return saved === 'pvp' || saved === 'pve' ? saved : 'pve'
   }
 
   private createContent() {
