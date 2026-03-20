@@ -24,6 +24,7 @@ import Card from '../../../../shared/state/card'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import Server from '../../server'
 import { GardenSettings, MechanicsSettings } from '../../../../shared/settings'
+import { decodeShareableDeckCode } from '../../../../shared/codec'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import newScrollablePanel from '../../lib/scrollablePanel'
 
@@ -457,6 +458,16 @@ export default class PlayMenu extends Menu {
             this.scene.signalError(Messages.disconnectError)
             return
           }
+          // If a password has been provided which is a valid deck code, AI uses that deck instead of a random one
+          const aiDeckCode = decodeShareableDeckCode(this.password?.trim())
+          const aiDeck =
+            aiDeckCode?.length === MechanicsSettings.DECK_SIZE
+              ? {
+                  ...getRandomAiDeck(),
+                  name: 'Custom AI',
+                  cards: aiDeckCode,
+                }
+              : getRandomAiDeck()
           this.scene.scene.stop()
           if (this.activeScene) {
             this.activeScene.scene.stop()
@@ -464,7 +475,7 @@ export default class PlayMenu extends Menu {
           this.scene.scene.start('StandardMatchScene', {
             isPvp: false,
             deck: this.deck,
-            aiDeck: getRandomAiDeck(),
+            aiDeck,
           })
           logEvent('queue_pve')
         }),
@@ -536,7 +547,7 @@ export default class PlayMenu extends Menu {
         fontFamily: 'Mulish',
         fontSize: '24px',
         color: Color.textboxText,
-        maxLength: 10,
+        maxLength: MechanicsSettings.DECK_SIZE * 4,
         selectAll: true,
         id: 'search-field',
       })
