@@ -208,6 +208,9 @@ export default class Card {
     return false
   }
 
+  // When given player resolves a card with base-cost 7 or more
+  onBigResolve(player: number, game: GameModel, index: number): void {}
+
   /* Common functions */
   reset(game: GameModel) {
     game.score = [0, 0]

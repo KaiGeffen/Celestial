@@ -523,6 +523,28 @@ const suddenDraw = new Prometheus({
   text: 'When played, draw 2 cards.\nDiscard 2 cards.',
 })
 
+class Zoomies extends Card {
+  onBigResolve(player: number, game: GameModel, index: number) {
+    game.animations[player].push(
+      new Animation({
+        from: Zone.Discard,
+        to: Zone.Story,
+        card: this,
+      }),
+    )
+
+    game.pile[player].splice(index, 1)
+    game.story.addAct(this, player, 0)
+  }
+}
+const zoomies = new Zoomies({
+  name: 'Zoomies',
+  id: 2085,
+  cost: 1,
+  points: 1,
+  text: 'When you resolve a card that costs 7 or more, move this card from your discard pile to the story.',
+})
+
 export {
   dash,
   impulse,
@@ -546,4 +568,5 @@ export {
   // finale,
   // prometheus,
   // suddenDraw,
+  zoomies,
 }
