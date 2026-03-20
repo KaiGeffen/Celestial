@@ -187,25 +187,6 @@ export class MatchScene extends BaseScene {
       })
     })
 
-    // Set the callbacks for overlays
-    view.ourAvatar.setOverlayCallbacks(
-      () => {
-        this.view.showOverlay(this.view.ourDeckOverlay)
-      },
-      () => {
-        this.view.showOverlay(this.view.ourDiscardOverlay)
-      },
-    )
-
-    view.theirAvatar.setOverlayCallbacks(
-      () => {
-        this.view.showOverlay(this.view.theirDeckOverlay)
-      },
-      () => {
-        this.view.showOverlay(this.view.theirDiscardOverlay)
-      },
-    )
-
     // Story
     view.story.setCallback((i: number) => {
       return function () {
@@ -235,13 +216,6 @@ export class MatchScene extends BaseScene {
       }
       return false
     })
-    view.pass.setShowResultsCallback(() => {
-      if (!this.view.results.isVisible()) {
-        this.view.results.show()
-      } else {
-        this.view.results.hide()
-      }
-    })
 
     // Mulligan
     view.mulligan.setCallback(() => {
@@ -260,6 +234,25 @@ export class MatchScene extends BaseScene {
   }
 
   protected setCommonCallbacks(view: View): void {
+    // Set the callbacks for overlays
+    view.ourAvatar.setOverlayCallbacks(
+      () => {
+        this.view.showOverlay(this.view.ourDeckOverlay)
+      },
+      () => {
+        this.view.showOverlay(this.view.ourDiscardOverlay)
+      },
+    )
+
+    view.theirAvatar.setOverlayCallbacks(
+      () => {
+        this.view.showOverlay(this.view.theirDeckOverlay)
+      },
+      () => {
+        this.view.showOverlay(this.view.theirDiscardOverlay)
+      },
+    )
+
     // Watch recap (Resolutioin of last story)
     view.theirScore.recapCallback = () => {
       // Scan backwards through the queued states to find the start of the recap
@@ -290,6 +283,15 @@ export class MatchScene extends BaseScene {
     // Display the cost of each card in our hand
     view.ourBoard.setDisplayCostCallback((cost: number) => {
       this.view.ourScore.displayCost(cost)
+    })
+
+    // For showing the results after match is over
+    view.pass.setShowResultsCallback(() => {
+      if (!this.view.results.isVisible()) {
+        this.view.results.show()
+      } else {
+        this.view.results.hide()
+      }
     })
   }
 
