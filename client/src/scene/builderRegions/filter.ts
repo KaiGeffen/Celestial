@@ -244,8 +244,9 @@ export default class FilterRegion {
       if (!this.searchText.trim()) return true
 
       // Parse search query into tokens (handling quotes)
-      const tokens = this.parseSearchQuery(this.searchText)
-      .filter((token) => token.field !== 'deck')
+      const tokens = this.parseSearchQuery(this.searchText).filter(
+        (token) => token.field !== 'deck',
+      )
 
       // Check each token against the card
       for (const token of tokens) {
@@ -398,7 +399,7 @@ export default class FilterRegion {
     const lowerQuery = query.toLowerCase()
 
     // Build searchable string
-    let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points}`
+    let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points} ${card.beta ? 'beta' : ''}`
 
     // Keyword reminder text
     for (const [keyword, _] of Catalog.getReferencedKeywords(card)) {

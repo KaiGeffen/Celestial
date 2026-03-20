@@ -403,6 +403,7 @@ const heavens = new Heavens({
   cost: 9,
   points: 9,
   text: "Costs 2 less for each time you've triggered Exhale since the last story began.",
+  beta: true,
 })
 
 export {

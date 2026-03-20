@@ -248,7 +248,7 @@ const damBreaks = new DamBreaks({
 })
 
 // TODO
-class Ouroboros extends Card {
+class Crabs extends Card {
   onRoundEndIfThisResolved(player: number, game: GameModel) {
     // If we won, discard a card
     if (game.score[player] >= game.score[player ^ 1]) {
@@ -258,12 +258,13 @@ class Ouroboros extends Card {
     }
   }
 }
-const ouroboros = new Ouroboros({
-  name: 'Ouroboros',
+const crabs = new Crabs({
+  name: 'Crabs',
   id: 7035,
   cost: 2,
   points: 3,
   text: 'When you win this round, discard a card.\nWhen you lose this round, draw a card.',
+  beta: true,
 })
 
 class Rime extends Card {
@@ -281,6 +282,7 @@ const rime = new Rime({
   cost: 4,
   points: 5,
   text: 'Create 2 copies of Ice on the bottom of your deck.',
+  beta: true,
 })
 
 export {
@@ -298,6 +300,6 @@ export {
   damBreaks,
   overflow,
   // NEW
-  ouroboros,
+  crabs,
   rime,
 }
