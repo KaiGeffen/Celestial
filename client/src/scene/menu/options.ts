@@ -24,7 +24,7 @@ import { rulebookString } from '../../data/rulebook'
 import { creditsString } from '../../data/credits'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 import { openDiscord } from '../../utils/externalLinks'
-import { server } from '../../server'
+import Server, { server } from '../../server'
 import SearchingRegion from '../matchRegions/searching'
 import { SpectatorMatchScene } from '../spectatorMatchScene'
 
@@ -208,6 +208,8 @@ export default class OptionsMenu extends Menu {
     sizer
       .add(this.createAutopass(), { expand: true })
       .addSpace()
+      .add(this.createCanBeSpectated(), { expand: true })
+      .addSpace()
       .add(this.createHotkeys(), { expand: true })
       .addSpace()
       .add(this.createHome(activeScene), { expand: true })
@@ -379,6 +381,40 @@ export default class OptionsMenu extends Menu {
           btn.setText('Enabled')
           UserSettings._set('autopass', true)
         }
+      },
+    })
+    sizer.add(container)
+
+    return sizer
+  }
+
+  private createCanBeSpectated(): import('phaser').GameObjects.GameObject {
+    let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
+
+    let txtHint = this.scene.add.text(0, 0, 'Can be spectated:', Style.basic)
+    sizer.add(txtHint)
+    sizer.addSpace()
+
+    const s = UserSettings._get('canBeSpectated') !== false ? 'Enabled' : 'Disabled'
+    let container = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    let btn = new Buttons.Basic({
+      within: container,
+      text: s,
+      f: () => {
+        if (UserSettings._get('canBeSpectated') !== false) {
+          btn.setText('Disabled')
+          UserSettings._set('canBeSpectated', false)
+        } else {
+          btn.setText('Enabled')
+          UserSettings._set('canBeSpectated', true)
+        }
+        Server.sendCanBeSpectatedPreference()
       },
     })
     sizer.add(container)

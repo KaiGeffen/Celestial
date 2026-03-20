@@ -51,6 +51,9 @@ let activePlayers: { [key: string]: ServerWS } = {}
 // Map from each active user in a game to that game
 let userActiveGameMap: { [key: string]: ActiveGame } = {}
 
+// Whether each connected user allows others to spectate their matches (default: allowed)
+let spectateAllowedByUserId: { [key: string]: boolean } = {}
+
 // Create the websocket server
 export default function createWebSocketServer() {
   const wss = new WebSocketServer({ port: USER_DATA_PORT })
@@ -492,10 +495,18 @@ export default function createWebSocketServer() {
         .on('cancelQueue', ({ password }) => {
           delete searchingPlayers[password]
         })
+        .on('setCanBeSpectated', ({ allowed }) => {
+          if (!id) return
+          spectateAllowedByUserId[id] = allowed
+        })
         // Spectator mode: watch another connected user's match
         .on('spectatePlayer', async ({ targetUuid }) => {
           const targetActive = userActiveGameMap[targetUuid]
           if (!targetActive?.match || targetActive.match.isOver()) {
+            ws.send({ type: 'signalError' })
+            return
+          }
+          if (spectateAllowedByUserId[targetUuid] === false) {
             ws.send({ type: 'signalError' })
             return
           }
@@ -564,6 +575,9 @@ export default function createWebSocketServer() {
         // Remove them from active players
         if (activePlayers[id] === ws) {
           delete activePlayers[id]
+        }
+        if (id) {
+          delete spectateAllowedByUserId[id]
         }
 
         if (spectatingMatch) {

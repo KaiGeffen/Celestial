@@ -187,6 +187,7 @@ export default class Server {
         }
 
         this.loadUserData(data, game)
+        Server.sendCanBeSpectatedPreference()
         // TODO Bad smell, the callback should only happen once as it references a scene
         if (callback) {
           callback()
@@ -296,6 +297,18 @@ export default class Server {
     server.send({
       type: 'sendAvatarExperience',
       experience: experience,
+    })
+  }
+
+  /** Sync whether others may spectate this user's matches (see UserSettings.canBeSpectated). */
+  static sendCanBeSpectatedPreference(): void {
+    if (!server || !server.isOpen()) {
+      return
+    }
+    const allowed = UserSettings._get('canBeSpectated') !== false
+    server.send({
+      type: 'setCanBeSpectated',
+      allowed,
     })
   }
 

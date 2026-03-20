@@ -89,4 +89,8 @@ export default interface messagesToServer {
   spectatePlayer: {
     targetUuid: string
   }
+  // Whether other users may spectate this connection's matches (default true)
+  setCanBeSpectated: {
+    allowed: boolean
+  }
 }
