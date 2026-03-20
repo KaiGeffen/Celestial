@@ -44,6 +44,8 @@ export default interface messagesToClient {
   spectatorJoined: {
     username: string
   }
+  /** Sent to a spectator when they are removed (e.g. host disabled spectating). */
+  spectateEnded: {}
   opponentSurrendered: {}
   opponentDisconnected: {}
   opponentReconnected: {}

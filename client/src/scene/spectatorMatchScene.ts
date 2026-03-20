@@ -1,6 +1,5 @@
 import 'phaser'
 
-import { Deck } from '../../../shared/types/deck'
 import GameModel from '../../../shared/state/gameModel'
 
 import { server } from '../server'
@@ -89,5 +88,15 @@ export class SpectatorMatchScene extends MatchScene {
 
   signalOpponentReconnected(): void {
     // No popups in spectator mode.
+  }
+
+  protected registerMatchServerHooks(): void {
+    super.registerMatchServerHooks()
+
+    // An additional hook for when spectating ends
+    // TODO Make the message persistant
+    server.on('spectateEnded', () => {
+      this.doBack()
+    })
   }
 }

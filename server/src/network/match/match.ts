@@ -66,6 +66,16 @@ class Match implements Match {
     this.spectators[1].delete(ws)
   }
 
+  // Drop every spectator watching from this player's perspective
+  removeAllSpectatorsForPerspective(playerPerspective: 0 | 1): ServerWS[] {
+    const set = this.spectators[playerPerspective]
+    const removed = Array.from(set)
+    for (const ws of removed) {
+      this.removeSpectator(ws)
+    }
+    return removed
+  }
+
   async startMatch() {
     const user1 = await this.getUsernameElo(this.uuid1)
     const user2 = await this.getUsernameElo(this.uuid2)
