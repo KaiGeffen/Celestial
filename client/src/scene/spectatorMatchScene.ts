@@ -78,18 +78,6 @@ export class SpectatorMatchScene extends MatchScene {
     return false
   }
 
-  signalOpponentSurrendered(): void {
-    // No popups in spectator mode.
-  }
-
-  signalOpponentDisconnect(): void {
-    // No popups in spectator mode.
-  }
-
-  signalOpponentReconnected(): void {
-    // No popups in spectator mode.
-  }
-
   beforeExit(): void {
     if (server && server.isOpen()) {
       server.send({ type: 'exitSpectating' })

@@ -143,7 +143,7 @@ export class MatchScene extends BaseScene {
     this.maxVersion = Math.max(this.maxVersion, state.versionNo)
   }
 
-  signalOpponentSurrendered(): void {
+  private signalOpponentSurrendered(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
       title: 'Opponent Surrendered',
@@ -151,7 +151,7 @@ export class MatchScene extends BaseScene {
     })
   }
 
-  signalOpponentDisconnect(): void {
+  private signalOpponentDisconnect(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
       title: 'Opponent Disconnected',
@@ -159,7 +159,7 @@ export class MatchScene extends BaseScene {
     })
   }
 
-  signalOpponentReconnected(): void {
+  private signalOpponentReconnected(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
       title: 'Opponent Reconnected',
