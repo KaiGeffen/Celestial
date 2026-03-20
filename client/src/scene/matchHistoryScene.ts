@@ -40,6 +40,9 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     this.filteredMatchHistoryData = []
     this.searchText = ''
     this.matchTypeFilter = 'pve'
+    this.basePanel = null
+    this.searchObj = null
+    this.loadingText = null
 
     // TODO This is insane code LMAO
     const defaultTitle = this.children.list.find(

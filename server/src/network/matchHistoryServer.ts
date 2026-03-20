@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { and, desc, eq, or } from 'drizzle-orm'
+import { and, desc, eq, ne, or } from 'drizzle-orm'
 import { MATCH_HISTORY_PORT } from '../../../shared/network/settings'
 import { db } from '../db/db'
 import { matchHistory } from '../db/schema'
@@ -21,22 +21,43 @@ export default function createMatchHistoryServer() {
     logFunnelEvent(uuid, 'home_scene_options', 'match_history')
 
     try {
-      const matches = await db
-        .select()
-        .from(matchHistory)
-        .where(
-          or(
-            eq(matchHistory.player1_id, uuid),
-            eq(matchHistory.player2_id, uuid),
-          ),
-        )
-        .orderBy(desc(matchHistory.match_date))
-        .limit(50)
+      const playerMatchFilter = or(
+        eq(matchHistory.player1_id, uuid),
+        eq(matchHistory.player2_id, uuid),
+      )
 
-      // Transform the data to match our frontend expectations
-      const transformedMatches: MatchHistoryEntry[] = matches.map((match) => {
+      const [pveMatches, pvpMatches] = await Promise.all([
+        db
+          .select()
+          .from(matchHistory)
+          .where(
+            and(
+              playerMatchFilter,
+              or(
+                eq(matchHistory.player1_username, 'Computer'),
+                eq(matchHistory.player2_username, 'Computer'),
+              ),
+            ),
+          )
+          .orderBy(desc(matchHistory.match_date))
+          .limit(20),
+        db
+          .select()
+          .from(matchHistory)
+          .where(
+            and(
+              playerMatchFilter,
+              ne(matchHistory.player1_username, 'Computer'),
+              ne(matchHistory.player2_username, 'Computer'),
+            ),
+          )
+          .orderBy(desc(matchHistory.match_date))
+          .limit(20),
+      ])
+
+      const transformMatch = (match): MatchHistoryEntry => {
         const isPlayer1 = match.player1_id === uuid
-        const result: MatchHistoryEntry = {
+        return {
           time: match.match_date,
           elo: isPlayer1 ? match.player1_elo : match.player2_elo,
           deck: isPlayer1
@@ -54,9 +75,17 @@ export default function createMatchHistoryServer() {
           roundsTied: match.rounds_tied,
           wasWin: isPlayer1,
         }
+      }
 
-        return result
-      })
+      const transformedMatches: MatchHistoryEntry[] = [
+        ...pveMatches,
+        ...pvpMatches,
+      ]
+        .sort(
+          (a, b) =>
+            new Date(b.match_date).getTime() - new Date(a.match_date).getTime(),
+        )
+        .map(transformMatch)
 
       res.json(transformedMatches)
     } catch (error) {
