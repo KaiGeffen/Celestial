@@ -89,6 +89,7 @@ export default interface messagesToServer {
   spectatePlayer: {
     targetUuid: string
   }
+  exitSpectating: {}
   setCanBeSpectated: {
     allowed: boolean
   }

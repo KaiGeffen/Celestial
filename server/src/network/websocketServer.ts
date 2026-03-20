@@ -562,6 +562,14 @@ export default function createWebSocketServer() {
             })
           }
         })
+        .on('exitSpectating', () => {
+          const m = spectatorWsToMatch.get(ws)
+          if (m) {
+            m.removeSpectator(ws)
+            spectatorWsToMatch.delete(ws)
+          }
+          if (id) spectatingUserIds.delete(id)
+        })
         // In match events
         .on('playCard', (data) => {
           if (!activeGame.match) return

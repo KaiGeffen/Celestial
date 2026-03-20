@@ -90,6 +90,13 @@ export class SpectatorMatchScene extends MatchScene {
     // No popups in spectator mode.
   }
 
+  beforeExit(): void {
+    if (server && server.isOpen()) {
+      server.send({ type: 'exitSpectating' })
+    }
+    super.beforeExit()
+  }
+
   protected registerMatchServerHooks(): void {
     super.registerMatchServerHooks()
 
