@@ -294,7 +294,7 @@ class ServerController {
 
     // Declare match winner if a player has 5 wins
     ;[0, 1].forEach((player) => {
-      if (this.model.wins[player] >= 1) {
+      if (this.model.wins[player] >= 5) {
         this.model.winner = player
       }
     })
