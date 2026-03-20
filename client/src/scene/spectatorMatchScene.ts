@@ -3,6 +3,7 @@ import 'phaser'
 import GameModel from '../../../shared/state/gameModel'
 
 import { server } from '../server'
+import { MatchResultsSimplifiedRegion } from './matchRegions/matchResults'
 import { MatchScene, View } from './matchScene'
 
 export class SpectatorMatchScene extends MatchScene {
@@ -43,6 +44,7 @@ export class SpectatorMatchScene extends MatchScene {
 
     // Create the view in read-only mode.
     this.view = new View(this, 0, '')
+    this.view.results = new MatchResultsSimplifiedRegion().create(this)
 
     // Hide the searching region immediately so the user can't click Cancel.
     this.view.searching.hide()

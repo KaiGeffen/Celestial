@@ -387,7 +387,7 @@ export class ResultsRegionTutorial extends MatchResultsRegion {
   }
 }
 
-export class ResultsRegionJourney extends MatchResultsRegion {
+export class MatchResultsSimplifiedRegion extends MatchResultsRegion {
   protected createButtons() {
     const container = this.scene.add.container()
     this.container.add(container)
