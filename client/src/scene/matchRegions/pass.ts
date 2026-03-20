@@ -21,7 +21,7 @@ import { server } from '../../server'
 
 // During the round, shows Pass button, who has passed, and who has priority
 export default class PassRegion extends Region {
-  callback: () => void
+  callback: () => boolean
   recapCallback: () => void
 
   // The callback once the winner has been declared
@@ -109,7 +109,7 @@ export default class PassRegion extends Region {
         if (!server.isOpen()) {
           this.scene.signalError(Messages.disconnectError)
         } else {
-          this.callback()
+          if (!this.callback()) return
           this.btnPass.disable()
         }
       })
@@ -126,7 +126,7 @@ export default class PassRegion extends Region {
   }
 
   // Set the callback for when user hits the Pass button
-  setCallback(callback: () => void): void {
+  setCallback(callback: () => boolean): void {
     this.callback = callback
   }
 

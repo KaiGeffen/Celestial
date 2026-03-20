@@ -41,6 +41,41 @@ class Match implements Match {
     this.deck2 = deck2
   }
 
+  // Spectators per side/perspective (0 or 1).
+  private spectators: [Set<ServerWS>, Set<ServerWS>] = [
+    new Set<ServerWS>(),
+    new Set<ServerWS>(),
+  ]
+
+  addSpectator(ws: ServerWS, playerPerspective: 0 | 1): void {
+    this.spectators[playerPerspective].add(ws)
+
+    // Send an immediate snapshot so the spectator can render right away.
+    if (this.game) {
+      const game = this.game
+
+      ws.send({
+        type: 'transmitState',
+        state: getClientGameModel(game.model, playerPerspective, false),
+      })
+    }
+  }
+
+  removeSpectator(ws: ServerWS): void {
+    this.spectators[0].delete(ws)
+    this.spectators[1].delete(ws)
+  }
+
+  // Drop every spectator watching from this player's perspective
+  removeAllSpectatorsForPerspective(playerPerspective: 0 | 1): ServerWS[] {
+    const set = this.spectators[playerPerspective]
+    const removed = Array.from(set)
+    for (const ws of removed) {
+      this.removeSpectator(ws)
+    }
+    return removed
+  }
+
   async startMatch() {
     const user1 = await this.getUsernameElo(this.uuid1)
     const user2 = await this.getUsernameElo(this.uuid2)
@@ -77,19 +112,29 @@ class Match implements Match {
       but for recaps it's each slice of the recap
     */
     await Promise.all(
-      this.getActiveWsList().map((ws, player) => {
-        // Send any recap states
-        this.game.model.recentModels[player].forEach((state) =>
+      [0, 1].map(async (player) => {
+        const recipients: ServerWS[] = []
+
+        const activeWs = player === 0 ? this.ws1 : this.ws2
+        if (activeWs) recipients.push(activeWs)
+
+        // Add spectators registered for this same perspective.
+        recipients.push(...Array.from(this.spectators[player]))
+
+        recipients.forEach((ws) => {
+          // Send any recap states
+          this.game.model.recentModels[player].forEach((state) =>
+            ws.send({
+              type: 'transmitState',
+              state: state,
+            }),
+          )
+
+          // Send the normal state
           ws.send({
             type: 'transmitState',
-            state: state,
-          }),
-        )
-
-        // Send the normal state
-        ws.send({
-          type: 'transmitState',
-          state: getClientGameModel(this.game.model, player, false),
+            state: getClientGameModel(this.game.model, player, false),
+          })
         })
       }),
     )

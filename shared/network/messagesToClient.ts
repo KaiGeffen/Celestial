@@ -41,15 +41,22 @@ export default interface messagesToClient {
     state: GameModel
   }
   signalError: {}
+  spectatorJoined: {
+    username: string
+  }
+  spectateEnded: {}
   opponentSurrendered: {}
   opponentDisconnected: {}
   opponentReconnected: {}
   opponentEmote: {}
   broadcastOnlinePlayersList: {
     players: {
+      uuid: string
       username: string
       cosmeticSet: CosmeticSet
       status: number
+      /** Whether this user allows others to spectate their match (when in game or journey). */
+      canBeSpectated: boolean
     }[]
   }
 }

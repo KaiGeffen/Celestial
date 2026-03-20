@@ -85,4 +85,11 @@ export default interface messagesToServer {
   surrender: {}
   disconnect: {}
   emote: {}
+  // Other
+  spectatePlayer: {
+    targetUuid: string
+  }
+  setCanBeSpectated: {
+    allowed: boolean
+  }
 }

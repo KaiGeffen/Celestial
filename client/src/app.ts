@@ -8,6 +8,7 @@ import {
   JourneyMatchScene,
   RaceMatchScene,
 } from './scene/matchScene'
+import { SpectatorMatchScene } from './scene/spectatorMatchScene'
 import TutorialMatchScene from './scene/tutorialScene'
 import { BuilderScene, MapJourneyBuilderScene } from './scene/builderScene'
 import MatchHistoryScene from './scene/matchHistoryScene'
@@ -67,6 +68,7 @@ const config: Phaser.Types.Core.GameConfig = {
     // Race mode
     RaceScene,
     RaceMatchScene,
+    SpectatorMatchScene,
   ],
   plugins: {
     scene: [

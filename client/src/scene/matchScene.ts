@@ -169,30 +169,8 @@ export class MatchScene extends BaseScene {
 
   // Set all of the callback functions for the regions in the view
   private setCallbacks(view): void {
-    // Their score region
-    view.theirScore.recapCallback = () => {
-      // Scan backwards through the queued states to find the start of the recap
-      for (let version = this.currentVersion - 1; version >= 0; version--) {
-        if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
-          // Continue backwards until we find where isRecap is false
-          while (version >= 0 && this.queuedStates[version].isRecap) {
-            version--
-          }
-          this.currentVersion = version
-          break
-        }
-      }
-    }
-    view.theirScore.skipCallback = () => {
-      this.tweens.getTweens().forEach((tween) => {
-        tween.complete()
-      })
-
-      // End the pause
-      this.paused = false
-
-      this.currentVersion = this.maxVersion - 1
-    }
+    // Callbacks in this and spectator modes
+    this.setCommonCallbacks(view)
 
     // Hand region
     view.ourBoard.setCardClickCallback((i: number) => {
@@ -201,9 +179,7 @@ export class MatchScene extends BaseScene {
         cardNum: i,
         versionNo: this.currentVersion,
       })
-    })
-    view.ourBoard.setDisplayCostCallback((cost: number) => {
-      this.view.ourScore.displayCost(cost)
+      return true
     })
     view.ourAvatar.setEmoteCallback(() => {
       server.send({
@@ -255,7 +231,9 @@ export class MatchScene extends BaseScene {
           type: 'passTurn',
           versionNo: this.currentVersion,
         })
+        return true
       }
+      return false
     })
     view.pass.setShowResultsCallback(() => {
       if (!this.view.results.isVisible()) {
@@ -278,6 +256,40 @@ export class MatchScene extends BaseScene {
         type: 'mulligan',
         mulligan: choice,
       })
+    })
+  }
+
+  protected setCommonCallbacks(view: View): void {
+    // Watch recap (Resolutioin of last story)
+    view.theirScore.recapCallback = () => {
+      // Scan backwards through the queued states to find the start of the recap
+      for (let version = this.currentVersion - 1; version >= 0; version--) {
+        if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
+          // Continue backwards until we find where isRecap is false
+          while (version >= 0 && this.queuedStates[version].isRecap) {
+            version--
+          }
+          this.currentVersion = version
+          break
+        }
+      }
+    }
+
+    // Skip watching the story resolve
+    view.theirScore.skipCallback = () => {
+      this.tweens.getTweens().forEach((tween) => {
+        tween.complete()
+      })
+
+      // End the pause
+      this.paused = false
+
+      this.currentVersion = this.maxVersion - 1
+    }
+
+    // Display the cost of each card in our hand
+    view.ourBoard.setDisplayCostCallback((cost: number) => {
+      this.view.ourScore.displayCost(cost)
     })
   }
 
@@ -327,7 +339,7 @@ export class MatchScene extends BaseScene {
   }
 
   // Return if the user should pass automatically, based on the game state and their settings
-  private shouldPass(state: GameModel): boolean {
+  protected shouldPass(state: GameModel): boolean {
     // Don't pass if mulligans aren't complete
     if (state.mulligansComplete.includes(false)) {
       return false
@@ -397,7 +409,7 @@ export class MatchScene extends BaseScene {
     })
   }
 
-  private registerMatchServerHooks(): void {
+  protected registerMatchServerHooks(): void {
     // Each registered event
     server
       .on('transmitState', (data) => {
@@ -406,6 +418,9 @@ export class MatchScene extends BaseScene {
       .on('signalError', () => {
         this.signalError('Server says that an action was in error.')
         console.log('Server says that an action was in error.')
+      })
+      .on('spectatorJoined', ({ username }) => {
+        this.signalError(`${username} began spectating.`)
       })
       .on('opponentSurrendered', () => {
         this.signalOpponentSurrendered()

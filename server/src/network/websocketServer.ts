@@ -22,6 +22,7 @@ import TutorialMatch from './match/tutorialMatch'
 import sendUserData from './sendUserData'
 import { getStartingInventoryBitString } from '../startingInventory'
 import PveSpecialMatch from './match/pveSpecialMatch'
+import getClientGameModel from '../../../shared/state/clientGameModel'
 import REWARD_AMOUNTS from '../../../shared/config/rewardAmounts'
 import { journeyData } from '../../../shared/journey/journey'
 
@@ -49,6 +50,15 @@ let activePlayers: { [key: string]: ServerWS } = {}
 
 // Map from each active user in a game to that game
 let userActiveGameMap: { [key: string]: ActiveGame } = {}
+
+// Whether each connected user allows others to spectate their matches (default: allowed)
+let spectateAllowedByUserId: { [key: string]: boolean } = {}
+
+// Spectator connections -> match they're watching (for cleanup / bulk remove)
+const spectatorWsToMatch = new WeakMap<ServerWS, Match>()
+
+// User ids currently spectating another player's match (for online status)
+const spectatingUserIds = new Set<string>()
 
 // Create the websocket server
 export default function createWebSocketServer() {
@@ -487,6 +497,71 @@ export default function createWebSocketServer() {
         .on('cancelQueue', ({ password }) => {
           delete searchingPlayers[password]
         })
+        .on('setCanBeSpectated', ({ allowed }) => {
+          if (!id) return
+          spectateAllowedByUserId[id] = allowed
+
+          // Host disabled spectating mid-match: drop everyone watching their perspective.
+          if (!allowed) {
+            const ag = userActiveGameMap[id]
+            if (ag?.match && !ag.match.isOver()) {
+              const perspective = (ag.playerNumber === 1 ? 1 : 0) as 0 | 1
+              const removed =
+                ag.match.removeAllSpectatorsForPerspective(perspective)
+              for (const sWs of removed) {
+                spectatorWsToMatch.delete(sWs)
+                const sid = Object.keys(activePlayers).find(
+                  (uid) => activePlayers[uid] === sWs,
+                )
+                if (sid) spectatingUserIds.delete(sid)
+                if (sWs.isOpen()) {
+                  sWs.send({ type: 'spectateEnded' })
+                }
+              }
+            }
+          }
+        })
+        // Spectator mode: watch another connected user's match
+        .on('spectatePlayer', async ({ targetUuid }) => {
+          const targetActive = userActiveGameMap[targetUuid]
+          if (!targetActive?.match || targetActive.match.isOver()) {
+            ws.send({ type: 'signalError' })
+            return
+          }
+          if (spectateAllowedByUserId[targetUuid] === false) {
+            ws.send({ type: 'signalError' })
+            return
+          }
+
+          // Only one active spectate subscription per socket for now.
+          const prevMatch = spectatorWsToMatch.get(ws)
+          if (prevMatch) {
+            prevMatch.removeSpectator(ws)
+            spectatorWsToMatch.delete(ws)
+          }
+
+          const perspective = targetActive.playerNumber === 1 ? 1 : 0
+          targetActive.match.addSpectator(ws, perspective)
+          spectatorWsToMatch.set(ws, targetActive.match)
+          if (id) spectatingUserIds.add(id)
+
+          // Notify the watched player (not the opponent) that someone is spectating
+          if (!id) return
+          const [watcher] = await db
+            .select({ username: players.username })
+            .from(players)
+            .where(eq(players.id, id))
+            .limit(1)
+
+          const watchedWs =
+            perspective === 0 ? targetActive.match.ws1 : targetActive.match.ws2
+          if (watchedWs?.isOpen()) {
+            watchedWs.send({
+              type: 'spectatorJoined',
+              username: watcher?.username ?? 'Someone',
+            })
+          }
+        })
         // In match events
         .on('playCard', (data) => {
           if (!activeGame.match) return
@@ -525,6 +600,16 @@ export default function createWebSocketServer() {
         if (activePlayers[id] === ws) {
           delete activePlayers[id]
         }
+        if (id) {
+          delete spectateAllowedByUserId[id]
+        }
+
+        const spectating = spectatorWsToMatch.get(ws)
+        if (spectating) {
+          spectating.removeSpectator(ws)
+          spectatorWsToMatch.delete(ws)
+        }
+        if (id) spectatingUserIds.delete(id)
 
         // Disconnect from active match if it hasn't ended
         if (activeGame.match && !activeGame.match.isOver()) {
@@ -557,9 +642,11 @@ export default function createWebSocketServer() {
       )
 
       let playersList: Array<{
+        uuid: string
         username: string
         cosmeticSet: any
         status: number
+        canBeSpectated: boolean
       }> = []
 
       if (activeUserIds.length > 0) {
@@ -575,8 +662,10 @@ export default function createWebSocketServer() {
 
         // Build the players list with username, cosmetics, and computed status.
         // Status encoding:
-        // 0 = none, 1 = searching, 2 = inMatch, 3 = inJourney
+        // 0 = none, 1 = searching, 2 = inMatch, 3 = inJourney, 4 = spectating
         const getStatusForUserId = (userId: string): number => {
+          if (spectatingUserIds.has(userId)) return 4
+
           const isSearching = Object.values(searchingPlayers).some(
             (p) => p?.id === userId && p?.ws?.isOpen(),
           )
@@ -599,9 +688,11 @@ export default function createWebSocketServer() {
           }
 
           return {
+            uuid: player.id,
             username: player.username,
             cosmeticSet,
             status: getStatusForUserId(player.id),
+            canBeSpectated: spectateAllowedByUserId[player.id] !== false,
           }
         })
       }

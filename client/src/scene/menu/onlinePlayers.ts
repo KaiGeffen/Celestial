@@ -2,7 +2,7 @@ import 'phaser'
 import { Color, Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
-import Server from '../../server'
+import Server, { server } from '../../server'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import Buttons from '../../lib/buttons/buttons'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -13,9 +13,11 @@ const height = (Space.windowHeight * 2) / 3
 const width = 600
 
 interface OnlinePlayer {
+  uuid: string
   username: string
   cosmeticSet: CosmeticSet
   status: number
+  canBeSpectated: boolean
 }
 
 export default class OnlinePlayersMenu extends Menu {
@@ -92,6 +94,7 @@ export default class OnlinePlayersMenu extends Menu {
         !oldPlayer ||
         oldPlayer.username !== newPlayer.username ||
         oldPlayer.status !== newPlayer.status ||
+        oldPlayer.canBeSpectated !== newPlayer.canBeSpectated ||
         oldPlayer.cosmeticSet.avatar !== newPlayer.cosmeticSet.avatar ||
         oldPlayer.cosmeticSet.border !== newPlayer.cosmeticSet.border ||
         oldPlayer.cosmeticSet.relic !== newPlayer.cosmeticSet.relic
@@ -181,6 +184,17 @@ export default class OnlinePlayersMenu extends Menu {
   }
 
   private createRow(player: OnlinePlayer) {
+    const localUuid = Server.getUserData()?.uuid
+
+    // TODO This is a weird way to establish if we are in a match
+    const localIsInMatch =
+      localUuid &&
+      this.playersData.some(
+        (p) =>
+          p.uuid === localUuid &&
+          (p.status === 2 || p.status === 3 || p.status === 4),
+      )
+
     let rowSizer = this.scene.rexUI.add.sizer({
       width: width,
       space: {
@@ -223,17 +237,64 @@ export default class OnlinePlayersMenu extends Menu {
       Style.basic,
     )
 
+    // Right column: vertically center status, then put the Spectate button below it.
+    const rightColumnWidth = 220
+    const rightStack = this.scene.rexUI.add.sizer({
+      orientation: 'vertical',
+      width: rightColumnWidth,
+      height: Space.avatarSize,
+    })
+
+    const canSpectate =
+      !localIsInMatch &&
+      (player.status === 2 || player.status === 3) &&
+      player.canBeSpectated &&
+      player.uuid !== localUuid
+
+    let spectateBtnContainer: ContainerLite | null = null
+    if (canSpectate) {
+      spectateBtnContainer = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        Space.buttonWidth,
+        0,
+      )
+
+      new Buttons.Text(
+        spectateBtnContainer,
+        0,
+        0,
+        'Spectate',
+        () => {
+          if (!server || !server.isOpen()) return
+
+          this.scene.scene.stop()
+          this.scene.scene.start('SpectatorMatchScene', {
+            spectateTargetUuid: player.uuid,
+          })
+        },
+        Space.buttonWidth,
+        Space.buttonHeight,
+      ).setOrigin(0.5, 0)
+    }
+
+    if (spectateBtnContainer) {
+      rightStack.addSpace().add(statusText).add(spectateBtnContainer).addSpace()
+    } else {
+      rightStack.addSpace().add(statusText).addSpace()
+    }
+
     // Add each text with the right proportion
     rowSizer
       .add(avatarContainer)
       .add(usernameText, { proportion: 1 })
-      .add(statusText)
+      .add(rightStack)
 
     return rowSizer
   }
 
   private getStatusLabel(status: number): string {
-    // 0 = none, 1 = searching, 2 = inMatch, 3 = inJourney
     switch (status) {
       case 1:
         return 'Searching'
@@ -241,6 +302,8 @@ export default class OnlinePlayersMenu extends Menu {
         return 'Journeying'
       case 2:
         return 'In Game'
+      case 4:
+        return 'Spectating'
       case 0:
       default:
         return ''

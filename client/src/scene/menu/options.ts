@@ -24,8 +24,9 @@ import { rulebookString } from '../../data/rulebook'
 import { creditsString } from '../../data/credits'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 import { openDiscord } from '../../utils/externalLinks'
-import { server } from '../../server'
+import Server, { server } from '../../server'
 import SearchingRegion from '../matchRegions/searching'
+import { SpectatorMatchScene } from '../spectatorMatchScene'
 
 // TODO Use a non-mock color for the menu background
 const COLOR = Color.backgroundLight
@@ -207,6 +208,8 @@ export default class OptionsMenu extends Menu {
     sizer
       .add(this.createAutopass(), { expand: true })
       .addSpace()
+      .add(this.createCanBeSpectated(), { expand: true })
+      .addSpace()
       .add(this.createHotkeys(), { expand: true })
       .addSpace()
       .add(this.createHome(activeScene), { expand: true })
@@ -385,6 +388,40 @@ export default class OptionsMenu extends Menu {
     return sizer
   }
 
+  private createCanBeSpectated(): import('phaser').GameObjects.GameObject {
+    let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
+
+    let txtHint = this.scene.add.text(0, 0, 'Can be spectated:', Style.basic)
+    sizer.add(txtHint)
+    sizer.addSpace()
+
+    const s = UserSettings._get('canBeSpectated') !== false ? 'Enabled' : 'Disabled'
+    let container = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    let btn = new Buttons.Basic({
+      within: container,
+      text: s,
+      f: () => {
+        if (UserSettings._get('canBeSpectated') !== false) {
+          btn.setText('Disabled')
+          UserSettings._set('canBeSpectated', false)
+        } else {
+          btn.setText('Enabled')
+          UserSettings._set('canBeSpectated', true)
+        }
+        Server.sendCanBeSpectatedPreference()
+      },
+    })
+    sizer.add(container)
+
+    return sizer
+  }
+
   private createHotkeys(): import('phaser').GameObjects.GameObject {
     let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
@@ -454,11 +491,15 @@ export default class OptionsMenu extends Menu {
         this.scene.scene.start('JourneyScene')
       }
     } else {
-      // TODO This is super hacky - refactor searching to be a scene not a region
-      if (activeScene instanceof MatchScene) {
-        const region: SearchingRegion = activeScene.view.searching as any
-        if (region.matchFound) {
-          s = 'Surrender'
+      if (activeScene instanceof SpectatorMatchScene) {
+        s = 'Exit'
+      } else {
+        // TODO This is super hacky - refactor searching to be a scene not a region
+        if (activeScene instanceof MatchScene) {
+          const region: SearchingRegion = activeScene.view.searching as any
+          if (region.matchFound) {
+            s = 'Surrender'
+          }
         }
       }
       action = () => {
@@ -470,6 +511,9 @@ export default class OptionsMenu extends Menu {
 
         // Either cancel the search for a match, or forfeit the match
         if (activeScene instanceof MatchScene) {
+          // Spectators should never surrender/cancel matchmaking.
+          if (activeScene instanceof SpectatorMatchScene) return
+
           const searchingRegion: SearchingRegion = activeScene.view
             .searching as any
 
