@@ -183,10 +183,14 @@ export default class OnlinePlayersMenu extends Menu {
 
   private createRow(player: OnlinePlayer) {
     const localUuid = Server.getUserData()?.uuid
+
+    // TODO This is a weird way to establish if we are in a match
     const localIsInMatch =
       localUuid &&
       this.playersData.some(
-        (p) => p.uuid === localUuid && (p.status === 2 || p.status === 3),
+        (p) =>
+          p.uuid === localUuid &&
+          (p.status === 2 || p.status === 3 || p.status === 4),
       )
 
     let rowSizer = this.scene.rexUI.add.sizer({
@@ -288,7 +292,6 @@ export default class OnlinePlayersMenu extends Menu {
   }
 
   private getStatusLabel(status: number): string {
-    // 0 = none, 1 = searching, 2 = inMatch, 3 = inJourney
     switch (status) {
       case 1:
         return 'Searching'
@@ -296,6 +299,8 @@ export default class OnlinePlayersMenu extends Menu {
         return 'Journeying'
       case 2:
         return 'In Game'
+      case 4:
+        return 'Spectating'
       case 0:
       default:
         return ''

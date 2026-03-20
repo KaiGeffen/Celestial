@@ -57,6 +57,9 @@ let spectateAllowedByUserId: { [key: string]: boolean } = {}
 // Spectator connections -> match they're watching (for cleanup / bulk remove)
 const spectatorWsToMatch = new WeakMap<ServerWS, Match>()
 
+// User ids currently spectating another player's match (for online status)
+const spectatingUserIds = new Set<string>()
+
 // Create the websocket server
 export default function createWebSocketServer() {
   const wss = new WebSocketServer({ port: USER_DATA_PORT })
@@ -507,6 +510,10 @@ export default function createWebSocketServer() {
                 ag.match.removeAllSpectatorsForPerspective(perspective)
               for (const sWs of removed) {
                 spectatorWsToMatch.delete(sWs)
+                const sid = Object.keys(activePlayers).find(
+                  (uid) => activePlayers[uid] === sWs,
+                )
+                if (sid) spectatingUserIds.delete(sid)
                 if (sWs.isOpen()) {
                   sWs.send({ type: 'spectateEnded' })
                 }
@@ -536,6 +543,7 @@ export default function createWebSocketServer() {
           const perspective = targetActive.playerNumber === 1 ? 1 : 0
           targetActive.match.addSpectator(ws, perspective)
           spectatorWsToMatch.set(ws, targetActive.match)
+          if (id) spectatingUserIds.add(id)
 
           // Notify the watched player (not the opponent) that someone is spectating
           if (!id) return
@@ -601,6 +609,7 @@ export default function createWebSocketServer() {
           spectating.removeSpectator(ws)
           spectatorWsToMatch.delete(ws)
         }
+        if (id) spectatingUserIds.delete(id)
 
         // Disconnect from active match if it hasn't ended
         if (activeGame.match && !activeGame.match.isOver()) {
@@ -652,8 +661,10 @@ export default function createWebSocketServer() {
 
         // Build the players list with username, cosmetics, and computed status.
         // Status encoding:
-        // 0 = none, 1 = searching, 2 = inMatch, 3 = inJourney
+        // 0 = none, 1 = searching, 2 = inMatch, 3 = inJourney, 4 = spectating
         const getStatusForUserId = (userId: string): number => {
+          if (spectatingUserIds.has(userId)) return 4
+
           const isSearching = Object.values(searchingPlayers).some(
             (p) => p?.id === userId && p?.ws?.isOpen(),
           )
