@@ -2,6 +2,7 @@ import 'phaser'
 import { Color, Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
+import BaseScene from '../baseScene'
 import Server, { server } from '../../server'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import Buttons from '../../lib/buttons/buttons'
@@ -25,8 +26,12 @@ export default class OnlinePlayersMenu extends Menu {
   private scrollablePanel: ScrollablePanel
   private refreshTimer: Phaser.Time.TimerEvent | null = null
 
+  private activeScene: BaseScene
+
   constructor(scene: MenuScene, params) {
     super(scene, width, params)
+
+    this.activeScene = params.activeScene
 
     // Sizer has no pad between lines
     this.sizer.space.line = 0
@@ -269,7 +274,13 @@ export default class OnlinePlayersMenu extends Menu {
         () => {
           if (!server || !server.isOpen()) return
 
-          this.scene.scene.stop()
+          // Ensure the active scene stops
+          if (this.activeScene) {
+            this.activeScene.beforeExit()
+            this.activeScene.scene.stop()
+          }
+
+          // Start the spectator match scene (In place of this)
           this.scene.scene.start('SpectatorMatchScene', {
             spectateTargetUuid: player.uuid,
           })
