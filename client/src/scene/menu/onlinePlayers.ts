@@ -22,6 +22,8 @@ interface OnlinePlayer {
 }
 
 export default class OnlinePlayersMenu extends Menu {
+  readonly menuType = 'onlinePlayers'
+
   private playersData: OnlinePlayer[] = []
   private scrollablePanel: ScrollablePanel
   private refreshTimer: Phaser.Time.TimerEvent | null = null
