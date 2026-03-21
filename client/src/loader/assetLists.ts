@@ -47,6 +47,7 @@ export const assetLists = {
     "files": [
       "Cosmos",
       "Default",
+      "OLD Cosmos",
       "Tree"
     ],
     "pixelArt": false

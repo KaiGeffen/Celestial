@@ -10,7 +10,12 @@ import BaseScene from '../baseScene'
 import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import { achievementsMeta } from '../../../../shared/achievementsData'
-import { getUnlockedAvatars, getUnlockedBorders } from '../../utils/cosmetics'
+import {
+  getUnlockedAvatars,
+  getUnlockedBorders,
+  getUnlockedCardbacks,
+} from '../../utils/cosmetics'
+import cardbackNames from '../../data/cardbackNames'
 
 export default class UserProfileMenu extends Menu {
   // The avatar on the homeScene (optional, may be null if not displayed)
@@ -117,7 +122,7 @@ export default class UserProfileMenu extends Menu {
     )
 
     // Tab buttons
-    ;['Icon', 'Border'].forEach((tab) => {
+    ;['Icon', 'Border', 'Cardback'].forEach((tab) => {
       const container = new ContainerLite(
         this.scene,
         0,
@@ -204,6 +209,9 @@ export default class UserProfileMenu extends Menu {
     } else if (this.currentTab === 'Border') {
       const unlockedBorders = getUnlockedBorders()
       rows = Math.max(2, Math.ceil(unlockedBorders.length / 3))
+    } else if (this.currentTab === 'Cardback') {
+      const unlockedCardbacks = getUnlockedCardbacks()
+      rows = Math.max(2, Math.ceil(unlockedCardbacks.length / 3))
     }
 
     // Create new grid sizer with correct number of rows
@@ -231,6 +239,8 @@ export default class UserProfileMenu extends Menu {
       this.createIconGrid()
     } else if (this.currentTab === 'Border') {
       this.createBorderGrid()
+    } else if (this.currentTab === 'Cardback') {
+      this.createCardbackGrid()
     }
 
     // Force layout update
@@ -297,6 +307,47 @@ export default class UserProfileMenu extends Menu {
     })
   }
 
+  private createCardbackGrid() {
+    const unlockedCardbacks = getUnlockedCardbacks()
+
+    const width = Space.cardWidth * 0.85
+    const height = Space.cardHeight * 0.85
+
+    Array.from(unlockedCardbacks).forEach((cardbackId, index) => {
+      const container = new ContainerLite(this.scene, 0, 0, width, height)
+
+      const selected =
+        (Server.getUserData().cosmeticSet.cardback ?? 0) === cardbackId
+      const background = this.scene.add
+        .rectangle(
+          0,
+          0,
+          width,
+          height,
+          selected ? Color.buttonSelected : Color.backgroundLight,
+        )
+        .setStrokeStyle(2, selected ? Color.outline : Color.border)
+        .setInteractive()
+        .on('pointerdown', () => {
+          const newSet = {
+            avatar: Server.getUserData().cosmeticSet.avatar,
+            border: Server.getUserData().cosmeticSet.border,
+            cardback: cardbackId,
+          }
+          this.updateCosmeticSet(newSet)
+          this.updateGridContent()
+        })
+
+      const image = this.scene.add
+        .image(0, 0, `cardback-${cardbackNames[cardbackId]}`)
+        .setDisplaySize(width, height)
+        .setInteractive()
+        .on('pointerdown', () => background.emit('pointerdown'))
+
+      container.add([background, image])
+      this.gridSizer.add(container, index % 2, Math.floor(index / 2))
+    })
+  }
 
   private updateCosmeticSet(newSet: CosmeticSet) {
     this.currentAvatar.setAvatar(newSet.avatar)

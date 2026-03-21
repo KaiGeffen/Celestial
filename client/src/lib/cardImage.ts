@@ -6,6 +6,7 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import BaseScene from '../scene/baseScene'
 import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 import { Keywords } from '../../../shared/state/keyword'
+import cardbackNames from '../data/cardbackNames'
 
 // The offset of cost / points
 const statOffset1 = 27
@@ -13,8 +14,6 @@ const statOffset2 = 77
 
 const COLOR_BETTER = '#55dd55'
 const COLOR_WORSE = '#e45555'
-// TODO Move this to a separate file somewhere with full details of cardbacks
-const cardbackNames = ['Default', 'Cosmos', 'Tree']
 
 export class CardImage {
   scene: BaseScene
