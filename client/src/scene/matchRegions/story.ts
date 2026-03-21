@@ -44,6 +44,7 @@ export default class StoryRegion extends Region {
       let card = this.addCard(
         act.card,
         CardLocation.story(state, resolvedI, this.container, act.owner),
+        state.cosmeticSets[act.owner].cardback ?? 0,
       )
         .setResolved()
         .moveToTopOnHover()
@@ -59,6 +60,7 @@ export default class StoryRegion extends Region {
       let card = this.addCard(
         act.card,
         CardLocation.story(state, resolvedI + i, this.container, act.owner),
+        state.cosmeticSets[act.owner].cardback ?? 0,
       ).moveToTopOnHover()
 
       // Only allow jumping around in the recap if we are playing a recap

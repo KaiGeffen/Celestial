@@ -41,6 +41,7 @@ export default class TheirBoardRegion extends Region {
       let card = this.addCard(
         state.hand[1][i],
         CardLocation.theirHand(state, i, this.container),
+        state.cosmeticSets[1].cardback ?? 0,
       ).moveToTopOnHover()
 
       this.cards.push(card)

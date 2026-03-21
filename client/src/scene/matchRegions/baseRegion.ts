@@ -30,8 +30,14 @@ export default class Region {
   // Text showing which hotkey is relevant for each element in the region
   hotkeyHints: BBCodeText[] = []
 
-  addCard(card: Card, position: [number, number] = [0, 0]): CardImage {
-    return new CardImage(card, this.container).setPosition(position)
+  addCard(
+    card: Card,
+    position: [number, number] = [0, 0],
+    cardback: number = 0,
+  ): CardImage {
+    return new CardImage(card, this.container, true, true, cardback).setPosition(
+      position,
+    )
   }
 
   // Display parts of the given state relevant to this region

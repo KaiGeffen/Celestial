@@ -117,7 +117,11 @@ export default class MulliganRegion extends Region {
     // Show the cards as toggleable objects
     for (let i = 0; i < state.hand[0].length; i++) {
       const position = CardLocation.mulligan(this.container, i)
-      let card = this.addCard(state.hand[0][i], position)
+      let card = this.addCard(
+        state.hand[0][i],
+        position,
+        state.cosmeticSets[0].cardback ?? 0,
+      )
         .setCost(state.hand[0][i].cost)
         .setOnClick(this.onCardClick(i))
         .setFocusOptions('Toggle')

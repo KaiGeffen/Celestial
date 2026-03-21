@@ -210,6 +210,7 @@ export default class OurBoardRegion extends Region {
       let card = this.addCard(
         state.hand[0][i],
         CardLocation.ourHand(state, i, this.container),
+        state.cosmeticSets[0].cardback ?? 0,
       )
         .setCost(state.cardCosts[i])
         .setFocusOptions('Play')

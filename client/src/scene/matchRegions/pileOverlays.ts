@@ -63,14 +63,14 @@ export default class OverlayRegion extends Region {
     return this
   }
 
-  protected displayCards(cards: Card[]): void {
+  protected displayCards(cards: Card[], cardback: number = 0): void {
     this.deleteTemp()
     this.cardImages = []
     this.hoveredCard = null
 
     const total = cards.length
     for (let i = 0; i < total; i++) {
-      this.addOverlayCard(cards[i], i, total)
+      this.addOverlayCard(cards[i], i, total, cardback)
     }
 
     this.txtTitle.setVisible(total <= 15)
@@ -88,11 +88,16 @@ export default class OverlayRegion extends Region {
   }
 
   // Add a card to this overlay
-  private addOverlayCard(card: Card, i: number, total: number): CardImage {
+  private addOverlayCard(
+    card: Card,
+    i: number,
+    total: number,
+    cardback: number,
+  ): CardImage {
     const titleHeight = this.txtTitle.height
     let position = CardLocation.overlay(this.container, i, total, titleHeight)
 
-    let cardImage = this.addCard(card, position).moveToTopOnHover()
+    let cardImage = this.addCard(card, position, cardback).moveToTopOnHover()
 
     // Set up hover handlers to track which card is hovered
     cardImage.setOnHover(
@@ -139,7 +144,7 @@ export class OurDeckOverlay extends OverlayRegion {
   }
 
   displayState(state: GameModel): void {
-    this.displayCards(state.deck[0])
+    this.displayCards(state.deck[0], state.cosmeticSets[0].cardback ?? 0)
   }
 }
 
@@ -149,7 +154,7 @@ export class TheirDeckOverlay extends OverlayRegion {
   }
 
   displayState(state: GameModel): void {
-    this.displayCards(state.lastShuffle[1])
+    this.displayCards(state.lastShuffle[1], state.cosmeticSets[1].cardback ?? 0)
   }
 }
 
@@ -179,7 +184,7 @@ export class OurDiscardOverlay extends OverlayRegion {
   }
 
   displayState(state: GameModel): void {
-    this.displayCards(state.pile[0])
+    this.displayCards(state.pile[0], state.cosmeticSets[0].cardback ?? 0)
     
     // Update button text with expended card count
     if (this.switchButton) {
@@ -213,7 +218,7 @@ export class TheirDiscardOverlay extends OverlayRegion {
   }
 
   displayState(state: GameModel): void {
-    this.displayCards(state.pile[1])
+    this.displayCards(state.pile[1], state.cosmeticSets[1].cardback ?? 0)
     
     // Update button text with expended card count
     if (this.switchButton) {

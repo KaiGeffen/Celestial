@@ -37,7 +37,7 @@ export default class Animator {
         }
         // Shuffle a player's deck
         else if (animation.from === Zone.Shuffle) {
-          this.animateShuffle(owner, i)
+          this.animateShuffle(owner, i, state)
         }
         // Transform a card
         else if (animation.from === Zone.Transform) {
@@ -57,7 +57,11 @@ export default class Animator {
           let start = this.getStart(animation, state, owner)
           let end = this.getEnd(animation, state, owner)
 
-          let card = this.createCard(animation.card, start)
+          let card = this.createCard(
+            animation.card,
+            start,
+            state.cosmeticSets[owner].cardback ?? 0,
+          )
 
           if (animation.to !== animation.from) {
             // Get the cardImage that this card becomes upon completion, if there is one
@@ -164,11 +168,17 @@ export default class Animator {
     return [300, 300]
   }
 
-  private createCard(card: Card, start: [number, number] = [0, 0]): CardImage {
+  private createCard(
+    card: Card,
+    start: [number, number] = [0, 0],
+    cardback: number = 0,
+  ): CardImage {
     let cardImage = new CardImage(
       card || Catalog.cardback,
       this.container,
       false,
+      true,
+      cardback,
     )
 
     // Set its initial position and make it hidden until its tween plays
@@ -284,7 +294,11 @@ export default class Animator {
     const start = this.getStart(animation, state, owner)
 
     // Make a new cardImage of this card
-    let cardImage = this.createCard(animation.card, start).show()
+    let cardImage = this.createCard(
+      animation.card,
+      start,
+      state.cosmeticSets[owner].cardback ?? 0,
+    ).show()
 
     let permanentCard = this.getCard(animation, owner)
 
@@ -298,7 +312,7 @@ export default class Animator {
   }
 
   // Animate the given player's deck shuffling
-  private animateShuffle(owner: number, i: number): void {
+  private animateShuffle(owner: number, i: number, state: GameModel): void {
     let start
     if (owner === 0) {
       start = CardLocation.ourDeck()
@@ -306,8 +320,9 @@ export default class Animator {
       start = CardLocation.theirDeck()
     }
 
-    let topCard = this.createCard(Catalog.cardback, start)
-    let bottomCard = this.createCard(Catalog.cardback, start)
+    const cardback = state.cosmeticSets[owner].cardback ?? 0
+    let topCard = this.createCard(Catalog.cardback, start, cardback)
+    let bottomCard = this.createCard(Catalog.cardback, start, cardback)
 
     this.scene.add.tween({
       targets: topCard.container,
@@ -343,7 +358,9 @@ export default class Animator {
 
   // Animate a card being emphasized in its place, such as showing that a Morning card is proccing
   private animateEmphasis(card: CardImage, i: number): void {
-    let cardCopy = this.createCard(card.card, [0, 0]).copyLocation(card)
+    let cardCopy = this.createCard(card.card, [0, 0], card.cardback).copyLocation(
+      card,
+    )
 
     // Animate card scaling up and disappearing
     this.scene.tweens.add({
@@ -381,7 +398,7 @@ export default class Animator {
   // Animate a card being revealed
   private animateReveal(card: CardImage, i: number): void {
     // Animate the back of the card flipping
-    let hiddenCard = this.createCard(Catalog.cardback, [0, 0])
+    let hiddenCard = this.createCard(Catalog.cardback, [0, 0], card.cardback)
       .show()
       .copyLocation(card)
 
@@ -412,7 +429,13 @@ export default class Animator {
   // Animate a card transforming into another card
   private animateTransform(animation: Animation, i: number, owner): void {
     let newCard = this.getCard(animation, owner)
-    let oldCard = this.createCard(animation.card).show().copyLocation(newCard)
+    let oldCard = this.createCard(
+      animation.card,
+      [0, 0],
+      newCard?.cardback ?? 0,
+    )
+      .show()
+      .copyLocation(newCard)
 
     // Animate card scaling up and disappearing
     this.scene.tweens.add({
