@@ -1,6 +1,5 @@
 import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
 import { Color, Space, Flags } from '../../settings/settings'
@@ -10,14 +9,16 @@ import {
   encodeShareableDeckCode,
   decodeShareableDeckCode,
 } from '../../../../shared/codec'
-import {
-  DecklistSettings,
-  MechanicsSettings,
-} from '../../../../shared/settings'
+import { MechanicsSettings } from '../../../../shared/settings'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import Server from '../../server'
-import { getUnlockedAvatars, getUnlockedBorders } from '../../utils/cosmetics'
+import {
+  getUnlockedAvatars,
+  getUnlockedBorders,
+  getUnlockedCardbacks,
+} from '../../utils/cosmetics'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
+import cardbackNames from '../../data/cardbackNames'
 
 const width = 900
 const inputTextWidth = 200
@@ -25,8 +26,7 @@ const inputTextWidth = 200
 enum tab {
   ICON,
   BORDER,
-  RELIC,
-  PET,
+  CARDBACK,
 }
 
 class AlterDeckMenu extends Menu {
@@ -34,11 +34,11 @@ class AlterDeckMenu extends Menu {
 
   // The user inputted name for the deck
   name: string
-  nameInputText
 
   // The user selected avatar number and border
   selectedAvatar: number
   selectedBorder: number
+  selectedCardback: number
 
   // The deck code for this deck, if any
   deckCode: number[] = []
@@ -72,6 +72,10 @@ class AlterDeckMenu extends Menu {
       params.cosmeticSet?.avatar ?? Server.getUserData().cosmeticSet?.avatar
     this.selectedBorder =
       params.cosmeticSet?.border ?? Server.getUserData().cosmeticSet?.border
+    this.selectedCardback =
+      params.cosmeticSet?.cardback ??
+      Server.getUserData().cosmeticSet?.cardback ??
+      0
     this.titleString = titleString
     this.confirmString = confirmString
     this.deckCode = params.deckCode ?? []
@@ -79,9 +83,6 @@ class AlterDeckMenu extends Menu {
     this.createContent(params.callback)
 
     this.layout()
-
-    // Focus the name field
-    this.nameInputText.setFocus()
   }
 
   private createContent(
@@ -171,7 +172,7 @@ class AlterDeckMenu extends Menu {
           avatar.deselect()
         }
       })
-    } else {
+    } else if (this.currentTab === tab.BORDER) {
       // Create border sizer
       const unlockedBorders = getUnlockedBorders()
 
@@ -202,6 +203,40 @@ class AlterDeckMenu extends Menu {
           avatar.deselect()
         }
       })
+    } else {
+      const unlockedCardbacks = getUnlockedCardbacks()
+      const borders: Phaser.GameObjects.Rectangle[] = []
+
+      unlockedCardbacks.forEach((cardbackId) => {
+        const cardWidth = Space.cardWidth * 0.6
+        const cardHeight = Space.cardHeight * 0.6
+        const cardbackContainer = new ContainerLite(
+          this.scene,
+          0,
+          0,
+          cardWidth,
+          cardHeight,
+        )
+        const image = this.scene.add
+          .image(0, 0, `cardback-${cardbackNames[cardbackId]}`)
+          .setDisplaySize(cardWidth, cardHeight)
+          .setInteractive({ useHandCursor: true })
+          .on('pointerdown', () => {
+            borders.forEach((border) => border.setAlpha(0.1))
+            border.setAlpha(1)
+            this.selectedCardback = cardbackId
+          })
+
+        const border = this.scene.add
+          .rectangle(0, 0, cardWidth, cardHeight)
+          .setFillStyle(0x000000, 0)
+          .setStrokeStyle(5, Color.outline)
+          .setAlpha(cardbackId === this.selectedCardback ? 1 : 0.1)
+
+        cardbackContainer.add([image, border])
+        this.cosmeticChoicesSizer.add(cardbackContainer)
+        borders.push(border)
+      })
     }
 
     // Update the layout
@@ -230,37 +265,21 @@ class AlterDeckMenu extends Menu {
       },
     })
 
-    // Create name input field
-    this.nameInputText = this.scene.add
-      .rexInputText(0, 0, inputTextWidth, 40, {
-        type: 'text',
-        text: this.name,
-        align: 'center',
-        placeholder: 'Deck Name',
-        tooltip: 'Name for the new deck.',
-        fontFamily: 'Mulish',
-        fontSize: '24px',
-        color: Color.textboxText,
-        maxLength: DecklistSettings.MAX_DECK_NAME_LENGTH,
-        selectAll: true,
-        id: 'search-field',
-      })
-      .on('textchange', (inputText) => {
-        this.name = inputText.text
-      })
-
-    // Chrome
-    const chrome = this.scene.add.image(0, 0, 'icon-InputText')
-
-    // Container with textbox and chrome
-    let nameContainer = new ContainerLite(
+    const cardbackContainer = new ContainerLite(
       this.scene,
       0,
       0,
-      Space.textboxWidth,
-      Space.textboxHeight,
-      [this.nameInputText, chrome],
+      Space.buttonWidth,
+      Space.buttonHeight,
     )
+    new Buttons.Basic({
+      within: cardbackContainer,
+      text: 'Cardback',
+      f: () => {
+        this.currentTab = tab.CARDBACK
+        this.updateCosmeticGrid()
+      },
+    })
 
     // Create Border button
     const borderContainer = new ContainerLite(
@@ -279,11 +298,11 @@ class AlterDeckMenu extends Menu {
       },
     })
 
-    // Add Icon button, name field, and Border button to sizer
+    // Add Icon button, Cardback button, and Border button to sizer
     sizer
       .add(iconContainer)
       .addSpace()
-      .add(nameContainer)
+      .add(cardbackContainer)
       .addSpace()
       .add(borderContainer)
 
@@ -412,8 +431,7 @@ class AlterDeckMenu extends Menu {
         const cosmeticSet: CosmeticSet = {
           avatar: this.selectedAvatar,
           border: this.selectedBorder,
-          // TODO Add cardback selection
-          cardback: 0,
+          cardback: this.selectedCardback,
         }
         createCallback(this.name, cosmeticSet, this.deckCode)
 
