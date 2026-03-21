@@ -5,6 +5,7 @@ import BaseScene from '../scene/baseScene'
 import Buttons from './buttons/buttons'
 import { Color, Space, Style } from '../settings/settings'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
+import cardbackNames from '../data/cardbackNames'
 
 // Composite visual for a deck tile: cardback, avatar, and name bar
 export default class DeckThumbnail {
@@ -21,6 +22,7 @@ export default class DeckThumbnail {
     scene: BaseScene
     name: string
     cosmeticSet: CosmeticSet
+    cardback: number
     isValid: boolean
     onClick: () => void
   }) {
@@ -34,12 +36,13 @@ export default class DeckThumbnail {
     // Root container for this tile
     this.container = new ContainerLite(scene, 0, 0, width, height)
 
-    // CARD BACK – top-left, using default cardback art
+    // CARD BACK – top-left, using the deck's equipped cardback
     const angleFirst = -3
     const angleStepDeg = 3
+    const cardbackName = cardbackNames[opts.cardback] ?? 'Default'
     for (let i = 3; i >= 0; i--) {
       const cardBack = scene.add
-        .image(-40, 70, 'card-Cardback')
+        .image(-40, 70, `cardback-${cardbackName}`)
         .setOrigin(0.5, 1) // rotate around bottom-center
         .setDisplaySize(Space.cardWidth / 2, Space.cardHeight / 2)
         .setRotation((angleFirst + angleStepDeg * i * Math.PI) / 180)

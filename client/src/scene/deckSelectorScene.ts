@@ -197,6 +197,7 @@ export default class DeckSelectorScene extends BaseScene {
         scene: this,
         name,
         cosmeticSet,
+        cardback: cosmeticSet.cardback ?? 0,
         isValid,
         onClick: () => this.onDeckClick(i),
       })

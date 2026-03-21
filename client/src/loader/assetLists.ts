@@ -45,9 +45,9 @@ export const assetLists = {
   },
   "cardback": {
     "files": [
+      "ACosmos",
       "Cosmos",
       "Default",
-      "OLD Cosmos",
       "Tree"
     ],
     "pixelArt": false

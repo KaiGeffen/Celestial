@@ -318,15 +318,9 @@ export default class UserProfileMenu extends Menu {
 
       const selected =
         (Server.getUserData().cosmeticSet.cardback ?? 0) === cardbackId
-      const background = this.scene.add
-        .rectangle(
-          0,
-          0,
-          width,
-          height,
-          selected ? Color.buttonSelected : Color.backgroundLight,
-        )
-        .setStrokeStyle(2, selected ? Color.outline : Color.border)
+      const image = this.scene.add
+        .image(0, 0, `cardback-${cardbackNames[cardbackId]}`)
+        .setDisplaySize(width, height)
         .setInteractive()
         .on('pointerdown', () => {
           const newSet = {
@@ -338,13 +332,16 @@ export default class UserProfileMenu extends Menu {
           this.updateGridContent()
         })
 
-      const image = this.scene.add
-        .image(0, 0, `cardback-${cardbackNames[cardbackId]}`)
-        .setDisplaySize(width, height)
-        .setInteractive()
-        .on('pointerdown', () => background.emit('pointerdown'))
+      container.add(image)
 
-      container.add([background, image])
+      if (selected) {
+        const border = this.scene.add
+          .rectangle(0, 0, width, height)
+          .setFillStyle(0x000000, 0)
+          .setStrokeStyle(3, Color.outline)
+        container.add(border)
+      }
+
       this.gridSizer.add(container, index % 2, Math.floor(index / 2))
     })
   }
