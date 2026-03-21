@@ -256,6 +256,7 @@ export default class UserProfileMenu extends Menu {
           const newSet = {
             avatar: avatarId,
             border: Server.getUserData().cosmeticSet.border,
+            cardback: Server.getUserData().cosmeticSet.cardback ?? 0,
           }
           this.updateCosmeticSet(newSet)
         },
@@ -286,6 +287,7 @@ export default class UserProfileMenu extends Menu {
           const newSet = {
             avatar: Server.getUserData().cosmeticSet.avatar,
             border: borderId,
+            cardback: Server.getUserData().cosmeticSet.cardback ?? 0,
           }
           this.updateCosmeticSet(newSet)
         },

@@ -189,6 +189,7 @@ export default class DeckSelectorScene extends BaseScene {
       const cosmeticSet: CosmeticSet = deck.cosmeticSet ?? {
         avatar: 0,
         border: 0,
+        cardback: 0,
       }
       const isValid = (deck.cards?.length || 0) === MechanicsSettings.DECK_SIZE
 
@@ -291,6 +292,7 @@ export default class DeckSelectorScene extends BaseScene {
     const cosmeticSet: CosmeticSet = Server.getUserData().cosmeticSet ?? {
       avatar: 0,
       border: 0,
+      cardback: 0,
     }
     const num = decks.length + 1
     UserSettings._push('decks', {

@@ -84,6 +84,7 @@ export default class PlayMenu extends Menu {
         cosmeticSet: Server.getUserData().cosmeticSet || {
           avatar: 0,
           border: 0,
+          cardback: 0,
         },
       }
     }

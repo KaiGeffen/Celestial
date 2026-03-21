@@ -52,6 +52,7 @@ export default class RaceScene extends BaseScene {
       cosmeticSet: {
         avatar: 0,
         border: 0,
+        cardback: 0,
         relic: 0,
       },
     }
@@ -395,6 +396,7 @@ export default class RaceScene extends BaseScene {
       cosmeticSet: {
         avatar: 0,
         border: 0,
+        cardback: 0,
         relic: 0,
       },
     }

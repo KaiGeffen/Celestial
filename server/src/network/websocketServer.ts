@@ -188,6 +188,7 @@ export default function createWebSocketServer() {
               cosmetic_set: JSON.stringify({
                 avatar: 0,
                 border: 0,
+                cardback: 0,
                 relic: 0,
               }),
               ref,

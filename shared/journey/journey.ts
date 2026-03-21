@@ -94,6 +94,7 @@ export function missionToAiDeck(mission: MissionDetails): Deck {
     cosmeticSet: {
       avatar: 0,
       border: 0,
+      cardback: 0,
       relic: 0,
     },
   }

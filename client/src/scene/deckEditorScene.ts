@@ -56,10 +56,10 @@ export default class DeckEditorScene extends BaseScene {
     const deck: Deck = decks[this.deckIndex] || {
       name: `Deck ${this.deckIndex + 1}`,
       cards: [],
-      cosmeticSet: { avatar: 0, border: 0 },
+      cosmeticSet: { avatar: 0, border: 0, cardback: 0 },
     }
     this.deckName = deck.name
-    this.cosmeticSet = deck.cosmeticSet ?? { avatar: 0, border: 0 }
+    this.cosmeticSet = deck.cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 }
 
     this.createBackground()
 
@@ -480,7 +480,7 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   setCosmeticSet(set: CosmeticSet): void {
-    this.cosmeticSet = set ?? { avatar: 0, border: 0 }
+    this.cosmeticSet = set ?? { avatar: 0, border: 0, cardback: 0 }
     if (this.avatarBtn) {
       this.avatarBtn
         .setAvatar(this.cosmeticSet.avatar)

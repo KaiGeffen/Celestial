@@ -86,8 +86,8 @@ export default class GameModel {
       }
     }
     this.cosmeticSets = [
-      cosmeticSet1 ?? { avatar: 0, border: 0 },
-      cosmeticSet2 ?? { avatar: 0, border: 0 },
+      cosmeticSet1 ?? { avatar: 0, border: 0, cardback: 0 },
+      cosmeticSet2 ?? { avatar: 0, border: 0, cardback: 0 },
     ]
 
     // Starting priority is random
@@ -128,10 +128,12 @@ export default class GameModel {
       {
         avatar: this.cosmeticSets[0].avatar,
         border: this.cosmeticSets[0].border,
+        cardback: this.cosmeticSets[0].cardback,
       },
       {
         avatar: this.cosmeticSets[1].avatar,
         border: this.cosmeticSets[1].border,
+        cardback: this.cosmeticSets[1].cardback,
       },
       false,
     )

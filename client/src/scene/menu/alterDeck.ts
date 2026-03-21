@@ -412,6 +412,8 @@ class AlterDeckMenu extends Menu {
         const cosmeticSet: CosmeticSet = {
           avatar: this.selectedAvatar,
           border: this.selectedBorder,
+          // TODO Add cardback selection
+          cardback: 0,
         }
         createCallback(this.name, cosmeticSet, this.deckCode)
 

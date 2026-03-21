@@ -78,6 +78,7 @@ export default class DecklistsRegion {
           cosmeticSet = {
             avatar: 0,
             border: 0,
+            cardback: 0,
           }
         }
       }
@@ -172,6 +173,7 @@ export default class DecklistsRegion {
       const cosmeticSet: CosmeticSet = {
         avatar: id,
         border: 0,
+        cardback: 0,
       }
 
       this.createDeck(name, cosmeticSet, deck)
