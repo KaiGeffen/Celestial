@@ -13,11 +13,14 @@ const statOffset2 = 77
 
 const COLOR_BETTER = '#55dd55'
 const COLOR_WORSE = '#e45555'
+// TODO Move this to a separate file somewhere with full details of cardbacks
+const cardbackNames = ['Default', 'Cosmos', 'Tree']
 
 export class CardImage {
   scene: BaseScene
 
   card: Card
+  cardback: number
   visible = true
   interactive = false
 
@@ -60,9 +63,27 @@ export class CardImage {
     container: any,
     interactive: boolean = true,
     shadow: boolean = true,
+    cardback: number = 0,
   ) {
     card = card || Catalog.cardback
-    this.init(card, container, interactive, shadow)
+    this.init(card, container, interactive, shadow, cardback)
+  }
+
+  private getImageName(): string {
+    // Is a cardback
+    if (this.card.id === Catalog.cardback.id) {
+      const cardbackName = cardbackNames[this.cardback]
+      return `cardback-${cardbackName}`
+    }
+
+    // Is a card
+    const texture = `card-${this.card.name}`
+    if (this.scene.textures.exists(texture)) {
+      return texture
+    }
+
+    // Default card image
+    return 'card-Default'
   }
 
   private init(
@@ -70,16 +91,15 @@ export class CardImage {
     outerContainer: any,
     interactive: boolean,
     shadow: boolean,
+    cardback: number,
   ) {
     this.card = card
+    this.cardback = cardback
     this.scene = outerContainer.scene
     this.createContainer(outerContainer)
 
     // Card image
-    // If the card image doesn't exist, use a default image
-    const imageName = this.scene.textures.exists(`card-${this.card.name}`)
-      ? `card-${this.card.name}`
-      : 'card-Default'
+    const imageName = this.getImageName()
     this.image = this.scene.add.image(0, 0, imageName)
     this.image.setDisplaySize(Space.cardWidth, Space.cardHeight)
 
@@ -225,10 +245,7 @@ export class CardImage {
         },
       )
 
-      const imageName = this.scene.textures.exists(`card-${this.card.name}`)
-        ? `card-${this.card.name}`
-        : 'card-Default'
-      this.image.setTexture(imageName)
+      this.image.setTexture(this.getImageName())
       this.createStats()
       this.createText()
       this.createTitle()

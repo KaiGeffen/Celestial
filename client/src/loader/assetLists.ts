@@ -43,6 +43,14 @@ export const assetLists = {
     },
     "pixelArt": false
   },
+  "cardback": {
+    "files": [
+      "Cosmos",
+      "Default",
+      "Tree"
+    ],
+    "pixelArt": false
+  },
   "card": {
     "files": [
       "Abundance",
@@ -57,7 +65,6 @@ export const assetLists = {
       "Boa",
       "Bounty",
       "Bull",
-      "Cardback",
       "Celebration",
       "Child",
       "Clear View",
