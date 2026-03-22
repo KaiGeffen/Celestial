@@ -13,6 +13,7 @@ const statOffset2 = 77
 
 const COLOR_BETTER = '#55dd55'
 const COLOR_WORSE = '#e45555'
+const STAT_STROKE = '#000000'
 
 export class CardImage {
   scene: BaseScene
@@ -194,7 +195,7 @@ export class CardImage {
     this.cost = cost
 
     if (cost !== null) {
-      this.txtCost.setText(cost)
+      this.txtCost.setText(`[stroke=${STAT_STROKE}]${cost}[/stroke]`)
 
       if (this.card.cost > cost) {
         this.txtCost.setColor(COLOR_BETTER)
@@ -234,7 +235,7 @@ export class CardImage {
 
   setPoints(amt: number): this {
     this.points = amt
-    this.txtPoints.setText(amt)
+    this.txtPoints.setText(`[stroke=${STAT_STROKE}]${amt}[/stroke]`)
 
     // Use the correct color
     if (amt < this.card.basePoints) {
@@ -320,7 +321,7 @@ export class CardImage {
       .rexBBCodeText(
         -Space.cardWidth / 2 + 27,
         -Space.cardHeight / 2 + 58,
-        `${this.card.cost}`,
+        `[stroke=${STAT_STROKE}]${this.card.cost}[/stroke]`,
         BBStyle.cardCost,
       )
       .setVisible(this.card.id !== Catalog.cardback.id)
@@ -343,7 +344,7 @@ export class CardImage {
       .rexBBCodeText(
         -Space.cardWidth / 2 + 27,
         -Space.cardHeight / 2 + 102,
-        `${this.card.points}`,
+        `[stroke=${STAT_STROKE}]${this.card.points}[/stroke]`,
         BBStyle.cardPoints,
       )
       .setVisible(this.card.id !== Catalog.cardback.id)
@@ -448,7 +449,7 @@ export class CardImage {
 
   private createOutline(): void {
     const plugin: any = this.scene.plugins.get('rexOutlinePipeline')
-    this.outline = plugin.add(this.imageSubject, {
+    this.outline = plugin.add(this.imageArc, {
       thickness: 0,
       outlineColor: Color.outline,
       quality: 0.3,

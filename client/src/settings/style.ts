@@ -162,6 +162,8 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     fontFamily: altFont,
     fontSize: '20px',
     color: Color.cardText,
+    stroke: '#000000',
+    strokeThickness: 1,
   },
   homeSceneButton: {
     fontFamily: altFont,
@@ -202,16 +204,16 @@ export const BBStyle: Record<string, any> = {
     fontFamily: 'GrandCentral',
     fontSize: '24px',
     color: Color.cardCost,
-    stroke: '#ff0000',
-    strokeThickness: 3,
+    stroke: '#000000',
+    strokeThickness: 1,
     // TODO Add letter spacing after at least Phaser 3.6.0
   },
   cardPoints: {
     fontFamily: 'GrandCentral',
     fontSize: '24px',
     color: Color.cardPoints,
-    stroke: Color.blackS,
-    strokeThickness: 3,
+    stroke: '#000000',
+    strokeThickness: 1,
     // TODO Add letter spacing after at least Phaser 3.6.0
   },
   // The textbox for the card
