@@ -22,10 +22,10 @@ export class CardImage {
   interactive = false
 
   // Image layers
-  backgroundImage: Phaser.GameObjects.Image
-  image: Phaser.GameObjects.Image
-  arcImage: Phaser.GameObjects.Image
-  containerImage: Phaser.GameObjects.Image
+  imageBackground: Phaser.GameObjects.Image
+  imageSubject: Phaser.GameObjects.Image
+  imageArc: Phaser.GameObjects.Image
+  imageContainer: Phaser.GameObjects.Image
 
   // Text elements
   txtCost: BBCodeText
@@ -92,12 +92,12 @@ export class CardImage {
 
     // Make events for the card
     if (!Flags.mobile) {
-      this.image
+      this.imageSubject
         .on('pointerover', this.onHover())
         .on('pointerout', this.onHoverExit())
         .on('pointerdown', () => this.clickCallback())
     } else {
-      this.image.on('pointerdown', () => {
+      this.imageSubject.on('pointerdown', () => {
         this.scene.scene.launch('MenuScene', {
           menu: 'focus',
           card: this.card,
@@ -114,16 +114,16 @@ export class CardImage {
     this.createOutline()
 
     if (interactive) {
-      this.image.setInteractive()
+      this.imageSubject.setInteractive()
     }
   }
 
   destroy(): void {
     ;[
-      this.backgroundImage,
-      this.image,
-      this.arcImage,
-      this.containerImage,
+      this.imageBackground,
+      this.imageSubject,
+      this.imageArc,
+      this.imageContainer,
       this.txtCost,
       this.txtPoints,
       this.container,
@@ -224,7 +224,7 @@ export class CardImage {
         },
       )
 
-      this.image.setTexture(this.getSubjectImageName())
+      this.imageSubject.setTexture(this.getSubjectImageName())
       this.createStats()
       this.createText()
       this.createTitle()
@@ -284,32 +284,32 @@ export class CardImage {
   }
 
   private createImages(shadow: boolean): void {
-    this.backgroundImage = this.scene.add.image(0, 0, 'card/background-0')
-    this.backgroundImage.setDisplaySize(Space.cardWidth, Space.cardHeight)
-    this.container.add(this.backgroundImage)
+    this.imageBackground = this.scene.add.image(0, 0, 'card/background-0')
+    this.imageBackground.setDisplaySize(Space.cardWidth, Space.cardHeight)
+    this.container.add(this.imageBackground)
 
-    this.image = this.scene.add.image(0, 0, this.getSubjectImageName())
-    this.image.setDisplaySize(Space.cardWidth, Space.cardHeight)
+    this.imageSubject = this.scene.add.image(0, 0, this.getSubjectImageName())
+    this.imageSubject.setDisplaySize(Space.cardWidth, Space.cardHeight)
 
     if (shadow) {
-      this.scene.addShadow(this.image)
+      this.scene.addShadow(this.imageSubject)
     }
 
-    this.container.add(this.image)
+    this.container.add(this.imageSubject)
 
-    this.arcImage = this.scene.add.image(0, 0, 'card/arc-0')
-    this.arcImage.setDisplaySize(Space.cardWidth, Space.cardHeight)
-    this.container.add(this.arcImage)
+    this.imageArc = this.scene.add.image(0, 0, 'card/arc-0')
+    this.imageArc.setDisplaySize(Space.cardWidth, Space.cardHeight)
+    this.container.add(this.imageArc)
 
-    this.containerImage = this.scene.add.image(0, 0, 'card/container-0')
-    this.containerImage.setDisplaySize(Space.cardWidth, Space.cardHeight)
-    this.container.add(this.containerImage)
+    this.imageContainer = this.scene.add.image(0, 0, 'card/container-0')
+    this.imageContainer.setDisplaySize(Space.cardWidth, Space.cardHeight)
+    this.container.add(this.imageContainer)
   }
 
   private getSubjectImageName(): string {
     return this.scene.textures.exists(`card/subject-${this.card.name}`)
       ? `card/subject-${this.card.name}`
-      : 'card-Default'
+      : 'card/subject-Dove'
   }
 
   private createStats(): void {
@@ -451,7 +451,7 @@ export class CardImage {
 
   private createOutline(): void {
     const plugin: any = this.scene.plugins.get('rexOutlinePipeline')
-    this.outline = plugin.add(this.image, {
+    this.outline = plugin.add(this.imageSubject, {
       thickness: 0,
       outlineColor: Color.outline,
       quality: 0.3,
@@ -545,7 +545,7 @@ export class CardImage {
       const pointer = this.scene.input.activePointer
 
       // Don't do exit if still within bounds of the image
-      if (this.image.getBounds().contains(pointer.x, pointer.y)) {
+      if (this.imageSubject.getBounds().contains(pointer.x, pointer.y)) {
         return
       }
 
@@ -557,20 +557,20 @@ export class CardImage {
   }
 
   private setTint(color: number): void {
-    this.backgroundImage.setTint(color)
-    this.image.setTint(color)
-    this.arcImage.setTint(color)
-    this.containerImage.setTint(color)
+    this.imageBackground.setTint(color)
+    this.imageSubject.setTint(color)
+    this.imageArc.setTint(color)
+    this.imageContainer.setTint(color)
     this.txtCost.setTint(color)
     this.txtPoints.setTint(color)
     // this.txtText.setTint(color)
   }
 
   private clearTint(): void {
-    this.backgroundImage.clearTint()
-    this.image.clearTint()
-    this.arcImage.clearTint()
-    this.containerImage.clearTint()
+    this.imageBackground.clearTint()
+    this.imageSubject.clearTint()
+    this.imageArc.clearTint()
+    this.imageContainer.clearTint()
     this.txtCost.clearTint()
     this.txtPoints.clearTint()
     // this.txtText.clearTint()
@@ -593,7 +593,7 @@ export class FullSizeCardImage extends CardImage {
     // Load the full sized image and use it once loaded
     const s = `fullCard-${card.name}`
     if (this.scene.textures.exists(s)) {
-      this.image
+      this.imageSubject
         .setTexture(s)
         .setDisplaySize(Space.fullCardWidth, Space.fullCardHeight)
     } else {
@@ -601,8 +601,8 @@ export class FullSizeCardImage extends CardImage {
 
       // When image loads, set image texture
       this.scene.load.once('complete', () => {
-        if (this.image) {
-          this.image
+        if (this.imageSubject) {
+          this.imageSubject
             .setTexture(s)
             .setDisplaySize(Space.fullCardWidth, Space.fullCardHeight)
         }
