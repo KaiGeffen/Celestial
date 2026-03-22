@@ -162,6 +162,42 @@ export const assetLists = {
     ],
     "pixelArt": true
   },
+  "Background": {
+    "files": [
+      "0"
+    ],
+    "pixelArt": false
+  },
+  "Subject": {
+    "files": [
+      "Defiance",
+      "Dove",
+      "Fledgling",
+      "Heron",
+      "Lay Bare",
+      "Let Go",
+      "Nest",
+      "Phoenix",
+      "Rooster",
+      "Secretary Bird",
+      "Starling",
+      "Truth",
+      "Vulture"
+    ],
+    "pixelArt": false
+  },
+  "Arc": {
+    "files": [
+      "0"
+    ],
+    "pixelArt": false
+  },
+  "Container": {
+    "files": [
+      "0"
+    ],
+    "pixelArt": false
+  },
   "cutout": {
     "files": [
       "Abundance",

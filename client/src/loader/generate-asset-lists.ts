@@ -17,6 +17,10 @@ interface AssetList {
 const DIRECTORIES = [
   'img/avatar',
   'img/card',
+  'img/card/Background',
+  'img/card/Subject',
+  'img/card/Arc',
+  'img/card/Container',
   'img/cutout',
   'img/icon',
   'img/background',
@@ -36,6 +40,10 @@ const NON_PIXEL_ART_DIRS = [
   'dialog',
   'roundResult',
   'background',
+  'Background',
+  'Subject',
+  'Arc',
+  'Container',
   'chrome',
   'icon',
 ]
