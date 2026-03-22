@@ -219,9 +219,11 @@ export default class BaseScene extends SharedBaseScene {
     let esc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC)
     esc.on('down', this.openMenu(), this)
 
-    // When P is pressed, open the online players menu
-    let p = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P)
-    p.on('down', () => {
+    // When ` is pressed, open the online players menu
+    let backtick = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.BACKTICK,
+    )
+    backtick.on('down', () => {
       if (UserSettings._get('hotkeys')) {
         this.openFriendsList()()
       }
