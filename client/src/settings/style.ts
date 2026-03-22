@@ -160,7 +160,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   },
   cardTitle: {
     fontFamily: altFont,
-    fontSize: '26px',
+    fontSize: '24px',
     color: Color.cardText,
   },
   homeSceneButton: {
@@ -200,7 +200,7 @@ export const BBStyle: Record<string, any> = {
   // Cost / Points stats that are shown above each card
   cardCost: {
     fontFamily: mainFont,
-    fontSize: '30px',
+    fontSize: '24px',
     color: Color.cardCost,
     stroke: Color.blackS,
     strokeThickness: 3,
@@ -208,7 +208,7 @@ export const BBStyle: Record<string, any> = {
   },
   cardPoints: {
     fontFamily: mainFont,
-    fontSize: '30px',
+    fontSize: '24px',
     color: Color.cardPoints,
     stroke: Color.blackS,
     strokeThickness: 3,

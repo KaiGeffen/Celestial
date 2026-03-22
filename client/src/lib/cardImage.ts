@@ -318,9 +318,9 @@ export class CardImage {
     // Cost
     this.txtCost = this.scene.add
       .rexBBCodeText(
-        -Space.cardWidth / 2 + statOffset1,
-        -Space.cardHeight / 2 + statOffset1,
-        `[stroke=#353F4E]${this.card.cost}[/stroke]`,
+        -Space.cardWidth / 2 + 27,
+        -Space.cardHeight / 2 + 58,
+        `${this.card.cost}`,
         BBStyle.cardCost,
       )
       .setVisible(this.card.id !== Catalog.cardback.id)
@@ -341,9 +341,9 @@ export class CardImage {
     // Points
     this.txtPoints = this.scene.add
       .rexBBCodeText(
-        -Space.cardWidth / 2 + statOffset1,
-        -Space.cardHeight / 2 + statOffset2,
-        `[stroke=#353F4E]${this.card.points}[/stroke]`,
+        -Space.cardWidth / 2 + 27,
+        -Space.cardHeight / 2 + 102,
+        `${this.card.points}`,
         BBStyle.cardPoints,
       )
       .setVisible(this.card.id !== Catalog.cardback.id)
