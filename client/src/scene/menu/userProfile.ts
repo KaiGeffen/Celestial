@@ -338,7 +338,7 @@ export default class UserProfileMenu extends Menu {
         const border = this.scene.add
           .rectangle(0, 0, width, height)
           .setFillStyle(0x000000, 0)
-          .setStrokeStyle(3, Color.outline)
+          .setStrokeStyle(5, Color.outline)
         container.add(border)
       }
 
