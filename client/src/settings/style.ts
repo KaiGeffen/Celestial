@@ -200,15 +200,15 @@ export const BBStyle: Record<string, any> = {
   // Cost / Points stats that are shown above each card
   cardCost: {
     fontFamily: 'GrandCentral',
-    fontSize: '22px',
+    fontSize: '24px',
     color: Color.cardCost,
-    stroke: Color.blackS,
+    stroke: '#ff0000',
     strokeThickness: 3,
     // TODO Add letter spacing after at least Phaser 3.6.0
   },
   cardPoints: {
     fontFamily: 'GrandCentral',
-    fontSize: '22px',
+    fontSize: '24px',
     color: Color.cardPoints,
     stroke: Color.blackS,
     strokeThickness: 3,
@@ -219,6 +219,7 @@ export const BBStyle: Record<string, any> = {
     fontFamily: 'Upgrade',
     fontSize: '16px',
     color: Color.whiteS,
+    strokeThickness: 1,
     wrap: {
       mode: 'word',
       width: 224,

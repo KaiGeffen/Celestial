@@ -401,6 +401,9 @@ export class CardImage {
       )
     })
 
+    // Add a black stroke to the text
+    s = `[stroke=#000000]${s}[/stroke]`
+
     // Create the text
     this.txtText = this.scene.add
       .rexBBCodeText(0, Space.cardHeight / 2 - 40, s, BBStyle.cardText)
