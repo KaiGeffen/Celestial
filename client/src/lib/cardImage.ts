@@ -434,7 +434,7 @@ export class CardImage {
   private createTitle(): void {
     // Append upgrade version suffix (+ or ++) to the card name
     const upgradeSuffix = '+'.repeat(this.card.upgradeVersion || 0)
-    const displayName = this.card.name + upgradeSuffix
+    const displayName = this.card.name.toUpperCase() + upgradeSuffix
 
     this.txtTitle = this.scene.add
       .text(0, 18 - Space.cardHeight / 2, displayName, Style.cardTitle)
