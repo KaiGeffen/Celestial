@@ -33,7 +33,6 @@ export class CardImage {
   txtPoints: BBCodeText
   txtText: BBCodeText
   txtTitle: Phaser.GameObjects.Text
-  outline: any // Pipeline golden outline around the card
 
   // A container just for this cardImage and elements within it
   container: ContainerLite | Phaser.GameObjects.Container
@@ -96,9 +95,13 @@ export class CardImage {
       this.imageSubject
         .on('pointerover', this.onHover())
         .on('pointerout', this.onHoverExit())
-        .on('pointerdown', () => this.clickCallback())
+        .on('pointerdown', () => {
+          this.createHoverBurst()
+          this.clickCallback()
+        })
     } else {
       this.imageSubject.on('pointerdown', () => {
+        this.createHoverBurst()
         this.scene.scene.launch('MenuScene', {
           menu: 'focus',
           card: this.card,
@@ -110,9 +113,6 @@ export class CardImage {
         })
       })
     }
-
-    // Visual effect
-    this.createOutline()
 
     if (interactive) {
       this.imageSubject.setInteractive()
@@ -447,15 +447,6 @@ export class CardImage {
     this.container.add(this.txtTitle)
   }
 
-  private createOutline(): void {
-    const plugin: any = this.scene.plugins.get('rexOutlinePipeline')
-    this.outline = plugin.add(this.imageArc, {
-      thickness: 0,
-      outlineColor: Color.outline,
-      quality: 0.3,
-    })
-  }
-
   // Move this cardImage above everything else in its container when it's hovered
   moveToTopOnHover(): CardImage {
     let container = this.container
@@ -527,9 +518,16 @@ export class CardImage {
 
   private onHover(): () => void {
     return () => {
-      // Apply the highlight effect if it's interactive
+      // Enlarge the subject while hovered
       if (this.interactive) {
-        this.outline.thickness = Space.highlightWidth
+        this.scene.tweens.killTweensOf(this.imageSubject)
+        this.scene.tweens.add({
+          targets: this.imageSubject,
+          displayWidth: Space.cardWidth * 1.1,
+          displayHeight: Space.cardHeight * 1.1,
+          duration: 120,
+          ease: 'Quad.Out',
+        })
       }
 
       // Do the callback
@@ -547,11 +545,44 @@ export class CardImage {
         return
       }
 
-      this.outline.thickness = 0
+      this.scene.tweens.killTweensOf(this.imageSubject)
+      this.scene.tweens.add({
+        targets: this.imageSubject,
+        displayWidth: Space.cardWidth,
+        displayHeight: Space.cardHeight,
+        duration: 120,
+        ease: 'Quad.Out',
+      })
 
       // Do the callback
       this.exitCallback()
     }
+  }
+
+  private createHoverBurst(): void {
+    const bounds = this.imageSubject.getBounds()
+    const burst = this.scene.add.image(
+      bounds.centerX,
+      bounds.centerY,
+      this.imageSubject.texture.key,
+    )
+    burst.setDisplaySize(
+      this.imageSubject.displayWidth,
+      this.imageSubject.displayHeight,
+    )
+    burst.setAngle(this.imageSubject.angle)
+    burst.setAlpha(1)
+    this.scene.children.bringToTop(burst)
+
+    this.scene.tweens.add({
+      targets: burst,
+      displayWidth: Space.cardWidth * 1.5,
+      displayHeight: Space.cardHeight * 1.5,
+      alpha: 0,
+      duration: 340,
+      ease: 'Quad.Out',
+      onComplete: () => burst.destroy(),
+    })
   }
 
   private setTint(color: number): void {
