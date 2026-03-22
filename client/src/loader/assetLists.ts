@@ -162,13 +162,13 @@ export const assetLists = {
     ],
     "pixelArt": true
   },
-  "Background": {
+  "card/background": {
     "files": [
       "0"
     ],
     "pixelArt": false
   },
-  "Subject": {
+  "card/subject": {
     "files": [
       "Defiance",
       "Dove",
@@ -186,13 +186,13 @@ export const assetLists = {
     ],
     "pixelArt": false
   },
-  "Arc": {
+  "card/arc": {
     "files": [
       "0"
     ],
     "pixelArt": false
   },
-  "Container": {
+  "card/container": {
     "files": [
       "0"
     ],

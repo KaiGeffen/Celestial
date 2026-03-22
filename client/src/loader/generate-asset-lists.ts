@@ -17,10 +17,10 @@ interface AssetList {
 const DIRECTORIES = [
   'img/avatar',
   'img/card',
-  'img/card/Background',
-  'img/card/Subject',
-  'img/card/Arc',
-  'img/card/Container',
+  'img/card/background',
+  'img/card/subject',
+  'img/card/arc',
+  'img/card/container',
   'img/cutout',
   'img/icon',
   'img/background',
@@ -40,13 +40,17 @@ const NON_PIXEL_ART_DIRS = [
   'dialog',
   'roundResult',
   'background',
-  'Background',
-  'Subject',
-  'Arc',
-  'Container',
+  'card/background',
+  'card/subject',
+  'card/arc',
+  'card/container',
   'chrome',
   'icon',
 ]
+
+function getDirectoryKey(dir: string): string {
+  return dir.startsWith('img/') ? dir.slice(4) : dir
+}
 
 // Function to convert PNG to WebP using Sharp
 async function convertPngToWebp(pngPath: string): Promise<string> {
@@ -153,7 +157,7 @@ async function getAssetFiles(dir: string): Promise<{
   const result = {
     files: [] as string[],
     dimensions: {} as { [filename: string]: { width: number; height: number } },
-    pixelArt: !NON_PIXEL_ART_DIRS.includes(dir.split('/').pop()!),
+    pixelArt: !NON_PIXEL_ART_DIRS.includes(getDirectoryKey(dir)),
   }
 
   const entries = fs.readdirSync(fullPath, { withFileTypes: true })
@@ -209,8 +213,8 @@ async function generateAssetLists(): Promise<void> {
 
   // Generate lists for each directory
   for (const dir of DIRECTORIES) {
-    // Use the last part of the path as the key (e.g., 'img/avatar' -> 'avatar')
-    const dirKey = dir.split('/').pop()!
+    // Preserve nested image paths after 'img/' (e.g., 'img/card/subject' -> 'card/subject')
+    const dirKey = getDirectoryKey(dir)
     assetLists[dirKey] = await getAssetFiles(dir)
   }
 

@@ -54,6 +54,8 @@ export default class Loader {
           const key = `${directory}-${file}`
           const dims = info.dimensions?.[file]
 
+          // console.log(key)
+
           if (dims) {
             // If file has dimensions, it's in a dimension directory
             const filepath = `img/${directory}/${dims.width}x${dims.height}/${file}.${EXTENSION}`

@@ -77,8 +77,10 @@ export class CardImage {
 
     // Card image
     // If the card image doesn't exist, use a default image
-    const imageName = this.scene.textures.exists(`card-${this.card.name}`)
-      ? `card-${this.card.name}`
+    const imageName = this.scene.textures.exists(
+      `card/subject-${this.card.name}`,
+    )
+      ? `card/subject-${this.card.name}`
       : 'card-Default'
     this.image = this.scene.add.image(0, 0, imageName)
     this.image.setDisplaySize(Space.cardWidth, Space.cardHeight)
@@ -225,8 +227,10 @@ export class CardImage {
         },
       )
 
-      const imageName = this.scene.textures.exists(`card-${this.card.name}`)
-        ? `card-${this.card.name}`
+      const imageName = this.scene.textures.exists(
+        `card/subject-${this.card.name}`,
+      )
+        ? `card/subject-${this.card.name}`
         : 'card-Default'
       this.image.setTexture(imageName)
       this.createStats()
