@@ -292,7 +292,7 @@ export class CardImage {
     this.imageSubject.setDisplaySize(Space.cardWidth, Space.cardHeight)
 
     if (shadow) {
-      this.scene.addShadow(this.imageSubject)
+      this.scene.addShadow(this.imageBackground)
     }
 
     this.container.add(this.imageSubject)
@@ -445,7 +445,7 @@ export class CardImage {
 
   private createOutline(): void {
     const plugin: any = this.scene.plugins.get('rexOutlinePipeline')
-    this.outline = plugin.add(this.imageSubject, {
+    this.outline = plugin.add(this.imageBackground, {
       thickness: 0,
       outlineColor: Color.outline,
       quality: 0.3,
