@@ -89,7 +89,7 @@ const secretaryBird = new SecretaryBird({
   cost: 4,
   points: 4,
   qualities: [Quality.VISIBLE],
-  text: 'Visible\nWorth +1 for each card in your hand with base cost 0 or 1. Remove those cards from the game.',
+  text: 'Visible\nWorth +1 for each card in your hand with base cost 0 or 1. Remove them from the game.',
   story: 'I will I will I will\nBecome me become me become me\nAt your peril',
 })
 
