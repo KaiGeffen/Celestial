@@ -21,8 +21,13 @@ export class CardImage {
   visible = true
   interactive = false
 
-  // Visual elements that appear on the cardImage
+  // Image layers
+  backgroundImage: Phaser.GameObjects.Image
   image: Phaser.GameObjects.Image
+  arcImage: Phaser.GameObjects.Image
+  containerImage: Phaser.GameObjects.Image
+
+  // Text elements
   txtCost: BBCodeText
   txtPoints: BBCodeText
   txtText: BBCodeText
@@ -75,22 +80,8 @@ export class CardImage {
     this.scene = outerContainer.scene
     this.createContainer(outerContainer)
 
-    // Card image
-    // If the card image doesn't exist, use a default image
-    const imageName = this.scene.textures.exists(
-      `card/subject-${this.card.name}`,
-    )
-      ? `card/subject-${this.card.name}`
-      : 'card-Default'
-    this.image = this.scene.add.image(0, 0, imageName)
-    this.image.setDisplaySize(Space.cardWidth, Space.cardHeight)
-
-    // Add shadow to the card
-    if (shadow) {
-      this.scene.addShadow(this.image)
-    }
-
-    this.container.add(this.image)
+    // Create the image layers
+    this.createImages(shadow)
 
     // Stat text
     this.createStats()
@@ -128,9 +119,15 @@ export class CardImage {
   }
 
   destroy(): void {
-    ;[this.image, this.txtCost, this.txtPoints, this.container].forEach((obj) =>
-      obj.destroy(),
-    )
+    ;[
+      this.backgroundImage,
+      this.image,
+      this.arcImage,
+      this.containerImage,
+      this.txtCost,
+      this.txtPoints,
+      this.container,
+    ].forEach((obj) => obj.destroy())
   }
 
   show(): this {
@@ -227,12 +224,7 @@ export class CardImage {
         },
       )
 
-      const imageName = this.scene.textures.exists(
-        `card/subject-${this.card.name}`,
-      )
-        ? `card/subject-${this.card.name}`
-        : 'card-Default'
-      this.image.setTexture(imageName)
+      this.image.setTexture(this.getSubjectImageName())
       this.createStats()
       this.createText()
       this.createTitle()
@@ -289,6 +281,35 @@ export class CardImage {
     } else {
       throw 'CardImage was given a container that isnt of a correct type'
     }
+  }
+
+  private createImages(shadow: boolean): void {
+    this.backgroundImage = this.scene.add.image(0, 0, 'card/background-0')
+    this.backgroundImage.setDisplaySize(Space.cardWidth, Space.cardHeight)
+    this.container.add(this.backgroundImage)
+
+    this.image = this.scene.add.image(0, 0, this.getSubjectImageName())
+    this.image.setDisplaySize(Space.cardWidth, Space.cardHeight)
+
+    if (shadow) {
+      this.scene.addShadow(this.image)
+    }
+
+    this.container.add(this.image)
+
+    this.arcImage = this.scene.add.image(0, 0, 'card/arc-0')
+    this.arcImage.setDisplaySize(Space.cardWidth, Space.cardHeight)
+    this.container.add(this.arcImage)
+
+    this.containerImage = this.scene.add.image(0, 0, 'card/container-0')
+    this.containerImage.setDisplaySize(Space.cardWidth, Space.cardHeight)
+    this.container.add(this.containerImage)
+  }
+
+  private getSubjectImageName(): string {
+    return this.scene.textures.exists(`card/subject-${this.card.name}`)
+      ? `card/subject-${this.card.name}`
+      : 'card-Default'
   }
 
   private createStats(): void {
@@ -536,14 +557,20 @@ export class CardImage {
   }
 
   private setTint(color: number): void {
+    this.backgroundImage.setTint(color)
     this.image.setTint(color)
+    this.arcImage.setTint(color)
+    this.containerImage.setTint(color)
     this.txtCost.setTint(color)
     this.txtPoints.setTint(color)
     // this.txtText.setTint(color)
   }
 
   private clearTint(): void {
+    this.backgroundImage.clearTint()
     this.image.clearTint()
+    this.arcImage.clearTint()
+    this.containerImage.clearTint()
     this.txtCost.clearTint()
     this.txtPoints.clearTint()
     // this.txtText.clearTint()
