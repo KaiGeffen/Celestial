@@ -160,7 +160,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   },
   cardTitle: {
     fontFamily: altFont,
-    fontSize: '16px',
+    fontSize: '20px',
     color: Color.cardText,
   },
   homeSceneButton: {
