@@ -217,9 +217,8 @@ export const BBStyle: Record<string, any> = {
   // The textbox for the card
   cardText: {
     fontFamily: mainFont,
-    fontSize: '16px',
-    color: 0xffffff,
-    backgroundColor: 0x111111a0,
+    fontSize: '15px',
+    color: Color.whiteS,
     wrap: {
       mode: 'word',
       width: 224,

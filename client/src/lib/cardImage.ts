@@ -403,10 +403,9 @@ export class CardImage {
 
     // Create the text
     this.txtText = this.scene.add
-      .rexBBCodeText(0, 156, s, BBStyle.cardText)
-      .setOrigin(0.5, 1)
+      .rexBBCodeText(0, Space.cardHeight / 2 - 40, s, BBStyle.cardText)
+      .setOrigin(0.5)
       .setWordWrapWidth(Space.cardWidth)
-      .setVisible(s !== '')
 
     // Enable hovering to get hint
     let hint = this.scene.hint
@@ -438,13 +437,8 @@ export class CardImage {
     const displayName = this.card.name + upgradeSuffix
 
     this.txtTitle = this.scene.add
-      .text(
-        -Space.cardWidth / 2 + 56,
-        -Space.cardHeight / 2 + 3,
-        displayName,
-        Style.cardTitle,
-      )
-      .setOrigin(0)
+      .text(0, 18 - Space.cardHeight / 2, displayName, Style.cardTitle)
+      .setOrigin(0.5)
 
     this.container.add(this.txtTitle)
   }
