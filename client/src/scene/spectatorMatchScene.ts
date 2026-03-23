@@ -42,12 +42,13 @@ export class SpectatorMatchScene extends MatchScene {
       this.queueState(params.gameStartState)
     }
 
-    // Create the view in read-only mode.
+    // Create the view in read-only mode
     this.view = new View(this, 0, '')
-    this.view.results = new MatchResultsSimplifiedRegion().create(this)
 
-    // Hide the searching region immediately so the user can't click Cancel.
+    // Hide or simplify some regions
+    this.view.results = new MatchResultsSimplifiedRegion().create(this)
     this.view.searching.hide()
+    this.view.mulligan.hide()
 
     // Callbacks common to this and the match scene
     this.setCommonCallbacks(this.view)

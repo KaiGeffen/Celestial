@@ -134,13 +134,13 @@ export default class OurAvatarRegion extends Region {
       this.container,
       width / 2 - 55,
       y,
-    )
+    ).setVisible(false)
     this.btnNourish = new Buttons.Keywords.Nourish(this.container, width / 2, y)
     this.btnSight = new Buttons.Keywords.Sight(
       this.container,
       width / 2 + 55,
       y,
-    )
+    ).setVisible(false)
   }
 
   setEmoteCallback(fEmote: () => void): void {
