@@ -7,15 +7,13 @@ import BaseScene from './baseScene'
 import Decklist from '../lib/decklist'
 import Buttons from '../lib/buttons/buttons'
 import DeckThumbnail from '../lib/deckThumbnail'
-import { Color, Space, Style, UserSettings, Flags } from '../settings/settings'
+import { Color, Space, Style, UserSettings } from '../settings/settings'
 import newScrollablePanel from '../lib/scrollablePanel'
-import { DecklistSettings, MechanicsSettings } from '../../../shared/settings'
+import { MechanicsSettings } from '../../../shared/settings'
 import { Deck } from '../../../shared/types/deck'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import Catalog from '../../../shared/state/catalog'
 import Card from '../../../shared/state/card'
-import Server from '../server'
-import { encodeShareableDeckCode } from '../../../shared/codec'
 
 const ROSTER_WIDTH = Space.cutoutWidth + 20
 const CENTER_WIDTH = 280
@@ -260,11 +258,8 @@ export default class DeckSelectorScene extends BaseScene {
     }
 
     addBtn('Back', () => this.scene.start('HomeScene'))
-    addBtn('Create new+', () => this.onCreateNew())
-    addBtn('Import New', () => this.onCreateNew())
     addBtn('Delete deck', () => this.onDelete(), true)
     addBtn('Edit deck', () => this.onEdit())
-    addBtn('Share deck', () => this.onShare())
     const playContainer = new ContainerLite(
       this,
       0,
@@ -280,32 +275,6 @@ export default class DeckSelectorScene extends BaseScene {
     sizer.add(playContainer)
 
     return sizer
-  }
-
-  private onCreateNew(): void {
-    const decks = UserSettings._get('decks') || []
-    if (decks.length >= DecklistSettings.MAX_DECKS) {
-      this.signalError(
-        `Reached max number of decks (${DecklistSettings.MAX_DECKS}).`,
-      )
-      return
-    }
-    const cosmeticSet: CosmeticSet = Server.getUserData().cosmeticSet ?? {
-      avatar: 0,
-      border: 0,
-      cardback: 0,
-    }
-    const num = decks.length + 1
-    UserSettings._push('decks', {
-      name: `Deck ${num}`,
-      cards: [],
-      cosmeticSet,
-    })
-    const newIndex = (UserSettings._get('decks') || []).length - 1
-    this.refreshDeckList(this.centerPanel.getElement('panel') as FixWidthSizer)
-    this.centerPanel.layout()
-    UserSettings._set('equippedDeckIndex', newIndex)
-    this.scene.start('DeckEditorScene', { deckIndex: newIndex })
   }
 
   private onDelete(): void {
@@ -354,48 +323,6 @@ export default class DeckSelectorScene extends BaseScene {
       return
     }
     this.scene.start('DeckEditorScene', { deckIndex: this.savedDeckIndex })
-  }
-
-  private onShare(): void {
-    if (this.savedDeckIndex === undefined) {
-      this.signalError('Select a deck to share.')
-      return
-    }
-    const deck: Deck = UserSettings._get('decks')[this.savedDeckIndex]
-    const encoded = encodeShareableDeckCode(deck.cards || [])
-    const textToCopy =
-      Flags.local && deck.cards?.length ? deck.cards.toString() : encoded
-    this.copyToClipboard(textToCopy)
-  }
-
-  private copyToClipboard(text: string): void {
-    const doCopy = (t: string) => {
-      if (navigator.clipboard?.writeText) {
-        navigator.clipboard.writeText(t).then(
-          () => this.showMessage('Deck code copied to clipboard.'),
-          () => fallbackCopy(t),
-        )
-      } else {
-        fallbackCopy(t)
-      }
-    }
-    const fallbackCopy = (t: string) => {
-      const textarea = document.createElement('textarea')
-      textarea.value = t
-      textarea.style.position = 'fixed'
-      textarea.style.left = '-9999px'
-      textarea.setAttribute('readonly', '')
-      document.body.appendChild(textarea)
-      textarea.select()
-      try {
-        document.execCommand('copy')
-        this.showMessage('Deck code copied to clipboard.')
-      } catch {
-        this.signalError('Could not copy to clipboard.')
-      }
-      document.body.removeChild(textarea)
-    }
-    doCopy(text)
   }
 
   private onPlayMatch(): void {
