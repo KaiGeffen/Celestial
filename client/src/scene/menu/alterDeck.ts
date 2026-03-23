@@ -52,8 +52,6 @@ class AlterDeckMenu extends Menu {
   // Current tab for cosmetic selection
   currentTab: tab = tab.ICON
 
-  // Container for the cosmetic options
-  private cosmeticOptionsContainer: ContainerLite
   private cosmeticChoicesSizer: Sizer
 
   btnConfirm: Button
@@ -103,36 +101,17 @@ class AlterDeckMenu extends Menu {
   }
 
   private createCosmeticOptions() {
-    // Create the container for the cosmetic options
-    this.cosmeticOptionsContainer = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      width,
-      Space.avatarSize + Space.pad * 2,
-    )
-
-    // Create a sizer to center the grid
-    const centerSizer = this.scene.rexUI.add.sizer({
-      orientation: 'vertical',
-      space: { item: Space.pad },
-    })
-
     // Create the sizer for avatars/borders
     this.cosmeticChoicesSizer = this.scene.rexUI.add.sizer({
-      space: { item: Space.pad },
+      width,
+      height: Space.cardHeight,
+      space: { item: Space.pad, left: Space.pad, right: Space.pad },
     })
-
-    // Add the sizer to the center sizer
-    centerSizer.add(this.cosmeticChoicesSizer)
-
-    // Add the center sizer to the container
-    this.cosmeticOptionsContainer.add(centerSizer)
 
     // Create initial content
     this.updateCosmeticGrid()
 
-    return this.cosmeticOptionsContainer
+    return this.cosmeticChoicesSizer
   }
 
   private updateCosmeticGrid() {
@@ -208,8 +187,8 @@ class AlterDeckMenu extends Menu {
       const borders: Phaser.GameObjects.Rectangle[] = []
 
       unlockedCardbacks.forEach((cardbackId) => {
-        const cardWidth = Space.cardWidth * 0.6
-        const cardHeight = Space.cardHeight * 0.6
+        const cardWidth = Space.cardWidth
+        const cardHeight = Space.cardHeight
         const cardbackContainer = new ContainerLite(
           this.scene,
           0,
