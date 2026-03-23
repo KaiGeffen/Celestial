@@ -1,1 +1,1 @@
-export default ['Default', 'Cosmos', 'Tree']
+export default ['Default', 'Astrology', 'Blossom']
