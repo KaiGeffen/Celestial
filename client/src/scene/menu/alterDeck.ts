@@ -19,8 +19,9 @@ import {
 } from '../../utils/cosmetics'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import cardbackNames from '../../data/cardbackNames'
+import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 
-const width = 900
+const width = Space.avatarSize * 6 + Space.pad * 7
 const inputTextWidth = 200
 
 enum tab {
@@ -52,7 +53,7 @@ class AlterDeckMenu extends Menu {
   // Current tab for cosmetic selection
   currentTab: tab = tab.ICON
 
-  private cosmeticChoicesSizer: Sizer
+  private cosmeticChoicesSizer: FixWidthSizer
 
   btnConfirm: Button
 
@@ -102,11 +103,20 @@ class AlterDeckMenu extends Menu {
 
   private createCosmeticOptions() {
     // Create the sizer for avatars/borders
-    this.cosmeticChoicesSizer = this.scene.rexUI.add.sizer({
+    this.cosmeticChoicesSizer = this.scene.rexUI.add.fixWidthSizer({
       width,
       height: Space.cardHeight,
-      space: { item: Space.pad, left: Space.pad, right: Space.pad },
+
+      space: {
+        item: Space.pad,
+        line: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+      },
     })
+    this.cosmeticChoicesSizer.addBackground(
+      this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight, 0.4),
+    )
 
     // Create initial content
     this.updateCosmeticGrid()
