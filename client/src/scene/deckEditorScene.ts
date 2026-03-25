@@ -98,6 +98,9 @@ export default class DeckEditorScene extends BaseScene {
 
     this.setDeck((deck.cards || []).map((id) => Catalog.getCardById(id)))
     this.updateSavedDeck(this.getDeckCode())
+
+    //
+    this.filterCatalog()
   }
 
   private createBackground(): void {
@@ -228,6 +231,9 @@ export default class DeckEditorScene extends BaseScene {
       const label = i === MAX_COST_FILTER ? '7+' : i.toString()
       const btn = new UButton(container, 0, 0, label)
       btn.setOnClick(this.onClickCostFilter(i))
+      if (this.filterCostAry[i]) {
+        btn.toggle()
+      }
       this.costFilterBtns.push(btn)
     }
     const clearContainer = new ContainerLite(
