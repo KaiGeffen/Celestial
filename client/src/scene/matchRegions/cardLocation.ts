@@ -12,13 +12,39 @@ const todoTheirHandHeight = -Space.todoHandOffset
 // so that regions can move their cards to the appropriate locations for
 // other regions
 export default class CardLocation {
+  private static ourHandDistanceFromCenter(state: GameModel, i: number): number {
+    if (state === undefined) {
+      return 0
+    }
+
+    const totalCards = state.hand[0].length
+    if (totalCards <= 1) {
+      return 0
+    }
+
+    return i - (totalCards - 1) / 2
+  }
+
+  private static ourHandNormalizedDistance(state: GameModel, i: number): number {
+    if (state === undefined) {
+      return 0
+    }
+
+    const totalCards = state.hand[0].length
+    if (totalCards <= 1) {
+      return 0
+    }
+
+    const maxOffset = (totalCards - 1) / 2
+    return CardLocation.ourHandDistanceFromCenter(state, i) / maxOffset
+  }
+
   static ourHand(
     state: GameModel,
     i: number,
     container?: Phaser.GameObjects.Container,
   ): [number, number] {
-    const leftEdge = 200 + Space.cardWidth / 2
-    let dx = Space.cardWidth + Space.pad
+    let dx = Space.cardWidth * 0.48
 
     if (state !== undefined) {
       const totalCards = state.hand[0].length
@@ -30,8 +56,15 @@ export default class CardLocation {
         dx *= maxWidth / totalWidth
       }
 
-      const x = leftEdge + i * dx
-      let y = Space.windowHeight + Space.cardHeight / 2 - Space.todoHandOffset
+      const x =
+        Space.windowWidth / 2 + CardLocation.ourHandDistanceFromCenter(state, i) * dx
+      const normalizedOffset = CardLocation.ourHandNormalizedDistance(state, i)
+      let y =
+        Space.windowHeight +
+        Space.cardHeight / 2 -
+        Space.todoHandOffset -
+        24 +
+        Math.abs(normalizedOffset) * 42
 
       if (container !== undefined) {
         return [x - container.x, y - container.y]
@@ -40,6 +73,10 @@ export default class CardLocation {
     }
 
     return [0, 0]
+  }
+
+  static ourHandRotation(state: GameModel, i: number): number {
+    return CardLocation.ourHandNormalizedDistance(state, i) * 12
   }
 
   static theirHand(

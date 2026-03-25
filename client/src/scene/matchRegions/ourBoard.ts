@@ -37,6 +37,8 @@ export default class OurBoardRegion extends Region {
   // Track whether shift is held
   isShiftHeld = false
 
+  private currentState: GameModel | null = null
+
   background: Phaser.GameObjects.Image
 
   create(scene: MatchScene): this {
@@ -175,6 +177,8 @@ export default class OurBoardRegion extends Region {
               this.scene.tweens.add({
                 targets: adjustedCard.container,
                 x: CardLocation.ourHand(state, j - 1, this.container)[0],
+                y: CardLocation.ourHand(state, j - 1, this.container)[1],
+                angle: CardLocation.ourHandRotation(state, j - 1),
                 duration: Time.playCard() - 10,
                 ease: 'Sine.easeInOut',
               })
@@ -193,6 +197,7 @@ export default class OurBoardRegion extends Region {
 
   // Modify displayState to lower any raised card when state changes
   displayState(state: GameModel): void {
+    this.currentState = state
     this.deleteTemp()
 
     // Until we have mulliganed, hide (Delete) all the cards in our hand
@@ -216,9 +221,13 @@ export default class OurBoardRegion extends Region {
         .setFocusOptions('Play')
         .moveToTopOnHover()
 
+      card.container.setAngle(CardLocation.ourHandRotation(state, i))
+
       // If shift is held or card was hovered, raise the card immediately
       if (i === this.raisedCardIndex || this.isShiftHeld) {
-        card.container.setY(-HOVER_OFFSET)
+        card.container.setY(
+          CardLocation.ourHand(state, i, this.container)[1] - HOVER_OFFSET,
+        )
       }
 
       const cost = state.cardCosts[i]
@@ -277,7 +286,9 @@ export default class OurBoardRegion extends Region {
         // Raise the card
         this.scene.tweens.add({
           targets: card.container,
-          y: -HOVER_OFFSET,
+          y:
+            CardLocation.ourHand(this.currentState, index, this.container)[1] -
+            HOVER_OFFSET,
           duration: Time.cardFocus,
           ease: 'Sine.easeOut',
         })
@@ -303,7 +314,7 @@ export default class OurBoardRegion extends Region {
         // Lower the card
         this.scene.tweens.add({
           targets: card.container,
-          y: Space.cardHeight / 2 - Space.todoHandOffset,
+          y: CardLocation.ourHand(this.currentState, index, this.container)[1],
           duration: Time.cardFocus,
           ease: 'Sine.easeOut',
         })
@@ -335,7 +346,9 @@ export default class OurBoardRegion extends Region {
     this.cards.forEach((card, index) => {
       this.scene.tweens.add({
         targets: card.container,
-        y: -HOVER_OFFSET,
+        y:
+          CardLocation.ourHand(this.currentState, index, this.container)[1] -
+          HOVER_OFFSET,
         duration: Time.cardFocus,
         ease: 'Sine.easeOut',
       })
@@ -350,7 +363,7 @@ export default class OurBoardRegion extends Region {
     this.cards.forEach((card, index) => {
       this.scene.tweens.add({
         targets: card.container,
-        y: Space.cardHeight / 2 - Space.todoHandOffset,
+        y: CardLocation.ourHand(this.currentState, index, this.container)[1],
         duration: Time.cardFocus,
         ease: 'Sine.easeOut',
       })
