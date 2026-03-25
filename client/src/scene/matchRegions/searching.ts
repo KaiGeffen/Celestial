@@ -113,6 +113,17 @@ export default class SearchingRegion extends Region {
     return this
   }
 
+  beforeExit(): void {
+    if (this.matchFound) {
+      return
+    }
+
+    server.send({
+      type: 'cancelQueue',
+      password: this.password,
+    })
+  }
+
   private createBackground(scene: Phaser.Scene): void {
     let background = scene.add
       .rectangle(0, 0, 1, 1, Color.backgroundLight)
@@ -199,10 +210,6 @@ export default class SearchingRegion extends Region {
       text: 'Cancel',
       y: 100,
       f: () => {
-        server.send({
-          type: 'cancelQueue',
-          password: this.password,
-        })
         scene.doBack()
       },
     })

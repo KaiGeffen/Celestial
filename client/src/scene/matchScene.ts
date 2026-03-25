@@ -128,6 +128,10 @@ export class MatchScene extends BaseScene {
     )
   }
 
+  beforeExit(): void {
+    this.view.beforeExit()
+  }
+
   // Listens for websocket updates
   // Manages user decisions (What card to play, when to pass)
 
@@ -648,6 +652,10 @@ export class View {
     if (!alreadyVisible) {
       overlay.show()
     }
+  }
+
+  beforeExit(): void {
+    this.searching.beforeExit()
   }
 }
 

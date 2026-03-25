@@ -521,12 +521,6 @@ export default class OptionsMenu extends Menu {
             server.send({
               type: 'surrender',
             })
-          } else {
-            // In case we are in match queue, this will cancel the search
-            server.send({
-              type: 'cancelQueue',
-              password: searchingRegion.password,
-            })
           }
         }
       }

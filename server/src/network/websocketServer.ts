@@ -428,8 +428,10 @@ export default function createWebSocketServer() {
           Object.keys(searchingPlayers).forEach((password) => {
             // Ensure we never queue into ourself
             const isSelf = searchingPlayers[password].id === data.uuid
+
             // Ensure we don't queue into closed connections
             const isClosed = !searchingPlayers[password].ws.isOpen()
+
             if (isClosed || isSelf) {
               delete searchingPlayers[password]
             }
