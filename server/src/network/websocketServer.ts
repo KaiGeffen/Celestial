@@ -426,7 +426,11 @@ export default function createWebSocketServer() {
         .on('initPvp', async (data) => {
           // Clean up stale entries first
           Object.keys(searchingPlayers).forEach((password) => {
-            if (!searchingPlayers[password].ws.isOpen()) {
+            // Ensure we never queue into ourself
+            const isSelf = searchingPlayers[password].id === data.uuid
+            // Ensure we don't queue into closed connections
+            const isClosed = !searchingPlayers[password].ws.isOpen()
+            if (isClosed || isSelf) {
               delete searchingPlayers[password]
             }
           })
