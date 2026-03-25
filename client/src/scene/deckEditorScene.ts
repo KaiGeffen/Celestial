@@ -30,7 +30,6 @@ export default class DeckEditorScene extends BaseScene {
   private catalogPanel: ScrollablePanel
   private catalogPanelSizer: FixWidthSizer
   private cardCatalog: CardImage[] = []
-  private cardWrappers: ContainerLite[] = []
   private searchText = ''
   private searchObj: any
   private filterCostAry: boolean[] = []
@@ -39,7 +38,7 @@ export default class DeckEditorScene extends BaseScene {
   private avatarBtn: any
   private deckName: string
   private deckNameInput: any
-  private orderedByCost = false
+  private orderedByCost = true
 
   constructor() {
     super({
@@ -121,32 +120,29 @@ export default class DeckEditorScene extends BaseScene {
       },
     })
 
+    // Reset the card catalog
+    this.cardCatalog = []
+
     let pool: Card[] = []
     if (Flags.devCardsEnabled) {
       pool = [...Catalog.collectibleCards, ...Catalog.betaCards]
     } else {
       pool = [...Catalog.collectibleCards]
+
+      // Only show owned cards
       const inventory = UserSettings._get('cardInventory') || []
       pool = pool.filter((c) => inventory[c.id] === true)
     }
 
+    // Create all the cards in pool and add to the panel
     pool.forEach((card) => {
-      const wrapper = new ContainerLite(
-        this,
-        0,
-        0,
-        Space.cardWidth,
-        Space.cardHeight,
-      )
-      panel.add(wrapper)
-      const cardImage = new CardImage(card, wrapper, true, false).setOnClick(
+      const cardImage = new CardImage(card, panel, true, false).setOnClick(
         () => {
           this.addCardToDeck(card)
           this.sound.play('click')
         },
       )
       this.cardCatalog.push(cardImage)
-      this.cardWrappers.push(wrapper)
     })
 
     const scrollable = newScrollablePanel(this, {
@@ -160,6 +156,7 @@ export default class DeckEditorScene extends BaseScene {
     }).setOrigin(0)
     this.catalogPanelSizer = panel
     scrollable.layout()
+
     return scrollable
   }
 
@@ -298,22 +295,17 @@ export default class DeckEditorScene extends BaseScene {
   private filterCatalog(): void {
     this.catalogPanelSizer.clear()
 
-    // Hide all card wrappers first (like catalog.ts); only show and add matching ones
-    for (const wrapper of this.cardWrappers) {
-      wrapper.setVisible(false)
-    }
-
     const filterFunction = this.getFilterFunction()
     const sorted = [...this.cardCatalog]
     if (this.orderedByCost) {
       sorted.sort((a, b) => a.card.cost - b.card.cost)
     }
     for (const cardImage of sorted) {
-      if (!filterFunction(cardImage.card)) continue
-      const idx = this.cardCatalog.indexOf(cardImage)
-      if (idx >= 0 && this.cardWrappers[idx]) {
-        this.cardWrappers[idx].setVisible(true)
-        this.catalogPanelSizer.add(this.cardWrappers[idx])
+      if (filterFunction(cardImage.card)) {
+        cardImage.container.setVisible(true)
+        this.catalogPanelSizer.add(cardImage.container)
+      } else {
+        cardImage.container.setVisible(false)
       }
     }
     this.catalogPanel.t = 0
