@@ -44,7 +44,7 @@ export default class CardLocation {
     i: number,
     container?: Phaser.GameObjects.Container,
   ): [number, number] {
-    let dx = Space.cardWidth * 0.48
+    let dx = Space.cardWidth * 0.44
 
     if (state !== undefined) {
       const totalCards = state.hand[0].length
@@ -64,7 +64,7 @@ export default class CardLocation {
         Space.cardHeight / 2 -
         Space.todoHandOffset -
         24 +
-        Math.abs(normalizedOffset) * 42
+        Math.abs(normalizedOffset) * 54
 
       if (container !== undefined) {
         return [x - container.x, y - container.y]
@@ -76,7 +76,7 @@ export default class CardLocation {
   }
 
   static ourHandRotation(state: GameModel, i: number): number {
-    return CardLocation.ourHandNormalizedDistance(state, i) * 12
+    return CardLocation.ourHandNormalizedDistance(state, i) * 10
   }
 
   static theirHand(
