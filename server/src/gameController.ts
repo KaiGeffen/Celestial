@@ -59,12 +59,10 @@ class ServerController {
 
     // Do action: Pass or play a card
     if (choice === MechanicsSettings.PASS) {
-      // NOTE This logic isn't put in model because handling phase change is controller's responsibility
-      this.model.passes += 1
-      this.model.amtPasses[player] += 1
-      this.model.switchPriority()
-      this.model.sound = SoundEffect.Pass
+      // Handle the pass occuring and trigger any effects
+      this.pass(player)
 
+      // After pass occurs, end round if both players passed
       if (this.model.passes === 2) {
         this.doResolvePhase()
         this.doUpkeep()
@@ -83,6 +81,20 @@ class ServerController {
       } else {
         return false
       }
+    }
+  }
+
+  // Pass the turn, handle all logic to do with that
+  private pass(player: number): void {
+    this.model.passes += 1
+    this.model.amtPasses[player] += 1
+    this.model.switchPriority()
+    this.model.sound = SoundEffect.Pass
+
+    // Trigger on pass effects
+    for (let i = 0; i < this.model.story.acts.length; i++) {
+      const act = this.model.story.acts[i]
+      act.card.onPass(player, act.owner, this.model)
     }
   }
 

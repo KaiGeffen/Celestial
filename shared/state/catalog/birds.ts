@@ -318,29 +318,19 @@ const letGo = new LetGo({
 })
 
 class Birdsong extends Card {
-  onMorning(player: number, game: GameModel, index: number) {
-    if (game.hand[player].length > 0) {
-      const oldCard = game.hand[player][0]
-
-      const newCard = new Card({
-        name: oldCard.name,
-        id: oldCard.id,
-        cost: oldCard.cost,
-        points: oldCard.points,
-      })
-
-      game.hand[player][0] = newCard
+  onPass(playerWhoPassed: number, owner: number, game: GameModel): void {
+    if (playerWhoPassed === owner) {
+      game.createInStory(owner, dove)
     }
-
-    return true
   }
 }
 const birdsong = new Birdsong({
   name: 'Birdsong',
   id: 8094,
-  cost: 5,
-  points: 5,
-  text: 'Morning: Remove all card text from a card in your hand.',
+  cost: 3,
+  points: 2,
+  qualities: [Quality.VISIBLE],
+  text: 'Visible\nWhen you pass while this is in the story, create a Dove in the story.',
   beta: true,
 })
 
@@ -401,6 +391,6 @@ export {
   rooster,
   letGo,
   // NEW
-  // sudden,
   skyBurial,
+  birdsong,
 }

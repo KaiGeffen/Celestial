@@ -208,6 +208,9 @@ export default class Card {
     return false
   }
 
+  // Trigger when you pass while this is in the story
+  onPass(playerWhoPassed: number, owner: number, game: GameModel): void {}
+
   // When given player resolves a card with base-cost 7 or more
   onBigResolve(player: number, game: GameModel, index: number): void {}
 
