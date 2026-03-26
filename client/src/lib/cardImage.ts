@@ -225,7 +225,10 @@ export class CardImage {
         },
       )
 
+      this.imageBackground.setTexture(`card/background-${this.card.theme}`)
       this.imageSubject.setTexture(this.getSubjectImageName())
+      this.imageArc.setTexture(`card/arc-${this.card.theme}`)
+      this.imageContainer.setTexture(`card/container-${this.card.theme}`)
       this.createStats()
       this.createText()
       this.createTitle()
@@ -285,7 +288,11 @@ export class CardImage {
   }
 
   private createImages(shadow: boolean): void {
-    this.imageBackground = this.scene.add.image(0, 0, 'card/background-0')
+    this.imageBackground = this.scene.add.image(
+      0,
+      0,
+      `card/background-${this.card.theme}`,
+    )
     this.imageBackground.setDisplaySize(Space.cardWidth, Space.cardHeight)
     this.container.add(this.imageBackground)
 
@@ -298,11 +305,15 @@ export class CardImage {
 
     this.container.add(this.imageSubject)
 
-    this.imageArc = this.scene.add.image(0, 0, 'card/arc-0')
+    this.imageArc = this.scene.add.image(0, 0, `card/arc-${this.card.theme}`)
     this.imageArc.setDisplaySize(Space.cardWidth, Space.cardHeight)
     this.container.add(this.imageArc)
 
-    this.imageContainer = this.scene.add.image(0, 0, 'card/container-0')
+    this.imageContainer = this.scene.add.image(
+      0,
+      0,
+      `card/container-${this.card.theme}`,
+    )
     this.imageContainer.setDisplaySize(Space.cardWidth, Space.cardHeight)
     this.container.add(this.imageContainer)
   }
