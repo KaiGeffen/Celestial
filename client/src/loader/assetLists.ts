@@ -50,6 +50,7 @@ export const assetLists = {
   "card/background": {
     "files": [
       "0",
+      "1",
       "3",
       "6",
       "7"
@@ -59,11 +60,15 @@ export const assetLists = {
   "card/subject": {
     "files": [
       "Abundance",
+      "Ashes",
       "Bounty",
+      "Cling",
       "Cloak of Stars",
       "Cloud",
       "Cosmos",
       "Dam Breaks",
+      "Dash",
+      "Death",
       "Defiance",
       "Dew",
       "Dove",
@@ -72,27 +77,34 @@ export const assetLists = {
       "Ecology",
       "Excess",
       "Fates",
+      "Firebug",
       "Fish",
       "Fishing Boat",
       "Fledgling",
+      "From Ashes",
       "Fruit",
-      "Gain and Loss",
+      "Gain And Loss",
       "Gentle Rain",
+      "Goliath",
       "Hero",
       "Heron",
       "Hold Tight",
       "Hollow",
       "Iceberg",
+      "Immolant",
+      "Impulse",
       "Lay Bare",
       "Let Go",
-      "Me and Her",
+      "Me And Her",
       "Mercy",
+      "Mine",
       "Moon",
       "Nest",
       "Night Vision",
       "Oak",
       "Overflow",
       "Parade",
+      "Parch",
       "Pet",
       "Phoenix",
       "Pomegranate",
@@ -103,11 +115,13 @@ export const assetLists = {
       "Rose",
       "Secretary Bird",
       "Sensualist",
+      "Spark",
       "Starling",
       "Stars",
       "Sun",
       "Sunflower",
       "Truth",
+      "Veteran",
       "Vulture",
       "Yearn"
     ],
@@ -116,6 +130,7 @@ export const assetLists = {
   "card/arc": {
     "files": [
       "0",
+      "1",
       "3",
       "6",
       "7"
@@ -125,6 +140,7 @@ export const assetLists = {
   "card/container": {
     "files": [
       "0",
+      "1",
       "3",
       "6",
       "7"
