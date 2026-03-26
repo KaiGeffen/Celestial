@@ -279,6 +279,25 @@ const drip = new Drip({
   beta: true,
 })
 
+;[
+  mercy,
+  excess,
+  fishingBoat,
+  drown,
+  iceberg,
+  dew,
+  gentleRain,
+  refresh,
+  fish,
+  cloud,
+  gainAndLoss,
+  damBreaks,
+  overflow,
+  drip,
+].forEach((card) => {
+  card.theme = 7
+})
+
 // TODO
 
 export {

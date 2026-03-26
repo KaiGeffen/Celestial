@@ -500,6 +500,25 @@ const finale = new Finale({
   text: '.',
 })
 
+;[
+  dash,
+  impulse,
+  mine,
+  arsonist,
+  parch,
+  veteran,
+  cling,
+  death,
+  fromAshes,
+  goliath,
+  firebug,
+  immolant,
+  spark,
+  remnant,
+].forEach((card) => {
+  card.theme = 1
+})
+
 export {
   dash,
   impulse,

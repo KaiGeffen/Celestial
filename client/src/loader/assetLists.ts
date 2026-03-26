@@ -49,7 +49,9 @@ export const assetLists = {
   },
   "card/background": {
     "files": [
-      "0"
+      "0",
+      "3",
+      "7"
     ],
     "pixelArt": false
   },
@@ -99,13 +101,17 @@ export const assetLists = {
   },
   "card/arc": {
     "files": [
-      "0"
+      "0",
+      "3",
+      "7"
     ],
     "pixelArt": false
   },
   "card/container": {
     "files": [
-      "0"
+      "0",
+      "3",
+      "7"
     ],
     "pixelArt": false
   },
