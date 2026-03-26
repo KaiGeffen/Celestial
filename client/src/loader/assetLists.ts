@@ -51,6 +51,7 @@ export const assetLists = {
     "files": [
       "0",
       "3",
+      "6",
       "7"
     ],
     "pixelArt": false
@@ -59,20 +60,25 @@ export const assetLists = {
     "files": [
       "Abundance",
       "Bounty",
+      "Cloak of Stars",
       "Cloud",
+      "Cosmos",
       "Dam Breaks",
       "Defiance",
       "Dew",
       "Dove",
+      "Dreamer",
       "Drown",
+      "Ecology",
       "Excess",
+      "Fates",
       "Fish",
       "Fishing Boat",
       "Fledgling",
       "Fruit",
-      "Gain And Loss",
       "Gain and Loss",
       "Gentle Rain",
+      "Hero",
       "Heron",
       "Hold Tight",
       "Hollow",
@@ -80,21 +86,27 @@ export const assetLists = {
       "Lay Bare",
       "Let Go",
       "Me and Her",
-      "Me and Her",
       "Mercy",
+      "Moon",
       "Nest",
+      "Night Vision",
       "Oak",
       "Overflow",
       "Parade",
       "Pet",
       "Phoenix",
       "Pomegranate",
+      "Possibility",
+      "Pride",
       "Refresh",
       "Rooster",
       "Rose",
       "Secretary Bird",
       "Sensualist",
       "Starling",
+      "Stars",
+      "Sun",
+      "Sunflower",
       "Truth",
       "Vulture",
       "Yearn"
@@ -105,6 +117,7 @@ export const assetLists = {
     "files": [
       "0",
       "3",
+      "6",
       "7"
     ],
     "pixelArt": false
@@ -113,6 +126,7 @@ export const assetLists = {
     "files": [
       "0",
       "3",
+      "6",
       "7"
     ],
     "pixelArt": false

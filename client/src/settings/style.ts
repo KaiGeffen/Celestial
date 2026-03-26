@@ -244,11 +244,12 @@ export const BBStyle: Record<string, any> = {
     backgroundStrokeColor: '#0005',
     backgroundStrokeLineWidth: 2,
     backgroundCornerRadius: 5,
+    stroke: '#000000',
+    strokeThickness: 1,
     wrap: {
       mode: 'word',
       width: Space.maxTextWidth,
     },
-    // strokeThickness: 3,
     padding: {
       left: 20,
       right: 20,
