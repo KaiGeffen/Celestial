@@ -82,8 +82,8 @@ export default class Cutout extends Button {
 
     // Cost and points of the card
     const txtCost = this.scene.add.rexBBCodeText(
-      -164,
-      -22,
+      -161,
+      -18,
       `[stroke=#353F4E]${card.cost}[/stroke]`,
       BBStyle.cardCost,
     )
