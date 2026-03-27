@@ -60,6 +60,7 @@ export const assetLists = {
   "card/subject": {
     "files": [
       "Abundance",
+      "Arsonist",
       "Ashes",
       "Bounty",
       "Cling",
