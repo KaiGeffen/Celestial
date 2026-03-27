@@ -571,10 +571,9 @@ export class CardImage {
   }
 
   private createHoverBurst(): void {
-    const bounds = this.imageSubject.getBounds()
     const burst = this.scene.add.image(
-      bounds.centerX,
-      bounds.centerY,
+      this.imageSubject.x,
+      this.imageSubject.y,
       this.imageSubject.texture.key,
     )
     burst.setDisplaySize(
@@ -585,6 +584,10 @@ export class CardImage {
     burst.setAlpha(1)
     this.scene.children.bringToTop(burst)
 
+    // Add the burst to the container
+    this.container.add(burst)
+
+    // Animate the burst growing and fading out
     this.scene.tweens.add({
       targets: burst,
       displayWidth: Space.cardWidth * 1.5,
