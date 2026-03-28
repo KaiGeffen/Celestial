@@ -376,6 +376,26 @@ const starfall = new Starfall({
   beta: true,
 })
 
+;[
+  stars,
+  cosmos,
+  nightVision,
+  ecology,
+  sun,
+  moon,
+  sunflower,
+  fates,
+  hero,
+  possibility,
+  cloakOfStars,
+  dreamer,
+  pride,
+  rocketship,
+  starfall,
+].forEach((card) => {
+  card.theme = 6
+})
+
 export {
   stars,
   cosmos,

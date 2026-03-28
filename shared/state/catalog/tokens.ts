@@ -20,6 +20,7 @@ const seen = new Seen({
   cost: 2,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nAt the start of each round, if this is in your hand, give your opponent Sight 4.',
+  theme: 5,
 })
 
 class Ashes extends Card {
@@ -34,6 +35,7 @@ const ashes = new Ashes({
   cost: 1,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nDraw a card.',
+  theme: 1,
 })
 
 const child = new Card({
@@ -41,6 +43,7 @@ const child = new Card({
   id: 1003,
   qualities: [Quality.FLEETING],
   text: 'Fleeting',
+  theme: 4,
 })
 
 class Predator extends Card {
@@ -59,6 +62,7 @@ const predator = new Predator({
   cost: 1,
   qualities: [Quality.FLEETING],
   text: "Fleeting\nWorth +2 for each Prey in your opponent's discard pile.",
+  theme: 5,
 })
 
 class Wound extends Card {
@@ -86,12 +90,14 @@ const wound = new Wound({
   points: -3,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nWhen this is discarded, add it next in the story.',
+  theme: 2,
 })
 
 const heirloom = new Card({
   name: 'Heirloom',
   id: 1006,
   points: 4,
+  theme: 4,
 })
 
 export { seen, ashes, child, predator, wound, heirloom }

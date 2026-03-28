@@ -359,6 +359,26 @@ const spider = new Spider({
   beta: true,
 })
 
+;[
+  dagger,
+  shadow,
+  imprison,
+  nightmare,
+  boa,
+  hungryGhost,
+  hurricane,
+  wingClipping,
+  sickness,
+  victim,
+  lostInShadow,
+  vampire,
+  rupture,
+  voices,
+  spider,
+].forEach((card) => {
+  card.theme = 2
+})
+
 export {
   dagger,
   shadow,
