@@ -252,12 +252,12 @@ export default class OurBoardRegion extends Region {
       if (card !== undefined) {
         // Check that the mouse is still over the card's x
         const pointer = this.scene.input.activePointer
-        const pointerOverCard = card.image
+        const pointerOverCard = card.imageSubject
           .getBounds()
           .contains(pointer.x, pointer.y - HOVER_OFFSET)
 
         if (pointerOverCard) {
-          card.image.emit('pointerover')
+          card.imageSubject.emit('pointerover')
         }
       }
     }
