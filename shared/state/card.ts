@@ -118,6 +118,7 @@ export default class Card {
 
     // If there is no Child, create one if possible
     if (!isChildInHand) {
+      // NOTE This is the same as in tokens.ts to avoid circular dependency
       const card = new Card({
         name: 'Child',
         id: 1003,
@@ -125,6 +126,7 @@ export default class Card {
         basePoints: 0,
         text: 'Fleeting',
         qualities: [Quality.FLEETING],
+        theme: 4,
       })
       game.create(player, card)
     }

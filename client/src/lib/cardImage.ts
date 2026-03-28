@@ -590,6 +590,11 @@ export class CardImage {
   }
 
   private createHoverBurst(): void {
+    // Don't do it for cardback
+    if (this.card.id === Catalog.cardback.id) {
+      return
+    }
+
     const burst = this.scene.add.image(
       this.imageSubject.x,
       this.imageSubject.y,
