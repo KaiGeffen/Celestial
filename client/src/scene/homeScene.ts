@@ -507,7 +507,7 @@ export default class HomeScene extends BaseScene {
   }
 }
 
-const PATCH_NUMBER = '0.7.15'
+const PATCH_NUMBER = '0.7.16'
 
 const URL = 'https://luma.com/1lsziprm'
 
@@ -517,9 +517,9 @@ Please consider joining our [area=_link_discord][color=#FABD5D]Discord server[/c
 🏆 Our 11th tournament approaches!
 On April 4th, play for the chance to win 120$ in cash prizes, plus exclusive cosmetic rewards! [area=_link_register][color=#FABD5D]Register here[/color][/area]
 
-🌄 Journey Mode
-An all new Journey mode unfolds before you.
-Complete new missions with an ever-growing collection of cards as you learn about the characters who have arrived in the city. Earn gold as you learn to play the game!
+🌄 Card Redesign
+Our redesigned border and look for the cards is now live! Let us know your thoughts in the [area=_link_discord][color=#FABD5D]Discord[/color][/area]. Also try out a new cardback for a limited time.
 
-🎴 Card changes
-👇 [area=_Hero][color=#FABD5D]Hero[/color][/area] bonus points 4 > 3`
+👀 Spectator Mode
+Watch your friends play matchs in real time by clicking 'Spectate' from the players list (Top right).
+Can be disabled through the options menu.`
