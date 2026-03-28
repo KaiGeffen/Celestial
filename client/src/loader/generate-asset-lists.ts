@@ -22,6 +22,7 @@ const DIRECTORIES = [
   'img/card/arc',
   'img/card/container',
   'img/cutout',
+  'img/cardback',
   'img/icon',
   'img/background',
   'img/border',
@@ -46,6 +47,7 @@ const NON_PIXEL_ART_DIRS = [
   'card/container',
   'chrome',
   'icon',
+  'cardback',
 ]
 
 function getDirectoryKey(dir: string): string {

@@ -52,12 +52,12 @@ export const assetLists = {
       "0",
       "1",
       "2",
-      "2",
       "3",
       "4",
       "5",
       "6",
-      "7"
+      "7",
+      "8"
     ],
     "pixelArt": false
   },
@@ -71,7 +71,6 @@ export const assetLists = {
       "Balance",
       "Begging Bowl",
       "Beginner's Mind",
-      "Beginners Mind",
       "Birth",
       "Boa",
       "Bounty",
@@ -137,6 +136,7 @@ export const assetLists = {
       "Oak",
       "Overflow",
       "Parade",
+      "Paramountcy",
       "Parch",
       "Pass On",
       "Pet",
@@ -182,12 +182,12 @@ export const assetLists = {
       "0",
       "1",
       "2",
-      "2",
       "3",
       "4",
       "5",
       "6",
-      "7"
+      "7",
+      "8"
     ],
     "pixelArt": false
   },
@@ -196,12 +196,12 @@ export const assetLists = {
       "0",
       "1",
       "2",
-      "2",
       "3",
       "4",
       "5",
       "6",
-      "7"
+      "7",
+      "8"
     ],
     "pixelArt": false
   },
@@ -314,6 +314,12 @@ export const assetLists = {
       "Yearn"
     ],
     "pixelArt": true
+  },
+  "cardback": {
+    "files": [
+      "default"
+    ],
+    "pixelArt": false
   },
   "icon": {
     "files": [

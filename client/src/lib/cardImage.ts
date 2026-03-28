@@ -27,6 +27,7 @@ export class CardImage {
   imageSubject: Phaser.GameObjects.Image
   imageArc: Phaser.GameObjects.Image
   imageContainer: Phaser.GameObjects.Image
+  imageCardback: Phaser.GameObjects.Image
 
   // Text elements
   txtCost: BBCodeText
@@ -225,10 +226,16 @@ export class CardImage {
         },
       )
 
+      // Set to cardback if valid
+      this.imageCardback.setAlpha(this.card.id === Catalog.cardback.id ? 1 : 0)
+
+      // Set the textures of the images
       this.imageBackground.setTexture(`card/background-${this.card.theme}`)
       this.imageSubject.setTexture(this.getSubjectImageName())
       this.imageArc.setTexture(`card/arc-${this.card.theme}`)
       this.imageContainer.setTexture(`card/container-${this.card.theme}`)
+
+      // Recreate text elements
       this.createStats()
       this.createText()
       this.createTitle()
@@ -288,6 +295,7 @@ export class CardImage {
   }
 
   private createImages(shadow: boolean): void {
+    // Card background wash
     this.imageBackground = this.scene.add.image(
       0,
       0,
@@ -316,6 +324,17 @@ export class CardImage {
     )
     this.imageContainer.setDisplaySize(Space.cardWidth, Space.cardHeight)
     this.container.add(this.imageContainer)
+
+    // Cardback
+    this.imageCardback = this.scene.add.image(0, 0, 'cardback-default')
+    this.imageCardback.setDisplaySize(Space.cardWidth, Space.cardHeight)
+    this.container.add(this.imageCardback)
+
+    if (shadow) {
+      this.scene.addShadow(this.imageCardback)
+    }
+
+    this.imageCardback.setAlpha(this.card.id === Catalog.cardback.id ? 1 : 0)
   }
 
   private getSubjectImageName(): string {
