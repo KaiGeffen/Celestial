@@ -347,20 +347,17 @@ const spider = new Spider({
 
 class Monster extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    bonus += game.wins[player ^ 1]
-    super.play(player, game, index, bonus)
-  }
+    if (this.exhale(2, game, player)) {
+      bonus += game.wins[player ^ 1]
+    }
 
-  getCost(player: number, game: GameModel): number {
-    return this.cost + game.wins[player ^ 1]
+    super.play(player, game, index, bonus)
   }
 }
 const monster = new Monster({
   name: 'Monster',
   id: 342,
-  cost: 1,
-  points: 1,
-  text: "Costs 1 more and worth +1 for each round you've lost.",
+  text: "Exhale 2: Worth +1 for each round you've lost.",
 })
 
 export {
