@@ -346,8 +346,6 @@ const heart = new Heart({
   meAndHer,
   sensualist,
   doll,
-  skittish,
-  hiding,
 ].forEach((card) => {
   card.theme = 3
 })

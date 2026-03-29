@@ -390,7 +390,6 @@ const skyBurial = new SkyBurial({
   vulture,
   rooster,
   letGo,
-  updraft,
   birdsong,
 ].forEach((card) => {
   card.theme = 0

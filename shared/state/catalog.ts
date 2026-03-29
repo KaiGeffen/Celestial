@@ -15,7 +15,7 @@ import { Keyword, Keywords } from './keyword'
 
 const fullCatalog = [
   // TODO This theme is all beta
-  ...Object.values(groundCatalog).sort((a, b) => a.cost - b.cost),
+  // ...Object.values(groundCatalog).sort((a, b) => a.cost - b.cost),
   ...Object.values(birdsCatalog).sort((a, b) => a.cost - b.cost),
   ...Object.values(ashesCatalog).sort((a, b) => a.cost - b.cost),
   ...Object.values(petCatalog).sort((a, b) => a.cost - b.cost),
