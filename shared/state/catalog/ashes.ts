@@ -127,14 +127,23 @@ class Parch extends Card {
 
     super.play(player, game, index, bonus)
 
-    // NOTE This is done because some cards add themselves to the story when they are discarded
-    // Check this many cards (Discarding yours, ignoring theirs)
-    const maxCount = game.story.acts.length
-    for (let count = 0, i = 0; count < maxCount; count++) {
+    // Keep a count in case of infinite loop
+    const maxCount = 99
+    for (
+      let i = 0, count = 0;
+      i < game.story.acts.length || count > maxCount;
+      count++
+    ) {
       const act = game.story.acts[i]
       if (act.owner === player) {
-        game.removeAct(i)
+        const actReturnedToStory = game.removeAct(i)
+
+        // If act stayed in story, move on to next act. Otherwise, the story has shrunk by 1 anyways
+        if (actReturnedToStory) {
+          i++
+        }
       } else {
+        // If this is opponent's card, don't discard and move on to next act
         i++
       }
     }
@@ -272,10 +281,16 @@ class FromAshes extends Card {
     super.onShuffle(player, game, index)
 
     // Make a new version of this card with the correct points
-    const countFleetingInDeck = game.deck[player].filter((card) => card.qualities.includes(Quality.FLEETING)).length
-    const countFleetingInHand = game.hand[player].filter((card) => card.qualities.includes(Quality.FLEETING)).length
-    const newPoints = Math.floor((countFleetingInDeck + countFleetingInHand) / 3)
-    
+    const countFleetingInDeck = game.deck[player].filter((card) =>
+      card.qualities.includes(Quality.FLEETING),
+    ).length
+    const countFleetingInHand = game.hand[player].filter((card) =>
+      card.qualities.includes(Quality.FLEETING),
+    ).length
+    const newPoints = Math.floor(
+      (countFleetingInDeck + countFleetingInHand) / 3,
+    )
+
     const newVersion = this.copy()
     newVersion.points = newPoints
 
@@ -324,7 +339,7 @@ const firebug = new Firebug({
 })
 
 class Immolant extends Card {
-  onDiscard(player: number, game: GameModel) {
+  onDiscard(player: number, game: GameModel): boolean {
     game.animations[player].push(
       new Animation({
         from: Zone.Discard,
@@ -338,6 +353,8 @@ class Immolant extends Card {
     game.pile[player].pop()
 
     game.story.addAct(this, player, 0)
+
+    return true
   }
 }
 const immolant = new Immolant({
@@ -481,6 +498,25 @@ const finale = new Finale({
   cost: 7,
   points: 5,
   text: '.',
+})
+
+;[
+  dash,
+  impulse,
+  mine,
+  arsonist,
+  parch,
+  veteran,
+  cling,
+  death,
+  fromAshes,
+  goliath,
+  firebug,
+  immolant,
+  spark,
+  remnant,
+].forEach((card) => {
+  card.theme = 1
 })
 
 export {

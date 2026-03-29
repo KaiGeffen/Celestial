@@ -388,19 +388,19 @@ export default class HomeScene extends BaseScene {
     })
 
     // Image - show CardUpdate (was: deterministic by day of week)
-    // const dayOfWeek = new Date().getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-    // const newsImages = [
-    //   'Birth', // Sunday (0)
-    //   'Goliath', // Monday (1)
-    //   'LayBare', // Tuesday (2)
-    //   'MeAndHer', // Wednesday (3)
-    //   'Nightmare', // Thursday (4)
-    //   'Possibilities', // Friday (5)
-    //   'Refresh', // Saturday (6)
-    // ]
-    // const newsImageName = newsImages[dayOfWeek]
-    // const image = this.add.image(0, 0, `news-${newsImageName}`).setOrigin(0, 0)
-    const image = this.add.image(0, 0, 'news-CardUpdate').setOrigin(0, 0)
+    const dayOfWeek = new Date().getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const newsImages = [
+      'Birth', // Sunday (0)
+      'Goliath', // Monday (1)
+      'LayBare', // Tuesday (2)
+      'MeAndHer', // Wednesday (3)
+      'Nightmare', // Thursday (4)
+      'Possibilities', // Friday (5)
+      'Refresh', // Saturday (6)
+    ]
+    const newsImageName = newsImages[dayOfWeek]
+    const image = this.add.image(0, 0, `news-${newsImageName}`).setOrigin(0, 0)
+
     imageContainer.add(image, { align: 'top' })
     // Add the image container to contentSizer
     contentSizer.add(imageContainer, { align: 'top' })
@@ -507,27 +507,19 @@ export default class HomeScene extends BaseScene {
   }
 }
 
-const PATCH_NUMBER = '0.7.15'
+const PATCH_NUMBER = '0.7.16'
 
 const URL = 'https://luma.com/1lsziprm'
 
-const NEWS_TEXT = `🎴 Card visual redesign nears completion 🎴
-
-We'd love your feedback to help us finalize the look.
-
-Tell us which of 2 versions you prefer in the [area=_link_discord][color=#FABD5D]Discord server[/color][/area].`
-
-/*
-`🕊️ A warm welcome to all our new players!
+const NEWS_TEXT = `🕊️ A warm welcome to all our new players!
 Please consider joining our [area=_link_discord][color=#FABD5D]Discord server[/color][/area] to collect a one-time reward, receive strategy tips, and play excellent matches with excellent people.
 
 🏆 Our 11th tournament approaches!
 On April 4th, play for the chance to win 120$ in cash prizes, plus exclusive cosmetic rewards! [area=_link_register][color=#FABD5D]Register here[/color][/area]
 
-🌄 Journey Mode
-An all new Journey mode unfolds before you.
-Complete new missions with an ever-growing collection of cards as you learn about the characters who have arrived in the city. Earn gold as you learn to play the game!
+🌄 Card Redesign
+Our redesigned border and look for the cards is now live! Let us know your thoughts in the [area=_link_discord][color=#FABD5D]Discord[/color][/area]. Also try out a new cardback for a limited time.
 
-🌊 Card Borders
-Coming in March, a brand new visual redesign for the cards will go live!`
-*/
+👀 Spectator Mode
+Watch your friends play matchs in real time by clicking 'Spectate' from the players list (Top right).
+Can be disabled through the options menu.`

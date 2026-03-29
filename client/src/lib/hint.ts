@@ -73,7 +73,7 @@ export default class Hint {
       this.show()
     }
 
-    this.txt.setText(s).setFixedSize(0, 0)
+    this.txt.setText(`[stroke=#000000]${s}[/stroke]`).setFixedSize(0, 0)
     this.mainCard.hide()
     this.referencedCard.hide()
   }
@@ -119,7 +119,9 @@ export default class Hint {
         .setFixedSize(width, Space.cardHeight + BBStyle.hint.padding.top * 2)
     } else {
       this.txt
-        .setText(`\n\n\n\n\n\n\n\n\n\n\n\n${getKeywordsText(keywords)}`)
+        .setText(
+          `\n\n\n\n\n\n\n\n\n\n\n\n[stroke=#000000]${getKeywordsText(keywords)}[/stroke]`,
+        )
         .setFixedSize(0, 0)
     }
 

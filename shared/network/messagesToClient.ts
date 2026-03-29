@@ -37,24 +37,25 @@ export default interface messagesToClient {
     state: GameModel
   }
   // MATCH RELEVANT
-  matchStart: {
-    name1: string
-    name2: string
-    elo1: number
-    elo2: number
-  }
   transmitState: {
     state: GameModel
   }
   signalError: {}
+  spectatorJoined: {
+    username: string
+  }
+  spectateEnded: {}
   opponentSurrendered: {}
   opponentDisconnected: {}
   opponentReconnected: {}
   opponentEmote: {}
   broadcastOnlinePlayersList: {
     players: {
+      uuid: string
       username: string
       cosmeticSet: CosmeticSet
+      status: number
+      canBeSpectated: boolean
     }[]
   }
 }

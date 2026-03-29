@@ -1,4 +1,4 @@
-import avatarNames from '../data/avatarNames'
+import avatarNames from '../../../shared/data/avatarNames'
 import Catalog from '../../../shared/state/catalog'
 import { Space, Flags } from '../settings/settings'
 import { assetLists } from './assetLists'
@@ -53,6 +53,8 @@ export default class Loader {
         info.files.forEach((file: string) => {
           const key = `${directory}-${file}`
           const dims = info.dimensions?.[file]
+
+          // console.log(key)
 
           if (dims) {
             // If file has dimensions, it's in a dimension directory

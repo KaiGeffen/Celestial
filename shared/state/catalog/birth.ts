@@ -336,6 +336,26 @@ const beginnersMind = new BeginnersMind({
   text: 'When this is shuffled, move it to the top of your deck.',
 })
 
+;[
+  nascence,
+  birth,
+  ancestry,
+  theFuture,
+  posterity,
+  rebirth,
+  cradle,
+  uprising,
+  storytime,
+  pregnant,
+  passOn,
+  justLikeDad,
+  hug,
+  genesis,
+  beginnersMind,
+].forEach((card) => {
+  card.theme = 4
+})
+
 export {
   nascence,
   birth,

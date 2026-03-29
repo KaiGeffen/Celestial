@@ -340,6 +340,27 @@ const hiding = new Hiding({
   beta: true,
 })
 
+;[
+  fruit,
+  oak,
+  bounty,
+  pet,
+  hollow,
+  holdTight,
+  yearn,
+  pomegranate,
+  abundance,
+  rose,
+  parade,
+  meAndHer,
+  sensualist,
+  doll,
+  skittish,
+  hiding,
+].forEach((card) => {
+  card.theme = 3
+})
+
 export {
   fruit,
   oak,

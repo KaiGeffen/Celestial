@@ -14,7 +14,7 @@ import {
 } from '../../settings/settings'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import { DecklistSettings } from '../../../../shared/settings'
-import avatarNames from '../../data/avatarNames'
+import avatarNames from '../../../../shared/data/avatarNames'
 import premadeDecklists from '../../data/premadeDecklists'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
@@ -40,7 +40,7 @@ export default class DecklistsRegion {
 
   // List of buttons for user-defined decks
   decklistBtns: Button[]
-  
+
   // List of containers for deck buttons (for filtering visibility)
   decklistContainers: ContainerLite[]
 
@@ -423,7 +423,7 @@ export default class DecklistsRegion {
   // Filter which decks are visible based on the string
   filter(s: string): void {
     const panel = this.scrollablePanel.getElement('panel') as FixWidthSizer
-    
+
     // Make all decks invisible first
     this.decklistContainers.forEach((container) => {
       container.setVisible(false)

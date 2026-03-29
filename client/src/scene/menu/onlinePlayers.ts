@@ -2,7 +2,8 @@ import 'phaser'
 import { Color, Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
-import Server from '../../server'
+import BaseScene from '../baseScene'
+import Server, { server } from '../../server'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import Buttons from '../../lib/buttons/buttons'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -13,17 +14,26 @@ const height = (Space.windowHeight * 2) / 3
 const width = 600
 
 interface OnlinePlayer {
+  uuid: string
   username: string
   cosmeticSet: CosmeticSet
+  status: number
+  canBeSpectated: boolean
 }
 
 export default class OnlinePlayersMenu extends Menu {
+  readonly menuType = 'onlinePlayers'
+
   private playersData: OnlinePlayer[] = []
   private scrollablePanel: ScrollablePanel
   private refreshTimer: Phaser.Time.TimerEvent | null = null
 
+  private activeScene: BaseScene
+
   constructor(scene: MenuScene, params) {
     super(scene, width, params)
+
+    this.activeScene = params.activeScene
 
     // Sizer has no pad between lines
     this.sizer.space.line = 0
@@ -45,7 +55,7 @@ export default class OnlinePlayersMenu extends Menu {
   private startPolling() {
     // Check immediately
     this.checkForUpdates()
-    
+
     // Then check every second
     this.refreshTimer = this.scene.time.addEvent({
       delay: 1000,
@@ -64,7 +74,7 @@ export default class OnlinePlayersMenu extends Menu {
 
   private checkForUpdates() {
     const currentPlayers = Server.activePlayers
-    
+
     // Check if the list has changed by comparing lengths and content
     if (this.hasPlayersChanged(currentPlayers)) {
       this.updatePlayers(currentPlayers)
@@ -86,12 +96,16 @@ export default class OnlinePlayersMenu extends Menu {
     for (let i = 0; i < newPlayers.length; i++) {
       const newPlayer = newPlayers[i]
       const oldPlayer = this.playersData[i]
-      
-      if (!oldPlayer || 
-          oldPlayer.username !== newPlayer.username ||
-          oldPlayer.cosmeticSet.avatar !== newPlayer.cosmeticSet.avatar ||
-          oldPlayer.cosmeticSet.border !== newPlayer.cosmeticSet.border ||
-          oldPlayer.cosmeticSet.relic !== newPlayer.cosmeticSet.relic) {
+
+      if (
+        !oldPlayer ||
+        oldPlayer.username !== newPlayer.username ||
+        oldPlayer.status !== newPlayer.status ||
+        oldPlayer.canBeSpectated !== newPlayer.canBeSpectated ||
+        oldPlayer.cosmeticSet.avatar !== newPlayer.cosmeticSet.avatar ||
+        oldPlayer.cosmeticSet.border !== newPlayer.cosmeticSet.border ||
+        oldPlayer.cosmeticSet.relic !== newPlayer.cosmeticSet.relic
+      ) {
         return true
       }
     }
@@ -108,7 +122,7 @@ export default class OnlinePlayersMenu extends Menu {
       if (panelSizer && panelSizer.removeAll) {
         panelSizer.removeAll(true)
       }
-      
+
       // Create new player rows and add them to the panel
       const newPlayerRows = this.createPlayerRows()
       if (panelSizer) {
@@ -177,11 +191,25 @@ export default class OnlinePlayersMenu extends Menu {
   }
 
   private createRow(player: OnlinePlayer) {
+    const localUuid = Server.getUserData()?.uuid
+
+    // TODO This is a weird way to establish if we are in a match
+    const localIsInMatch =
+      localUuid &&
+      this.playersData.some(
+        (p) =>
+          p.uuid === localUuid &&
+          (p.status === 2 || p.status === 3 || p.status === 4),
+      )
+
     let rowSizer = this.scene.rexUI.add.sizer({
       width: width,
       space: {
         top: Space.padSmall,
         bottom: Space.padSmall,
+        left: Space.pad,
+        right: Space.pad,
+        item: Space.pad,
       },
     })
 
@@ -209,12 +237,89 @@ export default class OnlinePlayersMenu extends Menu {
 
     // Add each text object
     let usernameText = this.scene.add.text(0, 0, player.username, Style.basic)
+    const statusText = this.scene.add.text(
+      0,
+      0,
+      this.getStatusLabel(player.status),
+      Style.basic,
+    )
+
+    // Right column: vertically center status, then put the Spectate button below it.
+    const rightColumnWidth = 220
+    const rightStack = this.scene.rexUI.add.sizer({
+      orientation: 'vertical',
+      width: rightColumnWidth,
+      height: Space.avatarSize,
+    })
+
+    const canSpectate =
+      !localIsInMatch &&
+      (player.status === 2 || player.status === 3) &&
+      player.canBeSpectated &&
+      player.uuid !== localUuid
+
+    let spectateBtnContainer: ContainerLite | null = null
+    if (canSpectate) {
+      spectateBtnContainer = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        Space.buttonWidth,
+        0,
+      )
+
+      new Buttons.Text(
+        spectateBtnContainer,
+        0,
+        0,
+        'Spectate',
+        () => {
+          if (!server || !server.isOpen()) return
+
+          // Ensure the active scene stops
+          if (this.activeScene) {
+            this.activeScene.beforeExit()
+            this.activeScene.scene.stop()
+          }
+
+          // Start the spectator match scene (In place of this)
+          this.scene.scene.start('SpectatorMatchScene', {
+            spectateTargetUuid: player.uuid,
+          })
+        },
+        Space.buttonWidth,
+        Space.buttonHeight,
+      ).setOrigin(0.5, 0)
+    }
+
+    if (spectateBtnContainer) {
+      rightStack.addSpace().add(statusText).add(spectateBtnContainer).addSpace()
+    } else {
+      rightStack.addSpace().add(statusText).addSpace()
+    }
 
     // Add each text with the right proportion
     rowSizer
-      .add(avatarContainer, { proportion: 1.5 })
-      .add(usernameText, { proportion: 3 })
+      .add(avatarContainer)
+      .add(usernameText, { proportion: 1 })
+      .add(rightStack)
 
     return rowSizer
+  }
+
+  private getStatusLabel(status: number): string {
+    switch (status) {
+      case 1:
+        return 'Searching'
+      case 3:
+        return 'Journeying'
+      case 2:
+        return 'In Game'
+      case 4:
+        return 'Spectating'
+      case 0:
+      default:
+        return ''
+    }
   }
 }

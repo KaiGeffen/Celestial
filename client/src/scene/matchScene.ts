@@ -128,6 +128,10 @@ export class MatchScene extends BaseScene {
     )
   }
 
+  beforeExit(): void {
+    this.view.beforeExit()
+  }
+
   // Listens for websocket updates
   // Manages user decisions (What card to play, when to pass)
 
@@ -143,7 +147,7 @@ export class MatchScene extends BaseScene {
     this.maxVersion = Math.max(this.maxVersion, state.versionNo)
   }
 
-  signalOpponentSurrendered(): void {
+  private signalOpponentSurrendered(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
       title: 'Opponent Surrendered',
@@ -151,7 +155,7 @@ export class MatchScene extends BaseScene {
     })
   }
 
-  signalOpponentDisconnect(): void {
+  private signalOpponentDisconnect(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
       title: 'Opponent Disconnected',
@@ -159,7 +163,7 @@ export class MatchScene extends BaseScene {
     })
   }
 
-  signalOpponentReconnected(): void {
+  private signalOpponentReconnected(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
       title: 'Opponent Reconnected',
@@ -167,45 +171,10 @@ export class MatchScene extends BaseScene {
     })
   }
 
-  // Signal that a match has been found with given player names
-  signalMatchFound(
-    name1: string,
-    name2: string,
-    elo1: number,
-    elo2: number,
-  ): void {
-    console.log('Match found between', name1, 'and', name2)
-
-    this.view.ourAvatar.showUsername(name1, elo1)
-    this.view.theirAvatar.showUsername(name2, elo2)
-  }
-
   // Set all of the callback functions for the regions in the view
   private setCallbacks(view): void {
-    // Their score region
-    view.theirScore.recapCallback = () => {
-      // Scan backwards through the queued states to find the start of the recap
-      for (let version = this.currentVersion - 1; version >= 0; version--) {
-        if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
-          // Continue backwards until we find where isRecap is false
-          while (version >= 0 && this.queuedStates[version].isRecap) {
-            version--
-          }
-          this.currentVersion = version
-          break
-        }
-      }
-    }
-    view.theirScore.skipCallback = () => {
-      this.tweens.getTweens().forEach((tween) => {
-        tween.complete()
-      })
-
-      // End the pause
-      this.paused = false
-
-      this.currentVersion = this.maxVersion - 1
-    }
+    // Callbacks in this and spectator modes
+    this.setCommonCallbacks(view)
 
     // Hand region
     view.ourBoard.setCardClickCallback((i: number) => {
@@ -214,34 +183,13 @@ export class MatchScene extends BaseScene {
         cardNum: i,
         versionNo: this.currentVersion,
       })
-    })
-    view.ourBoard.setDisplayCostCallback((cost: number) => {
-      this.view.ourScore.displayCost(cost)
+      return true
     })
     view.ourAvatar.setEmoteCallback(() => {
       server.send({
         type: 'emote',
       })
     })
-
-    // Set the callbacks for overlays
-    view.ourAvatar.setOverlayCallbacks(
-      () => {
-        this.view.showOverlay(this.view.ourDeckOverlay)
-      },
-      () => {
-        this.view.showOverlay(this.view.ourDiscardOverlay)
-      },
-    )
-
-    view.theirAvatar.setOverlayCallbacks(
-      () => {
-        this.view.showOverlay(this.view.theirDeckOverlay)
-      },
-      () => {
-        this.view.showOverlay(this.view.theirDiscardOverlay)
-      },
-    )
 
     // Story
     view.story.setCallback((i: number) => {
@@ -268,14 +216,9 @@ export class MatchScene extends BaseScene {
           type: 'passTurn',
           versionNo: this.currentVersion,
         })
+        return true
       }
-    })
-    view.pass.setShowResultsCallback(() => {
-      if (!this.view.results.isVisible()) {
-        this.view.results.show()
-      } else {
-        this.view.results.hide()
-      }
+      return false
     })
 
     // Mulligan
@@ -291,6 +234,68 @@ export class MatchScene extends BaseScene {
         type: 'mulligan',
         mulligan: choice,
       })
+    })
+  }
+
+  protected setCommonCallbacks(view: View): void {
+    // Set the callbacks for overlays
+    view.ourAvatar.setOverlayCallbacks(
+      () => {
+        this.view.showOverlay(this.view.ourDeckOverlay)
+      },
+      () => {
+        this.view.showOverlay(this.view.ourDiscardOverlay)
+      },
+    )
+
+    view.theirAvatar.setOverlayCallbacks(
+      () => {
+        this.view.showOverlay(this.view.theirDeckOverlay)
+      },
+      () => {
+        this.view.showOverlay(this.view.theirDiscardOverlay)
+      },
+    )
+
+    // Watch recap (Resolutioin of last story)
+    view.theirScore.recapCallback = () => {
+      // Scan backwards through the queued states to find the start of the recap
+      for (let version = this.currentVersion - 1; version >= 0; version--) {
+        if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
+          // Continue backwards until we find where isRecap is false
+          while (version >= 0 && this.queuedStates[version].isRecap) {
+            version--
+          }
+          this.currentVersion = version
+          break
+        }
+      }
+    }
+
+    // Skip watching the story resolve
+    view.theirScore.skipCallback = () => {
+      this.tweens.getTweens().forEach((tween) => {
+        tween.complete()
+      })
+
+      // End the pause
+      this.paused = false
+
+      this.currentVersion = this.maxVersion - 1
+    }
+
+    // Display the cost of each card in our hand
+    view.ourBoard.setDisplayCostCallback((cost: number) => {
+      this.view.ourScore.displayCost(cost)
+    })
+
+    // For showing the results after match is over
+    view.pass.setShowResultsCallback(() => {
+      if (!this.view.results.isVisible()) {
+        this.view.results.show()
+      } else {
+        this.view.results.hide()
+      }
     })
   }
 
@@ -340,7 +345,7 @@ export class MatchScene extends BaseScene {
   }
 
   // Return if the user should pass automatically, based on the game state and their settings
-  private shouldPass(state: GameModel): boolean {
+  protected shouldPass(state: GameModel): boolean {
     // Don't pass if mulligans aren't complete
     if (state.mulligansComplete.includes(false)) {
       return false
@@ -410,19 +415,18 @@ export class MatchScene extends BaseScene {
     })
   }
 
-  private registerMatchServerHooks(): void {
+  protected registerMatchServerHooks(): void {
     // Each registered event
     server
-      .on('matchStart', ({ name1, name2, elo1, elo2 }) => {
-        // Signal that a match has been found
-        this.signalMatchFound(name1, name2, elo1, elo2)
-      })
       .on('transmitState', (data) => {
         this.queueState(data.state)
       })
       .on('signalError', () => {
         this.signalError('Server says that an action was in error.')
         console.log('Server says that an action was in error.')
+      })
+      .on('spectatorJoined', ({ username }) => {
+        this.signalError(`${username} began spectating.`)
       })
       .on('opponentSurrendered', () => {
         this.signalOpponentSurrendered()
@@ -649,22 +653,15 @@ export class View {
       overlay.show()
     }
   }
+
+  beforeExit(): void {
+    this.searching.beforeExit()
+  }
 }
 
 export class StandardMatchScene extends MatchScene {
   constructor(args = { key: 'StandardMatchScene', lastScene: 'DeckSelectorScene' }) {
     super(args)
-  }
-
-  signalMatchFound(
-    name1: string,
-    name2: string,
-    elo1: number,
-    elo2: number,
-  ): void {
-    this.view.searching.displayState(undefined)
-
-    super.signalMatchFound(name1, name2, elo1, elo2)
   }
 
   doExit(): () => void {
@@ -680,13 +677,6 @@ export class JourneyMatchScene extends MatchScene {
   constructor(args = { key: 'JourneyMatchScene', lastScene: 'JourneyScene' }) {
     super(args)
   }
-
-  signalMatchFound(
-    name1: string,
-    name2: string,
-    elo1: number,
-    elo2: number,
-  ): void {}
 
   doExit(): () => void {
     return () => {

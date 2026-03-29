@@ -161,6 +161,10 @@ class TutorialController extends ServerController {
       ai_deck,
       { avatar: 0, border: 0 },
       { avatar: 0, border: 0 },
+      'Jules',
+      'Umbra',
+      'New Friend',
+      'Curious Spirit',
       false,
     )
 

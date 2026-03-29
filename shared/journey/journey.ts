@@ -88,11 +88,15 @@ export function getMissionById(id: number): MissionDetails | undefined {
 /** Build an AI Deck from a mission's opponent list (for server PvE). */
 export function missionToAiDeck(mission: MissionDetails): Deck {
   if (mission.opponent == null) throw new Error('Mission has no opponent')
+
+  // Set the deck's avatar deterministically based on the mission id (Non-sequential)
+  const avatar = (mission.id * 7) % 6
+
   return {
     name: 'AI Deck',
     cards: mission.opponent,
     cosmeticSet: {
-      avatar: 0,
+      avatar: avatar,
       border: 0,
       cardback: 0,
       relic: 0,

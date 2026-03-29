@@ -25,8 +25,9 @@ export default class TheirAvatarRegion extends Region {
   btnSight: Button
   btnDeck: Button
   btnDiscard: Button
-
   avatar: AvatarButton
+  txtUsername: Phaser.GameObjects.Text
+  txtUsernameSubtitle: Phaser.GameObjects.Text
 
   create(scene: MatchScene): this {
     this.scene = scene
@@ -36,6 +37,7 @@ export default class TheirAvatarRegion extends Region {
     this.createStatusDisplay()
     this.createAvatar()
     this.createStacks()
+    this.createUsernames()
 
     this.addHotkeyListeners()
 
@@ -61,6 +63,10 @@ export default class TheirAvatarRegion extends Region {
     // Pile sizes
     this.btnDeck.setText(`${state.deck[1].length}`)
     this.btnDiscard.setText(`${state.pile[1].length}`)
+
+    // Usernames and subtitles
+    this.txtUsername.setText(state.usernames[1])
+    this.txtUsernameSubtitle.setText(state.subtitles[1])
   }
 
   private createStacks(): void {
@@ -96,18 +102,18 @@ export default class TheirAvatarRegion extends Region {
     this.btnDiscard.setOnClick(fDiscard)
   }
 
-  showUsername(username: string, elo: number): void {
+  private createUsernames(): void {
     const x = this.avatar.icon.x
     const y0 = this.avatar.icon.y + this.avatar.icon.height / 2 + 5
 
-    const txtUsername = this.scene.add
-      .text(x, y0, username, Style.username)
+    this.txtUsername = this.scene.add
+      .text(x, y0, '', Style.username)
       .setOrigin(0.5, 0)
-    const txtUsernameElo = this.scene.add
-      .text(x, y0 + 16 + 5, elo.toString(), Style.usernameElo)
+    this.txtUsernameSubtitle = this.scene.add
+      .text(x, y0 + 16 + 5, '', Style.usernameElo)
       .setOrigin(0.5, 0)
 
-    this.container.add([txtUsername, txtUsernameElo])
+    this.container.add([this.txtUsername, this.txtUsernameSubtitle])
   }
 
   // Show their avatar using the given emote

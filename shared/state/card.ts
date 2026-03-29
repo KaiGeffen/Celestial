@@ -21,6 +21,7 @@ interface CardData {
   text?: string
   story?: string
   beta?: boolean
+  theme?: number
 }
 
 export default class Card {
@@ -37,6 +38,7 @@ export default class Card {
   text: string
   story: string = ''
   beta: boolean = false
+  theme: number = 0
 
   constructor({
     name = '',
@@ -50,6 +52,7 @@ export default class Card {
     text = '',
     story = '',
     beta = false,
+    theme = 0,
   }: CardData) {
     this.name = name
     this.id = id
@@ -62,6 +65,7 @@ export default class Card {
     this.text = text
     this.story = story
     this.beta = beta
+    this.theme = theme
   }
 
   /* Main functions */
@@ -114,6 +118,7 @@ export default class Card {
 
     // If there is no Child, create one if possible
     if (!isChildInHand) {
+      // NOTE This is the same as in tokens.ts to avoid circular dependency
       const card = new Card({
         name: 'Child',
         id: 1003,
@@ -121,6 +126,7 @@ export default class Card {
         basePoints: 0,
         text: 'Fleeting',
         qualities: [Quality.FLEETING],
+        theme: 4,
       })
       game.create(player, card)
     }
@@ -183,7 +189,10 @@ export default class Card {
 
   onPlay(player: number, game: GameModel): void {}
 
-  onDiscard(player: number, game: GameModel): void {}
+  // Return whether it returned to the story
+  onDiscard(player: number, game: GameModel): boolean {
+    return false
+  }
 
   onRoundEndIfThisResolved(player: number, game: GameModel): void {}
 

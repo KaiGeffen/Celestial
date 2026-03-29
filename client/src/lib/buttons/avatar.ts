@@ -1,6 +1,6 @@
 import 'phaser'
 import Button from './button'
-import avatarNames from '../../data/avatarNames'
+import avatarNames from '../../../../shared/data/avatarNames'
 import { Color, Time } from '../../settings/settings'
 
 const noOp = () => {}

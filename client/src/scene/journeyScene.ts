@@ -25,7 +25,7 @@ import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWid
 import newScrollablePanel from '../lib/scrollablePanel'
 import showTooltip from '../utils/tooltips'
 import avatarBios from '../data/avatarBios/index'
-import avatarNames from '../data/avatarNames'
+import avatarNames from '../../../shared/data/avatarNames'
 import avatarStories from '../data/avatarStories/avatarStories'
 import Server from '../server'
 
