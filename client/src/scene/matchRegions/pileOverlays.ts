@@ -106,7 +106,7 @@ export default class OverlayRegion extends Region {
         let stillHovering = false
 
         for (const img of this.cardImages) {
-          if (img.image.getBounds().contains(pointer.x, pointer.y)) {
+          if (img.imageSubject.getBounds().contains(pointer.x, pointer.y)) {
             stillHovering = true
             if (img !== cardImage) {
               this.hoveredCard = img
@@ -180,7 +180,7 @@ export class OurDiscardOverlay extends OverlayRegion {
 
   displayState(state: GameModel): void {
     this.displayCards(state.pile[0])
-    
+
     // Update button text with expended card count
     if (this.switchButton) {
       const expendedCount = state.expended[0]?.length || 0
@@ -214,7 +214,7 @@ export class TheirDiscardOverlay extends OverlayRegion {
 
   displayState(state: GameModel): void {
     this.displayCards(state.pile[1])
-    
+
     // Update button text with expended card count
     if (this.switchButton) {
       const expendedCount = state.expended[1]?.length || 0
@@ -250,7 +250,7 @@ export class OurExpendedOverlay extends OverlayRegion {
 
   displayState(state: GameModel): void {
     this.displayCards(state.expended[0])
-    
+
     // Update button text with discard card count
     if (this.switchButton) {
       const discardCount = state.pile[0]?.length || 0
@@ -284,7 +284,7 @@ export class TheirExpendedOverlay extends OverlayRegion {
 
   displayState(state: GameModel): void {
     this.displayCards(state.expended[1])
-    
+
     // Update button text with discard card count
     if (this.switchButton) {
       const discardCount = state.pile[1]?.length || 0

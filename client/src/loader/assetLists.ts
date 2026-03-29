@@ -44,6 +44,24 @@ export const assetLists = {
     "pixelArt": false
   },
   "card": {
+    "files": [],
+    "pixelArt": true
+  },
+  "card/background": {
+    "files": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "pixelArt": false
+  },
+  "card/subject": {
     "files": [
       "Abundance",
       "Ancestry",
@@ -57,8 +75,6 @@ export const assetLists = {
       "Boa",
       "Bounty",
       "Bull",
-      "Cardback",
-      "Celebration",
       "Child",
       "Clear View",
       "Cling",
@@ -72,7 +88,6 @@ export const assetLists = {
       "Dash",
       "Dawn",
       "Death",
-      "Default",
       "Defiance",
       "Dew",
       "Dove",
@@ -80,6 +95,7 @@ export const assetLists = {
       "Drown",
       "Ecology",
       "Enlightenment",
+      "Enlightment",
       "Excess",
       "Fates",
       "Firebug",
@@ -148,7 +164,6 @@ export const assetLists = {
       "Storytime",
       "Sun",
       "Sunflower",
-      "Supernova",
       "The Future",
       "Timid",
       "Truth",
@@ -160,7 +175,35 @@ export const assetLists = {
       "Wing Clipping",
       "Yearn"
     ],
-    "pixelArt": true
+    "pixelArt": false
+  },
+  "card/arc": {
+    "files": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "pixelArt": false
+  },
+  "card/container": {
+    "files": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "pixelArt": false
   },
   "cutout": {
     "files": [
@@ -271,6 +314,12 @@ export const assetLists = {
       "Yearn"
     ],
     "pixelArt": true
+  },
+  "cardback": {
+    "files": [
+      "default"
+    ],
+    "pixelArt": false
   },
   "icon": {
     "files": [

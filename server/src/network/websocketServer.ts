@@ -22,6 +22,7 @@ import TutorialMatch from './match/tutorialMatch'
 import sendUserData from './sendUserData'
 import { getStartingInventoryBitString } from '../startingInventory'
 import PveSpecialMatch from './match/pveSpecialMatch'
+import getClientGameModel from '../../../shared/state/clientGameModel'
 import REWARD_AMOUNTS from '../../../shared/config/rewardAmounts'
 import { journeyData } from '../../../shared/journey/journey'
 
@@ -41,16 +42,23 @@ interface WaitingPlayer {
 }
 
 const CARD_COST = 1000
-const REFERRAL_BONUS_GOLD = 1000
-
 // Players searching for a match with password as key
 let searchingPlayers: { [key: string]: WaitingPlayer } = {}
 
 // List of active player connections
 let activePlayers: { [key: string]: ServerWS } = {}
 
-// Dictionary from players to games they're in, for reconnect purposes
-let userGameReconnectMap: { [key: string]: ActiveGame } = {}
+// Map from each active user in a game to that game
+let userActiveGameMap: { [key: string]: ActiveGame } = {}
+
+// Whether each connected user allows others to spectate their matches (default: allowed)
+let spectateAllowedByUserId: { [key: string]: boolean } = {}
+
+// Spectator connections -> match they're watching (for cleanup / bulk remove)
+const spectatorWsToMatch = new WeakMap<ServerWS, Match>()
+
+// User ids currently spectating another player's match (for online status)
+const spectatingUserIds = new Set<string>()
 
 // Create the websocket server
 export default function createWebSocketServer() {
@@ -103,20 +111,19 @@ export default function createWebSocketServer() {
           // Send user their data
           await sendUserData(ws, id)
 
-          // If user is in a match, reconnect them
-          if (
-            userGameReconnectMap[uuid] &&
-            userGameReconnectMap[uuid].match &&
-            !userGameReconnectMap[uuid].match.isOver()
-          ) {
-            // Set the active game for this connection
-            activeGame = userGameReconnectMap[uuid]
+          // If user disconnected from a match, assign them back to that match and reconnect below
+          const savedActiveGame = userActiveGameMap[uuid]
+          if (savedActiveGame?.match && !savedActiveGame.match.isOver()) {
+            activeGame = savedActiveGame
+          }
 
-            // NOTE Don't delete to avoid client not successfully loading the state (Due to network issues etc)
-            // delete usersAwaitingReconnect[uuid]
+          // Map this user's entry in the dict to active game
+          // NOTE Changing activeGame then mutates the dict
+          userActiveGameMap[uuid] = activeGame
 
-            // Reconnect the user
-            activeGame.match.reconnectUser(ws, activeGame.playerNumber)
+          // Reconnect to match
+          if (activeGame.match) {
+            await activeGame.match.reconnectUser(ws, activeGame.playerNumber)
           }
         }
       })
@@ -167,18 +174,6 @@ export default function createWebSocketServer() {
               }
             }
 
-            // Check if the ref is valid, and award bonus gold if so
-            ref = ref ? ref.toLowerCase() : null
-            if (ref) {
-              const allowed = await db
-                .select({ code: approvedRefs.code })
-                .from(approvedRefs)
-                .where(sql`LOWER(${approvedRefs.code}) = LOWER(${ref})`)
-                .limit(1)
-              if (allowed.length === 0) ref = null
-            }
-            const bonusGold = ref ? REFERRAL_BONUS_GOLD : 0
-
             // Create new user entry in database
             const data = {
               id: id,
@@ -198,7 +193,7 @@ export default function createWebSocketServer() {
               lastactive: new Date().toISOString(),
               garden: [],
               gems: 0,
-              coins: bonusGold,
+              coins: 0,
               cosmetic_set: JSON.stringify({
                 avatar: 0,
                 border: 0,
@@ -213,6 +208,20 @@ export default function createWebSocketServer() {
 
             // Handle initial achievement
             await AchievementManager.onConnection(id)
+
+            // Award referral achievement if they used a valid ref
+            ref = ref ? ref.toLowerCase() : null
+            if (ref) {
+              const allowed = await db
+                .select({ code: approvedRefs.code })
+                .from(approvedRefs)
+                .where(sql`LOWER(${approvedRefs.code}) = LOWER(${ref})`)
+                .limit(1)
+              if (allowed.length === 0) ref = null
+            }
+            if (ref) {
+              await AchievementManager.onReferralSignup(id)
+            }
 
             // Send user their data
             await sendUserData(ws, id)
@@ -349,16 +358,22 @@ export default function createWebSocketServer() {
         .on('initMission', async ({ uuid, deck, missionID }) => {
           if (!id) return
           console.log('Mission:', missionID)
+
+          // This might fail if the mission is invalid
           try {
             activeGame.match = new PveMatchMission(ws, uuid, deck, missionID)
           } catch (e) {
             console.error('initMission:', e)
             return
           }
+
+          // Just like in pve, we are player 1
           activeGame.playerNumber = 0
 
           logFunnelEvent(uuid, 'play_mode', 'journey')
 
+          // Start the match and let user know the starting state
+          await activeGame.match.startMatch()
           await activeGame.match.notifyState()
         })
         .on('initPve', async ({ aiDeck, uuid, deck }) => {
@@ -371,12 +386,16 @@ export default function createWebSocketServer() {
           )
 
           activeGame.match = new PveMatch(ws, uuid, deck, aiDeck)
+          await activeGame.match.startMatch()
+
+          // TODO Explain why to make us player 1
           activeGame.playerNumber = 0
 
           // Analytics
           logFunnelEvent(uuid, 'play_mode', 'pve')
 
           // Start the match
+          await activeGame.match.startMatch()
           await activeGame.match.notifyState()
         })
         .on('initSpecialPve', async ({ aiDeck, uuid, deck, enabledModes }) => {
@@ -400,13 +419,20 @@ export default function createWebSocketServer() {
           // Analytics
           logFunnelEvent(uuid, 'play_mode', 'race')
 
-          // Start the match
+          // Start the match and let user know the starting state
+          await activeGame.match.startMatch()
           await activeGame.match.notifyState()
         })
         .on('initPvp', async (data) => {
           // Clean up stale entries first
           Object.keys(searchingPlayers).forEach((password) => {
-            if (!searchingPlayers[password].ws.isOpen()) {
+            // Ensure we never queue into ourself
+            const isSelf = searchingPlayers[password].id === data.uuid
+
+            // Ensure we don't queue into closed connections
+            const isClosed = !searchingPlayers[password].ws.isOpen()
+
+            if (isClosed || isSelf) {
               delete searchingPlayers[password]
             }
           })
@@ -449,10 +475,9 @@ export default function createWebSocketServer() {
             // TODO Maybe just delete the last one? Somehow don't lose to race conditions
             delete searchingPlayers[data.password]
 
-            // Inform players that match started TODO That it's pvp specifically (Change the name of the ws message to clarify that. All of this waits on deciding if elo/username is a part of gameState)
-            await activeGame.match.notifyMatchStart()
-
             // Notify both players that they are connected
+            // Start the match and let both users know the starting state
+            await activeGame.match.startMatch()
             await activeGame.match.notifyState()
           } else {
             // Queue the player with their information
@@ -471,11 +496,85 @@ export default function createWebSocketServer() {
           activeGame.match = new TutorialMatch(ws, data.num, data.uuid)
           activeGame.playerNumber = 0
 
-          // Start the match
+          // Start the match and let user know the starting state
+          await activeGame.match.startMatch()
           await activeGame.match.notifyState()
         })
         .on('cancelQueue', ({ password }) => {
           delete searchingPlayers[password]
+        })
+        .on('setCanBeSpectated', ({ allowed }) => {
+          if (!id) return
+          spectateAllowedByUserId[id] = allowed
+
+          // Host disabled spectating mid-match: drop everyone watching their perspective.
+          if (!allowed) {
+            const ag = userActiveGameMap[id]
+            if (ag?.match && !ag.match.isOver()) {
+              const perspective = (ag.playerNumber === 1 ? 1 : 0) as 0 | 1
+              const removed =
+                ag.match.removeAllSpectatorsForPerspective(perspective)
+              for (const sWs of removed) {
+                spectatorWsToMatch.delete(sWs)
+                const sid = Object.keys(activePlayers).find(
+                  (uid) => activePlayers[uid] === sWs,
+                )
+                if (sid) spectatingUserIds.delete(sid)
+                if (sWs.isOpen()) {
+                  sWs.send({ type: 'spectateEnded' })
+                }
+              }
+            }
+          }
+        })
+        // Spectator mode: watch another connected user's match
+        .on('spectatePlayer', async ({ targetUuid }) => {
+          const targetActive = userActiveGameMap[targetUuid]
+          if (!targetActive?.match || targetActive.match.isOver()) {
+            ws.send({ type: 'signalError' })
+            return
+          }
+          if (spectateAllowedByUserId[targetUuid] === false) {
+            ws.send({ type: 'signalError' })
+            return
+          }
+
+          // Only one active spectate subscription per socket for now.
+          const prevMatch = spectatorWsToMatch.get(ws)
+          if (prevMatch) {
+            prevMatch.removeSpectator(ws)
+            spectatorWsToMatch.delete(ws)
+          }
+
+          const perspective = targetActive.playerNumber === 1 ? 1 : 0
+          targetActive.match.addSpectator(ws, perspective)
+          spectatorWsToMatch.set(ws, targetActive.match)
+          if (id) spectatingUserIds.add(id)
+
+          // Notify the watched player (not the opponent) that someone is spectating
+          if (!id) return
+          const [watcher] = await db
+            .select({ username: players.username })
+            .from(players)
+            .where(eq(players.id, id))
+            .limit(1)
+
+          const watchedWs =
+            perspective === 0 ? targetActive.match.ws1 : targetActive.match.ws2
+          if (watchedWs?.isOpen()) {
+            watchedWs.send({
+              type: 'spectatorJoined',
+              username: watcher?.username ?? 'Someone',
+            })
+          }
+        })
+        .on('exitSpectating', () => {
+          const m = spectatorWsToMatch.get(ws)
+          if (m) {
+            m.removeSpectator(ws)
+            spectatorWsToMatch.delete(ws)
+          }
+          if (id) spectatingUserIds.delete(id)
         })
         // In match events
         .on('playCard', (data) => {
@@ -510,19 +609,35 @@ export default function createWebSocketServer() {
 
       // Handle disconnect logic
       ws.onClose(() => {
+        // TODO Maybe this check is unnecessary, should delete in all cases
         // Remove them from active players
         if (activePlayers[id] === ws) {
           delete activePlayers[id]
         }
+        if (id) {
+          delete spectateAllowedByUserId[id]
+        }
+
+        const spectating = spectatorWsToMatch.get(ws)
+        if (spectating) {
+          spectating.removeSpectator(ws)
+          spectatorWsToMatch.delete(ws)
+        }
+        if (id) spectatingUserIds.delete(id)
 
         // Disconnect from active match if it hasn't ended
         if (activeGame.match && !activeGame.match.isOver()) {
           activeGame.match.doDisconnect(ws)
 
-          // Queue them to be reconnected (Unless tutorial)
-          if (!(activeGame.match instanceof TutorialMatch)) {
-            userGameReconnectMap[id] = activeGame
+          // If in a match besides a tutorial, retain the active game for when user reconnects
+          if (activeGame.match instanceof TutorialMatch) {
+            delete userActiveGameMap[id]
+          } else {
+            userActiveGameMap[id] = activeGame
           }
+        } else {
+          // No match (or match already over) => nothing to reconnect to.
+          delete userActiveGameMap[id]
         }
       })
     } catch (e) {
@@ -532,6 +647,7 @@ export default function createWebSocketServer() {
 
   console.log('User-data server is running on port: ', USER_DATA_PORT)
 
+  // TODO It's ineffecicient for each user to calculate this themself, instead the server should calculate it once and each thread uses it
   // Broadcast online players list every 2 seconds
   setInterval(async () => {
     try {
@@ -539,7 +655,13 @@ export default function createWebSocketServer() {
         (id) => activePlayers[id] && activePlayers[id].isOpen(),
       )
 
-      let playersList: Array<{ username: string; cosmeticSet: any }> = []
+      let playersList: Array<{
+        uuid: string
+        username: string
+        cosmeticSet: any
+        status: number
+        canBeSpectated: boolean
+      }> = []
 
       if (activeUserIds.length > 0) {
         // Get player data from database
@@ -552,7 +674,25 @@ export default function createWebSocketServer() {
           .from(players)
           .where(inArray(players.id, activeUserIds))
 
-        // Build the players list with username and cosmetic set
+        // Build the players list with username, cosmetics, and computed status.
+        // Status encoding:
+        // 0 = none, 1 = searching, 2 = inMatch, 3 = inJourney, 4 = spectating
+        const getStatusForUserId = (userId: string): number => {
+          if (spectatingUserIds.has(userId)) return 4
+
+          const isSearching = Object.values(searchingPlayers).some(
+            (p) => p?.id === userId && p?.ws?.isOpen(),
+          )
+          if (isSearching) return 1
+
+          const active = userActiveGameMap[userId]
+          if (active?.match && !active.match.isOver()) {
+            return active.match instanceof PveMatchMission ? 3 : 2
+          }
+
+          return 0
+        }
+
         playersList = playerData.map((player) => {
           let cosmeticSet
           try {
@@ -560,9 +700,13 @@ export default function createWebSocketServer() {
           } catch (e) {
             cosmeticSet = { avatar: 0, border: 0, relic: 0 }
           }
+
           return {
+            uuid: player.id,
             username: player.username,
             cosmeticSet,
+            status: getStatusForUserId(player.id),
+            canBeSpectated: spectateAllowedByUserId[player.id] !== false,
           }
         })
       }

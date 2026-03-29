@@ -47,12 +47,16 @@ export default class AchievementsMenu extends Menu {
 
     Object.keys(achievementsMeta).forEach((idStr) => {
       const id = Number(idStr)
+      const meta = achievementsMeta[id]
       const userAch = userAchievements[id]
+      const isUnlocked = userAch && (typeof meta.progress !== 'number' || userAch.progress >= meta.progress)
+      if (meta.hideIfLocked && !isUnlocked) {
+        return
+      }
       if (!userAch) {
         locked.push(id)
       } else {
         // Progress achievement not yet completed
-        const meta = achievementsMeta[id]
         if (
           typeof meta.progress === 'number' &&
           userAch.progress < meta.progress

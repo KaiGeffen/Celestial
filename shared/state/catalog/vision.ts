@@ -318,6 +318,26 @@ const switcheroo = new Switcheroo({
   text: 'Turn your Sight into Nourish.',
 })
 
+;[
+  dawn,
+  nectar,
+  clearView,
+  awakening,
+  enlightenment,
+  prey,
+  conquer,
+  timid,
+  balance,
+  riddle,
+  bull,
+  lantern,
+  beggingBowl,
+  suddenInsight,
+  greatWheel,
+].forEach((card) => {
+  card.theme = 5
+})
+
 export {
   dawn,
   nectar,

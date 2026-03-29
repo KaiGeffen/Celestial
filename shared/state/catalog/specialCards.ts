@@ -46,6 +46,7 @@ const paramountcy = new Paramountcy({
   cost: 9,
   id: 62,
   text: 'Add the top four cards of your discard pile to the story after this.\n(Besides Paramountcy)',
+  theme: 8,
 })
 
 export { paramountcy }

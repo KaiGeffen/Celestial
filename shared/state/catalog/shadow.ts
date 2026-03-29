@@ -359,6 +359,25 @@ const monster = new Monster({
   id: 342,
   text: "Exhale 2: Worth +1 for each round you've lost.",
 })
+;[
+  dagger,
+  shadow,
+  imprison,
+  nightmare,
+  boa,
+  hungryGhost,
+  hurricane,
+  wingClipping,
+  sickness,
+  victim,
+  lostInShadow,
+  vampire,
+  rupture,
+  voices,
+  spider,
+].forEach((card) => {
+  card.theme = 2
+})
 
 export {
   dagger,

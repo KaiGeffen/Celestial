@@ -4,11 +4,12 @@ import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
-import avatarNames from '../../data/avatarNames'
+import avatarNames from '../../../../shared/data/avatarNames'
 import GameModel from '../../../../shared/state/gameModel'
 import { server } from '../../server'
 
 export default class SearchingRegion extends Region {
+  playerAvatar: Phaser.GameObjects.Image
   mysteryAvatar: Phaser.GameObjects.Image
 
   startTime: number
@@ -41,6 +42,11 @@ export default class SearchingRegion extends Region {
 
   sum = 0
   update(time, delta): void {
+    // Keep the avatar size ratio right in case window resizes
+    // TODO This should be in a on-resize callback
+    this.fitHalfWidthAvatar(this.playerAvatar)
+    this.fitHalfWidthAvatar(this.mysteryAvatar)
+
     // If a match has been found, stop counting
     if (this.matchFound) {
       return
@@ -53,7 +59,6 @@ export default class SearchingRegion extends Region {
 
       const i = Math.floor(Math.random() * 6)
       this.mysteryAvatar.setTexture(`avatar-${avatarNames[i]}Full`)
-      this.fitFullAvatar(this.mysteryAvatar)
     }
 
     // Format the timer text
@@ -108,6 +113,17 @@ export default class SearchingRegion extends Region {
     return this
   }
 
+  beforeExit(): void {
+    if (this.matchFound) {
+      return
+    }
+
+    server.send({
+      type: 'cancelQueue',
+      password: this.password,
+    })
+  }
+
   private createBackground(scene: Phaser.Scene): void {
     let background = scene.add
       .rectangle(0, 0, 1, 1, Color.backgroundLight)
@@ -122,28 +138,49 @@ export default class SearchingRegion extends Region {
   }
 
   private createAvatars(scene: Phaser.Scene, avatarId: number): void {
-    let avatar = scene.add
-      .image(-Space.windowWidth / 2, 0, `avatar-${avatarNames[avatarId]}Full`)
-      .setOrigin(0, 0.5)
-    this.fitFullAvatar(avatar)
-
     this.mysteryAvatar = scene.add
-      .image(Space.windowWidth / 2, 0, `avatar-${avatarNames[0]}Full`)
+      .image(0, 0, `avatar-${avatarNames[0]}Full`)
       .setTint(Color.grey)
-      .setOrigin(1, 0.5)
-    this.fitFullAvatar(this.mysteryAvatar)
+      .setOrigin(0, 0.5)
+    scene.plugins.get('rexAnchor')['add'](this.mysteryAvatar, {
+      left: '0%',
+      width: '50%',
+      height: '100%',
+    })
+    this.fitHalfWidthAvatar(this.mysteryAvatar)
 
-    this.container.add([avatar, this.mysteryAvatar])
+    this.playerAvatar = scene.add
+      .image(0, 0, `avatar-${avatarNames[avatarId]}Full`)
+      .setOrigin(1, 0.5)
+    scene.plugins.get('rexAnchor')['add'](this.playerAvatar, {
+      right: '0%',
+      width: '50%',
+      height: '100%',
+    })
+    this.fitHalfWidthAvatar(this.playerAvatar)
+
+    this.container.add([this.mysteryAvatar, this.playerAvatar])
   }
 
-  private fitFullAvatar(avatar: Phaser.GameObjects.Image): void {
+  private fitHalfWidthAvatar(avatar: Phaser.GameObjects.Image): void {
     const source = this.scene.textures.get(avatar.texture.key).getSourceImage()
-    const availableHeight = Space.windowHeight
-    const scale = availableHeight / source.height
+    const halfWidth = Space.windowWidth / 2
+    const scaleW = halfWidth / source.width
+    const scaleH = Space.windowHeight / source.height
+    const scale = Math.max(scaleW, scaleH)
     avatar.setScale(scale)
   }
 
-  private createText(scene: Phaser.Scene): void {
+  private createText(scene: MatchScene): void {
+    const textBlockHeight = 280
+    const textBlockWidth = 580
+    const textBackground = scene.add
+      .rectangle(0, 5, textBlockWidth, textBlockHeight, Color.backgroundLight)
+      .setOrigin(0.5, 0.5)
+      .setAlpha(0.8)
+    scene.addShadow(textBackground)
+    this.container.add(textBackground)
+
     this.txtTitle = scene.add
       .text(0, -100, 'Searching for an opponent', Style.announcement)
       .setStroke(Color.backgroundLightS, 4)
@@ -173,10 +210,6 @@ export default class SearchingRegion extends Region {
       text: 'Cancel',
       y: 100,
       f: () => {
-        server.send({
-          type: 'cancelQueue',
-          password: this.password,
-        })
         scene.doBack()
       },
     })

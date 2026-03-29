@@ -5,10 +5,32 @@ import { ServerWS } from '../../../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../../../shared/types/deck'
 import { updateMatchResultPVE } from '../../db/updateMatchResult'
 import { AchievementManager } from '../../achievementManager'
+import { ServerController } from '../../gameController'
+import Catalog from '../../../../shared/state/catalog'
+import avatarNames from '../../../../shared/data/avatarNames'
 
 class PveMatch extends Match {
   constructor(ws: ServerWS, uuid: string, deck: Deck, aiDeck: Deck) {
     super(ws, uuid, deck, aiDeck)
+  }
+
+  async startMatch() {
+    const user1 = await this.getUsernameElo(this.uuid1)
+    const username2 = avatarNames[this.deck2.cosmeticSet.avatar]
+
+    // Make a new game
+    // TODO Custom modes (tutorial, race) will overwrite this. Instead they should never make this
+    this.game = new ServerController()
+    this.game.startGame(
+      this.deck1.cards.map((cardId) => Catalog.getCardById(cardId)),
+      this.deck2.cards.map((cardId) => Catalog.getCardById(cardId)),
+      this.deck1.cosmeticSet,
+      this.deck2.cosmeticSet,
+      user1.username,
+      username2,
+      user1.elo,
+      'Computer',
+    )
   }
 
   // Given ws is disconnecting

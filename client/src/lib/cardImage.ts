@@ -13,6 +13,7 @@ const statOffset2 = 77
 
 const COLOR_BETTER = '#55dd55'
 const COLOR_WORSE = '#e45555'
+const STAT_STROKE = '#000000'
 
 export class CardImage {
   scene: BaseScene
@@ -21,13 +22,18 @@ export class CardImage {
   visible = true
   interactive = false
 
-  // Visual elements that appear on the cardImage
-  image: Phaser.GameObjects.Image
+  // Image layers
+  imageBackground: Phaser.GameObjects.Image
+  imageSubject: Phaser.GameObjects.Image
+  imageArc: Phaser.GameObjects.Image
+  imageContainer: Phaser.GameObjects.Image
+  imageCardback: Phaser.GameObjects.Image
+
+  // Text elements
   txtCost: BBCodeText
   txtPoints: BBCodeText
   txtText: BBCodeText
   txtTitle: Phaser.GameObjects.Text
-  outline: any // Pipeline golden outline around the card
 
   // A container just for this cardImage and elements within it
   container: ContainerLite | Phaser.GameObjects.Container
@@ -75,20 +81,8 @@ export class CardImage {
     this.scene = outerContainer.scene
     this.createContainer(outerContainer)
 
-    // Card image
-    // If the card image doesn't exist, use a default image
-    const imageName = this.scene.textures.exists(`card-${this.card.name}`)
-      ? `card-${this.card.name}`
-      : 'card-Default'
-    this.image = this.scene.add.image(0, 0, imageName)
-    this.image.setDisplaySize(Space.cardWidth, Space.cardHeight)
-
-    // Add shadow to the card
-    if (shadow) {
-      this.scene.addShadow(this.image)
-    }
-
-    this.container.add(this.image)
+    // Create the image layers
+    this.createImages(shadow)
 
     // Stat text
     this.createStats()
@@ -99,12 +93,16 @@ export class CardImage {
 
     // Make events for the card
     if (!Flags.mobile) {
-      this.image
+      this.imageSubject
         .on('pointerover', this.onHover())
         .on('pointerout', this.onHoverExit())
-        .on('pointerdown', () => this.clickCallback())
+        .on('pointerdown', () => {
+          this.createHoverBurst()
+          this.clickCallback()
+        })
     } else {
-      this.image.on('pointerdown', () => {
+      this.imageSubject.on('pointerdown', () => {
+        this.createHoverBurst()
         this.scene.scene.launch('MenuScene', {
           menu: 'focus',
           card: this.card,
@@ -117,18 +115,21 @@ export class CardImage {
       })
     }
 
-    // Visual effect
-    this.createOutline()
-
     if (interactive) {
-      this.image.setInteractive()
+      this.imageSubject.setInteractive()
     }
   }
 
   destroy(): void {
-    ;[this.image, this.txtCost, this.txtPoints, this.container].forEach((obj) =>
-      obj.destroy(),
-    )
+    ;[
+      this.imageBackground,
+      this.imageSubject,
+      this.imageArc,
+      this.imageContainer,
+      this.txtCost,
+      this.txtPoints,
+      this.container,
+    ].forEach((obj) => obj.destroy())
   }
 
   show(): this {
@@ -195,7 +196,7 @@ export class CardImage {
     this.cost = cost
 
     if (cost !== null) {
-      this.txtCost.setText(cost)
+      this.txtCost.setText(`[stroke=${STAT_STROKE}]${cost}[/stroke]`)
 
       if (this.card.cost > cost) {
         this.txtCost.setColor(COLOR_BETTER)
@@ -225,10 +226,16 @@ export class CardImage {
         },
       )
 
-      const imageName = this.scene.textures.exists(`card-${this.card.name}`)
-        ? `card-${this.card.name}`
-        : 'card-Default'
-      this.image.setTexture(imageName)
+      // Set to cardback if valid
+      this.imageCardback.setAlpha(this.card.id === Catalog.cardback.id ? 1 : 0)
+
+      // Set the textures of the images
+      this.imageBackground.setTexture(`card/background-${this.card.theme}`)
+      this.imageSubject.setTexture(this.getSubjectImageName())
+      this.imageArc.setTexture(`card/arc-${this.card.theme}`)
+      this.imageContainer.setTexture(`card/container-${this.card.theme}`)
+
+      // Recreate text elements
       this.createStats()
       this.createText()
       this.createTitle()
@@ -238,7 +245,7 @@ export class CardImage {
 
   setPoints(amt: number): this {
     this.points = amt
-    this.txtPoints.setText(amt)
+    this.txtPoints.setText(`[stroke=${STAT_STROKE}]${amt}[/stroke]`)
 
     // Use the correct color
     if (amt < this.card.basePoints) {
@@ -287,15 +294,64 @@ export class CardImage {
     }
   }
 
+  private createImages(shadow: boolean): void {
+    // Card background wash
+    this.imageBackground = this.scene.add.image(
+      0,
+      0,
+      `card/background-${this.card.theme}`,
+    )
+    this.imageBackground.setDisplaySize(Space.cardWidth, Space.cardHeight)
+    this.container.add(this.imageBackground)
+
+    this.imageSubject = this.scene.add.image(0, 0, this.getSubjectImageName())
+    this.imageSubject.setDisplaySize(Space.cardWidth, Space.cardHeight)
+
+    if (shadow) {
+      this.scene.addShadow(this.imageBackground)
+    }
+
+    this.container.add(this.imageSubject)
+
+    this.imageArc = this.scene.add.image(0, 0, `card/arc-${this.card.theme}`)
+    this.imageArc.setDisplaySize(Space.cardWidth, Space.cardHeight)
+    this.container.add(this.imageArc)
+
+    this.imageContainer = this.scene.add.image(
+      0,
+      0,
+      `card/container-${this.card.theme}`,
+    )
+    this.imageContainer.setDisplaySize(Space.cardWidth, Space.cardHeight)
+    this.container.add(this.imageContainer)
+
+    // Cardback
+    this.imageCardback = this.scene.add.image(0, 0, 'cardback-default')
+    this.imageCardback.setDisplaySize(Space.cardWidth, Space.cardHeight)
+    this.container.add(this.imageCardback)
+
+    if (shadow) {
+      this.scene.addShadow(this.imageCardback)
+    }
+
+    this.imageCardback.setAlpha(this.card.id === Catalog.cardback.id ? 1 : 0)
+  }
+
+  private getSubjectImageName(): string {
+    return this.scene.textures.exists(`card/subject-${this.card.name}`)
+      ? `card/subject-${this.card.name}`
+      : 'card/subject-Dove'
+  }
+
   private createStats(): void {
     let hint = this.scene.hint
 
     // Cost
     this.txtCost = this.scene.add
       .rexBBCodeText(
-        -Space.cardWidth / 2 + statOffset1,
-        -Space.cardHeight / 2 + statOffset1,
-        `[stroke=#353F4E]${this.card.cost}[/stroke]`,
+        -Space.cardWidth / 2 + 27,
+        -Space.cardHeight / 2 + 58,
+        `[stroke=${STAT_STROKE}]${this.card.cost}[/stroke]`,
         BBStyle.cardCost,
       )
       .setVisible(this.card.id !== Catalog.cardback.id)
@@ -316,9 +372,9 @@ export class CardImage {
     // Points
     this.txtPoints = this.scene.add
       .rexBBCodeText(
-        -Space.cardWidth / 2 + statOffset1,
-        -Space.cardHeight / 2 + statOffset2,
-        `[stroke=#353F4E]${this.card.points}[/stroke]`,
+        -Space.cardWidth / 2 + 27,
+        -Space.cardHeight / 2 + 102,
+        `[stroke=${STAT_STROKE}]${this.card.points}[/stroke]`,
         BBStyle.cardPoints,
       )
       .setVisible(this.card.id !== Catalog.cardback.id)
@@ -376,12 +432,14 @@ export class CardImage {
       )
     })
 
+    // Add a black stroke to the text
+    s = `[stroke=#000000]${s}[/stroke]`
+
     // Create the text
     this.txtText = this.scene.add
-      .rexBBCodeText(0, 156, s, BBStyle.cardText)
-      .setOrigin(0.5, 1)
+      .rexBBCodeText(0, Space.cardHeight / 2 - 40, s, BBStyle.cardText)
+      .setOrigin(0.5)
       .setWordWrapWidth(Space.cardWidth)
-      .setVisible(s !== '')
 
     // Enable hovering to get hint
     let hint = this.scene.hint
@@ -413,24 +471,10 @@ export class CardImage {
     const displayName = this.card.name + upgradeSuffix
 
     this.txtTitle = this.scene.add
-      .text(
-        -Space.cardWidth / 2 + 56,
-        -Space.cardHeight / 2 + 3,
-        displayName,
-        Style.cardTitle,
-      )
-      .setOrigin(0)
+      .text(0, 18 - Space.cardHeight / 2, displayName, Style.cardTitle)
+      .setOrigin(0.5)
 
     this.container.add(this.txtTitle)
-  }
-
-  private createOutline(): void {
-    const plugin: any = this.scene.plugins.get('rexOutlinePipeline')
-    this.outline = plugin.add(this.image, {
-      thickness: 0,
-      outlineColor: Color.outline,
-      quality: 0.3,
-    })
   }
 
   // Move this cardImage above everything else in its container when it's hovered
@@ -504,9 +548,16 @@ export class CardImage {
 
   private onHover(): () => void {
     return () => {
-      // Apply the highlight effect if it's interactive
+      // Enlarge the subject while hovered
       if (this.interactive) {
-        this.outline.thickness = Space.highlightWidth
+        this.scene.tweens.killTweensOf(this.imageSubject)
+        this.scene.tweens.add({
+          targets: this.imageSubject,
+          displayWidth: Space.cardWidth * 1.1,
+          displayHeight: Space.cardHeight * 1.1,
+          duration: 120,
+          ease: 'Quad.Out',
+        })
       }
 
       // Do the callback
@@ -520,26 +571,73 @@ export class CardImage {
       const pointer = this.scene.input.activePointer
 
       // Don't do exit if still within bounds of the image
-      if (this.image.getBounds().contains(pointer.x, pointer.y)) {
+      if (this.imageSubject.getBounds().contains(pointer.x, pointer.y)) {
         return
       }
 
-      this.outline.thickness = 0
+      this.scene.tweens.killTweensOf(this.imageSubject)
+      this.scene.tweens.add({
+        targets: this.imageSubject,
+        displayWidth: Space.cardWidth,
+        displayHeight: Space.cardHeight,
+        duration: 120,
+        ease: 'Quad.Out',
+      })
 
       // Do the callback
       this.exitCallback()
     }
   }
 
+  private createHoverBurst(): void {
+    // Don't do it for cardback
+    if (this.card.id === Catalog.cardback.id) {
+      return
+    }
+
+    const burst = this.scene.add.image(
+      this.imageSubject.x,
+      this.imageSubject.y,
+      this.imageSubject.texture.key,
+    )
+    burst.setDisplaySize(
+      this.imageSubject.displayWidth,
+      this.imageSubject.displayHeight,
+    )
+    burst.setAngle(this.imageSubject.angle)
+    burst.setAlpha(1)
+    this.scene.children.bringToTop(burst)
+
+    // Add the burst to the container
+    this.container.add(burst)
+
+    // Animate the burst growing and fading out
+    this.scene.tweens.add({
+      targets: burst,
+      displayWidth: Space.cardWidth * 1.5,
+      displayHeight: Space.cardHeight * 1.5,
+      alpha: 0,
+      duration: 340,
+      ease: 'Quad.Out',
+      onComplete: () => burst.destroy(),
+    })
+  }
+
   private setTint(color: number): void {
-    this.image.setTint(color)
+    this.imageBackground.setTint(color)
+    this.imageSubject.setTint(color)
+    this.imageArc.setTint(color)
+    this.imageContainer.setTint(color)
     this.txtCost.setTint(color)
     this.txtPoints.setTint(color)
     // this.txtText.setTint(color)
   }
 
   private clearTint(): void {
-    this.image.clearTint()
+    this.imageBackground.clearTint()
+    this.imageSubject.clearTint()
+    this.imageArc.clearTint()
+    this.imageContainer.clearTint()
     this.txtCost.clearTint()
     this.txtPoints.clearTint()
     // this.txtText.clearTint()
@@ -562,7 +660,7 @@ export class FullSizeCardImage extends CardImage {
     // Load the full sized image and use it once loaded
     const s = `fullCard-${card.name}`
     if (this.scene.textures.exists(s)) {
-      this.image
+      this.imageSubject
         .setTexture(s)
         .setDisplaySize(Space.fullCardWidth, Space.fullCardHeight)
     } else {
@@ -570,8 +668,8 @@ export class FullSizeCardImage extends CardImage {
 
       // When image loads, set image texture
       this.scene.load.once('complete', () => {
-        if (this.image) {
-          this.image
+        if (this.imageSubject) {
+          this.imageSubject
             .setTexture(s)
             .setDisplaySize(Space.fullCardWidth, Space.fullCardHeight)
         }

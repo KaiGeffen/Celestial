@@ -166,7 +166,7 @@ class Hero extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     // Departure
     if (super.exhale(5, game, player)) {
-      bonus += 4
+      bonus += 3
     }
 
     super.play(player, game, index, bonus)
@@ -185,7 +185,7 @@ class Hero extends Card {
 const hero = new Hero({
   name: 'Hero',
   id: 94,
-  text: 'Exhale 5: Worth +4.\nExhale 3: Discard the next card in the story.\nExhale 1: Inspire 1',
+  text: 'Exhale 5: Worth +3.\nExhale 3: Discard the next card in the story.\nExhale 1: Inspire 1',
 })
 
 class Possibility extends Card {
@@ -404,6 +404,25 @@ const heavens = new Heavens({
   points: 9,
   text: "Costs 2 less for each time you've triggered Exhale since the last story began.",
   beta: true,
+})
+;[
+  stars,
+  cosmos,
+  nightVision,
+  ecology,
+  sun,
+  moon,
+  sunflower,
+  fates,
+  hero,
+  possibility,
+  cloakOfStars,
+  dreamer,
+  pride,
+  rocketship,
+  starfall,
+].forEach((card) => {
+  card.theme = 6
 })
 
 export {

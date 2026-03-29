@@ -127,14 +127,23 @@ class Parch extends Card {
 
     super.play(player, game, index, bonus)
 
-    // NOTE This is done because some cards add themselves to the story when they are discarded
-    // Check this many cards (Discarding yours, ignoring theirs)
-    const maxCount = game.story.acts.length
-    for (let count = 0, i = 0; count < maxCount; count++) {
+    // Keep a count in case of infinite loop
+    const maxCount = 99
+    for (
+      let i = 0, count = 0;
+      i < game.story.acts.length || count > maxCount;
+      count++
+    ) {
       const act = game.story.acts[i]
       if (act.owner === player) {
-        game.removeAct(i)
+        const actReturnedToStory = game.removeAct(i)
+
+        // If act stayed in story, move on to next act. Otherwise, the story has shrunk by 1 anyways
+        if (actReturnedToStory) {
+          i++
+        }
       } else {
+        // If this is opponent's card, don't discard and move on to next act
         i++
       }
     }
@@ -330,7 +339,7 @@ const firebug = new Firebug({
 })
 
 class Immolant extends Card {
-  onDiscard(player: number, game: GameModel) {
+  onDiscard(player: number, game: GameModel): boolean {
     game.animations[player].push(
       new Animation({
         from: Zone.Discard,
@@ -344,6 +353,8 @@ class Immolant extends Card {
     game.pile[player].pop()
 
     game.story.addAct(this, player, 0)
+
+    return true
   }
 }
 const immolant = new Immolant({
@@ -544,6 +555,24 @@ const zoomies = new Zoomies({
   points: 1,
   text: 'When you resolve a card that costs 7 or more, move this card from your discard pile to the story.',
   beta: true,
+})
+;[
+  dash,
+  impulse,
+  mine,
+  arsonist,
+  parch,
+  veteran,
+  cling,
+  death,
+  fromAshes,
+  goliath,
+  firebug,
+  immolant,
+  spark,
+  remnant,
+].forEach((card) => {
+  card.theme = 1
 })
 
 export {

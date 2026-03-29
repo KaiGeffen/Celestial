@@ -10,6 +10,7 @@ import {
   Color,
   Style,
   Messages,
+  UserSettings,
 } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Hint from '../lib/hint'
@@ -218,10 +219,20 @@ export default class BaseScene extends SharedBaseScene {
     let esc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC)
     esc.on('down', this.openMenu(), this)
 
-    // For testing: Press P to close the server connection
+    // When ` is pressed, open the online players menu
+    let backtick = this.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.BACKTICK,
+    )
+    backtick.on('down', () => {
+      if (UserSettings._get('hotkeys')) {
+        this.openFriendsList()()
+      }
+    })
+
+    // For testing: Press N to close the server connection
     if (Flags.networkToggle) {
-      let pKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P)
-      pKey.on('down', () => {
+      let nKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.N)
+      nKey.on('down', () => {
         server.close()
         console.log('Server connection closed (testing)')
       })
@@ -318,6 +329,14 @@ export default class BaseScene extends SharedBaseScene {
 
   private openFriendsList(): () => void {
     return () => {
+      if (this.scene.isActive('MenuScene')) {
+        const menuScene = this.scene.get('MenuScene') as any
+        if (menuScene.menu?.menuType === 'onlinePlayers') {
+          menuScene.menu.close()
+          return
+        }
+      }
+
       this.scene.launch('MenuScene', {
         menu: 'onlinePlayers',
         activeScene: this,

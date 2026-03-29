@@ -36,7 +36,7 @@
     "difficulty": 3,
     "deck": [27, 27, 27, 27, 26, 12, 12, 67, 67, 45],
     "opponent": [63, 63, 5, 5, 3, 6, 6, 12, 12, 14, 14, 17, 17, 20, 56],
-    "cards": [67],
+    "cards": [45],
     "tip": "Enlightenment comes easiest to the one who knows when to Pass."
   },
   {
@@ -86,7 +86,7 @@
     "difficulty": 5,
     "deck": [50, 0, 27, 91, 91],
     "opponent": [2, 63, 63, 63, 97, 97, 68, 68, 7, 7, 98, 98, 84, 46, 46],
-    "cards": [50],
+    "cards": [91],
     "tip": "Pass whenever you can, and play Lantern as your last card to keep the fire burning."
   }
 ]

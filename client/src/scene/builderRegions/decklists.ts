@@ -14,7 +14,7 @@ import {
 } from '../../settings/settings'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import { DecklistSettings } from '../../../../shared/settings'
-import avatarNames from '../../data/avatarNames'
+import avatarNames from '../../../../shared/data/avatarNames'
 import premadeDecklists from '../../data/premadeDecklists'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'

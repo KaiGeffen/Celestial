@@ -160,8 +160,10 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   },
   cardTitle: {
     fontFamily: altFont,
-    fontSize: '26px',
+    fontSize: '20px',
     color: Color.cardText,
+    stroke: '#000000',
+    strokeThickness: 1,
   },
   homeSceneButton: {
     fontFamily: altFont,
@@ -199,27 +201,27 @@ export const BBStyle: Record<string, any> = {
   },
   // Cost / Points stats that are shown above each card
   cardCost: {
-    fontFamily: mainFont,
-    fontSize: '30px',
+    fontFamily: 'GrandCentral',
+    fontSize: '24px',
     color: Color.cardCost,
-    stroke: Color.blackS,
-    strokeThickness: 3,
+    stroke: '#000000',
+    strokeThickness: 1,
     // TODO Add letter spacing after at least Phaser 3.6.0
   },
   cardPoints: {
-    fontFamily: mainFont,
-    fontSize: '30px',
+    fontFamily: 'GrandCentral',
+    fontSize: '24px',
     color: Color.cardPoints,
-    stroke: Color.blackS,
-    strokeThickness: 3,
+    stroke: '#000000',
+    strokeThickness: 1,
     // TODO Add letter spacing after at least Phaser 3.6.0
   },
   // The textbox for the card
   cardText: {
-    fontFamily: mainFont,
+    fontFamily: 'Upgrade',
     fontSize: '16px',
-    color: 0xffffff,
-    backgroundColor: 0x111111a0,
+    color: Color.whiteS,
+    strokeThickness: 1,
     wrap: {
       mode: 'word',
       width: 224,
@@ -242,11 +244,12 @@ export const BBStyle: Record<string, any> = {
     backgroundStrokeColor: '#0005',
     backgroundStrokeLineWidth: 2,
     backgroundCornerRadius: 5,
+    stroke: '#000000',
+    strokeThickness: 1,
     wrap: {
       mode: 'word',
       width: Space.maxTextWidth,
     },
-    // strokeThickness: 3,
     padding: {
       left: 20,
       right: 20,

@@ -49,7 +49,17 @@ export default class SpecialGameModel extends GameModel {
     cosmeticSet2: CosmeticSet,
     enabledModes: number[],
   ) {
-    super(deck1, deck2, cosmeticSet1, cosmeticSet2, true)
+    super(
+      deck1,
+      deck2,
+      cosmeticSet1,
+      cosmeticSet2,
+      'todo',
+      'todo',
+      '',
+      '',
+      true,
+    )
 
     this.enabledModes = enabledModes
 

@@ -19,7 +19,7 @@ const HOVER_OFFSET = Space.cardHeight / 2 + Space.padSmall
 
 export default class OurBoardRegion extends Region {
   // Function called when elements in this region are interacted with
-  callback: (i: number) => void
+  callback: (i: number) => boolean
   displayCostCallback: (cost: number) => void
 
   // Whether we have already clicked on a card to play it
@@ -145,6 +145,8 @@ export default class OurBoardRegion extends Region {
     )
 
     return () => {
+      if (!this.callback(i)) return
+
       if (this.scene['paused']) {
         return
       }
@@ -250,12 +252,12 @@ export default class OurBoardRegion extends Region {
       if (card !== undefined) {
         // Check that the mouse is still over the card's x
         const pointer = this.scene.input.activePointer
-        const pointerOverCard = card.image
+        const pointerOverCard = card.imageSubject
           .getBounds()
           .contains(pointer.x, pointer.y - HOVER_OFFSET)
 
         if (pointerOverCard) {
-          card.image.emit('pointerover')
+          card.imageSubject.emit('pointerover')
         }
       }
     }
@@ -316,7 +318,7 @@ export default class OurBoardRegion extends Region {
   }
 
   // Set the callback for when a card in this region is clicked on
-  setCardClickCallback(f: (x: number) => void): Region {
+  setCardClickCallback(f: (x: number) => boolean): Region {
     this.callback = f
     return this
   }

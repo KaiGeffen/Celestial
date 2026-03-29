@@ -39,43 +39,58 @@ class Match implements Match {
 
     this.deck1 = deck1
     this.deck2 = deck2
+  }
+
+  // Spectators per side/perspective (0 or 1).
+  private spectators: [Set<ServerWS>, Set<ServerWS>] = [
+    new Set<ServerWS>(),
+    new Set<ServerWS>(),
+  ]
+
+  addSpectator(ws: ServerWS, playerPerspective: 0 | 1): void {
+    this.spectators[playerPerspective].add(ws)
+
+    // Send an immediate snapshot so the spectator can render right away.
+    if (this.game) {
+      const game = this.game
+
+      ws.send({
+        type: 'transmitState',
+        state: getClientGameModel(game.model, playerPerspective, false),
+      })
+    }
+  }
+
+  removeSpectator(ws: ServerWS): void {
+    this.spectators[0].delete(ws)
+    this.spectators[1].delete(ws)
+  }
+
+  // Drop every spectator watching from this player's perspective
+  removeAllSpectatorsForPerspective(playerPerspective: 0 | 1): ServerWS[] {
+    const set = this.spectators[playerPerspective]
+    const removed = Array.from(set)
+    for (const ws of removed) {
+      this.removeSpectator(ws)
+    }
+    return removed
+  }
+
+  async startMatch() {
+    const user1 = await this.getUsernameElo(this.uuid1)
+    const user2 = await this.getUsernameElo(this.uuid2)
 
     // Make a new game
-    // TODO Custom modes (tutorial, race) will overwrite this. Instead they should never make this
     this.game = new ServerController()
     this.game.startGame(
       this.deck1.cards.map((cardId) => Catalog.getCardById(cardId)),
       this.deck2.cards.map((cardId) => Catalog.getCardById(cardId)),
       this.deck1.cosmeticSet,
       this.deck2.cosmeticSet,
-    )
-  }
-
-  // Notify all connected players that the match has started
-  async notifyMatchStart() {
-    const user1 = await this.getUsernameElo(this.uuid1)
-    const user2 = await this.getUsernameElo(this.uuid2)
-
-    await Promise.all(
-      this.getActiveWsList().map((ws) => {
-        if (ws === this.ws1) {
-          ws.send({
-            type: 'matchStart',
-            name1: user1.username,
-            name2: user2.username,
-            elo1: user1.elo,
-            elo2: user2.elo,
-          })
-        } else {
-          ws.send({
-            type: 'matchStart',
-            name1: user2.username,
-            name2: user1.username,
-            elo1: user2.elo,
-            elo2: user1.elo,
-          })
-        }
-      }),
+      user1.username,
+      user2.username,
+      user1.elo,
+      user2.elo,
     )
   }
 
@@ -97,19 +112,29 @@ class Match implements Match {
       but for recaps it's each slice of the recap
     */
     await Promise.all(
-      this.getActiveWsList().map((ws, player) => {
-        // Send any recap states
-        this.game.model.recentModels[player].forEach((state) =>
+      [0, 1].map(async (player) => {
+        const recipients: ServerWS[] = []
+
+        const activeWs = player === 0 ? this.ws1 : this.ws2
+        if (activeWs) recipients.push(activeWs)
+
+        // Add spectators registered for this same perspective.
+        recipients.push(...Array.from(this.spectators[player]))
+
+        recipients.forEach((ws) => {
+          // Send any recap states
+          this.game.model.recentModels[player].forEach((state) =>
+            ws.send({
+              type: 'transmitState',
+              state: state,
+            }),
+          )
+
+          // Send the normal state
           ws.send({
             type: 'transmitState',
-            state: state,
-          }),
-        )
-
-        // Send the normal state
-        ws.send({
-          type: 'transmitState',
-          state: getClientGameModel(this.game.model, player, false),
+            state: getClientGameModel(this.game.model, player, false),
+          })
         })
       }),
     )
@@ -207,10 +232,10 @@ class Match implements Match {
   }
 
   // Get the name of player with given uuid
-  private async getUsernameElo(
+  protected async getUsernameElo(
     uuid: string | null,
-  ): Promise<{ username: string; elo: number }> {
-    if (!uuid) return { username: '', elo: 0 }
+  ): Promise<{ username: string; elo: string }> {
+    if (!uuid) return { username: '', elo: '' }
 
     try {
       const result = await db
@@ -222,12 +247,12 @@ class Match implements Match {
         .where(eq(players.id, uuid))
         .limit(1)
 
-      if (result.length === 0) return { username: '', elo: 0 }
+      if (result.length === 0) return { username: '', elo: '' }
 
-      return { username: result[0].username, elo: result[0].elo }
+      return { username: result[0].username, elo: result[0].elo.toString() }
     } catch (error) {
       console.error('Error fetching username:', error)
-      return { username: '', elo: 0 }
+      return { username: '', elo: '' }
     }
   }
 
