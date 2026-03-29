@@ -1,6 +1,6 @@
 import Card from '../card'
 import { SightCard } from '../card'
-import { seen, predator } from './tokens'
+import { seen, predator, greatWheel } from './tokens'
 import { Quality } from '../quality'
 import { Keywords } from '../keyword'
 import GameModel from '../gameModel'
@@ -287,19 +287,17 @@ const realms = new Realms({
   text: 'Switch your deck and discard pile.',
 })
 
-class GreatWheel extends Card {
+class Path extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
-    game.story.roundEndedForced = true
+    game.create(player, greatWheel)
   }
 }
-const greatWheel = new GreatWheel({
-  name: 'Great Wheel',
+const path = new Path({
+  name: 'Path',
   id: 6102,
-  cost: 8,
-  points: 8,
-  qualities: [Quality.FLEETING],
-  text: 'Fleeting\nEnd the current round.',
+  cost: 2,
+  text: 'Create a Great Wheel in your hand.',
   beta: true,
 })
 
@@ -333,7 +331,7 @@ const switcheroo = new Switcheroo({
   lantern,
   beggingBowl,
   suddenInsight,
-  greatWheel,
+  path,
 ].forEach((card) => {
   card.theme = 5
 })
@@ -355,6 +353,6 @@ export {
   // NEW CARDS
   suddenInsight,
   // realms,
-  greatWheel,
+  path as greatWheel,
   // switcheroo,
 }

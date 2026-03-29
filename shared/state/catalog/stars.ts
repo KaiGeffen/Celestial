@@ -323,7 +323,8 @@ class Fable extends Card {
 const fable = new Fable({
   name: 'Fable',
   id: 8093,
-  text: 'Exhale 5: Draw 3 cards.\nExhale 3: Create a Sickness in the story.\nExhale 1: Create a Dove in the story.',
+  text: 'Exhale 5: Draw 3 cards.\nExhale 3: Create a Sickness in the story.\nExhale 1: Discard the 3 cheapest cards from your deck.',
+  beta: true,
 })
 
 const phi = new Card({
@@ -421,6 +422,7 @@ const heavens = new Heavens({
   pride,
   rocketship,
   starfall,
+  fable,
 ].forEach((card) => {
   card.theme = 6
 })
@@ -445,4 +447,5 @@ export {
   starfall,
   boreas,
   heavens,
+  fable,
 }

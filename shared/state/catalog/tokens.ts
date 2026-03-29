@@ -150,4 +150,31 @@ const ice = new Ice({
   beta: true,
 })
 
-export { seen, ashes, child, predator, wound, heirloom, condemnation, ice }
+class GreatWheel extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    game.story.roundEndedForced = true
+  }
+}
+const greatWheel = new GreatWheel({
+  name: 'Great Wheel',
+  id: 1009,
+  cost: 8,
+  points: 8,
+  qualities: [Quality.FLEETING],
+  text: 'Fleeting\nEnd the current round.',
+  theme: 5,
+  beta: true,
+})
+
+export {
+  seen,
+  ashes,
+  child,
+  predator,
+  wound,
+  heirloom,
+  condemnation,
+  ice,
+  greatWheel,
+}

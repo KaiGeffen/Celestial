@@ -357,8 +357,34 @@ class Monster extends Card {
 const monster = new Monster({
   name: 'Monster',
   id: 342,
-  text: "Exhale 2: Worth +1 for each round you've lost.",
+  text: "Discard the next card in the story if it shares a base-cost with a card in your hand.\nExhale 2: Worth +1 for each round you've lost.",
+  beta: true,
 })
+
+class Mutual extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    let triggerCondition = false
+    for (let i = 0; i < Math.min(2, game.story.acts.length); i++) {
+      if (game.story.acts[i].owner === player) {
+        triggerCondition = !triggerCondition
+      }
+    }
+
+    if (this.exhale(1, game, player) && triggerCondition) {
+      game.removeAct(0)
+      game.removeAct(0)
+    }
+
+    super.play(player, game, index, bonus)
+  }
+}
+const mutual = new Mutual({
+  name: 'Mutual',
+  id: 343,
+  text: 'Exhale 1: If exactly one of the next 2 cards in the story is yours, discard both.',
+  beta: true,
+})
+
 ;[
   dagger,
   shadow,
@@ -375,6 +401,8 @@ const monster = new Monster({
   rupture,
   voices,
   spider,
+  monster,
+  mutual,
 ].forEach((card) => {
   card.theme = 2
 })
@@ -397,4 +425,5 @@ export {
   rupture,
   voices,
   monster,
+  mutual,
 }
