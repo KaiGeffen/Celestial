@@ -385,28 +385,6 @@ const mutual = new Mutual({
   beta: true,
 })
 
-;[
-  dagger,
-  shadow,
-  imprison,
-  nightmare,
-  boa,
-  hungryGhost,
-  hurricane,
-  wingClipping,
-  sickness,
-  victim,
-  lostInShadow,
-  vampire,
-  rupture,
-  voices,
-  spider,
-  monster,
-  mutual,
-].forEach((card) => {
-  card.theme = 2
-})
-
 export {
   dagger,
   shadow,

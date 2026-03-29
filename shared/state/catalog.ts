@@ -10,21 +10,31 @@ import * as starsCatalog from './catalog/stars'
 import * as waterCatalog from './catalog/water'
 import * as tokensCatalog from './catalog/tokens'
 import * as specialCardsCatalog from './catalog/specialCards'
-import * as groundCatalog from './catalog/ground'
 import { Keyword, Keywords } from './keyword'
 
+// Apply the card's theme and sort by cost for building the full catalog
+function applyThemeAndSort(
+  catalog: Record<string, Card>,
+  themeId: number,
+): Card[] {
+  return Object.values(catalog)
+    .map((c) => {
+      c.theme = themeId
+      return c
+    })
+    .sort((a, b) => a.cost - b.cost)
+}
+
 const fullCatalog = [
-  // TODO This theme is all beta
-  // ...Object.values(groundCatalog).sort((a, b) => a.cost - b.cost),
-  ...Object.values(birdsCatalog).sort((a, b) => a.cost - b.cost),
-  ...Object.values(ashesCatalog).sort((a, b) => a.cost - b.cost),
-  ...Object.values(petCatalog).sort((a, b) => a.cost - b.cost),
-  ...Object.values(shadowCatalog).sort((a, b) => a.cost - b.cost),
-  ...Object.values(birthCatalog).sort((a, b) => a.cost - b.cost),
-  ...Object.values(visionCatalog).sort((a, b) => a.cost - b.cost),
-  ...Object.values(starsCatalog).sort((a, b) => a.cost - b.cost),
-  ...Object.values(waterCatalog).sort((a, b) => a.cost - b.cost),
-  ...Object.values(specialCardsCatalog).sort((a, b) => a.cost - b.cost),
+  ...applyThemeAndSort(birdsCatalog, 0),
+  ...applyThemeAndSort(ashesCatalog, 1),
+  ...applyThemeAndSort(shadowCatalog, 2),
+  ...applyThemeAndSort(petCatalog, 3),
+  ...applyThemeAndSort(birthCatalog, 4),
+  ...applyThemeAndSort(visionCatalog, 5),
+  ...applyThemeAndSort(starsCatalog, 6),
+  ...applyThemeAndSort(waterCatalog, 7),
+  ...applyThemeAndSort(specialCardsCatalog, 8),
 ]
 const nonCollectibles = [...Object.values(tokensCatalog)]
 const allCards = [...fullCatalog, ...nonCollectibles]

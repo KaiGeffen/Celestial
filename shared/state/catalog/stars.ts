@@ -406,26 +406,6 @@ const heavens = new Heavens({
   text: "Costs 2 less for each time you've triggered Exhale since the last story began.",
   beta: true,
 })
-;[
-  stars,
-  cosmos,
-  nightVision,
-  ecology,
-  sun,
-  moon,
-  sunflower,
-  fates,
-  hero,
-  possibility,
-  cloakOfStars,
-  dreamer,
-  pride,
-  rocketship,
-  starfall,
-  fable,
-].forEach((card) => {
-  card.theme = 6
-})
 
 export {
   stars,

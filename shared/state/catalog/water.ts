@@ -284,23 +284,6 @@ const rime = new Rime({
   text: 'Create 2 copies of Ice on the bottom of your deck.',
   beta: true,
 })
-;[
-  mercy,
-  excess,
-  fishingBoat,
-  drown,
-  iceberg,
-  dew,
-  gentleRain,
-  refresh,
-  fish,
-  cloud,
-  gainAndLoss,
-  damBreaks,
-  overflow,
-].forEach((card) => {
-  card.theme = 7
-})
 
 // TODO
 

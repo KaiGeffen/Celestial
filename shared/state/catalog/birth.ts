@@ -352,25 +352,6 @@ const growingUp = new GrowingUp({
   cost: 1,
   text: 'When played, Birth 1 if you have a Child in your hand.',
 })
-;[
-  nascence,
-  birth,
-  ancestry,
-  theFuture,
-  posterity,
-  rebirth,
-  cradle,
-  uprising,
-  storytime,
-  pregnant,
-  passOn,
-  justLikeDad,
-  hug,
-  genesis,
-  beginnersMind,
-].forEach((card) => {
-  card.theme = 4
-})
 
 export {
   nascence,

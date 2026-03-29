@@ -556,24 +556,6 @@ const zoomies = new Zoomies({
   text: 'When you resolve a card that costs 7 or more, move this card from your discard pile to the story.',
   beta: true,
 })
-;[
-  dash,
-  impulse,
-  mine,
-  arsonist,
-  parch,
-  veteran,
-  cling,
-  death,
-  fromAshes,
-  goliath,
-  firebug,
-  immolant,
-  spark,
-  remnant,
-].forEach((card) => {
-  card.theme = 1
-})
 
 export {
   dash,

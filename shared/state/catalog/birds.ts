@@ -376,25 +376,6 @@ const skyBurial = new SkyBurial({
   beta: true,
 })
 
-;[
-  dove,
-  starling,
-  secretaryBird,
-  phoenix,
-  heron,
-  fledgling,
-  nest,
-  truth,
-  defiance,
-  layBare,
-  vulture,
-  rooster,
-  letGo,
-  birdsong,
-].forEach((card) => {
-  card.theme = 0
-})
-
 export {
   dove,
   starling,
