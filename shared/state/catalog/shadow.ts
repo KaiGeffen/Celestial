@@ -325,6 +325,7 @@ const isolation = new Isolation({
   cost: 7,
   points: 7,
   text: 'Costs 0 if you won last round without playing any cards.',
+  beta: true,
 })
 
 class Spider extends Card {
@@ -399,9 +400,8 @@ export {
   lostInShadow,
   vampire,
   // NEW CARDS
-  // isolation,
-  rupture,
+  // rupture,
   voices,
-  monster,
-  mutual,
+  // mutual,
+  isolation,
 }

@@ -289,8 +289,17 @@ const realms = new Realms({
 
 class Path extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
+    let exhaled = false
+    if (super.exhale(1, game, player)) {
+      bonus -= 2
+      exhaled = true
+    }
+
     super.play(player, game, index, bonus)
-    game.create(player, greatWheel)
+
+    if (exhaled) {
+      game.create(player, greatWheel)
+    }
   }
 }
 const path = new Path({
