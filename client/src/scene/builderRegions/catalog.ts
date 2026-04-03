@@ -151,17 +151,9 @@ export default class CatalogRegion {
   private createCard(card: Card): void {
     const container = this.panel.getElement('panel')
 
-    const cardImage = new CardImage(card, container, true, false)
-      .setOnClick(this.onClickCatalogCard(card))
-      .setFocusOptions(
-        'Add',
-        () => {
-          return this.scene.isOverfull()
-        },
-        () => {
-          return this.scene.getCount(card)
-        },
-      )
+    const cardImage = new CardImage(card, container, true, false).setOnClick(
+      this.onClickCatalogCard(card),
+    )
 
     // Add this cardImage to the maintained list of cardImages in the catalog
     this.cardCatalog.push(cardImage)

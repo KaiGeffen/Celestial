@@ -214,7 +214,6 @@ export default class OurBoardRegion extends Region {
         CardLocation.ourHand(state, i, this.container),
       )
         .setCost(state.cardCosts[i])
-        .setFocusOptions('Play')
         .moveToTopOnHover()
 
       // If shift is held or card was hovered, raise the card immediately

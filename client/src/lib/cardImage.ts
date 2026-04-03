@@ -7,10 +7,6 @@ import BaseScene from '../scene/baseScene'
 import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 import { Keywords } from '../../../shared/state/keyword'
 
-// The offset of cost / points
-const statOffset1 = 27
-const statOffset2 = 77
-
 const COLOR_BETTER = '#55dd55'
 const COLOR_WORSE = '#e45555'
 const STAT_STROKE = '#000000'
@@ -53,13 +49,6 @@ export class CardImage {
   renderIndex: number = undefined
 
   // The outline visual effect
-
-  // In focus menu, the string describing what action to take with this card
-  private focusString = ''
-  private focusCloseOnClick = () => {
-    return true
-  }
-  private getCount: () => number
 
   constructor(
     card: Card,
@@ -239,22 +228,6 @@ export class CardImage {
       this.txtPoints.setColor(COLOR_BETTER)
     } else {
       this.txtPoints.setColor(Color.cardText)
-    }
-
-    return this
-  }
-
-  setFocusOptions(
-    s: string,
-    closeOnClick?: () => boolean,
-    getCount?: () => number,
-  ): this {
-    this.focusString = s
-    if (closeOnClick) {
-      this.focusCloseOnClick = closeOnClick
-    }
-    if (getCount) {
-      this.getCount = getCount
     }
 
     return this
