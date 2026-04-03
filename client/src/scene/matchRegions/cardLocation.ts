@@ -50,21 +50,22 @@ export default class CardLocation {
     i: number,
     container: Phaser.GameObjects.Container,
   ): [number, number] {
-    const leftEdge = 200 + Space.cardWidth / 2
-    let dx = Space.cardWidth + Space.pad
+    // Mirror `ourHand`: centered row along the top edge (opponent).
+    let dx = Space.cardWidth
 
     if (state !== undefined) {
       const totalCards = state.hand[1].length
 
-      // If total width exceeds max, scale down spacing
-      const maxWidth = Space.windowWidth - (200 + 200 + Space.cardWidth)
+      const maxWidth = Space.windowWidth - 1200
       const totalWidth = dx * (totalCards - 1)
       if (totalWidth > maxWidth) {
         dx *= maxWidth / totalWidth
       }
 
-      const x = leftEdge + i * dx
-      let y = -Space.cardHeight / 2 + Space.todoHandOffset
+      const firstCardCenterX =
+        Space.windowWidth / 2 - (dx * (totalCards - 1)) / 2
+      const x = firstCardCenterX + i * dx
+      const y = -Space.cardHeight / 2 + Space.todoHandOffset
 
       return [x - container.x, y - container.y]
     }
@@ -141,9 +142,16 @@ export default class CardLocation {
     container?: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const x = 200 + Space.cardWidth / 2
+    // Mirror `ourDeck` along the top edge (same x / stagger pattern; y from top).
+    const x = 320
     const y = todoTheirHandHeight
-    return [x - (container?.x || 0), y - (container?.y || 0)]
+
+    const deckBackXOffsetPx = -3
+    const deckBackYOffsetPx = 3
+    const ox = deckBackXOffsetPx * i
+    const oy = deckBackYOffsetPx * i
+
+    return [x + ox - (container?.x || 0), y + oy - (container?.y || 0)]
   }
 
   static ourDiscard(
@@ -166,13 +174,13 @@ export default class CardLocation {
     container: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const x = -220 + Space.cardWidth / 2
-    const y = Space.windowHeight - todoTheirHandHeight
+    // Mirror `ourDiscard` along the top edge (same x as bottom-right; y from top).
+    const x = Space.windowWidth - 320
+    const y = todoTheirHandHeight
 
-    // Small stagger so multiple cardbacks are visible.
     const deckBackXOffsetPx = -3
-    const deckBackYOffsetPx = -3
-    const ox = deckBackXOffsetPx * i
+    const deckBackYOffsetPx = 3
+    const ox = -deckBackXOffsetPx * i
     const oy = deckBackYOffsetPx * i
 
     return [x + ox - (container?.x || 0), y + oy - (container?.y || 0)]

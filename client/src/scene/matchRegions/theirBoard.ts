@@ -1,16 +1,7 @@
 import 'phaser'
-import Button from '../../lib/buttons/button'
-import Buttons from '../../lib/buttons/buttons'
+import { CardImage } from '../../lib/cardImage'
 import GameModel from '../../../../shared/state/gameModel'
-import {
-  Depth,
-  Space,
-  Style,
-  Time,
-  Flags,
-  UserSettings,
-  Color,
-} from '../../settings/settings'
+import { Depth, Space, Style } from '../../settings/settings'
 import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
@@ -19,10 +10,15 @@ export default class TheirBoardRegion extends Region {
   // Effect showing that they have priority
   priorityHighlight: Phaser.GameObjects.Video
 
-  btnDeck: Button
-  btnDiscard: Button
-
   background: Phaser.GameObjects.Image
+
+  // Persistent deck rendering (stack of cardbacks)
+  private deckCardbacks: CardImage[] = []
+  private deckContainer: Phaser.GameObjects.Container
+
+  // Persistent discard pile (face-up cards)
+  private discardCards: CardImage[] = []
+  private discardContainer: Phaser.GameObjects.Container
 
   create(scene: MatchScene): this {
     this.scene = scene
@@ -30,15 +26,67 @@ export default class TheirBoardRegion extends Region {
     this.container = scene.add.container(0, 0).setDepth(Depth.theirHand)
     this.createBackground()
 
+    this.createDiscard()
+    this.createDeck()
+
     return this
   }
 
   displayState(state: GameModel): void {
     this.deleteTemp()
 
+    // Opponent discard: `state.pile[1]`
+    const desiredDiscardCount = state.pile[1]?.length ?? 0
+
+    while (this.discardCards.length < desiredDiscardCount) {
+      const card = state.pile[1][this.discardCards.length]
+      const cardImg = new CardImage(card, this.discardContainer, false, true)
+      this.discardCards.push(cardImg)
+    }
+
+    while (this.discardCards.length > desiredDiscardCount) {
+      const extra = this.discardCards.pop()
+      extra?.destroy()
+    }
+
+    for (let i = 0; i < this.discardCards.length; i++) {
+      this.discardCards[i].setCard(state.pile[1][i])
+      this.discardCards[i].setPosition(
+        CardLocation.theirDiscard(this.container, i),
+      )
+      this.discardCards[i].container.setScale(0.8)
+      this.discardCards[i].container.setRotation(-Math.PI / 32)
+    }
+
+    // Opponent deck: `state.deck[1]`
+    const desiredDeckCount = state.deck[1]?.length ?? 0
+
+    while (this.deckCardbacks.length < desiredDeckCount) {
+      const cardback = new CardImage(undefined, this.deckContainer, false, true)
+      this.deckCardbacks.push(cardback)
+    }
+
+    while (this.deckCardbacks.length > desiredDeckCount) {
+      const extra = this.deckCardbacks.pop()
+      extra?.destroy()
+    }
+
+    for (let i = 0; i < this.deckCardbacks.length; i++) {
+      this.deckCardbacks[i].setPosition(
+        CardLocation.theirDeck(this.container, i),
+      )
+      this.deckCardbacks[i].container.setScale(0.8)
+      this.deckCardbacks[i].container.setRotation(Math.PI / 32)
+    }
+
+    if (!state.mulligansComplete[1]) {
+      this.deleteTemp()
+      return
+    }
+
     this.cards = []
     for (let i = 0; i < state.hand[1].length; i++) {
-      let card = this.addCard(
+      const card = this.addCard(
         state.hand[1][i],
         CardLocation.theirHand(state, i, this.container),
       ).moveToTopOnHover()
@@ -79,6 +127,18 @@ export default class TheirBoardRegion extends Region {
     this.container.add(this.background)
   }
 
+  private createDiscard(): void {
+    this.discardContainer = this.scene.add.container()
+    this.container.add(this.discardContainer)
+  }
+
+  private createDeck(): void {
+    this.deckContainer = this.scene.add.container()
+    this.container.add(this.deckContainer)
+
+    this.deckCardbacks = []
+  }
+
   onWindowResize(): void {
     this.background.setScale(
       this.background.width >= Space.windowWidth
@@ -88,5 +148,21 @@ export default class TheirBoardRegion extends Region {
     )
 
     this.background.setPosition(0, Space.todoHandOffset + Space.pad + 7)
+
+    for (let i = 0; i < this.deckCardbacks.length; i++) {
+      this.deckCardbacks[i].setPosition(
+        CardLocation.theirDeck(this.container, i),
+      )
+      this.deckCardbacks[i].container.setScale(0.8)
+      this.deckCardbacks[i].container.setRotation(Math.PI / 32)
+    }
+
+    for (let i = 0; i < this.discardCards.length; i++) {
+      this.discardCards[i].setPosition(
+        CardLocation.theirDiscard(this.container, i),
+      )
+      this.discardCards[i].container.setScale(0.8)
+      this.discardCards[i].container.setRotation(-Math.PI / 32)
+    }
   }
 }
