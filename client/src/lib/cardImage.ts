@@ -92,28 +92,13 @@ export class CardImage {
     }
 
     // Make events for the card
-    if (!Flags.mobile) {
-      this.imageSubject
-        .on('pointerover', this.onHover())
-        .on('pointerout', this.onHoverExit())
-        .on('pointerdown', () => {
-          this.createHoverBurst()
-          this.clickCallback()
-        })
-    } else {
-      this.imageSubject.on('pointerdown', () => {
+    this.imageSubject
+      .on('pointerover', this.onHover())
+      .on('pointerout', this.onHoverExit())
+      .on('pointerdown', () => {
         this.createHoverBurst()
-        this.scene.scene.launch('MenuScene', {
-          menu: 'focus',
-          card: this.card,
-          cost: this.cost,
-          btnString: this.focusString,
-          closeOnClick: this.focusCloseOnClick,
-          getCount: this.getCount,
-          callback: () => this.clickCallback(),
-        })
+        this.clickCallback()
       })
-    }
 
     if (interactive) {
       this.imageSubject.setInteractive()
@@ -393,11 +378,9 @@ export class CardImage {
       .on('pointerdown', () => this.clickCallback())
     this.setPoints(this.card.points)
 
-    if (!Flags.mobile) {
-      // Make cost and points interactive
-      this.txtCost.setInteractive()
-      this.txtPoints.setInteractive()
-    }
+    // Make cost and points interactive
+    this.txtCost.setInteractive()
+    this.txtPoints.setInteractive()
 
     this.container.add([this.txtCost, this.txtPoints])
   }
@@ -644,47 +627,6 @@ export class CardImage {
   }
 }
 
+// TODO Deprecated - remove
 // For mobile, the larger, full-sized CardImage
-export class FullSizeCardImage extends CardImage {
-  constructor(
-    card: Card,
-    container: any,
-    interactive: boolean = true,
-    shadow: boolean = true,
-  ) {
-    super(card, container, interactive, shadow)
-
-    // Move cost and points back to their normal location
-    this.revertStatsLocation()
-
-    // Load the full sized image and use it once loaded
-    const s = `fullCard-${card.name}`
-    if (this.scene.textures.exists(s)) {
-      this.imageSubject
-        .setTexture(s)
-        .setDisplaySize(Space.fullCardWidth, Space.fullCardHeight)
-    } else {
-      this.scene.load.image(s, `assets/cards/card-${card.name}.webp`).start()
-
-      // When image loads, set image texture
-      this.scene.load.once('complete', () => {
-        if (this.imageSubject) {
-          this.imageSubject
-            .setTexture(s)
-            .setDisplaySize(Space.fullCardWidth, Space.fullCardHeight)
-        }
-      })
-    }
-  }
-
-  // TODO Lots of constants pulled from different places
-  revertStatsLocation(): void {
-    this.txtCost
-      .setPosition(-((336 * 7) / 10) / 2 + 27, -336 / 2 + 25)
-      .setFontSize(36)
-
-    this.txtPoints
-      .setPosition(-((336 * 7) / 10) / 2 + 27, -336 / 2 + 75)
-      .setFontSize(36)
-  }
-}
+export class FullSizeCardImage extends CardImage {}
