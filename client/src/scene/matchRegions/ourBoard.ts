@@ -37,6 +37,10 @@ export default class OurBoardRegion extends Region {
   // Track whether shift is held
   isShiftHeld = false
 
+  // Persistent deck rendering (stack of cardbacks)
+  private deckCardbacks: CardImage[] = []
+  private deckContainer: Phaser.GameObjects.Container
+
   background: Phaser.GameObjects.Image
 
   create(scene: MatchScene): this {
@@ -49,6 +53,9 @@ export default class OurBoardRegion extends Region {
     })
 
     this.createBackground(scene)
+
+    // Create deck container first so it's added behind the rest.
+    this.createDeckBack()
 
     return this
   }
@@ -129,6 +136,27 @@ export default class OurBoardRegion extends Region {
     )
 
     this.background.setPosition(0, -(Space.todoHandOffset + Space.pad + 7))
+
+    // Keep deck cardback stack in correct absolute position after resize
+    const [x, y] = CardLocation.ourDeck(this.container)
+    this.deckContainer.setPosition(x, y)
+  }
+
+  private createDeckBack(): void {
+    // Make the deck stack a child of `this.container` so it renders:
+    // above the hand background (added in createBackground), but below hand cards
+    // (added later in displayState).
+    this.deckContainer = this.scene.add.container()
+    this.container.add(this.deckContainer)
+
+    const [x, y] = CardLocation.ourDeck(this.container)
+    this.deckContainer.setPosition(x, y)
+
+    // Rotate the whole deck stack slightly for depth.
+    this.deckContainer.setRotation(-Math.PI / 32)
+
+    // Deck size is driven by `displayState`; initialize stack as empty.
+    this.deckCardbacks = []
   }
 
   // Rename old onCardClick to onCardPlay
@@ -213,6 +241,27 @@ export default class OurBoardRegion extends Region {
   // Modify displayState to lower any raised card when state changes
   displayState(state: GameModel): void {
     this.deleteTemp()
+
+    // Sync deck stack cardbacks to current deck size.
+    // Deck is stored as Card[][] (card objects), so length is the count.
+    const desiredDeckCount = state.deck[0]?.length ?? 0
+
+    // Grow the stack
+    while (this.deckCardbacks.length < desiredDeckCount) {
+      const cardback = new CardImage(undefined, this.deckContainer, false, true)
+      this.deckCardbacks.push(cardback)
+    }
+
+    // Shrink the stack
+    while (this.deckCardbacks.length > desiredDeckCount) {
+      const extra = this.deckCardbacks.pop()
+      extra?.destroy()
+    }
+
+    for (let i = 0; i < this.deckCardbacks.length; i++) {
+      // CardLocation provides per-stack-position offsets (no alpha manipulation).
+      this.deckCardbacks[i].setPosition(CardLocation.ourDeckBackOffset(i))
+    }
 
     // Until we have mulliganed, hide (Delete) all the cards in our hand
     if (!state.mulligansComplete[0]) {

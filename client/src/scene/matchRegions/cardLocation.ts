@@ -6,12 +6,21 @@ import GameModel from '../../../../shared/state/gameModel'
 import { Space, Flags } from '../../settings/settings'
 
 // TODO Remove this, deck and discard are no longer used
-const todoTheirHandHeight = -Space.todoHandOffset
+const todoTheirHandHeight = Space.todoHandOffset - Space.cardHeight / 2
 
 // This describes where on screen each card in each region should appear
 // so that regions can move their cards to the appropriate locations for
 // other regions
 export default class CardLocation {
+  // Local offset (relative to the deck container origin) for the n-th
+  // cardback in the deck stack (0 = topmost/closest).
+  static ourDeckBackOffset(i = 0): [number, number] {
+    // Small stagger so multiple cardbacks are visible.
+    const deckBackXOffsetPx = -3
+    const deckBackYOffsetPx = -3
+    return [deckBackXOffsetPx * i, deckBackYOffsetPx * i]
+  }
+
   static ourHand(
     state: GameModel,
     i: number,
@@ -127,7 +136,8 @@ export default class CardLocation {
   ): [number, number] {
     const x = 200 + Space.cardWidth / 2
     const y = Space.windowHeight - todoTheirHandHeight
-    return [x - (container?.x || 0), y - (container?.y || 0)]
+    const [ox, oy] = CardLocation.ourDeckBackOffset(i)
+    return [x + ox - (container?.x || 0), y + oy - (container?.y || 0)]
   }
 
   static theirDeck(
