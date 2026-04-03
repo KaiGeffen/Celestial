@@ -546,51 +546,47 @@ export class CardImage {
   }
 
   private onClick(): () => void {
-    const createHoverBurst = () => {
-      // Don't do it for cardback
-      if (this.card.id === Catalog.cardback.id) {
-        return
-      }
-
-      const burst = this.scene.add.image(
-        this.imageSubject.x,
-        this.imageSubject.y,
-        this.imageSubject.texture.key,
-      )
-      burst.setDisplaySize(
-        this.imageSubject.displayWidth,
-        this.imageSubject.displayHeight,
-      )
-      burst.setAngle(this.imageSubject.angle)
-      burst.setAlpha(1)
-      this.scene.children.bringToTop(burst)
-
-      // Add the burst to the container
-      this.container.add(burst)
-
-      // Animate the burst growing and fading out
-      this.scene.tweens.add({
-        targets: burst,
-        displayWidth: Space.cardWidth * 1.5,
-        displayHeight: Space.cardHeight * 1.5,
-        alpha: 0,
-        duration: 340,
-        ease: 'Quad.Out',
-        onComplete: () => burst.destroy(),
-      })
-    }
-
-    // Do hover burst, then the onclick callback
     return () => {
-      if (this.doBurstEffect) {
-        createHoverBurst()
-      }
-
+      this.createHoverBurst()
       this.clickCallback()
     }
   }
 
-  private createHoverBurst(): void {}
+  // Exposed method, also used in onClick
+  createHoverBurst(): void {
+    if (!this.doBurstEffect) {
+      return
+    }
+
+    if (this.card.id === Catalog.cardback.id) {
+      return
+    }
+
+    const burst = this.scene.add.image(
+      this.imageSubject.x,
+      this.imageSubject.y,
+      this.imageSubject.texture.key,
+    )
+    burst.setDisplaySize(
+      this.imageSubject.displayWidth,
+      this.imageSubject.displayHeight,
+    )
+    burst.setAngle(this.imageSubject.angle)
+    burst.setAlpha(1)
+    this.scene.children.bringToTop(burst)
+
+    this.container.add(burst)
+
+    this.scene.tweens.add({
+      targets: burst,
+      displayWidth: Space.cardWidth * 1.5,
+      displayHeight: Space.cardHeight * 1.5,
+      alpha: 0,
+      duration: 340,
+      ease: 'Quad.Out',
+      onComplete: () => burst.destroy(),
+    })
+  }
 
   private setTint(color: number): void {
     this.imageBackground.setTint(color)
