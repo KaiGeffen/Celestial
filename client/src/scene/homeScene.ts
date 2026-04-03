@@ -12,6 +12,8 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 const NAVIGATION_BUTTON_WIDTH = 278
 
 export default class HomeScene extends BaseScene {
+  private coinsDisplayText: Phaser.GameObjects.Text
+
   constructor() {
     super({
       key: 'HomeScene',
@@ -330,11 +332,11 @@ export default class HomeScene extends BaseScene {
       .setOrigin(0, 0.5)
     textSizer.add(gemsText, { align: 'left' })
 
-    // Line 5: Coins
-    const coinsText = this.add
+    // Line 5: Coins (gold)
+    this.coinsDisplayText = this.add
       .text(0, 0, `💰 ${amtCoins.toLocaleString()}`, Style.username)
       .setOrigin(0, 0.5)
-    textSizer.add(coinsText, { align: 'left' })
+    textSizer.add(this.coinsDisplayText, { align: 'left' })
 
     // Layout text sizer
     textSizer.layout()
@@ -506,6 +508,12 @@ export default class HomeScene extends BaseScene {
 
     // Show any unseen achievements
     this.checkAndShowUnseenAchievements()
+
+    const coins = Server.getUserData().coins ?? 0
+    const coinsStr = `💰 ${coins.toLocaleString()}`
+    if (this.coinsDisplayText && this.coinsDisplayText.text !== coinsStr) {
+      this.coinsDisplayText.setText(coinsStr)
+    }
   }
 
   beforeExit(): void {
