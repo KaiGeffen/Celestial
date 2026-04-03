@@ -55,7 +55,8 @@ export default class TheirBoardRegion extends Region {
         CardLocation.theirDiscard(this.container, i),
       )
       this.discardCards[i].container.setScale(0.8)
-      this.discardCards[i].container.setRotation(-Math.PI / 32)
+      // Small tilt plus 180° so their cards are upside-down relative to ours
+      this.discardCards[i].container.setRotation(Math.PI - Math.PI / 32)
     }
 
     // Opponent deck: `state.deck[1]`
@@ -76,7 +77,8 @@ export default class TheirBoardRegion extends Region {
         CardLocation.theirDeck(this.container, i),
       )
       this.deckCardbacks[i].container.setScale(0.8)
-      this.deckCardbacks[i].container.setRotation(Math.PI / 32)
+      // Small tilt plus 180° so the top of the card faces them
+      this.deckCardbacks[i].container.setRotation(Math.PI + Math.PI / 32)
     }
 
     if (!state.mulligansComplete[1]) {
@@ -90,6 +92,8 @@ export default class TheirBoardRegion extends Region {
         state.hand[1][i],
         CardLocation.theirHand(state, i, this.container),
       ).moveToTopOnHover()
+
+      card.container.setRotation(Math.PI)
 
       this.cards.push(card)
       this.temp.push(card)
@@ -154,7 +158,7 @@ export default class TheirBoardRegion extends Region {
         CardLocation.theirDeck(this.container, i),
       )
       this.deckCardbacks[i].container.setScale(0.8)
-      this.deckCardbacks[i].container.setRotation(Math.PI / 32)
+      this.deckCardbacks[i].container.setRotation(Math.PI + Math.PI / 32)
     }
 
     for (let i = 0; i < this.discardCards.length; i++) {
@@ -162,7 +166,7 @@ export default class TheirBoardRegion extends Region {
         CardLocation.theirDiscard(this.container, i),
       )
       this.discardCards[i].container.setScale(0.8)
-      this.discardCards[i].container.setRotation(-Math.PI / 32)
+      this.discardCards[i].container.setRotation(Math.PI - Math.PI / 32)
     }
   }
 }
