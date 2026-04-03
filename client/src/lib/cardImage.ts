@@ -266,7 +266,8 @@ export class CardImage {
     this.imageSubject.setDisplaySize(Space.cardWidth, Space.cardHeight)
 
     if (shadow) {
-      this.scene.addShadow(this.imageBackground)
+      // TODO Skipping for now to not overload cpu
+      // this.scene.addShadow(this.imageBackground)
     }
 
     this.container.add(this.imageSubject)
@@ -289,7 +290,8 @@ export class CardImage {
     this.container.add(this.imageCardback)
 
     if (shadow) {
-      this.scene.addShadow(this.imageCardback)
+      // TODO Skipping for now to not overload cpu
+      // this.scene.addShadow(this.imageCardback)
     }
 
     this.imageCardback.setAlpha(this.card.id === Catalog.cardback.id ? 1 : 0)

@@ -150,10 +150,8 @@ export default class OurBoardRegion extends Region {
 
     // Keep deck/discard stacks aligned after resize.
     for (let i = 0; i < this.deckCardbacks.length; i++) {
-      this.deckCardbacks[i].setPosition(
-        CardLocation.ourDeck(this.container, i),
-      )
-      this.deckCardbacks[i].container.setScale(0.8)
+      this.deckCardbacks[i].setPosition(CardLocation.ourDeck(this.container, i))
+      this.deckCardbacks[i].container.setScale(0.75)
       this.deckCardbacks[i].container.setRotation(-Math.PI / 32)
     }
 
@@ -161,7 +159,7 @@ export default class OurBoardRegion extends Region {
       this.discardCards[i].setPosition(
         CardLocation.ourDiscard(this.container, i),
       )
-      this.discardCards[i].container.setScale(0.8)
+      this.discardCards[i].container.setScale(0.75)
       this.discardCards[i].container.setRotation(Math.PI / 32)
     }
   }
@@ -288,7 +286,7 @@ export default class OurBoardRegion extends Region {
       this.discardCards[i].setPosition(
         CardLocation.ourDiscard(this.container, i),
       )
-      this.discardCards[i].container.setScale(0.8)
+      this.discardCards[i].container.setScale(0.75)
       this.discardCards[i].container.setRotation(Math.PI / 32)
     }
 
@@ -310,10 +308,8 @@ export default class OurBoardRegion extends Region {
 
     for (let i = 0; i < this.deckCardbacks.length; i++) {
       // Use CardLocation's deck position (handles per-depth staggering).
-      this.deckCardbacks[i].setPosition(
-        CardLocation.ourDeck(this.container, i),
-      )
-      this.deckCardbacks[i].container.setScale(0.8)
+      this.deckCardbacks[i].setPosition(CardLocation.ourDeck(this.container, i))
+      this.deckCardbacks[i].container.setScale(0.75)
       this.deckCardbacks[i].container.setRotation(-Math.PI / 32)
     }
 

@@ -17,7 +17,7 @@ export default class CardLocation {
     i: number,
     container?: Phaser.GameObjects.Container,
   ): [number, number] {
-    let dx = Space.cardWidth
+    let dx = Space.cardWidth - 1
 
     if (state !== undefined) {
       const totalCards = state.hand[0].length
