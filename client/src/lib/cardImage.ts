@@ -118,7 +118,7 @@ export class CardImage {
     return this
   }
 
-  setOnClick(f: () => void, removeListeners = false): this {
+  setOnClick(f: () => void): this {
     this.clickCallback = f
     this.interactive = true
     return this

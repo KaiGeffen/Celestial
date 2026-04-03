@@ -102,6 +102,7 @@ export default class OurBoardRegion extends Region {
 
       // If no errors, play the card
       this.onCardPlay(i, card, this.cards, state)()
+      card.doBurstEffect = false
     })
   }
 
@@ -167,6 +168,7 @@ export default class OurBoardRegion extends Region {
         y: nextStoryPosition[1],
         duration: Time.playCard(),
         ease: 'Sine.easeInOut',
+        // Moves other cards in hand to fill the hole
         onStart: () => {
           setTimeout(() => {
             this.scene.hint.hide()
