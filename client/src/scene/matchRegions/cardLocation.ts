@@ -6,7 +6,7 @@ import GameModel from '../../../../shared/state/gameModel'
 import { Space, Flags } from '../../settings/settings'
 
 // TODO Remove this, deck and discard are no longer used
-const todoTheirHandHeight = Space.todoHandOffset - 200
+const todoTheirHandHeight = Space.todoHandOffset - 150
 
 // This describes where on screen each card in each region should appear
 // so that regions can move their cards to the appropriate locations for
@@ -125,7 +125,7 @@ export default class CardLocation {
     container?: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const x = 220 + Space.cardWidth / 2
+    const x = 320
     const y = Space.windowHeight - todoTheirHandHeight
 
     // Small stagger so multiple cardbacks are visible.
@@ -150,8 +150,8 @@ export default class CardLocation {
     container: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const x = Space.windowWidth - (220 + Space.cardWidth / 2)
-    const y = Space.windowHeight + todoTheirHandHeight
+    const x = Space.windowWidth - 320
+    const y = Space.windowHeight - todoTheirHandHeight
 
     // Small stagger so multiple cardbacks are visible.
     const deckBackXOffsetPx = -3

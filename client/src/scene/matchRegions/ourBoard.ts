@@ -135,8 +135,7 @@ export default class OurBoardRegion extends Region {
     this.discardContainer = this.scene.add.container()
     this.container.add(this.discardContainer)
 
-    // Slight rotation for depth (matches other stacks).
-    this.discardContainer.setRotation(Math.PI / 32)
+    // NOTE: do not rotate the container; rotate each card instead.
   }
 
   onWindowResize(): void {
@@ -149,15 +148,22 @@ export default class OurBoardRegion extends Region {
 
     this.background.setPosition(0, -(Space.todoHandOffset + Space.pad + 7))
 
-    // // Keep deck cardback stack in correct absolute position after resize
-    // const [x, y] = CardLocation.ourDeck(this.container)
-    // this.deckContainer.setPosition(x, y)
+    // Keep deck/discard stacks aligned after resize.
+    for (let i = 0; i < this.deckCardbacks.length; i++) {
+      this.deckCardbacks[i].setPosition(
+        CardLocation.ourDeck(this.container, i),
+      )
+      this.deckCardbacks[i].container.setScale(0.8)
+      this.deckCardbacks[i].container.setRotation(-Math.PI / 32)
+    }
 
-    // for (let i = 0; i < this.discardCards.length; i++) {
-    //   this.discardCards[i].setPosition(
-    //     CardLocation.ourDiscard(this.discardContainer, i),
-    //   )
-    // }
+    for (let i = 0; i < this.discardCards.length; i++) {
+      this.discardCards[i].setPosition(
+        CardLocation.ourDiscard(this.container, i),
+      )
+      this.discardCards[i].container.setScale(0.8)
+      this.discardCards[i].container.setRotation(Math.PI / 32)
+    }
   }
 
   private createDeck(): void {
@@ -168,7 +174,7 @@ export default class OurBoardRegion extends Region {
     this.container.add(this.deckContainer)
 
     // Rotate the whole deck stack slightly for depth.
-    this.deckContainer.setRotation(-Math.PI / 32)
+    // NOTE: do not rotate the container; rotate each card instead.
 
     this.deckCardbacks = []
   }
@@ -278,11 +284,12 @@ export default class OurBoardRegion extends Region {
       // Set to the right image
       this.discardCards[i].setCard(state.pile[0][i])
 
-      // Use CardLocation's deck position (handles per-depth staggering).
+      // Use CardLocation's discard position (handles per-depth staggering).
       this.discardCards[i].setPosition(
         CardLocation.ourDiscard(this.container, i),
       )
-      // this.discardCards[i].container.setScale(0.8)
+      this.discardCards[i].container.setScale(0.8)
+      this.discardCards[i].container.setRotation(Math.PI / 32)
     }
 
     // Sync deck stack cardbacks to current deck size.
@@ -303,8 +310,11 @@ export default class OurBoardRegion extends Region {
 
     for (let i = 0; i < this.deckCardbacks.length; i++) {
       // Use CardLocation's deck position (handles per-depth staggering).
-      this.deckCardbacks[i].setPosition(CardLocation.ourDeck(this.container, i))
-      // this.deckCardbacks[i].container.setScale(0.8)
+      this.deckCardbacks[i].setPosition(
+        CardLocation.ourDeck(this.container, i),
+      )
+      this.deckCardbacks[i].container.setScale(0.8)
+      this.deckCardbacks[i].container.setRotation(-Math.PI / 32)
     }
 
     // Until we have mulliganed, hide (Delete) all the cards in our hand
