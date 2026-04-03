@@ -41,6 +41,10 @@ export default class OurBoardRegion extends Region {
   private deckCardbacks: CardImage[] = []
   private deckContainer: Phaser.GameObjects.Container
 
+  // Persistent discard pile (face-up cards)
+  private discardCards: CardImage[] = []
+  private discardContainer: Phaser.GameObjects.Container
+
   background: Phaser.GameObjects.Image
 
   create(scene: MatchScene): this {
@@ -54,6 +58,7 @@ export default class OurBoardRegion extends Region {
 
     this.createBackground(scene)
 
+    this.createDiscard()
     this.createDeck()
 
     return this
@@ -126,6 +131,14 @@ export default class OurBoardRegion extends Region {
     this.container.add(this.background)
   }
 
+  private createDiscard(): void {
+    this.discardContainer = this.scene.add.container()
+    this.container.add(this.discardContainer)
+
+    // Slight rotation for depth (matches other stacks).
+    this.discardContainer.setRotation(Math.PI / 32)
+  }
+
   onWindowResize(): void {
     this.background.setScale(
       this.background.width >= Space.windowWidth
@@ -136,9 +149,15 @@ export default class OurBoardRegion extends Region {
 
     this.background.setPosition(0, -(Space.todoHandOffset + Space.pad + 7))
 
-    // Keep deck cardback stack in correct absolute position after resize
-    const [x, y] = CardLocation.ourDeck(this.container)
-    this.deckContainer.setPosition(x, y)
+    // // Keep deck cardback stack in correct absolute position after resize
+    // const [x, y] = CardLocation.ourDeck(this.container)
+    // this.deckContainer.setPosition(x, y)
+
+    // for (let i = 0; i < this.discardCards.length; i++) {
+    //   this.discardCards[i].setPosition(
+    //     CardLocation.ourDiscard(this.discardContainer, i),
+    //   )
+    // }
   }
 
   private createDeck(): void {
@@ -237,6 +256,35 @@ export default class OurBoardRegion extends Region {
   displayState(state: GameModel): void {
     this.deleteTemp()
 
+    // Sync our discard pile to current state.
+    // In this game model, this corresponds to `state.pile[0]`.
+    const desiredDiscardCount = state.pile[0].length
+
+    // Grow
+    while (this.discardCards.length < desiredDiscardCount) {
+      const card = state.pile[0][this.discardCards.length]
+      const cardImg = new CardImage(card, this.discardContainer, false, true)
+      this.discardCards.push(cardImg)
+    }
+
+    // Shrink
+    while (this.discardCards.length > desiredDiscardCount) {
+      const extra = this.discardCards.pop()
+      extra?.destroy()
+    }
+
+    // Update content + positions.
+    for (let i = 0; i < this.discardCards.length; i++) {
+      // Set to the right image
+      this.discardCards[i].setCard(state.pile[0][i])
+
+      // Use CardLocation's deck position (handles per-depth staggering).
+      this.discardCards[i].setPosition(
+        CardLocation.ourDiscard(this.container, i),
+      )
+      // this.discardCards[i].container.setScale(0.8)
+    }
+
     // Sync deck stack cardbacks to current deck size.
     // Deck is stored as Card[][] (card objects), so length is the count.
     const desiredDeckCount = state.deck[0]?.length ?? 0
@@ -256,9 +304,7 @@ export default class OurBoardRegion extends Region {
     for (let i = 0; i < this.deckCardbacks.length; i++) {
       // Use CardLocation's deck position (handles per-depth staggering).
       this.deckCardbacks[i].setPosition(CardLocation.ourDeck(this.container, i))
-      this.deckCardbacks[i].container.setScale(0.8)
-
-      this.deckCardbacks[i].container
+      // this.deckCardbacks[i].container.setScale(0.8)
     }
 
     // Until we have mulliganed, hide (Delete) all the cards in our hand

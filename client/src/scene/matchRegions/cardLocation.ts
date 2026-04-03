@@ -150,18 +150,32 @@ export default class CardLocation {
     container: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const x = Space.windowWidth - Space.cardWidth / 2 - 200
-    const y = Space.windowHeight - todoTheirHandHeight
-    return [x - container.x, y - container.y]
+    const x = Space.windowWidth - (220 + Space.cardWidth / 2)
+    const y = Space.windowHeight + todoTheirHandHeight
+
+    // Small stagger so multiple cardbacks are visible.
+    const deckBackXOffsetPx = -3
+    const deckBackYOffsetPx = -3
+    const ox = -deckBackXOffsetPx * i
+    const oy = deckBackYOffsetPx * i
+
+    return [x + ox - (container?.x || 0), y + oy - (container?.y || 0)]
   }
 
   static theirDiscard(
     container: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const x = Space.windowWidth - Space.cardWidth / 2 - 200
-    const y = todoTheirHandHeight
-    return [x - container.x, y - container.y]
+    const x = -220 + Space.cardWidth / 2
+    const y = Space.windowHeight - todoTheirHandHeight
+
+    // Small stagger so multiple cardbacks are visible.
+    const deckBackXOffsetPx = -3
+    const deckBackYOffsetPx = -3
+    const ox = deckBackXOffsetPx * i
+    const oy = deckBackYOffsetPx * i
+
+    return [x + ox - (container?.x || 0), y + oy - (container?.y || 0)]
   }
 
   static overlay(
