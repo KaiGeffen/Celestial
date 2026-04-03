@@ -298,10 +298,18 @@ export default class HomeScene extends BaseScene {
       NAVIGATION_BUTTON_WIDTH - Space.avatarSize - Space.pad * 3
 
     // Line 1: Username (with word wrap to prevent overflow)
+    const usernameFontSize =
+      typeof Style.username.fontSize === 'string'
+        ? parseInt(Style.username.fontSize, 10)
+        : (Style.username.fontSize as number)
+
     const usernameText = this.add
       .text(0, 0, username, Style.username)
       .setOrigin(0, 0.5)
-      .setWordWrapWidth(maxTextWidth)
+      // Advanced wrapping helps even for "single long words" usernames
+      .setWordWrapWidth(maxTextWidth, true)
+      // Lock width in the layout (important when rexUI measures text)
+      .setFixedSize(maxTextWidth, usernameFontSize)
     textSizer.add(usernameText, { align: 'left' })
 
     // Line 2: Divider line (thin black line)
