@@ -54,8 +54,7 @@ export default class OurBoardRegion extends Region {
 
     this.createBackground(scene)
 
-    // Create deck container first so it's added behind the rest.
-    this.createDeckBack()
+    this.createDeck()
 
     return this
   }
@@ -142,20 +141,16 @@ export default class OurBoardRegion extends Region {
     this.deckContainer.setPosition(x, y)
   }
 
-  private createDeckBack(): void {
+  private createDeck(): void {
     // Make the deck stack a child of `this.container` so it renders:
     // above the hand background (added in createBackground), but below hand cards
     // (added later in displayState).
     this.deckContainer = this.scene.add.container()
     this.container.add(this.deckContainer)
 
-    const [x, y] = CardLocation.ourDeck(this.container)
-    this.deckContainer.setPosition(x, y)
-
     // Rotate the whole deck stack slightly for depth.
     this.deckContainer.setRotation(-Math.PI / 32)
 
-    // Deck size is driven by `displayState`; initialize stack as empty.
     this.deckCardbacks = []
   }
 
@@ -246,7 +241,7 @@ export default class OurBoardRegion extends Region {
     // Deck is stored as Card[][] (card objects), so length is the count.
     const desiredDeckCount = state.deck[0]?.length ?? 0
 
-    // Grow the stack
+    // Grow the deck
     while (this.deckCardbacks.length < desiredDeckCount) {
       const cardback = new CardImage(undefined, this.deckContainer, false, true)
       this.deckCardbacks.push(cardback)
@@ -259,8 +254,11 @@ export default class OurBoardRegion extends Region {
     }
 
     for (let i = 0; i < this.deckCardbacks.length; i++) {
-      // CardLocation provides per-stack-position offsets (no alpha manipulation).
-      this.deckCardbacks[i].setPosition(CardLocation.ourDeckBackOffset(i))
+      // Use CardLocation's deck position (handles per-depth staggering).
+      this.deckCardbacks[i].setPosition(CardLocation.ourDeck(this.container, i))
+      this.deckCardbacks[i].container.setScale(0.8)
+
+      this.deckCardbacks[i].container
     }
 
     // Until we have mulliganed, hide (Delete) all the cards in our hand

@@ -6,21 +6,12 @@ import GameModel from '../../../../shared/state/gameModel'
 import { Space, Flags } from '../../settings/settings'
 
 // TODO Remove this, deck and discard are no longer used
-const todoTheirHandHeight = Space.todoHandOffset - Space.cardHeight / 2
+const todoTheirHandHeight = Space.todoHandOffset - 200
 
 // This describes where on screen each card in each region should appear
 // so that regions can move their cards to the appropriate locations for
 // other regions
 export default class CardLocation {
-  // Local offset (relative to the deck container origin) for the n-th
-  // cardback in the deck stack (0 = topmost/closest).
-  static ourDeckBackOffset(i = 0): [number, number] {
-    // Small stagger so multiple cardbacks are visible.
-    const deckBackXOffsetPx = -3
-    const deckBackYOffsetPx = -3
-    return [deckBackXOffsetPx * i, deckBackYOffsetPx * i]
-  }
-
   static ourHand(
     state: GameModel,
     i: number,
@@ -32,7 +23,7 @@ export default class CardLocation {
       const totalCards = state.hand[0].length
 
       // If total width exceeds max, scale down spacing
-      const maxWidth = Space.windowWidth - (200 + 200 + Space.cardWidth)
+      const maxWidth = Space.windowWidth - 1200
       const totalWidth = dx * (totalCards - 1)
       if (totalWidth > maxWidth) {
         dx *= maxWidth / totalWidth
@@ -134,9 +125,15 @@ export default class CardLocation {
     container?: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const x = 200 + Space.cardWidth / 2
+    const x = 220 + Space.cardWidth / 2
     const y = Space.windowHeight - todoTheirHandHeight
-    const [ox, oy] = CardLocation.ourDeckBackOffset(i)
+
+    // Small stagger so multiple cardbacks are visible.
+    const deckBackXOffsetPx = -3
+    const deckBackYOffsetPx = -3
+    const ox = deckBackXOffsetPx * i
+    const oy = deckBackYOffsetPx * i
+
     return [x + ox - (container?.x || 0), y + oy - (container?.y || 0)]
   }
 
