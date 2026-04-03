@@ -161,6 +161,21 @@ export default class OurBoardRegion extends Region {
       // Hide any hints
       this.scene.hint.hide()
 
+      // If the whole hand was raised due to hover, lower the other cards when playing
+      if (!this.isShiftHeld) {
+        const loweredY = Space.cardHeight / 2 - Space.todoHandOffset
+        hand.forEach((other) => {
+          if (other !== card) {
+            this.scene.tweens.add({
+              targets: other.container,
+              y: loweredY,
+              duration: Time.cardFocus,
+              ease: 'Sine.easeOut',
+            })
+          }
+        })
+      }
+
       // Send card to story
       this.scene.tweens.add({
         targets: card.container,
@@ -218,8 +233,8 @@ export default class OurBoardRegion extends Region {
         .setCost(state.cardCosts[i])
         .moveToTopOnHover()
 
-      // If shift is held or card was hovered, raise the card immediately
-      if (i === this.raisedCardIndex || this.isShiftHeld) {
+      // If shift is held or hand is currently raised (hover), raise all cards immediately
+      if (this.isShiftHeld || this.raisedCardIndex !== null) {
         card.container.setY(-HOVER_OFFSET)
       }
 
@@ -274,18 +289,20 @@ export default class OurBoardRegion extends Region {
       // Show the card's cost
       this.displayCostCallback(cost)
 
-      // Only raise if shift is not held
-      if (!this.isShiftHeld) {
-        // Raise the card
-        this.scene.tweens.add({
-          targets: card.container,
-          y: -HOVER_OFFSET,
-          duration: Time.cardFocus,
-          ease: 'Sine.easeOut',
-        })
+      const wasRaised = this.raisedCardIndex !== null
+      this.raisedCardIndex = index
 
-        // Track which card is raised
-        this.raisedCardIndex = index
+      // Only raise if shift is not held (shift already means "raise all")
+      // When not shifted, raise the entire hand on first hover.
+      if (!this.isShiftHeld && !wasRaised) {
+        this.cards.forEach((c) => {
+          this.scene.tweens.add({
+            targets: c.container,
+            y: -HOVER_OFFSET,
+            duration: Time.cardFocus,
+            ease: 'Sine.easeOut',
+          })
+        })
       }
     }
   }
@@ -300,19 +317,26 @@ export default class OurBoardRegion extends Region {
       // Hide the cost
       this.displayCostCallback(0)
 
-      // Only lower if shift is not held
-      if (!this.isShiftHeld) {
-        // Lower the card
-        this.scene.tweens.add({
-          targets: card.container,
-          y: Space.cardHeight / 2 - Space.todoHandOffset,
-          duration: Time.cardFocus,
-          ease: 'Sine.easeOut',
-        })
+      const pointer = this.scene.input.activePointer
+      const pointerOverAnyCard = cards.some((c) =>
+        c.imageSubject.getBounds().contains(pointer.x, pointer.y),
+      )
 
-        // Clear raised card tracking if this was the raised card
-        if (this.raisedCardIndex === index) {
-          this.raisedCardIndex = null
+      // Only lower if the pointer left the whole hand
+      if (!pointerOverAnyCard) {
+        this.raisedCardIndex = null
+
+        // Only lower if shift is not held (shift already means "raise all")
+        if (!this.isShiftHeld) {
+          const loweredY = Space.cardHeight / 2 - Space.todoHandOffset
+          cards.forEach((c) => {
+            this.scene.tweens.add({
+              targets: c.container,
+              y: loweredY,
+              duration: Time.cardFocus,
+              ease: 'Sine.easeOut',
+            })
+          })
         }
       }
     }
@@ -349,10 +373,15 @@ export default class OurBoardRegion extends Region {
     if (!this.isShiftHeld) return // Don't lower if already lowered
     this.isShiftHeld = false
 
-    this.cards.forEach((card, index) => {
+    const shouldRemainRaisedDueToHover = this.raisedCardIndex !== null
+    const targetY = shouldRemainRaisedDueToHover
+      ? -HOVER_OFFSET
+      : Space.cardHeight / 2 - Space.todoHandOffset
+
+    this.cards.forEach((card) => {
       this.scene.tweens.add({
         targets: card.container,
-        y: Space.cardHeight / 2 - Space.todoHandOffset,
+        y: targetY,
         duration: Time.cardFocus,
         ease: 'Sine.easeOut',
       })
