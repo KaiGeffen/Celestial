@@ -121,6 +121,9 @@ export default class MulliganRegion extends Region {
         .setCost(state.hand[0][i].cost)
         .setOnClick(this.onCardClick(i))
 
+      // Don't do the burst effect
+      card.doBurstEffect = false
+
       this.cards.push(card)
 
       this.addHotkeyHint(position, `${i + 1}`)

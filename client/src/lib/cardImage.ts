@@ -11,12 +11,15 @@ const COLOR_BETTER = '#55dd55'
 const COLOR_WORSE = '#e45555'
 const STAT_STROKE = '#000000'
 
+// TODO Many fields should be private
+
 export class CardImage {
   scene: BaseScene
 
   card: Card
   visible = true
   interactive = false
+  doBurstEffect = true
 
   // Image layers
   imageBackground: Phaser.GameObjects.Image
@@ -84,10 +87,7 @@ export class CardImage {
     this.imageSubject
       .on('pointerover', this.onHover())
       .on('pointerout', this.onHoverExit())
-      .on('pointerdown', () => {
-        this.createHoverBurst()
-        this.clickCallback()
-      })
+      .on('pointerdown', this.onClick())
 
     if (interactive) {
       this.imageSubject.setInteractive()
@@ -545,39 +545,52 @@ export class CardImage {
     }
   }
 
-  private createHoverBurst(): void {
-    // Don't do it for cardback
-    if (this.card.id === Catalog.cardback.id) {
-      return
+  private onClick(): () => void {
+    const createHoverBurst = () => {
+      // Don't do it for cardback
+      if (this.card.id === Catalog.cardback.id) {
+        return
+      }
+
+      const burst = this.scene.add.image(
+        this.imageSubject.x,
+        this.imageSubject.y,
+        this.imageSubject.texture.key,
+      )
+      burst.setDisplaySize(
+        this.imageSubject.displayWidth,
+        this.imageSubject.displayHeight,
+      )
+      burst.setAngle(this.imageSubject.angle)
+      burst.setAlpha(1)
+      this.scene.children.bringToTop(burst)
+
+      // Add the burst to the container
+      this.container.add(burst)
+
+      // Animate the burst growing and fading out
+      this.scene.tweens.add({
+        targets: burst,
+        displayWidth: Space.cardWidth * 1.5,
+        displayHeight: Space.cardHeight * 1.5,
+        alpha: 0,
+        duration: 340,
+        ease: 'Quad.Out',
+        onComplete: () => burst.destroy(),
+      })
     }
 
-    const burst = this.scene.add.image(
-      this.imageSubject.x,
-      this.imageSubject.y,
-      this.imageSubject.texture.key,
-    )
-    burst.setDisplaySize(
-      this.imageSubject.displayWidth,
-      this.imageSubject.displayHeight,
-    )
-    burst.setAngle(this.imageSubject.angle)
-    burst.setAlpha(1)
-    this.scene.children.bringToTop(burst)
+    // Do hover burst, then the onclick callback
+    return () => {
+      if (this.doBurstEffect) {
+        createHoverBurst()
+      }
 
-    // Add the burst to the container
-    this.container.add(burst)
-
-    // Animate the burst growing and fading out
-    this.scene.tweens.add({
-      targets: burst,
-      displayWidth: Space.cardWidth * 1.5,
-      displayHeight: Space.cardHeight * 1.5,
-      alpha: 0,
-      duration: 340,
-      ease: 'Quad.Out',
-      onComplete: () => burst.destroy(),
-    })
+      this.clickCallback()
+    }
   }
+
+  private createHoverBurst(): void {}
 
   private setTint(color: number): void {
     this.imageBackground.setTint(color)
