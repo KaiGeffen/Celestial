@@ -17,7 +17,6 @@ export default class CardLocation {
     i: number,
     container?: Phaser.GameObjects.Container,
   ): [number, number] {
-    const leftEdge = 200 + Space.cardWidth / 2
     let dx = Space.cardWidth
 
     if (state !== undefined) {
@@ -30,7 +29,11 @@ export default class CardLocation {
         dx *= maxWidth / totalWidth
       }
 
-      const x = leftEdge + i * dx
+      // Center the whole hand horizontally: first/last card centers span
+      // symmetrically around `Space.windowWidth / 2`.
+      const firstCardCenterX =
+        Space.windowWidth / 2 - (dx * (totalCards - 1)) / 2
+      const x = firstCardCenterX + i * dx
       let y = Space.windowHeight + Space.cardHeight / 2 - Space.todoHandOffset
 
       if (container !== undefined) {
