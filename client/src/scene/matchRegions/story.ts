@@ -75,6 +75,7 @@ export default class StoryRegion extends Region {
       this.displayScores(state)
     }
 
+    // TODO This is just animating card coming from opps hand, confusing
     this.animate(state, cards)
 
     this.cards = cards
@@ -134,12 +135,12 @@ export default class StoryRegion extends Region {
   }
 
   private animate(state: GameModel, cards: CardImage[]): void {
-    // If the last card was just played by the opponent,
-    // animate it from their hand
     if (state.story.acts.length === 0) {
       return
     }
 
+    // If the last card was just played by the opponent,
+    // animate it from their hand
     const lastAct = state.story.acts[state.story.acts.length - 1]
     const lastCardTheirs = lastAct.owner === 1
     const noPasses = state.passes === 0

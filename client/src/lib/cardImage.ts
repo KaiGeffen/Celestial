@@ -547,13 +547,13 @@ export class CardImage {
 
   private onClick(): () => void {
     return () => {
-      this.createHoverBurst()
+      this.emphasize()
       this.clickCallback()
     }
   }
 
   // Exposed method, also used in onClick
-  createHoverBurst(): void {
+  emphasize(): void {
     if (!this.doBurstEffect) {
       return
     }
