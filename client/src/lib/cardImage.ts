@@ -146,6 +146,21 @@ export class CardImage {
     return this
   }
 
+  /**
+   * Undo the hover behavior, and call the exit callback
+   */
+  onHoverExitBehavior(): void {
+    this.scene.tweens.killTweensOf(this.imageSubject)
+    this.scene.tweens.add({
+      targets: this.imageSubject,
+      displayWidth: Space.cardWidth,
+      displayHeight: Space.cardHeight,
+      duration: 120,
+      ease: 'Quad.Out',
+    })
+    this.exitCallback()
+  }
+
   setPlayable(isPlayable: boolean): void {
     if (isPlayable) {
       this.clearTint()
@@ -533,17 +548,8 @@ export class CardImage {
         return
       }
 
-      this.scene.tweens.killTweensOf(this.imageSubject)
-      this.scene.tweens.add({
-        targets: this.imageSubject,
-        displayWidth: Space.cardWidth,
-        displayHeight: Space.cardHeight,
-        duration: 120,
-        ease: 'Quad.Out',
-      })
-
-      // Do the callback
-      this.exitCallback()
+      // Do the exit behavior
+      this.onHoverExitBehavior()
     }
   }
 

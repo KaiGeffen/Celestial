@@ -123,7 +123,12 @@ export default class OurBoardRegion extends Region {
 
       // If no errors, play the card
       this.onCardPlay(i, card, this.cards, state)()
+
+      // Stop the card from doing a further on-click visual effect
       card.doBurstEffect = false
+
+      // Zoom out the subject
+      card.onHoverExitBehavior()
     })
   }
 
