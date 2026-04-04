@@ -54,7 +54,7 @@ export default class TheirBoardRegion extends Region {
       this.discardCards[i].setPosition(
         CardLocation.theirDiscard(this.container, i),
       )
-      this.discardCards[i].container.setScale(0.8)
+      this.discardCards[i].container.setScale(0.75)
       // Small tilt plus 180° so their cards are upside-down relative to ours
       this.discardCards[i].container.setRotation(Math.PI - Math.PI / 32)
     }
@@ -76,7 +76,7 @@ export default class TheirBoardRegion extends Region {
       this.deckCardbacks[i].setPosition(
         CardLocation.theirDeck(this.container, i),
       )
-      this.deckCardbacks[i].container.setScale(0.8)
+      this.deckCardbacks[i].container.setScale(0.75)
       // Small tilt plus 180° so the top of the card faces them
       this.deckCardbacks[i].container.setRotation(Math.PI + Math.PI / 32)
     }
@@ -157,7 +157,7 @@ export default class TheirBoardRegion extends Region {
       this.deckCardbacks[i].setPosition(
         CardLocation.theirDeck(this.container, i),
       )
-      this.deckCardbacks[i].container.setScale(0.8)
+      this.deckCardbacks[i].container.setScale(0.75)
       this.deckCardbacks[i].container.setRotation(Math.PI + Math.PI / 32)
     }
 
@@ -165,7 +165,7 @@ export default class TheirBoardRegion extends Region {
       this.discardCards[i].setPosition(
         CardLocation.theirDiscard(this.container, i),
       )
-      this.discardCards[i].container.setScale(0.8)
+      this.discardCards[i].container.setScale(0.75)
       this.discardCards[i].container.setRotation(Math.PI - Math.PI / 32)
     }
   }

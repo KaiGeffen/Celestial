@@ -17,6 +17,13 @@ import { server } from '../../server'
 // The y distance card moves up when hovered
 const HOVER_OFFSET = Space.cardHeight / 2 + Space.padSmall
 
+// When the hand is hovered, spread cards horizontally so they do not overlap.
+// Extra gap vs stacked hand (`ourHand` uses ~cardWidth − 1): visibly farther apart when fanned.
+const HAND_FAN_MIN_DX = Space.cardWidth - Space.pad
+// Stacked `ourHand` uses `windowWidth - 1200` — too narrow for a fanned row; that clamp was
+// overriding `HAND_FAN_MIN_DX` almost always. Fanned layout uses nearly full width.
+const HAND_FAN_SCREEN_MARGIN = 80
+
 export default class OurBoardRegion extends Region {
   // Function called when elements in this region are interacted with
   callback: (i: number) => boolean
@@ -44,6 +51,9 @@ export default class OurBoardRegion extends Region {
   // Persistent discard pile (face-up cards)
   private discardCards: CardImage[] = []
   private discardContainer: Phaser.GameObjects.Container
+
+  /** Last state used to lay out the hand (fan + rest positions). */
+  private lastHandState: GameModel | null = null
 
   background: Phaser.GameObjects.Image
 
@@ -162,6 +172,8 @@ export default class OurBoardRegion extends Region {
       this.discardCards[i].container.setScale(0.75)
       this.discardCards[i].container.setRotation(Math.PI / 32)
     }
+
+    this.reflowHandAfterResize()
   }
 
   private createDeck(): void {
@@ -175,6 +187,52 @@ export default class OurBoardRegion extends Region {
     // NOTE: do not rotate the container; rotate each card instead.
 
     this.deckCardbacks = []
+  }
+
+  /** Fanned hover layout: wider horizontal spacing only (no rotation / arc). */
+  private ourHandFannedLayout(
+    state: GameModel,
+    i: number,
+  ): { x: number; y: number } {
+    const n = state.hand[0].length
+    const maxWidth = Math.max(0, Space.windowWidth - HAND_FAN_SCREEN_MARGIN * 2)
+
+    if (n <= 1) {
+      return {
+        x: Space.windowWidth / 2 - this.container.x,
+        y: -HOVER_OFFSET,
+      }
+    }
+
+    let dx = HAND_FAN_MIN_DX
+    const totalWidth = dx * (n - 1)
+    if (totalWidth > maxWidth) {
+      dx = maxWidth / (n - 1)
+    }
+    const firstCardCenterX = Space.windowWidth / 2 - (dx * (n - 1)) / 2
+    const x = firstCardCenterX + i * dx - this.container.x
+    const y = -HOVER_OFFSET
+
+    return { x, y }
+  }
+
+  private reflowHandAfterResize(): void {
+    if (!this.lastHandState || !this.cards?.length) {
+      return
+    }
+    const st = this.lastHandState
+    if (this.isShiftHeld || this.raisedCardIndex !== null) {
+      this.cards.forEach((c, idx) => {
+        const { x, y } = this.ourHandFannedLayout(st, idx)
+        c.setPosition([x, y])
+        c.container.setRotation(0)
+      })
+    } else {
+      this.cards.forEach((c, idx) => {
+        c.setPosition(CardLocation.ourHand(st, idx, this.container))
+        c.container.setRotation(0)
+      })
+    }
   }
 
   // Rename old onCardClick to onCardPlay
@@ -209,12 +267,14 @@ export default class OurBoardRegion extends Region {
 
       // If the whole hand was raised due to hover, lower the other cards when playing
       if (!this.isShiftHeld) {
-        const loweredY = Space.cardHeight / 2 - Space.todoHandOffset
-        hand.forEach((other) => {
+        hand.forEach((other, idx) => {
           if (other !== card) {
+            const [x, y] = CardLocation.ourHand(state, idx, this.container)
             this.scene.tweens.add({
               targets: other.container,
-              y: loweredY,
+              x,
+              y,
+              rotation: 0,
               duration: Time.cardFocus,
               ease: 'Sine.easeOut',
             })
@@ -322,6 +382,8 @@ export default class OurBoardRegion extends Region {
       this.cardHotkeysRegistered = true
     }
 
+    this.lastHandState = state
+
     // Add each of the cards in our hand
     this.cards = []
     for (let i = 0; i < state.hand[0].length; i++) {
@@ -331,11 +393,6 @@ export default class OurBoardRegion extends Region {
       )
         .setCost(state.cardCosts[i])
         .moveToTopOnHover()
-
-      // If shift is held or hand is currently raised (hover), raise all cards immediately
-      if (this.isShiftHeld || this.raisedCardIndex !== null) {
-        card.container.setY(-HOVER_OFFSET)
-      }
 
       const cost = state.cardCosts[i]
       card.setOnHover(
@@ -358,6 +415,15 @@ export default class OurBoardRegion extends Region {
 
       // If shift is held, show the hotkey hint
       hotkeyText.setVisible(this.isShiftHeld)
+    }
+
+    // Shift or hover-active: fan out so cards do not overlap
+    if (this.isShiftHeld || this.raisedCardIndex !== null) {
+      this.cards.forEach((c, idx) => {
+        const { x, y } = this.ourHandFannedLayout(state, idx)
+        c.setPosition([x, y])
+        c.container.setRotation(0)
+      })
     }
 
     // Hover whichever card was being hovered last
@@ -392,12 +458,19 @@ export default class OurBoardRegion extends Region {
       this.raisedCardIndex = index
 
       // Only raise if shift is not held (shift already means "raise all")
-      // When not shifted, raise the entire hand on first hover.
+      // When not shifted, fan the entire hand on first hover.
       if (!this.isShiftHeld && !wasRaised) {
-        this.cards.forEach((c) => {
+        const st = this.lastHandState
+        if (!st) {
+          return
+        }
+        this.cards.forEach((c, idx) => {
+          const { x, y } = this.ourHandFannedLayout(st, idx)
           this.scene.tweens.add({
             targets: c.container,
-            y: -HOVER_OFFSET,
+            x,
+            y,
+            rotation: 0,
             duration: Time.cardFocus,
             ease: 'Sine.easeOut',
           })
@@ -427,11 +500,17 @@ export default class OurBoardRegion extends Region {
 
         // Only lower if shift is not held (shift already means "raise all")
         if (!this.isShiftHeld) {
-          const loweredY = Space.cardHeight / 2 - Space.todoHandOffset
-          cards.forEach((c) => {
+          const st = this.lastHandState
+          if (!st) {
+            return
+          }
+          cards.forEach((c, idx) => {
+            const [x, y] = CardLocation.ourHand(st, idx, this.container)
             this.scene.tweens.add({
               targets: c.container,
-              y: loweredY,
+              x,
+              y,
+              rotation: 0,
               duration: Time.cardFocus,
               ease: 'Sine.easeOut',
             })
@@ -457,10 +536,17 @@ export default class OurBoardRegion extends Region {
     if (this.isShiftHeld) return // Don't raise if already raised
     this.isShiftHeld = true
 
-    this.cards.forEach((card, index) => {
+    const st = this.lastHandState
+    if (!st) {
+      return
+    }
+    this.cards.forEach((card, idx) => {
+      const { x, y } = this.ourHandFannedLayout(st, idx)
       this.scene.tweens.add({
         targets: card.container,
-        y: -HOVER_OFFSET,
+        x,
+        y,
+        rotation: 0,
         duration: Time.cardFocus,
         ease: 'Sine.easeOut',
       })
@@ -472,18 +558,34 @@ export default class OurBoardRegion extends Region {
     if (!this.isShiftHeld) return // Don't lower if already lowered
     this.isShiftHeld = false
 
-    const shouldRemainRaisedDueToHover = this.raisedCardIndex !== null
-    const targetY = shouldRemainRaisedDueToHover
-      ? -HOVER_OFFSET
-      : Space.cardHeight / 2 - Space.todoHandOffset
+    const st = this.lastHandState
+    if (!st) {
+      return
+    }
+    const shouldRemainFanned = this.raisedCardIndex !== null
 
-    this.cards.forEach((card) => {
-      this.scene.tweens.add({
-        targets: card.container,
-        y: targetY,
-        duration: Time.cardFocus,
-        ease: 'Sine.easeOut',
-      })
+    this.cards.forEach((card, idx) => {
+      if (shouldRemainFanned) {
+        const { x, y } = this.ourHandFannedLayout(st, idx)
+        this.scene.tweens.add({
+          targets: card.container,
+          x,
+          y,
+          rotation: 0,
+          duration: Time.cardFocus,
+          ease: 'Sine.easeOut',
+        })
+      } else {
+        const [x, y] = CardLocation.ourHand(st, idx, this.container)
+        this.scene.tweens.add({
+          targets: card.container,
+          x,
+          y,
+          rotation: 0,
+          duration: Time.cardFocus,
+          ease: 'Sine.easeOut',
+        })
+      }
     })
   }
 
