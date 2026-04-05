@@ -244,6 +244,20 @@ export default class OurBoardRegion extends Region {
     }
   }
 
+  /** After a play, grey out remaining cards that exceed breath minus the played card's cost (until server state arrives). */
+  private applyOptimisticBreathPlayability(
+    state: GameModel,
+    playedIndex: number,
+    hand: CardImage[],
+  ): void {
+    const remainingBreath = state.breath[0] - state.cardCosts[playedIndex]
+    hand.forEach((c, idx) => {
+      if (idx !== playedIndex) {
+        c.setPlayable(state.cardCosts[idx] <= remainingBreath)
+      }
+    })
+  }
+
   // Rename old onCardClick to onCardPlay
   private onCardPlay(
     i: number,
@@ -264,6 +278,8 @@ export default class OurBoardRegion extends Region {
       if (this.scene['paused']) {
         return
       }
+
+      this.applyOptimisticBreathPlayability(state, i, hand)
 
       // Reset raised card tracking
       this.raisedCardIndex = null
