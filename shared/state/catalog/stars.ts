@@ -323,7 +323,8 @@ class Fable extends Card {
 const fable = new Fable({
   name: 'Fable',
   id: 8093,
-  text: 'Exhale 5: Draw 3 cards.\nExhale 3: Create a Sickness in the story.\nExhale 1: Create a Dove in the story.',
+  text: 'Exhale 5: Draw 3 cards.\nExhale 3: Create a Sickness in the story.\nExhale 1: Discard the 3 cheapest cards from your deck.',
+  beta: true,
 })
 
 const phi = new Card({
@@ -358,8 +359,9 @@ class Starfall extends Card {
     player: number,
     game: GameModel,
     index: number,
+    handSizeAtStart: number,
   ): [boolean, boolean] {
-    if (game.hand[player].length >= 5) {
+    if (handSizeAtStart >= 5) {
       game.discard(player, 1, index)
       this.inspired(1, game, player)
       return [true, true]
@@ -371,29 +373,38 @@ const starfall = new Starfall({
   name: 'Starfall',
   id: 8006,
   cost: 6,
-  points: 6,
+  points: 7,
   text: 'At the start of turn, if your hand has at least 5 cards including this, discard this to Inspired 1.',
   beta: true,
 })
 
-;[
-  stars,
-  cosmos,
-  nightVision,
-  ecology,
-  sun,
-  moon,
-  sunflower,
-  fates,
-  hero,
-  possibility,
-  cloakOfStars,
-  dreamer,
-  pride,
-  rocketship,
-  starfall,
-].forEach((card) => {
-  card.theme = 6
+class Boreas extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    game.breath[player] += 2
+  }
+}
+const boreas = new Boreas({
+  name: 'Boreas',
+  id: 8096,
+  cost: 2,
+  points: 2,
+  text: 'Gain 2 breath.',
+})
+
+class Heavens extends Card {
+  getCost(player: number, game: GameModel): number {
+    return this.cost - game.exhaleCountLastRound[player] * 2
+  }
+}
+const heavens = new Heavens({
+  name: 'Heavens',
+  id: 8019,
+  cost: 9,
+  points: 9,
+  text: "Costs 2 less for each time you've triggered Exhale since the last story began.",
+  beta: true,
 })
 
 export {
@@ -411,7 +422,10 @@ export {
   dreamer,
   pride,
   // NEW
-  rocketship,
+  // rocketship,
   // fable,
   starfall,
+  // boreas,
+  heavens,
+  // fable,
 }

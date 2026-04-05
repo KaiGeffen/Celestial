@@ -105,6 +105,12 @@ export default class Card {
   exhale(amt: number, game: GameModel, player: number): boolean {
     if (game.breath[player] >= amt) {
       game.breath[player] -= amt
+
+      // Increment the exhale count for the given player
+      if (amt > 0) {
+        game.exhaleCountLastRound[player] += 1
+      }
+
       return true
     } else {
       return false
@@ -179,6 +185,7 @@ export default class Card {
     player: number,
     game: GameModel,
     index: number,
+    handSizeAtStart?: number,
   ): [boolean, boolean] {
     return [false, false]
   }
@@ -200,8 +207,21 @@ export default class Card {
 
   onShuffle(player: number, game: GameModel, index: number): void {}
 
-  // Called when a card is played while this is in the story
-  onCardPlayedAfter(player: number, game: GameModel, index: number): void {}
+  // Called when a card is played while this is in the story, return whether the card was removed
+  onCardPlayedAfter(
+    index: number,
+    owner: number,
+    playedCardOwner: number,
+    game: GameModel,
+  ): boolean {
+    return false
+  }
+
+  // Trigger when you pass while this is in the story
+  onPass(playerWhoPassed: number, owner: number, game: GameModel): void {}
+
+  // When given player resolves a card with base-cost 7 or more
+  onBigResolve(player: number, game: GameModel, index: number): void {}
 
   /* Common functions */
   reset(game: GameModel) {

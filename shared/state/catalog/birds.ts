@@ -317,35 +317,26 @@ const letGo = new LetGo({
   text: 'Remove from the game the top four cards of your discard pile.',
 })
 
-class Updraft extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
-
-    // TODO Refactor out this behavior
-    for (let i = 0; i < game.story.acts.length; i++) {
-      const act = game.story.acts[i]
-
-      // If it's your card and you can move forward
-      const isYourCard = act.owner === player
-      const canMoveForward = i + 1 < game.story.acts.length
-      if (isYourCard && canMoveForward) {
-        const replacedAct = game.story.acts[i + 1]
-        game.story.acts[i + 1] = act
-        game.story.acts[i] = replacedAct
-      }
+class Birdsong extends Card {
+  onPass(playerWhoPassed: number, owner: number, game: GameModel): void {
+    if (playerWhoPassed === owner) {
+      game.createInStory(owner, dove)
     }
   }
 }
-const updraft = new Updraft({
-  name: 'Updraft',
-  id: 1066,
-  qualities: [Quality.FLEETING],
-  text: 'Fleeting\nMove your next card in the story forward one spot.',
+const birdsong = new Birdsong({
+  name: 'Birdsong',
+  id: 8094,
+  cost: 3,
+  points: 2,
+  qualities: [Quality.VISIBLE],
+  text: 'Visible\nWhen you pass while this is in the story, create a Dove in the story.',
   beta: true,
 })
 
-class Birdsong extends Card {
-  onMorning(player: number, game: GameModel, index: number) {
+class Sudden extends Card {
+  onPlay(player: number, game: GameModel): void {
+    // If there is a card, transform it into a version with no text/qualities
     if (game.hand[player].length > 0) {
       const oldCard = game.hand[player][0]
 
@@ -358,37 +349,31 @@ class Birdsong extends Card {
 
       game.hand[player][0] = newCard
     }
-
-    return true
   }
 }
-const birdsong = new Birdsong({
-  name: 'Birdsong',
-  id: 8094,
-  cost: 5,
-  points: 5,
-  text: 'Morning: Remove all card text from a card in your hand.',
+const sudden = new Sudden({
+  name: 'Sudden',
+  id: 1036,
+  cost: 3,
+  points: 3,
+  text: 'When played, remove all card text from a card in your hand.',
   beta: true,
 })
 
-;[
-  dove,
-  starling,
-  secretaryBird,
-  phoenix,
-  heron,
-  fledgling,
-  nest,
-  truth,
-  defiance,
-  layBare,
-  vulture,
-  rooster,
-  letGo,
-  updraft,
-  birdsong,
-].forEach((card) => {
-  card.theme = 0
+class SkyBurial extends Card {
+  onPlay(player: number, game: GameModel) {
+    const i = game.story.acts.length
+    game.createInStory(player ^ 1, vulture, i - 1)
+  }
+}
+const skyBurial = new SkyBurial({
+  name: 'Sky Burial',
+  id: 1070,
+  cost: 2,
+  points: 7,
+  qualities: [Quality.VISIBLE],
+  text: 'Visible\nWhen played, create a Vulture before this in the story for your opponent.',
+  beta: true,
 })
 
 export {
@@ -406,6 +391,6 @@ export {
   rooster,
   letGo,
   // NEW
-  updraft,
-  birdsong as eclipse,
+  skyBurial,
+  birdsong,
 }

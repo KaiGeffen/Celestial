@@ -29,7 +29,7 @@ export default class CatalogRegion {
     // In dev mode, show beta cards and cards you don't own
     let pool = []
     if (Flags.devCardsEnabled) {
-      pool = [...Catalog.collectibleCards, ...Catalog.betaCards]
+      pool = Catalog.collectibleCardsWithBetaCards
     } else {
       pool = Catalog.collectibleCards
 

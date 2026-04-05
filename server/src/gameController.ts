@@ -67,12 +67,10 @@ class ServerController {
 
     // Do action: Pass or play a card
     if (choice === MechanicsSettings.PASS) {
-      // NOTE This logic isn't put in model because handling phase change is controller's responsibility
-      this.model.passes += 1
-      this.model.amtPasses[player] += 1
-      this.model.switchPriority()
-      this.model.sound = SoundEffect.Pass
+      // Handle the pass occuring and trigger any effects
+      this.pass(player)
 
+      // After pass occurs, end round if both players passed
       if (this.model.passes === 2) {
         this.doResolvePhase()
         this.doUpkeep()
@@ -91,6 +89,20 @@ class ServerController {
       } else {
         return false
       }
+    }
+  }
+
+  // Pass the turn, handle all logic to do with that
+  private pass(player: number): void {
+    this.model.passes += 1
+    this.model.amtPasses[player] += 1
+    this.model.switchPriority()
+    this.model.sound = SoundEffect.Pass
+
+    // Trigger on pass effects
+    for (let i = 0; i < this.model.story.acts.length; i++) {
+      const act = this.model.story.acts[i]
+      act.card.onPass(player, act.owner, this.model)
     }
   }
 
@@ -115,9 +127,20 @@ class ServerController {
     this.model.story.addAct(card, player)
 
     // Trigger on-play effects
-    for (let i = 0; i < this.model.story.acts.length - 1; i++) {
+    for (let i = 0; i < this.model.story.acts.length - 1; ) {
       const act = this.model.story.acts[i]
-      act.card.onCardPlayedAfter(player, this.model, i)
+
+      const cardRemoved = act.card.onCardPlayedAfter(
+        i,
+        act.owner,
+        player,
+        this.model,
+      )
+
+      // In the special case in which a card was removed, don't increment i
+      if (!cardRemoved) {
+        i++
+      }
     }
     card.onPlay(player, this.model)
 
@@ -219,6 +242,8 @@ class ServerController {
 
     // Hand triggers
     for (const player of players) {
+      const handSizeAtStart = this.model.hand[player].length
+
       // Do any effects that activate in hand
       let index = 0
       while (index < this.model.hand[player].length) {
@@ -227,6 +252,7 @@ class ServerController {
           player,
           this.model,
           index,
+          handSizeAtStart,
         )
 
         if (somethingActivated) {
@@ -282,6 +308,9 @@ class ServerController {
   // The resolution phase, after both players have passed. Points and effects happen as cards resolve
   protected doResolvePhase(): void {
     this.model.score = [0, 0]
+
+    // Reset the exhale count since a new resolution is beginning
+    this.model.exhaleCountLastRound = [0, 0]
 
     this.model.story.run(this.model)
 

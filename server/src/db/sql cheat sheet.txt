@@ -3,3 +3,6 @@
 
 INSERT INTO achievements (player_id, achievement_id, progress, seen, date_unlocked) VALUES 
 ('UUID', ACHIEVEMENT_NUMBER, 0, false, now());
+
+INSERT INTO achievements (player_id, achievement_id, progress, seen, date_unlocked) VALUES 
+('UUID', ACHIEVEMENT_NUMBER, 0, false, now());

@@ -308,57 +308,27 @@ const doll = new Doll({
   beta: true,
 })
 
-class Skittish extends Card {
-  onCardPlayedAfter(player: number, game: GameModel, index: number) {
-    console.log('onCardPlayedAfter', index)
-    this.transform(index, hiding, game)
+class Heart extends Card {
+  onCardPlayedAfter(
+    index: number,
+    owner: number,
+    playedCardOwner: number,
+    game: GameModel,
+  ): boolean {
+    // Discard this and nourish 3
+    game.removeAct(index)
+    this.nourish(3, game, owner)
+
+    return true
   }
 }
-const skittish = new Skittish({
-  name: 'Skittish',
-  id: 4082,
+const heart = new Heart({
+  name: 'Heart',
+  id: 4088,
   cost: 3,
   points: 4,
-  text: 'When a card is played after this, transform this into Hiding.',
+  text: 'When a card is played while this is in the story, discard this and Nourish 3.',
   beta: true,
-})
-
-// TODO Move to a transformation file or something
-class Hiding extends Card {
-  onPlay(player: number, game: GameModel) {
-    const index = game.story.acts.length - 1
-    this.transform(index, skittish, game)
-    game.story.replaceAct(index, new Act(skittish, player))
-  }
-}
-const hiding = new Hiding({
-  name: 'Hiding',
-  id: 1007,
-  cost: 2,
-  points: 2,
-  text: 'When played, transform this into Skittish.',
-  beta: true,
-})
-
-;[
-  fruit,
-  oak,
-  bounty,
-  pet,
-  hollow,
-  holdTight,
-  yearn,
-  pomegranate,
-  abundance,
-  rose,
-  parade,
-  meAndHer,
-  sensualist,
-  doll,
-  skittish,
-  hiding,
-].forEach((card) => {
-  card.theme = 3
 })
 
 export {
@@ -377,6 +347,5 @@ export {
   sensualist,
   // NEW
   doll,
-  skittish,
-  hiding,
+  heart,
 }
