@@ -16,11 +16,13 @@ export default class CardLocation {
     state: GameModel,
     i: number,
     container?: Phaser.GameObjects.Container,
+    /** When set (e.g. optimistic layout after a play), used instead of `state.hand[0].length` for dx / centering. */
+    handCountForLayout?: number,
   ): [number, number] {
     let dx = Space.cardWidth - 1
 
     if (state !== undefined) {
-      const totalCards = state.hand[0].length
+      const totalCards = handCountForLayout ?? state.hand[0].length
 
       // If total width exceeds max, scale down spacing
       const maxWidth = Space.windowWidth - 1200

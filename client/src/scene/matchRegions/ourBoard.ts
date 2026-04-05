@@ -173,10 +173,11 @@ export default class OurBoardRegion extends Region {
   private ourHandRestPosition(
     state: GameModel,
     i: number,
+    /** Hand size for horizontal spacing and arc (defaults to current state). */
     arcN?: number,
   ): [number, number] {
-    const [x, y] = CardLocation.ourHand(state, i, this.container)
     const n = arcN ?? state.hand[0].length
+    const [x, y] = CardLocation.ourHand(state, i, this.container, n)
     return [x, y + this.ourHandArcYOffset(i, n)]
   }
 
@@ -274,16 +275,18 @@ export default class OurBoardRegion extends Region {
       this.scene.hint.hide()
 
       // If the whole hand was raised due to hover, lower the other cards when playing
+      // Use one fewer card for spacing/rotation so it matches the post-play hand before server state.
       if (!this.isShiftHeld) {
+        const newN = state.hand[0].length - 1
         hand.forEach((other, idx) => {
           if (other !== card) {
-            const n = state.hand[0].length
-            const [x, y] = this.ourHandRestPosition(state, idx)
+            const newIndex = idx > i ? idx - 1 : idx
+            const [x, y] = this.ourHandRestPosition(state, newIndex, newN)
             this.scene.tweens.add({
               targets: other.container,
               x,
               y,
-              rotation: this.ourHandRestFanRotation(idx, n),
+              rotation: this.ourHandRestFanRotation(newIndex, newN),
               duration: Time.cardFocus,
               ease: 'Sine.easeOut',
             })
