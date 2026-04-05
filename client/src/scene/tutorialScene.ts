@@ -153,8 +153,7 @@ export default class TutorialMatchScene extends MatchScene {
 
     switch (this.params.missionID) {
       case 0:
-        // this.view.ourAvatar.tutorialHide()
-        // this.view.theirAvatar.tutorialHide()
+        // this.view.ourStacks.tutorialHide()
         // this.view.theirScore.hide()
         this.displayHints1()
         break

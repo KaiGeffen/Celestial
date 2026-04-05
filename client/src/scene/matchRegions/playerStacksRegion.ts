@@ -1,11 +1,19 @@
 import 'phaser'
 import { CardImage } from '../../lib/cardImage'
 import GameModel from '../../../../shared/state/gameModel'
+import { BBStyle, Space, UserSettings } from '../../settings/settings'
+import Buttons from '../../lib/buttons/buttons'
+import Button from '../../lib/buttons/button'
 import { MatchScene } from '../matchScene'
+
+// Count badges: nudge away from screen center (deck left, discard right) and a bit further in Y.
+const STACK_ICON_OUTWARD_X = 52
+const STACK_ICON_EXTRA_Y = 12
 
 /**
  * Shared deck + discard pile rendering for one player, parented under the
- * hand board container (between chrome and hand cards).
+ * hand board container (between chrome and hand cards), plus count icons on
+ * top of each stack (opens overlays; same hotkeys as the old avatar chrome).
  */
 export default abstract class PlayerStacksRegion {
   scene: MatchScene
@@ -17,6 +25,14 @@ export default abstract class PlayerStacksRegion {
 
   protected discardCards: CardImage[] = []
   protected discardContainer!: Phaser.GameObjects.Container
+
+  /** Renders above the card stacks; brought to front after hand cards each frame. */
+  protected stackIconsContainer!: Phaser.GameObjects.Container
+
+  btnDeck!: Button
+  btnDiscard!: Button
+
+  private hotkeyHints: Phaser.GameObjects.GameObject[] = []
 
   /** 0 = us, 1 = opponent */
   protected abstract ownerIndex(): 0 | 1
@@ -35,6 +51,31 @@ export default abstract class PlayerStacksRegion {
     i: number,
   ): [number, number]
 
+  /** Single-letter hotkey label (e.g. Q / A) for deck overlay. */
+  protected abstract deckHotkeyLetter(): string
+
+  /** Single-letter hotkey label (e.g. W / S) for discard overlay. */
+  protected abstract discardHotkeyLetter(): string
+
+  /** Count icons sit above/below the card center depending on which edge of the table. */
+  private stackIconYDeltaFromCardCenter(): number {
+    return this.ownerIndex() === 0
+      ? -Space.cardHeight / 2 - STACK_ICON_EXTRA_Y
+      : Space.cardHeight / 2 + STACK_ICON_EXTRA_Y
+  }
+
+  /** Deck badge: left stack — shift farther from center (negative x). */
+  private stackIconDeckPosition(loc: [number, number]): [number, number] {
+    const dy = this.stackIconYDeltaFromCardCenter()
+    return [loc[0] - STACK_ICON_OUTWARD_X, loc[1] + dy]
+  }
+
+  /** Discard badge: right stack — shift farther from center (positive x). */
+  private stackIconDiscardPosition(loc: [number, number]): [number, number] {
+    const dy = this.stackIconYDeltaFromCardCenter()
+    return [loc[0] + STACK_ICON_OUTWARD_X, loc[1] + dy]
+  }
+
   create(
     scene: MatchScene,
     layoutParent: Phaser.GameObjects.Container,
@@ -50,7 +91,102 @@ export default abstract class PlayerStacksRegion {
 
     this.deckCardbacks = []
 
+    this.stackIconsContainer = this.scene.add.container(0, 0)
+    this.layoutParent.add(this.stackIconsContainer)
+
+    const deckPos = this.stackIconDeckPosition(
+      this.deckLocation(this.layoutParent, 0),
+    )
+    const discardPos = this.stackIconDiscardPosition(
+      this.discardLocation(this.layoutParent, 0),
+    )
+    const o = this.ownerIndex()
+
+    this.btnDeck = new Buttons.Stacks.Deck(
+      this.stackIconsContainer,
+      deckPos[0],
+      deckPos[1],
+      o,
+    )
+    this.btnDiscard = new Buttons.Stacks.Discard(
+      this.stackIconsContainer,
+      discardPos[0],
+      discardPos[1],
+      o,
+    )
+
+    this.addHotkeyHint(deckPos, this.deckHotkeyLetter())
+    this.addHotkeyHint(discardPos, this.discardHotkeyLetter())
+
+    this.registerStackHotkeys()
+
     return this
+  }
+
+  setOverlayCallbacks(fDeck: () => void, fDiscard: () => void): void {
+    this.btnDeck.setOnClick(fDeck)
+    this.btnDiscard.setOnClick(fDiscard)
+  }
+
+  setHotkeyHintVisible(show: boolean): void {
+    this.hotkeyHints.forEach((hint) => {
+      ;(hint as Phaser.GameObjects.Text).setVisible(show)
+    })
+  }
+
+  /** Keep count badges above the hand cards (hand is appended to the board after stacks). */
+  bringStackIconsToFront(): void {
+    this.layoutParent.bringToTop(this.stackIconsContainer)
+  }
+
+  private addHotkeyHint(position: [number, number], s: string): void {
+    const hotkeyText = this.scene.add
+      .rexBBCodeText(position[0], position[1], s, BBStyle.hotkeyHint)
+      .setOrigin(0.5)
+      .setVisible(false)
+
+    // Same container as deck/discard buttons so `bringStackIconsToFront` keeps hints above cards.
+    this.stackIconsContainer.add(hotkeyText)
+    this.hotkeyHints.push(hotkeyText)
+  }
+
+  private registerStackHotkeys(): void {
+    const deckKey = `keydown-${this.deckHotkeyLetter()}`
+    const discardKey = `keydown-${this.discardHotkeyLetter()}`
+
+    this.scene.input.keyboard.on(deckKey, () => {
+      if (UserSettings._get('hotkeys')) {
+        this.btnDeck.onClick()
+      }
+    })
+    this.scene.input.keyboard.on(discardKey, () => {
+      if (UserSettings._get('hotkeys')) {
+        this.btnDiscard.onClick()
+      }
+    })
+  }
+
+  private layoutStackIcons(): void {
+    const deckPos = this.stackIconDeckPosition(
+      this.deckLocation(this.layoutParent, 0),
+    )
+    const discardPos = this.stackIconDiscardPosition(
+      this.discardLocation(this.layoutParent, 0),
+    )
+    this.btnDeck.setPosition(deckPos[0], deckPos[1])
+    this.btnDiscard.setPosition(discardPos[0], discardPos[1])
+    if (this.hotkeyHints[0]) {
+      ;(this.hotkeyHints[0] as Phaser.GameObjects.Text).setPosition(
+        deckPos[0],
+        deckPos[1],
+      )
+    }
+    if (this.hotkeyHints[1]) {
+      ;(this.hotkeyHints[1] as Phaser.GameObjects.Text).setPosition(
+        discardPos[0],
+        discardPos[1],
+      )
+    }
   }
 
   onWindowResize(): void {
@@ -72,6 +208,9 @@ export default abstract class PlayerStacksRegion {
       this.discardCards[i].container.setScale(0.75)
       this.discardCards[i].container.setRotation(discardR)
     }
+
+    this.layoutStackIcons()
+    this.bringStackIconsToFront()
   }
 
   displayState(state: GameModel): void {
@@ -120,5 +259,9 @@ export default abstract class PlayerStacksRegion {
       this.deckCardbacks[i].container.setScale(0.75)
       this.deckCardbacks[i].container.setRotation(deckR)
     }
+
+    this.btnDeck.setText(`${state.deck[o]?.length ?? 0}`)
+    this.btnDiscard.setText(`${pileRow.length}`)
+    this.layoutStackIcons()
   }
 }

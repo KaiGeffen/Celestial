@@ -2,10 +2,9 @@ import 'phaser'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import GameModel from '../../../../shared/state/gameModel'
-import { Color, Depth, Space, Style } from '../../settings/settings'
+import { Depth, Space, Style } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
-import { UserSettings } from '../../settings/userSettings'
 import AvatarButton from '../../lib/buttons/avatar'
 
 const width = Space.avatarSize + Space.pad * 2
@@ -15,8 +14,6 @@ export default class OurAvatarRegion extends Region {
   btnInspire: Button
   btnNourish: Button
   btnSight: Button
-  btnDeck: Button
-  btnDiscard: Button
   avatar: AvatarButton
   txtUsername: Phaser.GameObjects.Text
   txtUsernameSubtitle: Phaser.GameObjects.Text
@@ -31,10 +28,7 @@ export default class OurAvatarRegion extends Region {
     this.createBackground()
     this.createStatusDisplay()
     this.createAvatar()
-    this.createStacks()
     this.createUsernames()
-
-    this.addHotkeyListeners()
 
     return this
   }
@@ -55,47 +49,13 @@ export default class OurAvatarRegion extends Region {
       .setVisible(state.status[0].vision !== 0)
       .setText(`${state.status[0].vision}`)
 
-    // Pile sizes
-    this.btnDeck.setText(`${state.deck[0].length}`)
-    this.btnDiscard.setText(`${state.pile[0].length}`)
-
     // Usernames and subtitles
     this.txtUsername.setText(state.usernames[0])
     this.txtUsernameSubtitle.setText(state.subtitles[0])
   }
 
-  private createStacks(): void {
-    let x = width / 4
-    const y = Space.pad + Space.stackIconHeight / 2
-    // Deck
-    this.btnDeck = new Buttons.Stacks.Deck(this.container, x, y, 0)
-    this.addHotkeyHint([x, y], 'Q')
-
-    // Discard pile
-    x = (width * 3) / 4
-    this.btnDiscard = new Buttons.Stacks.Discard(this.container, x, y, 0)
-    this.addHotkeyHint([x, y], 'W')
-  }
-
-  private addHotkeyListeners() {
-    // Deck
-    this.scene.input.keyboard.on('keydown-Q', () => {
-      if (UserSettings._get('hotkeys')) {
-        this.btnDeck.onClick()
-      }
-    })
-
-    // Discard
-    this.scene.input.keyboard.on('keydown-W', () => {
-      if (UserSettings._get('hotkeys')) {
-        this.btnDiscard.onClick()
-      }
-    })
-  }
-
-  setOverlayCallbacks(fDeck: () => void, fDiscard: () => void): void {
-    this.btnDeck.setOnClick(fDeck)
-    this.btnDiscard.setOnClick(fDiscard)
+  setEmoteCallback(fEmote: () => void): void {
+    this.avatar.setOnClick(fEmote, false, false)
   }
 
   private createUsernames(): void {
@@ -119,7 +79,7 @@ export default class OurAvatarRegion extends Region {
 
   private createAvatar(): void {
     const x = width / 2
-    const y = Space.stackIconHeight + Space.pad * 2 + Space.avatarSize / 2
+    const y = Space.pad * 2 + Space.avatarSize / 2
     this.avatar = new Buttons.Avatar({
       within: this.container,
       x,
@@ -141,14 +101,5 @@ export default class OurAvatarRegion extends Region {
       width / 2 + 55,
       y,
     ).setVisible(false)
-  }
-
-  setEmoteCallback(fEmote: () => void): void {
-    this.avatar.setOnClick(fEmote, false, false)
-  }
-
-  tutorialHide(): void {
-    this.btnDeck.setVisible(false)
-    this.btnDiscard.setVisible(false)
   }
 }

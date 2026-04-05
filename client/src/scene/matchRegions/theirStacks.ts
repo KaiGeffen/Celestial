@@ -31,4 +31,12 @@ export default class TheirStacksRegion extends PlayerStacksRegion {
   ): [number, number] {
     return CardLocation.theirDiscard(parent, i)
   }
+
+  protected deckHotkeyLetter(): string {
+    return 'A'
+  }
+
+  protected discardHotkeyLetter(): string {
+    return 'S'
+  }
 }

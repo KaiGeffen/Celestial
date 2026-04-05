@@ -31,4 +31,22 @@ export default class OurStacksRegion extends PlayerStacksRegion {
   ): [number, number] {
     return CardLocation.ourDiscard(parent, i)
   }
+
+  protected deckHotkeyLetter(): string {
+    return 'Q'
+  }
+
+  protected discardHotkeyLetter(): string {
+    return 'W'
+  }
+
+  /** Used by tutorial flow to hide pile controls. */
+  tutorialHide(): void {
+    if (this.btnDeck) {
+      this.btnDeck.setVisible(false)
+    }
+    if (this.btnDiscard) {
+      this.btnDiscard.setVisible(false)
+    }
+  }
 }

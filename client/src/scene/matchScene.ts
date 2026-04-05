@@ -240,8 +240,8 @@ export class MatchScene extends BaseScene {
   }
 
   protected setCommonCallbacks(view: View): void {
-    // Set the callbacks for overlays
-    view.ourAvatar.setOverlayCallbacks(
+    // Set the callbacks for overlays (count icons sit on the pile stacks)
+    view.ourStacks.setOverlayCallbacks(
       () => {
         this.view.showOverlay(this.view.ourDeckOverlay)
       },
@@ -250,7 +250,7 @@ export class MatchScene extends BaseScene {
       },
     )
 
-    view.theirAvatar.setOverlayCallbacks(
+    view.theirStacks.setOverlayCallbacks(
       () => {
         this.view.showOverlay(this.view.theirDeckOverlay)
       },
@@ -393,6 +393,8 @@ export class MatchScene extends BaseScene {
       this.view.mulligan,
       this.view.ourAvatar,
       this.view.theirAvatar,
+      this.view.ourStacks,
+      this.view.theirStacks,
       this.view.ourBoard,
       this.view.theirScore,
       this.view.pass,
@@ -578,8 +580,11 @@ export class View {
 
     this.ourStacks.displayState(state)
     this.ourBoard.displayState(state)
+    this.ourStacks.bringStackIconsToFront()
+
     this.theirStacks.displayState(state)
     this.theirBoard.displayState(state)
+    this.theirStacks.bringStackIconsToFront()
 
     this.ourScore.displayState(state)
     this.theirScore.displayState(state)

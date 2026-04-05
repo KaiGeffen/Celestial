@@ -6,14 +6,9 @@ import {
   Depth,
   Space,
   Style,
-  Time,
-  Flags,
-  UserSettings,
-  Color,
 } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
-import CardLocation from './cardLocation'
 import AvatarButton from '../../lib/buttons/avatar'
 
 const width = Space.avatarSize + Space.pad * 2
@@ -23,23 +18,18 @@ export default class TheirAvatarRegion extends Region {
   btnInspire: Button
   btnNourish: Button
   btnSight: Button
-  btnDeck: Button
-  btnDiscard: Button
   avatar: AvatarButton
   txtUsername: Phaser.GameObjects.Text
   txtUsernameSubtitle: Phaser.GameObjects.Text
 
   create(scene: MatchScene): this {
     this.scene = scene
-    this.container = scene.add.container().setDepth(Depth.theirAvatar)
+    this.container = scene.add.container(0, 0).setDepth(Depth.theirAvatar)
 
     this.createBackground()
     this.createStatusDisplay()
     this.createAvatar()
-    this.createStacks()
     this.createUsernames()
-
-    this.addHotkeyListeners()
 
     return this
   }
@@ -60,46 +50,14 @@ export default class TheirAvatarRegion extends Region {
       .setVisible(state.status[1].vision !== 0)
       .setText(`${state.status[1].vision}`)
 
-    // Pile sizes
-    this.btnDeck.setText(`${state.deck[1].length}`)
-    this.btnDiscard.setText(`${state.pile[1].length}`)
-
     // Usernames and subtitles
     this.txtUsername.setText(state.usernames[1])
     this.txtUsernameSubtitle.setText(state.subtitles[1])
   }
 
-  private createStacks(): void {
-    let x = width / 4
-    const y = height - Space.pad - Space.stackIconHeight / 2
-    this.btnDeck = new Buttons.Stacks.Deck(this.container, x, y, 1)
-    this.addHotkeyHint([x, y], 'A')
-
-    // Discard pile
-    x = (width * 3) / 4
-    this.btnDiscard = new Buttons.Stacks.Discard(this.container, x, y, 1)
-    this.addHotkeyHint([x, y], 'S')
-  }
-
-  private addHotkeyListeners() {
-    // Deck
-    this.scene.input.keyboard.on('keydown-A', () => {
-      if (UserSettings._get('hotkeys')) {
-        this.btnDeck.onClick()
-      }
-    })
-
-    // Discard
-    this.scene.input.keyboard.on('keydown-S', () => {
-      if (UserSettings._get('hotkeys')) {
-        this.btnDiscard.onClick()
-      }
-    })
-  }
-
-  setOverlayCallbacks(fDeck: () => void, fDiscard: () => void): void {
-    this.btnDeck.setOnClick(fDeck)
-    this.btnDiscard.setOnClick(fDiscard)
+  // Show their avatar using the given emote
+  emote(emoteNumber: number): void {
+    this.avatar.doEmote(emoteNumber)
   }
 
   private createUsernames(): void {
@@ -114,11 +72,6 @@ export default class TheirAvatarRegion extends Region {
       .setOrigin(0.5, 0)
 
     this.container.add([this.txtUsername, this.txtUsernameSubtitle])
-  }
-
-  // Show their avatar using the given emote
-  emote(emoteNumber: number): void {
-    this.avatar.doEmote(emoteNumber)
   }
 
   private createBackground(): void {
