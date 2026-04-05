@@ -14,7 +14,9 @@ import TheirAvatarRegion from './matchRegions/theirAvatar'
 import OurAvatarRegion from './matchRegions/ourAvatar'
 import TheirScoreRegion from './matchRegions/theirScore'
 import OurBoardRegion from './matchRegions/ourBoard'
+import OurStacksRegion from './matchRegions/ourStacks'
 import TheirBoardRegion from './matchRegions/theirBoard'
+import TheirStacksRegion from './matchRegions/theirStacks'
 import StoryRegion from './matchRegions/story'
 import OurScoreRegion from './matchRegions/ourScore'
 import MulliganRegion from './matchRegions/mulliganRegion'
@@ -443,7 +445,9 @@ export class MatchScene extends BaseScene {
   }
 
   onWindowResize(): void {
+    this.view.ourStacks.onWindowResize()
     this.view.ourBoard.onWindowResize()
+    this.view.theirStacks.onWindowResize()
     this.view.theirBoard.onWindowResize()
   }
 }
@@ -462,7 +466,9 @@ export class View {
   ourAvatar: OurAvatarRegion
 
   ourBoard: OurBoardRegion
+  ourStacks: OurStacksRegion
   theirBoard: TheirBoardRegion
+  theirStacks: TheirStacksRegion
 
   ourScore: OurScoreRegion
   theirScore: TheirScoreRegion
@@ -511,7 +517,12 @@ export class View {
     // this.createOurHand()
     // new HandRegion()//.create(scene)
     this.ourBoard = new Regions.OurBoard().create(scene)
+    this.ourStacks = new Regions.OurStacks().create(scene, this.ourBoard.container)
     this.theirBoard = new Regions.TheirBoard().create(scene)
+    this.theirStacks = new Regions.TheirStacks().create(
+      scene,
+      this.theirBoard.container,
+    )
 
     this.story = new Regions.Story().create(scene)
     this.ourScore = new Regions.OurScore().create(scene)
@@ -565,7 +576,9 @@ export class View {
     this.theirAvatar.displayState(state)
     this.ourAvatar.displayState(state)
 
+    this.ourStacks.displayState(state)
     this.ourBoard.displayState(state)
+    this.theirStacks.displayState(state)
     this.theirBoard.displayState(state)
 
     this.ourScore.displayState(state)

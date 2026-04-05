@@ -2,7 +2,9 @@ import SearchingRegion from './searching'
 import TheirScoreRegion from './theirScore'
 
 import OurBoardRegion from './ourBoard'
+import OurStacksRegion from './ourStacks'
 import TheirBoardRegion from './theirBoard'
+import TheirStacksRegion from './theirStacks'
 import StoryRegion from './story'
 import OurScoreRegion from './ourScore'
 import * as Overlay from './pileOverlays'
@@ -24,7 +26,9 @@ export default class Regions {
 
   // The cards in our / their hands
   static OurBoard = OurBoardRegion
+  static OurStacks = OurStacksRegion
   static TheirBoard = TheirBoardRegion
+  static TheirStacks = TheirStacksRegion
 
   // Regions for the scores (Right-side showing wins etc)
   static OurScore = OurScoreRegion
