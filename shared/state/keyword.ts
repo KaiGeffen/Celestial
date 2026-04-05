@@ -13,6 +13,7 @@ export class Keywords {
   static getAll(): Keyword[] {
     return [
       Keywords.visible,
+      Keywords.revealed,
       Keywords.fleeting,
       Keywords.morning,
       Keywords.sight,
@@ -29,6 +30,11 @@ export class Keywords {
   static visible = new Keyword(
     'Visible',
     "[color=#FABD5D]Visible[/color]: Both players can see this card while it's in the story.",
+    false,
+  )
+  static revealed = new Keyword(
+    'Revealed',
+    '[color=#FABD5D]Revealed[/color]: Both players can see this card until it leaves the story.',
     false,
   )
   static fleeting = new Keyword(

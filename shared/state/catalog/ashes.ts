@@ -352,7 +352,7 @@ class Immolant extends Card {
     // Remove this from the discard pile
     game.pile[player].pop()
 
-    game.story.addAct(this, player, 0)
+    game.story.addAct(this, player, 0, true)
 
     return true
   }
@@ -362,7 +362,7 @@ const immolant = new Immolant({
   id: 42,
   cost: 1,
   points: 1,
-  text: 'When this is discarded, add it next in the story.',
+  text: 'When this is discarded, add it next in the story Revealed.',
 })
 
 class Spark extends Card {

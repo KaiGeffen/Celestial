@@ -248,7 +248,7 @@ class Pride extends Card {
   onMorning(player: number, game: GameModel, index: number) {
     if (super.exhale(1, game, player)) {
       game.pile[player].splice(index, 1)
-      game.createInStory(player, this)
+      game.createInStory(player, this, 0, true)
       game.discard(player)
     }
     return true
@@ -259,7 +259,7 @@ const pride = new Pride({
   id: 98,
   cost: 3,
   points: 3,
-  text: 'Morning: Exhale 1: Add this to the story. Discard a card.',
+  text: 'Morning: Exhale 1: Add this to the story Revealed. Discard a card.',
 })
 
 // NEW

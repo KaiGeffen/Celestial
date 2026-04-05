@@ -96,7 +96,7 @@ class Nightmare extends Card {
         // Move THIS card from discard to story
         game.pile[player].splice(index, 1)
 
-        game.createInStory(player, this)
+        game.createInStory(player, this, undefined, true)
 
         game.animations[player].push(
           new Animation({
@@ -118,7 +118,7 @@ const nightmare = new Nightmare({
   id: 68,
   cost: 2,
   points: 2,
-  text: 'Morning: If you have more cards in hand than your opponent, add this to the story.',
+  text: 'Morning: If you have more cards in hand than your opponent, add this to the story Revealed.',
   story:
     'I struggle to find myself\nBetween the claws and biting words\nShearing my mind away',
 })

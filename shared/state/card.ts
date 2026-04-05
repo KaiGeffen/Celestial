@@ -160,7 +160,7 @@ export default class Card {
       const act = game.story.acts[index]
       const oldCard = act.card
 
-      game.story.replaceAct(index, new Act(card, act.owner))
+      game.story.replaceAct(index, new Act(card, act.owner, act.revealed))
 
       game.animations[act.owner].push(
         new Animation({

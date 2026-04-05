@@ -14,8 +14,8 @@ class Story {
   roundEndedForced: boolean = false
 
   // Add a card to the story with given owner and at given position
-  addAct(card: Card, owner: number, i?: number) {
-    const act = new Act(card, owner)
+  addAct(card: Card, owner: number, i?: number, revealed = false) {
+    const act = new Act(card, owner, revealed)
     if (i === undefined) {
       this.acts.push(act)
     } else {
