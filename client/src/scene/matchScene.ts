@@ -580,11 +580,9 @@ export class View {
 
     this.ourStacks.displayState(state)
     this.ourBoard.displayState(state)
-    this.ourStacks.bringStackIconsToFront()
 
     this.theirStacks.displayState(state)
     this.theirBoard.displayState(state)
-    this.theirStacks.bringStackIconsToFront()
 
     this.ourScore.displayState(state)
     this.theirScore.displayState(state)

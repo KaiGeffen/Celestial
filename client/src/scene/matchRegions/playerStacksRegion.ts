@@ -26,7 +26,7 @@ export default abstract class PlayerStacksRegion {
   protected discardCards: CardImage[] = []
   protected discardContainer!: Phaser.GameObjects.Container
 
-  /** Renders above the card stacks; brought to front after hand cards each frame. */
+  /** Deck/discard count badges (same draw order as other stack children — below the hand). */
   protected stackIconsContainer!: Phaser.GameObjects.Container
 
   btnDeck!: Button
@@ -134,18 +134,12 @@ export default abstract class PlayerStacksRegion {
     })
   }
 
-  /** Keep count badges above the hand cards (hand is appended to the board after stacks). */
-  bringStackIconsToFront(): void {
-    this.layoutParent.bringToTop(this.stackIconsContainer)
-  }
-
   private addHotkeyHint(position: [number, number], s: string): void {
     const hotkeyText = this.scene.add
       .rexBBCodeText(position[0], position[1], s, BBStyle.hotkeyHint)
       .setOrigin(0.5)
       .setVisible(false)
 
-    // Same container as deck/discard buttons so `bringStackIconsToFront` keeps hints above cards.
     this.stackIconsContainer.add(hotkeyText)
     this.hotkeyHints.push(hotkeyText)
   }
@@ -210,7 +204,6 @@ export default abstract class PlayerStacksRegion {
     }
 
     this.layoutStackIcons()
-    this.bringStackIconsToFront()
   }
 
   displayState(state: GameModel): void {
