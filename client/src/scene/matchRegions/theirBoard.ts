@@ -107,10 +107,12 @@ export default class TheirBoardRegion extends Region {
     const handN = state.hand[1].length
     this.cards = []
     for (let i = 0; i < handN; i++) {
-      const card = this.addCard(
+      const card = new CardImage(
         state.hand[1][i],
-        CardLocation.theirHand(state, i, this.container),
-      ).moveToTopOnHover()
+        this.container,
+        false,
+        true,
+      ).setPosition(CardLocation.theirHand(state, i, this.container))
 
       card.container.setRotation(this.theirHandFanRotation(i, handN))
 

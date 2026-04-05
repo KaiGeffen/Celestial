@@ -28,6 +28,10 @@ const HAND_FAN_SCREEN_MARGIN = 80
 // Hovered / shift-raised hand: flat rotation 0 + `ourHandFannedLayout` spread.
 const OUR_HAND_REST_FAN_MAX_RAD = (4 * Math.PI) / 180
 
+// Rest hand only: center cards sit slightly higher (vertical arc). Fanned /
+// hover spread is one shared height — no Y arc so the row reads level.
+const OUR_HAND_REST_ARC_LIFT_PX = 14
+
 export default class OurBoardRegion extends Region {
   // Function called when elements in this region are interacted with
   callback: (i: number) => boolean
@@ -198,7 +202,31 @@ export default class OurBoardRegion extends Region {
     this.deckCardbacks = []
   }
 
-  /** Fanned hover layout: wider horizontal spacing only (no rotation / arc). */
+  /**
+   * Rest-only vertical arc: indices nearer the hand center sit higher (smaller y).
+   */
+  private ourHandArcYOffset(i: number, arcN: number): number {
+    if (arcN <= 1) {
+      return 0
+    }
+    const mid = (arcN - 1) / 2
+    const t = Math.abs(i - mid) / Math.max(mid, 1)
+    // t=0 at center → lift up; t=1 at edges → no lift
+    return -OUR_HAND_REST_ARC_LIFT_PX * (1 - t * t)
+  }
+
+  /** Rest hand position: `ourHand` plus vertical arc. */
+  private ourHandRestPosition(
+    state: GameModel,
+    i: number,
+    arcN?: number,
+  ): [number, number] {
+    const [x, y] = CardLocation.ourHand(state, i, this.container)
+    const n = arcN ?? state.hand[0].length
+    return [x, y + this.ourHandArcYOffset(i, n)]
+  }
+
+  /** Fanned hover / shift-raise: wide horizontal spacing, flat shared Y. */
   private ourHandFannedLayout(
     state: GameModel,
     i: number,
@@ -249,7 +277,7 @@ export default class OurBoardRegion extends Region {
     } else {
       const n = st.hand[0].length
       this.cards.forEach((c, idx) => {
-        c.setPosition(CardLocation.ourHand(st, idx, this.container))
+        c.setPosition(this.ourHandRestPosition(st, idx))
         c.container.setRotation(this.ourHandRestFanRotation(idx, n))
       })
     }
@@ -289,8 +317,8 @@ export default class OurBoardRegion extends Region {
       if (!this.isShiftHeld) {
         hand.forEach((other, idx) => {
           if (other !== card) {
-            const [x, y] = CardLocation.ourHand(state, idx, this.container)
             const n = state.hand[0].length
+            const [x, y] = this.ourHandRestPosition(state, idx)
             this.scene.tweens.add({
               targets: other.container,
               x,
@@ -316,11 +344,14 @@ export default class OurBoardRegion extends Region {
             this.scene.hint.hide()
 
             // Fill in the hole where the card was
+            const newN = hand.length - 1
             for (let j = i + 1; j < hand.length; j++) {
               let adjustedCard = hand[j]
+              const [tx, ty] = this.ourHandRestPosition(state, j - 1, newN)
               this.scene.tweens.add({
                 targets: adjustedCard.container,
-                x: CardLocation.ourHand(state, j - 1, this.container)[0],
+                x: tx,
+                y: ty,
                 duration: Time.playCard() - 10,
                 ease: 'Sine.easeInOut',
               })
@@ -410,7 +441,7 @@ export default class OurBoardRegion extends Region {
     for (let i = 0; i < state.hand[0].length; i++) {
       let card = this.addCard(
         state.hand[0][i],
-        CardLocation.ourHand(state, i, this.container),
+        this.ourHandRestPosition(state, i),
       )
         .setCost(state.cardCosts[i])
         .moveToTopOnHover()
@@ -429,7 +460,7 @@ export default class OurBoardRegion extends Region {
       this.temp.push(card)
 
       // Add hotkey hint text above the card
-      let position = CardLocation.ourHand(state, i, this.container)
+      let position = this.ourHandRestPosition(state, i)
       position[1] -= Space.cardHeight / 2 + HOVER_OFFSET + 35
       const hotkeyText = this.addHotkeyHint(position, `${i + 1}`)
       this.temp.push(hotkeyText)
@@ -448,6 +479,7 @@ export default class OurBoardRegion extends Region {
     } else {
       const handN = state.hand[0].length
       this.cards.forEach((c, idx) => {
+        c.setPosition(this.ourHandRestPosition(state, idx))
         c.container.setRotation(this.ourHandRestFanRotation(idx, handN))
       })
     }
@@ -532,7 +564,7 @@ export default class OurBoardRegion extends Region {
           }
           const n = st.hand[0].length
           cards.forEach((c, idx) => {
-            const [x, y] = CardLocation.ourHand(st, idx, this.container)
+            const [x, y] = this.ourHandRestPosition(st, idx)
             this.scene.tweens.add({
               targets: c.container,
               x,
@@ -604,7 +636,7 @@ export default class OurBoardRegion extends Region {
         })
       } else {
         const n = st.hand[0].length
-        const [x, y] = CardLocation.ourHand(st, idx, this.container)
+        const [x, y] = this.ourHandRestPosition(st, idx)
         this.scene.tweens.add({
           targets: card.container,
           x,
