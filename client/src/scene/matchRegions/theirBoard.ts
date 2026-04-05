@@ -6,6 +6,9 @@ import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
 
+// Slight hand fan for opponent cards (rotation only; base is π so they face the opponent).
+const THEIR_HAND_FAN_MAX_RAD = (4 * Math.PI) / 180
+
 export default class TheirBoardRegion extends Region {
   // Effect showing that they have priority
   priorityHighlight: Phaser.GameObjects.Video
@@ -20,6 +23,9 @@ export default class TheirBoardRegion extends Region {
   private discardCards: CardImage[] = []
   private discardContainer: Phaser.GameObjects.Container
 
+  /** Last state used to reposition their hand on resize (fan rotation). */
+  private lastHandState: GameModel | null = null
+
   create(scene: MatchScene): this {
     this.scene = scene
 
@@ -30,6 +36,16 @@ export default class TheirBoardRegion extends Region {
     this.createDeck()
 
     return this
+  }
+
+  private theirHandFanRotation(i: number, n: number): number {
+    if (n <= 1) {
+      return Math.PI
+    }
+    const mid = (n - 1) / 2
+    const delta =
+      -((i - mid) / Math.max(mid, 1)) * THEIR_HAND_FAN_MAX_RAD
+    return Math.PI + delta
   }
 
   displayState(state: GameModel): void {
@@ -86,14 +102,18 @@ export default class TheirBoardRegion extends Region {
       return
     }
 
+    this.lastHandState = state
+
+    // Their hand
+    const handN = state.hand[1].length
     this.cards = []
-    for (let i = 0; i < state.hand[1].length; i++) {
+    for (let i = 0; i < handN; i++) {
       const card = this.addCard(
         state.hand[1][i],
         CardLocation.theirHand(state, i, this.container),
       ).moveToTopOnHover()
 
-      card.container.setRotation(Math.PI)
+      card.container.setRotation(this.theirHandFanRotation(i, handN))
 
       this.cards.push(card)
       this.temp.push(card)
@@ -167,6 +187,15 @@ export default class TheirBoardRegion extends Region {
       )
       this.discardCards[i].container.setScale(0.75)
       this.discardCards[i].container.setRotation(Math.PI - Math.PI / 32)
+    }
+
+    const st = this.lastHandState
+    if (st && this.cards?.length && this.cards.length === st.hand[1].length) {
+      const n = st.hand[1].length
+      this.cards.forEach((c, i) => {
+        c.setPosition(CardLocation.theirHand(st, i, this.container))
+        c.container.setRotation(this.theirHandFanRotation(i, n))
+      })
     }
   }
 }
