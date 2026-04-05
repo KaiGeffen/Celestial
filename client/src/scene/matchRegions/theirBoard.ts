@@ -43,8 +43,7 @@ export default class TheirBoardRegion extends Region {
       return Math.PI
     }
     const mid = (n - 1) / 2
-    const delta =
-      -((i - mid) / Math.max(mid, 1)) * THEIR_HAND_FAN_MAX_RAD
+    const delta = -((i - mid) / Math.max(mid, 1)) * THEIR_HAND_FAN_MAX_RAD
     return Math.PI + delta
   }
 

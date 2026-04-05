@@ -24,6 +24,10 @@ const HAND_FAN_MIN_DX = Space.cardWidth - Space.pad
 // overriding `HAND_FAN_MIN_DX` almost always. Fanned layout uses nearly full width.
 const HAND_FAN_SCREEN_MARGIN = 80
 
+// Rest hand: slight rotation fan only (same curve as `theirBoard`, upright: base 0).
+// Hovered / shift-raised hand: flat rotation 0 + `ourHandFannedLayout` spread.
+const OUR_HAND_REST_FAN_MAX_RAD = (4 * Math.PI) / 180
+
 export default class OurBoardRegion extends Region {
   // Function called when elements in this region are interacted with
   callback: (i: number) => boolean
@@ -221,6 +225,16 @@ export default class OurBoardRegion extends Region {
     return { x, y }
   }
 
+  /** Matches `theirHandFanRotation` shape with π removed (our cards face the player). */
+  private ourHandRestFanRotation(i: number, n: number): number {
+    if (n <= 1) {
+      return 0
+    }
+    const mid = (n - 1) / 2
+    const delta = ((i - mid) / Math.max(mid, 1)) * OUR_HAND_REST_FAN_MAX_RAD
+    return delta
+  }
+
   private reflowHandAfterResize(): void {
     if (!this.lastHandState || !this.cards?.length) {
       return
@@ -233,9 +247,10 @@ export default class OurBoardRegion extends Region {
         c.container.setRotation(0)
       })
     } else {
+      const n = st.hand[0].length
       this.cards.forEach((c, idx) => {
         c.setPosition(CardLocation.ourHand(st, idx, this.container))
-        c.container.setRotation(0)
+        c.container.setRotation(this.ourHandRestFanRotation(idx, n))
       })
     }
   }
@@ -275,11 +290,12 @@ export default class OurBoardRegion extends Region {
         hand.forEach((other, idx) => {
           if (other !== card) {
             const [x, y] = CardLocation.ourHand(state, idx, this.container)
+            const n = state.hand[0].length
             this.scene.tweens.add({
               targets: other.container,
               x,
               y,
-              rotation: 0,
+              rotation: this.ourHandRestFanRotation(idx, n),
               duration: Time.cardFocus,
               ease: 'Sine.easeOut',
             })
@@ -422,12 +438,17 @@ export default class OurBoardRegion extends Region {
       hotkeyText.setVisible(this.isShiftHeld)
     }
 
-    // Shift or hover-active: fan out so cards do not overlap
+    // Shift or hover-active: wide spread + raised (flat rotation like before)
     if (this.isShiftHeld || this.raisedCardIndex !== null) {
       this.cards.forEach((c, idx) => {
         const { x, y } = this.ourHandFannedLayout(state, idx)
         c.setPosition([x, y])
         c.container.setRotation(0)
+      })
+    } else {
+      const handN = state.hand[0].length
+      this.cards.forEach((c, idx) => {
+        c.container.setRotation(this.ourHandRestFanRotation(idx, handN))
       })
     }
 
@@ -509,13 +530,14 @@ export default class OurBoardRegion extends Region {
           if (!st) {
             return
           }
+          const n = st.hand[0].length
           cards.forEach((c, idx) => {
             const [x, y] = CardLocation.ourHand(st, idx, this.container)
             this.scene.tweens.add({
               targets: c.container,
               x,
               y,
-              rotation: 0,
+              rotation: this.ourHandRestFanRotation(idx, n),
               duration: Time.cardFocus,
               ease: 'Sine.easeOut',
             })
@@ -581,12 +603,13 @@ export default class OurBoardRegion extends Region {
           ease: 'Sine.easeOut',
         })
       } else {
+        const n = st.hand[0].length
         const [x, y] = CardLocation.ourHand(st, idx, this.container)
         this.scene.tweens.add({
           targets: card.container,
           x,
           y,
-          rotation: 0,
+          rotation: this.ourHandRestFanRotation(idx, n),
           duration: Time.cardFocus,
           ease: 'Sine.easeOut',
         })
