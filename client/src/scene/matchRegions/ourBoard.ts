@@ -186,7 +186,13 @@ export default class OurBoardRegion extends Region {
     i: number,
   ): { x: number; y: number } {
     const n = state.hand[0].length
-    const maxWidth = Math.max(0, Space.windowWidth - HAND_FAN_SCREEN_MARGIN * 2)
+    const maxWidth = Math.max(
+      0,
+      Math.min(
+        Space.windowWidth - 600,
+        Space.windowWidth - HAND_FAN_SCREEN_MARGIN * 2,
+      ),
+    )
 
     if (n <= 1) {
       return {
