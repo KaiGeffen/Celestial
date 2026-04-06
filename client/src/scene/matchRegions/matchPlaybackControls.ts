@@ -6,7 +6,7 @@ import { MatchScene } from '../matchScene'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
 
-// Recap, skip (during replay), and animation speed — anchored left-center of the match view.
+// Recap, skip (during replay), and animation speed — anchor x: 0%+100, y: 50%.
 export default class MatchPlaybackControlsRegion extends Region {
   recapCallback: () => void
   skipCallback: () => void
@@ -15,8 +15,6 @@ export default class MatchPlaybackControlsRegion extends Region {
   private btnSkip: Button
   private btnSpeed: Button
 
-  private readonly rowHeight = Space.pad * 2 + Space.iconSize
-
   create(scene: MatchScene): this {
     this.scene = scene
     this.container = scene.add
@@ -24,8 +22,8 @@ export default class MatchPlaybackControlsRegion extends Region {
       .setDepth(Depth.matchPlaybackControls)
 
     scene.plugins.get('rexAnchor')['add'](this.container, {
-      x: `${Space.pad}`,
-      y: `50%-${this.rowHeight / 2}`,
+      x: '0%+40',
+      y: `50%`,
     })
 
     this.createButtons()
@@ -69,14 +67,17 @@ export default class MatchPlaybackControlsRegion extends Region {
   }
 
   private createButtons(): void {
-    let x = Space.pad + Space.iconSize / 2
-    const y = Space.pad + Space.iconSize / 2
+    // Local coords: anchor places container origin at 0%+100px, so layout from x=0 inside the container.
+    const xRecap = Space.iconSize / 2
+    const xSpeed = Space.iconSize + Space.pad + Space.iconSize / 2
+    // y: 50% on container origin — icon centers at y=0 keeps the row vertically centered.
+    const y = 0
 
     this.btnRecap = new Buttons.Icon({
       name: 'Recap',
       within: this.container,
       hint: 'Watch replay',
-      x: x,
+      x: xRecap,
       y: y,
       f: () => this.recapCallback(),
     })
@@ -85,20 +86,18 @@ export default class MatchPlaybackControlsRegion extends Region {
       name: 'Skip',
       within: this.container,
       hint: 'Skip replay',
-      x: x,
+      x: xRecap,
       y: y,
       f: () => this.skipCallback(),
     }).setVisible(false)
 
-    this.addHotkeyHint([x, y], 'R')
-
-    x = Space.pad * 2 + Space.iconSize + Space.iconSize / 2
+    this.addHotkeyHint([xRecap, y], 'R')
 
     this.btnSpeed = new Buttons.Icon({
       name: 'Speed',
       within: this.container,
       hint: 'Animation speed',
-      x: x,
+      x: xSpeed,
       y: y,
       f: () => {
         const currentSpeed = UserSettings._get('animationSpeed')
@@ -116,6 +115,6 @@ export default class MatchPlaybackControlsRegion extends Region {
       },
     })
 
-    this.addHotkeyHint([x, y], 'E')
+    this.addHotkeyHint([xSpeed, y], 'E')
   }
 }
