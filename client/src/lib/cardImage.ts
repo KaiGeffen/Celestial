@@ -168,6 +168,10 @@ export class CardImage {
       this.clearTint()
     } else {
       this.setTint(Color.cardGreyed)
+
+      // Set to grey shadow
+      this.imageShadow.setAlpha(0.25)
+      this.imageShadow.clearTint()
     }
   }
 
@@ -177,7 +181,7 @@ export class CardImage {
     return this
   }
 
-  /** Show or hide the card drop shadow (`card/effects-shadow`). */
+  // Set the shadow visible or not
   setShadow(show: boolean): this {
     if (this.imageShadow) {
       this.imageShadow.setVisible(show)
@@ -199,10 +203,13 @@ export class CardImage {
 
       if (this.card.cost > cost) {
         this.txtCost.setColor(COLOR_BETTER)
+        this.imageShadow.setTintFill(0x55dd55).setAlpha(1)
       } else if (this.card.cost < cost) {
         this.txtCost.setColor(COLOR_WORSE)
+        this.imageShadow.setTintFill(0xe45555).setAlpha(1)
       } else {
         this.txtCost.setColor(Color.cardCost)
+        this.imageShadow.clearTint().setAlpha(0.25)
       }
     }
     return this
@@ -281,10 +288,7 @@ export class CardImage {
     this.imageShadow = this.scene.add.image(0, 0, 'card/effects-shadow')
     this.imageShadow.setDisplaySize(Space.cardWidth + 30, Space.cardHeight + 30)
     this.container.add(this.imageShadow)
-    this.imageShadow.setAlpha(0.2)
-    //.setTintFill(0x5f99dc, 0x5f99dc, 0xfabd5d, 0xfabd5d)
-    // .setTintFill(0x5f99dc)
-    //.setTintFill(0xfabd5d)
+    this.imageShadow.setAlpha(0.25)
     this.setShadow(shadow)
 
     // Card background wash

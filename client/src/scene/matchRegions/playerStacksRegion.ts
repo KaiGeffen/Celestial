@@ -213,7 +213,7 @@ export default abstract class PlayerStacksRegion {
 
     while (this.discardCards.length < desiredDiscardCount) {
       const card = pileRow[this.discardCards.length]
-      const cardImg = new CardImage(card, this.discardContainer, false, true)
+      const cardImg = new CardImage(card, this.discardContainer, false, false)
       this.discardCards.push(cardImg)
     }
 
@@ -235,7 +235,7 @@ export default abstract class PlayerStacksRegion {
     const desiredDeckCount = state.deck[o]?.length ?? 0
 
     while (this.deckCardbacks.length < desiredDeckCount) {
-      const cardback = new CardImage(undefined, this.deckContainer, false, true)
+      const cardback = new CardImage(undefined, this.deckContainer, false, false)
       this.deckCardbacks.push(cardback)
     }
 
