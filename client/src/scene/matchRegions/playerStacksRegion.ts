@@ -99,17 +99,19 @@ export default abstract class PlayerStacksRegion {
     )
     const o = this.ownerIndex()
 
-    this.btnDeck = new Buttons.Stacks.Deck(
+    this.btnDeck = new Buttons.Stacks.StackCount(
       this.stackIconsContainer,
       deckPos[0],
       deckPos[1],
       o,
+      'deck',
     )
-    this.btnDiscard = new Buttons.Stacks.Discard(
+    this.btnDiscard = new Buttons.Stacks.StackCount(
       this.stackIconsContainer,
       discardPos[0],
       discardPos[1],
       o,
+      'discard',
     )
 
     this.addHotkeyHint(deckPos, this.deckHotkeyLetter())
