@@ -614,6 +614,11 @@ export class CardImage {
     this.imageContainer.clearTint()
     // this.txtText.clearTint()
   }
+
+  setMorningGlow(): this {
+    this.imageShadow.setGlow(0xfabd5d)
+    return this
+  }
 }
 
 class CardShadow extends Phaser.GameObjects.Image {
@@ -633,8 +638,9 @@ class CardShadow extends Phaser.GameObjects.Image {
   }
 
   setGlow(color: number): void {
-    this.setTint(color)
+    this.setTintFill(color)
     this.setAlpha(1)
+    this.setVisible(true)
   }
 }
 

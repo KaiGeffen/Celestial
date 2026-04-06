@@ -76,10 +76,7 @@ export default abstract class PlayerStacksRegion {
     return [loc[0] + STACK_ICON_OUTWARD_X, loc[1] + dy]
   }
 
-  create(
-    scene: MatchScene,
-    layoutParent: Phaser.GameObjects.Container,
-  ): this {
+  create(scene: MatchScene, layoutParent: Phaser.GameObjects.Container): this {
     this.scene = scene
     this.layoutParent = layoutParent
 
@@ -188,9 +185,7 @@ export default abstract class PlayerStacksRegion {
     const discardR = this.discardRotationRad()
 
     for (let i = 0; i < this.deckCardbacks.length; i++) {
-      this.deckCardbacks[i].setPosition(
-        this.deckLocation(this.layoutParent, i),
-      )
+      this.deckCardbacks[i].setPosition(this.deckLocation(this.layoutParent, i))
       this.deckCardbacks[i].container.setScale(0.75)
       this.deckCardbacks[i].container.setRotation(deckR)
     }
@@ -232,10 +227,28 @@ export default abstract class PlayerStacksRegion {
       this.discardCards[i].container.setRotation(discardR)
     }
 
+    // Set the top card to glow if it's a morning card
+    const discardN = this.discardCards.length
+    if (discardN > 0) {
+      const topIdx = discardN - 1
+      for (let i = 0; i < topIdx; i++) {
+        this.discardCards[i].imageShadow.setVisible(false)
+      }
+      const topCard = pileRow[topIdx]
+      if (topCard.text.includes('Morning')) {
+        this.discardCards[topIdx].setMorningGlow()
+      }
+    }
+
     const desiredDeckCount = state.deck[o]?.length ?? 0
 
     while (this.deckCardbacks.length < desiredDeckCount) {
-      const cardback = new CardImage(undefined, this.deckContainer, false, false)
+      const cardback = new CardImage(
+        undefined,
+        this.deckContainer,
+        false,
+        false,
+      )
       this.deckCardbacks.push(cardback)
     }
 
@@ -246,9 +259,7 @@ export default abstract class PlayerStacksRegion {
 
     const deckR = this.deckRotationRad()
     for (let i = 0; i < this.deckCardbacks.length; i++) {
-      this.deckCardbacks[i].setPosition(
-        this.deckLocation(this.layoutParent, i),
-      )
+      this.deckCardbacks[i].setPosition(this.deckLocation(this.layoutParent, i))
       this.deckCardbacks[i].container.setScale(0.75)
       this.deckCardbacks[i].container.setRotation(deckR)
     }
