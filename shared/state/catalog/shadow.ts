@@ -346,22 +346,6 @@ const spider = new Spider({
   beta: true,
 })
 
-class Monster extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    if (this.exhale(2, game, player)) {
-      bonus += game.wins[player ^ 1]
-    }
-
-    super.play(player, game, index, bonus)
-  }
-}
-const monster = new Monster({
-  name: 'Monster',
-  id: 342,
-  text: "Discard the next card in the story if it shares a base-cost with a card in your hand.\nExhale 2: Worth +1 for each round you've lost.",
-  beta: true,
-})
-
 class Mutual extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     let triggerCondition = false
@@ -386,6 +370,36 @@ const mutual = new Mutual({
   beta: true,
 })
 
+class Abandoned extends Card {
+  onDiscard(player: number, game: GameModel): boolean {
+    game.animations[player].push(
+      new Animation({
+        from: Zone.Discard,
+        to: Zone.Story,
+        index: game.pile[player].length - 1,
+        index2: game.story.resolvedActs.length + 1,
+      }),
+    )
+
+    // Remove this from the discard pile
+    game.pile[player].pop()
+
+    game.story.addAct(this, player, 0)
+
+    // Create a Wound in hand
+    game.create(player, wound)
+
+    return true
+  }
+}
+const abandoned = new Abandoned({
+  name: 'Abandoned',
+  id: 3042,
+  cost: 3,
+  points: 3,
+  text: 'When discarded, add this to the story Revealed and create a Wound in hand.',
+})
+
 export {
   dagger,
   shadow,
@@ -404,4 +418,5 @@ export {
   voices,
   // mutual,
   isolation,
+  abandoned,
 }
