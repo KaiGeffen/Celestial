@@ -205,6 +205,12 @@ export const assetLists = {
     ],
     "pixelArt": false
   },
+  "card/effects": {
+    "files": [
+      "shadow"
+    ],
+    "pixelArt": false
+  },
   "cutout": {
     "files": [
       "Abundance",

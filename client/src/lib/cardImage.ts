@@ -21,7 +21,8 @@ export class CardImage {
   interactive = false
   doBurstEffect = true
 
-  // Image layers
+  // Image layers (shadow is drawn first / behind everything)
+  imageShadow: Phaser.GameObjects.Image
   imageBackground: Phaser.GameObjects.Image
   imageSubject: Phaser.GameObjects.Image
   imageArc: Phaser.GameObjects.Image
@@ -96,6 +97,7 @@ export class CardImage {
 
   destroy(): void {
     ;[
+      this.imageShadow,
       this.imageBackground,
       this.imageSubject,
       this.imageArc,
@@ -172,6 +174,14 @@ export class CardImage {
   // Set that a card has resolved (In the story)
   setResolved(): this {
     this.setTint(Color.cardGreyed)
+    return this
+  }
+
+  /** Show or hide the card drop shadow (`card/effects-shadow`). */
+  setShadow(show: boolean): this {
+    if (this.imageShadow) {
+      this.imageShadow.setVisible(show)
+    }
     return this
   }
 
@@ -268,6 +278,15 @@ export class CardImage {
   }
 
   private createImages(shadow: boolean): void {
+    this.imageShadow = this.scene.add.image(0, 0, 'card/effects-shadow')
+    this.imageShadow.setDisplaySize(Space.cardWidth + 30, Space.cardHeight + 30)
+    this.container.add(this.imageShadow)
+    this.imageShadow.setAlpha(0.2)
+    //.setTintFill(0x5f99dc, 0x5f99dc, 0xfabd5d, 0xfabd5d)
+    // .setTintFill(0x5f99dc)
+    //.setTintFill(0xfabd5d)
+    this.setShadow(shadow)
+
     // Card background wash
     this.imageBackground = this.scene.add.image(
       0,
@@ -279,11 +298,6 @@ export class CardImage {
 
     this.imageSubject = this.scene.add.image(0, 0, this.getSubjectImageName())
     this.imageSubject.setDisplaySize(Space.cardWidth, Space.cardHeight)
-
-    if (shadow) {
-      // TODO Skipping for now to not overload cpu
-      // this.scene.addShadow(this.imageBackground)
-    }
 
     this.container.add(this.imageSubject)
 
@@ -303,11 +317,6 @@ export class CardImage {
     this.imageCardback = this.scene.add.image(0, 0, 'cardback-default')
     this.imageCardback.setDisplaySize(Space.cardWidth, Space.cardHeight)
     this.container.add(this.imageCardback)
-
-    if (shadow) {
-      // TODO Skipping for now to not overload cpu
-      // this.scene.addShadow(this.imageCardback)
-    }
 
     this.imageCardback.setAlpha(this.card.id === Catalog.cardback.id ? 1 : 0)
   }
