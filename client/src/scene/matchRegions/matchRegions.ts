@@ -1,5 +1,6 @@
 import SearchingRegion from './searching'
 import TheirScoreRegion from './theirScore'
+import MatchPlaybackControlsRegion from './matchPlaybackControls'
 
 import OurBoardRegion from './ourBoard'
 import OurStacksRegion from './ourStacks'
@@ -33,6 +34,7 @@ export default class Regions {
   // Regions for the scores (Right-side showing wins etc)
   static OurScore = OurScoreRegion
   static TheirScore = TheirScoreRegion
+  static MatchPlaybackControls = MatchPlaybackControlsRegion
 
   // Overlays of the stacks
   static OurDeck = Overlay.OurDeckOverlay

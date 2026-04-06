@@ -10,6 +10,7 @@ export const Depth: Record<string, number> = {
   storyAtNight: 2,
   ourScore: 3,
   theirScore: 3,
+  matchPlaybackControls: 3,
   mulligan: 4,
   pass: 5,
 

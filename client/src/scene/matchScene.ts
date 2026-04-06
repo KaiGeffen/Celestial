@@ -13,6 +13,7 @@ import Server from '../server'
 import TheirAvatarRegion from './matchRegions/theirAvatar'
 import OurAvatarRegion from './matchRegions/ourAvatar'
 import TheirScoreRegion from './matchRegions/theirScore'
+import MatchPlaybackControlsRegion from './matchRegions/matchPlaybackControls'
 import OurBoardRegion from './matchRegions/ourBoard'
 import OurStacksRegion from './matchRegions/ourStacks'
 import TheirBoardRegion from './matchRegions/theirBoard'
@@ -259,8 +260,8 @@ export class MatchScene extends BaseScene {
       },
     )
 
-    // Watch recap (Resolutioin of last story)
-    view.theirScore.recapCallback = () => {
+    // Watch recap (resolution of last story)
+    view.matchPlaybackControls.recapCallback = () => {
       // Scan backwards through the queued states to find the start of the recap
       for (let version = this.currentVersion - 1; version >= 0; version--) {
         if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
@@ -275,7 +276,7 @@ export class MatchScene extends BaseScene {
     }
 
     // Skip watching the story resolve
-    view.theirScore.skipCallback = () => {
+    view.matchPlaybackControls.skipCallback = () => {
       this.tweens.getTweens().forEach((tween) => {
         tween.complete()
       })
@@ -396,7 +397,7 @@ export class MatchScene extends BaseScene {
       this.view.ourStacks,
       this.view.theirStacks,
       this.view.ourBoard,
-      this.view.theirScore,
+      this.view.matchPlaybackControls,
       this.view.pass,
     ]
     this.input.keyboard.on('keydown-SHIFT', () => {
@@ -474,6 +475,7 @@ export class View {
 
   ourScore: OurScoreRegion
   theirScore: TheirScoreRegion
+  matchPlaybackControls: MatchPlaybackControlsRegion
 
   // Overlays
   ourDeckOverlay: OverlayRegion
@@ -529,6 +531,7 @@ export class View {
     this.story = new Regions.Story().create(scene)
     this.ourScore = new Regions.OurScore().create(scene)
     this.theirScore = new Regions.TheirScore().create(scene)
+    this.matchPlaybackControls = new Regions.MatchPlaybackControls().create(scene)
     // this.ourButtons = new Regions.OurButtons().create(scene)
 
     this.pass = new Regions.Pass().create(scene)
@@ -586,6 +589,7 @@ export class View {
 
     this.ourScore.displayState(state)
     this.theirScore.displayState(state)
+    this.matchPlaybackControls.displayState(state)
 
     this.story.displayState(state)
     this.pass.displayState(state)
