@@ -1,6 +1,7 @@
 import 'phaser'
 import Button from './button'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
+import { Style } from '../../settings/style'
 
 export type StackCountKind = 'deck' | 'discard'
 
@@ -20,6 +21,7 @@ export default class StackCountButton extends Button {
       text: {
         text: '',
         interactive: false,
+        style: Style.stackCountButton,
       },
       icon: {
         name: 'chrome-stackCount',
