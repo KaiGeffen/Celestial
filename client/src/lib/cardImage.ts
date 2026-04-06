@@ -22,7 +22,7 @@ export class CardImage {
   doBurstEffect = true
 
   // Image layers (shadow is drawn first / behind everything)
-  imageShadow: Phaser.GameObjects.Image
+  imageShadow: CardShadow
   imageBackground: Phaser.GameObjects.Image
   imageSubject: Phaser.GameObjects.Image
   imageArc: Phaser.GameObjects.Image
@@ -170,22 +170,13 @@ export class CardImage {
       this.setTint(Color.cardGreyed)
 
       // Set to grey shadow
-      this.imageShadow.setAlpha(0.25)
-      this.imageShadow.clearTint()
+      this.imageShadow.clearGlow()
     }
   }
 
   // Set that a card has resolved (In the story)
   setResolved(): this {
     this.setTint(Color.cardGreyed)
-    return this
-  }
-
-  // Set the shadow visible or not
-  setShadow(show: boolean): this {
-    if (this.imageShadow) {
-      this.imageShadow.setVisible(show)
-    }
     return this
   }
 
@@ -203,13 +194,13 @@ export class CardImage {
 
       if (this.card.cost > cost) {
         this.txtCost.setColor(COLOR_BETTER)
-        this.imageShadow.setTintFill(0x55dd55).setAlpha(1)
+        this.imageShadow.setGlow(0x55dd55)
       } else if (this.card.cost < cost) {
         this.txtCost.setColor(COLOR_WORSE)
-        this.imageShadow.setTintFill(0xe45555).setAlpha(1)
+        this.imageShadow.setGlow(0xe45555)
       } else {
         this.txtCost.setColor(Color.cardCost)
-        this.imageShadow.clearTint().setAlpha(0.25)
+        this.imageShadow.clearGlow()
       }
     }
     return this
@@ -285,11 +276,9 @@ export class CardImage {
   }
 
   private createImages(shadow: boolean): void {
-    this.imageShadow = this.scene.add.image(0, 0, 'card/effects-shadow')
-    this.imageShadow.setDisplaySize(Space.cardWidth + 30, Space.cardHeight + 30)
+    this.imageShadow = new CardShadow(this.scene, 0, 0)
     this.container.add(this.imageShadow)
-    this.imageShadow.setAlpha(0.25)
-    this.setShadow(shadow)
+    this.imageShadow.setVisible(shadow)
 
     // Card background wash
     this.imageBackground = this.scene.add.image(
@@ -624,6 +613,28 @@ export class CardImage {
     this.imageArc.clearTint()
     this.imageContainer.clearTint()
     // this.txtText.clearTint()
+  }
+}
+
+class CardShadow extends Phaser.GameObjects.Image {
+  constructor(scene: BaseScene, x: number, y: number) {
+    super(scene, x, y, 'card/effects-shadow')
+
+    // Set the size slightly larger than a card
+    this.setDisplaySize(Space.cardWidth + 30, Space.cardHeight + 30)
+
+    // Alpha is typically 0.25
+    this.setAlpha(0.25)
+  }
+
+  clearGlow(): void {
+    this.clearTint()
+    this.setAlpha(0.25)
+  }
+
+  setGlow(color: number): void {
+    this.setTint(color)
+    this.setAlpha(1)
   }
 }
 
