@@ -451,7 +451,8 @@ export const assetLists = {
       "CloudBottom",
       "CloudTop",
       "Hand",
-      "ResultGlow"
+      "ResultGlow",
+      "stackCount"
     ],
     "pixelArt": false
   },
