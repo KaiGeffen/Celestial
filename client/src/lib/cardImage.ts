@@ -601,8 +601,7 @@ export class CardImage {
     this.imageSubject.setTint(color)
     this.imageArc.setTint(color)
     this.imageContainer.setTint(color)
-    this.txtCost.setTint(color)
-    this.txtPoints.setTint(color)
+    // Keep txtCost / txtPoints untinted so stats stay readable when greyed
     // this.txtText.setTint(color)
   }
 
@@ -611,8 +610,6 @@ export class CardImage {
     this.imageSubject.clearTint()
     this.imageArc.clearTint()
     this.imageContainer.clearTint()
-    this.txtCost.clearTint()
-    this.txtPoints.clearTint()
     // this.txtText.clearTint()
   }
 }
