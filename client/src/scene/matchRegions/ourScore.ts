@@ -8,10 +8,10 @@ import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 export default class OurScoreRegion extends Region {
   // Move these inside the class as fields so they're set on instantiation
-  private width = 240
-  private height = 240
-  private BREATH_X = 120
-  private BREATH_Y = 120
+  private width = 180
+  private height = 180
+  private BREATH_X = 90
+  private BREATH_Y = 90
 
   // For the current state, the maximum and current amount of breath we have
   maxBreath: number
@@ -122,19 +122,12 @@ export default class OurScoreRegion extends Region {
     )
     this.container.add(breathWheel)
 
-    const x = this.width / 2 + 20
-    this.txtBreath = this.scene.add
-      .text(x, this.BREATH_Y, '', Style.todoScore)
-      .setOrigin(0, 1)
-
-    const hintBreath = this.scene.add
-      .text(x, this.BREATH_Y, 'Breath', Style.todoSubtext)
-      .setOrigin(0, 0)
-
-    this.container.add([this.txtBreath, hintBreath])
-
-    // Create all of the breath icons
     this.createBreathIcons()
+
+    this.txtBreath = this.scene.add
+      .text(this.BREATH_X, this.BREATH_Y, '', Style.todoScore)
+      .setOrigin(0.5)
+    this.container.add(this.txtBreath)
   }
 
   // Create all of the breath icons
@@ -158,7 +151,7 @@ export default class OurScoreRegion extends Region {
     images: Phaser.GameObjects.Image[],
   ): void {
     const center = [this.BREATH_X, this.BREATH_Y]
-    const radius = 80
+    const radius = 60
 
     // 10 is the max displayed breath, but player could have more
     for (let i = 0; i < MechanicsSettings.BREATH_CAP; i++) {

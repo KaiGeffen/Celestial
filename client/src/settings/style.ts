@@ -148,7 +148,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   },
   todoScore: {
     fontFamily: mainFont,
-    fontSize: '24px',
+    fontSize: '36px',
     color: Color.todoScore,
   },
   todoCloud: {
