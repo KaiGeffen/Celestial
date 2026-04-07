@@ -8,6 +8,7 @@ import TheirBoardRegion from './theirBoard'
 import TheirStacksRegion from './theirStacks'
 import StoryRegion from './story'
 import OurScoreRegion from './ourScore'
+import WinsRegion from './scoreRegion'
 import * as Overlay from './pileOverlays'
 import PassRegion from './pass'
 import RoundResultRegion from './roundResult'
@@ -34,6 +35,7 @@ export default class Regions {
   // Regions for the scores (Right-side showing wins etc)
   static OurScore = OurScoreRegion
   static TheirScore = TheirScoreRegion
+  static Wins = WinsRegion
   static MatchPlaybackControls = MatchPlaybackControlsRegion
 
   // Overlays of the stacks

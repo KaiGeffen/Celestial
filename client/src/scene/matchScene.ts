@@ -21,6 +21,7 @@ import TheirStacksRegion from './matchRegions/theirStacks'
 import StoryRegion from './matchRegions/story'
 import OurScoreRegion from './matchRegions/ourScore'
 import MulliganRegion from './matchRegions/mulliganRegion'
+import WinsRegion from './matchRegions/scoreRegion'
 
 // TODO Figure out
 import { server } from '../server'
@@ -475,6 +476,7 @@ export class View {
 
   ourScore: OurScoreRegion
   theirScore: TheirScoreRegion
+  wins: WinsRegion
   matchPlaybackControls: MatchPlaybackControlsRegion
 
   // Overlays
@@ -533,6 +535,7 @@ export class View {
     this.story = new Regions.Story().create(scene)
     this.ourScore = new Regions.OurScore().create(scene)
     this.theirScore = new Regions.TheirScore().create(scene)
+    this.wins = new Regions.Wins().create(scene)
     this.matchPlaybackControls = new Regions.MatchPlaybackControls().create(
       scene,
     )
@@ -593,6 +596,7 @@ export class View {
 
     this.ourScore.displayState(state)
     this.theirScore.displayState(state)
+    this.wins.displayState(state)
     this.matchPlaybackControls.displayState(state)
 
     this.story.displayState(state)

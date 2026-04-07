@@ -4,7 +4,6 @@ import { Depth, Space, Style, Color } from '../../settings/settings'
 import Region from './baseRegion'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { MatchScene } from '../matchScene'
-import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 export default class OurScoreRegion extends Region {
   // Move these inside the class as fields so they're set on instantiation
@@ -19,7 +18,6 @@ export default class OurScoreRegion extends Region {
   currentBreath: number
 
   txtBreath: Phaser.GameObjects.Text
-  txtWins: Phaser.GameObjects.Text
 
   // Icons for each of the states of breath
   breathBasic: Phaser.GameObjects.Image[] = []
@@ -38,7 +36,6 @@ export default class OurScoreRegion extends Region {
       y: `100%-${this.height}`,
     })
 
-    this.createWins()
     this.createBreath()
 
     return this
@@ -54,8 +51,6 @@ export default class OurScoreRegion extends Region {
     const s = `${state.breath[0]}/${state.maxBreath[0]}`
     this.txtBreath.setText(s)
 
-    // Wins
-    this.txtWins.setText(`${state.wins[0]}/5`)
   }
 
   // Display a given breath cost
@@ -78,27 +73,6 @@ export default class OurScoreRegion extends Region {
       .setOrigin(0)
 
     this.container.add(background)
-  }
-
-  private createWins(): void {
-    // Create a vertical sizer
-    const winsSizer = new Sizer(this.scene, {
-      x: this.width / 2,
-      y: 0,
-      orientation: 'vertical',
-      space: { top: Space.padSmall, item: 4 },
-    }).setOrigin(0.5, 0)
-
-    this.txtWins = this.scene.add.text(0, 0, '0/5', Style.todoScore)
-    const hintWins = this.scene.add.text(0, 0, 'Wins', Style.todoSubtext)
-
-    // Add texts to sizer, centering them horizontally
-    winsSizer
-      .add(this.txtWins, { align: 'center' })
-      .add(hintWins, { align: 'center' })
-      .layout()
-
-    this.container.add(winsSizer)
   }
 
   private createBreath(): void {
