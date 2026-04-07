@@ -1,6 +1,6 @@
 import SearchingRegion from './searching'
 import TheirScoreRegion from './theirScore'
-import MatchPlaybackControlsRegion from './matchPlaybackControls'
+import MatchPlaybackControlsRegion from './matchPlaybackControlsRegion'
 
 import OurBoardRegion from './ourBoard'
 import OurStacksRegion from './ourStacks'

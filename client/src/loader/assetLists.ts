@@ -454,7 +454,7 @@ export const assetLists = {
       "ResultGlow",
       "breathWheel",
       "nameplate",
-      "nameplate",
+      "replayControls",
       "replayControls",
       "stackCount"
     ],

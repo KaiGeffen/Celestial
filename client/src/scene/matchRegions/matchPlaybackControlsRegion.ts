@@ -22,7 +22,7 @@ export default class MatchPlaybackControlsRegion extends Region {
       .setDepth(Depth.matchPlaybackControls)
 
     scene.plugins.get('rexAnchor')['add'](this.container, {
-      x: '0%+40',
+      x: '0%+80',
       y: `50%`,
     })
 
@@ -67,18 +67,18 @@ export default class MatchPlaybackControlsRegion extends Region {
   }
 
   private createButtons(): void {
-    // Local coords: anchor places container origin at 0%+100px, so layout from x=0 inside the container.
-    const xRecap = Space.iconSize / 2
-    const xSpeed = Space.iconSize + Space.pad + Space.iconSize / 2
-    // y: 50% on container origin — icon centers at y=0 keeps the row vertically centered.
-    const y = 0
+    const x = 10
+    const yDelta = 70
+
+    const chrome = this.scene.add.image(0, 0, 'chrome-replayControls')
+    this.container.add(chrome)
 
     this.btnRecap = new Buttons.Icon({
       name: 'Recap',
       within: this.container,
       hint: 'Watch replay',
-      x: xRecap,
-      y: y,
+      x,
+      y: -yDelta,
       f: () => this.recapCallback(),
     })
 
@@ -86,19 +86,19 @@ export default class MatchPlaybackControlsRegion extends Region {
       name: 'Skip',
       within: this.container,
       hint: 'Skip replay',
-      x: xRecap,
-      y: y,
+      x,
+      y: -yDelta,
       f: () => this.skipCallback(),
     }).setVisible(false)
 
-    this.addHotkeyHint([xRecap, y], 'R')
+    this.addHotkeyHint([x, yDelta], 'R')
 
     this.btnSpeed = new Buttons.Icon({
       name: 'Speed',
       within: this.container,
       hint: 'Animation speed',
-      x: xSpeed,
-      y: y,
+      x,
+      y: yDelta,
       f: () => {
         const currentSpeed = UserSettings._get('animationSpeed')
 
@@ -115,6 +115,6 @@ export default class MatchPlaybackControlsRegion extends Region {
       },
     })
 
-    this.addHotkeyHint([xSpeed, y], 'E')
+    this.addHotkeyHint([x, -yDelta], 'E')
   }
 }
