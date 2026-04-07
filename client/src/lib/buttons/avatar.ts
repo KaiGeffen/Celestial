@@ -2,7 +2,6 @@ import 'phaser'
 import Button from './button'
 import avatarNames from '../../../../shared/data/avatarNames'
 import { Color, Time } from '../../settings/settings'
-import type BaseScene from '../../scene/baseScene'
 
 // TODO As this grows move it to another file
 const borderNames = [
@@ -110,14 +109,6 @@ export default class AvatarButton extends Button {
   setBorder(border: number): this {
     this.border.setTexture(`border-${borderNames[border]}`)
 
-    return this
-  }
-
-  /** Drop shadow behind portrait + border (rex DropShadow pipeline). */
-  addPortraitShadow(angle = 45): this {
-    const scene = this.scene as BaseScene
-    scene.addShadow(this.icon, angle)
-    scene.addShadow(this.border, angle)
     return this
   }
 

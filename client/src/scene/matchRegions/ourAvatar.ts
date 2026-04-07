@@ -14,6 +14,14 @@ export default class OurAvatarRegion extends AvatarRegionBase {
   btnNourish: Button
   btnSight: Button
 
+  protected avatarCenterY(): number {
+    return Space.pad * 2 + Space.avatarSize / 2
+  }
+
+  protected avatarEmotive(): boolean {
+    return true
+  }
+
   create(scene: MatchScene): this {
     this.scene = scene
     this.container = scene.add.container().setDepth(Depth.ourAvatar)
@@ -55,18 +63,6 @@ export default class OurAvatarRegion extends AvatarRegionBase {
   private createBackground(): void {
     const background = this.scene.add.image(0, -7, 'chrome-Avatar').setOrigin(0)
     this.container.add(background)
-  }
-
-  private createAvatar(): void {
-    const x = width / 2
-    const y = Space.pad * 2 + Space.avatarSize / 2
-    this.avatar = new Buttons.Avatar({
-      within: this.container,
-      x,
-      y,
-      emotive: true,
-    })
-    this.addAvatarPortraitShadow()
   }
 
   private createStatusDisplay(): void {

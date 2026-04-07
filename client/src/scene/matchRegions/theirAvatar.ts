@@ -14,6 +14,10 @@ export default class TheirAvatarRegion extends AvatarRegionBase {
   btnNourish: Button
   btnSight: Button
 
+  protected avatarCenterY(): number {
+    return Space.avatarSize / 2 + Space.pad
+  }
+
   create(scene: MatchScene): this {
     this.scene = scene
     this.container = scene.add.container(0, 0).setDepth(Depth.theirAvatar)
@@ -56,17 +60,6 @@ export default class TheirAvatarRegion extends AvatarRegionBase {
       .setOrigin(0, 1)
       .setScale(1, -1)
     this.container.add(background)
-  }
-
-  private createAvatar(): void {
-    const x = width / 2
-    const y = Space.avatarSize / 2 + Space.pad
-    this.avatar = new Buttons.Avatar({
-      within: this.container,
-      x,
-      y,
-    })
-    this.addAvatarPortraitShadow()
   }
 
   private createStatusDisplay(): void {
