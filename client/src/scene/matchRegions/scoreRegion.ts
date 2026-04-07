@@ -15,8 +15,10 @@ const CIRCLE_RADIUS = 360
 const CIRCLE_CENTER_X_FROM_RIGHT = SUN_X_FROM_RIGHT - CIRCLE_RADIUS // positive -> offscreen right
 
 // Their gems sit above the sun, ours below it, on the same circle.
-const ARC_SPREAD_RAD = 1.05
-const ARC_GAP_RAD = 0.18
+const ARC_FIRST_DEG = 22
+const ARC_SPAN_DEG = 20
+const ARC_FIRST_RAD = (ARC_FIRST_DEG * Math.PI) / 180
+const ARC_LAST_RAD = ((ARC_FIRST_DEG + ARC_SPAN_DEG) * Math.PI) / 180
 
 export default class WinsRegion extends Region {
   private ourGems: Phaser.GameObjects.Image[] = []
@@ -88,13 +90,12 @@ export default class WinsRegion extends Region {
     // Their gems: above the sun (approaching the sun from above).
     makeArcRad(
       this.theirGems,
-      sunTheta - ARC_SPREAD_RAD,
-      sunTheta - ARC_GAP_RAD,
+      sunTheta - ARC_LAST_RAD,
+      sunTheta - ARC_FIRST_RAD,
       0x111111,
     )
 
     // Our gems: below the sun (departing the sun downward).
-    makeArcRad(this.ourGems, sunTheta + ARC_GAP_RAD, sunTheta + ARC_SPREAD_RAD)
+    makeArcRad(this.ourGems, sunTheta + ARC_FIRST_RAD, sunTheta + ARC_LAST_RAD)
   }
 }
-
