@@ -391,8 +391,8 @@ export const assetLists = {
   },
   "background": {
     "files": [
-      "Dark",
-      "Light"
+      "Light",
+      "match"
     ],
     "pixelArt": false
   },
@@ -454,7 +454,6 @@ export const assetLists = {
       "ResultGlow",
       "breathWheel",
       "nameplate",
-      "replayControls",
       "replayControls",
       "stackCount"
     ],

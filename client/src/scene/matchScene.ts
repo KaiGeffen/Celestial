@@ -1,6 +1,6 @@
 import 'phaser'
 // Import Settings itself
-import { Ease, Space, UserSettings, Messages } from '../settings/settings'
+import { Ease, UserSettings, Messages } from '../settings/settings'
 import BaseScene from './baseScene'
 import Animator from './matchRegions/animator'
 import Region from './matchRegions/baseRegion'
@@ -500,7 +500,7 @@ export class View {
     this.scene = scene
 
     this.background = scene.add
-      .image(0, 0, 'background-Dark')
+      .image(0, 0, 'background-match')
       .setOrigin(0)
       .setDepth(-1)
       // Hovering this will hide the hint, in case it lingers from a state change
@@ -509,11 +509,10 @@ export class View {
         this.scene.hint.hide()
       })
 
-    this.background.setScale(
-      this.background.width >= Space.windowWidth
-        ? 1
-        : Space.windowWidth / this.background.width,
-    )
+    scene.plugins.get('rexAnchor')['add'](this.background, {
+      width: `100%`,
+      height: `100%`,
+    })
 
     this.searching = new Regions.Searching().create(scene, avatarId, password)
 
@@ -521,7 +520,10 @@ export class View {
     // this.createOurHand()
     // new HandRegion()//.create(scene)
     this.ourBoard = new Regions.OurBoard().create(scene)
-    this.ourStacks = new Regions.OurStacks().create(scene, this.ourBoard.container)
+    this.ourStacks = new Regions.OurStacks().create(
+      scene,
+      this.ourBoard.container,
+    )
     this.theirBoard = new Regions.TheirBoard().create(scene)
     this.theirStacks = new Regions.TheirStacks().create(
       scene,
@@ -531,7 +533,9 @@ export class View {
     this.story = new Regions.Story().create(scene)
     this.ourScore = new Regions.OurScore().create(scene)
     this.theirScore = new Regions.TheirScore().create(scene)
-    this.matchPlaybackControls = new Regions.MatchPlaybackControls().create(scene)
+    this.matchPlaybackControls = new Regions.MatchPlaybackControls().create(
+      scene,
+    )
     // this.ourButtons = new Regions.OurButtons().create(scene)
 
     this.pass = new Regions.Pass().create(scene)
