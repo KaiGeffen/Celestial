@@ -7,7 +7,7 @@ import AvatarRegionBase from './avatarRegionBase'
 import { MatchScene } from '../matchScene'
 
 const width = Space.avatarSize + Space.pad * 2
-const height = 270
+const height = 240
 
 export default class OurAvatarRegion extends AvatarRegionBase {
   btnInspire: Button
@@ -29,7 +29,6 @@ export default class OurAvatarRegion extends AvatarRegionBase {
       y: `100%-${height}`,
     })
 
-    this.createBackground()
     this.createStatusDisplay()
     this.createAvatar()
     this.createUsernames()
@@ -58,11 +57,6 @@ export default class OurAvatarRegion extends AvatarRegionBase {
 
   setEmoteCallback(fEmote: () => void): void {
     this.avatar.setOnClick(fEmote, false, false)
-  }
-
-  private createBackground(): void {
-    const background = this.scene.add.image(0, -7, 'chrome-Avatar').setOrigin(0)
-    this.container.add(background)
   }
 
   private createStatusDisplay(): void {

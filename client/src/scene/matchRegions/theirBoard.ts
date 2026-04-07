@@ -13,8 +13,6 @@ export default class TheirBoardRegion extends Region {
   // Effect showing that they have priority
   priorityHighlight: Phaser.GameObjects.Video
 
-  background: Phaser.GameObjects.Image
-
   /** Last state used to reposition their hand on resize (fan rotation). */
   private lastHandState: GameModel | null = null
 
@@ -22,7 +20,6 @@ export default class TheirBoardRegion extends Region {
     this.scene = scene
 
     this.container = scene.add.container(0, 0).setDepth(Depth.theirHand)
-    this.createBackground()
 
     return this
   }
@@ -77,34 +74,7 @@ export default class TheirBoardRegion extends Region {
     )
   }
 
-  private createBackground(): void {
-    // NOTE 7 is the height of the shadow
-    const y = Space.todoHandOffset + Space.pad + 7
-    this.background = this.scene.add
-      .image(0, y, 'chrome-Hand')
-      .setRotation(Math.PI)
-      .setOrigin(1, 0)
-
-    this.background.setScale(
-      this.background.width >= Space.windowWidth
-        ? 1
-        : Space.windowWidth / this.background.width,
-      1,
-    )
-
-    this.container.add(this.background)
-  }
-
   onWindowResize(): void {
-    this.background.setScale(
-      this.background.width >= Space.windowWidth
-        ? 1
-        : Space.windowWidth / this.background.width,
-      1,
-    )
-
-    this.background.setPosition(0, Space.todoHandOffset + Space.pad + 7)
-
     const st = this.lastHandState
     if (st && this.cards?.length && this.cards.length === st.hand[1].length) {
       const n = st.hand[1].length

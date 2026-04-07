@@ -22,7 +22,6 @@ export default class TheirAvatarRegion extends AvatarRegionBase {
     this.scene = scene
     this.container = scene.add.container(0, 0).setDepth(Depth.theirAvatar)
 
-    this.createBackground()
     this.createStatusDisplay()
     this.createAvatar()
     this.createUsernames()
@@ -52,14 +51,6 @@ export default class TheirAvatarRegion extends AvatarRegionBase {
   // Show their avatar using the given emote
   emote(emoteNumber: number): void {
     this.avatar.doEmote(emoteNumber)
-  }
-
-  private createBackground(): void {
-    const background = this.scene.add
-      .image(-1, -1, 'chrome-Avatar')
-      .setOrigin(0, 1)
-      .setScale(1, -1)
-    this.container.add(background)
   }
 
   private createStatusDisplay(): void {

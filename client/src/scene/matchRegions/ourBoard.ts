@@ -55,8 +55,6 @@ export default class OurBoardRegion extends Region {
   /** Last state used to lay out the hand (fan + rest positions). */
   private lastHandState: GameModel | null = null
 
-  background: Phaser.GameObjects.Image
-
   create(scene: MatchScene): this {
     this.scene = scene
     this.cards = []
@@ -65,8 +63,6 @@ export default class OurBoardRegion extends Region {
     this.scene.plugins.get('rexAnchor')['add'](this.container, {
       y: `100%`,
     })
-
-    this.createBackground(scene)
 
     return this
   }
@@ -129,30 +125,7 @@ export default class OurBoardRegion extends Region {
     })
   }
 
-  private createBackground(scene: Phaser.Scene): void {
-    // 7 is the height of the shadow
-    const y = -(Space.todoHandOffset + Space.pad + 7)
-    this.background = this.scene.add.image(0, y, 'chrome-Hand').setOrigin(0)
-    this.background.setScale(
-      this.background.width >= Space.windowWidth
-        ? 1
-        : Space.windowWidth / this.background.width,
-      1,
-    )
-
-    this.container.add(this.background)
-  }
-
   onWindowResize(): void {
-    this.background.setScale(
-      this.background.width >= Space.windowWidth
-        ? 1
-        : Space.windowWidth / this.background.width,
-      1,
-    )
-
-    this.background.setPosition(0, -(Space.todoHandOffset + Space.pad + 7))
-
     this.reflowHandAfterResize()
   }
 
