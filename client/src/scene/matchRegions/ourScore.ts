@@ -164,8 +164,12 @@ export default class OurScoreRegion extends Region {
       const y = center[1] + Math.sin(theta) * radius
       const s = `icon-Breath${key}`
 
+      // Top slot (i=0): 0 rad; bottom (i=N/2): π rad; linear in i around the circle
+      const rotation =
+        (2 * Math.PI * i) / MechanicsSettings.BREATH_CAP
+
       // Create the icon, add it to container and list of breath for this subtype
-      let image = this.scene.add.image(x, y, s)
+      let image = this.scene.add.image(x, y, s).setRotation(rotation)
       this.container.add(image)
       images.push(image)
     }
