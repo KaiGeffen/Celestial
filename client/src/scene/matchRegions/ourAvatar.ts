@@ -2,21 +2,17 @@ import 'phaser'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import GameModel from '../../../../shared/state/gameModel'
-import { Depth, Space, Style } from '../../settings/settings'
-import Region from './baseRegion'
+import { Depth, Space } from '../../settings/settings'
+import AvatarRegionBase from './avatarRegionBase'
 import { MatchScene } from '../matchScene'
-import AvatarButton from '../../lib/buttons/avatar'
 
 const width = Space.avatarSize + Space.pad * 2
 const height = 270
 
-export default class OurAvatarRegion extends Region {
+export default class OurAvatarRegion extends AvatarRegionBase {
   btnInspire: Button
   btnNourish: Button
   btnSight: Button
-  avatar: AvatarButton
-  txtUsername: Phaser.GameObjects.Text
-  txtUsernameSubtitle: Phaser.GameObjects.Text
 
   create(scene: MatchScene): this {
     this.scene = scene
@@ -49,27 +45,11 @@ export default class OurAvatarRegion extends Region {
       .setVisible(state.status[0].vision !== 0)
       .setText(`${state.status[0].vision}`)
 
-    // Usernames and subtitles
     this.txtUsername.setText(state.usernames[0])
-    this.txtUsernameSubtitle.setText(state.subtitles[0])
   }
 
   setEmoteCallback(fEmote: () => void): void {
     this.avatar.setOnClick(fEmote, false, false)
-  }
-
-  private createUsernames(): void {
-    const x = this.avatar.icon.x
-    const y0 = this.avatar.icon.y + this.avatar.icon.height / 2 + 5
-
-    this.txtUsername = this.scene.add
-      .text(x, y0, '', Style.username)
-      .setOrigin(0.5, 0)
-    this.txtUsernameSubtitle = this.scene.add
-      .text(x, y0 + 16 + 5, '', Style.usernameElo)
-      .setOrigin(0.5, 0)
-
-    this.container.add([this.txtUsername, this.txtUsernameSubtitle])
   }
 
   private createBackground(): void {
@@ -86,6 +66,7 @@ export default class OurAvatarRegion extends Region {
       y,
       emotive: true,
     })
+    this.addAvatarPortraitShadow()
   }
 
   private createStatusDisplay(): void {
