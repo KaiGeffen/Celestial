@@ -22,7 +22,7 @@ export default class MatchPlaybackControlsRegion extends Region {
       .setDepth(Depth.matchPlaybackControls)
 
     scene.plugins.get('rexAnchor')['add'](this.container, {
-      x: '0%+80',
+      x: '0%+110',
       y: `50%`,
     })
 

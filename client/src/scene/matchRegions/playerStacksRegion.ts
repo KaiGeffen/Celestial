@@ -9,6 +9,9 @@ import { MatchScene } from '../matchScene'
 // Count badges: nudge away from screen center (deck left, discard right) and a bit further in Y.
 const STACK_ICON_OUTWARD_X = 52
 const STACK_ICON_EXTRA_Y = 12
+/** Extra horizontal nudge for stack count buttons (deck / discard). */
+const STACK_ICON_DECK_X_NUDGE = 25
+const STACK_ICON_DISCARD_X_NUDGE = -30
 
 /**
  * Shared deck + discard pile rendering for one player, parented under the
@@ -67,13 +70,19 @@ export default abstract class PlayerStacksRegion {
   /** Deck badge: left stack — shift farther from center (negative x). */
   private stackIconDeckPosition(loc: [number, number]): [number, number] {
     const dy = this.stackIconYDeltaFromCardCenter()
-    return [loc[0] - STACK_ICON_OUTWARD_X, loc[1] + dy]
+    return [
+      loc[0] - STACK_ICON_OUTWARD_X + STACK_ICON_DECK_X_NUDGE,
+      loc[1] + dy,
+    ]
   }
 
   /** Discard badge: right stack — shift farther from center (positive x). */
   private stackIconDiscardPosition(loc: [number, number]): [number, number] {
     const dy = this.stackIconYDeltaFromCardCenter()
-    return [loc[0] + STACK_ICON_OUTWARD_X, loc[1] + dy]
+    return [
+      loc[0] + STACK_ICON_OUTWARD_X + STACK_ICON_DISCARD_X_NUDGE,
+      loc[1] + dy,
+    ]
   }
 
   create(scene: MatchScene, layoutParent: Phaser.GameObjects.Container): this {

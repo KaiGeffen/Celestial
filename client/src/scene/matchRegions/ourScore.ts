@@ -12,6 +12,7 @@ export default class OurScoreRegion extends Region {
   private height = 180
   private BREATH_X = 90
   private BREATH_Y = 90
+  private X_NUDGE = -10
 
   // For the current state, the maximum and current amount of breath we have
   maxBreath: number
@@ -36,7 +37,7 @@ export default class OurScoreRegion extends Region {
 
     // Anchor to bottom right
     scene.plugins.get('rexAnchor')['add'](this.container, {
-      x: `100%-${this.width}`,
+      x: `100%-${this.width + this.X_NUDGE}`,
       y: `100%-${this.height}`,
     })
 
