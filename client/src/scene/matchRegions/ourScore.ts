@@ -8,10 +8,10 @@ import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 export default class OurScoreRegion extends Region {
   // Move these inside the class as fields so they're set on instantiation
-  private width = Space.iconSize * 3 + Space.pad * 4
-  private height = Space.todoHandOffset + Space.pad
-  private BREATH_X = 30 + Space.padSmall
-  private BREATH_Y = this.height - 30 - Space.padSmall
+  private width = 240
+  private height = 240
+  private BREATH_X = 120
+  private BREATH_Y = 120
 
   // For the current state, the maximum and current amount of breath we have
   maxBreath: number
@@ -158,12 +158,13 @@ export default class OurScoreRegion extends Region {
     images: Phaser.GameObjects.Image[],
   ): void {
     const center = [this.BREATH_X, this.BREATH_Y]
-    const radius = 30
+    const radius = 80
 
     // 10 is the max displayed breath, but player could have more
     for (let i = 0; i < MechanicsSettings.BREATH_CAP; i++) {
-      // Angle in radians
-      const theta = (2 * Math.PI * i) / MechanicsSettings.BREATH_CAP
+      // Angle in radians — first slot at top (−π/2), then evenly around the circle
+      const theta =
+        (2 * Math.PI * i) / MechanicsSettings.BREATH_CAP - Math.PI / 2
 
       const x = center[0] + Math.cos(theta) * radius
       const y = center[1] + Math.sin(theta) * radius
