@@ -1,6 +1,6 @@
 import 'phaser'
 import GameModel from '../../../../shared/state/gameModel'
-import { Depth, Space, Style, Flags, Color } from '../../settings/settings'
+import { Depth, Space, Style, Color } from '../../settings/settings'
 import Region from './baseRegion'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { MatchScene } from '../matchScene'
@@ -28,9 +28,6 @@ export default class OurScoreRegion extends Region {
   breathHover: Phaser.GameObjects.Image[] = []
   breathOom: Phaser.GameObjects.Image[] = []
 
-  // Relic icon
-  relic: Phaser.GameObjects.Image
-
   create(scene: MatchScene): this {
     this.scene = scene
     this.container = scene.add.container().setDepth(Depth.ourScore)
@@ -42,7 +39,6 @@ export default class OurScoreRegion extends Region {
     })
 
     this.createWins()
-    this.createRelic()
     this.createBreath()
 
     return this
@@ -60,9 +56,6 @@ export default class OurScoreRegion extends Region {
 
     // Wins
     this.txtWins.setText(`${state.wins[0]}/5`)
-
-    // Relic
-    this.relic.setFrame(state.wins[0])
   }
 
   // Display a given breath cost
@@ -106,13 +99,6 @@ export default class OurScoreRegion extends Region {
       .layout()
 
     this.container.add(winsSizer)
-  }
-
-  private createRelic(): void {
-    this.relic = this.scene.add
-      .image(this.width / 2, 0, 'relic-Dandelion')
-      .setOrigin(0.5, 1)
-    this.container.add(this.relic)
   }
 
   private createBreath(): void {

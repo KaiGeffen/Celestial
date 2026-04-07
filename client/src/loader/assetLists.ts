@@ -379,7 +379,8 @@ export const assetLists = {
       "Thumb",
       "Underline",
       "Wins",
-      "XOut"
+      "XOut",
+      "win"
     ],
     "dimensions": {
       "Mission": {
@@ -447,10 +448,8 @@ export const assetLists = {
   },
   "chrome": {
     "files": [
-      "Avatar",
       "CloudBottom",
       "CloudTop",
-      "Hand",
       "ResultGlow",
       "breathWheel",
       "nameplate",
