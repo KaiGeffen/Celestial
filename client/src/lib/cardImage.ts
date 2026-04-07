@@ -616,7 +616,7 @@ export class CardImage {
   }
 
   setMorningGlow(): this {
-    this.imageShadow.setGlow(0xfabd5d)
+    this.imageShadow.setGlow(0xffff9f)
     return this
   }
 }

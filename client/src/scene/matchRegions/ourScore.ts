@@ -115,6 +115,13 @@ export default class OurScoreRegion extends Region {
   }
 
   private createBreath(): void {
+    const breathWheel = this.scene.add.image(
+      this.BREATH_X,
+      this.BREATH_Y,
+      'chrome-breathWheel',
+    )
+    this.container.add(breathWheel)
+
     const x = this.width / 2 + 20
     this.txtBreath = this.scene.add
       .text(x, this.BREATH_Y, '', Style.todoScore)

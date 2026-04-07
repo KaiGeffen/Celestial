@@ -452,6 +452,10 @@ export const assetLists = {
       "CloudTop",
       "Hand",
       "ResultGlow",
+      "breathWheel",
+      "breathWheel",
+      "nameplate",
+      "replayControls",
       "stackCount"
     ],
     "pixelArt": false
