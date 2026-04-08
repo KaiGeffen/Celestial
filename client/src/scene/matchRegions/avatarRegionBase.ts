@@ -3,12 +3,12 @@ import GameModel from '../../../../shared/state/gameModel'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import AvatarButton from '../../lib/buttons/avatar'
-import { Space, Style } from '../../settings/settings'
+import { Color, Space, Style } from '../../settings/settings'
 import Region from './baseRegion'
 
 const AVATAR_REGION_WIDTH = Space.avatarSize + Space.pad * 2
 
-/** Shared match avatar UI: portrait + nameplate + name. */
+/** Shared match avatar UI: portrait + username. */
 export default abstract class AvatarRegionBase extends Region {
   avatar: AvatarButton
   txtUsername: Phaser.GameObjects.Text
@@ -38,13 +38,17 @@ export default abstract class AvatarRegionBase extends Region {
   protected createUsernames(): void {
     const x = this.avatar.icon.x
     const y0 = this.avatar.icon.y + this.avatar.icon.height / 2
-    const nameplateY = y0 + 10 + Space.padSmall * 2
+    const usernameY = y0 + 10 + Space.padSmall
 
-    const nameplate = this.scene.add.image(x, nameplateY, 'chrome-nameplate')
-    this.container.add(nameplate)
-
+    // TODO Move to style file
     this.txtUsername = this.scene.add
-      .text(x, nameplateY, '', Style.username)
+      .text(x, usernameY, '', {
+        fontFamily: Style.username.fontFamily,
+        fontSize: '20px',
+        color: Color.whiteS,
+        stroke: Color.blackS,
+        strokeThickness: 2,
+      })
       .setOrigin(0.5)
 
     this.container.add(this.txtUsername)
