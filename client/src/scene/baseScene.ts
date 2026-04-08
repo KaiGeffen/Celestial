@@ -164,7 +164,7 @@ export default class BaseScene extends SharedBaseScene {
 
     // Friends list button (to the left of options)
     this.btnFriends = new Buttons.Icon({
-      name: 'Friends',
+      name: 'Social',
       within: this,
       f: this.openFriendsList(),
       muteClick: true,

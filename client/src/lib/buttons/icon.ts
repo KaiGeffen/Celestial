@@ -1,5 +1,6 @@
 import 'phaser'
 import Button from './button'
+import { Space } from '../../settings/settings'
 
 export default class Icon extends Button {
   constructor({
@@ -27,5 +28,8 @@ export default class Icon extends Button {
     if (hint) {
       this.makeHintable(hint)
     }
+
+    // TODO Remove this once sizes are set in stone
+    this.icon.setDisplaySize(Space.iconSize, Space.iconSize)
   }
 }
