@@ -45,7 +45,7 @@ export default class BackgroundRegion extends Region {
     this.scene.tweens.add({
       targets: { t: 0 },
       t: 1,
-      duration: 400,
+      duration: 600,
       ease: Ease.basic,
       onUpdate: (tween) => {
         const t = tween.getValue()

@@ -81,7 +81,7 @@ export default class CardLocation {
     container: Phaser.GameObjects.Container,
     owner: number,
   ): [number, number] {
-    const x0 = 300
+    const x0 = 330
     let dx = Space.cardWidth - Space.storyXOverlap
 
     // Space to the right of the last card
