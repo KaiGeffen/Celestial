@@ -32,10 +32,6 @@ export default class CatalogRegion {
       pool = [...Catalog.collectibleCards, ...Catalog.betaCards]
     } else {
       pool = Catalog.collectibleCards
-
-      // Only show owned cards
-      const cardInventory = UserSettings._get('cardInventory') || []
-      pool = pool.filter((card) => cardInventory[card.id] === true)
     }
 
     // Create all the cards in pool
