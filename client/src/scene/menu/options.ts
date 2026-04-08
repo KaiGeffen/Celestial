@@ -25,7 +25,7 @@ import { creditsString } from '../../data/credits'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 import { openDiscord } from '../../utils/externalLinks'
 import Server, { server } from '../../server'
-import SearchingRegion from '../matchRegions/searching'
+import SearchingRegion from '../matchRegions/searchingRegion'
 import { SpectatorMatchScene } from '../spectatorMatchScene'
 
 // TODO Use a non-mock color for the menu background

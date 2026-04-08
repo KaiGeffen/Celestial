@@ -18,7 +18,7 @@ const STACK_ICON_DISCARD_X_NUDGE = -30
  * hand board container (between chrome and hand cards), plus count icons on
  * top of each stack (opens overlays; same hotkeys as the old avatar chrome).
  */
-export default abstract class PlayerStacksRegion {
+export default abstract class StacksRegionBase {
   scene: MatchScene
 
   protected layoutParent!: Phaser.GameObjects.Container

@@ -1,11 +1,11 @@
 import 'phaser'
 import CardLocation from './cardLocation'
-import PlayerStacksRegion from './playerStacksRegion'
+import StacksRegionBase from './stacksRegionBase'
 
 /**
- * Our deck (cardbacks) and discard pile — see {@link PlayerStacksRegion}.
+ * Our deck (cardbacks) and discard pile — see {@link StacksRegionBase}.
  */
-export default class OurStacksRegion extends PlayerStacksRegion {
+export default class OurStacksRegion extends StacksRegionBase {
   protected ownerIndex(): 0 | 1 {
     return 0
   }

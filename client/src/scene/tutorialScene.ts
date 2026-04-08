@@ -17,7 +17,7 @@ import Buttons from '../lib/buttons/buttons'
 import { CardImage } from '../lib/cardImage'
 import Catalog from '../../../shared/state/catalog'
 import { ResultsRegionTutorial } from './matchRegions/matchResults'
-import { SearchingRegionTutorial } from './matchRegions/searching'
+import { SearchingRegionTutorial } from './matchRegions/searchingRegion'
 import { Animation } from '../../../shared/animation'
 import { Zone } from '../../../shared/state/zone'
 import GameModel from '../../../shared/state/gameModel'
@@ -154,7 +154,6 @@ export default class TutorialMatchScene extends MatchScene {
     switch (this.params.missionID) {
       case 0:
         // this.view.ourStacks.tutorialHide()
-        // this.view.theirScore.hide()
         this.displayHints1()
         break
 
@@ -226,8 +225,6 @@ export default class TutorialMatchScene extends MatchScene {
         this.view.ourAvatar.hide()
         this.view.theirAvatar.hide()
         this.view.theirBoard.hide()
-        this.view.theirScore.hide()
-
         // Hide cards in hand until later
         this.view.ourBoard.tutorialSetHandVisibility(false)
         break

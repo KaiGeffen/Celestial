@@ -7,7 +7,7 @@ import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
 
 // Recap, skip (during replay), and animation speed — anchor x: 0%+100, y: 50%.
-export default class MatchPlaybackControlsRegion extends Region {
+export default class HistoryRegion extends Region {
   recapCallback: () => void
   skipCallback: () => void
 

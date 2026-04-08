@@ -5,7 +5,7 @@ import Region from './baseRegion'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { MatchScene } from '../matchScene'
 
-export default class OurScoreRegion extends Region {
+export default class BreathRegion extends Region {
   // Move these inside the class as fields so they're set on instantiation
   private width = 180
   private height = 180

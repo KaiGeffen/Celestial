@@ -1,27 +1,27 @@
 import 'phaser'
 // Import Settings itself
-import { Ease, UserSettings, Messages } from '../settings/settings'
+import { UserSettings, Messages } from '../settings/settings'
 import BaseScene from './baseScene'
 import Animator from './matchRegions/animator'
 import Region from './matchRegions/baseRegion'
 import Regions from './matchRegions/matchRegions'
-import OverlayRegion from './matchRegions/pileOverlays'
+import OverlayRegion from './matchRegions/pileOverlayRegions'
 import GameModel from '../../../shared/state/gameModel'
-import PassRegion from './matchRegions/pass'
+import PassRegion from './matchRegions/passRegion'
 import { Deck } from '../../../shared/types/deck'
 import Server from '../server'
-import TheirAvatarRegion from './matchRegions/theirAvatar'
-import OurAvatarRegion from './matchRegions/ourAvatar'
-import TheirScoreRegion from './matchRegions/theirScore'
-import MatchPlaybackControlsRegion from './matchRegions/matchPlaybackControlsRegion'
-import OurBoardRegion from './matchRegions/ourBoard'
-import OurStacksRegion from './matchRegions/ourStacks'
-import TheirBoardRegion from './matchRegions/theirBoard'
-import TheirStacksRegion from './matchRegions/theirStacks'
-import StoryRegion from './matchRegions/story'
-import OurScoreRegion from './matchRegions/ourScore'
+import TheirAvatarRegion from './matchRegions/theirAvatarRegion'
+import OurAvatarRegion from './matchRegions/ourAvatarRegion'
+import OurBoardRegion from './matchRegions/ourBoardRegion'
+import OurStacksRegion from './matchRegions/ourStacksRegion'
+import TheirBoardRegion from './matchRegions/theirBoardRegion'
+import TheirStacksRegion from './matchRegions/theirStacksRegion'
+import StoryRegion from './matchRegions/storyRegion'
 import MulliganRegion from './matchRegions/mulliganRegion'
 import WinsRegion from './matchRegions/scoreRegion'
+import BackgroundRegion from './matchRegions/backgroundRegion'
+import BreathRegion from './matchRegions/breathRegion'
+import HistoryRegion from './matchRegions/historyRegion'
 
 // TODO Figure out
 import { server } from '../server'
@@ -262,7 +262,7 @@ export class MatchScene extends BaseScene {
     )
 
     // Watch recap (resolution of last story)
-    view.matchPlaybackControls.recapCallback = () => {
+    view.historyRegion.recapCallback = () => {
       // Scan backwards through the queued states to find the start of the recap
       for (let version = this.currentVersion - 1; version >= 0; version--) {
         if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
@@ -277,7 +277,7 @@ export class MatchScene extends BaseScene {
     }
 
     // Skip watching the story resolve
-    view.matchPlaybackControls.skipCallback = () => {
+    view.historyRegion.skipCallback = () => {
       this.tweens.getTweens().forEach((tween) => {
         tween.complete()
       })
@@ -290,7 +290,7 @@ export class MatchScene extends BaseScene {
 
     // Display the cost of each card in our hand
     view.ourBoard.setDisplayCostCallback((cost: number) => {
-      this.view.ourScore.displayCost(cost)
+      this.view.breathRegion.displayCost(cost)
     })
 
     // For showing the results after match is over
@@ -398,7 +398,7 @@ export class MatchScene extends BaseScene {
       this.view.ourStacks,
       this.view.theirStacks,
       this.view.ourBoard,
-      this.view.matchPlaybackControls,
+      this.view.historyRegion,
       this.view.pass,
     ]
     this.input.keyboard.on('keydown-SHIFT', () => {
@@ -474,10 +474,9 @@ export class View {
   theirBoard: TheirBoardRegion
   theirStacks: TheirStacksRegion
 
-  ourScore: OurScoreRegion
-  theirScore: TheirScoreRegion
+  breathRegion: BreathRegion
   wins: WinsRegion
-  matchPlaybackControls: MatchPlaybackControlsRegion
+  historyRegion: HistoryRegion
 
   // Overlays
   ourDeckOverlay: OverlayRegion
@@ -496,25 +495,12 @@ export class View {
   // Class that animates everything that is animated
   animator: Animator
 
-  background: Phaser.GameObjects.Image
+  backgroundRegion: BackgroundRegion
 
   constructor(scene: MatchScene, avatarId: number, password: string) {
     this.scene = scene
 
-    this.background = scene.add
-      .image(0, 0, 'background-match')
-      .setOrigin(0)
-      .setDepth(-1)
-      // Hovering this will hide the hint, in case it lingers from a state change
-      .setInteractive()
-      .on('pointerover', () => {
-        this.scene.hint.hide()
-      })
-
-    scene.plugins.get('rexAnchor')['add'](this.background, {
-      width: `100%`,
-      height: `100%`,
-    })
+    this.backgroundRegion = new Regions.Background().create(scene)
 
     this.searching = new Regions.Searching().create(scene, avatarId, password)
 
@@ -533,12 +519,9 @@ export class View {
     )
 
     this.story = new Regions.Story().create(scene)
-    this.ourScore = new Regions.OurScore().create(scene)
-    this.theirScore = new Regions.TheirScore().create(scene)
+    this.breathRegion = new Regions.Breath().create(scene)
     this.wins = new Regions.Wins().create(scene)
-    this.matchPlaybackControls = new Regions.MatchPlaybackControls().create(
-      scene,
-    )
+    this.historyRegion = new Regions.History().create(scene)
     // this.ourButtons = new Regions.OurButtons().create(scene)
 
     this.pass = new Regions.Pass().create(scene)
@@ -594,10 +577,9 @@ export class View {
     this.theirStacks.displayState(state)
     this.theirBoard.displayState(state)
 
-    this.ourScore.displayState(state)
-    this.theirScore.displayState(state)
+    this.breathRegion.displayState(state)
     this.wins.displayState(state)
-    this.matchPlaybackControls.displayState(state)
+    this.historyRegion.displayState(state)
 
     this.story.displayState(state)
     this.pass.displayState(state)
@@ -622,42 +604,7 @@ export class View {
       this.scene.playSound(state.sound)
     }
 
-    // At night, background is dark
-    this.tweenBackgroundTint(state.isRecap)
-  }
-
-  // Tween the background tint between day and night
-  private tweenBackgroundTint(isRecap: boolean) {
-    const startTint = this.background.tintTopLeft
-    const endTint = isRecap ? 0x666666 : 0xffffff
-
-    const startR = (startTint >> 16) & 0xff
-    const startG = (startTint >> 8) & 0xff
-    const startB = startTint & 0xff
-
-    const endR = (endTint >> 16) & 0xff
-    const endG = (endTint >> 8) & 0xff
-    const endB = endTint & 0xff
-
-    this.scene.tweens.add({
-      targets: { t: 0 },
-      t: 1,
-      duration: 400,
-      ease: Ease.basic,
-      onUpdate: (tween) => {
-        const t = tween.getValue()
-        const r = Math.round(startR + (endR - startR) * t)
-        const g = Math.round(startG + (endG - startG) * t)
-        const b = Math.round(startB + (endB - startB) * t)
-        const tint = (r << 16) | (g << 8) | b
-        this.background.setTint(tint)
-      },
-      onComplete: () => {
-        if (!isRecap) {
-          this.background.clearTint()
-        }
-      },
-    })
+    this.backgroundRegion.tweenTintForRecap(state.isRecap)
   }
 
   // Show the given overlay and hide all others
