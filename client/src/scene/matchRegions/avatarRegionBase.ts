@@ -8,10 +8,11 @@ import Region from './baseRegion'
 
 const AVATAR_REGION_WIDTH = Space.avatarSize + Space.pad * 2
 
-/** Shared match avatar UI: portrait + username. */
+/** Shared match avatar UI: portrait + username + subtitle. */
 export default abstract class AvatarRegionBase extends Region {
   avatar: AvatarButton
   txtUsername: Phaser.GameObjects.Text
+  txtSubtitle: Phaser.GameObjects.Text
   btnInspire: Button
   btnNourish: Button
   btnSight: Button
@@ -38,20 +39,32 @@ export default abstract class AvatarRegionBase extends Region {
   protected createUsernames(): void {
     const x = this.avatar.icon.x
     const y0 = this.avatar.icon.y + this.avatar.icon.height / 2
-    const usernameY = y0 + 10 + Space.padSmall
+    const usernameY = y0 + 8 + Space.padSmall
 
     // TODO Move to style file
     this.txtUsername = this.scene.add
       .text(x, usernameY, '', {
         fontFamily: Style.username.fontFamily,
-        fontSize: '20px',
+        fontSize: '22px',
         color: Color.whiteS,
-        stroke: Color.blackS,
-        strokeThickness: 2,
+        stroke: '#000000',
+        strokeThickness: 1.5,
+      })
+      .setOrigin(0.5)
+
+    const subtitleY = usernameY + 22
+    this.txtSubtitle = this.scene.add
+      .text(x, subtitleY, '', {
+        fontFamily: Style.username.fontFamily,
+        fontSize: '18px',
+        color: Color.whiteS,
+        stroke: '#000000',
+        strokeThickness: 1.5,
       })
       .setOrigin(0.5)
 
     this.container.add(this.txtUsername)
+    this.container.add(this.txtSubtitle)
   }
 
   displayState(state: GameModel): void {
@@ -70,5 +83,8 @@ export default abstract class AvatarRegionBase extends Region {
       .setText(`${state.status[i].vision}`)
 
     this.txtUsername.setText(state.usernames[i])
+
+    const subtitle = state.subtitles[i]
+    this.txtSubtitle.setText(subtitle).setVisible(!!subtitle)
   }
 }
