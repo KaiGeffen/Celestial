@@ -5,6 +5,8 @@ export const Depth: Record<string, number> = {
   theirAvatar: 1,
   ourAvatar: 1,
   storyAtDay: 0,
+  /** Inspire / Nourish / Sight; below {@link ourHand} / {@link theirHand}. */
+  matchStatus: 0,
   ourHand: 1,
   theirHand: 1,
   storyAtNight: 2,
