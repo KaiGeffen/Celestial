@@ -8,7 +8,7 @@ import { Style, Color, Flags } from '../../settings/settings'
 // Each subclass of this specifies which of those exists
 // Which accepts input, glows, etc
 
-interface Config {
+export interface Config {
   text?: {
     text: string
     interactive: boolean

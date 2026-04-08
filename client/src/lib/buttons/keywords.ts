@@ -1,10 +1,15 @@
 import 'phaser'
-import Button from './button'
+import Button, { Config } from './button'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import { Style, Space, Flags } from '../../settings/settings'
 import { Keywords } from '../../../../shared/state/keyword'
 
-function getHint(btn: Button, status: string): string {
+/** Reword second-person keyword lines for the opponent’s status row (“they” not “you”). */
+function hintForOpponentPerspective(s: string): string {
+  return s.replace(/\byour\b/g, 'their').replace(/\byou\b/g, 'they')
+}
+
+function getHint(btn: Button, status: string, opponentPerspective?: boolean): string {
   let keyword = Keywords.get(status)
 
   let s = keyword.text
@@ -20,10 +25,27 @@ function getHint(btn: Button, status: string): string {
   // This matches the logic in hint.ts showKeyword function
   s = s.split(/\+\-/).join('-')
 
+  if (opponentPerspective) {
+    s = hintForOpponentPerspective(s)
+  }
+
   return s
 }
 
 class KeywordButton extends Button {
+  protected readonly opponentPerspective: boolean
+
+  constructor(
+    within: Phaser.Scene | Phaser.GameObjects.Container | ContainerLite,
+    x: number,
+    y: number,
+    config: Config,
+    opponentPerspective: boolean = false,
+  ) {
+    super(within, x, y, config)
+    this.opponentPerspective = opponentPerspective
+  }
+
   setText(s: string): Button {
     let result = super.setText(s)
 
@@ -47,26 +69,33 @@ export class InspireButton extends KeywordButton {
     y: number,
     text: string = '',
     f: () => void = function () {},
+    opponentPerspective: boolean = false,
   ) {
-    super(within, x, y, {
-      text: {
-        text: text,
-        interactive: false,
-        style: Style.basic,
-        offsetX: 15,
+    super(
+      within,
+      x,
+      y,
+      {
+        text: {
+          text: text,
+          interactive: false,
+          style: Style.basic,
+          offsetX: 15,
+        },
+        icon: {
+          name: `Inspire`,
+          interactive: true,
+        },
+        callbacks: {
+          click: f,
+        },
       },
-      icon: {
-        name: `Inspire`,
-        interactive: true,
-      },
-      callbacks: {
-        click: f,
-      },
-    })
+      opponentPerspective,
+    )
   }
 
   makeHintable(): Button {
-    const s = getHint(this, 'Inspired')
+    const s = getHint(this, 'Inspired', this.opponentPerspective)
 
     return super.makeHintable(s)
   }
@@ -79,26 +108,33 @@ export class NourishButton extends KeywordButton {
     y: number,
     text: string = '',
     f: () => void = function () {},
+    opponentPerspective: boolean = false,
   ) {
-    super(within, x, y, {
-      text: {
-        text: text,
-        interactive: false,
-        style: Style.basic,
-        offsetX: 15,
+    super(
+      within,
+      x,
+      y,
+      {
+        text: {
+          text: text,
+          interactive: false,
+          style: Style.basic,
+          offsetX: 15,
+        },
+        icon: {
+          name: `Nourish`,
+          interactive: true,
+        },
+        callbacks: {
+          click: f,
+        },
       },
-      icon: {
-        name: `Nourish`,
-        interactive: true,
-      },
-      callbacks: {
-        click: f,
-      },
-    })
+      opponentPerspective,
+    )
   }
 
   makeHintable(): Button {
-    const s = getHint(this, 'Nourish')
+    const s = getHint(this, 'Nourish', this.opponentPerspective)
 
     return super.makeHintable(s)
   }
@@ -112,21 +148,26 @@ export class SightButton extends KeywordButton {
     text: string = '',
     f: () => void = function () {},
   ) {
-    super(within, x, y, {
-      text: {
-        text: text,
-        interactive: false,
-        style: Style.basic,
-        offsetX: 15,
+    super(
+      within,
+      x,
+      y,
+      {
+        text: {
+          text: text,
+          interactive: false,
+          style: Style.basic,
+          offsetX: 15,
+        },
+        icon: {
+          name: `Sight`,
+          interactive: true,
+        },
+        callbacks: {
+          click: f,
+        },
       },
-      icon: {
-        name: `Sight`,
-        interactive: true,
-      },
-      callbacks: {
-        click: f,
-      },
-    })
+    )
   }
 
   makeHintable(): Button {
