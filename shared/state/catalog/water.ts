@@ -232,7 +232,7 @@ class DamBreaks extends Card {
 
       // Add the hand to the story
       while (game.hand[player].length > 0) {
-        const card = game.hand[player].shift()
+        const card = game.hand[player].pop()
         game.story.addAct(card, player, 0)
       }
     }
