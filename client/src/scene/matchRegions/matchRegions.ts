@@ -17,6 +17,7 @@ import MulliganRegion from './mulliganRegion'
 import MatchResultsRegion from './matchResults'
 import OurAvatarRegion from './ourAvatarRegion'
 import TheirAvatarRegion from './theirAvatarRegion'
+import StatusRegion from './statusRegion'
 
 export default class Regions {
   static Background = BackgroundRegion
@@ -26,6 +27,7 @@ export default class Regions {
 
   static OurAvatar = OurAvatarRegion
   static TheirAvatar = TheirAvatarRegion
+  static Status = StatusRegion
 
   static OurBoard = OurBoardRegion
   static OurStacks = OurStacksRegion

@@ -22,6 +22,7 @@ import WinsRegion from './matchRegions/scoreRegion'
 import BackgroundRegion from './matchRegions/backgroundRegion'
 import BreathRegion from './matchRegions/breathRegion'
 import HistoryRegion from './matchRegions/historyRegion'
+import StatusRegion from './matchRegions/statusRegion'
 
 // TODO Figure out
 import { server } from '../server'
@@ -496,6 +497,7 @@ export class View {
   animator: Animator
 
   backgroundRegion: BackgroundRegion
+  statusRegion: StatusRegion
 
   constructor(scene: MatchScene, avatarId: number, password: string) {
     this.scene = scene
@@ -517,6 +519,8 @@ export class View {
       scene,
       this.theirBoard.container,
     )
+
+    this.statusRegion = new StatusRegion().create(scene)
 
     this.story = new Regions.Story().create(scene)
     this.breathRegion = new Regions.Breath().create(scene)
@@ -570,6 +574,8 @@ export class View {
 
     this.theirAvatar.displayState(state)
     this.ourAvatar.displayState(state)
+
+    this.statusRegion.displayState(state)
 
     this.ourStacks.displayState(state)
     this.ourBoard.displayState(state)
