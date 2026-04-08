@@ -5,23 +5,32 @@ import { MatchScene } from '../matchScene'
 
 /** Full-screen match backdrop; recap state tints the image. */
 export default class BackgroundRegion extends Region {
-  image: Phaser.GameObjects.Image
+  water: Phaser.GameObjects.Image
+  outer: Phaser.GameObjects.Image
 
   create(scene: MatchScene): this {
     this.scene = scene
     this.container = scene.add.container().setDepth(-1)
 
-    this.image = scene.add
-      .image(0, 0, 'background-match')
+    this.water = scene.add.image(0, 0, 'background-water').setOrigin(0)
+
+    this.outer = scene.add
+      .image(0, 0, 'background-matchOuter')
       .setOrigin(0)
       .setInteractive()
       .on('pointerover', () => {
         this.scene.hint.hide()
       })
 
-    this.container.add(this.image)
+    this.container.add(this.water)
+    this.container.add(this.outer)
 
-    scene.plugins.get('rexAnchor')['add'](this.image, {
+    scene.plugins.get('rexAnchor')['add'](this.water, {
+      width: `100%`,
+      height: `100%`,
+    })
+
+    scene.plugins.get('rexAnchor')['add'](this.outer, {
       width: `100%`,
       height: `100%`,
     })
@@ -31,7 +40,7 @@ export default class BackgroundRegion extends Region {
 
   /** Tween tint between normal and recap (night) look. */
   tweenTintForRecap(isRecap: boolean): void {
-    const startTint = this.image.tintTopLeft
+    const startTint = this.water.tintTopLeft
     const endTint = isRecap ? 0x666666 : 0xffffff
 
     const startR = (startTint >> 16) & 0xff
@@ -53,11 +62,11 @@ export default class BackgroundRegion extends Region {
         const g = Math.round(startG + (endG - startG) * t)
         const b = Math.round(startB + (endB - startB) * t)
         const tint = (r << 16) | (g << 8) | b
-        this.image.setTint(tint)
+        this.water.setTint(tint)
       },
       onComplete: () => {
         if (!isRecap) {
-          this.image.clearTint()
+          this.water.clearTint()
         }
       },
     })
