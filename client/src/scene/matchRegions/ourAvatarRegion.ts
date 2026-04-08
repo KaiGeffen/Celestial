@@ -1,7 +1,5 @@
 import 'phaser'
-import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
-import GameModel from '../../../../shared/state/gameModel'
 import { Depth, Space } from '../../settings/settings'
 import AvatarRegionBase from './avatarRegionBase'
 import { MatchScene } from '../matchScene'
@@ -10,9 +8,9 @@ const width = Space.avatarSize + Space.pad * 2
 const height = 240
 
 export default class OurAvatarRegion extends AvatarRegionBase {
-  btnInspire: Button
-  btnNourish: Button
-  btnSight: Button
+  protected playerIndex(): 0 | 1 {
+    return 0
+  }
 
   protected avatarCenterY(): number {
     return Space.pad * 2 + Space.avatarSize / 2
@@ -34,25 +32,6 @@ export default class OurAvatarRegion extends AvatarRegionBase {
     this.createUsernames()
 
     return this
-  }
-
-  displayState(state: GameModel): void {
-    // Avatar
-    this.avatar.setAvatar(state.cosmeticSets[0].avatar)
-    this.avatar.setBorder(state.cosmeticSets[0].border)
-
-    // Statuses
-    this.btnInspire
-      .setVisible(state.status[0].inspired !== 0)
-      .setText(`${state.status[0].inspired}`)
-    this.btnNourish
-      .setVisible(state.status[0].nourish !== 0)
-      .setText(`${state.status[0].nourish}`)
-    this.btnSight
-      .setVisible(state.status[0].vision !== 0)
-      .setText(`${state.status[0].vision}`)
-
-    this.txtUsername.setText(state.usernames[0])
   }
 
   setEmoteCallback(fEmote: () => void): void {

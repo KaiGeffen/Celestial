@@ -1,7 +1,5 @@
 import 'phaser'
-import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
-import GameModel from '../../../../shared/state/gameModel'
 import { Depth, Space } from '../../settings/settings'
 import AvatarRegionBase from './avatarRegionBase'
 import { MatchScene } from '../matchScene'
@@ -10,9 +8,9 @@ const width = Space.avatarSize + Space.pad * 2
 const height = 270
 
 export default class TheirAvatarRegion extends AvatarRegionBase {
-  btnInspire: Button
-  btnNourish: Button
-  btnSight: Button
+  protected playerIndex(): 0 | 1 {
+    return 1
+  }
 
   protected avatarCenterY(): number {
     return Space.avatarSize / 2 + Space.pad
@@ -27,25 +25,6 @@ export default class TheirAvatarRegion extends AvatarRegionBase {
     this.createUsernames()
 
     return this
-  }
-
-  displayState(state: GameModel): void {
-    // Avatar
-    this.avatar.setAvatar(state.cosmeticSets[1].avatar)
-    this.avatar.setBorder(state.cosmeticSets[1].border)
-
-    // Statuses
-    this.btnInspire
-      .setVisible(state.status[1].inspired !== 0)
-      .setText(`${state.status[1].inspired}`)
-    this.btnNourish
-      .setVisible(state.status[1].nourish !== 0)
-      .setText(`${state.status[1].nourish}`)
-    this.btnSight
-      .setVisible(state.status[1].vision !== 0)
-      .setText(`${state.status[1].vision}`)
-
-    this.txtUsername.setText(state.usernames[1])
   }
 
   // Show their avatar using the given emote

@@ -1,4 +1,6 @@
 import 'phaser'
+import GameModel from '../../../../shared/state/gameModel'
+import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import AvatarButton from '../../lib/buttons/avatar'
 import { Space, Style } from '../../settings/settings'
@@ -10,6 +12,12 @@ const AVATAR_REGION_WIDTH = Space.avatarSize + Space.pad * 2
 export default abstract class AvatarRegionBase extends Region {
   avatar: AvatarButton
   txtUsername: Phaser.GameObjects.Text
+  btnInspire: Button
+  btnNourish: Button
+  btnSight: Button
+
+  /** Player slot in shared state arrays (0 = us, 1 = them). */
+  protected abstract playerIndex(): 0 | 1
 
   protected createAvatar(): void {
     this.avatar = new Buttons.Avatar({
@@ -40,5 +48,23 @@ export default abstract class AvatarRegionBase extends Region {
       .setOrigin(0.5)
 
     this.container.add(this.txtUsername)
+  }
+
+  displayState(state: GameModel): void {
+    const i = this.playerIndex()
+    this.avatar.setAvatar(state.cosmeticSets[i].avatar)
+    this.avatar.setBorder(state.cosmeticSets[i].border)
+
+    this.btnInspire
+      .setVisible(state.status[i].inspired !== 0)
+      .setText(`${state.status[i].inspired}`)
+    this.btnNourish
+      .setVisible(state.status[i].nourish !== 0)
+      .setText(`${state.status[i].nourish}`)
+    this.btnSight
+      .setVisible(state.status[i].vision !== 0)
+      .setText(`${state.status[i].vision}`)
+
+    this.txtUsername.setText(state.usernames[i])
   }
 }

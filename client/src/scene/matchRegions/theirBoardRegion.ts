@@ -61,19 +61,6 @@ export default class TheirBoardRegion extends Region {
     }
   }
 
-  showUsername(username: string): void {
-    this.container.add(
-      this.scene.add
-        .text(
-          21 + Space.avatarSize / 2,
-          14 + Space.avatarSize,
-          username,
-          Style.username,
-        )
-        .setOrigin(0.5, 0),
-    )
-  }
-
   onWindowResize(): void {
     const st = this.lastHandState
     if (st && this.cards?.length && this.cards.length === st.hand[1].length) {
