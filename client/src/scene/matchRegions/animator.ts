@@ -380,10 +380,14 @@ export default class Animator {
 
   // Animate a card being revealed
   private animateReveal(card: CardImage, i: number): void {
+    const endScaleX = card.container.scaleX
+    const endScaleY = card.container.scaleY
+
     // Animate the back of the card flipping
     let hiddenCard = this.createCard(Catalog.cardback, [0, 0])
       .show()
       .copyLocation(card)
+    hiddenCard.container.setScale(endScaleX, endScaleY)
 
     this.scene.tweens.add({
       targets: hiddenCard.container,
@@ -400,7 +404,7 @@ export default class Animator {
     card.container.scaleX = 0
     this.scene.tweens.add({
       targets: card.container,
-      scaleX: 1,
+      scaleX: endScaleX,
       delay: i * Time.recapTweenWithPause() + Time.recapTween() / 2,
       duration: Time.recapTween() / 2,
       onStart: function (tween: Phaser.Tweens.Tween, targets, _) {

@@ -288,6 +288,7 @@ export default class OurBoardRegion extends Region {
         targets: card.container,
         x: nextStoryPosition[0],
         y: nextStoryPosition[1],
+        scale: 0.8,
         duration: Time.playCard(),
         ease: 'Sine.easeInOut',
         // Moves other cards in hand to fill the hole
