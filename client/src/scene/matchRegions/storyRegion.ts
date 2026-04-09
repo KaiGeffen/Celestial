@@ -6,6 +6,7 @@ import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
 import Act from '../../../../shared/state/act'
+import { Quality } from '../../../../shared/state/quality'
 
 const CARD_SCALE = 0.8
 
@@ -64,6 +65,11 @@ export default class StoryRegion extends Region {
         act.card,
         CardLocation.story(state, resolvedI + i, this.container, act.owner),
       ).moveToTopOnHover()
+
+      // Visible cards glow during the day
+      if (!state.isRecap && act.card.qualities.includes(Quality.VISIBLE)) {
+        card.setVisibleGlow()
+      }
 
       // Only allow jumping around in the recap if we are playing a recap
       if (state.isRecap && !Flags.mobile) {

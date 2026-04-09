@@ -6,7 +6,7 @@ import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
 import { MatchScene } from '../matchScene'
 
-const CARD_SCALE = 0.65
+const CARD_SCALE = 0.8
 
 // Count badges: nudge away from screen center (deck left, discard right) and a bit further in Y.
 const STACK_ICON_OUTWARD_X = 52
