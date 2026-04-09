@@ -82,7 +82,7 @@ export default class CardLocation {
     owner: number,
   ): [number, number] {
     const x0 = 330
-    let dx = Space.cardWidth - Space.storyXOverlap
+    let dx = Space.cardWidth * 0.8 - Space.storyXOverlap
 
     // Space to the right of the last card
     const rightPad = 300

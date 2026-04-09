@@ -7,6 +7,8 @@ import Region from './baseRegion'
 import CardLocation from './cardLocation'
 import Act from '../../../../shared/state/act'
 
+const CARD_SCALE = 0.8
+
 export default class StoryRegion extends Region {
   lastScores: [number, number]
 
@@ -49,6 +51,8 @@ export default class StoryRegion extends Region {
         .moveToTopOnHover()
       // .setOnClick(this.callback(resolvedI))
 
+      card.container.setScale(CARD_SCALE)
+
       this.temp.push(card)
     }
 
@@ -65,6 +69,8 @@ export default class StoryRegion extends Region {
       if (state.isRecap && !Flags.mobile) {
         // card.setOnClick(this.callback(resolvedI + i))
       }
+
+      card.container.setScale(CARD_SCALE)
 
       cards.push(card)
       this.temp.push(card)
