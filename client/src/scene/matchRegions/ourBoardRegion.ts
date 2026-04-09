@@ -122,9 +122,6 @@ export default class OurBoardRegion extends Region {
 
       // Stop the card from doing a further on-click visual effect
       card.doBurstEffect = false
-
-      // Zoom out the subject
-      card.onHoverExitBehavior()
     })
   }
 
@@ -262,10 +259,11 @@ export default class OurBoardRegion extends Region {
       // Reset raised card tracking
       this.raisedCardIndex = null
 
-      // Remove hover behavior
-      card.removeOnHover()
-
+      // So onCardExit (via exitCallback) does not tween this container while it plays to story
       this.cardTweeningToStory = card
+
+      card.onHoverExitBehavior()
+      card.removeOnHover()
 
       // Hide any hints
       this.scene.hint.hide()
