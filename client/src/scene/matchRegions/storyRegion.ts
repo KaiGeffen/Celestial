@@ -66,9 +66,17 @@ export default class StoryRegion extends Region {
         CardLocation.story(state, resolvedI + i, this.container, act.owner),
       ).moveToTopOnHover()
 
-      // Visible cards glow during the day
-      if (!state.isRecap && act.card.qualities.includes(Quality.VISIBLE)) {
+      // Apply glow based on various conditions
+      if (act.card.qualities.includes(Quality.VISIBLE)) {
         card.setVisibleGlow()
+      }
+      // Visible via Sight
+      else if (
+        !state.isRecap &&
+        state.status[0].vision > i &&
+        act.owner === 1
+      ) {
+        card.setSeenGlow()
       }
 
       // Only allow jumping around in the recap if we are playing a recap

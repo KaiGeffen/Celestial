@@ -624,6 +624,11 @@ export class CardImage {
     this.imageShadow.setGlow(0xffff9f)
     return this
   }
+
+  setSeenGlow(): this {
+    this.imageShadow.setGlow(0xedb282)
+    return this
+  }
 }
 
 class CardShadow extends Phaser.GameObjects.Image {
