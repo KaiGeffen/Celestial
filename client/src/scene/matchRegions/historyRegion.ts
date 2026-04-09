@@ -6,7 +6,7 @@ import { MatchScene } from '../matchScene'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
 
-// Recap, skip (during replay), and animation speed — anchor x: 0%+100, y: 50%.
+// Recap, skip (during replay), and animation speed — anchor x: 100%-200, y: 50%.
 export default class HistoryRegion extends Region {
   recapCallback: () => void
   skipCallback: () => void
@@ -22,8 +22,8 @@ export default class HistoryRegion extends Region {
       .setDepth(Depth.matchPlaybackControls)
 
     scene.plugins.get('rexAnchor')['add'](this.container, {
-      x: '0%+110',
-      y: `50%`,
+      x: '100%-200',
+      y: '50%',
     })
 
     this.createButtons()
@@ -68,7 +68,7 @@ export default class HistoryRegion extends Region {
 
   private createButtons(): void {
     const x = 10
-    const yDelta = 70
+    const yDelta = 190
 
     const chrome = this.scene.add.image(0, 0, 'chrome-replayControls')
     this.container.add(chrome)

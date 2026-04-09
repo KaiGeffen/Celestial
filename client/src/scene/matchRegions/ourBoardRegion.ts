@@ -55,6 +55,9 @@ export default class OurBoardRegion extends Region {
   /** Last state used to lay out the hand (fan + rest positions). */
   private lastHandState: GameModel | null = null
 
+  /** Card animating hand→story; hand-wide tweens must not move it (see `onCardExit`). */
+  private cardTweeningToStory: CardImage | null = null
+
   create(scene: MatchScene): this {
     this.scene = scene
     this.cards = []
@@ -204,6 +207,7 @@ export default class OurBoardRegion extends Region {
     const st = this.lastHandState
     if (this.isShiftHeld || this.raisedCardIndex !== null) {
       this.cards.forEach((c, idx) => {
+        if (c === this.cardTweeningToStory) return
         const { x, y } = this.ourHandFannedLayout(st, idx)
         c.setPosition([x, y])
         c.container.setRotation(0)
@@ -211,6 +215,7 @@ export default class OurBoardRegion extends Region {
     } else {
       const n = st.hand[0].length
       this.cards.forEach((c, idx) => {
+        if (c === this.cardTweeningToStory) return
         c.setPosition(this.ourHandRestPosition(st, idx))
         c.container.setRotation(this.ourHandRestFanRotation(idx, n))
       })
@@ -259,6 +264,8 @@ export default class OurBoardRegion extends Region {
 
       // Remove hover behavior
       card.removeOnHover()
+
+      this.cardTweeningToStory = card
 
       // Hide any hints
       this.scene.hint.hide()
@@ -323,6 +330,7 @@ export default class OurBoardRegion extends Region {
 
   // Modify displayState to lower any raised card when state changes
   displayState(state: GameModel): void {
+    this.cardTweeningToStory = null
     this.deleteTemp()
 
     // Until we have mulliganed, hide (Delete) all the cards in our hand
@@ -372,6 +380,7 @@ export default class OurBoardRegion extends Region {
     // Shift or hover-active: wide spread + raised (flat rotation like before)
     if (this.isShiftHeld || this.raisedCardIndex !== null) {
       this.cards.forEach((c, idx) => {
+        if (c === this.cardTweeningToStory) return
         const { x, y } = this.ourHandFannedLayout(state, idx)
         c.setPosition([x, y])
         c.container.setRotation(0)
@@ -379,6 +388,7 @@ export default class OurBoardRegion extends Region {
     } else {
       const handN = state.hand[0].length
       this.cards.forEach((c, idx) => {
+        if (c === this.cardTweeningToStory) return
         c.setPosition(this.ourHandRestPosition(state, idx))
         c.container.setRotation(this.ourHandRestFanRotation(idx, handN))
       })
@@ -423,6 +433,7 @@ export default class OurBoardRegion extends Region {
           return
         }
         this.cards.forEach((c, idx) => {
+          if (c === this.cardTweeningToStory) return
           const { x, y } = this.ourHandFannedLayout(st, idx)
           this.scene.tweens.add({
             targets: c.container,
@@ -464,6 +475,7 @@ export default class OurBoardRegion extends Region {
           }
           const n = st.hand[0].length
           cards.forEach((c, idx) => {
+            if (c === this.cardTweeningToStory) return
             const [x, y] = this.ourHandRestPosition(st, idx)
             this.scene.tweens.add({
               targets: c.container,
@@ -500,6 +512,7 @@ export default class OurBoardRegion extends Region {
       return
     }
     this.cards.forEach((card, idx) => {
+      if (card === this.cardTweeningToStory) return
       const { x, y } = this.ourHandFannedLayout(st, idx)
       this.scene.tweens.add({
         targets: card.container,
@@ -524,6 +537,7 @@ export default class OurBoardRegion extends Region {
     const shouldRemainFanned = this.raisedCardIndex !== null
 
     this.cards.forEach((card, idx) => {
+      if (card === this.cardTweeningToStory) return
       if (shouldRemainFanned) {
         const { x, y } = this.ourHandFannedLayout(st, idx)
         this.scene.tweens.add({
