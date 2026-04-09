@@ -4,6 +4,10 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import { Style, Space, Flags } from '../../settings/settings'
 import { Keywords } from '../../../../shared/state/keyword'
 
+const STATUS_TEXT_INSPIRE = '#1c2962'
+const STATUS_TEXT_NOURISH = '#053327'
+const STATUS_TEXT_SIGHT = '#632709'
+
 /** Reword second-person keyword lines for the opponent’s status row (“they” not “you”). */
 function hintForOpponentPerspective(s: string): string {
   return s.replace(/\byour\b/g, 'their').replace(/\byou\b/g, 'they')
@@ -44,6 +48,12 @@ class KeywordButton extends Button {
   ) {
     super(within, x, y, config)
     this.opponentPerspective = opponentPerspective
+  }
+
+  protected applyStatusTextColor(color: string): void {
+    if (this.txt) {
+      this.txt.setColor(color)
+    }
   }
 
   setText(s: string): Button {
@@ -92,6 +102,7 @@ export class InspireButton extends KeywordButton {
       },
       opponentPerspective,
     )
+    this.applyStatusTextColor(STATUS_TEXT_INSPIRE)
   }
 
   makeHintable(): Button {
@@ -131,6 +142,7 @@ export class NourishButton extends KeywordButton {
       },
       opponentPerspective,
     )
+    this.applyStatusTextColor(STATUS_TEXT_NOURISH)
   }
 
   makeHintable(): Button {
@@ -168,6 +180,7 @@ export class SightButton extends KeywordButton {
         },
       },
     )
+    this.applyStatusTextColor(STATUS_TEXT_SIGHT)
   }
 
   makeHintable(): Button {
