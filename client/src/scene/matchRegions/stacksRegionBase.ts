@@ -247,9 +247,15 @@ export default abstract class StacksRegionBase {
       for (let i = 0; i < topIdx; i++) {
         this.discardCards[i].imageShadow.setVisible(false)
       }
+
+      // If the top card has Morning, set the top CARDIMAGE to glow, otherwise clear the glow
+      const topImg = this.discardCards[topIdx]
       const topCard = pileRow[topIdx]
       if (topCard.text.includes('Morning')) {
-        this.discardCards[topIdx].setMorningGlow()
+        topImg.setMorningGlow()
+      } else {
+        topImg.imageShadow.clearGlow()
+        topImg.imageShadow.setVisible(false)
       }
     }
 

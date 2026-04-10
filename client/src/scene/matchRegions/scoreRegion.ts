@@ -34,6 +34,7 @@ export default class WinsRegion extends Region {
     })
 
     this.createGems()
+    this.container.setVisible(false)
 
     return this
   }

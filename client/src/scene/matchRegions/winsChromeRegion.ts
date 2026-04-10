@@ -35,6 +35,7 @@ export default class WinsChromeRegion extends Region {
       .setScale(WINS_CHROME_SCALE)
 
     this.container.add([this.imgTheir, this.imgOur])
+    this.container.setVisible(false)
 
     return this
   }

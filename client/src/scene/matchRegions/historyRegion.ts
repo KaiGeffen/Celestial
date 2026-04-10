@@ -71,6 +71,7 @@ export default class HistoryRegion extends Region {
     const yDelta = 190
 
     const chrome = this.scene.add.image(0, 0, 'chrome-replayControls')
+    chrome.setVisible(false)
     this.container.add(chrome)
 
     this.btnRecap = new Buttons.Icon({
