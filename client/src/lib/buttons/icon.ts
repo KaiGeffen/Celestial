@@ -11,6 +11,8 @@ export default class Icon extends Button {
     f = () => {},
     muteClick = false,
     hint = '',
+    /** Square edge length in pixels; defaults to {@link Space.iconSize}. */
+    size = Space.iconSize,
   }) {
     super(within, x, y, {
       icon: {
@@ -30,6 +32,6 @@ export default class Icon extends Button {
     }
 
     // TODO Remove this once sizes are set in stone
-    this.icon.setDisplaySize(Space.iconSize, Space.iconSize)
+    this.icon.setDisplaySize(size, size)
   }
 }
