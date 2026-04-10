@@ -9,6 +9,7 @@ import TheirStacksRegion from './theirStacksRegion'
 import StoryRegion from './storyRegion'
 import BreathRegion from './breathRegion'
 import WinsRegion from './scoreRegion'
+import WinsChromeRegion from './winsChromeRegion'
 import * as Overlay from './pileOverlayRegions'
 import PassRegion from './passRegion'
 import RoundResultRegion from './roundResultRegion'
@@ -36,6 +37,7 @@ export default class Regions {
 
   static Breath = BreathRegion
   static Wins = WinsRegion
+  static WinsChrome = WinsChromeRegion
   static History = HistoryRegion
 
   static OurDeck = Overlay.OurDeckOverlay

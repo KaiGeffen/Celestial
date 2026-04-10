@@ -19,6 +19,7 @@ import TheirStacksRegion from './matchRegions/theirStacksRegion'
 import StoryRegion from './matchRegions/storyRegion'
 import MulliganRegion from './matchRegions/mulliganRegion'
 import WinsRegion from './matchRegions/scoreRegion'
+import WinsChromeRegion from './matchRegions/winsChromeRegion'
 import BackgroundRegion from './matchRegions/backgroundRegion'
 import BreathRegion from './matchRegions/breathRegion'
 import HistoryRegion from './matchRegions/historyRegion'
@@ -477,6 +478,7 @@ export class View {
 
   breathRegion: BreathRegion
   wins: WinsRegion
+  winsChromeRegion: WinsChromeRegion
   historyRegion: HistoryRegion
 
   // Overlays
@@ -524,6 +526,7 @@ export class View {
 
     this.story = new Regions.Story().create(scene)
     this.breathRegion = new Regions.Breath().create(scene)
+    this.winsChromeRegion = new Regions.WinsChrome().create(scene)
     this.wins = new Regions.Wins().create(scene)
     this.historyRegion = new Regions.History().create(scene)
     // this.ourButtons = new Regions.OurButtons().create(scene)
@@ -584,6 +587,7 @@ export class View {
     this.theirBoard.displayState(state)
 
     this.breathRegion.displayState(state)
+    this.winsChromeRegion.displayState(state)
     this.wins.displayState(state)
     this.historyRegion.displayState(state)
 

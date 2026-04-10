@@ -10,6 +10,7 @@ const AVATAR_REGION_WIDTH = Space.avatarSize + Space.pad * 2
 /** Shared match avatar UI: portrait + username + subtitle. */
 export default abstract class AvatarRegionBase extends Region {
   avatar: AvatarButton
+  imgNameplate: Phaser.GameObjects.Image
   txtUsername: Phaser.GameObjects.Text
   txtSubtitle: Phaser.GameObjects.Text
 
@@ -36,6 +37,13 @@ export default abstract class AvatarRegionBase extends Region {
     const x = this.avatar.icon.x
     const y0 = this.avatar.icon.y + this.avatar.icon.height / 2
     const usernameY = y0 + 8 + Space.padSmall
+    const subtitleY = usernameY + 22
+    const nameplateY = (usernameY + subtitleY) / 2
+
+    this.imgNameplate = this.scene.add
+      .image(x, nameplateY, 'chrome-nameplate')
+      .setOrigin(0.5)
+    this.container.add(this.imgNameplate)
 
     // TODO Move to style file
     this.txtUsername = this.scene.add
@@ -48,7 +56,6 @@ export default abstract class AvatarRegionBase extends Region {
       })
       .setOrigin(0.5)
 
-    const subtitleY = usernameY + 22
     this.txtSubtitle = this.scene.add
       .text(x, subtitleY, '', {
         fontFamily: Style.username.fontFamily,

@@ -358,7 +358,6 @@ export const assetLists = {
       "New",
       "Nourish",
       "Options",
-      "Options",
       "PlayTab",
       "Pointer",
       "ProfileTab",
@@ -371,7 +370,6 @@ export const assetLists = {
       "Sight",
       "Skip",
       "SmallX",
-      "Social",
       "Social",
       "Speed",
       "Status",
@@ -455,8 +453,10 @@ export const assetLists = {
       "CloudTop",
       "ResultGlow",
       "breathWheel",
+      "nameplate",
       "replayControls",
-      "stackCount"
+      "stackCount",
+      "wins"
     ],
     "pixelArt": false
   },
