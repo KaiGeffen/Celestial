@@ -7,7 +7,7 @@ export const Depth: Record<string, number> = {
   storyAtDay: 0,
   /** Inspire / Nourish / Sight; below {@link ourHand} / {@link theirHand}. */
   matchStatus: 0,
-  ourHand: 1,
+  ourHand: 5,
   theirHand: 1,
   storyAtNight: 2,
   ourScore: 3,
