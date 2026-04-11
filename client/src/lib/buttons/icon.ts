@@ -11,7 +11,7 @@ export default class Icon extends Button {
     f = () => {},
     muteClick = false,
     hint = '',
-    /** Square edge length in pixels; defaults to {@link Space.iconSize}. */
+    // Size for the icon
     size = Space.iconSize,
   }) {
     super(within, x, y, {
