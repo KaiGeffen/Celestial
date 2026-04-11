@@ -165,13 +165,7 @@ class Pregnant extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    const card = new Card({
-      name: child.name,
-      id: child.id,
-      text: child.text,
-      qualities: child.qualities,
-      basePoints: child.basePoints,
-    })
+    const card = child.copy()
     game.createOnDeck(player, card)
   }
 }
