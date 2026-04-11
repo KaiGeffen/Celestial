@@ -21,7 +21,7 @@ export const STORY_RESOLVE_NOURISH_BUBBLE_NAME = 'storyNourishBubble'
 export const STORY_RESOLVE_EFFECTS_BUBBLE_NAME = 'storyEffectsBubble'
 
 /** Resolved story cards: main art stays slightly visible; other chrome fades out. */
-const STORY_RESOLVED_SUBJECT_ALPHA = 0.2
+const STORY_RESOLVED_SUBJECT_ALPHA = 0.3
 
 // TODO Many fields should be private
 
@@ -225,7 +225,9 @@ export class CardImage {
     )
   }
 
-  private findChildByName(name: string): Phaser.GameObjects.GameObject | undefined {
+  private findChildByName(
+    name: string,
+  ): Phaser.GameObjects.GameObject | undefined {
     if (this.container instanceof Phaser.GameObjects.Container) {
       return this.container.list.find((c) => c.name === name)
     }

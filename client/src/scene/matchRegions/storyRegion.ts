@@ -124,12 +124,10 @@ export default class StoryRegion extends Region {
       )
 
       const pointsEarned = this.resolvedPointsEarnedByActIndex[resolvedI] ?? 0
-      const pointsStat = card.points ?? act.card.points
+      const pointsStat = act.card.basePoints
       const effectAmt = pointsEarned - pointsStat - nourishAmt
       const tweenEffectsFromStatus =
-        oneNewResolvedAct &&
-        resolvedI === resolvedCount - 1 &&
-        effectAmt !== 0
+        oneNewResolvedAct && resolvedI === resolvedCount - 1 && effectAmt !== 0
       this.resolveBubbles.addEffectsResolveCircle(
         card,
         tweenEffectsFromStatus,
@@ -583,7 +581,9 @@ class StoryResolveBubbles {
       fontSize: `${Math.round(fontPx)}px`,
       strokeThickness: Math.max(
         1,
-        Math.round(t * (fontPx / StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX)),
+        Math.round(
+          t * (fontPx / StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX),
+        ),
       ),
     }
   }
@@ -597,7 +597,9 @@ class StoryResolveBubbles {
       color: Color.whiteS,
       strokeThickness: Math.max(
         1,
-        Math.round(t * (fontPx / StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX)),
+        Math.round(
+          t * (fontPx / StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX),
+        ),
       ),
     }
   }
@@ -611,7 +613,9 @@ class StoryResolveBubbles {
       color: Color.whiteS,
       strokeThickness: Math.max(
         1,
-        Math.round(t * (fontPx / StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX)),
+        Math.round(
+          t * (fontPx / StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX),
+        ),
       ),
     }
   }
