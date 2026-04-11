@@ -1,6 +1,6 @@
 import 'phaser'
 import Catalog from '../../../shared/state/catalog'
-import { Color, Style, BBStyle, Space, Flags } from '../settings/settings'
+import { Color, Style, BBStyle, Space, Flags, Time } from '../settings/settings'
 import Card from '../../../shared/state/card'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import BaseScene from '../scene/baseScene'
@@ -10,6 +10,9 @@ import { Keywords } from '../../../shared/state/keyword'
 const COLOR_BETTER = '#55dd55'
 const COLOR_WORSE = '#e45555'
 const STAT_STROKE = '#000000'
+
+/** Name on the story points-resolve bubble container so setResolved can keep it visible. */
+export const STORY_RESOLVE_BUBBLE_NAME = 'storyPointsBubble'
 
 // TODO Many fields should be private
 
@@ -175,9 +178,46 @@ export class CardImage {
   }
 
   // Set that a card has resolved (In the story)
-  setResolved(): this {
-    this.setTint(Color.cardGreyed)
+  /** @param animateFade If a bubble is present, tween non-bubble layers to transparent; otherwise set alpha immediately (rebuilt older resolves). */
+  setResolved(animateFade = false): this {
+    const hasBubble = this.findChildByName(STORY_RESOLVE_BUBBLE_NAME) !== undefined
+    if (hasBubble) {
+      this.eachDirectChild((child) => {
+        if (child.name === STORY_RESOLVE_BUBBLE_NAME) return
+        const go = child as Phaser.GameObjects.GameObject &
+          Phaser.GameObjects.Components.AlphaSingle
+        if (animateFade) {
+          this.scene.tweens.add({
+            targets: go,
+            alpha: 0,
+            duration: Time.recapTween(),
+            ease: 'Sine.easeInOut',
+          })
+        } else {
+          go.setAlpha(0)
+        }
+      })
+    } else {
+      this.setTint(Color.cardGreyed)
+    }
     return this
+  }
+
+  private findChildByName(name: string): Phaser.GameObjects.GameObject | undefined {
+    if (this.container instanceof Phaser.GameObjects.Container) {
+      return this.container.list.find((c) => c.name === name)
+    }
+    return this.container.getChildren().find((c) => c.name === name)
+  }
+
+  private eachDirectChild(
+    fn: (child: Phaser.GameObjects.GameObject) => void,
+  ): void {
+    if (this.container instanceof Phaser.GameObjects.Container) {
+      this.container.list.forEach(fn)
+    } else {
+      this.container.getChildren().forEach(fn)
+    }
   }
 
   setPosition(position: [number, number]): this {

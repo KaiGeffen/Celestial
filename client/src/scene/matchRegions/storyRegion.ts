@@ -1,5 +1,5 @@
 import 'phaser'
-import { CardImage } from '../../lib/cardImage'
+import { CardImage, STORY_RESOLVE_BUBBLE_NAME } from '../../lib/cardImage'
 import GameModel from '../../../../shared/state/gameModel'
 import {
   Space,
@@ -62,7 +62,6 @@ export default class StoryRegion extends Region {
     // If this is a recap, add the already played cards greyed out
     // TODO: Either enable the onClick callback or remove its api
     let resolvedI = 0
-    let newestResolvedCard: CardImage | undefined
     for (; resolvedI < state.story.resolvedActs.length; resolvedI++) {
       const act: Act = state.story.resolvedActs[resolvedI]
 
@@ -70,15 +69,17 @@ export default class StoryRegion extends Region {
         act.card,
         CardLocation.story(state, resolvedI, this.container, act.owner),
       )
-        .setResolved()
-        .moveToTopOnHover()
       // .setOnClick(this.callback(resolvedI))
 
       card.container.setScale(CARD_SCALE)
 
-      if (oneNewResolvedAct && resolvedI === resolvedCount - 1) {
-        newestResolvedCard = card
-      }
+      // Every resolved card needs a bubble so setResolved keeps art faded; only the
+      // newest resolve this frame tweens from the points stat to center.
+      const tweenBubbleFromStat =
+        oneNewResolvedAct && resolvedI === resolvedCount - 1
+      this.addPointsResolveCircle(card, tweenBubbleFromStat)
+
+      card.setResolved(tweenBubbleFromStat).moveToTopOnHover()
 
       this.temp.push(card)
     }
@@ -124,19 +125,25 @@ export default class StoryRegion extends Region {
     // TODO This is just animating card coming from opps hand, confusing
     this.animate(state, cards)
 
-    if (newestResolvedCard !== undefined) {
-      this.addPointsResolveCircle(newestResolvedCard)
-    }
-
     this.lastResolvedActCount = resolvedCount
 
     this.cards = cards
   }
 
-  /** Ring + points at {@link CardImage.txtPoints}, then tweens to the card center (0,0) like recap timing. */
-  private addPointsResolveCircle(card: CardImage): void {
+  /**
+   * Ring + points for a resolved act. {@link CardImage.setResolved} keeps the bubble
+   * and fades the rest — so every resolved row must have one.
+   * @param tweenFromStat If true, bubble starts at {@link CardImage.txtPoints} and tweens to center; if false, placed at center (already-resolved rows on later frames).
+   */
+  private addPointsResolveCircle(
+    card: CardImage,
+    tweenFromStat: boolean,
+  ): void {
     const pts = card.points ?? card.card.points
-    const bubble = this.scene.add.container(card.txtPoints.x, card.txtPoints.y)
+    const bx = tweenFromStat ? card.txtPoints.x : 0
+    const by = tweenFromStat ? card.txtPoints.y : 0
+    const bubble = this.scene.add.container(bx, by)
+    bubble.name = STORY_RESOLVE_BUBBLE_NAME
 
     const circle = this.scene.add.circle(
       0,
@@ -162,13 +169,15 @@ export default class StoryRegion extends Region {
     const parent = card.container as Phaser.GameObjects.Container
     parent.addAt(bubble, parent.getIndex(card.txtPoints))
 
-    this.scene.tweens.add({
-      targets: bubble,
-      x: 0,
-      y: 0,
-      duration: Time.recapTween(),
-      ease: 'Sine.easeInOut',
-    })
+    if (tweenFromStat) {
+      this.scene.tweens.add({
+        targets: bubble,
+        x: 0,
+        y: 0,
+        duration: Time.recapTween(),
+        ease: 'Sine.easeInOut',
+      })
+    }
   }
 
   // Set the callback for when an act in the story is clicked on
@@ -178,10 +187,11 @@ export default class StoryRegion extends Region {
 
   // Display the current score totals and change in scores
   private displayScores(state: GameModel): void {
-    let index = state.story.resolvedActs.length - 1
-    if (index >= 0) {
-      this.animateScoreGains(index, state.score, state)
-    }
+    // Recap +/- beside story — hidden for now (points bubble on resolve instead).
+    // let index = state.story.resolvedActs.length - 1
+    // if (index >= 0) {
+    //   this.animateScoreGains(index, state.score, state)
+    // }
 
     this.lastScores = state.score
   }
