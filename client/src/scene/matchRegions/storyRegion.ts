@@ -1,7 +1,15 @@
 import 'phaser'
 import { CardImage } from '../../lib/cardImage'
 import GameModel from '../../../../shared/state/gameModel'
-import { Space, Style, Depth, Time, Flags, Color } from '../../settings/settings'
+import {
+  Space,
+  Style,
+  Depth,
+  Time,
+  Flags,
+  Color,
+  BBStyle,
+} from '../../settings/settings'
 import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
@@ -9,6 +17,9 @@ import Act from '../../../../shared/state/act'
 import { Quality } from '../../../../shared/state/quality'
 
 const CARD_SCALE = 0.8
+
+/** Matches `STAT_STROKE` in `cardImage.ts` (cost / points BBCode). */
+const STAT_STROKE = '#000000'
 
 /** Radius of the ring drawn at the points stat when an act resolves into `resolvedActs`. */
 const POINTS_RESOLVE_CIRCLE_RADIUS = 18
@@ -122,22 +133,37 @@ export default class StoryRegion extends Region {
     this.cards = cards
   }
 
-  /** Ring at {@link CardImage.txtPoints}, then tweens to the card center (0,0) like recap timing. */
+  /** Ring + points at {@link CardImage.txtPoints}, then tweens to the card center (0,0) like recap timing. */
   private addPointsResolveCircle(card: CardImage): void {
+    const pts = card.points ?? card.card.points
+    const bubble = this.scene.add.container(card.txtPoints.x, card.txtPoints.y)
+
     const circle = this.scene.add.circle(
-      card.txtPoints.x,
-      card.txtPoints.y,
+      0,
+      0,
       POINTS_RESOLVE_CIRCLE_RADIUS,
-      Color.white,
-      0.12,
+      Color.black,
+      0.92,
     )
     circle.setStrokeStyle(2, Color.white, 0.9)
     circle.setOrigin(0.5)
+
+    const txtPts = this.scene.add
+      .rexBBCodeText(
+        0,
+        0,
+        `[stroke=${STAT_STROKE}]${pts}[/stroke]`,
+        BBStyle.cardCost,
+      )
+      .setOrigin(0.5)
+
+    bubble.add([circle, txtPts])
+
     const parent = card.container as Phaser.GameObjects.Container
-    parent.addAt(circle, parent.getIndex(card.txtPoints))
+    parent.addAt(bubble, parent.getIndex(card.txtPoints))
 
     this.scene.tweens.add({
-      targets: circle,
+      targets: bubble,
       x: 0,
       y: 0,
       duration: Time.recapTween(),
