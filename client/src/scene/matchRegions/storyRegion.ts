@@ -1,7 +1,7 @@
 import 'phaser'
 import { CardImage } from '../../lib/cardImage'
 import GameModel from '../../../../shared/state/gameModel'
-import { Space, Style, Depth, Time, Flags } from '../../settings/settings'
+import { Space, Style, Depth, Time, Flags, Color } from '../../settings/settings'
 import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
@@ -10,8 +10,14 @@ import { Quality } from '../../../../shared/state/quality'
 
 const CARD_SCALE = 0.8
 
+/** Radius of the ring drawn at the points stat when an act resolves into `resolvedActs`. */
+const POINTS_RESOLVE_CIRCLE_RADIUS = 18
+
 export default class StoryRegion extends Region {
   lastScores: [number, number]
+
+  /** Previous `state.story.resolvedActs.length` (for detecting a single new resolve). */
+  private lastResolvedActCount = 0
 
   // Callback that plays when ith card in recap is clicked on
   callback: (i: number) => () => void
@@ -33,6 +39,10 @@ export default class StoryRegion extends Region {
   displayState(state: GameModel): void {
     this.deleteTemp()
 
+    const resolvedCount = state.story.resolvedActs.length
+    const oneNewResolvedAct =
+      resolvedCount === this.lastResolvedActCount + 1 && resolvedCount > 0
+
     // Set the correct depth based on day/night
     this.container.setDepth(
       state.isRecap ? Depth.storyAtNight : Depth.storyAtDay,
@@ -41,6 +51,7 @@ export default class StoryRegion extends Region {
     // If this is a recap, add the already played cards greyed out
     // TODO: Either enable the onClick callback or remove its api
     let resolvedI = 0
+    let newestResolvedCard: CardImage | undefined
     for (; resolvedI < state.story.resolvedActs.length; resolvedI++) {
       const act: Act = state.story.resolvedActs[resolvedI]
 
@@ -53,6 +64,10 @@ export default class StoryRegion extends Region {
       // .setOnClick(this.callback(resolvedI))
 
       card.container.setScale(CARD_SCALE)
+
+      if (oneNewResolvedAct && resolvedI === resolvedCount - 1) {
+        newestResolvedCard = card
+      }
 
       this.temp.push(card)
     }
@@ -98,7 +113,36 @@ export default class StoryRegion extends Region {
     // TODO This is just animating card coming from opps hand, confusing
     this.animate(state, cards)
 
+    if (newestResolvedCard !== undefined) {
+      this.addPointsResolveCircle(newestResolvedCard)
+    }
+
+    this.lastResolvedActCount = resolvedCount
+
     this.cards = cards
+  }
+
+  /** Ring at {@link CardImage.txtPoints}, then tweens to the card center (0,0) like recap timing. */
+  private addPointsResolveCircle(card: CardImage): void {
+    const circle = this.scene.add.circle(
+      card.txtPoints.x,
+      card.txtPoints.y,
+      POINTS_RESOLVE_CIRCLE_RADIUS,
+      Color.white,
+      0.12,
+    )
+    circle.setStrokeStyle(2, Color.white, 0.9)
+    circle.setOrigin(0.5)
+    const parent = card.container as Phaser.GameObjects.Container
+    parent.addAt(circle, parent.getIndex(card.txtPoints))
+
+    this.scene.tweens.add({
+      targets: circle,
+      x: 0,
+      y: 0,
+      duration: Time.recapTween(),
+      ease: 'Sine.easeInOut',
+    })
   }
 
   // Set the callback for when an act in the story is clicked on
