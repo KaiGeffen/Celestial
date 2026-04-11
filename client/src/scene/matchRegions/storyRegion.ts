@@ -24,6 +24,26 @@ const STAT_STROKE = '#000000'
 /** Radius of the ring drawn at the points stat when an act resolves into `resolvedActs`. */
 const POINTS_RESOLVE_CIRCLE_RADIUS = 18
 
+/** Match {@link BBStyle.cardCost} `fontSize` (`24px`) — bubble starts here then grows. */
+const POINTS_RESOLVE_FONT_SMALL_PX = 24
+/** Final size for the resolve bubble (2.5× stat text; avoid scaling the container so text stays sharp). */
+const POINTS_RESOLVE_FONT_SCALE = 2.5
+const POINTS_RESOLVE_FONT_LARGE_PX = Math.round(
+  POINTS_RESOLVE_FONT_SMALL_PX * POINTS_RESOLVE_FONT_SCALE,
+)
+const POINTS_RESOLVE_CIRCLE_RADIUS_LARGE =
+  POINTS_RESOLVE_CIRCLE_RADIUS * POINTS_RESOLVE_FONT_SCALE
+
+function resolvePointsBubbleTextStyle(fontPx: number) {
+  const base = BBStyle.cardCost
+  const t = base.strokeThickness ?? 1
+  return {
+    ...base,
+    fontSize: `${Math.round(fontPx)}px`,
+    strokeThickness: Math.max(1, Math.round(t * (fontPx / POINTS_RESOLVE_FONT_SMALL_PX))),
+  }
+}
+
 export default class StoryRegion extends Region {
   lastScores: [number, number]
 
@@ -160,9 +180,15 @@ export default class StoryRegion extends Region {
         0,
         0,
         `[stroke=${STAT_STROKE}]${pts}[/stroke]`,
-        BBStyle.cardCost,
+        tweenFromStat
+          ? BBStyle.cardCost
+          : resolvePointsBubbleTextStyle(POINTS_RESOLVE_FONT_LARGE_PX),
       )
       .setOrigin(0.5)
+
+    if (!tweenFromStat) {
+      circle.setRadius(POINTS_RESOLVE_CIRCLE_RADIUS_LARGE)
+    }
 
     bubble.add([circle, txtPts])
 
@@ -170,12 +196,27 @@ export default class StoryRegion extends Region {
     parent.addAt(bubble, parent.getIndex(card.txtPoints))
 
     if (tweenFromStat) {
+      const grow = {
+        fontPx: POINTS_RESOLVE_FONT_SMALL_PX,
+        radius: POINTS_RESOLVE_CIRCLE_RADIUS,
+      }
       this.scene.tweens.add({
         targets: bubble,
         x: 0,
         y: 0,
         duration: Time.recapTween(),
         ease: 'Sine.easeInOut',
+      })
+      this.scene.tweens.add({
+        targets: grow,
+        fontPx: POINTS_RESOLVE_FONT_LARGE_PX,
+        radius: POINTS_RESOLVE_CIRCLE_RADIUS_LARGE,
+        duration: Time.recapTween(),
+        ease: 'Sine.easeInOut',
+        onUpdate: () => {
+          circle.setRadius(grow.radius)
+          txtPts.setStyle(resolvePointsBubbleTextStyle(grow.fontPx))
+        },
       })
     }
   }
