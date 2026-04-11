@@ -17,6 +17,9 @@ export const STORY_RESOLVE_BUBBLE_NAME = 'storyPointsBubble'
 /** Name on the story nourish-resolve bubble (from status row to card). */
 export const STORY_RESOLVE_NOURISH_BUBBLE_NAME = 'storyNourishBubble'
 
+/** Bonus/malus from card text (story position, etc.); not the points stat nor nourish. */
+export const STORY_RESOLVE_EFFECTS_BUBBLE_NAME = 'storyEffectsBubble'
+
 /** Resolved story cards: main art stays slightly visible; other chrome fades out. */
 const STORY_RESOLVED_SUBJECT_ALPHA = 0.2
 
@@ -188,7 +191,8 @@ export class CardImage {
   setResolved(animateFade = false): this {
     const hasBubble =
       this.findChildByName(STORY_RESOLVE_BUBBLE_NAME) !== undefined ||
-      this.findChildByName(STORY_RESOLVE_NOURISH_BUBBLE_NAME) !== undefined
+      this.findChildByName(STORY_RESOLVE_NOURISH_BUBBLE_NAME) !== undefined ||
+      this.findChildByName(STORY_RESOLVE_EFFECTS_BUBBLE_NAME) !== undefined
     if (hasBubble) {
       this.eachDirectChild((child) => {
         if (this.isStoryResolveBubbleChild(child.name)) return
@@ -216,7 +220,8 @@ export class CardImage {
   private isStoryResolveBubbleChild(name: string): boolean {
     return (
       name === STORY_RESOLVE_BUBBLE_NAME ||
-      name === STORY_RESOLVE_NOURISH_BUBBLE_NAME
+      name === STORY_RESOLVE_NOURISH_BUBBLE_NAME ||
+      name === STORY_RESOLVE_EFFECTS_BUBBLE_NAME
     )
   }
 

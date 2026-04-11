@@ -3,6 +3,7 @@ import {
   CardImage,
   STORY_RESOLVE_BUBBLE_NAME,
   STORY_RESOLVE_NOURISH_BUBBLE_NAME,
+  STORY_RESOLVE_EFFECTS_BUBBLE_NAME,
 } from '../../lib/cardImage'
 import GameModel from '../../../../shared/state/gameModel'
 import {
@@ -34,6 +35,12 @@ export default class StoryRegion extends Region {
   /** Parallel to `resolvedActs`: nourish amount consumed when that act resolved (0 = none). */
   private resolvedNourishByActIndex: number[] = []
 
+  /** Score for each player at end of last `displayState` (for points earned on a new resolve). */
+  private prevScore: [number, number] = [0, 0]
+
+  /** Total points added to that owner's score when each act resolved (from score delta). */
+  private resolvedPointsEarnedByActIndex: number[] = []
+
   private resolveBubbles: StoryResolveBubbles
 
   // Callback that plays when ith card in recap is clicked on
@@ -63,15 +70,21 @@ export default class StoryRegion extends Region {
 
     if (resolvedCount < this.resolvedNourishByActIndex.length) {
       this.resolvedNourishByActIndex.length = resolvedCount
+      this.resolvedPointsEarnedByActIndex.length = resolvedCount
     }
     if (resolvedCount > this.resolvedNourishByActIndex.length) {
       const delta = resolvedCount - this.resolvedNourishByActIndex.length
       if (delta === 1 && oneNewResolvedAct) {
         const act = state.story.resolvedActs[resolvedCount - 1]
-        this.resolvedNourishByActIndex.push(this.prevStatusNourish[act.owner])
+        const owner = act.owner
+        this.resolvedNourishByActIndex.push(this.prevStatusNourish[owner])
+        this.resolvedPointsEarnedByActIndex.push(
+          state.score[owner] - this.prevScore[owner],
+        )
       } else {
         for (let k = 0; k < delta; k++) {
           this.resolvedNourishByActIndex.push(0)
+          this.resolvedPointsEarnedByActIndex.push(0)
         }
       }
     }
@@ -108,6 +121,19 @@ export default class StoryRegion extends Region {
         card,
         tweenNourishFromStatus,
         nourishAmt,
+      )
+
+      const pointsEarned = this.resolvedPointsEarnedByActIndex[resolvedI] ?? 0
+      const pointsStat = card.points ?? act.card.points
+      const effectAmt = pointsEarned - pointsStat - nourishAmt
+      const tweenEffectsFromStatus =
+        oneNewResolvedAct &&
+        resolvedI === resolvedCount - 1 &&
+        effectAmt !== 0
+      this.resolveBubbles.addEffectsResolveCircle(
+        card,
+        tweenEffectsFromStatus,
+        effectAmt,
       )
 
       card.setResolved(tweenBubbleFromStat).moveToTopOnHover()
@@ -157,6 +183,7 @@ export default class StoryRegion extends Region {
     this.animate(state, cards)
 
     this.prevStatusNourish = [state.status[0].nourish, state.status[1].nourish]
+    this.prevScore = [state.score[0], state.score[1]]
     this.lastResolvedActCount = resolvedCount
 
     this.cards = cards
@@ -272,6 +299,9 @@ class StoryResolveBubbles {
 
   /** Final X for nourish bubble (points bubble ends at 0,0). */
   private static readonly NOURISH_BUBBLE_OFFSET_X = 78
+  /** Effects bonus bubble (left of center; points center, nourish right). */
+  private static readonly EFFECTS_BUBBLE_OFFSET_X = -78
+  private static readonly EFFECTS_CIRCLE_FILL = 0x5c4518
 
   constructor(private readonly scene: Phaser.Scene) {}
 
@@ -444,6 +474,107 @@ class StoryResolveBubbles {
     }
   }
 
+  /**
+   * Points from card text (story slot, hand size bonus, etc.): score gained minus
+   * points stat bubble minus nourish bubble. When animated, starts at {@link CardImage.txtText}.
+   */
+  addEffectsResolveCircle(
+    card: CardImage,
+    tweenFromEffectText: boolean,
+    effectAmt: number,
+  ): void {
+    if (effectAmt === 0) return
+
+    const parent = card.container
+    if (!(parent instanceof Phaser.GameObjects.Container)) return
+
+    const endX = StoryResolveBubbles.EFFECTS_BUBBLE_OFFSET_X
+    const endY = 0
+
+    let bx: number
+    let by: number
+    if (tweenFromEffectText) {
+      bx = card.txtText.x
+      by = card.txtText.y
+    } else {
+      bx = endX
+      by = endY
+    }
+
+    const bubble = this.scene.add.container(bx, by)
+    bubble.name = STORY_RESOLVE_EFFECTS_BUBBLE_NAME
+
+    const circle = this.scene.add.circle(
+      0,
+      0,
+      StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS,
+      StoryResolveBubbles.EFFECTS_CIRCLE_FILL,
+      0.92,
+    )
+    circle.setStrokeStyle(2, Color.white, 0.9)
+    circle.setOrigin(0.5)
+
+    const label = effectAmt > 0 ? `+${effectAmt}` : `${effectAmt}`
+    const txtFx = this.scene.add
+      .rexBBCodeText(
+        0,
+        0,
+        `[stroke=${StoryResolveBubbles.STAT_STROKE}]${label}[/stroke]`,
+        tweenFromEffectText
+          ? BBStyle.cardCost
+          : StoryResolveBubbles.effectsResolveBubbleTextStyle(
+              StoryResolveBubbles.POINTS_RESOLVE_FONT_LARGE_PX,
+            ),
+      )
+      .setOrigin(0.5)
+
+    if (!tweenFromEffectText) {
+      circle.setRadius(StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE)
+    }
+
+    bubble.add([circle, txtFx])
+
+    const nourishBubble = parent.list.find(
+      (c) => c.name === STORY_RESOLVE_NOURISH_BUBBLE_NAME,
+    )
+    const pointsBubble = parent.list.find(
+      (c) => c.name === STORY_RESOLVE_BUBBLE_NAME,
+    )
+    const insertAt = nourishBubble
+      ? parent.getIndex(nourishBubble) + 1
+      : pointsBubble
+        ? parent.getIndex(pointsBubble) + 1
+        : parent.getIndex(card.txtPoints)
+    parent.addAt(bubble, insertAt)
+
+    if (tweenFromEffectText) {
+      const grow = {
+        fontPx: StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX,
+        radius: StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS,
+      }
+      this.scene.tweens.add({
+        targets: bubble,
+        x: endX,
+        y: endY,
+        duration: Time.recapTween(),
+        ease: 'Sine.easeInOut',
+      })
+      this.scene.tweens.add({
+        targets: grow,
+        fontPx: StoryResolveBubbles.POINTS_RESOLVE_FONT_LARGE_PX,
+        radius: StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE,
+        duration: Time.recapTween(),
+        ease: 'Sine.easeInOut',
+        onUpdate: () => {
+          circle.setRadius(grow.radius)
+          txtFx.setStyle(
+            StoryResolveBubbles.effectsResolveBubbleTextStyle(grow.fontPx),
+          )
+        },
+      })
+    }
+  }
+
   private static resolvePointsBubbleTextStyle(fontPx: number) {
     const base = BBStyle.cardCost
     const t = base.strokeThickness ?? 1
@@ -458,6 +589,20 @@ class StoryResolveBubbles {
   }
 
   private static nourishResolveBubbleTextStyle(fontPx: number) {
+    const base = BBStyle.cardCost
+    const t = base.strokeThickness ?? 1
+    return {
+      ...base,
+      fontSize: `${Math.round(fontPx)}px`,
+      color: Color.whiteS,
+      strokeThickness: Math.max(
+        1,
+        Math.round(t * (fontPx / StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX)),
+      ),
+    }
+  }
+
+  private static effectsResolveBubbleTextStyle(fontPx: number) {
     const base = BBStyle.cardCost
     const t = base.strokeThickness ?? 1
     return {
