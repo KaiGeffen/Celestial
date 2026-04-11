@@ -14,6 +14,12 @@ const STAT_STROKE = '#000000'
 /** Name on the story points-resolve bubble container so setResolved can keep it visible. */
 export const STORY_RESOLVE_BUBBLE_NAME = 'storyPointsBubble'
 
+/** Name on the story nourish-resolve bubble (from status row to card). */
+export const STORY_RESOLVE_NOURISH_BUBBLE_NAME = 'storyNourishBubble'
+
+/** Resolved story cards: main art stays slightly visible; other chrome fades out. */
+const STORY_RESOLVED_SUBJECT_ALPHA = 0.2
+
 // TODO Many fields should be private
 
 export class CardImage {
@@ -178,29 +184,40 @@ export class CardImage {
   }
 
   // Set that a card has resolved (In the story)
-  /** @param animateFade If a bubble is present, tween non-bubble layers to transparent; otherwise set alpha immediately (rebuilt older resolves). */
+  /** @param animateFade If a bubble is present, tween non-bubble layers; subject ends dimmed; otherwise set alpha immediately (rebuilt older resolves). */
   setResolved(animateFade = false): this {
-    const hasBubble = this.findChildByName(STORY_RESOLVE_BUBBLE_NAME) !== undefined
+    const hasBubble =
+      this.findChildByName(STORY_RESOLVE_BUBBLE_NAME) !== undefined ||
+      this.findChildByName(STORY_RESOLVE_NOURISH_BUBBLE_NAME) !== undefined
     if (hasBubble) {
       this.eachDirectChild((child) => {
-        if (child.name === STORY_RESOLVE_BUBBLE_NAME) return
+        if (this.isStoryResolveBubbleChild(child.name)) return
         const go = child as Phaser.GameObjects.GameObject &
           Phaser.GameObjects.Components.AlphaSingle
+        const endAlpha =
+          child === this.imageSubject ? STORY_RESOLVED_SUBJECT_ALPHA : 0
         if (animateFade) {
           this.scene.tweens.add({
             targets: go,
-            alpha: 0,
+            alpha: endAlpha,
             duration: Time.recapTween(),
             ease: 'Sine.easeInOut',
           })
         } else {
-          go.setAlpha(0)
+          go.setAlpha(endAlpha)
         }
       })
     } else {
       this.setTint(Color.cardGreyed)
     }
     return this
+  }
+
+  private isStoryResolveBubbleChild(name: string): boolean {
+    return (
+      name === STORY_RESOLVE_BUBBLE_NAME ||
+      name === STORY_RESOLVE_NOURISH_BUBBLE_NAME
+    )
   }
 
   private findChildByName(name: string): Phaser.GameObjects.GameObject | undefined {
