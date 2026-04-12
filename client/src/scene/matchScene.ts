@@ -641,6 +641,8 @@ export class View {
 
   beforeExit(): void {
     this.searching.beforeExit()
+    this.ourAvatar.beforeExit()
+    this.theirAvatar.beforeExit()
   }
 }
 

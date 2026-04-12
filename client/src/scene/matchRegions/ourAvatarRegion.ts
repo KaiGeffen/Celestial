@@ -3,7 +3,7 @@ import { Depth, Space } from '../../settings/settings'
 import AvatarRegionBase from './avatarRegionBase'
 import { MatchScene } from '../matchScene'
 
-const height = 240
+const height = 250
 
 export default class OurAvatarRegion extends AvatarRegionBase {
   protected playerIndex(): 0 | 1 {

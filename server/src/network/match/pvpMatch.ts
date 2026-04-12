@@ -6,7 +6,7 @@ import { MechanicsSettings } from '../../../../shared/settings'
 import { AchievementManager } from '../../achievementManager'
 
 class PvpMatch extends Match {
-  timerCheckInterval: NodeJS.Timeout
+  timerCheckInterval: NodeJS.Timeout | null = null
 
   constructor(
     ws1: ServerWS,
@@ -21,7 +21,7 @@ class PvpMatch extends Match {
     this.ws2 = ws2
     this.uuid2 = uuid2
 
-    // this.startTimerCheck() TODO Enable once in prod
+    this.startTimerCheck()
   }
 
   protected async updateDatabases() {
@@ -96,6 +96,8 @@ class PvpMatch extends Match {
   // Start an interval to autopass if the user has no time left
   private startTimerCheck() {
     this.timerCheckInterval = setInterval(async () => {
+      if (this.game === null) return
+
       // If game is over, stop checking
       if (
         this.game.model.winner !== null ||
