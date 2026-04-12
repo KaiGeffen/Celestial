@@ -149,7 +149,6 @@ export default class StoryRegion extends Region {
           this.resolveBubbles.addPointsResolveCircle(
             card,
             tweenBubbleFromStat,
-            pointsStat,
           )
         })
         let delay = r
@@ -176,7 +175,6 @@ export default class StoryRegion extends Region {
         this.resolveBubbles.addPointsResolveCircle(
           card,
           tweenBubbleFromStat,
-          pointsStat,
         )
         this.resolveBubbles.addNourishResolveCircle(
           card,
@@ -382,15 +380,10 @@ class StoryResolveBubbles {
   }
 
   /**
-   * Ring + points for a resolved act. {@link CardImage.setResolved} keeps the bubble
-   * and fades the rest — so every resolved row must have one.
+   * Ring + points for a resolved act. Label uses {@link CardImage.points}.
    */
-  addPointsResolveCircle(
-    card: CardImage,
-    tweenFromStat: boolean,
-    displayPts?: number,
-  ): void {
-    const pts = displayPts ?? card.points ?? card.card.points
+  addPointsResolveCircle(card: CardImage, tweenFromStat: boolean): void {
+    const pts = card.points ?? card.card.points
     const bx = tweenFromStat ? card.txtPoints.x : 0
     const by = tweenFromStat ? card.txtPoints.y : 0
     const bubble = this.scene.add.container(bx, by)
