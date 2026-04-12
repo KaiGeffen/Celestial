@@ -1,0 +1,54 @@
+{
+  "name": "celestial",
+  "version": "1.0.0",
+  "description": "Celestial - Digital Card Game",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "gg.celestialdecks.celestial",
+    "productName": "Celestial",
+    "icon": "icon.png",
+    "files": ["main.js", "icon.png"],
+    "extraResources": [
+      {
+        "from": "../client",
+        "to": "client",
+        "filter": [
+          "index.html",
+          "style.css",
+          "dist/**",
+          "assets/**"
+        ]
+      }
+    ],
+    "directories": {
+      "output": "../electron-dist"
+    },
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "zip", "arch": ["x64"] }
+      ]
+    },
+    "mac": {
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] }
+      ]
+    },
+    "linux": {
+      "target": [
+        { "target": "AppImage", "arch": ["x64"] }
+      ]
+    }
+  },
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}
