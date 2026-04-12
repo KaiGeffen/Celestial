@@ -334,7 +334,10 @@ export const assetLists = {
       "Border",
       "BreathBasic",
       "BreathExtra",
+      "BreathExtra",
       "BreathHover",
+      "BreathHover",
+      "BreathOom",
       "BreathOom",
       "BreathSpent",
       "CustomDeck",
@@ -393,7 +396,6 @@ export const assetLists = {
   "background": {
     "files": [
       "Light",
-      "matchOuter",
       "matchOuter",
       "old matchOuter",
       "water"

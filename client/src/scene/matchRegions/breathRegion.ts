@@ -50,7 +50,6 @@ export default class BreathRegion extends Region {
 
     const s = `${state.breath[0]}/${state.maxBreath[0]}`
     this.txtBreath.setText(s)
-
   }
 
   // Display a given breath cost
@@ -58,7 +57,9 @@ export default class BreathRegion extends Region {
     // Each is hidden by the one below
     for (let i = 0; i < MechanicsSettings.BREATH_CAP; i++) {
       this.breathSpent[i].setVisible(i < this.maxBreath)
-      this.breathExtra[i].setVisible(i < this.currentBreath)
+      this.breathExtra[i].setVisible(
+        i >= this.maxBreath && i < this.currentBreath,
+      )
       this.breathBasic[i].setVisible(
         i < Math.min(this.maxBreath, this.currentBreath),
       )
@@ -125,8 +126,7 @@ export default class BreathRegion extends Region {
       const s = `icon-Breath${key}`
 
       // Top slot (i=0): 0 rad; bottom (i=N/2): π rad; linear in i around the circle
-      const rotation =
-        (2 * Math.PI * i) / MechanicsSettings.BREATH_CAP
+      const rotation = (2 * Math.PI * i) / MechanicsSettings.BREATH_CAP
 
       // Create the icon, add it to container and list of breath for this subtype
       let image = this.scene.add.image(x, y, s).setRotation(rotation)
