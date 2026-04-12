@@ -13,6 +13,7 @@ import CardLocation from './cardLocation'
 import { MatchScene } from '../matchScene'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { server } from '../../server'
+import { SHRUNKEN_CARD_SCALE } from './matchRegionSettings'
 
 // The y distance card moves up when hovered
 const HOVER_OFFSET = Space.cardHeight / 2 + Space.padSmall
@@ -293,7 +294,8 @@ export default class OurBoardRegion extends Region {
         targets: card.container,
         x: nextStoryPosition[0],
         y: nextStoryPosition[1],
-        scale: 0.8,
+        rotation: 0,
+        scale: SHRUNKEN_CARD_SCALE,
         duration: Time.playCard(),
         ease: 'Sine.easeInOut',
         // Moves other cards in hand to fill the hole

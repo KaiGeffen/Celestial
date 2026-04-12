@@ -5,8 +5,7 @@ import { BBStyle, Space, UserSettings } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
 import { MatchScene } from '../matchScene'
-
-const CARD_SCALE = 0.8
+import { SHRUNKEN_CARD_SCALE } from './matchRegionSettings'
 
 // Count badges: nudge away from screen center (deck left, discard right) and a bit further in Y.
 const STACK_ICON_OUTWARD_X = 52
@@ -199,7 +198,7 @@ export default abstract class StacksRegionBase {
 
     for (let i = 0; i < this.deckCardbacks.length; i++) {
       this.deckCardbacks[i].setPosition(this.deckLocation(this.layoutParent, i))
-      this.deckCardbacks[i].container.setScale(CARD_SCALE)
+      this.deckCardbacks[i].container.setScale(SHRUNKEN_CARD_SCALE)
       this.deckCardbacks[i].container.setRotation(deckR)
     }
 
@@ -207,7 +206,7 @@ export default abstract class StacksRegionBase {
       this.discardCards[i].setPosition(
         this.discardLocation(this.layoutParent, i),
       )
-      this.discardCards[i].container.setScale(CARD_SCALE)
+      this.discardCards[i].container.setScale(SHRUNKEN_CARD_SCALE)
       this.discardCards[i].container.setRotation(discardR)
     }
 
@@ -236,7 +235,7 @@ export default abstract class StacksRegionBase {
       this.discardCards[i].setPosition(
         this.discardLocation(this.layoutParent, i),
       )
-      this.discardCards[i].container.setScale(CARD_SCALE)
+      this.discardCards[i].container.setScale(SHRUNKEN_CARD_SCALE)
       this.discardCards[i].container.setRotation(discardR)
     }
 
@@ -279,7 +278,7 @@ export default abstract class StacksRegionBase {
     const deckR = this.deckRotationRad()
     for (let i = 0; i < this.deckCardbacks.length; i++) {
       this.deckCardbacks[i].setPosition(this.deckLocation(this.layoutParent, i))
-      this.deckCardbacks[i].container.setScale(CARD_SCALE)
+      this.deckCardbacks[i].container.setScale(SHRUNKEN_CARD_SCALE)
       this.deckCardbacks[i].container.setRotation(deckR)
     }
 

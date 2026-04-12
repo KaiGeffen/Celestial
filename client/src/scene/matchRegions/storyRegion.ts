@@ -7,8 +7,7 @@ import Region from './baseRegion'
 import CardLocation from './cardLocation'
 import Act from '../../../../shared/state/act'
 import { Quality } from '../../../../shared/state/quality'
-
-const CARD_SCALE = 0.8
+import { SHRUNKEN_CARD_SCALE } from './matchRegionSettings'
 
 export default class StoryRegion extends Region {
   lastScores: [number, number]
@@ -52,7 +51,7 @@ export default class StoryRegion extends Region {
         .moveToTopOnHover()
       // .setOnClick(this.callback(resolvedI))
 
-      card.container.setScale(CARD_SCALE)
+      card.container.setScale(SHRUNKEN_CARD_SCALE)
 
       this.temp.push(card)
     }
@@ -84,7 +83,7 @@ export default class StoryRegion extends Region {
         // card.setOnClick(this.callback(resolvedI + i))
       }
 
-      card.container.setScale(CARD_SCALE)
+      card.container.setScale(SHRUNKEN_CARD_SCALE)
 
       cards.push(card)
       this.temp.push(card)
