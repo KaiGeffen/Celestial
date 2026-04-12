@@ -492,7 +492,7 @@ class StoryResolveBubbles {
       )
     }
 
-    const label = `${nourishAmt}`
+    const label = nourishAmt > 0 ? `+${nourishAmt}` : `${nourishAmt}`
     const txtNourish = this.scene.add
       .rexBBCodeText(
         0,
