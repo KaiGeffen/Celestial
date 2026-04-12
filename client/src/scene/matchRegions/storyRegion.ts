@@ -354,10 +354,27 @@ class StoryResolveBubbles {
     StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS *
     StoryResolveBubbles.POINTS_RESOLVE_FONT_SCALE
 
-  /** Final X for nourish bubble (points bubble ends at 0,0). */
-  private static readonly NOURISH_BUBBLE_OFFSET_X = 78
-  /** Effects bonus bubble (left of center; points center, nourish right). */
-  private static readonly EFFECTS_BUBBLE_OFFSET_X = -78
+  /** Nourish/effect: same small start as points bubble; large end is half the points bubble’s large size. */
+  private static readonly NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE =
+    StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE / 2
+  private static readonly NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX = Math.round(
+    StoryResolveBubbles.POINTS_RESOLVE_FONT_LARGE_PX / 2,
+  )
+
+  /**
+   * Rest position for nourish (bottom-right) / effect (bottom-left) relative to main
+   * points bubble center (0,0). Tangency on the diagonal through each corner of the main ring.
+   */
+  private static secondaryBubbleRestAtMainCorner(
+    corner: 'bottomRight' | 'bottomLeft',
+  ): { x: number; y: number } {
+    const R = StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE
+    const r = StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE
+    const d = (R + r) / Math.SQRT2
+    return corner === 'bottomRight'
+      ? { x: d, y: d }
+      : { x: -d, y: d }
+  }
 
   constructor(private readonly scene: Phaser.Scene) {}
 
@@ -449,7 +466,7 @@ class StoryResolveBubbles {
   }
 
   /**
-   * Nourish bubble when that act consumed status nourish. Sits beside the points bubble.
+   * Nourish bubble when that act consumed status nourish. Ends at bottom-right of the main bubble.
    */
   addNourishResolveCircle(
     card: CardImage,
@@ -461,8 +478,8 @@ class StoryResolveBubbles {
     const parent = card.container
     if (!(parent instanceof Phaser.GameObjects.Container)) return
 
-    const endX = StoryResolveBubbles.NOURISH_BUBBLE_OFFSET_X
-    const endY = 0
+    const { x: endX, y: endY } =
+      StoryResolveBubbles.secondaryBubbleRestAtMainCorner('bottomRight')
 
     let bx: number
     let by: number
@@ -488,7 +505,7 @@ class StoryResolveBubbles {
     if (!tweenFromStatus) {
       StoryResolveBubbles.setBubbleDisplaySize(
         nourishBubbleImg,
-        StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE,
+        StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE,
       )
     }
 
@@ -501,7 +518,7 @@ class StoryResolveBubbles {
         tweenFromStatus
           ? BBStyle.cardCost
           : StoryResolveBubbles.nourishResolveBubbleTextStyle(
-              StoryResolveBubbles.POINTS_RESOLVE_FONT_LARGE_PX,
+              StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
             ),
       )
       .setOrigin(0.5)
@@ -530,8 +547,8 @@ class StoryResolveBubbles {
       })
       this.scene.tweens.add({
         targets: grow,
-        fontPx: StoryResolveBubbles.POINTS_RESOLVE_FONT_LARGE_PX,
-        radius: StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE,
+        fontPx: StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
+        radius: StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE,
         duration: Time.recapTween(),
         ease: 'Sine.easeInOut',
         onUpdate: () => {
@@ -558,8 +575,8 @@ class StoryResolveBubbles {
     const parent = card.container
     if (!(parent instanceof Phaser.GameObjects.Container)) return
 
-    const endX = StoryResolveBubbles.EFFECTS_BUBBLE_OFFSET_X
-    const endY = 0
+    const { x: endX, y: endY } =
+      StoryResolveBubbles.secondaryBubbleRestAtMainCorner('bottomLeft')
 
     let bx: number
     let by: number
@@ -582,7 +599,7 @@ class StoryResolveBubbles {
     if (!tweenFromEffectText) {
       StoryResolveBubbles.setBubbleDisplaySize(
         effectsBubbleImg,
-        StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE,
+        StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE,
       )
     }
 
@@ -595,7 +612,7 @@ class StoryResolveBubbles {
         tweenFromEffectText
           ? BBStyle.cardCost
           : StoryResolveBubbles.effectsResolveBubbleTextStyle(
-              StoryResolveBubbles.POINTS_RESOLVE_FONT_LARGE_PX,
+              StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
             ),
       )
       .setOrigin(0.5)
@@ -629,8 +646,8 @@ class StoryResolveBubbles {
       })
       this.scene.tweens.add({
         targets: grow,
-        fontPx: StoryResolveBubbles.POINTS_RESOLVE_FONT_LARGE_PX,
-        radius: StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE,
+        fontPx: StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
+        radius: StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE,
         duration: Time.recapTween(),
         ease: 'Sine.easeInOut',
         onUpdate: () => {
