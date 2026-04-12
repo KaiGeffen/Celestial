@@ -137,15 +137,16 @@ export default abstract class AvatarRegionBase extends Region {
 
     this.txtTime.setVisible(true)
 
+    // TODO Time should tick down during recap, but you need to be using the MOST RECENT STATE not just the last one shown.
+
     const inMulligan = state.mulligansComplete.includes(false)
-    // Live countdown only while this slot's clock is "running" on the server:
-    // main phase — it's their priority; mulligan — they still owe a keep/discard choice.
-    // Otherwise show the frozen `timers[i]` from the last state (opponent's turn, recap, or game over).
+    // Live countdown while this slot's clock is running on the server: their priority (including
+    // during story recap — time still ticks), or mulligan not finished yet.
+    // Otherwise show frozen `timers[i]` (opponent's turn or game over).
     const shouldLiveTick =
       state.winner === null &&
       !state.isRecap &&
-      (state.priority === i ||
-        (inMulligan && !state.mulligansComplete[i]))
+      (state.priority === i || (inMulligan && !state.mulligansComplete[i]))
 
     const applyText = () => {
       const ms = shouldLiveTick
