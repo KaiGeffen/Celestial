@@ -11,6 +11,15 @@ const COLOR_BETTER = '#55dd55'
 const COLOR_WORSE = '#e45555'
 const STAT_STROKE = '#000000'
 
+/** Name on the story points-resolve bubble container so setResolved can keep it visible. */
+export const STORY_RESOLVE_BUBBLE_NAME = 'storyPointsBubble'
+
+/** Name on the story nourish-resolve bubble (from status row to card). */
+export const STORY_RESOLVE_NOURISH_BUBBLE_NAME = 'storyNourishBubble'
+
+/** Bonus/malus from card text (story position, etc.); not the points stat nor nourish. */
+export const STORY_RESOLVE_EFFECTS_BUBBLE_NAME = 'storyEffectsBubble'
+
 // TODO Many fields should be private
 
 export class CardImage {
