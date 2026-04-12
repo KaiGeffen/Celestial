@@ -20,8 +20,7 @@ import Region from './baseRegion'
 import CardLocation from './cardLocation'
 import Act from '../../../../shared/state/act'
 import { Quality } from '../../../../shared/state/quality'
-
-const CARD_SCALE = 0.8
+import { SHRUNKEN_CARD_SCALE } from './matchRegionSettings'
 
 export default class StoryRegion extends Region {
   lastScores: [number, number]
@@ -106,7 +105,7 @@ export default class StoryRegion extends Region {
       )
       // .setOnClick(this.callback(resolvedI))
 
-      card.container.setScale(CARD_SCALE)
+      card.container.setScale(SHRUNKEN_CARD_SCALE)
 
       // Every resolved card needs a bubble so setResolved keeps art faded; only the
       // newest resolve this frame tweens from the points stat to center.
@@ -166,7 +165,7 @@ export default class StoryRegion extends Region {
         // card.setOnClick(this.callback(resolvedI + i))
       }
 
-      card.container.setScale(CARD_SCALE)
+      card.container.setScale(SHRUNKEN_CARD_SCALE)
 
       cards.push(card)
       this.temp.push(card)
@@ -279,10 +278,14 @@ export default class StoryRegion extends Region {
 }
 
 /**
- * Points + nourish resolve bubbles on story cards (local tweens, BBCode text, ring geometry).
+ * Points + nourish resolve bubbles on story cards (per-type `chrome-bubble*` art, BBCode text, tweens).
  */
 class StoryResolveBubbles {
   private static readonly STAT_STROKE = '#000000'
+
+  private static readonly BUBBLE_TEXTURE_POINTS = 'chrome-bubble'
+  private static readonly BUBBLE_TEXTURE_NOURISH = 'chrome-bubbleNourish'
+  private static readonly BUBBLE_TEXTURE_EFFECT = 'chrome-bubbleEffect'
 
   private static readonly POINTS_RESOLVE_CIRCLE_RADIUS = 18
   private static readonly POINTS_RESOLVE_FONT_SMALL_PX = 24
@@ -299,9 +302,27 @@ class StoryResolveBubbles {
   private static readonly NOURISH_BUBBLE_OFFSET_X = 78
   /** Effects bonus bubble (left of center; points center, nourish right). */
   private static readonly EFFECTS_BUBBLE_OFFSET_X = -78
-  private static readonly EFFECTS_CIRCLE_FILL = 0x5c4518
 
   constructor(private readonly scene: Phaser.Scene) {}
+
+  private static setBubbleDisplaySize(
+    img: Phaser.GameObjects.Image,
+    radius: number,
+  ): void {
+    const d = radius * 2
+    img.setDisplaySize(d, d)
+  }
+
+  private static createBubbleImage(
+    scene: Phaser.Scene,
+    textureKey: string,
+    radius: number,
+  ): Phaser.GameObjects.Image {
+    const img = scene.add.image(0, 0, textureKey)
+    StoryResolveBubbles.setBubbleDisplaySize(img, radius)
+    img.setOrigin(0.5)
+    return img
+  }
 
   /**
    * Ring + points for a resolved act. {@link CardImage.setResolved} keeps the bubble
@@ -314,15 +335,17 @@ class StoryResolveBubbles {
     const bubble = this.scene.add.container(bx, by)
     bubble.name = STORY_RESOLVE_BUBBLE_NAME
 
-    const circle = this.scene.add.circle(
-      0,
-      0,
+    const bubbleImg = StoryResolveBubbles.createBubbleImage(
+      this.scene,
+      StoryResolveBubbles.BUBBLE_TEXTURE_POINTS,
       StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS,
-      Color.black,
-      0.92,
     )
-    circle.setStrokeStyle(2, Color.white, 0.9)
-    circle.setOrigin(0.5)
+    if (!tweenFromStat) {
+      StoryResolveBubbles.setBubbleDisplaySize(
+        bubbleImg,
+        StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE,
+      )
+    }
 
     const txtPts = this.scene.add
       .rexBBCodeText(
@@ -337,11 +360,7 @@ class StoryResolveBubbles {
       )
       .setOrigin(0.5)
 
-    if (!tweenFromStat) {
-      circle.setRadius(StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE)
-    }
-
-    bubble.add([circle, txtPts])
+    bubble.add([bubbleImg, txtPts])
 
     const parent = card.container as Phaser.GameObjects.Container
     parent.addAt(bubble, parent.getIndex(card.txtPoints))
@@ -365,7 +384,7 @@ class StoryResolveBubbles {
         duration: Time.recapTween(),
         ease: 'Sine.easeInOut',
         onUpdate: () => {
-          circle.setRadius(grow.radius)
+          StoryResolveBubbles.setBubbleDisplaySize(bubbleImg, grow.radius)
           txtPts.setStyle(
             StoryResolveBubbles.resolvePointsBubbleTextStyle(grow.fontPx),
           )
@@ -406,15 +425,17 @@ class StoryResolveBubbles {
     const bubble = this.scene.add.container(bx, by)
     bubble.name = STORY_RESOLVE_NOURISH_BUBBLE_NAME
 
-    const circle = this.scene.add.circle(
-      0,
-      0,
+    const nourishBubbleImg = StoryResolveBubbles.createBubbleImage(
+      this.scene,
+      StoryResolveBubbles.BUBBLE_TEXTURE_NOURISH,
       StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS,
-      0x053327,
-      0.92,
     )
-    circle.setStrokeStyle(2, Color.white, 0.9)
-    circle.setOrigin(0.5)
+    if (!tweenFromStatus) {
+      StoryResolveBubbles.setBubbleDisplaySize(
+        nourishBubbleImg,
+        StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE,
+      )
+    }
 
     const label = `${nourishAmt}`
     const txtNourish = this.scene.add
@@ -430,11 +451,7 @@ class StoryResolveBubbles {
       )
       .setOrigin(0.5)
 
-    if (!tweenFromStatus) {
-      circle.setRadius(StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE)
-    }
-
-    bubble.add([circle, txtNourish])
+    bubble.add([nourishBubbleImg, txtNourish])
 
     const pointsBubble = parent.list.find(
       (c) => c.name === STORY_RESOLVE_BUBBLE_NAME,
@@ -463,7 +480,7 @@ class StoryResolveBubbles {
         duration: Time.recapTween(),
         ease: 'Sine.easeInOut',
         onUpdate: () => {
-          circle.setRadius(grow.radius)
+          StoryResolveBubbles.setBubbleDisplaySize(nourishBubbleImg, grow.radius)
           txtNourish.setStyle(
             StoryResolveBubbles.nourishResolveBubbleTextStyle(grow.fontPx),
           )
@@ -502,15 +519,17 @@ class StoryResolveBubbles {
     const bubble = this.scene.add.container(bx, by)
     bubble.name = STORY_RESOLVE_EFFECTS_BUBBLE_NAME
 
-    const circle = this.scene.add.circle(
-      0,
-      0,
+    const effectsBubbleImg = StoryResolveBubbles.createBubbleImage(
+      this.scene,
+      StoryResolveBubbles.BUBBLE_TEXTURE_EFFECT,
       StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS,
-      StoryResolveBubbles.EFFECTS_CIRCLE_FILL,
-      0.92,
     )
-    circle.setStrokeStyle(2, Color.white, 0.9)
-    circle.setOrigin(0.5)
+    if (!tweenFromEffectText) {
+      StoryResolveBubbles.setBubbleDisplaySize(
+        effectsBubbleImg,
+        StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE,
+      )
+    }
 
     const label = effectAmt > 0 ? `+${effectAmt}` : `${effectAmt}`
     const txtFx = this.scene.add
@@ -526,11 +545,7 @@ class StoryResolveBubbles {
       )
       .setOrigin(0.5)
 
-    if (!tweenFromEffectText) {
-      circle.setRadius(StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE)
-    }
-
-    bubble.add([circle, txtFx])
+    bubble.add([effectsBubbleImg, txtFx])
 
     const nourishBubble = parent.list.find(
       (c) => c.name === STORY_RESOLVE_NOURISH_BUBBLE_NAME,
@@ -564,7 +579,7 @@ class StoryResolveBubbles {
         duration: Time.recapTween(),
         ease: 'Sine.easeInOut',
         onUpdate: () => {
-          circle.setRadius(grow.radius)
+          StoryResolveBubbles.setBubbleDisplaySize(effectsBubbleImg, grow.radius)
           txtFx.setStyle(
             StoryResolveBubbles.effectsResolveBubbleTextStyle(grow.fontPx),
           )

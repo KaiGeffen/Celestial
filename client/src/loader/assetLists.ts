@@ -394,7 +394,6 @@ export const assetLists = {
     "files": [
       "Light",
       "matchOuter",
-      "matchOuter",
       "old matchOuter",
       "water"
     ],
@@ -455,6 +454,9 @@ export const assetLists = {
       "CloudTop",
       "ResultGlow",
       "breathWheel",
+      "bubble",
+      "bubbleEffect",
+      "bubbleNourish",
       "nameplate",
       "replayControls",
       "stackCount",

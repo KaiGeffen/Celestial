@@ -1,12 +1,11 @@
 import 'phaser'
 import { CardImage } from '../../lib/cardImage'
 import GameModel from '../../../../shared/state/gameModel'
-import { BBStyle, Space, UserSettings } from '../../settings/settings'
+import { Space, UserSettings } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
 import { MatchScene } from '../matchScene'
-
-const CARD_SCALE = 0.8
+import { SHRUNKEN_CARD_SCALE } from './matchRegionSettings'
 
 // Count badges: nudge away from screen center (deck left, discard right) and a bit further in Y.
 const STACK_ICON_OUTWARD_X = 52
@@ -36,8 +35,6 @@ export default abstract class StacksRegionBase {
 
   btnDeck!: Button
   btnDiscard!: Button
-
-  private hotkeyHints: Phaser.GameObjects.GameObject[] = []
 
   /** 0 = us, 1 = opponent */
   protected abstract ownerIndex(): 0 | 1
@@ -125,9 +122,6 @@ export default abstract class StacksRegionBase {
       'discard',
     )
 
-    this.addHotkeyHint(deckPos, this.deckHotkeyLetter())
-    this.addHotkeyHint(discardPos, this.discardHotkeyLetter())
-
     this.registerStackHotkeys()
 
     return this
@@ -136,22 +130,6 @@ export default abstract class StacksRegionBase {
   setOverlayCallbacks(fDeck: () => void, fDiscard: () => void): void {
     this.btnDeck.setOnClick(fDeck)
     this.btnDiscard.setOnClick(fDiscard)
-  }
-
-  setHotkeyHintVisible(show: boolean): void {
-    this.hotkeyHints.forEach((hint) => {
-      ;(hint as Phaser.GameObjects.Text).setVisible(show)
-    })
-  }
-
-  private addHotkeyHint(position: [number, number], s: string): void {
-    const hotkeyText = this.scene.add
-      .rexBBCodeText(position[0], position[1], s, BBStyle.hotkeyHint)
-      .setOrigin(0.5)
-      .setVisible(false)
-
-    this.stackIconsContainer.add(hotkeyText)
-    this.hotkeyHints.push(hotkeyText)
   }
 
   private registerStackHotkeys(): void {
@@ -179,18 +157,6 @@ export default abstract class StacksRegionBase {
     )
     this.btnDeck.setPosition(deckPos[0], deckPos[1])
     this.btnDiscard.setPosition(discardPos[0], discardPos[1])
-    if (this.hotkeyHints[0]) {
-      ;(this.hotkeyHints[0] as Phaser.GameObjects.Text).setPosition(
-        deckPos[0],
-        deckPos[1],
-      )
-    }
-    if (this.hotkeyHints[1]) {
-      ;(this.hotkeyHints[1] as Phaser.GameObjects.Text).setPosition(
-        discardPos[0],
-        discardPos[1],
-      )
-    }
   }
 
   onWindowResize(): void {
@@ -199,7 +165,7 @@ export default abstract class StacksRegionBase {
 
     for (let i = 0; i < this.deckCardbacks.length; i++) {
       this.deckCardbacks[i].setPosition(this.deckLocation(this.layoutParent, i))
-      this.deckCardbacks[i].container.setScale(CARD_SCALE)
+      this.deckCardbacks[i].container.setScale(SHRUNKEN_CARD_SCALE)
       this.deckCardbacks[i].container.setRotation(deckR)
     }
 
@@ -207,7 +173,7 @@ export default abstract class StacksRegionBase {
       this.discardCards[i].setPosition(
         this.discardLocation(this.layoutParent, i),
       )
-      this.discardCards[i].container.setScale(CARD_SCALE)
+      this.discardCards[i].container.setScale(SHRUNKEN_CARD_SCALE)
       this.discardCards[i].container.setRotation(discardR)
     }
 
@@ -236,7 +202,7 @@ export default abstract class StacksRegionBase {
       this.discardCards[i].setPosition(
         this.discardLocation(this.layoutParent, i),
       )
-      this.discardCards[i].container.setScale(CARD_SCALE)
+      this.discardCards[i].container.setScale(SHRUNKEN_CARD_SCALE)
       this.discardCards[i].container.setRotation(discardR)
     }
 
@@ -279,7 +245,7 @@ export default abstract class StacksRegionBase {
     const deckR = this.deckRotationRad()
     for (let i = 0; i < this.deckCardbacks.length; i++) {
       this.deckCardbacks[i].setPosition(this.deckLocation(this.layoutParent, i))
-      this.deckCardbacks[i].container.setScale(CARD_SCALE)
+      this.deckCardbacks[i].container.setScale(SHRUNKEN_CARD_SCALE)
       this.deckCardbacks[i].container.setRotation(deckR)
     }
 

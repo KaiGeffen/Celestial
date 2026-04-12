@@ -118,9 +118,6 @@ export class MatchScene extends BaseScene {
       this.params.password,
     )
 
-    // Register the shift hotkey to explain hotkeys in all regions
-    this.addHotkeyHint()
-
     this.paused = false
 
     this.setCallbacks(this.view)
@@ -389,38 +386,6 @@ export class MatchScene extends BaseScene {
   // Opponent has used a given emote
   emote(emoteNumber: number): void {
     this.view.theirAvatar.emote(emoteNumber)
-  }
-
-  // Register the shift hotkey to explain hotkeys in all regions
-  private addHotkeyHint(): void {
-    const regions = [
-      this.view.mulligan,
-      this.view.ourAvatar,
-      this.view.theirAvatar,
-      this.view.ourStacks,
-      this.view.theirStacks,
-      this.view.ourBoard,
-      this.view.historyRegion,
-      this.view.pass,
-    ]
-    this.input.keyboard.on('keydown-SHIFT', () => {
-      if (UserSettings._get('hotkeys')) {
-        regions.forEach((region) => {
-          region.setHotkeyHintVisible(true)
-        })
-        // Raise all cards when shift is pressed
-        this.view.ourBoard.raiseAllCards()
-      }
-    })
-    this.input.keyboard.on('keyup-SHIFT', () => {
-      if (UserSettings._get('hotkeys')) {
-        regions.forEach((region) => {
-          region.setHotkeyHintVisible(false)
-        })
-        // Lower all cards when shift is released
-        this.view.ourBoard.lowerAllCards()
-      }
-    })
   }
 
   protected registerMatchServerHooks(): void {
