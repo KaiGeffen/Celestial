@@ -14,7 +14,10 @@
     "appId": "gg.celestialdecks.celestial",
     "productName": "Celestial",
     "icon": "icon.png",
-    "files": ["main.js", "icon.png"],
+    "files": [
+      "main.js",
+      "icon.png"
+    ],
     "extraResources": [
       {
         "from": "../client",
@@ -32,23 +35,47 @@
     },
     "win": {
       "target": [
-        { "target": "nsis", "arch": ["x64"] },
-        { "target": "zip", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
       ]
     },
     "mac": {
       "target": [
-        { "target": "dmg", "arch": ["x64", "arm64"] }
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ]
     },
     "linux": {
       "target": [
-        { "target": "AppImage", "arch": ["x64"] }
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
       ]
     }
   },
   "devDependencies": {
     "electron": "^32.0.0",
     "electron-builder": "^25.0.0"
+  },
+  "dependencies": {
+    "steamworks.js": "^0.4.0"
   }
 }

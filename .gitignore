@@ -16,6 +16,9 @@ dist/
 # Electron packaged output #
 electron-dist/
 
+# Steam dev file — must not be shipped in builds #
+electron/steam_appid.txt
+
 # Compiled index.html in the client (Not about or privacy) #
 /client/index.html
 

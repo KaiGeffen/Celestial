@@ -2,6 +2,19 @@ const { app, BrowserWindow, shell } = require('electron')
 const path = require('path')
 const http = require('http')
 const fs = require('fs')
+const steamworks = require('steamworks.js')
+
+// Must be called before app is ready so the command-line switches are set in time
+steamworks.electronEnableSteamOverlay()
+
+// Initialize Steam. Fails gracefully if Steam isn't running.
+let steam = null
+try {
+  steam = steamworks.init(3810590)
+  console.log(`Steam initialized — logged in as: ${steam.localplayer.getName()}`)
+} catch (e) {
+  console.warn('Steam not available:', e.message)
+}
 
 // Fixed port for the local file server.
 // Must NOT be 4949 — that would set Flags.local=true and point the game at
