@@ -1,7 +1,7 @@
 import EloRank from 'elo-rank'
 import { eq, sql, lt } from 'drizzle-orm'
 import { db } from './db'
-import { matchHistory, players } from './schema'
+import { matchHistory, missionStats, players } from './schema'
 import { Deck } from '../../../shared/types/deck'
 import Garden from './garden'
 
@@ -144,6 +144,26 @@ function setBitInBitstring(bitstring: string, index: number): string {
   while (arr.length <= index) arr.push('0')
   arr[index] = '1'
   return arr.join('')
+}
+
+/** Increment global win/loss counts for a mission (indexed by mission id). */
+export async function recordMissionOutcome(
+  missionId: number,
+  playerWon: boolean,
+): Promise<void> {
+  await db
+    .insert(missionStats)
+    .values(
+      playerWon
+        ? { mission_id: missionId, wins: 1, losses: 0 }
+        : { mission_id: missionId, wins: 0, losses: 1 },
+    )
+    .onConflictDoUpdate({
+      target: missionStats.mission_id,
+      set: playerWon
+        ? { wins: sql`${missionStats.wins} + 1` }
+        : { losses: sql`${missionStats.losses} + 1` },
+    })
 }
 
 /** When player wins a journey mission, mark mission complete and unlock cards on the server. */

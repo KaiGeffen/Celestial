@@ -1,7 +1,10 @@
 import PveMatch from './pveMatch'
 import { ServerWS } from '../../../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../../../shared/types/deck'
-import { updateJourneyProgress } from '../../db/updateMatchResult'
+import {
+  recordMissionOutcome,
+  updateJourneyProgress,
+} from '../../db/updateMatchResult'
 import {
   getMissionById,
   missionToAiDeck,
@@ -49,7 +52,12 @@ class PveMatchMission extends PveMatch {
   protected async updateDatabases() {
     await super.updateDatabases()
 
-    if (this.game.model.winner === 0) {
+    const playerWon = this.game.model.winner === 0
+    await recordMissionOutcome(this.missionID, playerWon).catch((error) => {
+      console.error('Error recording mission stats:', error)
+    })
+
+    if (playerWon) {
       await updateJourneyProgress(
         this.uuid1,
         this.missionID,
