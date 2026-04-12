@@ -455,6 +455,7 @@ export const assetLists = {
       "ResultGlow",
       "breathWheel",
       "bubble",
+      "bubble",
       "bubbleEffect",
       "bubbleNourish",
       "nameplate",
