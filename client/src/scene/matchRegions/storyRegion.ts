@@ -123,8 +123,9 @@ export default class StoryRegion extends Region {
 
       const nourishAmt = this.resolvedNourishByActIndex[resolvedI] ?? 0
       const pointsEarned = this.resolvedPointsEarnedByActIndex[resolvedI] ?? 0
-      const pointsStat = act.card.basePoints
-      const effectAmt = pointsEarned - pointsStat - nourishAmt
+      // Use printed points (e.g. Child after Birth), not basePoints — main bubble matches card.points.
+      const printedPoints = act.card.points
+      const effectAmt = pointsEarned - printedPoints - nourishAmt
 
       const tweenNourishFromStatus =
         oneNewResolvedAct && resolvedI === resolvedCount - 1 && nourishAmt !== 0
@@ -544,8 +545,8 @@ class StoryResolveBubbles {
   }
 
   /**
-   * Points from card text (story slot, hand size bonus, etc.): score gained minus
-   * points stat bubble minus nourish bubble. When animated, starts at {@link CardImage.txtText}.
+   * Bonus/malus beyond printed points + nourish (story slot, Predator prey, etc.):
+   * score gained minus {@link Card#points} minus nourish. When animated, starts at {@link CardImage.txtText}.
    */
   addEffectsResolveCircle(
     card: CardImage,
