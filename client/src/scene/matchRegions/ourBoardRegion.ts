@@ -26,7 +26,7 @@ const HAND_FAN_MIN_DX = Space.cardWidth - Space.pad
 const HAND_FAN_SCREEN_MARGIN = 80
 
 // Rest hand: slight rotation fan only (same curve as `theirBoard`, upright: base 0).
-// Hovered / shift-raised hand: flat rotation 0 + `ourHandFannedLayout` spread.
+// Hovered hand: flat rotation 0 + `ourHandFannedLayout` spread.
 const OUR_HAND_REST_FAN_MAX_RAD = (4 * Math.PI) / 180
 
 // Rest hand only: center cards sit slightly higher (vertical arc). Fanned /
@@ -49,9 +49,6 @@ export default class OurBoardRegion extends Region {
 
   // Track which card is currently raised
   raisedCardIndex: number | null = null
-
-  // Track whether shift is held
-  isShiftHeld = false
 
   /** Last state used to lay out the hand (fan + rest positions). */
   private lastHandState: GameModel | null = null
@@ -203,7 +200,7 @@ export default class OurBoardRegion extends Region {
       return
     }
     const st = this.lastHandState
-    if (this.isShiftHeld || this.raisedCardIndex !== null) {
+    if (this.raisedCardIndex !== null) {
       this.cards.forEach((c, idx) => {
         if (c === this.cardTweeningToStory) return
         const { x, y } = this.ourHandFannedLayout(st, idx)
@@ -271,23 +268,21 @@ export default class OurBoardRegion extends Region {
 
       // If the whole hand was raised due to hover, lower the other cards when playing
       // Use one fewer card for spacing/rotation so it matches the post-play hand before server state.
-      if (!this.isShiftHeld) {
-        const newN = state.hand[0].length - 1
-        hand.forEach((other, idx) => {
-          if (other !== card) {
-            const newIndex = idx > i ? idx - 1 : idx
-            const [x, y] = this.ourHandRestPosition(state, newIndex, newN)
-            this.scene.tweens.add({
-              targets: other.container,
-              x,
-              y,
-              rotation: this.ourHandRestFanRotation(newIndex, newN),
-              duration: Time.cardFocus,
-              ease: 'Sine.easeOut',
-            })
-          }
-        })
-      }
+      const newN = state.hand[0].length - 1
+      hand.forEach((other, idx) => {
+        if (other !== card) {
+          const newIndex = idx > i ? idx - 1 : idx
+          const [x, y] = this.ourHandRestPosition(state, newIndex, newN)
+          this.scene.tweens.add({
+            targets: other.container,
+            x,
+            y,
+            rotation: this.ourHandRestFanRotation(newIndex, newN),
+            duration: Time.cardFocus,
+            ease: 'Sine.easeOut',
+          })
+        }
+      })
 
       // Send card to story
       this.scene.tweens.add({
@@ -366,19 +361,10 @@ export default class OurBoardRegion extends Region {
 
       this.cards.push(card)
       this.temp.push(card)
-
-      // Add hotkey hint text above the card
-      let position = this.ourHandRestPosition(state, i)
-      position[1] -= Space.cardHeight / 2 + HOVER_OFFSET + 35
-      const hotkeyText = this.addHotkeyHint(position, `${i + 1}`)
-      this.temp.push(hotkeyText)
-
-      // If shift is held, show the hotkey hint
-      hotkeyText.setVisible(this.isShiftHeld)
     }
 
-    // Shift or hover-active: wide spread + raised (flat rotation like before)
-    if (this.isShiftHeld || this.raisedCardIndex !== null) {
+    // Hover-active: wide spread + raised (flat rotation like before)
+    if (this.raisedCardIndex !== null) {
       this.cards.forEach((c, idx) => {
         if (c === this.cardTweeningToStory) return
         const { x, y } = this.ourHandFannedLayout(state, idx)
@@ -412,7 +398,6 @@ export default class OurBoardRegion extends Region {
     }
   }
 
-  // Modify onCardHover to not raise if shift is held
   private onCardHover(
     card: CardImage,
     cost: number,
@@ -425,9 +410,8 @@ export default class OurBoardRegion extends Region {
       const wasRaised = this.raisedCardIndex !== null
       this.raisedCardIndex = index
 
-      // Only raise if shift is not held (shift already means "raise all")
-      // When not shifted, fan the entire hand on first hover.
-      if (!this.isShiftHeld && !wasRaised) {
+      // Fan the entire hand on first hover.
+      if (!wasRaised) {
         const st = this.lastHandState
         if (!st) {
           return
@@ -448,7 +432,6 @@ export default class OurBoardRegion extends Region {
     }
   }
 
-  // Modify onCardExit to not lower if shift is held
   private onCardExit(
     card: CardImage,
     cards: CardImage[],
@@ -467,26 +450,23 @@ export default class OurBoardRegion extends Region {
       if (!pointerOverAnyCard) {
         this.raisedCardIndex = null
 
-        // Only lower if shift is not held (shift already means "raise all")
-        if (!this.isShiftHeld) {
-          const st = this.lastHandState
-          if (!st) {
-            return
-          }
-          const n = st.hand[0].length
-          cards.forEach((c, idx) => {
-            if (c === this.cardTweeningToStory) return
-            const [x, y] = this.ourHandRestPosition(st, idx)
-            this.scene.tweens.add({
-              targets: c.container,
-              x,
-              y,
-              rotation: this.ourHandRestFanRotation(idx, n),
-              duration: Time.cardFocus,
-              ease: 'Sine.easeOut',
-            })
-          })
+        const st = this.lastHandState
+        if (!st) {
+          return
         }
+        const n = st.hand[0].length
+        cards.forEach((c, idx) => {
+          if (c === this.cardTweeningToStory) return
+          const [x, y] = this.ourHandRestPosition(st, idx)
+          this.scene.tweens.add({
+            targets: c.container,
+            x,
+            y,
+            rotation: this.ourHandRestFanRotation(idx, n),
+            duration: Time.cardFocus,
+            ease: 'Sine.easeOut',
+          })
+        })
       }
     }
   }
@@ -500,67 +480,6 @@ export default class OurBoardRegion extends Region {
   // Set the callback for showing how much breath a card costs
   setDisplayCostCallback(f: (cost: number) => void): void {
     this.displayCostCallback = f
-  }
-
-  // Add method to raise all cards
-  raiseAllCards(): void {
-    if (this.isShiftHeld) return // Don't raise if already raised
-    this.isShiftHeld = true
-
-    const st = this.lastHandState
-    if (!st) {
-      return
-    }
-    this.cards.forEach((card, idx) => {
-      if (card === this.cardTweeningToStory) return
-      const { x, y } = this.ourHandFannedLayout(st, idx)
-      this.scene.tweens.add({
-        targets: card.container,
-        x,
-        y,
-        rotation: 0,
-        duration: Time.cardFocus,
-        ease: 'Sine.easeOut',
-      })
-    })
-  }
-
-  // Add method to lower all cards
-  lowerAllCards(): void {
-    if (!this.isShiftHeld) return // Don't lower if already lowered
-    this.isShiftHeld = false
-
-    const st = this.lastHandState
-    if (!st) {
-      return
-    }
-    const shouldRemainFanned = this.raisedCardIndex !== null
-
-    this.cards.forEach((card, idx) => {
-      if (card === this.cardTweeningToStory) return
-      if (shouldRemainFanned) {
-        const { x, y } = this.ourHandFannedLayout(st, idx)
-        this.scene.tweens.add({
-          targets: card.container,
-          x,
-          y,
-          rotation: 0,
-          duration: Time.cardFocus,
-          ease: 'Sine.easeOut',
-        })
-      } else {
-        const n = st.hand[0].length
-        const [x, y] = this.ourHandRestPosition(st, idx)
-        this.scene.tweens.add({
-          targets: card.container,
-          x,
-          y,
-          rotation: this.ourHandRestFanRotation(idx, n),
-          duration: Time.cardFocus,
-          ease: 'Sine.easeOut',
-        })
-      }
-    })
   }
 
   // TUTORIAL

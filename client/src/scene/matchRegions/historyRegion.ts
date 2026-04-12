@@ -92,8 +92,6 @@ export default class HistoryRegion extends Region {
       f: () => this.skipCallback(),
     }).setVisible(false)
 
-    this.addHotkeyHint([x, yDelta], 'R')
-
     this.btnSpeed = new Buttons.Icon({
       name: 'Speed',
       within: this.container,
@@ -115,7 +113,5 @@ export default class HistoryRegion extends Region {
         this.scene.signalError(`YOUR SPEED: ${newSpeed * 10}x`)
       },
     })
-
-    this.addHotkeyHint([x, -yDelta], 'E')
   }
 }

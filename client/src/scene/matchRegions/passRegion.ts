@@ -163,9 +163,6 @@ export default class PassRegion extends Region {
         )
       }
     })
-
-    this.addHotkeyHint([x, 0], 'SPACE')
-    this.addHotkeyHint([-x, 0], 'SPACE').setRotation(Math.PI)
   }
 
   private createText(): void {
