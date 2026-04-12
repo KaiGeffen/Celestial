@@ -145,7 +145,7 @@ export default abstract class AvatarRegionBase extends Region {
     // Otherwise show frozen `timers[i]` (opponent's turn or game over).
     const shouldLiveTick =
       state.winner === null &&
-      !state.isRecap &&
+      // !state.isRecap &&
       (state.priority === i || (inMulligan && !state.mulligansComplete[i]))
 
     const applyText = () => {
