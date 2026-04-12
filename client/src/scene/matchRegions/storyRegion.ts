@@ -42,6 +42,9 @@ export default class StoryRegion extends Region {
 
   private resolveBubbles: StoryResolveBubbles
 
+  /** Pending stagger timers for resolve bubbles (cancelled when `displayState` rebuilds). */
+  private bubbleStaggerEvents: Phaser.Time.TimerEvent[] = []
+
   // Callback that plays when ith card in recap is clicked on
   callback: (i: number) => () => void
 
@@ -60,7 +63,15 @@ export default class StoryRegion extends Region {
     return this
   }
 
+  private clearBubbleStaggerEvents(): void {
+    this.bubbleStaggerEvents.forEach((e) => {
+      this.scene.time.removeEvent(e)
+    })
+    this.bubbleStaggerEvents = []
+  }
+
   displayState(state: GameModel): void {
+    this.clearBubbleStaggerEvents()
     this.deleteTemp()
 
     const resolvedCount = state.story.resolvedActs.length
@@ -107,33 +118,79 @@ export default class StoryRegion extends Region {
 
       card.container.setScale(SHRUNKEN_CARD_SCALE)
 
-      // Every resolved card needs a bubble so setResolved keeps art faded; only the
-      // newest resolve this frame tweens from the points stat to center.
       const tweenBubbleFromStat =
         oneNewResolvedAct && resolvedI === resolvedCount - 1
-      this.resolveBubbles.addPointsResolveCircle(card, tweenBubbleFromStat)
 
       const nourishAmt = this.resolvedNourishByActIndex[resolvedI] ?? 0
-      const tweenNourishFromStatus =
-        oneNewResolvedAct && resolvedI === resolvedCount - 1 && nourishAmt !== 0
-      this.resolveBubbles.addNourishResolveCircle(
-        card,
-        tweenNourishFromStatus,
-        nourishAmt,
-      )
-
       const pointsEarned = this.resolvedPointsEarnedByActIndex[resolvedI] ?? 0
       const pointsStat = act.card.basePoints
       const effectAmt = pointsEarned - pointsStat - nourishAmt
+
+      const tweenNourishFromStatus =
+        oneNewResolvedAct && resolvedI === resolvedCount - 1 && nourishAmt !== 0
       const tweenEffectsFromStatus =
         oneNewResolvedAct && resolvedI === resolvedCount - 1 && effectAmt !== 0
-      this.resolveBubbles.addEffectsResolveCircle(
-        card,
-        tweenEffectsFromStatus,
-        effectAmt,
-      )
 
-      card.setResolved(tweenBubbleFromStat).moveToTopOnHover()
+      const shouldStagger =
+        oneNewResolvedAct && resolvedI === resolvedCount - 1
+      const r = Time.recapTween()
+      const pushBubbleStep = (delay: number, fn: () => void) => {
+        const ev = this.scene.time.delayedCall(delay, () => {
+          if (!card.container.active) {
+            return
+          }
+          fn()
+        })
+        this.bubbleStaggerEvents.push(ev)
+      }
+
+      if (shouldStagger) {
+        pushBubbleStep(0, () => {
+          this.resolveBubbles.addPointsResolveCircle(
+            card,
+            tweenBubbleFromStat,
+            pointsStat,
+          )
+        })
+        let delay = r
+        if (nourishAmt !== 0) {
+          pushBubbleStep(delay, () => {
+            this.resolveBubbles.addNourishResolveCircle(
+              card,
+              tweenNourishFromStatus,
+              nourishAmt,
+            )
+          })
+          delay += r
+        }
+        if (effectAmt !== 0) {
+          pushBubbleStep(delay, () => {
+            this.resolveBubbles.addEffectsResolveCircle(
+              card,
+              tweenEffectsFromStatus,
+              effectAmt,
+            )
+          })
+        }
+      } else {
+        this.resolveBubbles.addPointsResolveCircle(
+          card,
+          tweenBubbleFromStat,
+          pointsStat,
+        )
+        this.resolveBubbles.addNourishResolveCircle(
+          card,
+          tweenNourishFromStatus,
+          nourishAmt,
+        )
+        this.resolveBubbles.addEffectsResolveCircle(
+          card,
+          tweenEffectsFromStatus,
+          effectAmt,
+        )
+      }
+
+      card.setResolved().moveToTopOnHover()
 
       this.temp.push(card)
     }
@@ -328,8 +385,12 @@ class StoryResolveBubbles {
    * Ring + points for a resolved act. {@link CardImage.setResolved} keeps the bubble
    * and fades the rest — so every resolved row must have one.
    */
-  addPointsResolveCircle(card: CardImage, tweenFromStat: boolean): void {
-    const pts = card.points ?? card.card.points
+  addPointsResolveCircle(
+    card: CardImage,
+    tweenFromStat: boolean,
+    displayPts?: number,
+  ): void {
+    const pts = displayPts ?? card.points ?? card.card.points
     const bx = tweenFromStat ? card.txtPoints.x : 0
     const by = tweenFromStat ? card.txtPoints.y : 0
     const bubble = this.scene.add.container(bx, by)

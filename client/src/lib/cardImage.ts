@@ -1,6 +1,6 @@
 import 'phaser'
 import Catalog from '../../../shared/state/catalog'
-import { Color, Style, BBStyle, Space, Flags, Time } from '../settings/settings'
+import { Color, Style, BBStyle, Space, Flags } from '../settings/settings'
 import Card from '../../../shared/state/card'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import BaseScene from '../scene/baseScene'
@@ -19,9 +19,6 @@ export const STORY_RESOLVE_NOURISH_BUBBLE_NAME = 'storyNourishBubble'
 
 /** Bonus/malus from card text (story position, etc.); not the points stat nor nourish. */
 export const STORY_RESOLVE_EFFECTS_BUBBLE_NAME = 'storyEffectsBubble'
-
-/** Resolved story cards: main art stays slightly visible; other chrome fades out. */
-const STORY_RESOLVED_SUBJECT_ALPHA = 0.3
 
 // TODO Many fields should be private
 
@@ -187,61 +184,9 @@ export class CardImage {
   }
 
   // Set that a card has resolved (In the story)
-  /** @param animateFade If a bubble is present, tween non-bubble layers; subject ends dimmed; otherwise set alpha immediately (rebuilt older resolves). */
-  setResolved(animateFade = false): this {
-    const hasBubble =
-      this.findChildByName(STORY_RESOLVE_BUBBLE_NAME) !== undefined ||
-      this.findChildByName(STORY_RESOLVE_NOURISH_BUBBLE_NAME) !== undefined ||
-      this.findChildByName(STORY_RESOLVE_EFFECTS_BUBBLE_NAME) !== undefined
-    if (hasBubble) {
-      this.eachDirectChild((child) => {
-        if (this.isStoryResolveBubbleChild(child.name)) return
-        const go = child as Phaser.GameObjects.GameObject &
-          Phaser.GameObjects.Components.AlphaSingle
-        const endAlpha =
-          child === this.imageSubject ? STORY_RESOLVED_SUBJECT_ALPHA : 0
-        if (animateFade) {
-          this.scene.tweens.add({
-            targets: go,
-            alpha: endAlpha,
-            duration: Time.recapTween(),
-            ease: 'Sine.easeInOut',
-          })
-        } else {
-          go.setAlpha(endAlpha)
-        }
-      })
-    } else {
-      this.setTint(Color.cardGreyed)
-    }
+  setResolved(): this {
+    this.setTint(Color.cardGreyed)
     return this
-  }
-
-  private isStoryResolveBubbleChild(name: string): boolean {
-    return (
-      name === STORY_RESOLVE_BUBBLE_NAME ||
-      name === STORY_RESOLVE_NOURISH_BUBBLE_NAME ||
-      name === STORY_RESOLVE_EFFECTS_BUBBLE_NAME
-    )
-  }
-
-  private findChildByName(
-    name: string,
-  ): Phaser.GameObjects.GameObject | undefined {
-    if (this.container instanceof Phaser.GameObjects.Container) {
-      return this.container.list.find((c) => c.name === name)
-    }
-    return this.container.getChildren().find((c) => c.name === name)
-  }
-
-  private eachDirectChild(
-    fn: (child: Phaser.GameObjects.GameObject) => void,
-  ): void {
-    if (this.container instanceof Phaser.GameObjects.Container) {
-      this.container.list.forEach(fn)
-    } else {
-      this.container.getChildren().forEach(fn)
-    }
   }
 
   setPosition(position: [number, number]): this {
