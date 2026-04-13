@@ -1,10 +1,5 @@
 import 'phaser'
-import {
-  CardImage,
-  STORY_RESOLVE_BUBBLE_NAME,
-  STORY_RESOLVE_NOURISH_BUBBLE_NAME,
-  STORY_RESOLVE_EFFECTS_BUBBLE_NAME,
-} from '../../lib/cardImage'
+import { CardImage } from '../../lib/cardImage'
 import GameModel from '../../../../shared/state/gameModel'
 import {
   Space,
@@ -41,6 +36,7 @@ export default class StoryRegion extends Region {
   private resolvedPointsEarnedByActIndex: number[] = []
 
   private resolveBubbles: StoryResolveBubbles
+  private resolveBubbleLayer: Phaser.GameObjects.Container
 
   /** Pending stagger timers for resolve bubbles (cancelled when `displayState` rebuilds). */
   private bubbleStaggerEvents: Phaser.Time.TimerEvent[] = []
@@ -54,7 +50,10 @@ export default class StoryRegion extends Region {
   create(scene: MatchScene): StoryRegion {
     this.scene = scene
     this.lastScores = [0, 0]
-    this.resolveBubbles = new StoryResolveBubbles(scene)
+    this.resolveBubbleLayer = scene.add
+      .container(0, 0)
+      .setDepth(Depth.aboveOtherCards)
+    this.resolveBubbles = new StoryResolveBubbles(scene, this.resolveBubbleLayer)
 
     this.container = scene.add
       .container(0, Space.handHeight)
@@ -72,6 +71,7 @@ export default class StoryRegion extends Region {
 
   displayState(state: GameModel): void {
     this.clearBubbleStaggerEvents()
+    this.resolveBubbles.clear()
     this.deleteTemp()
 
     const resolvedCount = state.story.resolvedActs.length
@@ -367,7 +367,27 @@ class StoryResolveBubbles {
     return corner === 'bottomRight' ? { x: d, y: d } : { x: -d, y: d }
   }
 
-  constructor(private readonly scene: Phaser.Scene) {}
+  constructor(
+    private readonly scene: Phaser.Scene,
+    private readonly layer: Phaser.GameObjects.Container,
+  ) {}
+
+  clear(): void {
+    this.layer.removeAll(true)
+  }
+
+  private localToWorld(
+    target: Phaser.GameObjects.GameObject,
+    x: number,
+    y: number,
+  ): Phaser.Math.Vector2 {
+    const container = target as Phaser.GameObjects.Container
+    const m = container.getWorldTransformMatrix()
+    return new Phaser.Math.Vector2(
+      m.tx + m.a * x + m.c * y,
+      m.ty + m.b * x + m.d * y,
+    )
+  }
 
   private static setBubbleDisplaySize(
     img: Phaser.GameObjects.Image,
@@ -393,10 +413,11 @@ class StoryResolveBubbles {
    */
   addPointsResolveCircle(card: CardImage, tweenFromStat: boolean): void {
     const pts = card.points ?? card.card.points
-    const bx = tweenFromStat ? card.txtPoints.x : 0
-    const by = tweenFromStat ? card.txtPoints.y : 0
-    const bubble = this.scene.add.container(bx, by)
-    bubble.name = STORY_RESOLVE_BUBBLE_NAME
+    const start = tweenFromStat
+      ? this.localToWorld(card.container, card.txtPoints.x, card.txtPoints.y)
+      : this.localToWorld(card.container, 0, 0)
+    const end = this.localToWorld(card.container, 0, 0)
+    const bubble = this.scene.add.container(start.x, start.y)
 
     const bubbleImg = StoryResolveBubbles.createBubbleImage(
       this.scene,
@@ -424,9 +445,7 @@ class StoryResolveBubbles {
       .setOrigin(0.5)
 
     bubble.add([bubbleImg, txtPts])
-
-    const parent = card.container as Phaser.GameObjects.Container
-    parent.addAt(bubble, parent.getIndex(card.txtPoints))
+    this.layer.add(bubble)
 
     if (tweenFromStat) {
       const grow = {
@@ -435,8 +454,8 @@ class StoryResolveBubbles {
       }
       this.scene.tweens.add({
         targets: bubble,
-        x: 0,
-        y: 0,
+        x: end.x,
+        y: end.y,
         duration: Time.recapTween(),
         ease: 'Sine.easeInOut',
       })
@@ -466,27 +485,20 @@ class StoryResolveBubbles {
   ): void {
     if (nourishAmt === 0) return
 
-    const parent = card.container
-    if (!(parent instanceof Phaser.GameObjects.Container)) return
-
-    const { x: endX, y: endY } =
+    const { x: endLocalX, y: endLocalY } =
       StoryResolveBubbles.secondaryBubbleRestAtMainCorner('bottomRight')
+    const end = this.localToWorld(card.container, endLocalX, endLocalY)
 
-    let bx: number
-    let by: number
+    let bx = end.x
+    let by = end.y
     if (tweenFromStatus) {
       const cam = this.scene.cameras.main
       const world = cam.getWorldPoint(cam.width / 2, cam.height - 200)
-      const local = parent.pointToContainer(world)
-      bx = local.x
-      by = local.y
-    } else {
-      bx = endX
-      by = endY
+      bx = world.x
+      by = world.y
     }
 
     const bubble = this.scene.add.container(bx, by)
-    bubble.name = STORY_RESOLVE_NOURISH_BUBBLE_NAME
 
     const nourishBubbleImg = StoryResolveBubbles.createBubbleImage(
       this.scene,
@@ -515,14 +527,7 @@ class StoryResolveBubbles {
       .setOrigin(0.5)
 
     bubble.add([nourishBubbleImg, txtNourish])
-
-    const pointsBubble = parent.list.find(
-      (c) => c.name === STORY_RESOLVE_BUBBLE_NAME,
-    )
-    const insertAt = pointsBubble
-      ? parent.getIndex(pointsBubble) + 1
-      : parent.getIndex(card.txtPoints)
-    parent.addAt(bubble, insertAt)
+    this.layer.add(bubble)
 
     if (tweenFromStatus) {
       const grow = {
@@ -531,8 +536,8 @@ class StoryResolveBubbles {
       }
       this.scene.tweens.add({
         targets: bubble,
-        x: endX,
-        y: endY,
+        x: end.x,
+        y: end.y,
         duration: Time.recapTween(),
         ease: 'Sine.easeInOut',
       })
@@ -566,24 +571,19 @@ class StoryResolveBubbles {
   ): void {
     if (effectAmt === 0) return
 
-    const parent = card.container
-    if (!(parent instanceof Phaser.GameObjects.Container)) return
-
-    const { x: endX, y: endY } =
+    const { x: endLocalX, y: endLocalY } =
       StoryResolveBubbles.secondaryBubbleRestAtMainCorner('bottomLeft')
+    const end = this.localToWorld(card.container, endLocalX, endLocalY)
 
-    let bx: number
-    let by: number
+    let bx = end.x
+    let by = end.y
     if (tweenFromEffectText) {
-      bx = card.txtText.x
-      by = card.txtText.y
-    } else {
-      bx = endX
-      by = endY
+      const start = this.localToWorld(card.container, card.txtText.x, card.txtText.y)
+      bx = start.x
+      by = start.y
     }
 
     const bubble = this.scene.add.container(bx, by)
-    bubble.name = STORY_RESOLVE_EFFECTS_BUBBLE_NAME
 
     const effectsBubbleImg = StoryResolveBubbles.createBubbleImage(
       this.scene,
@@ -612,19 +612,7 @@ class StoryResolveBubbles {
       .setOrigin(0.5)
 
     bubble.add([effectsBubbleImg, txtFx])
-
-    const nourishBubble = parent.list.find(
-      (c) => c.name === STORY_RESOLVE_NOURISH_BUBBLE_NAME,
-    )
-    const pointsBubble = parent.list.find(
-      (c) => c.name === STORY_RESOLVE_BUBBLE_NAME,
-    )
-    const insertAt = nourishBubble
-      ? parent.getIndex(nourishBubble) + 1
-      : pointsBubble
-        ? parent.getIndex(pointsBubble) + 1
-        : parent.getIndex(card.txtPoints)
-    parent.addAt(bubble, insertAt)
+    this.layer.add(bubble)
 
     if (tweenFromEffectText) {
       const grow = {
@@ -633,8 +621,8 @@ class StoryResolveBubbles {
       }
       this.scene.tweens.add({
         targets: bubble,
-        x: endX,
-        y: endY,
+        x: end.x,
+        y: end.y,
         duration: Time.recapTween(),
         ease: 'Sine.easeInOut',
       })
