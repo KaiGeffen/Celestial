@@ -25,6 +25,8 @@ export default class Moon extends Button {
       },
     })
 
+    this.icon.setScale(0.8)
+
     // Rotate 180 since moon always viewed upside down
     this.txt.setRotation(Math.PI).setAlign('center')
   }

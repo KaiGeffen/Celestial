@@ -458,9 +458,9 @@ export const assetLists = {
       "bubbleEffect",
       "bubbleNourish",
       "nameplate",
-      "nameplate",
       "replayControls",
       "stackCount",
+      "sundial",
       "wins"
     ],
     "pixelArt": false

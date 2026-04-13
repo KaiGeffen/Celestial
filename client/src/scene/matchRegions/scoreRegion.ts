@@ -21,6 +21,7 @@ const ARC_FIRST_RAD = (ARC_FIRST_DEG * Math.PI) / 180
 const ARC_LAST_RAD = ((ARC_FIRST_DEG + ARC_SPAN_DEG) * Math.PI) / 180
 
 export default class WinsRegion extends Region {
+  private imgSundial: Phaser.GameObjects.Image
   private ourGems: Phaser.GameObjects.Image[] = []
   private theirGems: Phaser.GameObjects.Image[] = []
 
@@ -28,13 +29,21 @@ export default class WinsRegion extends Region {
     this.scene = scene
     this.container = scene.add.container(0, 0).setDepth(Depth.ourScore)
 
+    this.imgSundial = scene.add.image(0, 0, 'chrome-sundial').setOrigin(1, 0.5)
+    this.container.add(this.imgSundial)
+
     scene.plugins.get('rexAnchor')['add'](this.container, {
       x: `100%`,
       y: `50%`,
+      onUpdateViewportCallback: (viewport) => {
+        const h = viewport.height * 0.7
+        const aspect =
+          this.imgSundial.frame.width / this.imgSundial.frame.height
+        this.imgSundial.setDisplaySize(h * aspect, h)
+      },
     })
 
     this.createGems()
-    this.container.setVisible(false)
 
     return this
   }

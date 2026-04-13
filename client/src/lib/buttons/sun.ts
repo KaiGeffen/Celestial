@@ -27,6 +27,8 @@ export default class Sun extends Button {
         click: f,
       },
     })
+
+    this.icon.setScale(0.8)
   }
 
   enable() {
