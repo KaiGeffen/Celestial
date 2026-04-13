@@ -5,13 +5,13 @@ import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
 const HALF_WINS_BEFORE_FINAL = 4
-const LOTUS_SCALE = 0.5
+const LOTUS_SCALE = 0.6
 
 // Hand-tuned slot positions to match the vine arc.
 // Top and bottom should mirror each other.
-const SMALL_LOTUS_X = [18, 12, 6, 0]
-const TOP_SMALL_LOTUS_Y = [-250, -204, -158, -112]
-const BOTTOM_SMALL_LOTUS_Y = [112, 158, 204, 250]
+const SMALL_LOTUS_X = [160, 140, 80, 30]
+const BOTTOM_SMALL_LOTUS_Y = [235, 166, 131, 83]
+const TOP_SMALL_LOTUS_Y = BOTTOM_SMALL_LOTUS_Y.map((y) => -y)
 
 const TEX_SMALL_OPEN = 'chrome-smallLotusOpen'
 const TEX_SMALL_CLOSED = 'chrome-smallLotusClosed'
@@ -28,7 +28,7 @@ export default class WinsRegion extends Region {
     this.container = scene.add.container(0, 0).setDepth(Depth.ourScore)
 
     scene.plugins.get('rexAnchor')['add'](this.container, {
-      x: `0%+140`,
+      x: `0%+70`,
       y: `50%`,
     })
 
@@ -43,7 +43,9 @@ export default class WinsRegion extends Region {
     const theirWins = state.wins?.[1] ?? 0
 
     for (let i = 0; i < HALF_WINS_BEFORE_FINAL; i++) {
-      this.ourLotuses[i].setTexture(i < ourWins ? TEX_SMALL_OPEN : TEX_SMALL_CLOSED)
+      this.ourLotuses[i].setTexture(
+        i < ourWins ? TEX_SMALL_OPEN : TEX_SMALL_CLOSED,
+      )
     }
 
     for (let i = 0; i < HALF_WINS_BEFORE_FINAL; i++) {
@@ -65,12 +67,7 @@ export default class WinsRegion extends Region {
       this.theirLotuses.push(topLotus)
     }
 
-    // Final 5th win (shared middle lotus)
-    this.finalLotus = this.scene.add
-      .image(0, 0, TEX_BIG_CLOSED)
-      .setScale(LOTUS_SCALE)
-    this.container.add(this.finalLotus)
-
+    // Bottom row of small lotuses
     for (let i = 0; i < HALF_WINS_BEFORE_FINAL; i++) {
       const bottomLotus = this.scene.add
         .image(SMALL_LOTUS_X[i], BOTTOM_SMALL_LOTUS_Y[i], TEX_SMALL_CLOSED)
@@ -78,5 +75,11 @@ export default class WinsRegion extends Region {
       this.container.add(bottomLotus)
       this.ourLotuses.push(bottomLotus)
     }
+
+    // Final 5th win (shared middle lotus)
+    this.finalLotus = this.scene.add
+      .image(0, 0, TEX_BIG_CLOSED)
+      .setScale(LOTUS_SCALE)
+    this.container.add(this.finalLotus)
   }
 }
