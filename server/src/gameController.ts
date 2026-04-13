@@ -84,7 +84,6 @@ class ServerController {
         this.model.passes = 0
         this.model.lastPlayerWhoPlayed = player
         this.model.switchPriority()
-        this.model.versionIncrClearAnimations()
         return true
       } else {
         return false
@@ -109,6 +108,9 @@ class ServerController {
   private attemptPlay(player: number, cardNum: number): boolean {
     if (this.canPlay(player, cardNum)) {
       this.model.sound = null
+      // Clear prior animations and bump version before resolving play, so effects
+      // during play() (e.g. Heart → Story→Discard) stay on the outgoing state.
+      this.model.versionIncrClearAnimations()
       this.play(player, cardNum)
       return true
     } else {
