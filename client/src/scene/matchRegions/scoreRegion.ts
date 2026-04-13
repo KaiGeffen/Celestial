@@ -7,11 +7,11 @@ import { MatchScene } from '../matchScene'
 const GEM_COUNT = 5
 
 // Match `PassRegion` sun distance from the right edge (`x = -156`).
-const SUN_X_FROM_RIGHT = 156
+const SUN_X_FROM_RIGHT = 110
 
 // Circle center is far offscreen to the right; the sun's center lies on that circle.
 // If the sun is the left-most point on the circle: centerX = sunX + radius.
-const CIRCLE_RADIUS = 360
+const CIRCLE_RADIUS = 345
 const CIRCLE_CENTER_X_FROM_RIGHT = SUN_X_FROM_RIGHT - CIRCLE_RADIUS // positive -> offscreen right
 
 // Their gems sit above the sun, ours below it, on the same circle.
@@ -19,6 +19,12 @@ const ARC_FIRST_DEG = 22
 const ARC_SPAN_DEG = 20
 const ARC_FIRST_RAD = (ARC_FIRST_DEG * Math.PI) / 180
 const ARC_LAST_RAD = ((ARC_FIRST_DEG + ARC_SPAN_DEG) * Math.PI) / 180
+
+/** Rotate icon-win so its “out” direction matches the radial (+90° from prior tuning). */
+const WIN_PIP_ROTATION_OFFSET = Math.PI
+
+/** TODO: set false once win fill/dim behavior is finalized */
+const TEST_ALL_WIN_PIPS_FULLY_VISIBLE = true
 
 export default class WinsRegion extends Region {
   private imgSundial: Phaser.GameObjects.Image
@@ -51,6 +57,14 @@ export default class WinsRegion extends Region {
   displayState(state: GameModel): void {
     const ourWins = state.wins?.[0] ?? 0
     const theirWins = state.wins?.[1] ?? 0
+
+    if (TEST_ALL_WIN_PIPS_FULLY_VISIBLE) {
+      for (let i = 0; i < GEM_COUNT; i++) {
+        this.ourGems[i].setAlpha(1)
+        this.theirGems[i].setAlpha(1)
+      }
+      return
+    }
 
     for (let i = 0; i < GEM_COUNT; i++) {
       const filled = i < ourWins
@@ -85,7 +99,11 @@ export default class WinsRegion extends Region {
         const x = circleCenterX + Math.cos(theta) * radius
         const y = circleCenterY + Math.sin(theta) * radius
 
+        const dx = x - circleCenterX
+        const dy = y - circleCenterY
+
         const gem = this.scene.add.image(x, y, 'icon-win')
+        gem.setRotation(Math.atan2(dy, dx) + WIN_PIP_ROTATION_OFFSET)
         if (tint !== undefined) {
           gem.setTint(tint)
         }
