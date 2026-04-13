@@ -4,37 +4,36 @@ import { Depth } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
-const GEM_COUNT = 5
+const HALF_WINS_BEFORE_FINAL = 4
+const LOTUS_SCALE = 0.5
 
-// Match `PassRegion` sun distance from the right edge (`x = -156`).
-const SUN_X_FROM_RIGHT = 156
+// Hand-tuned slot positions to match the vine arc.
+// Top and bottom should mirror each other.
+const SMALL_LOTUS_X = [18, 12, 6, 0]
+const TOP_SMALL_LOTUS_Y = [-250, -204, -158, -112]
+const BOTTOM_SMALL_LOTUS_Y = [112, 158, 204, 250]
 
-// Circle center is far offscreen to the right; the sun's center lies on that circle.
-// If the sun is the left-most point on the circle: centerX = sunX + radius.
-const CIRCLE_RADIUS = 360
-const CIRCLE_CENTER_X_FROM_RIGHT = SUN_X_FROM_RIGHT - CIRCLE_RADIUS // positive -> offscreen right
-
-// Their gems sit above the sun, ours below it, on the same circle.
-const ARC_FIRST_DEG = 22
-const ARC_SPAN_DEG = 20
-const ARC_FIRST_RAD = (ARC_FIRST_DEG * Math.PI) / 180
-const ARC_LAST_RAD = ((ARC_FIRST_DEG + ARC_SPAN_DEG) * Math.PI) / 180
+const TEX_SMALL_OPEN = 'chrome-smallLotusOpen'
+const TEX_SMALL_CLOSED = 'chrome-smallLotusClosed'
+const TEX_BIG_OPEN = 'chrome-bigLotusOpen'
+const TEX_BIG_CLOSED = 'chrome-bigLotusClosed'
 
 export default class WinsRegion extends Region {
-  private ourGems: Phaser.GameObjects.Image[] = []
-  private theirGems: Phaser.GameObjects.Image[] = []
+  private ourLotuses: Phaser.GameObjects.Image[] = []
+  private theirLotuses: Phaser.GameObjects.Image[] = []
+  private finalLotus: Phaser.GameObjects.Image
 
   create(scene: MatchScene): this {
     this.scene = scene
     this.container = scene.add.container(0, 0).setDepth(Depth.ourScore)
 
     scene.plugins.get('rexAnchor')['add'](this.container, {
-      x: `100%`,
+      x: `0%+140`,
       y: `50%`,
     })
 
-    this.createGems()
-    this.container.setVisible(false)
+    this.createLotuses()
+    this.container.setVisible(true)
 
     return this
   }
@@ -43,60 +42,41 @@ export default class WinsRegion extends Region {
     const ourWins = state.wins?.[0] ?? 0
     const theirWins = state.wins?.[1] ?? 0
 
-    for (let i = 0; i < GEM_COUNT; i++) {
-      const filled = i < ourWins
-      this.ourGems[i].setAlpha(filled ? 1 : 0.25)
+    for (let i = 0; i < HALF_WINS_BEFORE_FINAL; i++) {
+      this.ourLotuses[i].setTexture(i < ourWins ? TEX_SMALL_OPEN : TEX_SMALL_CLOSED)
     }
 
-    for (let i = 0; i < GEM_COUNT; i++) {
-      const filled = i < theirWins
-      this.theirGems[i].setAlpha(filled ? 1 : 0.25)
+    for (let i = 0; i < HALF_WINS_BEFORE_FINAL; i++) {
+      this.theirLotuses[i].setTexture(
+        i < theirWins ? TEX_SMALL_OPEN : TEX_SMALL_CLOSED,
+      )
     }
+
+    const finalWon = ourWins >= 5 || theirWins >= 5
+    this.finalLotus.setTexture(finalWon ? TEX_BIG_OPEN : TEX_BIG_CLOSED)
   }
 
-  private createGems(): void {
-    // Container origin is at the right edge (x=0). Offscreen right is +x.
-    const circleCenterX = -CIRCLE_CENTER_X_FROM_RIGHT
-    const circleCenterY = 0
-    const radius = CIRCLE_RADIUS
-
-    // "Sun center" point on the circle (left-most point).
-    // const sunX = -SUN_X_FROM_RIGHT
-    // const sunY = 0
-
-    const makeArcRad = (
-      out: Phaser.GameObjects.Image[],
-      startRad: number,
-      endRad: number,
-      tint?: number,
-    ) => {
-      for (let i = 0; i < GEM_COUNT; i++) {
-        const t = i / (GEM_COUNT - 1)
-        const theta = startRad + (endRad - startRad) * t
-        const x = circleCenterX + Math.cos(theta) * radius
-        const y = circleCenterY + Math.sin(theta) * radius
-
-        const gem = this.scene.add.image(x, y, 'icon-win')
-        if (tint !== undefined) {
-          gem.setTint(tint)
-        }
-        this.container.add(gem)
-        out.push(gem)
-      }
+  private createLotuses(): void {
+    for (let i = 0; i < HALF_WINS_BEFORE_FINAL; i++) {
+      const topLotus = this.scene.add
+        .image(SMALL_LOTUS_X[i], TOP_SMALL_LOTUS_Y[i], TEX_SMALL_CLOSED)
+        .setScale(LOTUS_SCALE)
+      this.container.add(topLotus)
+      this.theirLotuses.push(topLotus)
     }
 
-    // Sun point is at angle π (left-most point).
-    const sunTheta = Math.PI
+    // Final 5th win (shared middle lotus)
+    this.finalLotus = this.scene.add
+      .image(0, 0, TEX_BIG_CLOSED)
+      .setScale(LOTUS_SCALE)
+    this.container.add(this.finalLotus)
 
-    // Their gems: above the sun (approaching the sun from above).
-    makeArcRad(
-      this.theirGems,
-      sunTheta - ARC_LAST_RAD,
-      sunTheta - ARC_FIRST_RAD,
-      0x111111,
-    )
-
-    // Our gems: below the sun (departing the sun downward).
-    makeArcRad(this.ourGems, sunTheta + ARC_FIRST_RAD, sunTheta + ARC_LAST_RAD)
+    for (let i = 0; i < HALF_WINS_BEFORE_FINAL; i++) {
+      const bottomLotus = this.scene.add
+        .image(SMALL_LOTUS_X[i], BOTTOM_SMALL_LOTUS_Y[i], TEX_SMALL_CLOSED)
+        .setScale(LOTUS_SCALE)
+      this.container.add(bottomLotus)
+      this.ourLotuses.push(bottomLotus)
+    }
   }
 }
