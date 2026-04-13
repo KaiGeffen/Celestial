@@ -4,18 +4,14 @@ import Button from '../../lib/buttons/button'
 import GameModel from '../../../../shared/state/gameModel'
 import {
   Style,
-  Color,
-  Space,
   Time,
   Ease,
-  Flags,
   UserSettings,
   Depth,
   Messages,
 } from '../../settings/settings'
 import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
-import { MechanicsSettings } from '../../../../shared/settings'
 import Buttons from '../../lib/buttons/buttons'
 import { server } from '../../server'
 
@@ -171,14 +167,18 @@ export default class PassRegion extends Region {
     this.yourPass = this.scene.add.container(-150, 80).setAlpha(0)
 
     // Them
-    const cloud = this.scene.add.image(0, 0, 'chrome-CloudBottom')
+    const cloud = this.scene.add
+      .image(0, 0, 'chrome-CloudBottom')
+      .setScale(0.8)
     const text = this.scene.add
       .text(0, 20, 'Passed', Style.todoCloud)
       .setOrigin(0.5)
     this.theirPass.add([cloud, text])
 
     // Me
-    const cloud2 = this.scene.add.image(0, -20, 'chrome-CloudTop')
+    const cloud2 = this.scene.add
+      .image(0, -20, 'chrome-CloudTop')
+      .setScale(0.8)
     const text2 = this.scene.add
       .text(0, 0, 'Passed', Style.todoCloud)
       .setOrigin(0.5)

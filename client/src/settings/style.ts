@@ -46,13 +46,13 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   // Pass button
   pass: {
     fontFamily: altFont,
-    fontSize: Flags.mobile ? '30px' : '40px',
+    fontSize: '32px',
     color: Color.passText,
   },
   // Moon button
   moon: {
     fontFamily: altFont,
-    fontSize: Flags.mobile ? '40px' : '60px',
+    fontSize: '48px',
     color: Color.passText,
   },
   // Surname for characters in premade deck
@@ -153,7 +153,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   },
   todoCloud: {
     fontFamily: altFont,
-    fontSize: '30px',
+    fontSize: '24px',
     color: Color.passText,
     stroke: '#fff',
     strokeThickness: 2,
