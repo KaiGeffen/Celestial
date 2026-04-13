@@ -155,6 +155,7 @@ export default class StoryRegion extends Region {
               card,
               tweenNourishFromStatus,
               nourishAmt,
+              act.owner,
             )
           })
           delay += r
@@ -174,6 +175,7 @@ export default class StoryRegion extends Region {
           card,
           tweenNourishFromStatus,
           nourishAmt,
+          act.owner,
         )
         this.resolveBubbles.addEffectsResolveCircle(
           card,
@@ -482,6 +484,7 @@ class StoryResolveBubbles {
     card: CardImage,
     tweenFromStatus: boolean,
     nourishAmt: number,
+    owner: number,
   ): void {
     if (nourishAmt === 0) return
 
@@ -493,7 +496,8 @@ class StoryResolveBubbles {
     let by = end.y
     if (tweenFromStatus) {
       const cam = this.scene.cameras.main
-      const world = cam.getWorldPoint(cam.width / 2, cam.height - 200)
+      const sourceY = owner === 1 ? 200 : cam.height - 200
+      const world = cam.getWorldPoint(cam.width / 2, sourceY)
       bx = world.x
       by = world.y
     }
