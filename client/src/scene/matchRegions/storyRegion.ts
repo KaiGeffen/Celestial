@@ -150,14 +150,13 @@ export default class StoryRegion extends Region {
         })
         let delay = r
         if (nourishAmt !== 0) {
-          pushBubbleStep(delay, () => {
-            this.resolveBubbles.addNourishResolveCircle(
-              card,
-              tweenNourishFromStatus,
-              nourishAmt,
-              act.owner,
-            )
-          })
+          this.resolveBubbles.addNourishResolveCircle(
+            card,
+            tweenNourishFromStatus,
+            nourishAmt,
+            act.owner,
+            delay,
+          )
           delay += r
         }
         if (effectAmt !== 0) {
@@ -485,6 +484,7 @@ class StoryResolveBubbles {
     tweenFromStatus: boolean,
     nourishAmt: number,
     owner: number,
+    moveDelayMs: number = 0,
   ): void {
     if (nourishAmt === 0) return
 
@@ -542,6 +542,7 @@ class StoryResolveBubbles {
         targets: bubble,
         x: end.x,
         y: end.y,
+        delay: moveDelayMs,
         duration: Time.recapTween(),
         ease: 'Sine.easeInOut',
       })
@@ -549,6 +550,7 @@ class StoryResolveBubbles {
         targets: grow,
         fontPx: StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
         radius: StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE,
+        delay: moveDelayMs,
         duration: Time.recapTween(),
         ease: 'Sine.easeInOut',
         onUpdate: () => {
