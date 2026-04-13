@@ -394,7 +394,7 @@ export const assetLists = {
     "files": [
       "Light",
       "matchOuter",
-      "old matchOuter",
+      "matchOuter",
       "water"
     ],
     "pixelArt": false
