@@ -112,6 +112,6 @@ export default class HistoryRegion extends Region {
 
         this.scene.signalError(`YOUR SPEED: ${newSpeed * 10}x`)
       },
-    })
+    }).setVisible(false)
   }
 }

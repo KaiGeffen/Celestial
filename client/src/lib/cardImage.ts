@@ -219,7 +219,8 @@ export class CardImage {
   setCard(card: Card): this {
     if (
       this.card.id !== card.id ||
-      this.card.upgradeVersion !== card.upgradeVersion
+      this.card.upgradeVersion !== card.upgradeVersion ||
+      this.points !== card.points
     ) {
       this.card = card
 

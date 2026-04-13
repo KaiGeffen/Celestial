@@ -14,7 +14,7 @@ const SUN_X_FROM_RIGHT = 110
 const CIRCLE_RADIUS = 345
 const CIRCLE_CENTER_X_FROM_RIGHT = SUN_X_FROM_RIGHT - CIRCLE_RADIUS // positive -> offscreen right
 
-// Their gems sit above the sun, ours below it, on the same circle.
+// Our gems sit above the sun, theirs below it, on the same circle.
 const ARC_FIRST_DEG = 22
 const ARC_SPAN_DEG = 20
 const ARC_FIRST_RAD = (ARC_FIRST_DEG * Math.PI) / 180
@@ -23,8 +23,10 @@ const ARC_LAST_RAD = ((ARC_FIRST_DEG + ARC_SPAN_DEG) * Math.PI) / 180
 /** Rotate icon-win so its “out” direction matches the radial (+90° from prior tuning). */
 const WIN_PIP_ROTATION_OFFSET = Math.PI
 
+const WIN_PIP_SCALE = 0.8
+
 /** TODO: set false once win fill/dim behavior is finalized */
-const TEST_ALL_WIN_PIPS_FULLY_VISIBLE = true
+const TEST_ALL_WIN_PIPS_FULLY_VISIBLE = false
 
 export default class WinsRegion extends Region {
   private imgSundial: Phaser.GameObjects.Image
@@ -71,9 +73,10 @@ export default class WinsRegion extends Region {
       this.ourGems[i].setAlpha(filled ? 1 : 0.25)
     }
 
+    // theirGems[] order along the arc is opposite to win index 0..N — map i to the matching pip
     for (let i = 0; i < GEM_COUNT; i++) {
       const filled = i < theirWins
-      this.theirGems[i].setAlpha(filled ? 1 : 0.25)
+      this.theirGems[GEM_COUNT - 1 - i].setAlpha(filled ? 1 : 0.25)
     }
   }
 
@@ -91,7 +94,6 @@ export default class WinsRegion extends Region {
       out: Phaser.GameObjects.Image[],
       startRad: number,
       endRad: number,
-      tint?: number,
     ) => {
       for (let i = 0; i < GEM_COUNT; i++) {
         const t = i / (GEM_COUNT - 1)
@@ -103,10 +105,8 @@ export default class WinsRegion extends Region {
         const dy = y - circleCenterY
 
         const gem = this.scene.add.image(x, y, 'icon-win')
+        gem.setScale(WIN_PIP_SCALE)
         gem.setRotation(Math.atan2(dy, dx) + WIN_PIP_ROTATION_OFFSET)
-        if (tint !== undefined) {
-          gem.setTint(tint)
-        }
         this.container.add(gem)
         out.push(gem)
       }
@@ -115,15 +115,18 @@ export default class WinsRegion extends Region {
     // Sun point is at angle π (left-most point).
     const sunTheta = Math.PI
 
-    // Their gems: above the sun (approaching the sun from above).
+    // Our gems: above the sun (approaching the sun from above).
     makeArcRad(
-      this.theirGems,
+      this.ourGems,
       sunTheta - ARC_LAST_RAD,
       sunTheta - ARC_FIRST_RAD,
-      0x111111,
     )
 
-    // Our gems: below the sun (departing the sun downward).
-    makeArcRad(this.ourGems, sunTheta + ARC_FIRST_RAD, sunTheta + ARC_LAST_RAD)
+    // Their gems: below the sun (departing the sun downward).
+    makeArcRad(
+      this.theirGems,
+      sunTheta + ARC_FIRST_RAD,
+      sunTheta + ARC_LAST_RAD,
+    )
   }
 }
