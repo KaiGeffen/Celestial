@@ -144,7 +144,7 @@ export default class PassRegion extends Region {
   }
 
   private createButtons(): void {
-    const x = -156
+    const x = -115
     this.btnPass = new Buttons.Sun(this.container, x, 0)
     this.btnMoon = new Buttons.Moon(this.container, -x, 0, () => {
       if (this.scene['paused']) {
@@ -167,18 +167,14 @@ export default class PassRegion extends Region {
     this.yourPass = this.scene.add.container(-150, 80).setAlpha(0)
 
     // Them
-    const cloud = this.scene.add
-      .image(0, 0, 'chrome-CloudBottom')
-      .setScale(0.8)
+    const cloud = this.scene.add.image(0, 0, 'chrome-CloudBottom').setScale(0.8)
     const text = this.scene.add
       .text(0, 20, 'Passed', Style.todoCloud)
       .setOrigin(0.5)
     this.theirPass.add([cloud, text])
 
     // Me
-    const cloud2 = this.scene.add
-      .image(0, -20, 'chrome-CloudTop')
-      .setScale(0.8)
+    const cloud2 = this.scene.add.image(0, -20, 'chrome-CloudTop').setScale(0.8)
     const text2 = this.scene.add
       .text(0, 0, 'Passed', Style.todoCloud)
       .setOrigin(0.5)

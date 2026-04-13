@@ -53,7 +53,10 @@ export default class StoryRegion extends Region {
     this.resolveBubbleLayer = scene.add
       .container(0, 0)
       .setDepth(Depth.aboveOtherCards)
-    this.resolveBubbles = new StoryResolveBubbles(scene, this.resolveBubbleLayer)
+    this.resolveBubbles = new StoryResolveBubbles(
+      scene,
+      this.resolveBubbleLayer,
+    )
 
     this.container = scene.add
       .container(0, Space.handHeight)
@@ -127,10 +130,16 @@ export default class StoryRegion extends Region {
       const printedPoints = act.card.points
       const effectAmt = pointsEarned - printedPoints - nourishAmt
 
+      // Pet is special and weird
+      const showEffectsBubble = act.card.name !== 'Pet'
+
       const tweenNourishFromStatus =
         oneNewResolvedAct && resolvedI === resolvedCount - 1 && nourishAmt !== 0
       const tweenEffectsFromStatus =
-        oneNewResolvedAct && resolvedI === resolvedCount - 1 && effectAmt !== 0
+        oneNewResolvedAct &&
+        resolvedI === resolvedCount - 1 &&
+        effectAmt !== 0 &&
+        showEffectsBubble
 
       const shouldStagger = oneNewResolvedAct && resolvedI === resolvedCount - 1
       const r = Time.recapTween()
@@ -159,7 +168,7 @@ export default class StoryRegion extends Region {
           )
           delay += r
         }
-        if (effectAmt !== 0) {
+        if (effectAmt !== 0 && showEffectsBubble) {
           pushBubbleStep(delay, () => {
             this.resolveBubbles.addEffectsResolveCircle(
               card,
@@ -176,11 +185,13 @@ export default class StoryRegion extends Region {
           nourishAmt,
           act.owner,
         )
-        this.resolveBubbles.addEffectsResolveCircle(
-          card,
-          tweenEffectsFromStatus,
-          effectAmt,
-        )
+        if (effectAmt !== 0 && showEffectsBubble) {
+          this.resolveBubbles.addEffectsResolveCircle(
+            card,
+            tweenEffectsFromStatus,
+            effectAmt,
+          )
+        }
       }
 
       card.setResolved().moveToTopOnHover()
@@ -584,7 +595,11 @@ class StoryResolveBubbles {
     let bx = end.x
     let by = end.y
     if (tweenFromEffectText) {
-      const start = this.localToWorld(card.container, card.txtText.x, card.txtText.y)
+      const start = this.localToWorld(
+        card.container,
+        card.txtText.x,
+        card.txtText.y,
+      )
       bx = start.x
       by = start.y
     }
