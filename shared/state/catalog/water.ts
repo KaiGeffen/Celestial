@@ -232,9 +232,24 @@ class DamBreaks extends Card {
       game.discard(player, 3)
 
       // Add the hand to the story
-      while (game.hand[player].length > 0) {
+      for (let i = 0; game.hand[player].length > 0; i++) {
         const card = game.hand[player].shift()
-        game.story.addAct(card, player, 0)
+        if (!card) {
+          console.error('Card is undefined for Dam Breaks')
+          continue
+        }
+
+        game.story.addAct(card, player, i)
+
+        game.animations[player].push(
+          new Animation({
+            from: Zone.Hand,
+            to: Zone.Story,
+            card,
+            index: 0,
+            index2: i,
+          }),
+        )
       }
     }
   }
@@ -242,7 +257,7 @@ class DamBreaks extends Card {
 const damBreaks = new DamBreaks({
   name: 'Dam Breaks',
   id: 104,
-  cost: 4,
+  // cost: 4,
   points: 4,
   text: 'Exhale 1: Discard 3 cards. Add your hand to the story after this.',
 })
