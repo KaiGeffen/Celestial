@@ -9,6 +9,7 @@ import { Space, Time, Depth, Ease } from '../../settings/settings'
 import Catalog from '../../../../shared/state/catalog'
 import { View } from '../matchScene'
 import Card from '../../../../shared/state/card'
+import { SHRUNKEN_CARD_SCALE } from './matchRegionSettings'
 
 export default class Animator {
   scene: MatchScene
@@ -70,6 +71,7 @@ export default class Animator {
               i,
               permanentCard,
               this.getSound(animation),
+              animation.to === Zone.Story ? SHRUNKEN_CARD_SCALE : undefined,
             )
           } else {
             // Emphasize the card if it stayed in the same zone
@@ -249,6 +251,7 @@ export default class Animator {
     i: number,
     permanentCard?: CardImage,
     sound?,
+    endScale?: number,
   ) {
     if (permanentCard) {
       permanentCard.hide()
@@ -259,6 +262,9 @@ export default class Animator {
       targets: card.container,
       x: end[0],
       y: end[1],
+      ...(endScale !== undefined
+        ? { scaleX: endScale, scaleY: endScale }
+        : {}),
       delay: i * Time.recapTweenWithPause(),
       duration: Time.recapTween(),
       ease: Ease.card,
@@ -299,6 +305,7 @@ export default class Animator {
       iAnimation,
       permanentCard,
       this.getSound(animation),
+      animation.to === Zone.Story ? SHRUNKEN_CARD_SCALE : undefined,
     )
   }
 

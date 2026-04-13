@@ -283,8 +283,12 @@ class Voices extends Card {
     super.play(player, game, index, bonus)
 
     // Opponent adds first
+    let opponentAddedACard = false
     if (super.exhale(1, game, player)) {
       if (game.hand[player ^ 1].length > 0) {
+        // Track whether a card was actually added
+        opponentAddedACard = true
+
         const card = game.hand[player ^ 1].shift()
         game.story.addAct(card, player ^ 1, 0)
         game.animations[player ^ 1].push(
@@ -310,7 +314,7 @@ class Voices extends Card {
             to: Zone.Story,
             card: card,
             index: 0,
-            index2: 1,
+            index2: opponentAddedACard ? 1 : 0,
           }),
         )
       }
