@@ -221,7 +221,7 @@ class Parade extends Card {
               from: Zone.Hand,
               to: Zone.Story,
               index: iHand,
-              index2: index + amtAdded,
+              index2: amtAdded,
             }),
           )
 

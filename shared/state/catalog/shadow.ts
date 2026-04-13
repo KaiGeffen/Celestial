@@ -287,6 +287,15 @@ class Voices extends Card {
       if (game.hand[player ^ 1].length > 0) {
         const card = game.hand[player ^ 1].shift()
         game.story.addAct(card, player ^ 1, 0)
+        game.animations[player ^ 1].push(
+          new Animation({
+            from: Zone.Hand,
+            to: Zone.Story,
+            card: card,
+            index: 0,
+            index2: 0,
+          }),
+        )
       }
     }
 
@@ -295,6 +304,15 @@ class Voices extends Card {
       if (game.hand[player].length > 0) {
         const card = game.hand[player].shift()
         game.story.addAct(card, player, 1)
+        game.animations[player].push(
+          new Animation({
+            from: Zone.Hand,
+            to: Zone.Story,
+            card: card,
+            index: 0,
+            index2: 1,
+          }),
+        )
       }
     }
   }

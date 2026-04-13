@@ -99,7 +99,12 @@ export default class Animator {
         }
 
       case Zone.Story:
-        return CardLocation.story(state, animation.index, this.container, owner)
+        return CardLocation.story(
+          state,
+          state.story.resolvedActs.length + (animation.index ?? 0),
+          this.container,
+          owner,
+        )
 
       case Zone.Gone:
         return CardLocation.gone(this.container)
@@ -135,7 +140,7 @@ export default class Animator {
       case Zone.Story:
         return CardLocation.story(
           state,
-          animation.index2,
+          state.story.resolvedActs.length + (animation.index2 ?? 0),
           this.container,
           owner,
         )

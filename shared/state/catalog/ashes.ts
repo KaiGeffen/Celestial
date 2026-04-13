@@ -345,7 +345,7 @@ class Immolant extends Card {
         from: Zone.Discard,
         to: Zone.Story,
         index: game.pile[player].length - 1,
-        index2: game.story.resolvedActs.length + 1,
+        index2: 0,
       }),
     )
 
@@ -541,6 +541,7 @@ class Zoomies extends Card {
         from: Zone.Discard,
         to: Zone.Story,
         card: this,
+        index2: 0,
       }),
     )
 
