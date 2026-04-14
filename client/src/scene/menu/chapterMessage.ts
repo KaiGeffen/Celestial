@@ -6,7 +6,7 @@ import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
 import Server from '../../server'
-import { Ease, Space, Style } from '../../settings/settings'
+import { Ease, Space, Style, Time } from '../../settings/settings'
 import REWARD_AMOUNTS from '../../../../shared/config/rewardAmounts'
 
 export default class ChapterMessageMenu extends MessageMenu {
@@ -64,7 +64,7 @@ export default class ChapterMessageMenu extends MessageMenu {
             targets: rewardText,
             y: y - 40,
             alpha: 0,
-            duration: 800,
+            duration: Time.general.rewardFloatMs,
             ease: Ease.basic,
             onComplete: () => rewardText.destroy(),
           })

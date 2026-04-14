@@ -907,7 +907,7 @@ export default class JourneyScene extends BaseScene {
     // Scroll the image going down
     this.add.tween({
       targets: img,
-      duration: 6000,
+      duration: Time.general.journeyStillframeScrollMs,
       ease: Ease.stillframe,
       y: Space.windowHeight - img.displayHeight,
       onStart: () => {

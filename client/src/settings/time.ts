@@ -23,6 +23,12 @@ export const MatchTiming = {
   recapStateMinimum: 800,
   /** How long a hint text takes to fade in */
   hintFade: 400,
+  /** Round-result stamp fade in/out duration */
+  roundResultFadeMs: 200,
+  /** Round-result stamp hold at full alpha */
+  roundResultHoldMs: 2000,
+  /** Match background tint transition when entering/exiting recap */
+  recapBackgroundTintMs: 600,
 } as const
 
 /**
@@ -48,10 +54,16 @@ export const AppUiTiming = {
   journeyStillframeHoldMs: 2000,
   /** Stillframes in journey mode fading out */
   journeyStillframeFadeMs: 500,
+  /** Stillframe image pan duration */
+  journeyStillframeScrollMs: 6000,
   /** On the searching scene, how long between when the avatar swaps */
   searchingAvatarSwapIntervalMs: 4000,
   /** On the searching scene when a match is found, how long for text to fade in/out */
   searchingMatchFoundPulseMs: 500,
+  /** Floating reward text rise/fade */
+  rewardFloatMs: 800,
+  /** Ready-to-harvest garden pulse cycle */
+  gardenReadyPulseMs: 800,
 } as const
 
 /**

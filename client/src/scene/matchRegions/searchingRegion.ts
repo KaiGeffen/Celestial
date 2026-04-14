@@ -384,7 +384,7 @@ export class SearchingRegionTutorial extends Region {
       // Scroll the image going down
       this.scene.add.tween({
         targets: this.img,
-        duration: 6000,
+        duration: Time.general.journeyStillframeScrollMs,
         ease: Ease.stillframe,
         y: downFully,
         onStart: () => {
@@ -396,7 +396,7 @@ export class SearchingRegionTutorial extends Region {
       // Scroll the image going down
       this.scene.add.tween({
         targets: this.img,
-        duration: (6000 * 1) / 3,
+        duration: Time.general.journeyStillframeScrollMs / 3,
         ease: Ease.stillframe,
         y: (downFully * 2) / 3,
         onStart: () => {

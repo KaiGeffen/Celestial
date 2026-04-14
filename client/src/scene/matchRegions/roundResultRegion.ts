@@ -1,6 +1,6 @@
 import 'phaser'
 import GameModel from '../../../../shared/state/gameModel'
-import { Depth } from '../../settings/settings'
+import { Depth, Time } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
@@ -56,8 +56,8 @@ export default class RoundResultRegion extends Region {
     // Tween it fading in and out
     this.scene.tweens.add({
       targets: this.roundResult,
-      duration: 200,
-      hold: 2000,
+      duration: Time.match.roundResultFadeMs,
+      hold: Time.match.roundResultHoldMs,
       ease: 'Sine.easeInOut',
       alpha: 1,
       yoyo: true,

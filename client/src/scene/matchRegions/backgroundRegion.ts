@@ -1,5 +1,5 @@
 import 'phaser'
-import { Ease } from '../../settings/settings'
+import { Ease, Time } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
@@ -54,7 +54,7 @@ export default class BackgroundRegion extends Region {
     this.scene.tweens.add({
       targets: { t: 0 },
       t: 1,
-      duration: 600,
+      duration: Time.match.recapBackgroundTintMs,
       ease: Ease.basic,
       onUpdate: (tween) => {
         const t = tween.getValue()
