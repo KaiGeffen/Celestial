@@ -371,24 +371,23 @@ export default class GameModel {
   }
 
   /**
-   * Add a card to the story and enqueue the recap animation. Defaults to
-   * Gone → Story (created/token); pass `animation` when the card visibly comes
-   * from another zone (e.g. Discard, Create).
+   * Add a card to the story and enqueue the recap animation. `from` defaults to
+   * Gone (created/token); use another zone when the card visibly moves from
+   * deck/discard/etc.
    */
   createInStory(
     player: number,
     card: Card,
     i?: number,
-    animation?: { from?: Zone; index?: number },
+    from: Zone = Zone.Gone,
   ) {
     this.story.addAct(card, player, i)
     const storySlot = i === undefined ? this.story.acts.length - 1 : i
     this.animations[player].push(
       new Animation({
-        from: animation?.from ?? Zone.Gone,
+        from,
         to: Zone.Story,
         card,
-        index: animation?.index,
         index2: storySlot,
       }),
     )

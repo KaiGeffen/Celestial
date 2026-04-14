@@ -180,7 +180,7 @@ const fledgling = new Fledgling({
 
 class Nest extends Card {
   onMorning(player: number, game: GameModel, index: number) {
-    game.createInStory(player, dove)
+    game.createInStory(player, dove, undefined, Zone.Discard)
     return true
   }
 }
