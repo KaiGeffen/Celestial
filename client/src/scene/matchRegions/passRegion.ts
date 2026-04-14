@@ -199,7 +199,7 @@ export default class PassRegion extends Region {
         targets: container,
         x: -150,
         alpha: 1,
-        duration: Time.recapTween(),
+        duration: Time.match.recapTween,
         ease: 'Cubic.out',
         onComplete: () => {
           container.setAlpha(1)
@@ -209,7 +209,7 @@ export default class PassRegion extends Region {
       this.scene.tweens.add({
         targets: container,
         alpha: 0,
-        duration: Time.recapTween(),
+        duration: Time.match.recapTween,
         onComplete: () => {
           container.setAlpha(0)
         },

@@ -193,7 +193,7 @@ export default class CatalogRegion {
       this.scene.tweens.add({
         targets: this.panel,
         minWidth: width,
-        duration: Time.builderSlide(),
+        duration: Time.general.builderCatalogSlideMs,
         ease: Ease.slide,
         onUpdate: () => {
           this.panel.layout()
@@ -216,7 +216,7 @@ export default class CatalogRegion {
       this.scene.tweens.add({
         targets: this.panel,
         minWidth: width,
-        duration: Time.builderSlide(),
+        duration: Time.general.builderCatalogSlideMs,
         ease: Ease.slide,
         onUpdate: () => {
           this.panel.layout()

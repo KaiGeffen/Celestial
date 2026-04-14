@@ -64,63 +64,7 @@ export const SpeedRates = {
 } as const
 
 export class Time {
-  static playCard(): number {
-    return MatchTiming.handToStory
-  }
-
-  static recapStateMinimum(): number {
-    return MatchTiming.recapStateMinimum
-  }
-
-  static recapTween(): number {
-    return MatchTiming.recapTween
-  }
-
-  static recapTweenWithPause(): number {
-    return MatchTiming.recapTweenStaggerStep
-  }
-
-  static hintFade(): number {
-    return MatchTiming.hintFade
-  }
-
-  static textSpeed(): number {
-    return SpeedRates.narrativeTextStep
-  }
-
-  static vignetteSpeed(): number {
-    return SpeedRates.vignetteDriftStep
-  }
-
-  static builderSlide(): number {
-    return AppUiTiming.builderCatalogSlideMs
-  }
-
-  static readonly optionsTabSlide = AppUiTiming.optionsTabSlideMs
-
-  static onscreenMessage = AppUiTiming.centerMessageLingerMs
-  static flash = AppUiTiming.attentionFlashMs
-  static emote = AppUiTiming.avatarEmoteMs
-  static chart = AppUiTiming.chartRevealMs
-  static menuTransition = AppUiTiming.menuPanelTransitionMs
-  static stillframeScroll = AppUiTiming.journeyStillframeHoldMs
-  static stillframeFade = AppUiTiming.journeyStillframeFadeMs
-  static avatarSwap = AppUiTiming.searchingAvatarSwapIntervalMs
-  static searchFlash = AppUiTiming.searchingMatchFoundPulseMs
-
-  /** Same as {@link MatchTiming.cardFocus}; used by hand layout tweens. */
-  static readonly cardFocus = MatchTiming.cardFocus
+  static readonly match = MatchTiming
+  static readonly general = AppUiTiming
+  static readonly speed = SpeedRates
 }
-
-/*
- * Next steps (animation-speed rewrite):
- *
- * 1. Options / history — Remove `animationSpeed` + Speed button in historyRegion
- *    if you no longer want user-controlled recap pacing.
- *
- * 2. Tuning — Edit `MatchTiming` / `AppUiTiming` / `SpeedRates` here; `Time.*`
- *    stays in sync.
- *
- * 3. Optional — Import `MatchTiming` in animator for clearer fractions
- *    (e.g. `MatchTiming.recapTween / 2`).
- */

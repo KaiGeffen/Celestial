@@ -54,7 +54,7 @@ export default class SearchingRegion extends Region {
 
     this.sum += delta
 
-    if (this.sum >= Time.avatarSwap) {
+    if (this.sum >= Time.general.searchingAvatarSwapIntervalMs) {
       this.sum = 0
 
       const i = Math.floor(Math.random() * 6)
@@ -97,7 +97,7 @@ export default class SearchingRegion extends Region {
     this.scene.tweens.add({
       targets: this.txtTitle,
       alpha: 0,
-      time: Time.searchFlash,
+      time: Time.general.searchingMatchFoundPulseMs,
       yoyo: true,
       onComplete: () => {
         this.hide()
@@ -359,7 +359,7 @@ export class SearchingRegionTutorial extends Region {
           // Tween the stillframe scrolling up to be flush with the top, then start the match
           this.scene.add.tween({
             targets: this.img,
-            duration: Time.stillframeScroll,
+            duration: Time.general.journeyStillframeHoldMs,
             ease: Ease.stillframeEnd,
             y: 0,
             onComplete: () => {

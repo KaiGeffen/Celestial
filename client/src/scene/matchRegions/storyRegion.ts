@@ -142,7 +142,7 @@ export default class StoryRegion extends Region {
         showEffectsBubble
 
       const shouldStagger = oneNewResolvedAct && resolvedI === resolvedCount - 1
-      const r = Time.recapTween()
+      const r = Time.match.recapTween
       const pushBubbleStep = (delay: number, fn: () => void) => {
         const ev = this.scene.time.delayedCall(delay, () => {
           if (!card.container.active) {
@@ -292,7 +292,7 @@ export default class StoryRegion extends Region {
     this.scene.add.tween({
       targets: txtGain,
       alpha: 1,
-      duration: Time.recapTween(),
+      duration: Time.match.recapTween,
       ease: 'Sine.easeInOut',
       yoyo: true,
       onComplete: function (tween, targets, _) {
@@ -328,7 +328,7 @@ export default class StoryRegion extends Region {
         targets: card.container,
         x: x,
         y: y,
-        duration: Time.playCard(),
+        duration: Time.match.handToStory,
         onStart: (tween, targets, _) => {
           card.show()
           this.scene.playSound('play them')
@@ -468,14 +468,14 @@ class StoryResolveBubbles {
         targets: bubble,
         x: end.x,
         y: end.y,
-        duration: Time.recapTween(),
+        duration: Time.match.recapTween,
         ease: 'Sine.easeInOut',
       })
       this.scene.tweens.add({
         targets: grow,
         fontPx: StoryResolveBubbles.POINTS_RESOLVE_FONT_LARGE_PX,
         radius: StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE,
-        duration: Time.recapTween(),
+        duration: Time.match.recapTween,
         ease: 'Sine.easeInOut',
         onUpdate: () => {
           StoryResolveBubbles.setBubbleDisplaySize(bubbleImg, grow.radius)
@@ -554,7 +554,7 @@ class StoryResolveBubbles {
         x: end.x,
         y: end.y,
         delay: moveDelayMs,
-        duration: Time.recapTween(),
+        duration: Time.match.recapTween,
         ease: 'Sine.easeInOut',
       })
       this.scene.tweens.add({
@@ -562,7 +562,7 @@ class StoryResolveBubbles {
         fontPx: StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
         radius: StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE,
         delay: moveDelayMs,
-        duration: Time.recapTween(),
+        duration: Time.match.recapTween,
         ease: 'Sine.easeInOut',
         onUpdate: () => {
           StoryResolveBubbles.setBubbleDisplaySize(
@@ -644,14 +644,14 @@ class StoryResolveBubbles {
         targets: bubble,
         x: end.x,
         y: end.y,
-        duration: Time.recapTween(),
+        duration: Time.match.recapTween,
         ease: 'Sine.easeInOut',
       })
       this.scene.tweens.add({
         targets: grow,
         fontPx: StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
         radius: StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE,
-        duration: Time.recapTween(),
+        duration: Time.match.recapTween,
         ease: 'Sine.easeInOut',
         onUpdate: () => {
           StoryResolveBubbles.setBubbleDisplaySize(

@@ -197,7 +197,7 @@ export default class TutorialMatchScene extends MatchScene {
     this.tweens.add({
       targets: this.txt,
       alpha: 1,
-      duration: Time.hintFade(),
+      duration: Time.match.hintFade,
       onStart: () => {
         this.txt.alpha = 0
       },

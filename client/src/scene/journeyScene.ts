@@ -892,7 +892,7 @@ export default class JourneyScene extends BaseScene {
           this.tweens.add({
             targets: container,
             alpha: 0,
-            duration: Time.stillframeFade,
+            duration: Time.general.journeyStillframeFadeMs,
             onComplete: () => {
               container.setVisible(false)
               container.alpha = 1

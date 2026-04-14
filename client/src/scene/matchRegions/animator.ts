@@ -265,8 +265,8 @@ export default class Animator {
       ...(endScale !== undefined
         ? { scaleX: endScale, scaleY: endScale }
         : {}),
-      delay: i * Time.recapTweenWithPause(),
-      duration: Time.recapTween(),
+      delay: i * Time.match.recapTweenStaggerStep,
+      duration: Time.match.recapTween,
       ease: Ease.card,
       onStart: (tween: Phaser.Tweens.Tween, targets, _) => {
         card.show()
@@ -324,8 +324,8 @@ export default class Animator {
     this.scene.add.tween({
       targets: topCard.container,
       x: start[0] + Space.cardWidth / 4,
-      delay: i * Time.recapTweenWithPause(),
-      duration: Time.recapTween() / 4,
+      delay: i * Time.match.recapTweenStaggerStep,
+      duration: Time.match.recapTween / 4,
       yoyo: true,
       repeat: 1,
       onStart: (tween: Phaser.Tweens.Tween, targets, _) => {
@@ -340,8 +340,8 @@ export default class Animator {
     this.scene.add.tween({
       targets: bottomCard.container,
       x: start[0] - Space.cardHeight / 2,
-      delay: i * Time.recapTweenWithPause(),
-      duration: Time.recapTween() / 4,
+      delay: i * Time.match.recapTweenStaggerStep,
+      duration: Time.match.recapTween / 4,
       yoyo: true,
       repeat: 1,
       onStart: function (tween: Phaser.Tweens.Tween, targets, _) {
@@ -362,8 +362,8 @@ export default class Animator {
       targets: cardCopy.container,
       scale: 3,
       alpha: 0,
-      delay: i * Time.recapTweenWithPause(),
-      duration: Time.recapTween(),
+      delay: i * Time.match.recapTweenStaggerStep,
+      duration: Time.match.recapTween,
       onStart: function (tween: Phaser.Tweens.Tween, targets, _) {
         cardCopy.show()
       },
@@ -404,8 +404,8 @@ export default class Animator {
     this.scene.tweens.add({
       targets: hiddenCard.container,
       scaleX: 0,
-      delay: i * Time.recapTweenWithPause(),
-      duration: Time.recapTween() / 2,
+      delay: i * Time.match.recapTweenStaggerStep,
+      duration: Time.match.recapTween / 2,
       onComplete: function (tween, targets, _) {
         hiddenCard.destroy()
       },
@@ -417,8 +417,8 @@ export default class Animator {
     this.scene.tweens.add({
       targets: card.container,
       scaleX: endScaleX,
-      delay: i * Time.recapTweenWithPause() + Time.recapTween() / 2,
-      duration: Time.recapTween() / 2,
+      delay: i * Time.match.recapTweenStaggerStep + Time.match.recapTween / 2,
+      duration: Time.match.recapTween / 2,
       onStart: function (tween: Phaser.Tweens.Tween, targets, _) {
         card.show()
       },
@@ -434,8 +434,8 @@ export default class Animator {
     this.scene.tweens.add({
       targets: oldCard.container,
       alpha: 0,
-      delay: i * Time.recapTweenWithPause(),
-      duration: Time.recapTween(),
+      delay: i * Time.match.recapTweenStaggerStep,
+      duration: Time.match.recapTween,
       onComplete: function (tween, targets, _) {
         oldCard.destroy()
       },

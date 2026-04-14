@@ -278,7 +278,7 @@ export default class OurBoardRegion extends Region {
             x,
             y,
             rotation: this.ourHandRestFanRotation(newIndex, newN),
-            duration: Time.cardFocus,
+            duration: Time.match.cardFocus,
             ease: 'Sine.easeOut',
           })
         }
@@ -291,7 +291,7 @@ export default class OurBoardRegion extends Region {
         y: nextStoryPosition[1],
         rotation: 0,
         scale: SHRUNKEN_CARD_SCALE,
-        duration: Time.playCard(),
+        duration: Time.match.handToStory,
         ease: 'Sine.easeInOut',
         // Moves other cards in hand to fill the hole
         onStart: () => {
@@ -307,7 +307,7 @@ export default class OurBoardRegion extends Region {
                 targets: adjustedCard.container,
                 x: tx,
                 y: ty,
-                duration: Time.playCard() - 10,
+                duration: Time.match.handToStory - 10,
                 ease: 'Sine.easeInOut',
               })
             }
@@ -424,7 +424,7 @@ export default class OurBoardRegion extends Region {
             x,
             y,
             rotation: 0,
-            duration: Time.cardFocus,
+            duration: Time.match.cardFocus,
             ease: 'Sine.easeOut',
           })
         })
@@ -463,7 +463,7 @@ export default class OurBoardRegion extends Region {
             x,
             y,
             rotation: this.ourHandRestFanRotation(idx, n),
-            duration: Time.cardFocus,
+            duration: Time.match.cardFocus,
             ease: 'Sine.easeOut',
           })
         })

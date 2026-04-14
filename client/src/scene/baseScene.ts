@@ -72,7 +72,7 @@ class SharedBaseScene extends Phaser.Scene {
 
     this.msgTimeout = setTimeout(() => {
       this.txtMessage.setText('').setVisible(false)
-    }, Time.onscreenMessage)
+    }, Time.general.centerMessageLingerMs)
   }
 
   // Alert the user that they have taken an illegal or impossible action

@@ -593,7 +593,7 @@ export default class OptionsMenu extends Menu {
       x: (Space.windowWidth - this.width - Space.pad * 2) / 2,
       y: y - 4,
 
-      duration: Time.optionsTabSlide,
+      duration: Time.general.optionsTabSlideMs,
       ease: 'Sine.easeInOut',
     })
   }
