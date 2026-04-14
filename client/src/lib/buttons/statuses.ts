@@ -1,19 +1,26 @@
 import 'phaser'
 import Button, { Config } from './button'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import { Style, Space, Flags } from '../../settings/settings'
+import { Style } from '../../settings/settings'
 import { Keywords } from '../../../../shared/state/keyword'
 
 const STATUS_TEXT_INSPIRE = '#1c2962'
 const STATUS_TEXT_NOURISH = '#053327'
 const STATUS_TEXT_SIGHT = '#632709'
 
+/** Status row icons are ~90px apart; keep the value glyph within a single slot. */
+const STATUS_VALUE_MAX_WIDTH_PX = 20
+
 /** Reword second-person keyword lines for the opponent’s status row (“they” not “you”). */
 function hintForOpponentPerspective(s: string): string {
   return s.replace(/\byour\b/g, 'their').replace(/\byou\b/g, 'they')
 }
 
-function getHint(btn: Button, status: string, opponentPerspective?: boolean): string {
+function getHint(
+  btn: Button,
+  status: string,
+  opponentPerspective?: boolean,
+): string {
   let keyword = Keywords.get(status)
 
   let s = keyword.text
@@ -57,7 +64,15 @@ class KeywordButton extends Button {
   }
 
   setText(s: string): Button {
-    let result = super.setText(s)
+    const result = super.setText(s)
+
+    if (this.txt) {
+      this.txt.setScale(1)
+      const w = this.txt.width
+      if (w > STATUS_VALUE_MAX_WIDTH_PX) {
+        this.txt.setScale(STATUS_VALUE_MAX_WIDTH_PX / w)
+      }
+    }
 
     this.makeHintable()
 
@@ -160,26 +175,21 @@ export class SightButton extends KeywordButton {
     text: string = '',
     f: () => void = function () {},
   ) {
-    super(
-      within,
-      x,
-      y,
-      {
-        text: {
-          text: text,
-          interactive: false,
-          style: Style.basic,
-          offsetX: 15,
-        },
-        icon: {
-          name: `Sight`,
-          interactive: true,
-        },
-        callbacks: {
-          click: f,
-        },
+    super(within, x, y, {
+      text: {
+        text: text,
+        interactive: false,
+        style: Style.basic,
+        offsetX: 15,
       },
-    )
+      icon: {
+        name: `Sight`,
+        interactive: true,
+      },
+      callbacks: {
+        click: f,
+      },
+    })
     this.applyStatusTextColor(STATUS_TEXT_SIGHT)
   }
 
