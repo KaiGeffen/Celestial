@@ -51,6 +51,8 @@ const DRIFT_SPEED = 0.0003
 const DRIFT_PHASE = 1.3
 const THEME_CAMERA_TWEEN_DURATION = 400
 
+const TODO_ICON_SIZE = 32
+
 const STARS_THEME_INDEX = THEME_KEYS.indexOf('stars')
 const ALT_MAP_FADE_DURATION = 400
 const MISSION_TIP_FADE_DURATION = 200
@@ -378,8 +380,8 @@ export default class JourneyScene extends BaseScene {
       this,
       0,
       0,
-      Space.iconSize,
-      Space.iconSize,
+      TODO_ICON_SIZE,
+      TODO_ICON_SIZE,
     )
     const overlayArtButton = new Buttons.Icon({
       within: this.overlayArtButtonContainer,
@@ -393,7 +395,7 @@ export default class JourneyScene extends BaseScene {
     })
     overlayArtButton.icon.setTintFill(Color.backgroundLight)
 
-    const sideControlsWidth = leftArrow.width + Space.pad + Space.iconSize
+    const sideControlsWidth = leftArrow.width + Space.pad + TODO_ICON_SIZE
     const leftControls = this.rexUI.add.sizer({
       orientation: 'horizontal',
       width: sideControlsWidth,
@@ -610,8 +612,8 @@ export default class JourneyScene extends BaseScene {
       this,
       0,
       0,
-      Space.iconSize,
-      Space.iconSize,
+      TODO_ICON_SIZE,
+      TODO_ICON_SIZE,
     )
     if (isCompleted) {
       const hasClaimedMissionGold =
@@ -647,8 +649,8 @@ export default class JourneyScene extends BaseScene {
       })
       if (!hasClaimedMissionGold) {
         const badge = this.add.circle(
-          Space.iconSize / 2 - 5,
-          -Space.iconSize / 2 + 5,
+          TODO_ICON_SIZE / 2 - 5,
+          -TODO_ICON_SIZE / 2 + 5,
           5,
           0xd64045,
         )
@@ -770,7 +772,7 @@ export default class JourneyScene extends BaseScene {
     const x =
       Space.windowWidth -
       Space.buttonWidth / 2 -
-      (Space.iconSize + Space.pad * 2) -
+      (TODO_ICON_SIZE + Space.pad * 2) -
       Space.buttonWidth * 2 -
       Space.pad * 2
     const y = Space.buttonHeight / 2 + Space.pad
