@@ -1,10 +1,7 @@
 /**
  * Central animation and delay timings (milliseconds unless noted).
- * (Previously scaled some recap values with `UserSettings.animationSpeed`; that
- * is removed — tune `MatchTiming` here.)
- *
- * Call sites keep using `Time.*`; import `MatchTiming` when you want a named
- * constant in match code (e.g. `MatchTiming.recapTween`).
+ * Tune values on `Time.match` / `Time.general` / `Time.speed` (or the exported
+ * `MatchTiming` / `AppUiTiming` / `SpeedRates` objects).
  */
 
 /** Match-only: live play, recap tweens, hint fade (all milliseconds). */

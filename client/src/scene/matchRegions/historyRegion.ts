@@ -1,19 +1,17 @@
 import 'phaser'
 import GameModel from '../../../../shared/state/gameModel'
-import { Space, Depth, UserSettings } from '../../settings/settings'
+import { Depth, UserSettings } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
 
-// Recap, skip (during replay), and animation speed — anchor x: 100%-200, y: 50%.
 export default class HistoryRegion extends Region {
   recapCallback: () => void
   skipCallback: () => void
 
   private btnRecap: Button
   private btnSkip: Button
-  private btnSpeed: Button
 
   create(scene: MatchScene): this {
     this.scene = scene
@@ -58,12 +56,6 @@ export default class HistoryRegion extends Region {
         }
       }
     })
-
-    this.scene.input.keyboard.on('keydown-E', () => {
-      if (UserSettings._get('hotkeys')) {
-        this.btnSpeed.onClick()
-      }
-    })
   }
 
   private createButtons(): void {
@@ -90,28 +82,6 @@ export default class HistoryRegion extends Region {
       x,
       y: -yDelta,
       f: () => this.skipCallback(),
-    }).setVisible(false)
-
-    this.btnSpeed = new Buttons.Icon({
-      name: 'Speed',
-      within: this.container,
-      hint: 'Animation speed',
-      x,
-      y: yDelta,
-      f: () => {
-        const currentSpeed = UserSettings._get('animationSpeed')
-
-        let newSpeed
-        if (currentSpeed < 0.25) newSpeed = 0.25
-        else if (currentSpeed < 0.5) newSpeed = 0.5
-        else if (currentSpeed < 1) newSpeed = 1
-        else if (currentSpeed < 2) newSpeed = 2
-        else newSpeed = 0.1
-
-        UserSettings._set('animationSpeed', newSpeed)
-
-        this.scene.signalError(`YOUR SPEED: ${newSpeed * 10}x`)
-      },
     }).setVisible(false)
   }
 }
