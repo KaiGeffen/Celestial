@@ -82,31 +82,14 @@ class Nightmare extends Card {
       // Upgrade 1: Create a shadow
       if (this.upgradeVersion === 1) {
         game.createInStory(player, shadow)
-
-        game.animations[player].push(
-          new Animation({
-            from: Zone.Create,
-            to: Zone.Story,
-            card: shadow,
-            index: 0,
-            index2: game.story.acts.length - 1,
-          }),
-        )
       } else {
         // Move THIS card from discard to story
         game.pile[player].splice(index, 1)
 
-        game.createInStory(player, this)
-
-        game.animations[player].push(
-          new Animation({
-            from: Zone.Discard,
-            to: Zone.Story,
-            card: this,
-            index: 0,
-            index2: game.story.acts.length - 1,
-          }),
-        )
+        game.createInStory(player, this, undefined, {
+          from: Zone.Discard,
+          index: 0,
+        })
       }
       return true
     }

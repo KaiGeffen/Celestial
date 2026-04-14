@@ -257,7 +257,7 @@ class DamBreaks extends Card {
 const damBreaks = new DamBreaks({
   name: 'Dam Breaks',
   id: 104,
-  // cost: 4,
+  cost: 4,
   points: 4,
   text: 'Exhale 1: Discard 3 cards. Add your hand to the story after this.',
 })

@@ -252,7 +252,7 @@ export default class GameModel {
           new Animation({
             from: Zone.Hand,
             to: Zone.Discard,
-            index: i,
+            index: 0,
             index2: discardPileIndex,
             card: card,
           }),
@@ -370,8 +370,28 @@ export default class GameModel {
     this.deck[player].unshift(card)
   }
 
-  createInStory(player: number, card: Card, i?: number) {
+  /**
+   * Add a card to the story and enqueue the recap animation. Defaults to
+   * Gone → Story (created/token); pass `animation` when the card visibly comes
+   * from another zone (e.g. Discard, Create).
+   */
+  createInStory(
+    player: number,
+    card: Card,
+    i?: number,
+    animation?: { from?: Zone; index?: number },
+  ) {
     this.story.addAct(card, player, i)
+    const storySlot = i === undefined ? this.story.acts.length - 1 : i
+    this.animations[player].push(
+      new Animation({
+        from: animation?.from ?? Zone.Gone,
+        to: Zone.Story,
+        card,
+        index: animation?.index,
+        index2: storySlot,
+      }),
+    )
   }
 
   dig(player: number, amt: number) {
