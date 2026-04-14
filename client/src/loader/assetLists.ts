@@ -500,13 +500,6 @@ export const assetLists = {
     ]
   },
   "dialog": {
-    "files": [
-      "Adonis",
-      "Imani",
-      "Jules",
-      "Kitz",
-      "Mia",
-      "Mitra"
-    ]
+    "files": []
   }
 } as const;
