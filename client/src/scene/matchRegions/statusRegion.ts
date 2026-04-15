@@ -8,13 +8,16 @@ import { Depth, Time } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
+/** Distance between adjacent icon centers: Inspire–Nourish–Sight are evenly spaced with Nourish at 0; Possibility sits one more step to the right of Sight. */
 const ICON_SPREAD = 90
+
 /** Pixels below top / above bottom edge (matches “0%+100” / “100%-100” roughly). */
 const TOP_OFFSET = 205
 const BOTTOM_OFFSET = 205
 
 /**
- * Inspire / Nourish / Sight for both players: centered horizontally, anchored near top and bottom.
+ * Status row: Inspire, Nourish, Sight evenly spaced with Nourish on the horizontal center;
+ * Possibility is one step further right (same step as between the trio). Anchored top/bottom.
  */
 export default class StatusRegion extends Region {
   private ourRow: Phaser.GameObjects.Container
@@ -23,9 +26,11 @@ export default class StatusRegion extends Region {
   private btnOurInspire: Button
   private btnOurNourish: Button
   private btnOurSight: Button
+  private btnOurPossibility: Button
   private btnTheirInspire: Button
   private btnTheirNourish: Button
   private btnTheirSight: Button
+  private btnTheirPossibility: Button
 
   /** Base timings shared with recap animation slots. */
   private static readonly SLOT_MS =
@@ -56,6 +61,11 @@ export default class StatusRegion extends Region {
     )
     this.btnOurNourish = new Buttons.Keywords.Nourish(this.ourRow, 0, 0)
     this.btnOurSight = new Buttons.Keywords.Sight(this.ourRow, ICON_SPREAD, 0)
+    this.btnOurPossibility = new Buttons.Keywords.Possibility(
+      this.ourRow,
+      2 * ICON_SPREAD,
+      0,
+    )
 
     this.btnTheirInspire = new Buttons.Keywords.Inspire(
       this.theirRow,
@@ -78,6 +88,14 @@ export default class StatusRegion extends Region {
       ICON_SPREAD,
       0,
     )
+    this.btnTheirPossibility = new Buttons.Keywords.Possibility(
+      this.theirRow,
+      2 * ICON_SPREAD,
+      0,
+      '',
+      () => {},
+      true,
+    )
 
     return this
   }
@@ -92,6 +110,9 @@ export default class StatusRegion extends Region {
     this.btnOurSight
       .setVisible(state.status[0].vision !== 0)
       .setText(`${state.status[0].vision}`)
+    this.btnOurPossibility
+      .setVisible(state.status[0].possibility !== 0)
+      .setText(`${state.status[0].possibility}`)
 
     this.btnTheirInspire
       .setVisible(state.status[1].inspired !== 0)
@@ -102,6 +123,9 @@ export default class StatusRegion extends Region {
     this.btnTheirSight
       .setVisible(state.status[1].vision !== 0)
       .setText(`${state.status[1].vision}`)
+    this.btnTheirPossibility
+      .setVisible(state.status[1].possibility !== 0)
+      .setText(`${state.status[1].possibility}`)
 
     this.hideStatusesUntilAnimationSlot(state)
   }
@@ -113,7 +137,8 @@ export default class StatusRegion extends Region {
     for (let owner = 0; owner < 2; owner++) {
       for (const animation of state.animations[owner]) {
         if (animation.from !== Zone.Status) continue
-        if (animation.index !== 0 && animation.index !== 1) continue
+        if (animation.index !== 0 && animation.index !== 1 && animation.index !== 3)
+          continue
 
         const btn = this.getStatusButton(owner, animation.index)
         if (!btn) continue
@@ -130,12 +155,14 @@ export default class StatusRegion extends Region {
       if (index === 0) return this.btnOurInspire
       if (index === 1 || index === -1) return this.btnOurNourish
       if (index === 2) return this.btnOurSight
+      if (index === 3) return this.btnOurPossibility
       return undefined
     }
 
     if (index === 0) return this.btnTheirInspire
     if (index === 1 || index === -1) return this.btnTheirNourish
     if (index === 2) return this.btnTheirSight
+    if (index === 3) return this.btnTheirPossibility
     return undefined
   }
 
@@ -148,7 +175,7 @@ export default class StatusRegion extends Region {
     const delay = slot * StatusRegion.SLOT_MS
 
     // Positive status gain: reveal at this slot with a simple alpha fade.
-    if (animation.index === 0 || animation.index === 1) {
+    if (animation.index === 0 || animation.index === 1 || animation.index === 3) {
       this.scene.tweens.add({
         targets: [btn.icon, btn.txt].filter(Boolean),
         alpha: 1,

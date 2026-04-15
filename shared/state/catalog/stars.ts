@@ -192,7 +192,7 @@ class Possibility extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    game.maxBreath[player] += 1
+    this.possibility(1, game, player)
   }
 }
 const possibility = new Possibility({

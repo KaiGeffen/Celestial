@@ -353,6 +353,9 @@ class ServerController {
     this.model.status[player].inspired = this.model.status[player].inspire
     this.model.breath[player] += this.model.status[player].inspire
     this.model.status[player].inspire = 0
+
+    // Possibility: same breath grant as inspire per stack, but the count persists
+    this.model.breath[player] += this.model.status[player].possibility
   }
 
   private canPlay(player: number, cardNum: number): boolean {

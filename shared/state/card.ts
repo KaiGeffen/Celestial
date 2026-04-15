@@ -244,6 +244,16 @@ export default class Card {
     game.status[player].inspire += amt
   }
 
+  possibility(amt: number, game: GameModel, player: number) {
+    game.animations[player].push(
+      new Animation({
+        from: Zone.Status,
+        index: 3,
+      }),
+    )
+    game.status[player].possibility += amt
+  }
+
   nourish(amt: number, game: GameModel, player: number) {
     game.animations[player].push(
       new Animation({
@@ -276,7 +286,10 @@ export default class Card {
   rateReset(world: any): number {
     let knownValue = 0
     let theirUnknownCards = 0
-    let theirBreath = world.maxBreath[1] + world.status[1].inspired
+    let theirBreath =
+      world.maxBreath[1] +
+      world.status[1].inspired +
+      world.status[1].possibility
 
     for (const act of world.story.acts) {
       const card = act.card
