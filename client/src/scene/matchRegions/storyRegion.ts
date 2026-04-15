@@ -234,7 +234,7 @@ export default class StoryRegion extends Region {
 
     // Show changes in score
     if (state.isRecap) {
-      this.displayScores(state)
+      this.lastScores = state.score
     }
 
     // TODO This is just animating card coming from opps hand, confusing
@@ -250,55 +250,6 @@ export default class StoryRegion extends Region {
   // Set the callback for when an act in the story is clicked on
   setCallback(callback: (i: number) => () => void): void {
     this.callback = callback
-  }
-
-  // Display the current score totals and change in scores
-  private displayScores(state: GameModel): void {
-    // Recap +/- beside story — hidden for now (points bubble on resolve instead).
-    // let index = state.story.resolvedActs.length - 1
-    // if (index >= 0) {
-    //   this.animateScoreGains(index, state.score, state)
-    // }
-
-    this.lastScores = state.score
-  }
-
-  // Animate each player gaining or losing points for the act at this index
-  private animateScoreGains(
-    index: number,
-    scores: [number, number],
-    state: GameModel,
-  ): void {
-    // TODO The first arg (state) should have a variable if squishing is possible
-    const loc = CardLocation.story(state, index, this.container, undefined)
-
-    // Form the string for the gain of the given player
-    const getGain = (i: number) => {
-      let amt = scores[i] - this.lastScores[i]
-      if (amt < 0) {
-        return amt.toString()
-      } else if (amt === 0) {
-        return ''
-      } else {
-        return `+${amt}`
-      }
-    }
-    const txtGain = this.scene.add
-      .text(...loc, `${getGain(1)}\n\n${getGain(0)}`, Style.cardResolution)
-      .setOrigin(0.5)
-    // .setAlpha(0)
-
-    this.container.add(txtGain)
-    this.scene.add.tween({
-      targets: txtGain,
-      alpha: 1,
-      duration: Time.match.recapTween,
-      ease: 'Sine.easeInOut',
-      yoyo: true,
-      onComplete: function (tween, targets, _) {
-        txtGain.destroy()
-      },
-    })
   }
 
   private animate(state: GameModel, cards: CardImage[]): void {
@@ -328,7 +279,7 @@ export default class StoryRegion extends Region {
         targets: card.container,
         x: x,
         y: y,
-        duration: Time.match.handToStory,
+        duration: Time.match.playCard,
         onStart: (tween, targets, _) => {
           card.show()
           this.scene.playSound('play them')
