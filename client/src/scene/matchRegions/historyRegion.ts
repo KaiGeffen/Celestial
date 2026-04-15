@@ -60,7 +60,7 @@ export default class HistoryRegion extends Region {
 
   private createButtons(): void {
     const x = 10
-    const yDelta = 190
+    const y = 190
 
     const chrome = this.scene.add.image(0, 0, 'chrome-replayControls')
     chrome.setVisible(false)
@@ -71,7 +71,7 @@ export default class HistoryRegion extends Region {
       within: this.container,
       hint: 'Watch replay',
       x,
-      y: -yDelta,
+      y,
       f: () => this.recapCallback(),
     })
 
@@ -80,7 +80,7 @@ export default class HistoryRegion extends Region {
       within: this.container,
       hint: 'Skip replay',
       x,
-      y: -yDelta,
+      y,
       f: () => this.skipCallback(),
     }).setVisible(false)
   }

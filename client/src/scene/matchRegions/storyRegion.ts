@@ -1,7 +1,14 @@
 import 'phaser'
 import { CardImage } from '../../lib/cardImage'
 import GameModel from '../../../../shared/state/gameModel'
-import { Space, Style, Depth, Time, Flags, Color } from '../../settings/settings'
+import {
+  Space,
+  Style,
+  Depth,
+  Time,
+  Flags,
+  Color,
+} from '../../settings/settings'
 import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
