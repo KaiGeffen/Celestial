@@ -151,6 +151,30 @@ export class MatchScene extends BaseScene {
     this.maxVersion = Math.max(this.maxVersion, state.versionNo)
   }
 
+  /**
+   * Advance recap playback to the next live match state (exit the replay stream).
+   * If that state is not in the buffer yet, jump to the newest buffered frame instead.
+   */
+  protected seekQueuedStateAfterRecap(): void {
+    let v = this.currentVersion + 1
+    while (
+      v <= this.maxVersion &&
+      this.queuedStates[v] &&
+      this.queuedStates[v].isRecap
+    ) {
+      v++
+    }
+    if (
+      v <= this.maxVersion &&
+      this.queuedStates[v] &&
+      !this.queuedStates[v].isRecap
+    ) {
+      this.currentVersion = v - 1
+    } else if (this.maxVersion > this.currentVersion) {
+      this.currentVersion = this.maxVersion - 1
+    }
+  }
+
   private signalOpponentSurrendered(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
@@ -276,16 +300,14 @@ export class MatchScene extends BaseScene {
       }
     }
 
-    // Skip watching the story resolve
+    // Skip: go to the next live match state, or the latest buffered frame if needed
     view.historyRegion.skipCallback = () => {
       this.tweens.getTweens().forEach((tween) => {
         tween.complete()
       })
 
-      // End the pause
       this.paused = false
-
-      this.currentVersion = this.maxVersion - 1
+      this.seekQueuedStateAfterRecap()
     }
 
     // Display the cost of each card in our hand
