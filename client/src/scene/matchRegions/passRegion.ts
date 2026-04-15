@@ -112,13 +112,6 @@ export default class PassRegion extends Region {
     } else {
       this.btnPass.disable()
     }
-
-    // Disable moon during day
-    if (state.isRecap) {
-      this.btnMoon.enable()
-    } else {
-      this.btnMoon.disable()
-    }
   }
 
   // Set the callback for when user hits the Pass button
@@ -130,28 +123,11 @@ export default class PassRegion extends Region {
     this.showResultsCallback = callback
   }
 
-  /**
-   * Final recap frame (round win/loss/tie): hold the timeline until the player
-   * unpauses via the moon (same as manual pause during recap).
-   */
-  applyRecapEndPause(): void {
-    this.scene.paused = true
-    const t = this.btnMoon.txt.text as string
-    if (t.includes('\nPaused\n')) {
-      return
-    }
-    this.btnMoon.setText(t.replace('\n\n', '\nPaused\n'))
-  }
-
   private addHotkeys() {
     this.scene.input.keyboard.removeListener('keydown-SPACE')
     this.scene.input.keyboard.on('keydown-SPACE', () => {
-      if (UserSettings._get('hotkeys')) {
-        if (this.btnPass.enabled) {
-          this.btnPass.onClick()
-        } else if (this.btnMoon.enabled) {
-          this.btnMoon.onClick()
-        }
+      if (UserSettings._get('hotkeys') && this.btnPass.enabled) {
+        this.btnPass.onClick()
       }
     })
   }
@@ -159,19 +135,7 @@ export default class PassRegion extends Region {
   private createButtons(): void {
     const x = -115
     this.btnPass = new Buttons.Sun(this.container, x, 0)
-    this.btnMoon = new Buttons.Moon(this.container, -x, 0, () => {
-      if (this.scene['paused']) {
-        this.scene['paused'] = false
-        this.btnMoon.setText(
-          this.btnMoon.txt.text.replace('\nPaused\n', '\n\n'),
-        )
-      } else {
-        this.scene['paused'] = true
-        this.btnMoon.setText(
-          this.btnMoon.txt.text.replace('\n\n', '\nPaused\n'),
-        )
-      }
-    })
+    this.btnMoon = new Buttons.Moon(this.container, -x, 0, () => {})
   }
 
   private createText(): void {

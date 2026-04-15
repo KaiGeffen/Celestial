@@ -350,7 +350,7 @@ export class MatchScene extends BaseScene {
         state.sound === SoundEffect.Lose ||
         state.sound === SoundEffect.Tie)
     ) {
-      this.view.pass.applyRecapEndPause()
+      this.paused = true
     }
 
     return true
