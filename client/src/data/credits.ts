@@ -1,14 +1,33 @@
-export const creditsString = 
-`Lead developer: [b]Kai Geffen[/b]
+export const creditsString = `Game Director / Programmer:
+[b]Kai Geffen[/b]
 
-Artistic Director: [b]Kiva Singh[/b]
+Artists:
+[b]Kiva Singh[/b]
+[b]Elise Mahan[/b]
+[b]Ege Alper[/b]
+[b]Heeral Chhibber[/b]
 
-Artist: [b]Elise Mahan[/b]
+UI/UX Design:
+[b]Alina Onishchenko[/b]
+[b]Zach Fischer[/b]
 
-UI Design: [b]Alina Onishchenko[/b]
+Writing:
+[b]Roshini Soans[/b]
 
-Sound Effects: [b]Eduardo Zolhof[/b]
-Original score and music design by [b]Ian Riley[/b]
+Editing:
+[b]Josh Wagner[/b]
 
-Icons are from game-icons.net under CC BY 3.0
-[b]Lorc[/b]: https://lorcblog.blogspot.com/ (Visible icon)`
+Sound Effects:
+[b]Eduardo Zolhof[/b]
+
+Music:
+[b]Ian Riley[/b]
+
+Video Editing:
+[b]Mark Geffen[/b]
+
+Animation:
+[b]Ferr Animation[/b]
+
+Additional Project Development:
+[b]Cosmic Cog[/b]`
