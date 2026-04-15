@@ -19,6 +19,14 @@ export default class Animator {
   // In the last state, which cards were hidden in the story
   lastHiddenCards: boolean[] = []
 
+  /**
+   * End-of-previous-`animate` snapshot (same role as StoryRegion’s prev score / nourish /
+   * resolved count at the start of the next `displayState`).
+   */
+  private snapshotResolvedActCount = 0
+  private snapshotScore: [number, number] = [0, 0]
+  private snapshotStatusNourish: [number, number] = [0, 0]
+
   constructor(scene: MatchScene, view: View) {
     this.scene = scene
     this.view = view
@@ -26,23 +34,25 @@ export default class Animator {
   }
 
   animate(state: GameModel): void {
-    // Animate any cards being revealed
     this.animateAllReveals(state)
+
+    const bubbleSlots = this.computeRecapBubbleTweenSlots(state)
 
     for (let owner = 0; owner < 2; owner++) {
       for (let i = 0; i < state.animations[owner].length; i++) {
         let animation = state.animations[owner][i]
+        const slot = i + bubbleSlots
 
         if (animation.from === Zone.Mulligan) {
-          this.animateMulligan(animation, owner, i, state)
+          this.animateMulligan(animation, owner, slot, state)
         }
         // Shuffle a player's deck
         else if (animation.from === Zone.Shuffle) {
-          this.animateShuffle(owner, i)
+          this.animateShuffle(owner, slot)
         }
         // Transform a card
         else if (animation.from === Zone.Transform) {
-          this.animateTransform(animation, i, owner)
+          this.animateTransform(animation, slot, owner)
         } else if (animation.from === Zone.Status) {
           // TODO Clarify all this and make a negative nourish sound
           // if (animation.index === 0) {
@@ -68,20 +78,60 @@ export default class Animator {
             this.animateCard(
               card,
               end,
-              i,
+              slot,
               permanentCard,
               this.getSound(animation),
               animation.to === Zone.Story ? SHRUNKEN_CARD_SCALE : undefined,
             )
           } else {
             // Emphasize the card if it stayed in the same zone
-            this.animateEmphasis(card, i)
+            this.animateEmphasis(card, slot)
           }
         }
       }
     }
 
     this.lastHiddenCards = this.getHiddenCards(state)
+
+    // Take a snapshot of the state to use next state to see the changes
+    this.snapshotResolvedActCount = state.story.resolvedActs.length
+    this.snapshotScore = [state.score[0], state.score[1]]
+    this.snapshotStatusNourish = [
+      state.status[0].nourish,
+      state.status[1].nourish,
+    ]
+  }
+
+  /**
+   * Matches resolve-bubble tween branches for the newest resolved act when exactly one act
+   * was added since {@link snapshotResolvedActCount} (parallel to StoryRegion bookkeeping).
+   */
+  private computeRecapBubbleTweenSlots(state: GameModel): number {
+    const resolvedCount = state.story.resolvedActs.length
+    const oneNewResolvedAct =
+      resolvedCount === this.snapshotResolvedActCount + 1 && resolvedCount > 0
+
+    if (!oneNewResolvedAct) {
+      return 0
+    }
+
+    const act = state.story.resolvedActs[resolvedCount - 1]
+    const owner = act.owner
+    const tweenBubbleFromStat = true
+    const nourishAmt = this.snapshotStatusNourish[owner]
+    const pointsEarned = state.score[owner] - this.snapshotScore[owner]
+    const printedPoints = act.card.points
+    const effectAmt = pointsEarned - printedPoints - nourishAmt
+    const showEffectsBubble = act.card.name !== 'Pet'
+    const tweenNourishFromStatus = nourishAmt !== 0
+    const tweenEffectsFromStatus =
+      effectAmt !== 0 && showEffectsBubble
+
+    let n = 0
+    if (tweenBubbleFromStat) n++
+    if (nourishAmt !== 0 && tweenNourishFromStatus) n++
+    if (effectAmt !== 0 && showEffectsBubble && tweenEffectsFromStatus) n++
+    return n
   }
 
   private getStart(
@@ -371,7 +421,7 @@ export default class Animator {
     })
   }
 
-  // Animate all cards newly revealed on this state
+  // Animate all cards newly revealed on this state (runs before resolve-bubble recap stagger)
   private animateAllReveals(state: GameModel): void {
     let acts = state.story.acts
     let amtSeen = 0
