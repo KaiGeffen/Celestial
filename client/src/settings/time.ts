@@ -12,16 +12,19 @@ export const MatchTiming = {
   playCard: 200,
 
   /** Base duration for anything to happen in the recap (Card flips, discard, etc.) */
-  recapTween: 350,
-  /** Delay between stacked recap steps (multiplied by index in animator) */
-  recapTweenStaggerStep: 320,
+  recapTween: 370,
+  /** Pause between anything happening in the recap */
+  recapPauseBetweenTweens: 60,
 
   /** Round-result stamp fade in/out duration */
   roundResultFade: 200,
   /** Round-result stamp hold at full alpha */
   roundResultHold: 2000,
+
+  // NOTE This applies every step, not just the transition day/night
+  // NOTE Therefore, each step must take at least this long
   /** Match background tint transition when entering/exiting recap */
-  recapBackgroundTintMs: 600,
+  recapBackgroundTintMs: 400,
 
   /** TUTORIAL: How long a hint text takes to fade in */
   hintFade: 400,
