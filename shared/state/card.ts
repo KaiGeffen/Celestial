@@ -342,8 +342,18 @@ export class SightCard extends Card {
 export class RefreshCard extends Card {
   onPlay(player: number, game: GameModel): void {
     if (game.hand[player].length > 0) {
+      // Move leftmost card to bottom of deck
       const card = game.hand[player].shift()
       game.deck[player].unshift(card)
+      game.animations[player].push(
+        new Animation({
+          from: Zone.Hand,
+          to: Zone.Deck,
+          card: card,
+          index: 0,
+        }),
+      )
+
       game.draw(player, 1)
     }
   }
