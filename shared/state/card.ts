@@ -231,16 +231,17 @@ export default class Card {
   inspired(amt: number, game: GameModel, player: number) {
     game.breath[player] += amt
     game.status[player].inspired += amt
-  }
 
-  inspire(amt: number, game: GameModel, player: number) {
-    // TODO Handle status animations
+    // NOTE Inspired, not Inspire, is what fades in
     game.animations[player].push(
       new Animation({
         from: Zone.Status,
         index: 0,
       }),
     )
+  }
+
+  inspire(amt: number, game: GameModel, player: number) {
     game.status[player].inspire += amt
   }
 
