@@ -442,6 +442,10 @@ export default class Animator {
     let newCard = this.getCard(animation, owner)
     let oldCard = this.createCard(animation.card).show().copyLocation(newCard)
 
+    // Display the old card with the same scale as the new card
+    oldCard.container.setScale(newCard.container.scale)
+    oldCard.imageShadow.setVisible(false)
+
     // Animate card scaling up and disappearing
     this.scene.tweens.add({
       targets: oldCard.container,
