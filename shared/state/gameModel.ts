@@ -428,6 +428,30 @@ export default class GameModel {
     }
   }
 
+  returnFromDiscardToHand(player: number, index: number = undefined) {
+    // Default to returning card from top of discard pile
+    if (index === undefined) {
+      index = this.pile[player].length - 1
+    }
+
+    if (index < 0 || index >= this.pile[player].length) {
+      return
+    }
+
+    const card = this.pile[player].splice(index, 1)[0]
+    this.hand[player].push(card)
+
+    this.animations[player].push(
+      new Animation({
+        from: Zone.Discard,
+        to: Zone.Hand,
+        card,
+        index,
+        index2: this.hand[player].length - 1,
+      }),
+    )
+  }
+
   /**
    * Shuffle the deck of the given player
    * @param player - The player whose deck to shuffle

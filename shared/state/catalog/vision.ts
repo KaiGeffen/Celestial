@@ -8,8 +8,7 @@ import Act from '../act'
 
 class Dawn extends SightCard {
   onMorning(player: number, game: GameModel, index: number): boolean {
-    game.pile[player].splice(index, 1)
-    game.create(player, this)
+    game.returnFromDiscardToHand(player, index)
     return true
   }
 }
