@@ -280,21 +280,22 @@ class ServerController {
       // Do any activated in discard pile effects
       if (this.model.pile[player].length > 0) {
         const card = this.model.pile[player][this.model.pile[player].length - 1]
+        const morningAnimation = new Animation({
+          from: Zone.Discard,
+          to: Zone.Discard,
+          card: card,
+        })
+        this.model.animations[player].push(morningAnimation)
+
         const somethingActivated = card.onMorning(
           player,
           this.model,
           this.model.pile[player].length - 1,
         )
-        if (somethingActivated) {
-          this.model.animations[player].push(
-            new Animation({
-              from: Zone.Discard,
-              to: Zone.Discard,
-              card: card,
-              index: 0, // TODO Use this or remove
-              index2: 0,
-            }),
-          )
+
+        // If nothing happened, remove the prequeued morning animation.
+        if (!somethingActivated) {
+          this.model.animations[player].pop()
         }
       }
     }
