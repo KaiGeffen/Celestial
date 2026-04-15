@@ -130,6 +130,19 @@ export default class PassRegion extends Region {
     this.showResultsCallback = callback
   }
 
+  /**
+   * Final recap frame (round win/loss/tie): hold the timeline until the player
+   * unpauses via the moon (same as manual pause during recap).
+   */
+  applyRecapEndPause(): void {
+    this.scene.paused = true
+    const t = this.btnMoon.txt.text as string
+    if (t.includes('\nPaused\n')) {
+      return
+    }
+    this.btnMoon.setText(t.replace('\n\n', '\nPaused\n'))
+  }
+
   private addHotkeys() {
     this.scene.input.keyboard.removeListener('keydown-SPACE')
     this.scene.input.keyboard.on('keydown-SPACE', () => {

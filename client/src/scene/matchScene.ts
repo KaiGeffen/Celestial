@@ -7,6 +7,7 @@ import Region from './matchRegions/baseRegion'
 import Regions from './matchRegions/matchRegions'
 import OverlayRegion from './matchRegions/pileOverlayRegions'
 import GameModel from '../../../shared/state/gameModel'
+import { SoundEffect } from '../../../shared/state/soundEffect'
 import PassRegion from './matchRegions/passRegion'
 import { Deck } from '../../../shared/types/deck'
 import Server from '../server'
@@ -343,7 +344,15 @@ export class MatchScene extends BaseScene {
       })
     }
 
-    // State was displayed
+    if (
+      state.isRecap &&
+      (state.sound === SoundEffect.Win ||
+        state.sound === SoundEffect.Lose ||
+        state.sound === SoundEffect.Tie)
+    ) {
+      this.view.pass.applyRecapEndPause()
+    }
+
     return true
   }
 
