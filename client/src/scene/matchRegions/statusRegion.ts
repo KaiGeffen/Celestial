@@ -1,8 +1,10 @@
 import 'phaser'
 import GameModel from '../../../../shared/state/gameModel'
+import { Animation } from '../../../../shared/animation'
+import { Zone } from '../../../../shared/state/zone'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
-import { Depth, Space } from '../../settings/settings'
+import { Depth, Time } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
@@ -24,6 +26,10 @@ export default class StatusRegion extends Region {
   private btnTheirInspire: Button
   private btnTheirNourish: Button
   private btnTheirSight: Button
+
+  /** Base timings shared with recap animation slots. */
+  private static readonly SLOT_MS =
+    Time.match.recapTween + Time.match.recapPauseBetweenTweens
 
   create(scene: MatchScene): this {
     this.scene = scene
@@ -96,5 +102,63 @@ export default class StatusRegion extends Region {
     this.btnTheirSight
       .setVisible(state.status[1].vision !== 0)
       .setText(`${state.status[1].vision}`)
+
+    this.hideStatusesUntilAnimationSlot(state)
+  }
+
+  /**
+   * Hide positive status icons until their Zone.Status animation reaches its slot.
+   */
+  private hideStatusesUntilAnimationSlot(state: GameModel): void {
+    for (let owner = 0; owner < 2; owner++) {
+      for (const animation of state.animations[owner]) {
+        if (animation.from !== Zone.Status) continue
+        if (animation.index !== 0 && animation.index !== 1) continue
+
+        const btn = this.getStatusButton(owner, animation.index)
+        if (!btn) continue
+
+        btn.setVisible(false).setAlpha(1)
+        if (btn.icon) btn.icon.setScale(1)
+        if (btn.txt) btn.txt.setScale(1)
+      }
+    }
+  }
+
+  private getStatusButton(owner: number, index: number): Button | undefined {
+    if (owner === 0) {
+      if (index === 0) return this.btnOurInspire
+      if (index === 1 || index === -1) return this.btnOurNourish
+      if (index === 2) return this.btnOurSight
+      return undefined
+    }
+
+    if (index === 0) return this.btnTheirInspire
+    if (index === 1 || index === -1) return this.btnTheirNourish
+    if (index === 2) return this.btnTheirSight
+    return undefined
+  }
+
+  animateStatus(animation: Animation, owner: number, slot: number): void {
+    if (animation.from !== Zone.Status) return
+
+    const btn = this.getStatusButton(owner, animation.index)
+    if (!btn) return
+
+    const delay = slot * StatusRegion.SLOT_MS
+
+    // Positive status gain: reveal at this slot with a simple alpha fade.
+    if (animation.index === 0 || animation.index === 1) {
+      this.scene.tweens.add({
+        targets: [btn.icon, btn.txt].filter(Boolean),
+        alpha: 1,
+        delay,
+        duration: 120,
+        onStart: () => {
+          btn.setVisible(true).setAlpha(0)
+        },
+      })
+      return
+    }
   }
 }

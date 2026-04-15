@@ -12,7 +12,7 @@ export const MatchTiming = {
   playCard: 200,
 
   /** Base duration for anything to happen in the recap (Card flips, discard, etc.) */
-  recapTween: 370,
+  recapTween: 470,
   /** Pause between anything happening in the recap */
   recapPauseBetweenTweens: 60,
 
