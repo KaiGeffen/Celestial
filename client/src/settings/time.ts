@@ -6,26 +6,25 @@
 
 /** Match-only: live play, recap tweens, hint fade (all milliseconds). */
 export const MatchTiming = {
+  /** How fast cards in hand take to move into focus */
   cardFocus: 150,
-  /**
-   * Time for a card to be played from hand to story.
-   * (Visible shadow tween uses the same duration.)
-   */
-  handToStory: 150,
-  /** Base duration for a single recap zone tween (card move, flip segment, etc.) */
-  recapTween: 400,
+  /** How long for either player to play a card (Hand to story). */
+  playCard: 200,
+
+  /** Base duration for anything to happen in the recap (Card flips, discard, etc.) */
+  recapTween: 350,
   /** Delay between stacked recap steps (multiplied by index in animator) */
   recapTweenStaggerStep: 320,
-  /** Minimum time a recap “state beat” may be shown before advancing (reserved / future) */
-  recapStateMinimum: 800,
-  /** How long a hint text takes to fade in */
-  hintFade: 400,
+
   /** Round-result stamp fade in/out duration */
-  roundResultFadeMs: 200,
+  roundResultFade: 200,
   /** Round-result stamp hold at full alpha */
-  roundResultHoldMs: 2000,
+  roundResultHold: 2000,
   /** Match background tint transition when entering/exiting recap */
   recapBackgroundTintMs: 600,
+
+  /** TUTORIAL: How long a hint text takes to fade in */
+  hintFade: 400,
 } as const
 
 /**

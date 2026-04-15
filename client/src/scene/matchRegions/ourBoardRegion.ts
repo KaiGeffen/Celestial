@@ -291,7 +291,7 @@ export default class OurBoardRegion extends Region {
         y: nextStoryPosition[1],
         rotation: 0,
         scale: SHRUNKEN_CARD_SCALE,
-        duration: Time.match.handToStory,
+        duration: Time.match.playCard,
         ease: 'Sine.easeInOut',
         // Moves other cards in hand to fill the hole
         onStart: () => {
@@ -307,7 +307,7 @@ export default class OurBoardRegion extends Region {
                 targets: adjustedCard.container,
                 x: tx,
                 y: ty,
-                duration: Time.match.handToStory - 10,
+                duration: Time.match.playCard - 10,
                 ease: 'Sine.easeInOut',
               })
             }

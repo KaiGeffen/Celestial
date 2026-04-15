@@ -56,8 +56,8 @@ export default class RoundResultRegion extends Region {
     // Tween it fading in and out
     this.scene.tweens.add({
       targets: this.roundResult,
-      duration: Time.match.roundResultFadeMs,
-      hold: Time.match.roundResultHoldMs,
+      duration: Time.match.roundResultFade,
+      hold: Time.match.roundResultHold,
       ease: 'Sine.easeInOut',
       alpha: 1,
       yoyo: true,
