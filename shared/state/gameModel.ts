@@ -22,6 +22,8 @@ export default class GameModel {
   maxBreath: number[] = [1, 1]
   // TODO This is a hack for Radiant Core, consider other approaches
   endingBreath: number[] = [0, 0]
+  exhaleCountLastRound: number[] = [0, 0]
+
   status: [Statuses, Statuses]
 
   // Resolving specific
@@ -175,6 +177,7 @@ export default class GameModel {
     copy.cardCosts = [...this.cardCosts]
     copy.amtPasses = [...this.amtPasses]
     copy.amtDrawn = [...this.amtDrawn]
+    copy.exhaleCountLastRound = [...this.exhaleCountLastRound]
     // Unnecessary since a new own gets init above, but left in for clarity
     // copy.usernames = [...this.usernames]
     // copy.avatars = [...this.avatars]
@@ -249,7 +252,7 @@ export default class GameModel {
           new Animation({
             from: Zone.Hand,
             to: Zone.Discard,
-            index: i,
+            index: 0,
             index2: discardPileIndex,
             card: card,
           }),
@@ -353,8 +356,41 @@ export default class GameModel {
     this.deck[player].push(card)
   }
 
-  createInStory(player: number, card: Card, i?: number, revealed = false) {
-    this.story.addAct(card, player, i, revealed)
+  createOnDeckBottom(player: number, card: Card) {
+    this.animations[player].push(
+      new Animation({
+        from: Zone.Gone,
+        to: Zone.Deck,
+        card: card,
+        index2: 0,
+      }),
+    )
+
+    // Add the card at the bottom of the deck
+    this.deck[player].unshift(card)
+  }
+
+  /**
+   * Add a card to the story and enqueue the recap animation. `from` defaults to
+   * Gone (created/token); use another zone when the card visibly moves from
+   * deck/discard/etc.
+   */
+  createInStory(
+    player: number,
+    card: Card,
+    i?: number,
+    from: Zone = Zone.Gone,
+  ) {
+    this.story.addAct(card, player, i)
+    const storySlot = i === undefined ? this.story.acts.length - 1 : i
+    this.animations[player].push(
+      new Animation({
+        from,
+        to: Zone.Story,
+        card,
+        index2: storySlot,
+      }),
+    )
   }
 
   dig(player: number, amt: number) {
@@ -390,6 +426,30 @@ export default class GameModel {
         card.onDiscard(player, this)
       }
     }
+  }
+
+  returnFromDiscardToHand(player: number, index: number = undefined) {
+    // Default to returning card from top of discard pile
+    if (index === undefined) {
+      index = this.pile[player].length - 1
+    }
+
+    if (index < 0 || index >= this.pile[player].length) {
+      return
+    }
+
+    const card = this.pile[player].splice(index, 1)[0]
+    this.hand[player].push(card)
+
+    this.animations[player].push(
+      new Animation({
+        from: Zone.Discard,
+        to: Zone.Hand,
+        card,
+        index,
+        index2: this.hand[player].length - 1,
+      }),
+    )
   }
 
   /**

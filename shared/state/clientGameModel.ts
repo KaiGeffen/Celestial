@@ -50,6 +50,7 @@ function reverseAttributes(model: GameModel): void {
     'amtPasses',
     'amtDrawn',
     'cosmeticSets',
+    'exhaleCountLastRound',
     'usernames',
     'subtitles',
   ]

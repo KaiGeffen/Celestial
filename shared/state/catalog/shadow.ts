@@ -81,32 +81,12 @@ class Nightmare extends Card {
     if (game.hand[player ^ 1].length < game.hand[player].length) {
       // Upgrade 1: Create a shadow
       if (this.upgradeVersion === 1) {
-        game.createInStory(player, shadow)
-
-        game.animations[player].push(
-          new Animation({
-            from: Zone.Create,
-            to: Zone.Story,
-            card: shadow,
-            index: 0,
-            index2: game.story.acts.length - 1,
-          }),
-        )
+        game.createInStory(player, shadow, undefined, Zone.Create)
       } else {
         // Move THIS card from discard to story
         game.pile[player].splice(index, 1)
 
-        game.createInStory(player, this, undefined, true)
-
-        game.animations[player].push(
-          new Animation({
-            from: Zone.Discard,
-            to: Zone.Story,
-            card: this,
-            index: 0,
-            index2: game.story.acts.length - 1,
-          }),
-        )
+        game.createInStory(player, this, undefined, Zone.Discard)
       }
       return true
     }
@@ -181,29 +161,17 @@ class WingClipping extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    if (game.hand[player ^ 1].length > 0) {
-      const card = game.hand[player ^ 1].shift()
-      game.deck[player ^ 1].push(card)
-
-      // game.animations[player ^ 1].push(
-      //   new Animation({
-      //     from: Zone.Hand,
-      //     to: Zone.Deck,
-      //     card: card,
-      //     index: 0,
-      //     index2: 0,
-      //     visibility: Visibility.KnowItOccurred,
-      //   }),
-      // )
+    if (game.score[player] < game.score[player ^ 1]) {
+      game.discard(player ^ 1)
     }
   }
 }
 const wingClipping = new WingClipping({
   name: 'Wing Clipping',
   id: 16,
-  cost: 5,
+  cost: 4,
   points: 4,
-  text: 'Your opponent puts the leftmost card of their hand on top of their deck.',
+  text: 'If your opponent has more points than you, they discard a card.',
   story:
     'We walked and ran and played then\nYou leave me behind\nI gasp as the space between us grows',
 })
@@ -295,10 +263,23 @@ class Voices extends Card {
     super.play(player, game, index, bonus)
 
     // Opponent adds first
-    if (super.exhale(2, game, player)) {
+    let opponentAddedACard = false
+    if (super.exhale(1, game, player)) {
       if (game.hand[player ^ 1].length > 0) {
+        // Track whether a card was actually added
+        opponentAddedACard = true
+
         const card = game.hand[player ^ 1].shift()
         game.story.addAct(card, player ^ 1, 0)
+        game.animations[player ^ 1].push(
+          new Animation({
+            from: Zone.Hand,
+            to: Zone.Story,
+            card: card,
+            index: 0,
+            index2: 0,
+          }),
+        )
       }
     }
 
@@ -307,6 +288,15 @@ class Voices extends Card {
       if (game.hand[player].length > 0) {
         const card = game.hand[player].shift()
         game.story.addAct(card, player, 1)
+        game.animations[player].push(
+          new Animation({
+            from: Zone.Hand,
+            to: Zone.Story,
+            card: card,
+            index: 0,
+            index2: opponentAddedACard ? 1 : 0,
+          }),
+        )
       }
     }
   }
@@ -316,7 +306,7 @@ const voices = new Voices({
   id: 483,
   cost: 1,
   points: 1,
-  text: 'Exhale 2: Your opponent adds a card from their hand to the story.\nExhale 2: You do the same after their card.',
+  text: 'Exhale 1: Your opponent adds a card from their hand to the story.\nExhale 2: You do the same after their card.',
   beta: true,
 })
 
@@ -337,46 +327,65 @@ const isolation = new Isolation({
   cost: 7,
   points: 7,
   text: 'Costs 0 if you won last round without playing any cards.',
+  beta: true,
 })
 
 class Spider extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    if (super.exhale(2, game, player)) {
-      if (game.story.acts.length > 0) {
-        game.returnActToHand(0)
-      }
+    if (game.story.acts.length > 0) {
+      game.returnActToHand(0)
     }
   }
 }
 const spider = new Spider({
   name: 'Spider',
   id: 485,
-  cost: 3,
-  points: 3,
-  text: "Exhale 2: Return the next card in the story to its owner's hand.",
+  cost: 5,
+  points: 5,
+  text: "Return the next card in the story to its owner's hand.",
   beta: true,
 })
 
-;[
-  dagger,
-  shadow,
-  imprison,
-  nightmare,
-  boa,
-  hungryGhost,
-  hurricane,
-  wingClipping,
-  sickness,
-  victim,
-  lostInShadow,
-  vampire,
-  rupture,
-  voices,
-  spider,
-].forEach((card) => {
-  card.theme = 2
+class Monster extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    if (this.exhale(2, game, player)) {
+      bonus += game.wins[player ^ 1]
+    }
+
+    super.play(player, game, index, bonus)
+  }
+}
+const monster = new Monster({
+  name: 'Monster',
+  id: 342,
+  text: "Discard the next card in the story if it shares a base-cost with a card in your hand.\nExhale 2: Worth +1 for each round you've lost.",
+  beta: true,
+})
+
+class Mutual extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    let triggerCondition = false
+    for (let i = 0; i < Math.min(2, game.story.acts.length); i++) {
+      if (game.story.acts[i].owner === player) {
+        triggerCondition = !triggerCondition
+      }
+    }
+
+    if (this.exhale(1, game, player) && triggerCondition) {
+      game.removeAct(0)
+      game.removeAct(0)
+    }
+
+    super.play(player, game, index, bonus)
+  }
+}
+const mutual = new Mutual({
+  name: 'Mutual',
+  id: 343,
+  text: 'Exhale 1: If exactly one of the next 2 cards in the story is yours, discard both.',
+  beta: true,
 })
 
 export {
@@ -393,8 +402,8 @@ export {
   lostInShadow,
   vampire,
   // NEW CARDS
-  // isolation,
-  rupture,
+  // rupture,
   voices,
-  spider,
+  // mutual,
+  isolation,
 }

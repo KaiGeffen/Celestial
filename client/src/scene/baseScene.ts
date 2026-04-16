@@ -72,7 +72,7 @@ class SharedBaseScene extends Phaser.Scene {
 
     this.msgTimeout = setTimeout(() => {
       this.txtMessage.setText('').setVisible(false)
-    }, Time.onscreenMessage)
+    }, Time.general.centerMessageLingerMs)
   }
 
   // Alert the user that they have taken an illegal or impossible action
@@ -164,7 +164,7 @@ export default class BaseScene extends SharedBaseScene {
 
     // Friends list button (to the left of options)
     this.btnFriends = new Buttons.Icon({
-      name: 'Friends',
+      name: 'Social',
       within: this,
       f: this.openFriendsList(),
       muteClick: true,
@@ -175,8 +175,8 @@ export default class BaseScene extends SharedBaseScene {
 
     // Anchor to the left of options button
     this.plugins.get('rexAnchor')['add'](this.btnFriends.icon, {
-      x: `100%-${Space.pad + Space.iconSize + Space.pad}`,
-      y: `0%+${Space.pad + Space.iconSize / 2}`,
+      x: `100%-${Space.padSmall + Space.iconSize + Space.padSmall}`,
+      y: `0%+${Space.padSmall + Space.iconSize / 2}`,
     })
 
     // Menu button
@@ -192,8 +192,8 @@ export default class BaseScene extends SharedBaseScene {
 
     // Anchor to top right
     this.plugins.get('rexAnchor')['add'](this.btnOptions.icon, {
-      x: `100%-${Space.pad}`,
-      y: `0%+${Space.pad}`,
+      x: `100%-${Space.padSmall}`,
+      y: `0%+${Space.padSmall}`,
     })
 
     // Disconnected indicator (gear icon below options)

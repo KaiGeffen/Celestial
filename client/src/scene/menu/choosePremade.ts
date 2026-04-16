@@ -326,7 +326,7 @@ export default class ChoosePremade extends Menu {
           },
           options: {
             animation: {
-              duration: Time.chart,
+              duration: Time.general.chartRevealMs,
               easing: 'easeOutQuint',
             },
             plugins: {

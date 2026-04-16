@@ -1,23 +1,30 @@
 import 'phaser'
 // Import Settings itself
-import { Ease, Space, UserSettings, Messages } from '../settings/settings'
+import { UserSettings, Messages } from '../settings/settings'
 import BaseScene from './baseScene'
 import Animator from './matchRegions/animator'
 import Region from './matchRegions/baseRegion'
 import Regions from './matchRegions/matchRegions'
-import OverlayRegion from './matchRegions/pileOverlays'
+import OverlayRegion from './matchRegions/pileOverlayRegions'
 import GameModel from '../../../shared/state/gameModel'
-import PassRegion from './matchRegions/pass'
+import { SoundEffect } from '../../../shared/state/soundEffect'
+import PassRegion from './matchRegions/passRegion'
 import { Deck } from '../../../shared/types/deck'
 import Server from '../server'
-import TheirAvatarRegion from './matchRegions/theirAvatar'
-import OurAvatarRegion from './matchRegions/ourAvatar'
-import TheirScoreRegion from './matchRegions/theirScore'
-import OurBoardRegion from './matchRegions/ourBoard'
-import TheirBoardRegion from './matchRegions/theirBoard'
-import StoryRegion from './matchRegions/story'
-import OurScoreRegion from './matchRegions/ourScore'
+import TheirAvatarRegion from './matchRegions/theirAvatarRegion'
+import OurAvatarRegion from './matchRegions/ourAvatarRegion'
+import OurBoardRegion from './matchRegions/ourBoardRegion'
+import OurStacksRegion from './matchRegions/ourStacksRegion'
+import TheirBoardRegion from './matchRegions/theirBoardRegion'
+import TheirStacksRegion from './matchRegions/theirStacksRegion'
+import StoryRegion from './matchRegions/storyRegion'
 import MulliganRegion from './matchRegions/mulliganRegion'
+import WinsRegion from './matchRegions/scoreRegion'
+import WinsChromeRegion from './matchRegions/winsChromeRegion'
+import BackgroundRegion from './matchRegions/backgroundRegion'
+import BreathRegion from './matchRegions/breathRegion'
+import HistoryRegion from './matchRegions/historyRegion'
+import StatusRegion from './matchRegions/statusRegion'
 
 // TODO Figure out
 import { server } from '../server'
@@ -112,9 +119,6 @@ export class MatchScene extends BaseScene {
       this.params.password,
     )
 
-    // Register the shift hotkey to explain hotkeys in all regions
-    this.addHotkeyHint()
-
     this.paused = false
 
     this.setCallbacks(this.view)
@@ -145,6 +149,30 @@ export class MatchScene extends BaseScene {
     }
 
     this.maxVersion = Math.max(this.maxVersion, state.versionNo)
+  }
+
+  /**
+   * Advance recap playback to the next live match state (exit the replay stream).
+   * If that state is not in the buffer yet, jump to the newest buffered frame instead.
+   */
+  protected seekQueuedStateAfterRecap(): void {
+    let v = this.currentVersion + 1
+    while (
+      v <= this.maxVersion &&
+      this.queuedStates[v] &&
+      this.queuedStates[v].isRecap
+    ) {
+      v++
+    }
+    if (
+      v <= this.maxVersion &&
+      this.queuedStates[v] &&
+      !this.queuedStates[v].isRecap
+    ) {
+      this.currentVersion = v - 1
+    } else if (this.maxVersion > this.currentVersion) {
+      this.currentVersion = this.maxVersion - 1
+    }
   }
 
   private signalOpponentSurrendered(): void {
@@ -238,8 +266,8 @@ export class MatchScene extends BaseScene {
   }
 
   protected setCommonCallbacks(view: View): void {
-    // Set the callbacks for overlays
-    view.ourAvatar.setOverlayCallbacks(
+    // Set the callbacks for overlays (count icons sit on the pile stacks)
+    view.ourStacks.setOverlayCallbacks(
       () => {
         this.view.showOverlay(this.view.ourDeckOverlay)
       },
@@ -248,7 +276,7 @@ export class MatchScene extends BaseScene {
       },
     )
 
-    view.theirAvatar.setOverlayCallbacks(
+    view.theirStacks.setOverlayCallbacks(
       () => {
         this.view.showOverlay(this.view.theirDeckOverlay)
       },
@@ -257,8 +285,8 @@ export class MatchScene extends BaseScene {
       },
     )
 
-    // Watch recap (Resolutioin of last story)
-    view.theirScore.recapCallback = () => {
+    // Watch recap (resolution of last story)
+    view.historyRegion.recapCallback = () => {
       // Scan backwards through the queued states to find the start of the recap
       for (let version = this.currentVersion - 1; version >= 0; version--) {
         if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
@@ -272,21 +300,19 @@ export class MatchScene extends BaseScene {
       }
     }
 
-    // Skip watching the story resolve
-    view.theirScore.skipCallback = () => {
+    // Skip: go to the next live match state, or the latest buffered frame if needed
+    view.historyRegion.skipCallback = () => {
       this.tweens.getTweens().forEach((tween) => {
         tween.complete()
       })
 
-      // End the pause
       this.paused = false
-
-      this.currentVersion = this.maxVersion - 1
+      this.seekQueuedStateAfterRecap()
     }
 
     // Display the cost of each card in our hand
     view.ourBoard.setDisplayCostCallback((cost: number) => {
-      this.view.ourScore.displayCost(cost)
+      this.view.breathRegion.displayCost(cost)
     })
 
     // For showing the results after match is over
@@ -340,7 +366,15 @@ export class MatchScene extends BaseScene {
       })
     }
 
-    // State was displayed
+    if (
+      state.isRecap &&
+      (state.sound === SoundEffect.Win ||
+        state.sound === SoundEffect.Lose ||
+        state.sound === SoundEffect.Tie)
+    ) {
+      this.paused = true
+    }
+
     return true
   }
 
@@ -385,36 +419,6 @@ export class MatchScene extends BaseScene {
     this.view.theirAvatar.emote(emoteNumber)
   }
 
-  // Register the shift hotkey to explain hotkeys in all regions
-  private addHotkeyHint(): void {
-    const regions = [
-      this.view.mulligan,
-      this.view.ourAvatar,
-      this.view.theirAvatar,
-      this.view.ourBoard,
-      this.view.theirScore,
-      this.view.pass,
-    ]
-    this.input.keyboard.on('keydown-SHIFT', () => {
-      if (UserSettings._get('hotkeys')) {
-        regions.forEach((region) => {
-          region.setHotkeyHintVisible(true)
-        })
-        // Raise all cards when shift is pressed
-        this.view.ourBoard.raiseAllCards()
-      }
-    })
-    this.input.keyboard.on('keyup-SHIFT', () => {
-      if (UserSettings._get('hotkeys')) {
-        regions.forEach((region) => {
-          region.setHotkeyHintVisible(false)
-        })
-        // Lower all cards when shift is released
-        this.view.ourBoard.lowerAllCards()
-      }
-    })
-  }
-
   protected registerMatchServerHooks(): void {
     // Each registered event
     server
@@ -443,7 +447,9 @@ export class MatchScene extends BaseScene {
   }
 
   onWindowResize(): void {
+    this.view.ourStacks.onWindowResize()
     this.view.ourBoard.onWindowResize()
+    this.view.theirStacks.onWindowResize()
     this.view.theirBoard.onWindowResize()
   }
 }
@@ -462,10 +468,14 @@ export class View {
   ourAvatar: OurAvatarRegion
 
   ourBoard: OurBoardRegion
+  ourStacks: OurStacksRegion
   theirBoard: TheirBoardRegion
+  theirStacks: TheirStacksRegion
 
-  ourScore: OurScoreRegion
-  theirScore: TheirScoreRegion
+  breathRegion: BreathRegion
+  wins: WinsRegion
+  winsChromeRegion: WinsChromeRegion
+  historyRegion: HistoryRegion
 
   // Overlays
   ourDeckOverlay: OverlayRegion
@@ -484,26 +494,13 @@ export class View {
   // Class that animates everything that is animated
   animator: Animator
 
-  background: Phaser.GameObjects.Image
+  backgroundRegion: BackgroundRegion
+  statusRegion: StatusRegion
 
   constructor(scene: MatchScene, avatarId: number, password: string) {
     this.scene = scene
 
-    this.background = scene.add
-      .image(0, 0, 'background-Dark')
-      .setOrigin(0)
-      .setDepth(-1)
-      // Hovering this will hide the hint, in case it lingers from a state change
-      .setInteractive()
-      .on('pointerover', () => {
-        this.scene.hint.hide()
-      })
-
-    this.background.setScale(
-      this.background.width >= Space.windowWidth
-        ? 1
-        : Space.windowWidth / this.background.width,
-    )
+    this.backgroundRegion = new Regions.Background().create(scene)
 
     this.searching = new Regions.Searching().create(scene, avatarId, password)
 
@@ -511,11 +508,23 @@ export class View {
     // this.createOurHand()
     // new HandRegion()//.create(scene)
     this.ourBoard = new Regions.OurBoard().create(scene)
+    this.ourStacks = new Regions.OurStacks().create(
+      scene,
+      this.ourBoard.container,
+    )
     this.theirBoard = new Regions.TheirBoard().create(scene)
+    this.theirStacks = new Regions.TheirStacks().create(
+      scene,
+      this.theirBoard.container,
+    )
+
+    this.statusRegion = new StatusRegion().create(scene)
 
     this.story = new Regions.Story().create(scene)
-    this.ourScore = new Regions.OurScore().create(scene)
-    this.theirScore = new Regions.TheirScore().create(scene)
+    this.breathRegion = new Regions.Breath().create(scene)
+    this.winsChromeRegion = new Regions.WinsChrome().create(scene)
+    this.wins = new Regions.Wins().create(scene)
+    this.historyRegion = new Regions.History().create(scene)
     // this.ourButtons = new Regions.OurButtons().create(scene)
 
     this.pass = new Regions.Pass().create(scene)
@@ -565,11 +574,18 @@ export class View {
     this.theirAvatar.displayState(state)
     this.ourAvatar.displayState(state)
 
+    this.statusRegion.displayState(state)
+
+    this.ourStacks.displayState(state)
     this.ourBoard.displayState(state)
+
+    this.theirStacks.displayState(state)
     this.theirBoard.displayState(state)
 
-    this.ourScore.displayState(state)
-    this.theirScore.displayState(state)
+    this.breathRegion.displayState(state)
+    this.winsChromeRegion.displayState(state)
+    this.wins.displayState(state)
+    this.historyRegion.displayState(state)
 
     this.story.displayState(state)
     this.pass.displayState(state)
@@ -594,42 +610,7 @@ export class View {
       this.scene.playSound(state.sound)
     }
 
-    // At night, background is dark
-    this.tweenBackgroundTint(state.isRecap)
-  }
-
-  // Tween the background tint between day and night
-  private tweenBackgroundTint(isRecap: boolean) {
-    const startTint = this.background.tintTopLeft
-    const endTint = isRecap ? 0x666666 : 0xffffff
-
-    const startR = (startTint >> 16) & 0xff
-    const startG = (startTint >> 8) & 0xff
-    const startB = startTint & 0xff
-
-    const endR = (endTint >> 16) & 0xff
-    const endG = (endTint >> 8) & 0xff
-    const endB = endTint & 0xff
-
-    this.scene.tweens.add({
-      targets: { t: 0 },
-      t: 1,
-      duration: 400,
-      ease: Ease.basic,
-      onUpdate: (tween) => {
-        const t = tween.getValue()
-        const r = Math.round(startR + (endR - startR) * t)
-        const g = Math.round(startG + (endG - startG) * t)
-        const b = Math.round(startB + (endB - startB) * t)
-        const tint = (r << 16) | (g << 8) | b
-        this.background.setTint(tint)
-      },
-      onComplete: () => {
-        if (!isRecap) {
-          this.background.clearTint()
-        }
-      },
-    })
+    this.backgroundRegion.tweenTintForRecap(state.isRecap)
   }
 
   // Show the given overlay and hide all others

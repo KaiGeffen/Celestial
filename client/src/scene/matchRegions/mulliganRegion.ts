@@ -82,13 +82,6 @@ export default class MulliganRegion extends Region {
       },
       returnHotkey: true,
     })
-    this.addHotkeyHint(
-      [
-        Space.windowWidth / 2,
-        Space.windowHeight / 2 + Space.cardHeight / 2 + Space.pad * 4,
-      ],
-      'SPACE',
-    )
 
     this.addHotkeyListeners()
 
@@ -125,8 +118,6 @@ export default class MulliganRegion extends Region {
       card.doBurstEffect = false
 
       this.cards.push(card)
-
-      this.addHotkeyHint(position, `${i + 1}`)
     }
 
     // Update the text saying who starts with priority

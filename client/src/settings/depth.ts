@@ -5,11 +5,15 @@ export const Depth: Record<string, number> = {
   theirAvatar: 1,
   ourAvatar: 1,
   storyAtDay: 0,
-  ourHand: 1,
+  /** Inspire / Nourish / Sight; below {@link ourHand} / {@link theirHand}. */
+  matchStatus: 0,
+  ourHand: 5,
   theirHand: 1,
   storyAtNight: 2,
   ourScore: 3,
-  theirScore: 3,
+  /** Decorative chrome behind match win counts (see `WinsChromeRegion`). */
+  winsChrome: 3,
+  matchPlaybackControls: 3,
   mulligan: 4,
   pass: 5,
 

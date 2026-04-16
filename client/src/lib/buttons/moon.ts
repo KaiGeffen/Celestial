@@ -17,13 +17,15 @@ export default class Moon extends Button {
       },
       icon: {
         name: 'Moon',
-        interactive: true,
+        interactive: false,
         circular: true,
       },
       callbacks: {
         click: f,
       },
     })
+
+    this.icon.setScale(0.6)
 
     // Rotate 180 since moon always viewed upside down
     this.txt.setRotation(Math.PI).setAlign('center')

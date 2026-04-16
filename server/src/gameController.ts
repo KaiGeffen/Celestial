@@ -67,12 +67,10 @@ class ServerController {
 
     // Do action: Pass or play a card
     if (choice === MechanicsSettings.PASS) {
-      // NOTE This logic isn't put in model because handling phase change is controller's responsibility
-      this.model.passes += 1
-      this.model.amtPasses[player] += 1
-      this.model.switchPriority()
-      this.model.sound = SoundEffect.Pass
+      // Handle the pass occuring and trigger any effects
+      this.pass(player)
 
+      // After pass occurs, end round if both players passed
       if (this.model.passes === 2) {
         this.doResolvePhase()
         this.doUpkeep()
@@ -86,7 +84,6 @@ class ServerController {
         this.model.passes = 0
         this.model.lastPlayerWhoPlayed = player
         this.model.switchPriority()
-        this.model.versionIncrClearAnimations()
         return true
       } else {
         return false
@@ -94,9 +91,26 @@ class ServerController {
     }
   }
 
+  // Pass the turn, handle all logic to do with that
+  private pass(player: number): void {
+    this.model.passes += 1
+    this.model.amtPasses[player] += 1
+    this.model.switchPriority()
+    this.model.sound = SoundEffect.Pass
+
+    // Trigger on pass effects
+    for (let i = 0; i < this.model.story.acts.length; i++) {
+      const act = this.model.story.acts[i]
+      act.card.onPass(player, act.owner, this.model)
+    }
+  }
+
   private attemptPlay(player: number, cardNum: number): boolean {
     if (this.canPlay(player, cardNum)) {
       this.model.sound = null
+      // Clear prior animations and bump version before resolving play, so effects
+      // during play() (e.g. Heart → Story→Discard) stay on the outgoing state.
+      this.model.versionIncrClearAnimations()
       this.play(player, cardNum)
       return true
     } else {
@@ -115,9 +129,20 @@ class ServerController {
     this.model.story.addAct(card, player)
 
     // Trigger on-play effects
-    for (let i = 0; i < this.model.story.acts.length - 1; i++) {
+    for (let i = 0; i < this.model.story.acts.length - 1; ) {
       const act = this.model.story.acts[i]
-      act.card.onCardPlayedAfter(player, this.model, i)
+
+      const cardRemoved = act.card.onCardPlayedAfter(
+        i,
+        act.owner,
+        player,
+        this.model,
+      )
+
+      // In the special case in which a card was removed, don't increment i
+      if (!cardRemoved) {
+        i++
+      }
     }
     card.onPlay(player, this.model)
 
@@ -219,6 +244,8 @@ class ServerController {
 
     // Hand triggers
     for (const player of players) {
+      const handSizeAtStart = this.model.hand[player].length
+
       // Do any effects that activate in hand
       let index = 0
       while (index < this.model.hand[player].length) {
@@ -227,6 +254,7 @@ class ServerController {
           player,
           this.model,
           index,
+          handSizeAtStart,
         )
 
         if (somethingActivated) {
@@ -252,21 +280,22 @@ class ServerController {
       // Do any activated in discard pile effects
       if (this.model.pile[player].length > 0) {
         const card = this.model.pile[player][this.model.pile[player].length - 1]
+        const morningAnimation = new Animation({
+          from: Zone.Discard,
+          to: Zone.Discard,
+          card: card,
+        })
+        this.model.animations[player].push(morningAnimation)
+
         const somethingActivated = card.onMorning(
           player,
           this.model,
           this.model.pile[player].length - 1,
         )
-        if (somethingActivated) {
-          this.model.animations[player].push(
-            new Animation({
-              from: Zone.Discard,
-              to: Zone.Discard,
-              card: card,
-              index: 0, // TODO Use this or remove
-              index2: 0,
-            }),
-          )
+
+        // If nothing happened, remove the prequeued morning animation.
+        if (!somethingActivated) {
+          this.model.animations[player].pop()
         }
       }
     }
@@ -282,6 +311,9 @@ class ServerController {
   // The resolution phase, after both players have passed. Points and effects happen as cards resolve
   protected doResolvePhase(): void {
     this.model.score = [0, 0]
+
+    // Reset the exhale count since a new resolution is beginning
+    this.model.exhaleCountLastRound = [0, 0]
 
     this.model.story.run(this.model)
 
@@ -321,6 +353,9 @@ class ServerController {
     this.model.status[player].inspired = this.model.status[player].inspire
     this.model.breath[player] += this.model.status[player].inspire
     this.model.status[player].inspire = 0
+
+    // Possibility: same breath grant as inspire per stack, but the count persists
+    this.model.breath[player] += this.model.status[player].possibility
   }
 
   private canPlay(player: number, cardNum: number): boolean {

@@ -180,6 +180,7 @@ export default class FilterRegion {
       name: 'SmallX',
       within: sizer,
       f: this.onClearFilters(btns),
+      size: 32,
     })
 
     return sizer
@@ -405,7 +406,7 @@ export default class FilterRegion {
     const lowerQuery = query.toLowerCase()
 
     // Build searchable string
-    let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points}`
+    let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points} ${card.beta ? 'beta' : ''}`
 
     // Keyword reminder text
     for (const [keyword, _] of Catalog.getReferencedKeywords(card)) {

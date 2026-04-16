@@ -186,7 +186,6 @@ export class MapJourneyBuilderScene extends BuilderBase {
   }
 }
 
-
 export class BuilderScene extends BuilderBase {
   lastDecklist: number
   pinned: boolean = true
@@ -269,6 +268,7 @@ export class BuilderScene extends BuilderBase {
         // Resize the catalog
         this.catalogRegion.resize(this.sizer.width)
       },
+      size: 32,
     }).setDepth(100)
   }
 

@@ -205,6 +205,12 @@ export const assetLists = {
     ],
     "pixelArt": false
   },
+  "card/effects": {
+    "files": [
+      "shadow"
+    ],
+    "pixelArt": false
+  },
   "cutout": {
     "files": [
       "Abundance",
@@ -323,41 +329,30 @@ export const assetLists = {
   },
   "icon": {
     "files": [
+      "Wins",
       "Mission",
-      "Arrow",
-      "Border",
       "BreathBasic",
       "BreathExtra",
       "BreathHover",
       "BreathOom",
       "BreathSpent",
       "CustomDeck",
-      "Deck",
       "DeckbuilderTab",
-      "Discard",
       "Discord",
-      "Edit",
-      "Friends",
-      "History",
-      "HomeButton",
       "InputText",
       "Inspire",
-      "JourneyClearStamp",
       "JourneyStar",
       "JourneyTab",
-      "Leaderboard",
       "LeaderboardTab",
       "MatchHistoryTab",
       "Moon",
       "Network",
-      "New",
       "Nourish",
       "Options",
       "PlayTab",
       "Pointer",
       "ProfileTab",
       "Quest",
-      "QuestionMark",
       "QuestsTab",
       "Recap",
       "Search",
@@ -365,6 +360,7 @@ export const assetLists = {
       "Sight",
       "Skip",
       "SmallX",
+      "Social",
       "Speed",
       "Status",
       "Store",
@@ -372,10 +368,13 @@ export const assetLists = {
       "Sun",
       "Thumb",
       "Underline",
-      "Wins",
       "XOut"
     ],
     "dimensions": {
+      "Wins": {
+        "width": 157,
+        "height": 1080
+      },
       "Mission": {
         "width": 80,
         "height": 80
@@ -385,8 +384,10 @@ export const assetLists = {
   },
   "background": {
     "files": [
-      "Dark",
-      "Light"
+      "Light",
+      "matchBottom",
+      "matchTop",
+      "water"
     ],
     "pixelArt": false
   },
@@ -441,11 +442,18 @@ export const assetLists = {
   },
   "chrome": {
     "files": [
-      "Avatar",
       "CloudBottom",
       "CloudTop",
-      "Hand",
-      "ResultGlow"
+      "ResultGlow",
+      "breathWheel",
+      "bubble",
+      "bubbleEffect",
+      "bubbleNourish",
+      "nameplate",
+      "stackCount",
+      "sundial",
+      "sundial",
+      "wins"
     ],
     "pixelArt": false
   },

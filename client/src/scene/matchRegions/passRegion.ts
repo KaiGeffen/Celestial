@@ -1,0 +1,236 @@
+import 'phaser'
+import Button from '../../lib/buttons/button'
+
+import GameModel from '../../../../shared/state/gameModel'
+import {
+  Style,
+  Time,
+  Ease,
+  UserSettings,
+  Depth,
+  Messages,
+} from '../../settings/settings'
+import { MatchScene } from '../matchScene'
+import Region from './baseRegion'
+import Buttons from '../../lib/buttons/buttons'
+import { server } from '../../server'
+
+// During the round, shows Pass button, who has passed, and who has priority
+export default class PassRegion extends Region {
+  callback: () => boolean
+  recapCallback: () => void
+
+  // The callback once the winner has been declared
+  showResultsCallback: () => void
+
+  hotkeysRegistered = false
+
+  btnPass: Button
+  btnMoon: Button
+
+  yourPass: Phaser.GameObjects.Container
+  theirPass: Phaser.GameObjects.Container
+
+  create(scene: MatchScene): PassRegion {
+    this.scene = scene
+    this.container = scene.add.container(0, 0).setDepth(Depth.pass)
+
+    // Anchor to right
+    scene.plugins.get('rexAnchor')['add'](this.container, {
+      x: `100%`,
+      y: `50%`,
+    })
+
+    // Pass and recap button
+    this.createButtons()
+
+    // Show who has passed
+    this.createText()
+
+    return this
+  }
+
+  displayState(state: GameModel): void {
+    this.deleteTemp()
+
+    // Before mulligan is complete, hide this region
+    if (state.mulligansComplete.includes(false)) {
+      this.container.setVisible(false)
+      return
+    } else if (!this.hotkeysRegistered) {
+      this.addHotkeys()
+      this.hotkeysRegistered = true
+    }
+    this.container.setVisible(true)
+
+    // Display the current score totals
+    const s = `${state.score[1]}\n\n${state.score[0]}`
+    this.btnMoon.setText(s)
+
+    // Rotate to the right day/night
+    this.showDayNight(state.isRecap)
+
+    // Show who has passed
+    if (state.passes === 2) {
+      this.animatePass(this.yourPass, true)
+      this.animatePass(this.theirPass, true)
+    } else if (state.passes === 1) {
+      // My turn, so they passed
+      if (state.priority === 0) {
+        this.animatePass(this.yourPass, false)
+        this.animatePass(this.theirPass, true)
+      }
+      // Their turn, so I passed
+      else {
+        this.animatePass(this.yourPass, true)
+        this.animatePass(this.theirPass, false)
+      }
+    } else {
+      this.animatePass(this.yourPass, false)
+      this.animatePass(this.theirPass, false)
+    }
+
+    // Enable/disable button based on who has priority
+    if (state.winner !== null) {
+      // Once the game is over, change the callback to instead show results of match
+      this.btnPass
+        .enable()
+        .setText('EXIT')
+        .setOnClick(() => {
+          this.showResultsCallback()
+        })
+    } else if (state.priority === 0 && !state.isRecap) {
+      // Call callback if network is connected
+      this.btnPass.enable().setOnClick(() => {
+        if (!server.isOpen()) {
+          this.scene.signalError(Messages.disconnectError)
+        } else {
+          if (!this.callback()) return
+          this.btnPass.disable()
+        }
+      })
+    } else {
+      this.btnPass.disable()
+    }
+  }
+
+  // Set the callback for when user hits the Pass button
+  setCallback(callback: () => boolean): void {
+    this.callback = callback
+  }
+
+  setShowResultsCallback(callback: () => void): void {
+    this.showResultsCallback = callback
+  }
+
+  private addHotkeys() {
+    this.scene.input.keyboard.removeListener('keydown-SPACE')
+    this.scene.input.keyboard.on('keydown-SPACE', () => {
+      if (UserSettings._get('hotkeys') && this.btnPass.enabled) {
+        this.btnPass.onClick()
+      }
+    })
+  }
+
+  private createButtons(): void {
+    const x = -115
+    this.btnPass = new Buttons.Sun(this.container, x, 0)
+    this.btnMoon = new Buttons.Moon(this.container, -x, 0, () => {})
+  }
+
+  private createText(): void {
+    // Create containers for each pass indicator
+    this.theirPass = this.scene.add.container(-150, -100).setAlpha(0)
+    this.yourPass = this.scene.add.container(-150, 80).setAlpha(0)
+
+    // Them
+    const cloud = this.scene.add.image(0, 0, 'chrome-CloudBottom').setScale(0.8)
+    const text = this.scene.add
+      .text(0, 20, 'Passed', Style.todoCloud)
+      .setOrigin(0.5)
+    this.theirPass.add([cloud, text])
+
+    // Me
+    const cloud2 = this.scene.add.image(0, -20, 'chrome-CloudTop').setScale(0.8)
+    const text2 = this.scene.add
+      .text(0, 0, 'Passed', Style.todoCloud)
+      .setOrigin(0.5)
+    this.yourPass.add([cloud2, text2])
+
+    // Add containers to the main container
+    this.container.add([this.yourPass, this.theirPass])
+  }
+
+  // Animate the given object saying that the player has/not passed
+  // NOTE This causes a pause on every state change even if alpha is 0 > 0
+  private animatePass(
+    container: Phaser.GameObjects.Container,
+    hasPassed: boolean,
+  ): void {
+    if (hasPassed) {
+      // Start off screen to the left
+      container.x = -160
+      container.alpha = 0
+
+      this.scene.tweens.add({
+        targets: container,
+        x: -150,
+        alpha: 1,
+        duration: Time.match.recapTween,
+        ease: 'Cubic.out',
+        onComplete: () => {
+          container.setAlpha(1)
+        },
+      })
+    } else {
+      this.scene.tweens.add({
+        targets: container,
+        alpha: 0,
+        duration: Time.match.recapTween,
+        onComplete: () => {
+          container.setAlpha(0)
+        },
+      })
+    }
+  }
+
+  // Animate the sun / moon being visible when it's day or night
+  private showDayNight(isRecap: boolean) {
+    let target = this.container
+
+    // If day and sun not centered
+    if (!isRecap && target.rotation !== 0) {
+      this.scene.tweens.add({
+        targets: target,
+        rotation: 0,
+        ease: Ease.basic,
+      })
+    }
+    // If night and moon not centered
+    else if (
+      isRecap &&
+      target.rotation !== Math.PI &&
+      target.rotation !== -Math.PI
+    ) {
+      this.scene.tweens.add({
+        targets: target,
+        rotation: Math.PI,
+        ease: Ease.basic,
+      })
+    }
+  }
+
+  // For tutorial, disable the option to pass, but still show the sun
+  // private oldCallback: () => void
+  tutorialSimplifyPass(simplified: boolean): void {
+    if (simplified) {
+      this.btnPass.setText('')
+      this.btnPass['tutorialSimplifiedPass'] = true
+      this.btnPass.disable()
+    } else {
+      this.btnPass.setText('Pass')
+      this.btnPass['tutorialSimplifiedPass'] = false
+      this.btnPass.enable()
+    }
+  }
+}

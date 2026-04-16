@@ -3,16 +3,8 @@ import 'phaser'
 import { CardImage } from '../../lib/cardImage'
 import Card from '../../../../shared/state/card'
 import GameModel from '../../../../shared/state/gameModel'
-import {
-  Time,
-  Space,
-  Color,
-  Depth,
-  Style,
-  BBStyle,
-} from '../../settings/settings'
+import { Time, Space, Color, Depth, Style } from '../../settings/settings'
 import { MatchScene } from '../matchScene'
-import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 
 // Base region
 export default class Region {
@@ -26,9 +18,6 @@ export default class Region {
   // The cards in the current state in this region, if any
   cards: CardImage[]
   cards2: CardImage[]
-
-  // Text showing which hotkey is relevant for each element in the region
-  hotkeyHints: BBCodeText[] = []
 
   addCard(card: Card, position: [number, number] = [0, 0]): CardImage {
     return new CardImage(card, this.container).setPosition(position)
@@ -116,27 +105,5 @@ export default class Region {
 
     delete this.temp
     this.temp = []
-    // this.hotkeyHints = []
-  }
-
-  // Show / hide the hotkey hints
-  setHotkeyHintVisible(show: boolean): void {
-    this.hotkeyHints.forEach((hint) => {
-      hint.setVisible(show)
-    })
-  }
-
-  // Add a hotkey hint at position with text s
-  protected addHotkeyHint(position: [number, number], s: string): any {
-    const hotkeyText = this.scene.add
-      .rexBBCodeText(position[0], position[1], s, BBStyle.hotkeyHint)
-      .setOrigin(0.5)
-      .setVisible(false)
-
-    // Add to container and temp collection for cleanup
-    this.container.add(hotkeyText)
-    this.hotkeyHints.push(hotkeyText)
-
-    return hotkeyText
   }
 }

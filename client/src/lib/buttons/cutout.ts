@@ -198,7 +198,7 @@ export default class Cutout extends Button {
     this.tween = this.scene.tweens.add({
       targets: this.txt,
       alpha: 0,
-      duration: Time.flash,
+      duration: Time.general.attentionFlashMs,
       yoyo: true,
       onStart: () => {
         this.txt.alpha = 1

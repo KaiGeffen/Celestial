@@ -22,7 +22,8 @@ function predictPointDifference(model: GameModel): number {
   let ourNourish = model.status[0].nourish
   let theirNourish = model.status[1].nourish
 
-  let theirBreath = model.maxBreath[0] + model.status[1].inspired
+  let theirBreath =
+    model.maxBreath[0] + model.status[1].inspired + model.status[1].possibility
   let theyPlayedHiddenCards = false
 
   for (const act of model.story.acts) {

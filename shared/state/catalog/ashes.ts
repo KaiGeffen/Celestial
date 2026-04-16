@@ -1,5 +1,5 @@
 import Card from '../card'
-import { ashes } from './tokens'
+import { ashes, condemnation } from './tokens'
 import { Quality } from '../quality'
 import { Animation } from '../../animation'
 import { Zone } from '../zone'
@@ -345,7 +345,7 @@ class Immolant extends Card {
         from: Zone.Discard,
         to: Zone.Story,
         index: game.pile[player].length - 1,
-        index2: game.story.resolvedActs.length + 1,
+        index2: 0,
       }),
     )
 
@@ -430,8 +430,7 @@ class Remnant extends Card {
   }
 
   onMorning(player: number, game: GameModel, index: number): boolean {
-    game.pile[player].splice(index, 1)
-    game.create(player, this)
+    game.returnFromDiscardToHand(player, index)
     game.discard(player)
     return true
   }
@@ -441,7 +440,7 @@ const remnant = new Remnant({
   id: 2050,
   cost: 2,
   points: 2,
-  text: 'Add an Ashes to your discard pile.\nMorning: Return this to hand. Discard a card.',
+  text: 'Create an Ashes in your discard pile.\nMorning: Return this to hand. Discard a card.',
   beta: true,
 })
 
@@ -500,23 +499,62 @@ const finale = new Finale({
   text: '.',
 })
 
-;[
-  dash,
-  impulse,
-  mine,
-  arsonist,
-  parch,
-  veteran,
-  cling,
-  death,
-  fromAshes,
-  goliath,
-  firebug,
-  immolant,
-  spark,
-  remnant,
-].forEach((card) => {
-  card.theme = 1
+class Prometheus extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    game.maxBreath[player] += 1
+    game.createInPile(player, condemnation)
+  }
+}
+const prometheus = new Prometheus({
+  name: 'Prometheus',
+  id: 2073,
+  cost: 4,
+  points: 4,
+  text: 'Inspire 2.\nCreate a Condemnation in your discard pile.',
+})
+
+class SuddenDraw extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    game.discard(player, 2)
+  }
+
+  onPlay(player: number, game: GameModel) {
+    game.draw(player, 2)
+  }
+}
+const suddenDraw = new Prometheus({
+  name: 'Sudden Draw',
+  id: 2075,
+  cost: 1,
+  text: 'When played, draw 2 cards.\nDiscard 2 cards.',
+})
+
+class Zoomies extends Card {
+  onBigResolve(player: number, game: GameModel, index: number) {
+    game.animations[player].push(
+      new Animation({
+        from: Zone.Discard,
+        to: Zone.Story,
+        card: this,
+        index2: 0,
+      }),
+    )
+
+    game.pile[player].splice(index, 1)
+    game.story.addAct(this, player, 0)
+  }
+}
+const zoomies = new Zoomies({
+  name: 'Zoomies',
+  id: 2085,
+  cost: 1,
+  points: 1,
+  text: 'When you resolve a card that costs 7 or more, move this card from your discard pile to the story.',
+  beta: true,
 })
 
 export {
@@ -540,4 +578,7 @@ export {
   // dyingLight,
   // momentum,
   // finale,
+  // prometheus,
+  // suddenDraw,
+  zoomies,
 }

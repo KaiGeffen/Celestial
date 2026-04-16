@@ -11,6 +11,15 @@ const COLOR_BETTER = '#55dd55'
 const COLOR_WORSE = '#e45555'
 const STAT_STROKE = '#000000'
 
+/** Name on the story points-resolve bubble container so setResolved can keep it visible. */
+export const STORY_RESOLVE_BUBBLE_NAME = 'storyPointsBubble'
+
+/** Name on the story nourish-resolve bubble (from status row to card). */
+export const STORY_RESOLVE_NOURISH_BUBBLE_NAME = 'storyNourishBubble'
+
+/** Bonus/malus from card text (story position, etc.); not the points stat nor nourish. */
+export const STORY_RESOLVE_EFFECTS_BUBBLE_NAME = 'storyEffectsBubble'
+
 // TODO Many fields should be private
 
 export class CardImage {
@@ -21,7 +30,8 @@ export class CardImage {
   interactive = false
   doBurstEffect = true
 
-  // Image layers
+  // Image layers (shadow is drawn first / behind everything)
+  imageShadow: CardShadow
   imageBackground: Phaser.GameObjects.Image
   imageSubject: Phaser.GameObjects.Image
   imageArc: Phaser.GameObjects.Image
@@ -96,6 +106,7 @@ export class CardImage {
 
   destroy(): void {
     ;[
+      this.imageShadow,
       this.imageBackground,
       this.imageSubject,
       this.imageArc,
@@ -146,11 +157,29 @@ export class CardImage {
     return this
   }
 
+  /**
+   * Undo the hover behavior, and call the exit callback
+   */
+  onHoverExitBehavior(): void {
+    this.scene.tweens.killTweensOf(this.imageSubject)
+    this.scene.tweens.add({
+      targets: this.imageSubject,
+      displayWidth: Space.cardWidth,
+      displayHeight: Space.cardHeight,
+      duration: 120,
+      ease: 'Quad.Out',
+    })
+    this.exitCallback()
+  }
+
   setPlayable(isPlayable: boolean): void {
     if (isPlayable) {
       this.clearTint()
     } else {
       this.setTint(Color.cardGreyed)
+
+      // Set to grey shadow
+      this.imageShadow.clearGlow()
     }
   }
 
@@ -174,10 +203,13 @@ export class CardImage {
 
       if (this.card.cost > cost) {
         this.txtCost.setColor(COLOR_BETTER)
+        this.imageShadow.setGlow(0x55dd55)
       } else if (this.card.cost < cost) {
         this.txtCost.setColor(COLOR_WORSE)
+        this.imageShadow.setGlow(0xe45555)
       } else {
         this.txtCost.setColor(Color.cardCost)
+        this.imageShadow.clearGlow()
       }
     }
     return this
@@ -187,7 +219,8 @@ export class CardImage {
   setCard(card: Card): this {
     if (
       this.card.id !== card.id ||
-      this.card.upgradeVersion !== card.upgradeVersion
+      this.card.upgradeVersion !== card.upgradeVersion ||
+      this.points !== card.points
     ) {
       this.card = card
 
@@ -253,6 +286,10 @@ export class CardImage {
   }
 
   private createImages(shadow: boolean): void {
+    this.imageShadow = new CardShadow(this.scene, 0, 0)
+    this.container.add(this.imageShadow)
+    this.imageShadow.setVisible(shadow)
+
     // Card background wash
     this.imageBackground = this.scene.add.image(
       0,
@@ -264,10 +301,6 @@ export class CardImage {
 
     this.imageSubject = this.scene.add.image(0, 0, this.getSubjectImageName())
     this.imageSubject.setDisplaySize(Space.cardWidth, Space.cardHeight)
-
-    if (shadow) {
-      this.scene.addShadow(this.imageBackground)
-    }
 
     this.container.add(this.imageSubject)
 
@@ -287,10 +320,6 @@ export class CardImage {
     this.imageCardback = this.scene.add.image(0, 0, 'cardback-default')
     this.imageCardback.setDisplaySize(Space.cardWidth, Space.cardHeight)
     this.container.add(this.imageCardback)
-
-    if (shadow) {
-      this.scene.addShadow(this.imageCardback)
-    }
 
     this.imageCardback.setAlpha(this.card.id === Catalog.cardback.id ? 1 : 0)
   }
@@ -531,17 +560,8 @@ export class CardImage {
         return
       }
 
-      this.scene.tweens.killTweensOf(this.imageSubject)
-      this.scene.tweens.add({
-        targets: this.imageSubject,
-        displayWidth: Space.cardWidth,
-        displayHeight: Space.cardHeight,
-        duration: 120,
-        ease: 'Quad.Out',
-      })
-
-      // Do the callback
-      this.exitCallback()
+      // Do the exit behavior
+      this.onHoverExitBehavior()
     }
   }
 
@@ -593,8 +613,7 @@ export class CardImage {
     this.imageSubject.setTint(color)
     this.imageArc.setTint(color)
     this.imageContainer.setTint(color)
-    this.txtCost.setTint(color)
-    this.txtPoints.setTint(color)
+    // Keep txtCost / txtPoints untinted so stats stay readable when greyed
     // this.txtText.setTint(color)
   }
 
@@ -603,9 +622,45 @@ export class CardImage {
     this.imageSubject.clearTint()
     this.imageArc.clearTint()
     this.imageContainer.clearTint()
-    this.txtCost.clearTint()
-    this.txtPoints.clearTint()
     // this.txtText.clearTint()
+  }
+
+  setMorningGlow(): this {
+    this.imageShadow.setGlow(0xffff9f)
+    return this
+  }
+
+  setVisibleGlow(): this {
+    this.imageShadow.setGlow(0xffff9f)
+    return this
+  }
+
+  setSeenGlow(): this {
+    this.imageShadow.setGlow(0xedb282)
+    return this
+  }
+}
+
+class CardShadow extends Phaser.GameObjects.Image {
+  constructor(scene: BaseScene, x: number, y: number) {
+    super(scene, x, y, 'card/effects-shadow')
+
+    // Set the size slightly larger than a card
+    this.setDisplaySize(Space.cardWidth + 30, Space.cardHeight + 30)
+
+    // Alpha is typically 0.25
+    this.setAlpha(0.25)
+  }
+
+  clearGlow(): void {
+    this.clearTint()
+    this.setAlpha(0.25)
+  }
+
+  setGlow(color: number): void {
+    this.setTintFill(color)
+    this.setAlpha(1)
+    this.setVisible(true)
   }
 }
 
