@@ -4,37 +4,48 @@ import { Depth } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
+/** Shared score chrome height as a fraction of viewport height. */
+const SCORE_CHROME_HEIGHT_RATIO = 0.8
+
 export default class WinsRegion extends Region {
   private imgSundial: Phaser.GameObjects.Image
-  private imgWins: Phaser.GameObjects.Image
+  private imgOurWins: Phaser.GameObjects.Image
+  private imgTheirWins: Phaser.GameObjects.Image
 
   create(scene: MatchScene): this {
     this.scene = scene
     this.container = scene.add.container(0, 0).setDepth(Depth.ourScore)
 
     this.imgSundial = scene.add.image(0, 0, 'chrome-sundial').setOrigin(1, 0.5)
-    this.imgWins = scene.add.image(0, 0, 'icon-Wins').setOrigin(1, 0.5)
-    this.container.add([this.imgSundial, this.imgWins])
+    this.imgOurWins = scene.add.image(0, 0, 'icon-Wins').setOrigin(1, 0.5)
+    this.imgTheirWins = scene.add.image(0, 0, 'icon-Wins').setOrigin(1, 0.5)
+    this.imgTheirWins.setFlipY(true)
+    this.container.add([this.imgSundial, this.imgOurWins, this.imgTheirWins])
 
     scene.plugins.get('rexAnchor')['add'](this.container, {
       x: `100%`,
       y: `50%`,
       onUpdateViewportCallback: (viewport) => {
-        const sundialH = viewport.height * 0.7
+        const h = viewport.height * SCORE_CHROME_HEIGHT_RATIO
         const sundialAspect =
           this.imgSundial.frame.width / this.imgSundial.frame.height
-        this.imgSundial.setDisplaySize(sundialH * sundialAspect, sundialH)
+        this.imgSundial.setDisplaySize(h * sundialAspect, h)
 
-        const h = viewport.height
-        const aspect = this.imgWins.frame.width / this.imgWins.frame.height
-        this.imgWins.setDisplaySize(h * aspect, h)
+        const aspect = this.imgOurWins.frame.width / this.imgOurWins.frame.height
+        this.imgOurWins.setDisplaySize(h * aspect, h)
+        this.imgTheirWins.setDisplaySize(h * aspect, h)
       },
     })
 
     return this
   }
 
-  displayState(_state: GameModel): void {
-    // TODO hook wins state into the strip frame(s)
+  displayState(state: GameModel): void {
+    const ourWins = state.wins?.[0] ?? 0
+    const theirWins = state.wins?.[1] ?? 0
+
+    // 0..5 round wins map to the 6 frames in icon-Wins.
+    this.imgOurWins.setFrame(Math.max(0, Math.min(5, ourWins)))
+    this.imgTheirWins.setFrame(Math.max(0, Math.min(5, theirWins)))
   }
 }
