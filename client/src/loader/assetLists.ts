@@ -386,10 +386,7 @@ export const assetLists = {
     "files": [
       "Light",
       "matchBottom",
-      "matchOuter",
-      "matchRight",
       "matchTop",
-      "old matchOuter",
       "water"
     ],
     "pixelArt": false
@@ -453,8 +450,8 @@ export const assetLists = {
       "bubbleEffect",
       "bubbleNourish",
       "nameplate",
-      "replayControls",
       "stackCount",
+      "sundial",
       "sundial",
       "wins"
     ],
