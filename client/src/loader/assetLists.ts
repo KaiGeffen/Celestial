@@ -354,6 +354,7 @@ export const assetLists = {
       "Quest",
       "QuestsTab",
       "Recap",
+      "Recap",
       "Search",
       "Share",
       "Sight",

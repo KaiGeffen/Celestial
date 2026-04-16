@@ -74,6 +74,7 @@ export default class HistoryRegion extends Region {
       y,
       f: () => this.recapCallback(),
     })
+    this.btnRecap.icon.setDisplaySize(156, 146)
 
     this.btnSkip = new Buttons.Icon({
       name: 'Skip',
