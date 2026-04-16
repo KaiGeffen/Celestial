@@ -329,6 +329,7 @@ export const assetLists = {
   },
   "icon": {
     "files": [
+      "Wins",
       "Mission",
       "BreathBasic",
       "BreathExtra",
@@ -367,10 +368,13 @@ export const assetLists = {
       "Sun",
       "Thumb",
       "Underline",
-      "XOut",
-      "win"
+      "XOut"
     ],
     "dimensions": {
+      "Wins": {
+        "width": 157,
+        "height": 1080
+      },
       "Mission": {
         "width": 80,
         "height": 80

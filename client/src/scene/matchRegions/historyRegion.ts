@@ -84,5 +84,6 @@ export default class HistoryRegion extends Region {
       y,
       f: () => this.skipCallback(),
     }).setVisible(false)
+    this.btnSkip.icon.setDisplaySize(155, 150)
   }
 }
