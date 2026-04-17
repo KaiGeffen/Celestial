@@ -138,7 +138,10 @@ export default class PassRegion extends Region {
   private addHotkeys() {
     this.scene.input.keyboard.removeListener('keydown-SPACE')
     this.scene.input.keyboard.on('keydown-SPACE', () => {
-      if (UserSettings._get('hotkeys') && this.btnPass.enabled) {
+      if (!UserSettings._get('hotkeys')) return
+      if (this.btnMoon.enabled) {
+        this.btnMoon.onClick()
+      } else if (this.btnPass.enabled) {
         this.btnPass.onClick()
       }
     })
