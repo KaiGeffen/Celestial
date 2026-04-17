@@ -79,7 +79,7 @@ export default class HistoryRegion extends Region {
     this.btnSkip = new Buttons.Icon({
       name: 'Skip',
       within: this.container,
-      hint: 'Skip replay',
+      hint: 'Skip',
       x,
       y,
       f: () => this.skipCallback(),

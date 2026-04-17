@@ -3,26 +3,34 @@ import { Ease, Time } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
-/**
- * Offset for the match top and bottom images, multiplied by the scale of the image.
- * Used to ensure the vertical spacing is correct.
- */
-const Y_OFFSET = -80
-
 type RexAnchorWithOffset = {
   offsetX: number
   setOffset: (x: number, y: number) => void
 }
 
-/** Scale image to `targetWidth`; sync rex anchor Y to 0%/100% ± Y_OFFSET×scale. */
+/** Scale image to `targetWidth`; sync rex anchor Y to keep the avatar in the curved corner. */
 function fitBackgroundWidth(
   img: Phaser.GameObjects.Image,
   targetWidth: number,
   anchor: RexAnchorWithOffset,
+  edge: 'top' | 'bottom',
 ): void {
   const source = img.scene.textures.get(img.texture.key).getSourceImage()
   const scale = targetWidth / source.width
   img.setScale(scale)
+
+  // Adjust the y to keep the avatar in the curved corner
+  // Space for the avatar in the curved corner
+  const avatarHeight = 220
+
+  // Space for the portion of the border above that (Roughly)
+  const imageHeight = source.height
+  const ratioUpperPortion = 230 / 540
+  const heightAboveAvatar = imageHeight * ratioUpperPortion * scale
+
+  const magnitude = avatarHeight + heightAboveAvatar
+  const offset = edge === 'top' ? magnitude : -magnitude
+  anchor.setOffset(anchor.offsetX, offset)
 }
 
 /** Full-screen match backdrop; recap state tints the image. */
@@ -66,11 +74,11 @@ export default class BackgroundRegion extends Region {
           img as Phaser.GameObjects.Image,
           w,
           anchor as RexAnchorWithOffset,
+          'top',
         )
       },
     })
 
-    // 222
     scene.plugins.get('rexAnchor')['add'](this.matchBottom, {
       x: `50%`,
       y: `100%-${height}`,
@@ -80,6 +88,7 @@ export default class BackgroundRegion extends Region {
           img as Phaser.GameObjects.Image,
           w,
           anchor as RexAnchorWithOffset,
+          'bottom',
         )
       },
     })

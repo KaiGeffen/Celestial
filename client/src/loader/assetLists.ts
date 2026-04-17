@@ -385,10 +385,7 @@ export const assetLists = {
   "background": {
     "files": [
       "Light",
-      "matchBottom copy",
       "matchBottom",
-      "matchBottom",
-      "matchTop",
       "matchTop",
       "water"
     ],

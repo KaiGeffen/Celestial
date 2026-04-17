@@ -70,7 +70,7 @@ export default class PassRegion extends Region {
       state.sound !== null &&
       ['win', 'lose', 'tie'].includes(state.sound)
     this.btnMoon.setText(
-      `${state.score[1]}\n${isRecapEndPause ? 'Paused' : ''}\n${state.score[0]}`,
+      `${state.score[1]}\n${isRecapEndPause ? 'Continue' : ''}\n${state.score[0]}`,
     )
 
     if (state.isRecap) {
