@@ -18,8 +18,8 @@ export default class HistoryRegion extends Region {
       .setDepth(Depth.matchPlaybackControls)
 
     scene.plugins.get('rexAnchor')['add'](this.container, {
-      x: '100%-200',
-      y: '50%',
+      x: '100%-225',
+      y: '30%',
     })
 
     this.createButtons()
@@ -47,9 +47,6 @@ export default class HistoryRegion extends Region {
   }
 
   private createButtons(): void {
-    const x = 10
-    const y = -190
-
     const chrome = this.scene.add.image(0, 0, 'chrome-replayControls')
     chrome.setVisible(false)
     this.container.add(chrome)
@@ -58,8 +55,6 @@ export default class HistoryRegion extends Region {
       name: 'Recap',
       within: this.container,
       hint: 'Watch replay',
-      x,
-      y,
       f: () => this.recapCallback(),
     })
     this.btnRecap.icon.setDisplaySize(55, 62)
