@@ -309,7 +309,6 @@ export class MatchScene extends BaseScene {
       this.paused = false
       this.seekQueuedStateAfterRecap()
     }
-    view.historyRegion.skipCallback = skipRecap
     view.pass.skipCallback = skipRecap
 
     // Display the cost of each card in our hand
