@@ -17,7 +17,7 @@ export default class Moon extends Button {
       },
       icon: {
         name: 'Moon',
-        interactive: false,
+        interactive: true,
         circular: true,
       },
       callbacks: {

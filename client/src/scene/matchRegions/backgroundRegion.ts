@@ -39,9 +39,8 @@ export default class BackgroundRegion extends Region {
 
     this.matchTop = scene.add
       .image(0, 0, 'background-matchTop')
-      .setOrigin(0.5, 0)
+      .setOrigin(0.5, 1)
       .setInteractive()
-      .setVisible(false)
 
     this.matchBottom = scene.add
       .image(0, 0, 'background-matchBottom')
@@ -57,9 +56,10 @@ export default class BackgroundRegion extends Region {
       height: `100%`,
     })
 
+    const height = 350
     scene.plugins.get('rexAnchor')['add'](this.matchTop, {
       x: `50%`,
-      y: `0%`,
+      y: `0%+${height}`,
       width: `100%`,
       onResizeCallback: (w, _h, img, anchor) => {
         fitBackgroundWidth(
@@ -70,9 +70,10 @@ export default class BackgroundRegion extends Region {
       },
     })
 
+    // 222
     scene.plugins.get('rexAnchor')['add'](this.matchBottom, {
       x: `50%`,
-      y: `100%-${222}`,
+      y: `100%-${height}`,
       width: `100%`,
       onResizeCallback: (w, _h, img, anchor) => {
         fitBackgroundWidth(

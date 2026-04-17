@@ -301,7 +301,7 @@ export class MatchScene extends BaseScene {
     }
 
     // Skip: go to the next live match state, or the latest buffered frame if needed
-    view.historyRegion.skipCallback = () => {
+    const skipRecap = () => {
       this.tweens.getTweens().forEach((tween) => {
         tween.complete()
       })
@@ -309,6 +309,8 @@ export class MatchScene extends BaseScene {
       this.paused = false
       this.seekQueuedStateAfterRecap()
     }
+    view.historyRegion.skipCallback = skipRecap
+    view.pass.skipCallback = skipRecap
 
     // Display the cost of each card in our hand
     view.ourBoard.setDisplayCostCallback((cost: number) => {

@@ -19,6 +19,7 @@ import { server } from '../../server'
 export default class PassRegion extends Region {
   callback: () => boolean
   recapCallback: () => void
+  skipCallback: () => void
 
   // The callback once the winner has been declared
   showResultsCallback: () => void
@@ -63,9 +64,20 @@ export default class PassRegion extends Region {
     }
     this.container.setVisible(true)
 
-    // Display the current score totals
-    const s = `${state.score[1]}\n\n${state.score[0]}`
-    this.btnMoon.setText(s)
+    // Display the current score totals (mark when recap has paused on round result)
+    const isRecapEndPause =
+      state.isRecap &&
+      state.sound !== null &&
+      ['win', 'lose', 'tie'].includes(state.sound)
+    this.btnMoon.setText(
+      `${state.score[1]}\n${isRecapEndPause ? 'Paused' : ''}\n${state.score[0]}`,
+    )
+
+    if (state.isRecap) {
+      this.btnMoon.enable()
+    } else {
+      this.btnMoon.disable()
+    }
 
     // Rotate to the right day/night
     this.showDayNight(state.isRecap)
@@ -135,7 +147,9 @@ export default class PassRegion extends Region {
   private createButtons(): void {
     const x = -115
     this.btnPass = new Buttons.Sun(this.container, x, 0)
-    this.btnMoon = new Buttons.Moon(this.container, -x, 0, () => {})
+    this.btnMoon = new Buttons.Moon(this.container, -x, 0, () =>
+      this.skipCallback(),
+    ).disable()
   }
 
   private createText(): void {
