@@ -355,9 +355,11 @@ export const assetLists = {
       "Quest",
       "QuestsTab",
       "Recap",
+      "Recap",
       "Search",
       "Share",
       "Sight",
+      "Skip",
       "Skip",
       "SmallX",
       "Social",
@@ -385,6 +387,7 @@ export const assetLists = {
   "background": {
     "files": [
       "Light",
+      "matchBottom copy",
       "matchBottom",
       "matchTop",
       "water"
@@ -451,7 +454,6 @@ export const assetLists = {
       "bubbleNourish",
       "nameplate",
       "stackCount",
-      "sundial",
       "sundial",
       "wins"
     ],

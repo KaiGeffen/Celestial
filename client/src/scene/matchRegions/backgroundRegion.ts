@@ -3,13 +3,26 @@ import { Ease, Time } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
-/** Scale image so its width matches `targetWidth`; height follows aspect ratio. */
+/**
+ * Offset for the match top and bottom images, multiplied by the scale of the image.
+ * Used to ensure the vertical spacing is correct.
+ */
+const Y_OFFSET = -80
+
+type RexAnchorWithOffset = {
+  offsetX: number
+  setOffset: (x: number, y: number) => void
+}
+
+/** Scale image to `targetWidth`; sync rex anchor Y to 0%/100% ± Y_OFFSET×scale. */
 function fitBackgroundWidth(
   img: Phaser.GameObjects.Image,
   targetWidth: number,
+  anchor: RexAnchorWithOffset,
 ): void {
   const source = img.scene.textures.get(img.texture.key).getSourceImage()
-  img.setScale(targetWidth / source.width)
+  const scale = targetWidth / source.width
+  img.setScale(scale)
 }
 
 /** Full-screen match backdrop; recap state tints the image. */
@@ -28,10 +41,11 @@ export default class BackgroundRegion extends Region {
       .image(0, 0, 'background-matchTop')
       .setOrigin(0.5, 0)
       .setInteractive()
+      .setVisible(false)
 
     this.matchBottom = scene.add
       .image(0, 0, 'background-matchBottom')
-      .setOrigin(0.5, 1)
+      .setOrigin(0.5, 0)
       .setInteractive()
 
     this.container.add(this.water)
@@ -47,17 +61,25 @@ export default class BackgroundRegion extends Region {
       x: `50%`,
       y: `0%`,
       width: `100%`,
-      onResizeCallback: (w, _h, img) => {
-        fitBackgroundWidth(img as Phaser.GameObjects.Image, w)
+      onResizeCallback: (w, _h, img, anchor) => {
+        fitBackgroundWidth(
+          img as Phaser.GameObjects.Image,
+          w,
+          anchor as RexAnchorWithOffset,
+        )
       },
     })
 
     scene.plugins.get('rexAnchor')['add'](this.matchBottom, {
       x: `50%`,
-      y: `100%`,
+      y: `100%-${222}`,
       width: `100%`,
-      onResizeCallback: (w, _h, img) => {
-        fitBackgroundWidth(img as Phaser.GameObjects.Image, w)
+      onResizeCallback: (w, _h, img, anchor) => {
+        fitBackgroundWidth(
+          img as Phaser.GameObjects.Image,
+          w,
+          anchor as RexAnchorWithOffset,
+        )
       },
     })
 
