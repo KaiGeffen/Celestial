@@ -271,6 +271,7 @@ class Voices extends Card {
 
         const card = game.hand[player ^ 1].shift()
         game.story.addAct(card, player ^ 1, 0)
+
         game.animations[player ^ 1].push(
           new Animation({
             from: Zone.Hand,
@@ -287,14 +288,18 @@ class Voices extends Card {
     if (super.exhale(2, game, player)) {
       if (game.hand[player].length > 0) {
         const card = game.hand[player].shift()
-        game.story.addAct(card, player, 1)
+
+        // Be after 1 more card in story unless opp added no card
+        const targetIndex = opponentAddedACard ? 1 : 0
+
+        game.story.addAct(card, player, targetIndex)
         game.animations[player].push(
           new Animation({
             from: Zone.Hand,
             to: Zone.Story,
             card: card,
             index: 0,
-            index2: opponentAddedACard ? 1 : 0,
+            index2: targetIndex,
           }),
         )
       }
