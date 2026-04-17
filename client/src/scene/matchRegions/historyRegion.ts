@@ -13,9 +13,7 @@ export default class HistoryRegion extends Region {
 
   create(scene: MatchScene): this {
     this.scene = scene
-    this.container = scene.add
-      .container(0, 0)
-      .setDepth(Depth.matchPlaybackControls)
+    this.container = scene.add.container(0, 0)
 
     scene.plugins.get('rexAnchor')['add'](this.container, {
       x: '100%-225',

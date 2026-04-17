@@ -34,7 +34,7 @@ export default class PassRegion extends Region {
 
   create(scene: MatchScene): PassRegion {
     this.scene = scene
-    this.container = scene.add.container(0, 0).setDepth(Depth.pass)
+    this.container = scene.add.container(0, 0)
 
     // Anchor to right
     scene.plugins.get('rexAnchor')['add'](this.container, {

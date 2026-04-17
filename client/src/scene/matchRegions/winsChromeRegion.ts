@@ -18,7 +18,7 @@ export default class WinsChromeRegion extends Region {
 
   create(scene: MatchScene): this {
     this.scene = scene
-    this.container = scene.add.container(0, 0).setDepth(Depth.winsChrome)
+    this.container = scene.add.container(0, 0)
 
     scene.plugins.get('rexAnchor')['add'](this.container, {
       x: '0%+140',

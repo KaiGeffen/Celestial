@@ -39,7 +39,7 @@ export default class StatusRegion extends Region {
   create(scene: MatchScene): this {
     this.scene = scene
 
-    this.container = scene.add.container(0, 0).setDepth(Depth.matchStatus)
+    this.container = scene.add.container(0, 0).setDepth(Depth.statusIcons)
 
     this.theirRow = scene.add.container(0, 0)
     this.ourRow = scene.add.container(0, 0)

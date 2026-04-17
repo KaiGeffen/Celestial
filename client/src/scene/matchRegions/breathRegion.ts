@@ -28,7 +28,7 @@ export default class BreathRegion extends Region {
 
   create(scene: MatchScene): this {
     this.scene = scene
-    this.container = scene.add.container().setDepth(Depth.ourScore)
+    this.container = scene.add.container()
 
     // Anchor to bottom right
     scene.plugins.get('rexAnchor')['add'](this.container, {

@@ -14,7 +14,7 @@ export default class WinsRegion extends Region {
 
   create(scene: MatchScene): this {
     this.scene = scene
-    this.container = scene.add.container(0, 0).setDepth(Depth.ourScore)
+    this.container = scene.add.container(0, 0)
 
     this.imgSundial = scene.add.image(0, 0, 'chrome-sundial').setOrigin(1, 0.5)
     this.imgOurWins = scene.add.image(0, 0, 'icon-Wins').setOrigin(1, 0.5)
@@ -31,7 +31,8 @@ export default class WinsRegion extends Region {
           this.imgSundial.frame.width / this.imgSundial.frame.height
         this.imgSundial.setDisplaySize(h * sundialAspect, h)
 
-        const aspect = this.imgOurWins.frame.width / this.imgOurWins.frame.height
+        const aspect =
+          this.imgOurWins.frame.width / this.imgOurWins.frame.height
         this.imgOurWins.setDisplaySize(h * aspect, h)
         this.imgTheirWins.setDisplaySize(h * aspect, h)
       },

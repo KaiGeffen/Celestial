@@ -14,7 +14,7 @@ export default class TheirAvatarRegion extends AvatarRegionBase {
 
   create(scene: MatchScene): this {
     this.scene = scene
-    this.container = scene.add.container(0, 0).setDepth(Depth.theirAvatar)
+    this.container = scene.add.container(0, 0)
 
     this.createAvatar()
     this.createUsernames()

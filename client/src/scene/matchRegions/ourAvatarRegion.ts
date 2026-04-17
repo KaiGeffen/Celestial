@@ -20,7 +20,7 @@ export default class OurAvatarRegion extends AvatarRegionBase {
 
   create(scene: MatchScene): this {
     this.scene = scene
-    this.container = scene.add.container().setDepth(Depth.ourAvatar)
+    this.container = scene.add.container()
     this.scene.plugins.get('rexAnchor')['add'](this.container, {
       y: `100%-${height}`,
     })
