@@ -1,7 +1,7 @@
 import { Quality } from './quality'
 import { Act } from './story'
 import GameModel from './gameModel'
-import { Animation } from '../animation'
+import { Animation, Visibility } from '../animation'
 import { Zone } from './zone'
 import { Keyword } from './keyword'
 
@@ -365,6 +365,7 @@ export class RefreshCard extends Card {
           to: Zone.Deck,
           card: card,
           index: 0,
+          visibility: Visibility.FullyUnknown,
         }),
       )
 
