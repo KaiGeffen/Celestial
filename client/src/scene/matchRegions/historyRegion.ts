@@ -60,7 +60,7 @@ export default class HistoryRegion extends Region {
 
   private createButtons(): void {
     const x = 10
-    const y = 190
+    const y = -190
 
     const chrome = this.scene.add.image(0, 0, 'chrome-replayControls')
     chrome.setVisible(false)
