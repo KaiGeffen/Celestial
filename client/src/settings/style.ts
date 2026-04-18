@@ -43,17 +43,19 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     color: Color.textButton,
   },
 
-  // Pass button
-  pass: {
+  // Sun
+  sun: {
     fontFamily: altFont,
     fontSize: '32px',
     color: Color.passText,
   },
-  // Moon button
+  // Moon
   moon: {
     fontFamily: altFont,
     fontSize: '48px',
     color: Color.passText,
+    stroke: Color.backgroundLightS,
+    strokeThickness: 2,
   },
   // Surname for characters in premade deck
   surname: {

@@ -16,7 +16,7 @@ export default class Sun extends Button {
       text: {
         text: 'PASS',
         interactive: false,
-        style: Style.pass,
+        style: Style.sun,
       },
       icon: {
         name: `${Flags.mobile ? 'Mobile' : ''}Sun`,
