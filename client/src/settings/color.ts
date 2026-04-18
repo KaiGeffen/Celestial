@@ -17,7 +17,7 @@ const CoreColors: Record<string, number | string> = {
 
   grey: 0x555555,
   greyA: 0x555555e0,
-  lightGrey: 0x888888,
+  lightGrey: 0xbbbbbb,
 
   backgroundDark: 0xcbc1a8,
   backgroundLight: 0xf5f2eb,

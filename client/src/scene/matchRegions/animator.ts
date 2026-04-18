@@ -578,6 +578,7 @@ class StoryResolveBubbles {
     this.syncBookkeeping(state)
 
     const resolvedCount = state.story.resolvedActs.length
+    // Same predicate as `StoryRegion` (lastStoryResolvedActCount vs snapshot): only the newest resolve gets stagger / settle tween.
     const oneNewResolvedAct =
       resolvedCount === this.snapshotResolvedActCount + 1 && resolvedCount > 0
     const r = Time.match.recapTween

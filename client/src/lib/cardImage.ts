@@ -1,6 +1,6 @@
 import 'phaser'
 import Catalog from '../../../shared/state/catalog'
-import { Color, Style, BBStyle, Space, Flags } from '../settings/settings'
+import { Color, Style, BBStyle, Space, Flags, Time } from '../settings/settings'
 import Card from '../../../shared/state/card'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import BaseScene from '../scene/baseScene'
@@ -183,9 +183,29 @@ export class CardImage {
     }
   }
 
-  // Set that a card has resolved (In the story)
-  setResolved(): this {
-    this.setTint(Color.cardGreyed)
+  private static readonly RESOLVED_ALPHA = 0.6
+  private static readonly RESOLVED_SCALE = 0.7
+
+  /**
+   * Mark a story card as resolved (dim + shrink).
+   * @param animate — if true, tween; if false, set immediately (earlier resolves, or bulk recap).
+   */
+  setResolved(animate: boolean): this {
+    // this.setTint(Color.cardGreyed)
+    this.scene.tweens.killTweensOf(this.container)
+    if (animate) {
+      this.scene.tweens.add({
+        targets: this.container,
+        alpha: CardImage.RESOLVED_ALPHA,
+        scaleX: CardImage.RESOLVED_SCALE,
+        scaleY: CardImage.RESOLVED_SCALE,
+        duration: Time.match.cardSink,
+        ease: 'Sine.easeOut',
+      })
+    } else {
+      this.container.setAlpha(CardImage.RESOLVED_ALPHA)
+      this.container.setScale(CardImage.RESOLVED_SCALE)
+    }
     return this
   }
 

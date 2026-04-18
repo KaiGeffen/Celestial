@@ -19,6 +19,9 @@ import { SHRUNKEN_CARD_SCALE } from './matchRegionSettings'
 export default class StoryRegion extends Region {
   lastScores: [number, number]
 
+  /** Resolved-act count after last `displayState`; pairs with animator snapshot for `oneNewResolvedAct`. */
+  private lastStoryResolvedActCount = 0
+
   /** One `CardImage` per `resolvedActs` entry, in story order. */
   resolvedCards: CardImage[] = []
 
@@ -49,8 +52,12 @@ export default class StoryRegion extends Region {
 
     // If this is a recap, add the already played cards greyed out
     // TODO: Either enable the onClick callback or remove its api
+    const resolvedCount = state.story.resolvedActs.length
+    const oneNewResolvedAct =
+      resolvedCount === this.lastStoryResolvedActCount + 1 && resolvedCount > 0
+
     let resolvedI = 0
-    for (; resolvedI < state.story.resolvedActs.length; resolvedI++) {
+    for (; resolvedI < resolvedCount; resolvedI++) {
       const act: Act = state.story.resolvedActs[resolvedI]
 
       let card = this.addCard(
@@ -63,10 +70,14 @@ export default class StoryRegion extends Region {
 
       this.resolvedCards.push(card)
 
-      card.setResolved().moveToTopOnHover()
+      const animateSettle =
+        oneNewResolvedAct && resolvedI === resolvedCount - 1
+      card.setResolved(animateSettle).moveToTopOnHover()
 
       this.temp.push(card)
     }
+
+    this.lastStoryResolvedActCount = resolvedCount
 
     let cards = []
     for (let i = 0; i < state.story.acts.length; i++) {
