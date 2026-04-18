@@ -391,7 +391,7 @@ class Abandoned extends Card {
     // Remove this from the discard pile
     game.pile[player].pop()
 
-    game.story.addAct(this, player, 0)
+    game.story.addAct(this, player, 0, true)
 
     // Create a Wound in hand
     game.create(player, wound)

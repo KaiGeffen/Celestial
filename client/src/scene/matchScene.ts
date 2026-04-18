@@ -151,11 +151,20 @@ export class MatchScene extends BaseScene {
     this.maxVersion = Math.max(this.maxVersion, state.versionNo)
   }
 
+  /** Complete every active tween on this scene. */
+  protected completeAllSceneTweens(): void {
+    const list = this.tweens.getTweens()
+    for (let i = list.length - 1; i >= 0; i--) {
+      list[i].complete()
+    }
+  }
+
   /**
    * Advance recap playback to the next live match state (exit the replay stream).
    * If that state is not in the buffer yet, jump to the newest buffered frame instead.
    */
   protected seekQueuedStateAfterRecap(): void {
+    this.completeAllSceneTweens()
     let v = this.currentVersion + 1
     while (
       v <= this.maxVersion &&
@@ -176,9 +185,10 @@ export class MatchScene extends BaseScene {
   }
 
   /**
-   * Jump to the last buffered recap frame (still in recap). Used by the history Skip control.
+   * Last `versionNo` in the consecutive recap run starting at `currentVersion + 1`,
+   * or null if the next queued state is not recap.
    */
-  protected seekToLastRecapState(): void {
+  protected getLastRecapVersionAhead(): number | null {
     let v = this.currentVersion + 1
     let lastRecapV = -1
     while (
@@ -189,8 +199,15 @@ export class MatchScene extends BaseScene {
       lastRecapV = v
       v++
     }
-    if (lastRecapV >= 0) {
-      this.currentVersion = lastRecapV - 1
+    return lastRecapV >= 0 ? lastRecapV : null
+  }
+
+  /** Jump to the last buffered recap frame in the current forward recap run (still in recap). */
+  protected seekToLastRecapState(): void {
+    this.completeAllSceneTweens()
+    const L = this.getLastRecapVersionAhead()
+    if (L !== null) {
+      this.currentVersion = L - 1
     }
   }
 
@@ -240,18 +257,8 @@ export class MatchScene extends BaseScene {
 
     // Story
     view.story.setCallback((i: number) => {
-      return function () {
-        // Get the series of states for this recap starting from the given index
-
-        // To correctly display point changes, set the current scores to the last recaps totals
-
-        // Skip all tweens playing currently
-        // TODO Some text stays enlarged if it doesn't finish
-        this.tweens.getTweens().forEach((tween) => {
-          tween.complete()
-        })
-
-        // TODO Execution of story jumps to the act then stays paused
+      return () => {
+        this.completeAllSceneTweens()
         this.paused = false
       }
     })
@@ -306,6 +313,8 @@ export class MatchScene extends BaseScene {
 
     // Watch recap (resolution of last story)
     view.historyRegion.recapCallback = () => {
+      this.completeAllSceneTweens()
+      this.paused = false
       // Scan backwards through the queued states to find the start of the recap
       for (let version = this.currentVersion - 1; version >= 0; version--) {
         if (this.queuedStates[version] && this.queuedStates[version].isRecap) {
@@ -319,27 +328,24 @@ export class MatchScene extends BaseScene {
       }
     }
 
-    const finishRecapTweensAndUnpause = () => {
-      this.tweens.getTweens().forEach((tween) => {
-        tween.complete()
-      })
+    // Moon during recap: if more recap remains after the next frame, jump to the last recap
+    // frame; if the next frame is already the last recap (or only recap), exit to live.
+    const moonRecapNavigation = () => {
       this.paused = false
+      const L = this.getLastRecapVersionAhead()
+      if (L === null) {
+        this.seekQueuedStateAfterRecap()
+        return
+      }
+      const nextV = this.currentVersion + 1
+      if (nextV < L) {
+        this.seekToLastRecapState()
+      } else {
+        this.seekQueuedStateAfterRecap()
+      }
     }
 
-    // Moon (Continue): first state after recap — exit recap to live.
-    const continuePastRecap = () => {
-      finishRecapTweensAndUnpause()
-      this.seekQueuedStateAfterRecap()
-    }
-
-    // History Skip: last frame of the recap (still in recap).
-    const skipToEndOfRecap = () => {
-      finishRecapTweensAndUnpause()
-      this.seekToLastRecapState()
-    }
-
-    view.pass.skipCallback = continuePastRecap
-    view.historyRegion.skipCallback = skipToEndOfRecap
+    view.pass.skipCallback = moonRecapNavigation
 
     // Display the cost of each card in our hand
     view.ourBoard.setDisplayCostCallback((cost: number) => {

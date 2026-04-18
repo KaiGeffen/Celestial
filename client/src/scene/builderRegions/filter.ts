@@ -262,6 +262,10 @@ export default class FilterRegion {
     // Journey mode filters based on journey inventory
     // Non-journey mode based on permanent collection
     let ownershipFilter = (card: Card) => {
+      if (Flags.devCardsEnabled) {
+        return true
+      }
+
       // TODO These sql row names are horribly confusing - rename them
       if (this.isJourneyMode) {
         return UserSettings._get('inventory')[card.id]
