@@ -11,6 +11,9 @@ export const MatchTiming = {
   /** How long for either player to play a card (Hand to story). */
   playCard: 200,
 
+  /** Flip over a card in the story. Next card starts halfway through the current reveal. */
+  cardReveal: 300,
+
   /** Base duration for anything to happen in the recap (Card flips, discard, etc.) */
   recapTween: 470,
   /** Pause between anything happening in the recap */

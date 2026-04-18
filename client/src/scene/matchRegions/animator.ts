@@ -405,6 +405,9 @@ export default class Animator {
     const endScaleX = card.container.scaleX
     const endScaleY = card.container.scaleY
 
+    // Start the next reveal halfway through the current reveal
+    const stepDelay = i * (Time.match.cardReveal / 2)
+
     // Animate the back of the card flipping
     let hiddenCard = this.createCard(Catalog.cardback, [0, 0])
       .show()
@@ -414,9 +417,10 @@ export default class Animator {
     this.scene.tweens.add({
       targets: hiddenCard.container,
       scaleX: 0,
-      delay: i * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
-      duration: Time.match.recapTween / 2,
-      onComplete: function (tween, targets, _) {
+      delay: stepDelay,
+      duration: Time.match.cardReveal / 2,
+      ease: 'Sine.easeInOut',
+      onComplete: () => {
         hiddenCard.destroy()
       },
     })
@@ -427,10 +431,8 @@ export default class Animator {
     this.scene.tweens.add({
       targets: card.container,
       scaleX: endScaleX,
-      delay:
-        i * (Time.match.recapTween + Time.match.recapPauseBetweenTweens) +
-        Time.match.recapTween / 2,
-      duration: Time.match.recapTween / 2,
+      delay: stepDelay + Time.match.cardReveal / 2,
+      duration: Time.match.cardReveal / 2,
       onStart: function (tween: Phaser.Tweens.Tween, targets, _) {
         card.show()
       },

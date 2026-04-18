@@ -172,5 +172,16 @@ export default function getRandomAiDeck(): Deck {
   const difficulty = difficultyFromPveWins(pveWins)
   const decks =
     difficulty === 0 ? easyDecks : difficulty === 1 ? mediumDecks : hardDecks
-  return decks[Math.floor(Math.random() * decks.length)]
+  // return decks[Math.floor(Math.random() * decks.length)]
+
+  return placeholderDeck
+}
+
+const placeholderDeck: Deck = {
+  name: 'Placeholder',
+  cards: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  cosmeticSet: {
+    avatar: 0,
+    border: 0,
+  },
 }
