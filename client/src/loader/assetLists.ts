@@ -386,6 +386,7 @@ export const assetLists = {
     "files": [
       "Light",
       "matchBottom",
+      "matchNight",
       "matchTop",
       "water"
     ],

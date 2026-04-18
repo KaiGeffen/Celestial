@@ -8,6 +8,23 @@ type RexAnchorWithOffset = {
   setOffset: (x: number, y: number) => void
 }
 
+/** Scale image so it covers the viewport; preserves aspect ratio (no letterboxing). */
+function fitBackgroundCover(
+  img: Phaser.GameObjects.Image,
+  viewportWidth: number,
+  viewportHeight: number,
+): void {
+  const source = img.scene.textures.get(img.texture.key).getSourceImage() as {
+    width: number
+    height: number
+  }
+  const scale = Math.max(
+    viewportWidth / source.width,
+    viewportHeight / source.height,
+  )
+  img.setScale(scale)
+}
+
 /** Scale image to `targetWidth`; sync rex anchor Y to keep the avatar in the curved corner. */
 function fitBackgroundWidth(
   img: Phaser.GameObjects.Image,
@@ -36,6 +53,8 @@ function fitBackgroundWidth(
 /** Full-screen match backdrop; recap state tints the image. */
 export default class BackgroundRegion extends Region {
   water: Phaser.GameObjects.Image
+  /** Night layer over the water; alpha follows recap (night) vs round (day). */
+  waterNight: Phaser.GameObjects.Image
   matchTop: Phaser.GameObjects.Image
   matchBottom: Phaser.GameObjects.Image
 
@@ -44,6 +63,11 @@ export default class BackgroundRegion extends Region {
     this.container = scene.add.container().setDepth(-1)
 
     this.water = scene.add.image(0, 0, 'background-water').setOrigin(0)
+
+    this.waterNight = scene.add
+      .image(0, 0, 'background-matchNight')
+      .setOrigin(0)
+      .setAlpha(0)
 
     this.matchTop = scene.add
       .image(0, 0, 'background-matchTop')
@@ -56,12 +80,24 @@ export default class BackgroundRegion extends Region {
       .setInteractive()
 
     this.container.add(this.water)
+    this.container.add(this.waterNight)
     this.container.add(this.matchTop)
     this.container.add(this.matchBottom)
 
+    const fitWaterLayers = (viewport: { width: number; height: number }) => {
+      fitBackgroundCover(this.water, viewport.width, viewport.height)
+      fitBackgroundCover(this.waterNight, viewport.width, viewport.height)
+    }
+
     scene.plugins.get('rexAnchor')['add'](this.water, {
-      width: `100%`,
-      height: `100%`,
+      x: `0%`,
+      y: `0%`,
+      onUpdateViewportCallback: (viewport) => fitWaterLayers(viewport),
+    })
+
+    scene.plugins.get('rexAnchor')['add'](this.waterNight, {
+      x: `0%`,
+      y: `0%`,
     })
 
     const height = 350
@@ -101,6 +137,9 @@ export default class BackgroundRegion extends Region {
     const startTint = this.water.tintTopLeft
     const endTint = isRecap ? 0x666666 : 0xffffff
 
+    const startNightAlpha = this.waterNight.alpha
+    const endNightAlpha = isRecap ? 0.5 : 0
+
     const startR = (startTint >> 16) & 0xff
     const startG = (startTint >> 8) & 0xff
     const startB = startTint & 0xff
@@ -121,11 +160,15 @@ export default class BackgroundRegion extends Region {
         const b = Math.round(startB + (endB - startB) * t)
         const tint = (r << 16) | (g << 8) | b
         this.water.setTint(tint)
+        this.waterNight.setAlpha(
+          startNightAlpha + (endNightAlpha - startNightAlpha) * t,
+        )
       },
       onComplete: () => {
         if (!isRecap) {
           this.water.clearTint()
         }
+        this.waterNight.setAlpha(endNightAlpha)
       },
     })
   }
