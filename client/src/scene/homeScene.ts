@@ -523,12 +523,12 @@ export default class HomeScene extends BaseScene {
   }
 }
 
-const PATCH_NUMBER = '0.7.16.1'
+const PATCH_NUMBER = '0.7.16.2'
 
 const URL = 'https://luma.com/1lsziprm'
 
 const NEWS_TEXT = `🕊️ [b]Thank you to our wonderful Celestial community![/b]
-This month we are ramping up to a [color=#4090DD]Steam demo release[/color] on May 4th, expect big visual updates, writing, and more! 
+Many changes this month as we ramp up to a [color=#4090DD]Steam demo release[/color], let us know your thoughts! 
 
 🏆 Congrats to Sherlock for reclaiming his tournament title! And to Redrame for getting #1 on ladder.
 With the launch of the demo, we plan to snapshot the top players as we transition to a more public release.

@@ -79,7 +79,7 @@ class Wound extends Card {
     // Remove this from the discard pile
     game.pile[player].pop()
 
-    game.story.addAct(this, player, 0)
+    game.story.addAct(this, player, 0, true)
 
     return true
   }
@@ -89,7 +89,7 @@ const wound = new Wound({
   id: 1005,
   points: -3,
   qualities: [Quality.FLEETING],
-  text: 'Fleeting\nWhen this is discarded, add it next in the story.',
+  text: 'Fleeting\nWhen this is discarded, add it next in the story Revealed.',
   theme: 2,
 })
 
