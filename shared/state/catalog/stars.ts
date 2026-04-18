@@ -212,7 +212,9 @@ class CloakOfStars extends Card {
 
   onMorning(player: number, game: GameModel, index: number) {
     const amt = game.endingBreath[player]
-    super.inspired(amt, game, player)
+    if (amt > 0) {
+      super.inspired(amt, game, player)
+    }
 
     return true
   }
