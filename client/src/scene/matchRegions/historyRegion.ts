@@ -8,8 +8,10 @@ import Button from '../../lib/buttons/button'
 
 export default class HistoryRegion extends Region {
   recapCallback: () => void
+  skipCallback: () => void
 
   private btnRecap: Button
+  private btnSkip: Button
 
   create(scene: MatchScene): this {
     this.scene = scene
@@ -30,9 +32,13 @@ export default class HistoryRegion extends Region {
     if (!state.isRecap) {
       this.btnRecap.enable()
       this.btnRecap.setVisible(true)
+      this.btnSkip.disable()
+      this.btnSkip.setVisible(false)
     } else {
       this.btnRecap.disable()
       this.btnRecap.setVisible(false)
+      this.btnSkip.enable()
+      this.btnSkip.setVisible(true)
     }
   }
 
@@ -40,6 +46,11 @@ export default class HistoryRegion extends Region {
     this.scene.input.keyboard.on('keydown-R', () => {
       if (UserSettings._get('hotkeys') && this.btnRecap.enabled) {
         this.btnRecap.onClick()
+      }
+    })
+    this.scene.input.keyboard.on('keydown-S', () => {
+      if (UserSettings._get('hotkeys') && this.btnSkip.enabled) {
+        this.btnSkip.onClick()
       }
     })
   }
@@ -56,5 +67,13 @@ export default class HistoryRegion extends Region {
       f: () => this.recapCallback(),
     })
     this.btnRecap.icon.setDisplaySize(55, 62)
+
+    this.btnSkip = new Buttons.Icon({
+      name: 'Skip',
+      within: this.container,
+      hint: 'Skip to end',
+      f: () => this.skipCallback(),
+    })
+    this.btnSkip.icon.setDisplaySize(58, 64)
   }
 }
