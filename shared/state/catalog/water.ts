@@ -266,9 +266,9 @@ const damBreaks = new DamBreaks({
 class Crabs extends Card {
   onRoundEndIfThisResolved(player: number, game: GameModel) {
     // If we won, discard a card
-    if (game.score[player] >= game.score[player ^ 1]) {
+    if (game.score[player] > game.score[player ^ 1]) {
       game.discard(player, 1)
-    } else if (game.score[player] <= game.score[player ^ 1]) {
+    } else if (game.score[player] < game.score[player ^ 1]) {
       game.draw(player, 1)
     }
   }
