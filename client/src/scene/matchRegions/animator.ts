@@ -828,9 +828,13 @@ class StoryResolveBubbles {
   ): void {
     if (nourishAmt === 0) return
 
-    const { x: endLocalX, y: endLocalY } =
-      StoryResolveBubbles.secondaryBubbleRestAtMainCorner('bottomRight')
-    const end = this.localToWorld(card.container, endLocalX, endLocalY)
+    const { x: endOffsetX, y: endOffsetY } =
+      StoryResolveBubbles.secondaryBubbleRestAtMainCorner('bottomLeft')
+    const cardCenter = this.localToWorld(card.container, 0, 0)
+    const end = new Phaser.Math.Vector2(
+      cardCenter.x + endOffsetX,
+      cardCenter.y + endOffsetY,
+    )
 
     let bx = end.x
     let by = end.y
@@ -913,9 +917,13 @@ class StoryResolveBubbles {
   ): void {
     if (effectAmt === 0) return
 
-    const { x: endLocalX, y: endLocalY } =
-      StoryResolveBubbles.secondaryBubbleRestAtMainCorner('bottomLeft')
-    const end = this.localToWorld(card.container, endLocalX, endLocalY)
+    const { x: endOffsetX, y: endOffsetY } =
+      StoryResolveBubbles.secondaryBubbleRestAtMainCorner('bottomRight')
+    const cardCenter = this.localToWorld(card.container, 0, 0)
+    const end = new Phaser.Math.Vector2(
+      cardCenter.x + endOffsetX,
+      cardCenter.y + endOffsetY,
+    )
 
     let bx = end.x
     let by = end.y

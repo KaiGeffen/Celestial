@@ -137,6 +137,7 @@ class Yearn extends Card {
             new Animation({
               from: Zone.Discard,
               to: Zone.Story,
+              card: card,
               index2: 0,
             }),
           )
