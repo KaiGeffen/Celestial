@@ -405,6 +405,9 @@ export default class Animator {
     const endScaleX = card.container.scaleX
     const endScaleY = card.container.scaleY
 
+    // A scaling trick to make the card appear to flip over
+    const scaleTrick = 0.95
+
     // Start the next reveal halfway through the current reveal
     const stepDelay = i * (Time.match.cardReveal / 2)
 
@@ -417,9 +420,10 @@ export default class Animator {
     this.scene.tweens.add({
       targets: hiddenCard.container,
       scaleX: 0,
+      scaleY: endScaleY * scaleTrick,
       delay: stepDelay,
       duration: Time.match.cardReveal / 2,
-      ease: 'Sine.easeInOut',
+      ease: 'Sine.easeIn',
       onComplete: () => {
         hiddenCard.destroy()
       },
@@ -427,12 +431,15 @@ export default class Animator {
 
     // Animate the actual card flipping up
     card.hide()
+    card.container.scaleY = endScaleY * scaleTrick
     card.container.scaleX = 0
     this.scene.tweens.add({
       targets: card.container,
       scaleX: endScaleX,
+      scaleY: endScaleY,
       delay: stepDelay + Time.match.cardReveal / 2,
       duration: Time.match.cardReveal / 2,
+      ease: 'Sine.easeOut',
       onStart: function (tween: Phaser.Tweens.Tween, targets, _) {
         card.show()
       },
