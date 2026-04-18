@@ -405,6 +405,7 @@ const abandoned = new Abandoned({
   cost: 3,
   points: 3,
   text: 'When discarded, add this to the story Revealed and create a Wound in hand.',
+  beta: true,
 })
 
 export {
