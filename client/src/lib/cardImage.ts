@@ -607,6 +607,8 @@ export class CardImage {
       return
     }
 
+    // Keep burst under `artContainer` with `imageSubject` (same local space). Do not use
+    // `scene.children.bringToTop` or it renders at scene root (breaks nested scroll panels).
     const burst = this.scene.add.image(
       this.imageSubject.x,
       this.imageSubject.y,
@@ -617,10 +619,10 @@ export class CardImage {
       this.imageSubject.displayHeight,
     )
     burst.setAngle(this.imageSubject.angle)
+    burst.setOrigin(this.imageSubject.originX, this.imageSubject.originY)
     burst.setAlpha(1)
-    this.scene.children.bringToTop(burst)
-
-    this.container.add(burst)
+    this.artContainer.add(burst)
+    this.artContainer.bringToTop(burst)
 
     this.scene.tweens.add({
       targets: burst,
