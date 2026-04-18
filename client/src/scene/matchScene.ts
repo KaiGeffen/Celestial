@@ -175,6 +175,25 @@ export class MatchScene extends BaseScene {
     }
   }
 
+  /**
+   * Jump to the last buffered recap frame (still in recap). Used by the history Skip control.
+   */
+  protected seekToLastRecapState(): void {
+    let v = this.currentVersion + 1
+    let lastRecapV = -1
+    while (
+      v <= this.maxVersion &&
+      this.queuedStates[v] &&
+      this.queuedStates[v].isRecap
+    ) {
+      lastRecapV = v
+      v++
+    }
+    if (lastRecapV >= 0) {
+      this.currentVersion = lastRecapV - 1
+    }
+  }
+
   private signalOpponentSurrendered(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
@@ -300,17 +319,27 @@ export class MatchScene extends BaseScene {
       }
     }
 
-    // Skip: go to the next live match state, or the latest buffered frame if needed
-    const skipRecap = () => {
+    const finishRecapTweensAndUnpause = () => {
       this.tweens.getTweens().forEach((tween) => {
         tween.complete()
       })
-
       this.paused = false
+    }
+
+    // Moon (Continue): first state after recap — exit recap to live.
+    const continuePastRecap = () => {
+      finishRecapTweensAndUnpause()
       this.seekQueuedStateAfterRecap()
     }
-    view.pass.skipCallback = skipRecap
-    view.historyRegion.skipCallback = skipRecap
+
+    // History Skip: last frame of the recap (still in recap).
+    const skipToEndOfRecap = () => {
+      finishRecapTweensAndUnpause()
+      this.seekToLastRecapState()
+    }
+
+    view.pass.skipCallback = continuePastRecap
+    view.historyRegion.skipCallback = skipToEndOfRecap
 
     // Display the cost of each card in our hand
     view.ourBoard.setDisplayCostCallback((cost: number) => {
