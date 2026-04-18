@@ -12,6 +12,8 @@ export default class HistoryRegion extends Region {
 
   private btnRecap: Button
   private btnSkip: Button
+  private chromeRecap: Phaser.GameObjects.Image
+  private chromeSkip: Phaser.GameObjects.Image
 
   create(scene: MatchScene): this {
     this.scene = scene
@@ -32,13 +34,17 @@ export default class HistoryRegion extends Region {
     if (!state.isRecap) {
       this.btnRecap.enable()
       this.btnRecap.setVisible(true)
+      this.chromeRecap.setVisible(true)
       this.btnSkip.disable()
       this.btnSkip.setVisible(false)
+      this.chromeSkip.setVisible(false)
     } else {
       this.btnRecap.disable()
       this.btnRecap.setVisible(false)
+      this.chromeRecap.setVisible(false)
       this.btnSkip.enable()
       this.btnSkip.setVisible(true)
+      this.chromeSkip.setVisible(true)
     }
   }
 
@@ -56,9 +62,11 @@ export default class HistoryRegion extends Region {
   }
 
   private createButtons(): void {
-    const chrome = this.scene.add.image(0, 0, 'chrome-replayControls')
-    chrome.setVisible(false)
-    this.container.add(chrome)
+    this.chromeRecap = this.scene.add
+      .image(0, 0, 'chrome-Recap')
+      .setVisible(false)
+      .setAlpha(0.5)
+    this.container.add(this.chromeRecap)
 
     this.btnRecap = new Buttons.Icon({
       name: 'Recap',
@@ -67,6 +75,12 @@ export default class HistoryRegion extends Region {
       f: () => this.recapCallback(),
     })
     this.btnRecap.icon.setDisplaySize(55, 62)
+
+    this.chromeSkip = this.scene.add
+      .image(0, 0, 'chrome-Skip')
+      .setVisible(false)
+      .setAlpha(0.5)
+    this.container.add(this.chromeSkip)
 
     this.btnSkip = new Buttons.Icon({
       name: 'Skip',

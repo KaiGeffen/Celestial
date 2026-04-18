@@ -388,7 +388,6 @@ export const assetLists = {
       "matchBottom",
       "matchDay",
       "matchNight",
-      "matchNight",
       "matchTop"
     ],
     "pixelArt": false
@@ -446,7 +445,9 @@ export const assetLists = {
     "files": [
       "CloudBottom",
       "CloudTop",
+      "Recap",
       "ResultGlow",
+      "Skip",
       "breathWheel",
       "bubble",
       "bubbleEffect",
