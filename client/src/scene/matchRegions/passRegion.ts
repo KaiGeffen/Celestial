@@ -1,5 +1,6 @@
 import 'phaser'
 import Button from '../../lib/buttons/button'
+import Moon from '../../lib/buttons/moon'
 
 import GameModel from '../../../../shared/state/gameModel'
 import {
@@ -27,7 +28,7 @@ export default class PassRegion extends Region {
   hotkeysRegistered = false
 
   btnPass: Button
-  btnMoon: Button
+  btnMoon: Moon
 
   yourPass: Phaser.GameObjects.Container
   theirPass: Phaser.GameObjects.Container
@@ -69,9 +70,8 @@ export default class PassRegion extends Region {
       state.isRecap &&
       state.sound !== null &&
       ['win', 'lose', 'tie'].includes(state.sound)
-    this.btnMoon.setText(
-      `${state.score[1]}\n${isRecapEndPause ? 'Continue' : ''}\n${state.score[0]}`,
-    )
+    this.btnMoon.setText(`${state.score[1]}\n\n${state.score[0]}`)
+    this.btnMoon.txtAction.setText(isRecapEndPause ? 'Continue' : '')
 
     if (state.isRecap) {
       this.btnMoon.enable()

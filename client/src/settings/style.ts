@@ -50,9 +50,16 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     color: Color.passText,
   },
   // Moon
-  moon: {
+  moonPoints: {
     fontFamily: altFont,
     fontSize: '48px',
+    color: Color.passText,
+    stroke: Color.backgroundLightS,
+    strokeThickness: 2,
+  },
+  moonAction: {
+    fontFamily: altFont,
+    fontSize: '36px',
     color: Color.passText,
     stroke: Color.backgroundLightS,
     strokeThickness: 2,
