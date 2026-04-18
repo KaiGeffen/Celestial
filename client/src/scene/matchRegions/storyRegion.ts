@@ -70,8 +70,7 @@ export default class StoryRegion extends Region {
 
       this.resolvedCards.push(card)
 
-      const animateSettle =
-        oneNewResolvedAct && resolvedI === resolvedCount - 1
+      const animateSettle = oneNewResolvedAct && resolvedI === resolvedCount - 1
       card.setResolved(animateSettle).moveToTopOnHover()
 
       this.temp.push(card)
@@ -89,7 +88,7 @@ export default class StoryRegion extends Region {
       ).moveToTopOnHover()
 
       // Apply glow based on various conditions
-      if (act.card.qualities.includes(Quality.VISIBLE)) {
+      if (act.revealed || act.card.qualities.includes(Quality.VISIBLE)) {
         card.setVisibleGlow()
       }
       // Visible via Sight
