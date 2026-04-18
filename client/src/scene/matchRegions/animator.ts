@@ -82,6 +82,7 @@ export default class Animator {
               permanentCard,
               this.getSound(animation),
               animation.to === Zone.Story ? SHRUNKEN_CARD_SCALE : undefined,
+              animation.to === Zone.Mulligan ? Time.match.mulliganPause : undefined,
             )
           } else {
             // Emphasize the card if it stayed in the same zone
@@ -264,6 +265,7 @@ export default class Animator {
     permanentCard?: CardImage,
     sound?,
     endScale?: number,
+    pauseBetween: number = Time.match.recapPauseBetweenTweens,
   ) {
     if (permanentCard) {
       permanentCard.hide()
@@ -275,7 +277,7 @@ export default class Animator {
       x: end[0],
       y: end[1],
       ...(endScale !== undefined ? { scaleX: endScale, scaleY: endScale } : {}),
-      delay: i * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
+      delay: i * (Time.match.recapTween + pauseBetween),
       duration: Time.match.recapTween,
       ease: Ease.card,
       onStart: (tween: Phaser.Tweens.Tween, targets, _) => {
@@ -316,6 +318,7 @@ export default class Animator {
       permanentCard,
       this.getSound(animation),
       animation.to === Zone.Story ? SHRUNKEN_CARD_SCALE : undefined,
+      Time.match.mulliganPause,
     )
   }
 

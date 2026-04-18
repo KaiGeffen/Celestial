@@ -21,6 +21,8 @@ export const MatchTiming = {
   recapTween: 470,
   /** Pause between anything happening in the recap */
   recapPauseBetweenTweens: 60,
+  /** A special pause for actions during mulligan */
+  mulliganPause: -120,
 
   /** Round-result stamp fade in/out duration */
   roundResultFade: 200,
