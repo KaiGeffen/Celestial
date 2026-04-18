@@ -38,6 +38,9 @@ export class CardImage {
   imageContainer: Phaser.GameObjects.Image
   imageCardback: Phaser.GameObjects.Image
 
+  /** Image layers only; alpha dims on resolve while text stays opaque (sibling of text under `container`). */
+  private artContainer: Phaser.GameObjects.Container
+
   // Text elements
   txtCost: BBCodeText
   txtPoints: BBCodeText
@@ -105,16 +108,7 @@ export class CardImage {
   }
 
   destroy(): void {
-    ;[
-      this.imageShadow,
-      this.imageBackground,
-      this.imageSubject,
-      this.imageArc,
-      this.imageContainer,
-      this.txtCost,
-      this.txtPoints,
-      this.container,
-    ].forEach((obj) => obj.destroy())
+    this.container.destroy()
   }
 
   show(): this {
@@ -193,18 +187,26 @@ export class CardImage {
   setResolved(animate: boolean): this {
     // this.setTint(Color.cardGreyed)
     this.scene.tweens.killTweensOf(this.container)
+    this.scene.tweens.killTweensOf(this.artContainer)
     if (animate) {
+      const d = Time.match.cardSink
+      const ease = 'Sine.easeOut'
       this.scene.tweens.add({
         targets: this.container,
-        alpha: CardImage.RESOLVED_ALPHA,
         scaleX: CardImage.RESOLVED_SCALE,
         scaleY: CardImage.RESOLVED_SCALE,
-        duration: Time.match.cardSink,
-        ease: 'Sine.easeOut',
+        duration: d,
+        ease,
+      })
+      this.scene.tweens.add({
+        targets: this.artContainer,
+        alpha: CardImage.RESOLVED_ALPHA,
+        duration: d,
+        ease,
       })
     } else {
-      this.container.setAlpha(CardImage.RESOLVED_ALPHA)
       this.container.setScale(CardImage.RESOLVED_SCALE)
+      this.artContainer.setAlpha(CardImage.RESOLVED_ALPHA)
     }
     return this
   }
@@ -306,8 +308,11 @@ export class CardImage {
   }
 
   private createImages(shadow: boolean): void {
+    this.artContainer = this.scene.add.container()
+    this.container.add(this.artContainer)
+
     this.imageShadow = new CardShadow(this.scene, 0, 0)
-    this.container.add(this.imageShadow)
+    this.artContainer.add(this.imageShadow)
     this.imageShadow.setVisible(shadow)
 
     // Card background wash
@@ -317,16 +322,16 @@ export class CardImage {
       `card/background-${this.card.theme}`,
     )
     this.imageBackground.setDisplaySize(Space.cardWidth, Space.cardHeight)
-    this.container.add(this.imageBackground)
+    this.artContainer.add(this.imageBackground)
 
     this.imageSubject = this.scene.add.image(0, 0, this.getSubjectImageName())
     this.imageSubject.setDisplaySize(Space.cardWidth, Space.cardHeight)
 
-    this.container.add(this.imageSubject)
+    this.artContainer.add(this.imageSubject)
 
     this.imageArc = this.scene.add.image(0, 0, `card/arc-${this.card.theme}`)
     this.imageArc.setDisplaySize(Space.cardWidth, Space.cardHeight)
-    this.container.add(this.imageArc)
+    this.artContainer.add(this.imageArc)
 
     this.imageContainer = this.scene.add.image(
       0,
@@ -334,12 +339,12 @@ export class CardImage {
       `card/container-${this.card.theme}`,
     )
     this.imageContainer.setDisplaySize(Space.cardWidth, Space.cardHeight)
-    this.container.add(this.imageContainer)
+    this.artContainer.add(this.imageContainer)
 
     // Cardback
     this.imageCardback = this.scene.add.image(0, 0, 'cardback-default')
     this.imageCardback.setDisplaySize(Space.cardWidth, Space.cardHeight)
-    this.container.add(this.imageCardback)
+    this.artContainer.add(this.imageCardback)
 
     this.imageCardback.setAlpha(this.card.id === Catalog.cardback.id ? 1 : 0)
   }
