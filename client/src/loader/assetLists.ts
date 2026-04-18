@@ -386,9 +386,10 @@ export const assetLists = {
     "files": [
       "Light",
       "matchBottom",
+      "matchDay",
       "matchNight",
-      "matchTop",
-      "water"
+      "matchNight",
+      "matchTop"
     ],
     "pixelArt": false
   },

@@ -50,10 +50,11 @@ function fitBackgroundWidth(
   anchor.setOffset(anchor.offsetX, offset)
 }
 
-/** Full-screen match backdrop; recap state tints the image. */
+/** Full-screen match backdrop; recap darkens the top/bottom chrome and fades in the night layer. */
 export default class BackgroundRegion extends Region {
-  water: Phaser.GameObjects.Image
-  /** Night layer over the water; alpha follows recap (night) vs round (day). */
+  /** Full-bleed day backdrop under the night overlay and top/bottom chrome. */
+  matchDay: Phaser.GameObjects.Image
+  /** Night layer over matchDay; alpha follows recap (night) vs round (day). */
   waterNight: Phaser.GameObjects.Image
   matchTop: Phaser.GameObjects.Image
   matchBottom: Phaser.GameObjects.Image
@@ -62,7 +63,9 @@ export default class BackgroundRegion extends Region {
     this.scene = scene
     this.container = scene.add.container().setDepth(-1)
 
-    this.water = scene.add.image(0, 0, 'background-water').setOrigin(0)
+    this.matchDay = scene.add
+      .image(0, 0, 'background-matchDay')
+      .setOrigin(0)
 
     this.waterNight = scene.add
       .image(0, 0, 'background-matchNight')
@@ -79,20 +82,20 @@ export default class BackgroundRegion extends Region {
       .setOrigin(0.5, 0)
       .setInteractive()
 
-    this.container.add(this.water)
+    this.container.add(this.matchDay)
     this.container.add(this.waterNight)
     this.container.add(this.matchTop)
     this.container.add(this.matchBottom)
 
-    const fitWaterLayers = (viewport: { width: number; height: number }) => {
-      fitBackgroundCover(this.water, viewport.width, viewport.height)
+    const fitDayLayers = (viewport: { width: number; height: number }) => {
+      fitBackgroundCover(this.matchDay, viewport.width, viewport.height)
       fitBackgroundCover(this.waterNight, viewport.width, viewport.height)
     }
 
-    scene.plugins.get('rexAnchor')['add'](this.water, {
+    scene.plugins.get('rexAnchor')['add'](this.matchDay, {
       x: `0%`,
       y: `0%`,
-      onUpdateViewportCallback: (viewport) => fitWaterLayers(viewport),
+      onUpdateViewportCallback: (viewport) => fitDayLayers(viewport),
     })
 
     scene.plugins.get('rexAnchor')['add'](this.waterNight, {
@@ -132,13 +135,15 @@ export default class BackgroundRegion extends Region {
     return this
   }
 
-  /** Tween tint between normal and recap (night) look. */
+  /** Tween tint on top/bottom match art and night layer for recap. */
   tweenTintForRecap(isRecap: boolean): void {
-    const startTint = this.water.tintTopLeft
-    const endTint = isRecap ? 0x666666 : 0xffffff
+    this.matchDay.clearTint()
+
+    const startTint = this.matchTop.tintTopLeft
+    const endTint = isRecap ? 0x888888 : 0xffffff
 
     const startNightAlpha = this.waterNight.alpha
-    const endNightAlpha = isRecap ? 0.5 : 0
+    const endNightAlpha = isRecap ? 1 : 0
 
     const startR = (startTint >> 16) & 0xff
     const startG = (startTint >> 8) & 0xff
@@ -159,14 +164,16 @@ export default class BackgroundRegion extends Region {
         const g = Math.round(startG + (endG - startG) * t)
         const b = Math.round(startB + (endB - startB) * t)
         const tint = (r << 16) | (g << 8) | b
-        this.water.setTint(tint)
+        this.matchTop.setTint(tint)
+        this.matchBottom.setTint(tint)
         this.waterNight.setAlpha(
           startNightAlpha + (endNightAlpha - startNightAlpha) * t,
         )
       },
       onComplete: () => {
         if (!isRecap) {
-          this.water.clearTint()
+          this.matchTop.clearTint()
+          this.matchBottom.clearTint()
         }
         this.waterNight.setAlpha(endNightAlpha)
       },
