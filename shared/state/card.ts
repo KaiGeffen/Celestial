@@ -226,6 +226,7 @@ export default class Card {
   /* Common functions */
   reset(game: GameModel) {
     game.score = [0, 0]
+    game.animations[0].push(new Animation({ from: Zone.Reset }))
   }
 
   inspired(amt: number, game: GameModel, player: number) {

@@ -62,6 +62,8 @@ export default class Animator {
           this.animateTransform(animation, slot, owner)
         } else if (animation.from === Zone.Status) {
           this.view.statusRegion.animateStatus(animation, owner, slot)
+        } else if (animation.from === Zone.Reset) {
+          this.resolveBubbles.popBubbles(slot, state.story.resolvedActs.length)
         }
         // In all other cases, move it from start to end
         else {
@@ -599,6 +601,8 @@ class StoryResolveBubbles {
   private snapshotResolvedActCount = 0
   private snapshotScore: [number, number] = [0, 0]
   private snapshotStatusNourish: [number, number] = [0, 0]
+  /** Resolved act count at the time of the last reset; acts below this index skip bubble drawing. -1 = no reset. */
+  private resetBeforeResolvedCount = -1
 
   constructor(private readonly scene: MatchScene) {
     this.layer = scene.add.container(0, 0).setDepth(Depth.aboveOtherCards)
@@ -618,6 +622,25 @@ class StoryResolveBubbles {
     this.layer.removeAll(true)
   }
 
+  popBubbles(slot: number, resolvedCountAtReset: number): void {
+    this.resetBeforeResolvedCount = resolvedCountAtReset
+    this.cancelStaggerEvents()
+    const delay = slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens)
+    const targets = [...this.layer.list] as Phaser.GameObjects.Container[]
+    for (const bubble of targets) {
+      this.scene.tweens.add({
+        targets: bubble,
+        scaleX: 0,
+        scaleY: 0,
+        alpha: 0,
+        delay,
+        duration: Time.match.recapTween / 2,
+        ease: 'Back.easeIn',
+        onComplete: () => bubble.destroy(),
+      })
+    }
+  }
+
   private cancelStaggerEvents(): void {
     this.staggerEvents.forEach((e) => {
       this.scene.time.removeEvent(e)
@@ -633,12 +656,22 @@ class StoryResolveBubbles {
     this.syncBookkeeping(state)
 
     const resolvedCount = state.story.resolvedActs.length
+
+    // If a new round started, clear the reset tracking
+    if (resolvedCount === 0) {
+      this.resetBeforeResolvedCount = -1
+    }
+
     // Same predicate as `StoryRegion` (lastStoryResolvedActCount vs snapshot): only the newest resolve gets stagger / settle tween.
     const oneNewResolvedAct =
       resolvedCount === this.snapshotResolvedActCount + 1 && resolvedCount > 0
     const r = Time.match.recapTween
 
     for (let resolvedI = 0; resolvedI < resolvedCount; resolvedI++) {
+      // Skip acts whose bubbles were popped by a reset
+      if (this.resetBeforeResolvedCount !== -1 && resolvedI < this.resetBeforeResolvedCount) {
+        continue
+      }
       const act = state.story.resolvedActs[resolvedI]
       const card = resolvedCards[resolvedI]
       if (!card) {
