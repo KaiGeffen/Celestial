@@ -2,7 +2,7 @@ import Card from '../card'
 import { Quality } from '../quality'
 import GameModel from '../gameModel'
 import { Zone } from '../zone'
-import { Animation } from '../../animation'
+import { Animation, Visibility } from '../../animation'
 
 class Seen extends Card {
   onUpkeepInHand(
@@ -11,7 +11,17 @@ class Seen extends Card {
     index: number,
   ): [boolean, boolean] {
     game.status[player ^ 1].vision += 3
-    return [true, false]
+    game.animations[player].push(
+      new Animation({
+        from: Zone.Hand,
+        to: Zone.Hand,
+        card: this,
+        index,
+        index2: index,
+        visibility: Visibility.KnowAllDetails,
+      }),
+    )
+    return [false, false]
   }
 }
 const seen = new Seen({
