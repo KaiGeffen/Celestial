@@ -534,8 +534,7 @@ class StoryResolveBubbles {
     corner: 'bottomRight' | 'bottomLeft',
   ): { x: number; y: number } {
     const R = StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE
-    const r = StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE
-    const d = (R + r) / Math.SQRT2
+    const d = R / Math.SQRT2
     return corner === 'bottomRight' ? { x: d, y: d } : { x: -d, y: d }
   }
 
