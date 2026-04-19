@@ -195,6 +195,7 @@ export default abstract class StacksRegionBase {
       const cardImg = new CardImage(card, this.discardContainer, true, false)
       cardImg.doBurstEffect = false
       if (this.discardCallback) cardImg.setOnClick(this.discardCallback)
+      cardImg.interactive = false
       this.discardCards.push(cardImg)
     }
 
