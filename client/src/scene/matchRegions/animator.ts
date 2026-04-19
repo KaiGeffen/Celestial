@@ -627,13 +627,16 @@ class StoryResolveBubbles {
         })
         let delay = r
         if (nourishAmt !== 0) {
-          this.addNourishResolveCircle(
-            card,
-            tweenNourishFromStatus,
-            nourishAmt,
-            act.owner,
-            delay,
-          )
+          const nourishDelay = delay
+          pushBubbleStep(0, () => {
+            this.addNourishResolveCircle(
+              card,
+              tweenNourishFromStatus,
+              nourishAmt,
+              act.owner,
+              nourishDelay,
+            )
+          })
           delay += r
         }
         if (effectAmt !== 0 && showEffectsBubble) {
