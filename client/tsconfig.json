@@ -2,7 +2,8 @@
   "compilerOptions": {
     "target": "es5",
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "strictPropertyInitialization": false
   },
   "include": [
     "src/*",

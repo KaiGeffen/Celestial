@@ -26,6 +26,7 @@ export default class PassRegion extends Region {
   showResultsCallback: () => void
 
   hotkeysRegistered = false
+  autoAdvance = false
 
   btnPass: Button
   btnMoon: Moon
@@ -70,6 +71,12 @@ export default class PassRegion extends Region {
       state.isRecap &&
       state.sound !== null &&
       ['win', 'lose', 'tie'].includes(state.sound)
+
+    if (this.autoAdvance && isRecapEndPause) {
+      this.skipCallback()
+      return
+    }
+
     this.btnMoon.setText(`${state.score[1]}\n\n${state.score[0]}`)
     this.btnMoon.txtAction.setText(isRecapEndPause ? 'Continue' : '')
 
