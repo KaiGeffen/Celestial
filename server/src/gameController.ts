@@ -67,6 +67,9 @@ class ServerController {
 
     // Do action: Pass or play a card
     if (choice === MechanicsSettings.PASS) {
+      // NOTE Animations cleared here to capture any from pass() call
+      this.model.animations = [[],[]]
+
       // Handle the pass occuring and trigger any effects
       this.pass(player)
 
@@ -76,7 +79,7 @@ class ServerController {
         this.doUpkeep()
       }
       else {
-        // Just increment the version without clearing any animations from the pass above
+        // Just increment the version, don't reset the animations
         this.model.versionNo++
       }
 

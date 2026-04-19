@@ -49,6 +49,13 @@ export default class Animator {
       hasReset,
     )
 
+    // Total Zone.Story insertions across both owners — used to correctly compute the
+    // pre-insertion story length so animateStoryInsertShift applies the full shift once.
+    const totalStoryInsertions = state.animations[0]
+      .concat(state.animations[1])
+      .filter((a) => a.to === Zone.Story && a.from !== Zone.Story).length
+    let storyInsertShiftDone = false
+
     for (let owner = 0; owner < 2; owner++) {
       for (let i = 0; i < state.animations[owner].length; i++) {
         let animation = state.animations[owner][i]
@@ -98,12 +105,21 @@ export default class Animator {
               this.animateStoryShift(animation.index ?? 0, slot, state)
             }
 
-            // Shift existing story cards right when a card is inserted mid-story
+            // Shift existing story cards right when a card is inserted mid-story.
+            // Only run once per state — multiple simultaneous insertions (e.g. Zoomies) must
+            // apply the full combined shift in one pass to avoid stacking container offsets.
             if (
               animation.to === Zone.Story &&
-              (animation.index2 ?? 0) < state.story.acts.length - 1
+              (animation.index2 ?? 0) < state.story.acts.length - 1 &&
+              !storyInsertShiftDone
             ) {
-              this.animateStoryInsertShift(animation.index2 ?? 0, slot, state)
+              this.animateStoryInsertShift(
+                animation.index2 ?? 0,
+                slot,
+                state,
+                totalStoryInsertions,
+              )
+              storyInsertShiftDone = true
             }
           } else {
             // Emphasize the card if it stayed in the same zone
@@ -541,11 +557,12 @@ export default class Animator {
     insertionActiveIndex: number,
     slot: number,
     state: GameModel,
+    totalInsertions = 1,
   ): void {
     const resolvedCount = state.story.resolvedActs.length
     const newTotalLength =
       state.story.acts.length + (state.isRecap ? resolvedCount : 0)
-    const oldTotalLength = newTotalLength - 1
+    const oldTotalLength = newTotalLength - totalInsertions
 
     const oldDx = this.computeStoryDx(oldTotalLength)
     const newDx = this.computeStoryDx(newTotalLength)
@@ -554,7 +571,7 @@ export default class Animator {
       const card = this.view.story.cards[k]
       if (!card) continue
 
-      const fullIndexOld = resolvedCount + k - 1
+      const fullIndexOld = resolvedCount + k - totalInsertions
       const fullIndexNew = resolvedCount + k
       const shiftX = oldDx * fullIndexOld - newDx * fullIndexNew
 
