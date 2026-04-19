@@ -255,6 +255,20 @@ class ServerController {
       let index = 0
       while (index < this.model.hand[player].length) {
         const card = this.model.hand[player][index]
+
+        // Pre-queue burst before onUpkeepInHand so it precedes any animations the
+        // effect creates (e.g. Starfall's discard). Removed below if nothing activated.
+        const burstAnimIdx = this.model.animations[player].length
+        this.model.animations[player].push(
+          new Animation({
+            from: Zone.Hand,
+            to: Zone.Hand,
+            card: card,
+            index: index,
+            index2: index,
+          }),
+        )
+
         const [somethingActivated, cardLeftHand] = card.onUpkeepInHand(
           player,
           this.model,
@@ -262,16 +276,8 @@ class ServerController {
           handSizeAtStart,
         )
 
-        if (somethingActivated) {
-          this.model.animations[player].push(
-            new Animation({
-              from: Zone.Hand,
-              to: Zone.Hand,
-              card: card,
-              index: index,
-              index2: index,
-            }),
-          )
+        if (!somethingActivated) {
+          this.model.animations[player].splice(burstAnimIdx, 1)
         }
 
         if (!cardLeftHand) {
