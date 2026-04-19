@@ -74,8 +74,10 @@ class ServerController {
       if (this.model.passes === 2) {
         this.doResolvePhase()
         this.doUpkeep()
-      } else {
-        this.model.versionIncrClearAnimations()
+      }
+      else {
+        // Just increment the version without clearing any animations from the pass above
+        this.model.versionNo++
       }
 
       return true
