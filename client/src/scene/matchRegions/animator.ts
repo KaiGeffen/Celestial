@@ -40,9 +40,13 @@ export default class Animator {
 
     this.animateAllReveals(state)
 
+    const hasReset = state.animations.some((anims) =>
+      anims.some((a) => a.from === Zone.Reset),
+    )
     const bubbleSlots = this.resolveBubbles.playForResolvedActs(
       state,
       this.view.story.resolvedCards,
+      hasReset,
     )
 
     for (let owner = 0; owner < 2; owner++) {
@@ -603,6 +607,8 @@ class StoryResolveBubbles {
   private snapshotStatusNourish: [number, number] = [0, 0]
   /** Resolved act count at the time of the last reset; acts below this index skip bubble drawing. -1 = no reset. */
   private resetBeforeResolvedCount = -1
+  /** When >= 0, any bubble added via makeBubbleRoot will be popped after this delay (ms). -1 = no pending pop. */
+  private pendingPopDelay = -1
 
   constructor(private readonly scene: MatchScene) {
     this.layer = scene.add.container(0, 0).setDepth(Depth.aboveOtherCards)
@@ -620,25 +626,30 @@ class StoryResolveBubbles {
   clear(): void {
     this.cancelStaggerEvents()
     this.layer.removeAll(true)
+    this.pendingPopDelay = -1
   }
 
   popBubbles(slot: number, resolvedCountAtReset: number): void {
     this.resetBeforeResolvedCount = resolvedCountAtReset
-    this.cancelStaggerEvents()
     const delay = slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens)
+    this.pendingPopDelay = delay
     const targets = [...this.layer.list] as Phaser.GameObjects.Container[]
     for (const bubble of targets) {
-      this.scene.tweens.add({
-        targets: bubble,
-        scaleX: 0,
-        scaleY: 0,
-        alpha: 0,
-        delay,
-        duration: Time.match.recapTween / 2,
-        ease: 'Back.easeIn',
-        onComplete: () => bubble.destroy(),
-      })
+      this.scheduleBubblePop(bubble, delay)
     }
+  }
+
+  private scheduleBubblePop(bubble: Phaser.GameObjects.Container, delay: number): void {
+    this.scene.tweens.add({
+      targets: bubble,
+      scaleX: 0,
+      scaleY: 0,
+      alpha: 0,
+      delay,
+      duration: Time.match.recapTween / 2,
+      ease: 'Back.easeIn',
+      onComplete: () => bubble.destroy(),
+    })
   }
 
   private cancelStaggerEvents(): void {
@@ -652,7 +663,7 @@ class StoryResolveBubbles {
    * Draws resolve bubbles for each settled act (staggered when a single act just resolved).
    * Returns recap tween slots to align other recap animations with those bubble tweens.
    */
-  playForResolvedActs(state: GameModel, resolvedCards: CardImage[]): number {
+  playForResolvedActs(state: GameModel, resolvedCards: CardImage[], isResetState = false): number {
     this.syncBookkeeping(state)
 
     const resolvedCount = state.story.resolvedActs.length
@@ -725,7 +736,7 @@ class StoryResolveBubbles {
           })
           delay += r
         }
-        if (effectAmt !== 0 && showEffectsBubble) {
+        if (effectAmt !== 0 && showEffectsBubble && !isResetState) {
           pushBubbleStep(delay, () => {
             this.addEffectsResolveCircle(
               card,
@@ -810,6 +821,9 @@ class StoryResolveBubbles {
   ): Phaser.GameObjects.Container {
     const bubble = this.scene.add.container(worldX, worldY)
     this.layer.add(bubble)
+    if (this.pendingPopDelay >= 0) {
+      this.scheduleBubblePop(bubble, this.pendingPopDelay)
+    }
     return bubble
   }
 
