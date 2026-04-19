@@ -97,6 +97,14 @@ export default class Animator {
               card.show()
               this.animateStoryShift(animation.index ?? 0, slot, state)
             }
+
+            // Shift existing story cards right when a card is inserted mid-story
+            if (
+              animation.to === Zone.Story &&
+              (animation.index2 ?? 0) < state.story.acts.length - 1
+            ) {
+              this.animateStoryInsertShift(animation.index2 ?? 0, slot, state)
+            }
           } else {
             // Emphasize the card if it stayed in the same zone
             this.animateEmphasis(card, slot)
@@ -514,6 +522,39 @@ export default class Animator {
       if (!card) continue
 
       const fullIndexOld = resolvedCount + k + 1
+      const fullIndexNew = resolvedCount + k
+      const shiftX = oldDx * fullIndexOld - newDx * fullIndexNew
+
+      card.container.x += shiftX
+
+      this.scene.tweens.add({
+        targets: card.container,
+        x: card.container.x - shiftX,
+        delay: slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
+        duration: Time.match.recapTween,
+        ease: Ease.card,
+      })
+    }
+  }
+
+  private animateStoryInsertShift(
+    insertionActiveIndex: number,
+    slot: number,
+    state: GameModel,
+  ): void {
+    const resolvedCount = state.story.resolvedActs.length
+    const newTotalLength =
+      state.story.acts.length + (state.isRecap ? resolvedCount : 0)
+    const oldTotalLength = newTotalLength - 1
+
+    const oldDx = this.computeStoryDx(oldTotalLength)
+    const newDx = this.computeStoryDx(newTotalLength)
+
+    for (let k = insertionActiveIndex + 1; k < this.view.story.cards.length; k++) {
+      const card = this.view.story.cards[k]
+      if (!card) continue
+
+      const fullIndexOld = resolvedCount + k - 1
       const fullIndexNew = resolvedCount + k
       const shiftX = oldDx * fullIndexOld - newDx * fullIndexNew
 
