@@ -251,7 +251,12 @@ class Pride extends Card {
     if (super.exhale(1, game, player)) {
       game.pile[player].splice(index, 1)
       game.createInStory(player, this, undefined, Zone.Discard)
+      const prideAnimIdx = game.animations[player].length - 1
       game.discard(player)
+      // Discard may trigger cards (e.g. Abandoned) that insert before Pride in story.acts,
+      // shifting Pride's index. Patch the animation to reflect its actual final position.
+      const finalIdx = game.story.acts.findIndex((act) => act.card === this)
+      if (finalIdx >= 0) game.animations[player][prideAnimIdx].index2 = finalIdx
     }
     return true
   }

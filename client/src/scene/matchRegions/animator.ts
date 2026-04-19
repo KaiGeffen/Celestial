@@ -564,10 +564,24 @@ export default class Animator {
       state.story.acts.length + (state.isRecap ? resolvedCount : 0)
     const oldTotalLength = newTotalLength - totalInsertions
 
+    // No pre-existing cards to shift (all insertions are new to the story this state)
+    if (oldTotalLength <= 0) return
+
     const oldDx = this.computeStoryDx(oldTotalLength)
     const newDx = this.computeStoryDx(newTotalLength)
 
+    // Cards being newly inserted this state should not be shifted — only pre-existing ones
+    const newlyInsertedActiveIndices = new Set<number>()
+    for (const ownerAnims of [state.animations[0], state.animations[1]]) {
+      for (const anim of ownerAnims) {
+        if (anim.to === Zone.Story && anim.from !== Zone.Story) {
+          newlyInsertedActiveIndices.add(anim.index2 ?? 0)
+        }
+      }
+    }
+
     for (let k = insertionActiveIndex + 1; k < this.view.story.cards.length; k++) {
+      if (newlyInsertedActiveIndices.has(k)) continue
       const card = this.view.story.cards[k]
       if (!card) continue
 
