@@ -27,7 +27,7 @@ export const MatchTiming = {
   /** Round-result stamp fade in/out duration */
   roundResultFade: 200,
   /** Round-result stamp hold at full alpha */
-  roundResultHold: 2000,
+  roundResultHold: 1500,
 
   // NOTE This applies every step, not just the transition day/night
   // NOTE Therefore, each step must take at least this long
