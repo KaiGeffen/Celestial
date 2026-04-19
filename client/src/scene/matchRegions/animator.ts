@@ -84,6 +84,13 @@ export default class Animator {
               animation.to === Zone.Story ? SHRUNKEN_CARD_SCALE : undefined,
               animation.to === Zone.Mulligan ? Time.match.mulliganPause : undefined,
             )
+
+            // Shift remaining story cards when a card is removed mid-story
+            if (animation.from === Zone.Story) {
+              card.container.setScale(SHRUNKEN_CARD_SCALE)
+              card.show()
+              this.animateStoryShift(animation.index ?? 0, slot, state)
+            }
           } else {
             // Emphasize the card if it stayed in the same zone
             this.animateEmphasis(card, slot)
@@ -468,6 +475,52 @@ export default class Animator {
         oldCard.destroy()
       },
     })
+  }
+
+  private computeStoryDx(totalLength: number): number {
+    let dx = Space.cardWidth * 0.8 - Space.storyXOverlap
+    if (totalLength <= 1) return dx
+    const x0 = 230
+    const rightPad = 200
+    const maxOffset = Space.windowWidth - x0 - Space.cardWidth / 2 - rightPad
+    const lastCardOffset = dx * (totalLength - 1)
+    if (lastCardOffset > maxOffset) {
+      dx *= maxOffset / lastCardOffset
+    }
+    return dx
+  }
+
+  private animateStoryShift(
+    removalActiveIndex: number,
+    slot: number,
+    state: GameModel,
+  ): void {
+    const resolvedCount = state.story.resolvedActs.length
+    const newTotalLength =
+      state.story.acts.length + (state.isRecap ? resolvedCount : 0)
+    const oldTotalLength = newTotalLength + 1
+
+    const oldDx = this.computeStoryDx(oldTotalLength)
+    const newDx = this.computeStoryDx(newTotalLength)
+
+    for (let k = removalActiveIndex; k < this.view.story.cards.length; k++) {
+      const card = this.view.story.cards[k]
+      if (!card) continue
+
+      const fullIndexOld = resolvedCount + k + 1
+      const fullIndexNew = resolvedCount + k
+      const shiftX = oldDx * fullIndexOld - newDx * fullIndexNew
+
+      card.container.x += shiftX
+
+      this.scene.tweens.add({
+        targets: card.container,
+        x: card.container.x - shiftX,
+        delay: slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
+        duration: Time.match.recapTween,
+        ease: Ease.card,
+      })
+    }
   }
 
   private getHiddenCards(state: GameModel): boolean[] {
