@@ -36,6 +36,9 @@ export default abstract class StacksRegionBase {
   btnDeck!: Button
   btnDiscard!: Button
 
+  private deckCallback: () => void
+  private discardCallback: () => void
+
   /** 0 = us, 1 = opponent */
   protected abstract ownerIndex(): 0 | 1
 
@@ -128,6 +131,8 @@ export default abstract class StacksRegionBase {
   }
 
   setOverlayCallbacks(fDeck: () => void, fDiscard: () => void): void {
+    this.deckCallback = fDeck
+    this.discardCallback = fDiscard
     this.btnDeck.setOnClick(fDeck)
     this.btnDiscard.setOnClick(fDiscard)
   }
@@ -187,7 +192,9 @@ export default abstract class StacksRegionBase {
 
     while (this.discardCards.length < desiredDiscardCount) {
       const card = pileRow[this.discardCards.length]
-      const cardImg = new CardImage(card, this.discardContainer, false, false)
+      const cardImg = new CardImage(card, this.discardContainer, true, false)
+      cardImg.doBurstEffect = false
+      if (this.discardCallback) cardImg.setOnClick(this.discardCallback)
       this.discardCards.push(cardImg)
     }
 
@@ -231,9 +238,11 @@ export default abstract class StacksRegionBase {
       const cardback = new CardImage(
         undefined,
         this.deckContainer,
-        false,
+        true,
         false,
       )
+      cardback.doBurstEffect = false
+      if (this.deckCallback) cardback.setOnClick(this.deckCallback)
       this.deckCardbacks.push(cardback)
     }
 
