@@ -13,7 +13,6 @@ import { MechanicsSettings } from '../../../shared/settings'
 import { Deck } from '../../../shared/types/deck'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import Catalog from '../../../shared/state/catalog'
-import Card from '../../../shared/state/card'
 
 const ROSTER_WIDTH = Space.cutoutWidth + 20
 const CENTER_WIDTH = 280
@@ -47,6 +46,7 @@ export default class DeckSelectorScene extends BaseScene {
     this.savedDeckIndex = undefined
 
     this.createBackground()
+    this.createBackButton()
 
     this.mainSizer = this.rexUI.add.sizer().setOrigin(0, 0)
 
@@ -225,6 +225,7 @@ export default class DeckSelectorScene extends BaseScene {
     const deck: Deck = UserSettings._get('decks')[i]
     this.decklist.setDeck(deck.cards.map((id) => Catalog.getCardById(id)))
     UserSettings._set('equippedDeckIndex', i)
+    this.rosterPanel.t = 0
   }
 
   selectDeck(i: number): void {
@@ -236,6 +237,17 @@ export default class DeckSelectorScene extends BaseScene {
     this.savedDeckIndex = undefined
     this.deckThumbnails.forEach((t) => t.setSelected(false))
     this.decklist.setDeck([])
+  }
+
+  private createBackButton(): void {
+    new Buttons.Basic({
+      within: this,
+      text: 'Back',
+      x: Space.pad + Space.buttonWidth / 2,
+      y: Space.pad + Space.buttonHeight / 2,
+      f: () => this.scene.start('HomeScene'),
+      depth: 10,
+    })
   }
 
   private createRightPanel(): any {
@@ -256,7 +268,7 @@ export default class DeckSelectorScene extends BaseScene {
       } as any)
       .addBackground(background)
 
-    const addBtn = (text: string, f: () => void, muteClick = false) => {
+    const makeBtn = (text: string, f: () => void, muteClick = false) => {
       const container = new ContainerLite(
         this,
         0,
@@ -265,12 +277,16 @@ export default class DeckSelectorScene extends BaseScene {
         Space.buttonHeight,
       )
       new Buttons.Basic({ within: container, text, f, muteClick })
-      sizer.add(container)
+      return container
     }
 
-    addBtn('Back', () => this.scene.start('HomeScene'))
-    addBtn('Delete deck', () => this.onDelete(), true)
-    addBtn('Edit deck', () => this.onEdit())
+    const rowSizer = this.rexUI.add.sizer({
+      orientation: 0,
+      space: { item: Space.padSmall },
+    } as any)
+    rowSizer.add(makeBtn('Delete', () => this.onDelete(), true))
+    rowSizer.add(makeBtn('Edit', () => this.onEdit()))
+    sizer.add(rowSizer)
     const playContainer = new ContainerLite(
       this,
       0,
