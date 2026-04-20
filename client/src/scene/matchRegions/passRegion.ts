@@ -15,6 +15,7 @@ import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import Buttons from '../../lib/buttons/buttons'
 import { server } from '../../server'
+import { SCORE_CHROME_HEIGHT_RATIO } from './scoreRegion'
 
 // During the round, shows Pass button, who has passed, and who has priority
 export default class PassRegion extends Region {
@@ -38,17 +39,20 @@ export default class PassRegion extends Region {
     this.scene = scene
     this.container = scene.add.container(0, 0)
 
-    // Anchor to right
+    // Buttons must exist before anchor fires its initial callback
+    this.createButtons()
+    this.createText()
+
+    // Container sits at right edge / vertical center; buttons are offset ±dx inside it
     scene.plugins.get('rexAnchor')['add'](this.container, {
       x: `100%`,
       y: `50%`,
+      onUpdateViewportCallback: (viewport: { height: number }) => {
+        const dx = (160 / 1080) * viewport.height * SCORE_CHROME_HEIGHT_RATIO
+        this.btnPass.setPosition(-dx, 0)
+        this.btnMoon.setPosition(dx, 0)
+      },
     })
-
-    // Pass and recap button
-    this.createButtons()
-
-    // Show who has passed
-    this.createText()
 
     return this
   }
@@ -155,9 +159,8 @@ export default class PassRegion extends Region {
   }
 
   private createButtons(): void {
-    const x = -115
-    this.btnPass = new Buttons.Sun(this.container, x, 0)
-    this.btnMoon = new Buttons.Moon(this.container, -x, 0, () =>
+    this.btnPass = new Buttons.Sun(this.container, 0, 0)
+    this.btnMoon = new Buttons.Moon(this.container, 0, 0, () =>
       this.skipCallback(),
     ).disable()
   }

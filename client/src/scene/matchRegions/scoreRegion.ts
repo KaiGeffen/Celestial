@@ -5,7 +5,7 @@ import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
 /** Shared score chrome height as a fraction of viewport height. */
-const SCORE_CHROME_HEIGHT_RATIO = 0.8
+export const SCORE_CHROME_HEIGHT_RATIO = 0.8
 
 export default class WinsRegion extends Region {
   private imgSundial: Phaser.GameObjects.Image
