@@ -20,7 +20,6 @@ import { Scroll } from '../settings/settings'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 const ROSTER_WIDTH = Space.cutoutWidth + 20
-const RIGHT_WIDTH = Space.buttonWidth + Space.pad * 2
 const MAX_COST_FILTER = 7
 
 export default class DeckEditorScene extends BaseScene {
@@ -61,10 +60,11 @@ export default class DeckEditorScene extends BaseScene {
     this.cosmeticSet = deck.cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 }
 
     this.createBackground()
+    this.createBackButton()
 
     const mainSizer = this.rexUI.add.sizer().setOrigin(0)
 
-    const catalogWidth = Space.windowWidth - ROSTER_WIDTH - RIGHT_WIDTH
+    const catalogWidth = Space.windowWidth - ROSTER_WIDTH
 
     // Left: Collection (catalog + search)
     const leftSizer = this.rexUI.add
@@ -77,22 +77,27 @@ export default class DeckEditorScene extends BaseScene {
     leftSizer.add(this.catalogPanel)
     mainSizer.add(leftSizer)
 
-    // Center: Deck roster
+    // Right column: deck roster on top, buttons on bottom
     this.decklist = new Decklist(this, this.onClickCutout())
+    const buttonsSizer = this.createRightPanel()
+    buttonsSizer.layout()
+    const buttonsHeight = buttonsSizer.height
+
     this.rosterPanel = newScrollablePanel(this, {
-      x: catalogWidth,
-      y: 0,
       width: ROSTER_WIDTH,
-      height: Space.windowHeight,
+      height: Space.windowHeight - buttonsHeight,
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
       panel: { child: this.decklist.sizer },
       header: this.createRosterHeader(),
     }).setOrigin(0)
-    mainSizer.add(this.rosterPanel)
 
-    // Right: Back, Avatar, Styles, Play
-    const rightSizer = this.createRightPanel()
-    mainSizer.add(rightSizer)
+    const rightColumnSizer = this.rexUI.add.sizer({
+      width: ROSTER_WIDTH,
+      orientation: 1,
+    })
+    rightColumnSizer.add(this.rosterPanel, { proportion: 0 })
+    rightColumnSizer.add(buttonsSizer, { proportion: 0 })
+    mainSizer.add(rightColumnSizer)
 
     mainSizer.layout()
 
@@ -546,32 +551,34 @@ export default class DeckEditorScene extends BaseScene {
     return sizer
   }
 
-  private createRightPanel(): any {
-    const sizer = this.rexUI.add.sizer({
-      width: RIGHT_WIDTH,
-      orientation: 1,
-      space: {
-        left: Space.pad,
-        right: Space.pad,
-        top: Space.filterBarHeight + Space.pad,
-        bottom: Space.pad,
-        item: Space.padSmall,
-      },
-    } as any)
-
-    const backContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
+  private createBackButton(): void {
     new Buttons.Basic({
-      within: backContainer,
+      within: this,
       text: 'Back',
+      x: Space.pad + Space.buttonWidth / 2,
+      y: Space.pad + Space.buttonHeight / 2,
       f: () => this.scene.start('DeckSelectorScene'),
+      depth: 10,
     })
-    sizer.add(backContainer)
+  }
+
+  private createRightPanel(): any {
+    const background = this.add
+      .rectangle(0, 0, ROSTER_WIDTH, 1, Color.backgroundLight)
+      .setInteractive()
+    const sizer = this.rexUI.add
+      .sizer({
+        width: ROSTER_WIDTH,
+        orientation: 1,
+        space: {
+          left: Space.pad,
+          right: Space.pad,
+          top: Space.pad,
+          bottom: Space.pad,
+          item: Space.padSmall,
+        },
+      } as any)
+      .addBackground(background)
 
     const avatarContainer = new ContainerLite(
       this,
@@ -586,7 +593,6 @@ export default class DeckEditorScene extends BaseScene {
       border: this.cosmeticSet.border ?? 0,
       f: () => {},
     })
-    sizer.add(avatarContainer)
 
     const stylesContainer = new ContainerLite(
       this,
@@ -601,7 +607,13 @@ export default class DeckEditorScene extends BaseScene {
       f: () => this.openStylesMenu(),
       muteClick: true,
     })
-    sizer.add(stylesContainer)
+
+    const colSizer = this.rexUI.add.sizer({
+      orientation: 1,
+      space: { item: Space.padSmall },
+    } as any)
+    colSizer.add(avatarContainer)
+    colSizer.add(stylesContainer)
 
     const playContainer = new ContainerLite(
       this,
@@ -618,7 +630,14 @@ export default class DeckEditorScene extends BaseScene {
         this.scene.launch('MenuScene', { menu: 'play', activeScene: this })
       },
     })
-    sizer.add(playContainer)
+
+    const rowSizer = this.rexUI.add.sizer({
+      orientation: 0,
+      space: { item: Space.padSmall },
+    } as any)
+    rowSizer.add(colSizer)
+    rowSizer.add(playContainer)
+    sizer.add(rowSizer)
 
     return sizer
   }

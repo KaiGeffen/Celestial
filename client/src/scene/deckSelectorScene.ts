@@ -135,8 +135,6 @@ export default class DeckSelectorScene extends BaseScene {
         align: 'center',
       })
       .addBackground(background)
-    const title = this.add.text(0, 0, 'DECK', Style.announcement).setOrigin(0.5)
-    sizer.add(title)
     return sizer
   }
 
@@ -280,13 +278,13 @@ export default class DeckSelectorScene extends BaseScene {
       return container
     }
 
-    const rowSizer = this.rexUI.add.sizer({
-      orientation: 0,
+    const colSizer = this.rexUI.add.sizer({
+      orientation: 1,
       space: { item: Space.padSmall },
     } as any)
-    rowSizer.add(makeBtn('Delete', () => this.onDelete(), true))
-    rowSizer.add(makeBtn('Edit', () => this.onEdit()))
-    sizer.add(rowSizer)
+    colSizer.add(makeBtn('Edit', () => this.onEdit()))
+    colSizer.add(makeBtn('Delete', () => this.onDelete(), true))
+
     const playContainer = new ContainerLite(
       this,
       0,
@@ -299,7 +297,14 @@ export default class DeckSelectorScene extends BaseScene {
       text: 'Play',
       f: () => this.onPlayMatch(),
     })
-    sizer.add(playContainer)
+
+    const rowSizer = this.rexUI.add.sizer({
+      orientation: 0,
+      space: { item: Space.padSmall },
+    } as any)
+    rowSizer.add(colSizer)
+    rowSizer.add(playContainer)
+    sizer.add(rowSizer)
 
     return sizer
   }
