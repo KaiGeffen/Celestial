@@ -17,7 +17,6 @@ import Card from '../../../shared/state/card'
 
 const ROSTER_WIDTH = Space.cutoutWidth + 20
 const CENTER_WIDTH = 280
-const RIGHT_WIDTH = Space.buttonWidth + Space.pad * 2
 
 export default class DeckSelectorScene extends BaseScene {
   savedDeckIndex: number | undefined
@@ -26,6 +25,7 @@ export default class DeckSelectorScene extends BaseScene {
   private mainSizer: any
   private rosterPanel: ScrollablePanel | null
   private centerPanel: ScrollablePanel | null
+  private buttonsSizer: any
   private deckThumbnails: DeckThumbnail[] = []
   private background: Phaser.GameObjects.Image | null
 
@@ -50,7 +50,11 @@ export default class DeckSelectorScene extends BaseScene {
 
     this.mainSizer = this.rexUI.add.sizer().setOrigin(0, 0)
 
-    // Left: Deck roster (fixed width, full height via anchor)
+    // Left: List of decks (expands to fill available width)
+    this.centerPanel = this.createCenterPanel()
+    this.mainSizer.add(this.centerPanel, { proportion: 1 })
+
+    // Right column: deck preview on top, buttons on bottom
     this.decklist = new Decklist(this, () => () => {}) // no-op cutout callback
     this.rosterPanel = newScrollablePanel(this, {
       width: ROSTER_WIDTH,
@@ -59,15 +63,18 @@ export default class DeckSelectorScene extends BaseScene {
       panel: { child: this.decklist.sizer },
       header: this.createRosterHeader(),
     }).setOrigin(0)
-    this.mainSizer.add(this.rosterPanel, { proportion: 0 })
 
-    // Center: List of decks (expand to take extra width, full height via anchor)
-    this.centerPanel = this.createCenterPanel()
-    this.mainSizer.add(this.centerPanel, { proportion: 1 })
+    this.buttonsSizer = this.createRightPanel()
+    this.buttonsSizer.layout()
+    const buttonsHeight = this.buttonsSizer.height
 
-    // Right: Action buttons (fixed width)
-    const rightSizer = this.createRightPanel()
-    this.mainSizer.add(rightSizer, { proportion: 0 })
+    const rightColumnSizer = this.rexUI.add.sizer({
+      width: ROSTER_WIDTH,
+      orientation: 1,
+    })
+    rightColumnSizer.add(this.rosterPanel, { proportion: 0 })
+    rightColumnSizer.add(this.buttonsSizer, { proportion: 0 })
+    this.mainSizer.add(rightColumnSizer, { proportion: 0 })
 
     // Main sizer: full width and height via anchor; resize child panels to full height
     this.plugins.get('rexAnchor')['add'](this.mainSizer, {
@@ -79,7 +86,7 @@ export default class DeckSelectorScene extends BaseScene {
         if (!this.rosterPanel || !this.centerPanel) return
         go.setMinSize(width, height)
         go.layout()
-        this.rosterPanel.setMinSize(ROSTER_WIDTH, height)
+        this.rosterPanel.setMinSize(ROSTER_WIDTH, height - this.buttonsSizer.height)
         this.rosterPanel.layout()
         this.centerPanel.setMinSize(this.centerPanel.width, height)
         this.centerPanel.layout()
@@ -87,8 +94,8 @@ export default class DeckSelectorScene extends BaseScene {
     })
 
     this.mainSizer.layout()
-    // Initial full-height layout for the two left panels
-    this.rosterPanel.setMinSize(ROSTER_WIDTH, Space.windowHeight)
+    // Initial full-height layout
+    this.rosterPanel.setMinSize(ROSTER_WIDTH, Space.windowHeight - buttonsHeight)
     this.rosterPanel.layout()
     this.centerPanel.setMinSize(this.centerPanel.width, Space.windowHeight)
     this.centerPanel.layout()
@@ -146,7 +153,6 @@ export default class DeckSelectorScene extends BaseScene {
     })
 
     const scrollable = newScrollablePanel(this, {
-      x: ROSTER_WIDTH,
       width: CENTER_WIDTH,
       height: Space.windowHeight,
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
@@ -233,17 +239,22 @@ export default class DeckSelectorScene extends BaseScene {
   }
 
   private createRightPanel(): any {
-    const sizer = this.rexUI.add.sizer({
-      width: RIGHT_WIDTH,
-      orientation: 1,
-      space: {
-        left: Space.pad,
-        right: Space.pad,
-        top: Space.filterBarHeight + Space.pad,
-        bottom: Space.pad,
-        item: Space.padSmall,
-      },
-    } as any)
+    const background = this.add
+      .rectangle(0, 0, ROSTER_WIDTH, 1, Color.backgroundLight)
+      .setInteractive()
+    const sizer = this.rexUI.add
+      .sizer({
+        width: ROSTER_WIDTH,
+        orientation: 1,
+        space: {
+          left: Space.pad,
+          right: Space.pad,
+          top: Space.pad,
+          bottom: Space.pad,
+          item: Space.padSmall,
+        },
+      } as any)
+      .addBackground(background)
 
     const addBtn = (text: string, f: () => void, muteClick = false) => {
       const container = new ContainerLite(
