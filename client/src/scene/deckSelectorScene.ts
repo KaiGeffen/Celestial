@@ -184,6 +184,17 @@ export default class DeckSelectorScene extends BaseScene {
     panel.removeAll(true)
     this.deckThumbnails = []
 
+    const defaultCosmetics: CosmeticSet = { avatar: 0, border: 0, cardback: 0 }
+    const newDeckThumb = new DeckThumbnail({
+      scene: this,
+      name: 'New Deck',
+      cosmeticSet: defaultCosmetics,
+      cardback: 0,
+      isValid: true,
+      onClick: () => this.onNewDeckClick(),
+    })
+    panel.add(newDeckThumb.container)
+
     const decks: Deck[] = UserSettings._get('decks') || []
     for (let i = 0; i < decks.length; i++) {
       const deck = decks[i]
@@ -205,8 +216,22 @@ export default class DeckSelectorScene extends BaseScene {
       })
 
       this.deckThumbnails.push(thumb)
-      panel.add(thumb.container)
     }
+    for (let i = this.deckThumbnails.length - 1; i >= 0; i--) {
+      panel.add(this.deckThumbnails[i].container)
+    }
+  }
+
+  private onNewDeckClick(): void {
+    UserSettings._push('decks', {
+      name: `Deck ${(UserSettings._get('decks') || []).length + 1}`,
+      cards: [],
+      cosmeticSet: { avatar: 0, border: 0, cardback: 0 },
+    })
+    if (!this.centerPanel) return
+    this.refreshDeckList(this.centerPanel.getElement('panel') as FixWidthSizer)
+    this.centerPanel.layout()
+    this.selectDeck((UserSettings._get('decks') || []).length - 1)
   }
 
   private onDeckClick(i: number): void {
