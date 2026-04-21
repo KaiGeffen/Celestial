@@ -16,6 +16,7 @@ import { Deck } from '../../../shared/types/deck'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import Catalog from '../../../shared/state/catalog'
 import Card from '../../../shared/state/card'
+import { encodeShareableDeckCode } from '../../../shared/codec'
 import { MechanicsSettings } from '../../../shared/settings'
 import { Scroll } from '../settings/settings'
 
@@ -566,9 +567,44 @@ export default class DeckEditorScene extends BaseScene {
       isValid,
       onClick: () => this.openStylesMenu(),
     })
-    sizer.add(this.deckThumbnail.container)
+
+    const copyContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth / 3,
+      Space.avatarSize / 2,
+    )
+    new Buttons.Icon({
+      name: 'Share',
+      within: copyContainer,
+      x: 0,
+      y: 0,
+      f: () => this.copyDeckCodeToClipboard(),
+      hint: 'Export deck-code',
+    })
+
+    const headerRow = this.rexUI.add
+      .sizer({
+        orientation: 0,
+        space: { item: Space.padSmall },
+      } as any)
+      .add(this.deckThumbnail.container, { align: 'center' })
+      .add(copyContainer, { align: 'center' })
+
+    sizer.add(headerRow)
 
     return sizer
+  }
+
+  private copyDeckCodeToClipboard(): void {
+    const deckCode = this.getDeckCode()
+    const encodedDeck = encodeShareableDeckCode(deckCode)
+    navigator.clipboard.writeText(encodedDeck)
+    if (Flags.local) {
+      navigator.clipboard.writeText(deckCode.toString())
+    }
+    this.showMessage('Deck code copied to clipboard.')
   }
 
   private createRightPanel(): any {
