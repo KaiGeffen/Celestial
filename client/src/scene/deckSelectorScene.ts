@@ -17,6 +17,11 @@ import Catalog from '../../../shared/state/catalog'
 const ROSTER_WIDTH = Space.cutoutWidth + 20
 const CENTER_WIDTH = 280
 
+/** Vertical space taken by the shared full-width header (pads + announcement line). */
+function sharedMainHeaderScrollOffset(): number {
+  return Space.pad * 2 + 52
+}
+
 export default class DeckSelectorScene extends BaseScene {
   savedDeckIndex: number | undefined
 
@@ -45,27 +50,40 @@ export default class DeckSelectorScene extends BaseScene {
     this.createBackground()
     this.createBackButton()
 
-    // Right column: deck preview (expands) on top, buttons on bottom
+    const bodyScrollHeight = Space.windowHeight - sharedMainHeaderScrollOffset()
+
+    // Right column: deck preview + footer buttons (no column header)
     this.decklist = new Decklist(this, () => () => {}) // no-op cutout callback
     this.rosterPanel = newScrollablePanel(this, {
       width: ROSTER_WIDTH,
-      height: Space.windowHeight,
+      height: bodyScrollHeight,
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
       panel: { child: this.decklist.sizer },
-      header: this.createRosterHeader(),
       footer: this.createRightPanel(),
     }).setOrigin(0)
 
-    // Left: list of decks (expands to fill)
-    this.centerPanel = this.createCenterPanel()
+    // Left: list of decks (no column header — shared header below)
+    this.centerPanel = this.createCenterPanel(bodyScrollHeight)
+
+    const columnSizer = this.rexUI.add.sizer({
+      width: Space.windowWidth,
+      height: bodyScrollHeight,
+      orientation: 0,
+    }).setOrigin(0)
+    columnSizer.add(this.centerPanel, { proportion: 1, expand: true })
+    columnSizer.add(this.rosterPanel, { proportion: 0, expand: true })
 
     const mainSizer = this.rexUI.add.sizer({
       width: Space.windowWidth,
       height: Space.windowHeight,
-      orientation: 0,
+      orientation: 1,
     }).setOrigin(0)
-    mainSizer.add(this.centerPanel, { proportion: 1, expand: true })
-    mainSizer.add(this.rosterPanel, { proportion: 0, expand: true })
+    mainSizer.add(this.createMainHeader(), {
+      proportion: 0,
+      align: 'center',
+      expand: true,
+    })
+    mainSizer.add(columnSizer, { proportion: 1, expand: true })
     mainSizer.layout()
 
     ;(this.plugins.get('rexAnchor') as any).add(mainSizer, {
@@ -102,20 +120,25 @@ export default class DeckSelectorScene extends BaseScene {
     })
   }
 
-  private createRosterHeader(): FixWidthSizer {
+  /** Full-width header spanning both deck list and roster columns. */
+  private createMainHeader(): FixWidthSizer {
     const background = this.add.rectangle(0, 0, 1, 1, Color.backgroundDark)
     this.addShadow(background, -90)
     const sizer = this.rexUI.add
       .fixWidthSizer({
-        width: ROSTER_WIDTH,
+        width: Space.windowWidth,
         space: { top: Space.pad, bottom: Space.pad },
         align: 'center',
       })
       .addBackground(background)
+    const title = this.add
+      .text(0, 0, 'MY DECKS', Style.announcement)
+      .setOrigin(0.5)
+    sizer.add(title)
     return sizer
   }
 
-  private createCenterPanel(): ScrollablePanel {
+  private createCenterPanel(bodyScrollHeight: number): ScrollablePanel {
     const panel = this.rexUI.add.fixWidthSizer({
       width: CENTER_WIDTH,
       align: 'center',
@@ -129,32 +152,14 @@ export default class DeckSelectorScene extends BaseScene {
 
     const scrollable = newScrollablePanel(this, {
       width: CENTER_WIDTH,
-      height: Space.windowHeight,
+      height: bodyScrollHeight,
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
       panel: { child: panel },
-      header: this.createCenterHeader(),
     }).setOrigin(0)
 
     this.refreshDeckList(panel)
     scrollable.layout()
     return scrollable
-  }
-
-  private createCenterHeader(): FixWidthSizer {
-    const background = this.add.rectangle(0, 0, 1, 1, Color.backgroundDark)
-    this.addShadow(background, -90)
-    const sizer = this.rexUI.add
-      .fixWidthSizer({
-        width: CENTER_WIDTH,
-        space: { top: Space.pad, bottom: Space.pad },
-        align: 'center',
-      })
-      .addBackground(background)
-    const title = this.add
-      .text(0, 0, 'MY DECKS', Style.announcement)
-      .setOrigin(0.5)
-    sizer.add(title)
-    return sizer
   }
 
   private refreshDeckList(panel: FixWidthSizer): void {
