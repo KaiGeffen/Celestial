@@ -65,7 +65,7 @@ function getSpace() {
     textboxHeight: 58,
 
     avatarSize: Flags.mobile ? 80 : 130,
-    iconSize: 60,
+    iconSize: 40,
 
     sliderWidth: 40,
 

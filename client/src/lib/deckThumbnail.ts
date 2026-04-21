@@ -30,12 +30,19 @@ export default class DeckThumbnail {
     const { scene } = opts
     this.scene = scene
 
-    // Standard size for all deck thumbnails
-    const width = Space.avatarSize * 2
+    // Standard size for all deck thumbnails (85% of the previous tile width)
+    const width = Space.avatarSize * 2 * 0.85
     const height = 200
 
     // Root container for this tile
     this.container = new ContainerLite(scene, 0, 0, width, height)
+
+    // Bounding box (decorative outline; behind card art)
+    const boundsOutline = scene.add
+      .rectangle(0, 0, width, height)
+      .setFillStyle(0x000000, 0)
+      .setStrokeStyle(2, Color.border)
+    this.container.add(boundsOutline)
 
     // CARD BACK – top-left, using the deck's equipped cardback
     const angleFirst = -3
@@ -61,8 +68,8 @@ export default class DeckThumbnail {
       y: -10,
     })
 
-    // DECK NAME – background and text in main container; background is interactive
-    const nameBarWidth = width * 0.85
+    // DECK NAME – full width of the thumbnail
+    const nameBarWidth = width
     const nameBarY = height / 2 - Space.buttonHeight / 2
     this.isValid = opts.isValid
     this.nameBackground = scene.add

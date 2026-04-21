@@ -175,7 +175,7 @@ export default class BaseScene extends SharedBaseScene {
 
     // Anchor to the left of options button
     this.plugins.get('rexAnchor')['add'](this.btnFriends.icon, {
-      x: `100%-${Space.padSmall + Space.iconSize + Space.padSmall}`,
+      x: `100%-${Space.padSmall / 2 + Space.iconSize + Space.padSmall / 2}`,
       y: `0%+${Space.padSmall + Space.iconSize / 2}`,
     })
 
@@ -192,7 +192,7 @@ export default class BaseScene extends SharedBaseScene {
 
     // Anchor to top right
     this.plugins.get('rexAnchor')['add'](this.btnOptions.icon, {
-      x: `100%-${Space.padSmall}`,
+      x: `100%-${Space.padSmall / 2}`,
       y: `0%+${Space.padSmall}`,
     })
 
