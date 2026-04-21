@@ -5,14 +5,13 @@ import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/Sc
 
 import BaseScene from './baseScene'
 import Decklist from '../lib/decklist'
-import DeckThumbnail from '../lib/deckThumbnail'
 import Cutout from '../lib/buttons/cutout'
+import cardbackNames from '../data/cardbackNames'
 import Buttons from '../lib/buttons/buttons'
 import UButton from '../lib/buttons/underlined'
 import { CardImage } from '../lib/cardImage'
 import { Color, Space, UserSettings, Flags, Style } from '../settings/settings'
 import newScrollablePanel from '../lib/scrollablePanel'
-import { MechanicsSettings } from '../../../shared/settings'
 import { Deck } from '../../../shared/types/deck'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import Catalog from '../../../shared/state/catalog'
@@ -36,8 +35,9 @@ export default class DeckEditorScene extends BaseScene {
   private costFilterBtns: UButton[] = []
   private cosmeticSet: CosmeticSet
   private deckName: string
-  private deckThumbnail: DeckThumbnail | null = null
-  private thumbnailPlaceholder: ContainerLite | null = null
+  private deckNameInput: any
+  private cardbackImages: Phaser.GameObjects.Image[] = []
+  private avatarBtn: any
   private buttonsSizer: any
   private orderedByCost = true
 
@@ -63,53 +63,47 @@ export default class DeckEditorScene extends BaseScene {
 
     this.createBackground()
 
-    // Full-width filter header (with Back button)
-    const filterHeader = this.createFilterHeader()
+    const catalogWidth = Space.windowWidth - ROSTER_WIDTH
+
+    // Left column: filter header + catalog
+    const filterHeader = this.createFilterHeader(catalogWidth)
     filterHeader.layout()
     const filterHeight = filterHeader.height
 
-    const contentHeight = Space.windowHeight - filterHeight
-    const catalogWidth = Space.windowWidth - ROSTER_WIDTH
+    this.catalogPanel = this.createCatalogPanel(catalogWidth, Space.windowHeight - filterHeight)
 
-    // Left: Collection (catalog — no header, header is now global)
-    this.catalogPanel = this.createCatalogPanel(catalogWidth, contentHeight)
+    const leftSizer = this.rexUI.add.sizer({ orientation: 1 }).setOrigin(0)
+    leftSizer.add(filterHeader, { proportion: 0 })
+    leftSizer.add(this.catalogPanel, { proportion: 0 })
 
-    // Right column: thumbnail on top, deck roster, buttons on bottom
+    // Right column: spans full height with its own header
     this.decklist = new Decklist(this, this.onClickCutout())
-    const thumbnailSizer = this.createThumbnailSizer()
-    thumbnailSizer.layout()
-    const thumbnailHeight = thumbnailSizer.height
     this.buttonsSizer = this.createRightPanel()
     this.buttonsSizer.layout()
     const buttonsHeight = this.buttonsSizer.height
 
     this.rosterPanel = newScrollablePanel(this, {
       width: ROSTER_WIDTH,
-      height: contentHeight - thumbnailHeight - buttonsHeight,
+      height: Space.windowHeight - buttonsHeight,
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
       panel: { child: this.decklist.sizer },
+      header: this.createRosterHeader(),
     }).setOrigin(0)
 
     const rightColumnSizer = this.rexUI.add.sizer({
       width: ROSTER_WIDTH,
       orientation: 1,
     })
-    rightColumnSizer.add(thumbnailSizer, { proportion: 0 })
     rightColumnSizer.add(this.rosterPanel, { proportion: 0 })
     rightColumnSizer.add(this.buttonsSizer, { proportion: 0 })
 
-    const contentSizer = this.rexUI.add.sizer().setOrigin(0)
-    contentSizer.add(this.catalogPanel)
-    contentSizer.add(rightColumnSizer)
-
-    const outerSizer = this.rexUI.add.sizer({ orientation: 1 }).setOrigin(0)
-    outerSizer.add(filterHeader, { proportion: 0 })
-    outerSizer.add(contentSizer, { proportion: 0 })
+    const outerSizer = this.rexUI.add.sizer().setOrigin(0)
+    outerSizer.add(leftSizer)
+    outerSizer.add(rightColumnSizer)
     outerSizer.layout()
 
     this.setDeck((deck.cards || []).map((id) => Catalog.getCardById(id)))
     this.updateSavedDeck(this.getDeckCode())
-    this.refreshThumbnail()
 
     //
     this.filterCatalog()
@@ -172,15 +166,15 @@ export default class DeckEditorScene extends BaseScene {
     return scrollable
   }
 
-  private createFilterHeader(): any {
+  private createFilterHeader(width = Space.windowWidth): any {
     const background = this.add
-      .rectangle(0, 0, Space.windowWidth, 1, Color.backgroundLight)
+      .rectangle(0, 0, width, 1, Color.backgroundLight)
       .setInteractive()
     this.addShadow(background, -90)
 
     const sizer = this.rexUI.add
       .sizer({
-        width: Space.windowWidth,
+        width,
         orientation: 0,
         space: {
           left: Space.pad,
@@ -496,7 +490,12 @@ export default class DeckEditorScene extends BaseScene {
     }
     UserSettings._setIndex('decks', this.deckIndex, updated)
     if (name !== undefined) this.deckName = name
-    if (this.deckThumbnail) this.refreshThumbnail()
+    if (cosmeticSet !== undefined) {
+      this.avatarBtn?.setAvatar(cosmeticSet.avatar)
+      this.avatarBtn?.setBorder(cosmeticSet.border ?? 0)
+      const cardbackName = cardbackNames[cosmeticSet.cardback ?? 0] ?? 'Default'
+      this.cardbackImages.forEach((img) => img.setTexture(`cardback-${cardbackName}`))
+    }
   }
 
   setDeck(cards: Card[]): void {
@@ -506,29 +505,6 @@ export default class DeckEditorScene extends BaseScene {
 
   setCosmeticSet(set: CosmeticSet): void {
     this.cosmeticSet = set ?? { avatar: 0, border: 0, cardback: 0 }
-  }
-
-  private refreshThumbnail(): void {
-    if (this.deckThumbnail) {
-      this.deckThumbnail.container.destroy()
-      this.deckThumbnail = null
-    }
-    const decks = UserSettings._get('decks') || []
-    const isValid =
-      (decks[this.deckIndex]?.cards?.length || 0) === MechanicsSettings.DECK_SIZE
-    this.deckThumbnail = new DeckThumbnail({
-      scene: this,
-      name: this.deckName,
-      cosmeticSet: this.cosmeticSet,
-      cardback: this.cosmeticSet.cardback ?? 0,
-      isValid,
-      onClick: () => this.openStylesMenu(),
-    })
-    this.deckThumbnail.container.setPosition(
-      this.thumbnailPlaceholder.x,
-      this.thumbnailPlaceholder.y,
-    )
-    this.deckThumbnail.container.setDepth(10)
   }
 
   private onClickCutout(): (cutout: Cutout) => () => void {
@@ -549,25 +525,69 @@ export default class DeckEditorScene extends BaseScene {
     }
   }
 
-  private createThumbnailSizer(): any {
-    const background = this.add
-      .rectangle(0, 0, ROSTER_WIDTH, 1, Color.backgroundDark)
-      .setInteractive()
+  private createRosterHeader(): FixWidthSizer {
+    const background = this.add.rectangle(0, 0, 1, 1, Color.backgroundDark)
+    this.addShadow(background, -90)
     const sizer = this.rexUI.add
-      .sizer({
+      .fixWidthSizer({
         width: ROSTER_WIDTH,
-        orientation: 0,
-        space: { top: Space.pad, bottom: Space.pad },
-      } as any)
+        space: { top: Space.pad, bottom: Space.pad, item: Space.padSmall, line: Space.padSmall },
+        align: 'center',
+      })
       .addBackground(background)
-    this.thumbnailPlaceholder = new ContainerLite(
+
+    const cosmeticsContainer = new ContainerLite(this, 0, 0, Space.avatarSize * 2, 130)
+    const cardbackName = cardbackNames[this.cosmeticSet.cardback ?? 0] ?? 'Default'
+    const angleFirst = -3
+    const angleStepDeg = 3
+    this.cardbackImages = []
+    for (let i = 3; i >= 0; i--) {
+      const img = this.add
+        .image(-40, 65, `cardback-${cardbackName}`)
+        .setOrigin(0.5, 1)
+        .setDisplaySize(Space.cardWidth / 2, Space.cardHeight / 2)
+        .setRotation(((angleFirst + angleStepDeg * i) * Math.PI) / 180)
+      cosmeticsContainer.add(img)
+      this.cardbackImages.push(img)
+    }
+    this.avatarBtn = new Buttons.Avatar({
+      within: cosmeticsContainer,
+      avatarId: this.cosmeticSet.avatar,
+      border: this.cosmeticSet.border ?? 0,
+      muteClick: true,
+      x: Space.avatarSize / 4,
+      y: -10,
+      f: () => this.openStylesMenu(),
+    } as any)
+    sizer.add(cosmeticsContainer)
+
+    const nameContainer = new ContainerLite(
       this,
       0,
       0,
-      Space.avatarSize * 2,
-      200,
+      ROSTER_WIDTH - Space.pad * 2,
+      Space.textboxHeight,
     )
-    sizer.add(this.thumbnailPlaceholder)
+    this.deckNameInput = this.add
+      .rexInputText(0, 0, ROSTER_WIDTH - Space.pad * 2, Space.textboxHeight, {
+        type: 'text',
+        text: this.deckName,
+        align: 'center',
+        placeholder: 'Deck name',
+        tooltip: 'Click to rename this deck.',
+        fontFamily: 'Mulish',
+        fontSize: '24px',
+        color: Color.textboxText,
+        maxLength: 40,
+        id: 'deck-editor-name',
+      })
+      .on('textchange', (inputText: any) => {
+        this.deckName = inputText.text
+        this.updateSavedDeck(undefined, this.deckName)
+      })
+    nameContainer.add([this.deckNameInput, this.add.image(0, 0, 'icon-InputText')])
+    sizer.add(nameContainer)
+
     return sizer
   }
 
@@ -589,13 +609,17 @@ export default class DeckEditorScene extends BaseScene {
       } as any)
       .addBackground(background)
 
-    const playContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.bigButtonHeight,
-    )
+    const makeBtn = (text: string, f: () => void) => {
+      const container = new ContainerLite(this, 0, 0, Space.buttonWidth, Space.buttonHeight)
+      new Buttons.Basic({ within: container, text, f })
+      return container
+    }
+
+    const colSizer = this.rexUI.add.sizer({ orientation: 1, space: { item: Space.padSmall } } as any)
+    colSizer.add(makeBtn('Save', () => this.scene.start('DeckSelectorScene')))
+    colSizer.add(makeBtn('Cosmetics', () => this.openStylesMenu()))
+
+    const playContainer = new ContainerLite(this, 0, 0, Space.buttonWidth, Space.bigButtonHeight)
     new Buttons.Big({
       within: playContainer,
       text: 'Play',
@@ -604,7 +628,11 @@ export default class DeckEditorScene extends BaseScene {
         this.scene.launch('MenuScene', { menu: 'play', activeScene: this })
       },
     })
-    sizer.add(playContainer)
+
+    const rowSizer = this.rexUI.add.sizer({ orientation: 0, space: { item: Space.padSmall } } as any)
+    rowSizer.add(colSizer)
+    rowSizer.add(playContainer)
+    sizer.add(rowSizer)
 
     return sizer
   }
