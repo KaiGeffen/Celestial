@@ -501,6 +501,7 @@ export default class DeckEditorScene extends BaseScene {
 
   setDeck(cards: Card[]): void {
     this.decklist.setDeck(cards, Flags.devCardsEnabled ? false : true)
+    this.rosterPanel?.layout()
   }
 
   setCosmeticSet(set: CosmeticSet): void {

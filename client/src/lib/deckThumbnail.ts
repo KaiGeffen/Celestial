@@ -86,7 +86,10 @@ export default class DeckThumbnail {
       )
       .setOrigin(0.5, 1)
       .setInteractive({ useHandCursor: true })
-      .on('pointerdown', () => opts.onClick())
+      .on('pointerdown', () => {
+        scene.sound.play('click')
+        opts.onClick()
+      })
       .on('pointerover', () => {
         if (!this.selected) {
           this.nameBackground.setFillStyle(Color.gold)

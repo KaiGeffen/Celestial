@@ -223,6 +223,7 @@ export default class DeckSelectorScene extends BaseScene {
     const deck: Deck = UserSettings._get('decks')[i]
     this.decklist.setDeck(deck.cards.map((id) => Catalog.getCardById(id)))
     UserSettings._set('equippedDeckIndex', i)
+    this.rosterPanel.layout()
     this.rosterPanel.t = 0
   }
 
