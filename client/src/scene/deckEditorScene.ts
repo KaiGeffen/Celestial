@@ -10,14 +10,13 @@ import cardbackNames from '../data/cardbackNames'
 import Buttons from '../lib/buttons/buttons'
 import UButton from '../lib/buttons/underlined'
 import { CardImage } from '../lib/cardImage'
-import { Color, Space, UserSettings, Flags, Style } from '../settings/settings'
+import { Color, Space, UserSettings, Flags } from '../settings/settings'
 import newScrollablePanel from '../lib/scrollablePanel'
 import { Deck } from '../../../shared/types/deck'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import Catalog from '../../../shared/state/catalog'
 import Card from '../../../shared/state/card'
 import { Scroll } from '../settings/settings'
-import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 const ROSTER_WIDTH = Space.cutoutWidth + 20
 const MAX_COST_FILTER = 7
@@ -38,7 +37,6 @@ export default class DeckEditorScene extends BaseScene {
   private deckNameInput: any
   private cardbackImages: Phaser.GameObjects.Image[] = []
   private avatarBtn: any
-  private buttonsSizer: any
   private orderedByCost = true
 
   constructor() {
@@ -65,42 +63,46 @@ export default class DeckEditorScene extends BaseScene {
 
     const catalogWidth = Space.windowWidth - ROSTER_WIDTH
 
-    // Left column: filter header + catalog
+    // Left column: filter header (fixed) + catalog (expands)
     const filterHeader = this.createFilterHeader(catalogWidth)
-    filterHeader.layout()
-    const filterHeight = filterHeader.height
+    this.catalogPanel = this.createCatalogPanel(catalogWidth, Space.windowHeight)
 
-    this.catalogPanel = this.createCatalogPanel(catalogWidth, Space.windowHeight - filterHeight)
+    const leftSizer = this.rexUI.add.sizer({
+      width: catalogWidth,
+      height: Space.windowHeight,
+      orientation: 1,
+    }).setOrigin(0)
+    leftSizer.add(filterHeader, { proportion: 0, expand: true })
+    leftSizer.add(this.catalogPanel, { proportion: 1, expand: true })
 
-    const leftSizer = this.rexUI.add.sizer({ orientation: 1 }).setOrigin(0)
-    leftSizer.add(filterHeader, { proportion: 0 })
-    leftSizer.add(this.catalogPanel, { proportion: 0 })
-
-    // Right column: spans full height with its own header
+    // Right column: roster (expands) + buttons (fixed)
     this.decklist = new Decklist(this, this.onClickCutout())
-    this.buttonsSizer = this.createRightPanel()
-    this.buttonsSizer.layout()
-    const buttonsHeight = this.buttonsSizer.height
-
     this.rosterPanel = newScrollablePanel(this, {
       width: ROSTER_WIDTH,
-      height: Space.windowHeight - buttonsHeight,
+      height: Space.windowHeight,
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
       panel: { child: this.decklist.sizer },
       header: this.createRosterHeader(),
+      footer: this.createRightPanel(),
     }).setOrigin(0)
 
-    const rightColumnSizer = this.rexUI.add.sizer({
-      width: ROSTER_WIDTH,
-      orientation: 1,
-    })
-    rightColumnSizer.add(this.rosterPanel, { proportion: 0 })
-    rightColumnSizer.add(this.buttonsSizer, { proportion: 0 })
-
-    const outerSizer = this.rexUI.add.sizer().setOrigin(0)
-    outerSizer.add(leftSizer)
-    outerSizer.add(rightColumnSizer)
+    const outerSizer = this.rexUI.add.sizer({
+      width: Space.windowWidth,
+      height: Space.windowHeight,
+      orientation: 0,
+    }).setOrigin(0)
+    outerSizer.add(leftSizer, { proportion: 1, expand: true })
+    outerSizer.add(this.rosterPanel, { proportion: 0, expand: true })
     outerSizer.layout()
+
+    ;(this.plugins.get('rexAnchor') as any).add(outerSizer, {
+      width: '100%',
+      height: '100%',
+      onResizeCallback: (width: number, height: number, go: any) => {
+        go.setMinSize(width, height)
+        go.layout()
+      },
+    })
 
     this.setDeck((deck.cards || []).map((id) => Catalog.getCardById(id)))
     this.updateSavedDeck(this.getDeckCode())
@@ -111,7 +113,7 @@ export default class DeckEditorScene extends BaseScene {
 
   private createBackground(): void {
     const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
-    this.plugins.get('rexAnchor')['add'](background, {
+    ;(this.plugins.get('rexAnchor') as any).add(background, {
       width: '100%',
       height: '100%',
     })

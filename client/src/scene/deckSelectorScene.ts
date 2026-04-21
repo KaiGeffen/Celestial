@@ -21,10 +21,8 @@ export default class DeckSelectorScene extends BaseScene {
   savedDeckIndex: number | undefined
 
   private decklist: Decklist
-  private mainSizer: any
   private rosterPanel: ScrollablePanel | null
   private centerPanel: ScrollablePanel | null
-  private buttonsSizer: any
   private deckThumbnails: DeckThumbnail[] = []
   private background: Phaser.GameObjects.Image | null
 
@@ -33,7 +31,6 @@ export default class DeckSelectorScene extends BaseScene {
       key: 'DeckSelectorScene',
       lastScene: 'HomeScene',
     })
-    this.mainSizer = null
     this.rosterPanel = null
     this.centerPanel = null
     this.background = null
@@ -48,13 +45,7 @@ export default class DeckSelectorScene extends BaseScene {
     this.createBackground()
     this.createBackButton()
 
-    this.mainSizer = this.rexUI.add.sizer().setOrigin(0, 0)
-
-    // Left: List of decks (expands to fill available width)
-    this.centerPanel = this.createCenterPanel()
-    this.mainSizer.add(this.centerPanel, { proportion: 1 })
-
-    // Right column: deck preview on top, buttons on bottom
+    // Right column: deck preview (expands) on top, buttons on bottom
     this.decklist = new Decklist(this, () => () => {}) // no-op cutout callback
     this.rosterPanel = newScrollablePanel(this, {
       width: ROSTER_WIDTH,
@@ -62,43 +53,29 @@ export default class DeckSelectorScene extends BaseScene {
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
       panel: { child: this.decklist.sizer },
       header: this.createRosterHeader(),
+      footer: this.createRightPanel(),
     }).setOrigin(0)
 
-    this.buttonsSizer = this.createRightPanel()
-    this.buttonsSizer.layout()
-    const buttonsHeight = this.buttonsSizer.height
+    // Left: list of decks (expands to fill)
+    this.centerPanel = this.createCenterPanel()
 
-    const rightColumnSizer = this.rexUI.add.sizer({
-      width: ROSTER_WIDTH,
-      orientation: 1,
-    })
-    rightColumnSizer.add(this.rosterPanel, { proportion: 0 })
-    rightColumnSizer.add(this.buttonsSizer, { proportion: 0 })
-    this.mainSizer.add(rightColumnSizer, { proportion: 0 })
+    const mainSizer = this.rexUI.add.sizer({
+      width: Space.windowWidth,
+      height: Space.windowHeight,
+      orientation: 0,
+    }).setOrigin(0)
+    mainSizer.add(this.centerPanel, { proportion: 1, expand: true })
+    mainSizer.add(this.rosterPanel, { proportion: 0, expand: true })
+    mainSizer.layout()
 
-    // Main sizer: full width and height via anchor; resize child panels to full height
-    this.plugins.get('rexAnchor')['add'](this.mainSizer, {
-      left: '0%+0',
-      top: '0%+0',
+    ;(this.plugins.get('rexAnchor') as any).add(mainSizer, {
       width: '100%',
       height: '100%',
       onResizeCallback: (width: number, height: number, go: any) => {
-        if (!this.rosterPanel || !this.centerPanel) return
         go.setMinSize(width, height)
         go.layout()
-        this.rosterPanel.setMinSize(ROSTER_WIDTH, height - this.buttonsSizer.height)
-        this.rosterPanel.layout()
-        this.centerPanel.setMinSize(this.centerPanel.width, height)
-        this.centerPanel.layout()
       },
     })
-
-    this.mainSizer.layout()
-    // Initial full-height layout
-    this.rosterPanel.setMinSize(ROSTER_WIDTH, Space.windowHeight - buttonsHeight)
-    this.rosterPanel.layout()
-    this.centerPanel.setMinSize(this.centerPanel.width, Space.windowHeight)
-    this.centerPanel.layout()
 
     // Restore selection
     const equippedDeckIndex = UserSettings._get('equippedDeckIndex')
