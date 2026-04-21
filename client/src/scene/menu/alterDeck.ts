@@ -211,6 +211,7 @@ class AlterDeckMenu extends Menu {
           .setDisplaySize(cardWidth, cardHeight)
           .setInteractive({ useHandCursor: true })
           .on('pointerdown', () => {
+            this.scene.sound.play('click')
             borders.forEach((border) => border.setAlpha(0.1))
             border.setAlpha(1)
             this.selectedCardback = cardbackId
