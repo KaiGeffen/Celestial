@@ -6,8 +6,8 @@ import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/Sc
 import BaseScene from './baseScene'
 import Decklist from '../lib/decklist'
 import Cutout from '../lib/buttons/cutout'
-import cardbackNames from '../data/cardbackNames'
 import Buttons from '../lib/buttons/buttons'
+import DeckThumbnail from '../lib/deckThumbnail'
 import UButton from '../lib/buttons/underlined'
 import { CardImage } from '../lib/cardImage'
 import { Color, Space, UserSettings, Flags } from '../settings/settings'
@@ -16,6 +16,7 @@ import { Deck } from '../../../shared/types/deck'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import Catalog from '../../../shared/state/catalog'
 import Card from '../../../shared/state/card'
+import { MechanicsSettings } from '../../../shared/settings'
 import { Scroll } from '../settings/settings'
 
 const ROSTER_WIDTH = Space.cutoutWidth + 20
@@ -34,9 +35,7 @@ export default class DeckEditorScene extends BaseScene {
   private costFilterBtns: UButton[] = []
   private cosmeticSet: CosmeticSet
   private deckName: string
-  private deckNameInput: any
-  private cardbackImages: Phaser.GameObjects.Image[] = []
-  private avatarBtn: any
+  private deckThumbnail: DeckThumbnail
   private orderedByCost = true
 
   constructor() {
@@ -65,13 +64,18 @@ export default class DeckEditorScene extends BaseScene {
 
     // Left column: filter header (fixed) + catalog (expands)
     const filterHeader = this.createFilterHeader(catalogWidth)
-    this.catalogPanel = this.createCatalogPanel(catalogWidth, Space.windowHeight)
+    this.catalogPanel = this.createCatalogPanel(
+      catalogWidth,
+      Space.windowHeight,
+    )
 
-    const leftSizer = this.rexUI.add.sizer({
-      width: catalogWidth,
-      height: Space.windowHeight,
-      orientation: 1,
-    }).setOrigin(0)
+    const leftSizer = this.rexUI.add
+      .sizer({
+        width: catalogWidth,
+        height: Space.windowHeight,
+        orientation: 1,
+      })
+      .setOrigin(0)
     leftSizer.add(filterHeader, { proportion: 0, expand: true })
     leftSizer.add(this.catalogPanel, { proportion: 1, expand: true })
 
@@ -86,15 +90,16 @@ export default class DeckEditorScene extends BaseScene {
       footer: this.createRightPanel(),
     }).setOrigin(0)
 
-    const outerSizer = this.rexUI.add.sizer({
-      width: Space.windowWidth,
-      height: Space.windowHeight,
-      orientation: 0,
-    }).setOrigin(0)
+    const outerSizer = this.rexUI.add
+      .sizer({
+        width: Space.windowWidth,
+        height: Space.windowHeight,
+        orientation: 0,
+      })
+      .setOrigin(0)
     outerSizer.add(leftSizer, { proportion: 1, expand: true })
     outerSizer.add(this.rosterPanel, { proportion: 0, expand: true })
     outerSizer.layout()
-
     ;(this.plugins.get('rexAnchor') as any).add(outerSizer, {
       width: '100%',
       height: '100%',
@@ -493,11 +498,19 @@ export default class DeckEditorScene extends BaseScene {
     UserSettings._setIndex('decks', this.deckIndex, updated)
     if (name !== undefined) this.deckName = name
     if (cosmeticSet !== undefined) {
-      this.avatarBtn?.setAvatar(cosmeticSet.avatar)
-      this.avatarBtn?.setBorder(cosmeticSet.border ?? 0)
-      const cardbackName = cardbackNames[cosmeticSet.cardback ?? 0] ?? 'Default'
-      this.cardbackImages.forEach((img) => img.setTexture(`cardback-${cardbackName}`))
+      this.cosmeticSet = cosmeticSet
     }
+    this.syncDeckThumbnail()
+  }
+
+  private syncDeckThumbnail(): void {
+    const isValid = this.getDeckCode().length === MechanicsSettings.DECK_SIZE
+    this.deckThumbnail?.updateDisplay({
+      name: this.deckName,
+      cosmeticSet: this.cosmeticSet,
+      cardback: this.cosmeticSet.cardback ?? 0,
+      isValid,
+    })
   }
 
   setDeck(cards: Card[]): void {
@@ -533,62 +546,27 @@ export default class DeckEditorScene extends BaseScene {
     const sizer = this.rexUI.add
       .fixWidthSizer({
         width: ROSTER_WIDTH,
-        space: { top: Space.pad, bottom: Space.pad, item: Space.padSmall, line: Space.padSmall },
-        align: 'center',
+        space: {
+          top: Space.pad,
+          bottom: Space.pad,
+        },
+        align: 'left',
       })
       .addBackground(background)
 
-    const cosmeticsContainer = new ContainerLite(this, 0, 0, Space.avatarSize * 2, 130)
-    const cardbackName = cardbackNames[this.cosmeticSet.cardback ?? 0] ?? 'Default'
-    const angleFirst = -3
-    const angleStepDeg = 3
-    this.cardbackImages = []
-    for (let i = 3; i >= 0; i--) {
-      const img = this.add
-        .image(-40, 65, `cardback-${cardbackName}`)
-        .setOrigin(0.5, 1)
-        .setDisplaySize(Space.cardWidth / 2, Space.cardHeight / 2)
-        .setRotation(((angleFirst + angleStepDeg * i) * Math.PI) / 180)
-      cosmeticsContainer.add(img)
-      this.cardbackImages.push(img)
-    }
-    this.avatarBtn = new Buttons.Avatar({
-      within: cosmeticsContainer,
-      avatarId: this.cosmeticSet.avatar,
-      border: this.cosmeticSet.border ?? 0,
-      muteClick: true,
-      x: Space.avatarSize / 4,
-      y: -10,
-      f: () => this.openStylesMenu(),
-    } as any)
-    sizer.add(cosmeticsContainer)
-
-    const nameContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      ROSTER_WIDTH - Space.pad * 2,
-      Space.textboxHeight,
-    )
-    this.deckNameInput = this.add
-      .rexInputText(0, 0, ROSTER_WIDTH - Space.pad * 2, Space.textboxHeight, {
-        type: 'text',
-        text: this.deckName,
-        align: 'center',
-        placeholder: 'Deck name',
-        tooltip: 'Click to rename this deck.',
-        fontFamily: 'Mulish',
-        fontSize: '24px',
-        color: Color.textboxText,
-        maxLength: 40,
-        id: 'deck-editor-name',
-      })
-      .on('textchange', (inputText: any) => {
-        this.deckName = inputText.text
-        this.updateSavedDeck(undefined, this.deckName)
-      })
-    nameContainer.add([this.deckNameInput, this.add.image(0, 0, 'icon-InputText')])
-    sizer.add(nameContainer)
+    const decks = UserSettings._get('decks') || []
+    const savedDeck = decks[this.deckIndex]
+    const savedCount = savedDeck?.cards?.length ?? 0
+    const isValid = savedCount === MechanicsSettings.DECK_SIZE
+    this.deckThumbnail = new DeckThumbnail({
+      scene: this,
+      name: this.deckName,
+      cosmeticSet: this.cosmeticSet,
+      cardback: this.cosmeticSet.cardback ?? 0,
+      isValid,
+      onClick: () => this.openStylesMenu(),
+    })
+    sizer.add(this.deckThumbnail.container)
 
     return sizer
   }
@@ -612,16 +590,31 @@ export default class DeckEditorScene extends BaseScene {
       .addBackground(background)
 
     const makeBtn = (text: string, f: () => void) => {
-      const container = new ContainerLite(this, 0, 0, Space.buttonWidth, Space.buttonHeight)
+      const container = new ContainerLite(
+        this,
+        0,
+        0,
+        Space.buttonWidth,
+        Space.buttonHeight,
+      )
       new Buttons.Basic({ within: container, text, f })
       return container
     }
 
-    const colSizer = this.rexUI.add.sizer({ orientation: 1, space: { item: Space.padSmall } } as any)
+    const colSizer = this.rexUI.add.sizer({
+      orientation: 1,
+      space: { item: Space.padSmall },
+    } as any)
     colSizer.add(makeBtn('Save', () => this.scene.start('DeckSelectorScene')))
     colSizer.add(makeBtn('Cosmetics', () => this.openStylesMenu()))
 
-    const playContainer = new ContainerLite(this, 0, 0, Space.buttonWidth, Space.bigButtonHeight)
+    const playContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.bigButtonHeight,
+    )
     new Buttons.Big({
       within: playContainer,
       text: 'Play',
@@ -631,7 +624,10 @@ export default class DeckEditorScene extends BaseScene {
       },
     })
 
-    const rowSizer = this.rexUI.add.sizer({ orientation: 0, space: { item: Space.padSmall } } as any)
+    const rowSizer = this.rexUI.add.sizer({
+      orientation: 0,
+      space: { item: Space.padSmall },
+    } as any)
     rowSizer.add(colSizer)
     rowSizer.add(playContainer)
     sizer.add(rowSizer)

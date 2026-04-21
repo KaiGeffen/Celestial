@@ -15,6 +15,7 @@ export default class DeckThumbnail {
   private nameText: Phaser.GameObjects.Text
   private nameBackground: Phaser.GameObjects.Rectangle
   private avatarButton: any
+  private cardbackImages: Phaser.GameObjects.Image[] = []
   private selected = false
   private isValid: boolean
 
@@ -46,6 +47,7 @@ export default class DeckThumbnail {
         .setOrigin(0.5, 1) // rotate around bottom-center
         .setDisplaySize(Space.cardWidth / 2, Space.cardHeight / 2)
         .setRotation((angleFirst + angleStepDeg * i * Math.PI) / 180)
+      this.cardbackImages.push(cardBack)
       this.container.add(cardBack)
     }
 
@@ -98,8 +100,12 @@ export default class DeckThumbnail {
       })
       .on('pointerout', () => {
         if (!this.selected) {
-          this.nameBackground.setFillStyle(Color.backgroundLight)
-          this.nameBackground.setStrokeStyle(2, Color.border)
+          if (this.isValid) {
+            this.nameBackground.setFillStyle(Color.backgroundLight)
+            this.nameBackground.setStrokeStyle(2, Color.border)
+          } else {
+            this.nameBackground.setFillStyle(Color.cardGreyed)
+          }
         }
       })
     this.container.add(hitbox)
@@ -120,9 +126,42 @@ export default class DeckThumbnail {
     if (selected) {
       this.nameBackground.setFillStyle(Color.buttonSelected)
       this.nameBackground.setStrokeStyle(3, Color.outline)
-    } else {
+    } else if (this.isValid) {
       this.nameBackground.setFillStyle(Color.backgroundLight)
       this.nameBackground.setStrokeStyle(2, Color.border)
+    } else {
+      this.nameBackground.setFillStyle(Color.cardGreyed)
+    }
+  }
+
+  /** Refresh visuals after deck name or cosmetics change (e.g. from editor). */
+  updateDisplay(opts: {
+    name?: string
+    cosmeticSet?: CosmeticSet
+    cardback?: number
+    isValid?: boolean
+  }): void {
+    if (opts.name !== undefined) {
+      this.nameText.setText(opts.name)
+    }
+    if (opts.cosmeticSet !== undefined) {
+      this.avatarButton.setAvatar(opts.cosmeticSet.avatar)
+      this.avatarButton.setBorder(opts.cosmeticSet.border ?? 0)
+    }
+    if (opts.cardback !== undefined) {
+      const textureKey = `cardback-${cardbackNames[opts.cardback] ?? 'Default'}`
+      this.cardbackImages.forEach((img) => img.setTexture(textureKey))
+    }
+    if (opts.isValid !== undefined) {
+      this.isValid = opts.isValid
+      if (!this.selected) {
+        if (opts.isValid) {
+          this.nameBackground.setFillStyle(Color.backgroundLight)
+          this.nameBackground.setStrokeStyle(2, Color.border)
+        } else {
+          this.nameBackground.setFillStyle(Color.cardGreyed)
+        }
+      }
     }
   }
 }
