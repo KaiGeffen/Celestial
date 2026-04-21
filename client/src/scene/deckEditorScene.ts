@@ -142,7 +142,7 @@ export default class DeckEditorScene extends BaseScene {
 
     let pool: Card[] = []
     if (Flags.devCardsEnabled) {
-      pool = [...Catalog.collectibleCards, ...Catalog.betaCards]
+      pool = [...Catalog.collectibleCardsWithBetaCards]
     } else {
       pool = [...Catalog.collectibleCards]
 

@@ -1,36 +1,45 @@
-import SearchingRegion from './searching'
-import TheirScoreRegion from './theirScore'
+import BackgroundRegion from './backgroundRegion'
+import SearchingRegion from './searchingRegion'
+import HistoryRegion from './historyRegion'
 
-import OurBoardRegion from './ourBoard'
-import TheirBoardRegion from './theirBoard'
-import StoryRegion from './story'
-import OurScoreRegion from './ourScore'
-import * as Overlay from './pileOverlays'
-import PassRegion from './pass'
-import RoundResultRegion from './roundResult'
+import OurBoardRegion from './ourBoardRegion'
+import OurStacksRegion from './ourStacksRegion'
+import TheirBoardRegion from './theirBoardRegion'
+import TheirStacksRegion from './theirStacksRegion'
+import StoryRegion from './storyRegion'
+import BreathRegion from './breathRegion'
+import WinsRegion from './scoreRegion'
+import WinsChromeRegion from './winsChromeRegion'
+import * as Overlay from './pileOverlayRegions'
+import PassRegion from './passRegion'
+import RoundResultRegion from './roundResultRegion'
 
 import MulliganRegion from './mulliganRegion'
 import MatchResultsRegion from './matchResults'
-import OurAvatarRegion from './ourAvatar'
-import TheirAvatarRegion from './theirAvatar'
+import OurAvatarRegion from './ourAvatarRegion'
+import TheirAvatarRegion from './theirAvatarRegion'
+import StatusRegion from './statusRegion'
 
 export default class Regions {
+  static Background = BackgroundRegion
+
   static Searching = SearchingRegion
   static Story = StoryRegion
 
-  // Avatars and associated statuses
   static OurAvatar = OurAvatarRegion
   static TheirAvatar = TheirAvatarRegion
+  static Status = StatusRegion
 
-  // The cards in our / their hands
   static OurBoard = OurBoardRegion
+  static OurStacks = OurStacksRegion
   static TheirBoard = TheirBoardRegion
+  static TheirStacks = TheirStacksRegion
 
-  // Regions for the scores (Right-side showing wins etc)
-  static OurScore = OurScoreRegion
-  static TheirScore = TheirScoreRegion
+  static Breath = BreathRegion
+  static Wins = WinsRegion
+  static WinsChrome = WinsChromeRegion
+  static History = HistoryRegion
 
-  // Overlays of the stacks
   static OurDeck = Overlay.OurDeckOverlay
   static TheirDeck = Overlay.TheirDeckOverlay
   static OurDiscard = Overlay.OurDiscardOverlay

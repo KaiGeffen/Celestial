@@ -422,6 +422,9 @@ export default class DecklistsRegion {
 
   // Filter which decks are visible based on the string
   filter(s: string): void {
+    this.scrollablePanel.childOY = 0
+    this.scrollablePanel.t = 0
+
     const panel = this.scrollablePanel.getElement('panel') as FixWidthSizer
 
     // Make all decks invisible first
@@ -444,6 +447,7 @@ export default class DecklistsRegion {
         panel.add(container)
       })
       this.scrollablePanel.layout()
+      this.refreshBtns()
       return
     }
 
@@ -477,6 +481,7 @@ export default class DecklistsRegion {
     })
 
     this.scrollablePanel.layout()
+    this.refreshBtns()
   }
 
   // Create the "New" button which prompts user to make a new deck

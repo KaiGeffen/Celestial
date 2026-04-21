@@ -12,6 +12,8 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 const NAVIGATION_BUTTON_WIDTH = 278
 
 export default class HomeScene extends BaseScene {
+  private coinsDisplayText: Phaser.GameObjects.Text
+
   constructor() {
     super({
       key: 'HomeScene',
@@ -298,10 +300,18 @@ export default class HomeScene extends BaseScene {
       NAVIGATION_BUTTON_WIDTH - Space.avatarSize - Space.pad * 3
 
     // Line 1: Username (with word wrap to prevent overflow)
+    const usernameFontSize =
+      typeof Style.username.fontSize === 'string'
+        ? parseInt(Style.username.fontSize, 10)
+        : (Style.username.fontSize as number)
+
     const usernameText = this.add
       .text(0, 0, username, Style.username)
       .setOrigin(0, 0.5)
-      .setWordWrapWidth(maxTextWidth)
+      // Advanced wrapping helps even for "single long words" usernames
+      .setWordWrapWidth(maxTextWidth, true)
+      // Lock width in the layout (important when rexUI measures text)
+      .setFixedSize(maxTextWidth, usernameFontSize)
     textSizer.add(usernameText, { align: 'left' })
 
     // Line 2: Divider line (thin black line)
@@ -322,11 +332,11 @@ export default class HomeScene extends BaseScene {
       .setOrigin(0, 0.5)
     textSizer.add(gemsText, { align: 'left' })
 
-    // Line 5: Coins
-    const coinsText = this.add
+    // Line 5: Coins (gold)
+    this.coinsDisplayText = this.add
       .text(0, 0, `💰 ${amtCoins.toLocaleString()}`, Style.username)
       .setOrigin(0, 0.5)
-    textSizer.add(coinsText, { align: 'left' })
+    textSizer.add(this.coinsDisplayText, { align: 'left' })
 
     // Layout text sizer
     textSizer.layout()
@@ -498,6 +508,12 @@ export default class HomeScene extends BaseScene {
 
     // Show any unseen achievements
     this.checkAndShowUnseenAchievements()
+
+    const coins = Server.getUserData().coins ?? 0
+    const coinsStr = `💰 ${coins.toLocaleString()}`
+    if (this.coinsDisplayText && this.coinsDisplayText.text !== coinsStr) {
+      this.coinsDisplayText.setText(coinsStr)
+    }
   }
 
   beforeExit(): void {
@@ -507,19 +523,20 @@ export default class HomeScene extends BaseScene {
   }
 }
 
-const PATCH_NUMBER = '0.7.16'
+const PATCH_NUMBER = '0.7.16.2'
 
 const URL = 'https://luma.com/1lsziprm'
 
-const NEWS_TEXT = `🕊️ A warm welcome to all our new players!
-Please consider joining our [area=_link_discord][color=#FABD5D]Discord server[/color][/area] to collect a one-time reward, receive strategy tips, and play excellent matches with excellent people.
+const NEWS_TEXT = `🕊️ [b]Thank you to our wonderful Celestial community![/b]
+Many changes this month as we ramp up to a [color=#4090DD]Steam demo release[/color], let us know your thoughts! 
 
-🏆 Our 11th tournament approaches!
-On April 4th, play for the chance to win 120$ in cash prizes, plus exclusive cosmetic rewards! [area=_link_register][color=#FABD5D]Register here[/color][/area]
+🏆 Congrats to Sherlock for reclaiming his tournament title! And to Redrame for getting #1 on ladder.
+With the launch of the demo, we plan to snapshot the top players as we transition to a more public release.
 
-🌄 Card Redesign
-Our redesigned border and look for the cards is now live! Let us know your thoughts in the [area=_link_discord][color=#FABD5D]Discord[/color][/area]. Also try out a new cardback for a limited time.
+🐚 Shell Mode
+On Saturdays we play a new [color=#4090DD]Shell Mode[/color], hop in to the [area=_link_discord][color=#FABD5D]Discord server[/color][/area] to learn more!
 
-👀 Spectator Mode
-Watch your friends play matchs in real time by clicking 'Spectate' from the players list (Top right).
-Can be disabled through the options menu.`
+🎴 Card Changes
+👇 Hero - Exhale point +3 > +2
+👇 Seen - Clear View sight 4 > 3
+👆 Phoenix - Points 3 > 4`

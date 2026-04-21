@@ -49,6 +49,7 @@ export class SpectatorMatchScene extends MatchScene {
     this.view.results = new MatchResultsSimplifiedRegion().create(this)
     this.view.searching.hide()
     this.view.mulligan.hide()
+    this.view.pass.autoAdvance = true
 
     // Callbacks common to this and the match scene
     this.setCommonCallbacks(this.view)

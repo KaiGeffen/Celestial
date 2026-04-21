@@ -50,6 +50,7 @@ function reverseAttributes(model: GameModel): void {
     'amtPasses',
     'amtDrawn',
     'cosmeticSets',
+    'exhaleCountLastRound',
     'usernames',
     'subtitles',
   ]
@@ -106,7 +107,7 @@ function hideHiddenInformation(model: GameModel) {
   if (!model.isRecap) {
     for (let i = model.status[0].vision; i < model.story.acts.length; i++) {
       const act = model.story.acts[i]
-      if (act.owner === 1 && !act.card.isVisible()) {
+      if (act.owner === 1 && !act.card.isVisible() && !act.revealed) {
         model.story.acts[i].card = hiddenCard
       }
     }

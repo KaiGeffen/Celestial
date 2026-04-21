@@ -8,7 +8,7 @@ import { Style, Color, Flags } from '../../settings/settings'
 // Each subclass of this specifies which of those exists
 // Which accepts input, glows, etc
 
-interface Config {
+export interface Config {
   text?: {
     text: string
     interactive: boolean
@@ -66,6 +66,9 @@ export default class Button {
   txt: Phaser.GameObjects.Text
   icon: Phaser.GameObjects.Image
 
+  // The outline around the button
+  private outlineFx: any
+
   selected = false
   enabled = false
 
@@ -110,6 +113,15 @@ export default class Button {
       this.icon = this.scene.add.image(x, y + config.icon.offsetY, filename)
 
       if (!config.icon.noGlow && !Flags.mobile) {
+        // Make the outline glow
+        const plugin = this.scene.plugins.get('rexOutlinePipeline')
+        this.outlineFx = plugin['add'](this.icon, {
+          thickness: 3,
+          outlineColor: Color.outline,
+          quality: 0.3,
+        })
+        this.outlineFx.active = false
+
         this.icon
           .on('pointerover', () => this.glow())
           .on('pointerout', () => this.stopGlow())
@@ -268,7 +280,6 @@ export default class Button {
     if (this.txt !== undefined) {
       this.txt.setAlpha(value)
     }
-
     if (this.icon !== undefined) {
       this.icon.setAlpha(value)
     }
@@ -317,18 +328,16 @@ export default class Button {
 
   // The glow effect button has while hovered
   glow() {
-    let plugin = this.scene.plugins.get('rexOutlinePipeline')
-    plugin['add'](this.icon || this.txt, {
-      thickness: 3,
-      outlineColor: Color.outline,
-      quality: 0.3,
-    })
+    if (this.outlineFx) {
+      this.outlineFx.active = true
+    }
 
     return this
   }
   stopGlow() {
-    let plugin = this.scene.plugins.get('rexOutlinePipeline')
-    plugin['remove'](this.icon || this.txt)
+    if (this.outlineFx) {
+      this.outlineFx.active = false
+    }
 
     return this
   }
@@ -438,7 +447,6 @@ export default class Button {
     if (this.txt) {
       this.txt.setScrollFactor(0, 0)
     }
-
     if (this.icon) {
       this.icon.setScrollFactor(0, 0)
     }

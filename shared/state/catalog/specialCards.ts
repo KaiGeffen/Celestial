@@ -33,6 +33,7 @@ class Paramountcy extends Card {
             new Animation({
               from: Zone.Discard,
               to: Zone.Story,
+              card,
               index2: i,
             }),
           )

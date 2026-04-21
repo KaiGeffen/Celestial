@@ -16,7 +16,6 @@ export class UserSettings {
       volume: 0.5,
       musicVolume: 0.5,
       dialogVolume: 0.5,
-      animationSpeed: 0.1,
       // Whether the player should pass automatically if there's nothing they can play
       autopass: true,
 

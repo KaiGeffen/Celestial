@@ -166,7 +166,7 @@ class Hero extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     // Departure
     if (super.exhale(5, game, player)) {
-      bonus += 3
+      bonus += 2
     }
 
     super.play(player, game, index, bonus)
@@ -185,14 +185,14 @@ class Hero extends Card {
 const hero = new Hero({
   name: 'Hero',
   id: 94,
-  text: 'Exhale 5: Worth +3.\nExhale 3: Discard the next card in the story.\nExhale 1: Inspire 1',
+  text: 'Exhale 5: Worth +2.\nExhale 3: Discard the next card in the story.\nExhale 1: Inspire 1',
 })
 
 class Possibility extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    game.maxBreath[player] += 1
+    this.possibility(1, game, player)
   }
 }
 const possibility = new Possibility({
@@ -212,7 +212,9 @@ class CloakOfStars extends Card {
 
   onMorning(player: number, game: GameModel, index: number) {
     const amt = game.endingBreath[player]
-    super.inspired(amt, game, player)
+    if (amt > 0) {
+      super.inspired(amt, game, player)
+    }
 
     return true
   }
@@ -248,8 +250,13 @@ class Pride extends Card {
   onMorning(player: number, game: GameModel, index: number) {
     if (super.exhale(1, game, player)) {
       game.pile[player].splice(index, 1)
-      game.createInStory(player, this)
+      game.createInStory(player, this, undefined, Zone.Discard)
+      const prideAnimIdx = game.animations[player].length - 1
       game.discard(player)
+      // Discard may trigger cards (e.g. Abandoned) that insert before Pride in story.acts,
+      // shifting Pride's index. Patch the animation to reflect its actual final position.
+      const finalIdx = game.story.acts.findIndex((act) => act.card === this)
+      if (finalIdx >= 0) game.animations[player][prideAnimIdx].index2 = finalIdx
     }
     return true
   }
@@ -259,7 +266,7 @@ const pride = new Pride({
   id: 98,
   cost: 3,
   points: 3,
-  text: 'Morning: Exhale 1: Add this to the story. Discard a card.',
+  text: 'Morning: Exhale 1: Add this to the story Revealed. Discard a card.',
 })
 
 // NEW
@@ -323,7 +330,8 @@ class Fable extends Card {
 const fable = new Fable({
   name: 'Fable',
   id: 8093,
-  text: 'Exhale 5: Draw 3 cards.\nExhale 3: Create a Sickness in the story.\nExhale 1: Create a Dove in the story.',
+  text: 'Exhale 5: Draw 3 cards.\nExhale 3: Create a Sickness in the story.\nExhale 1: Discard the 3 cheapest cards from your deck.',
+  beta: true,
 })
 
 const phi = new Card({
@@ -358,8 +366,9 @@ class Starfall extends Card {
     player: number,
     game: GameModel,
     index: number,
+    handSizeAtStart: number,
   ): [boolean, boolean] {
-    if (game.hand[player].length >= 5) {
+    if (handSizeAtStart >= 5) {
       game.discard(player, 1, index)
       this.inspired(1, game, player)
       return [true, true]
@@ -371,29 +380,38 @@ const starfall = new Starfall({
   name: 'Starfall',
   id: 8006,
   cost: 6,
-  points: 6,
+  points: 7,
   text: 'At the start of turn, if your hand has at least 5 cards including this, discard this to Inspired 1.',
   beta: true,
 })
 
-;[
-  stars,
-  cosmos,
-  nightVision,
-  ecology,
-  sun,
-  moon,
-  sunflower,
-  fates,
-  hero,
-  possibility,
-  cloakOfStars,
-  dreamer,
-  pride,
-  rocketship,
-  starfall,
-].forEach((card) => {
-  card.theme = 6
+class Boreas extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    game.breath[player] += 2
+  }
+}
+const boreas = new Boreas({
+  name: 'Boreas',
+  id: 8096,
+  cost: 2,
+  points: 2,
+  text: 'Gain 2 breath.',
+})
+
+class Heavens extends Card {
+  getCost(player: number, game: GameModel): number {
+    return this.cost - game.exhaleCountLastRound[player] * 2
+  }
+}
+const heavens = new Heavens({
+  name: 'Heavens',
+  id: 8019,
+  cost: 9,
+  points: 9,
+  text: "Costs 2 less for each time you've triggered Exhale since the last story began.",
+  beta: true,
 })
 
 export {
@@ -411,7 +429,10 @@ export {
   dreamer,
   pride,
   // NEW
-  rocketship,
+  // rocketship,
   // fable,
   starfall,
+  // boreas,
+  heavens,
+  // fable,
 }

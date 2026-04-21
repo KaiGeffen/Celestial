@@ -133,6 +133,6 @@ export default class AvatarButton extends Button {
     // Keep track of this timeout
     this.timeout = setTimeout(() => {
       this.icon.setFrame(0)
-    }, Time.emote)
+    }, Time.general.avatarEmoteMs)
   }
 }

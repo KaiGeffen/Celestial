@@ -29,13 +29,9 @@ export default class CatalogRegion {
     // In dev mode, show beta cards and cards you don't own
     let pool = []
     if (Flags.devCardsEnabled) {
-      pool = [...Catalog.collectibleCards, ...Catalog.betaCards]
+      pool = Catalog.collectibleCardsWithBetaCards
     } else {
       pool = Catalog.collectibleCards
-
-      // Only show owned cards
-      const cardInventory = UserSettings._get('cardInventory') || []
-      pool = pool.filter((card) => cardInventory[card.id] === true)
     }
 
     // Create all the cards in pool
@@ -151,17 +147,9 @@ export default class CatalogRegion {
   private createCard(card: Card): void {
     const container = this.panel.getElement('panel')
 
-    const cardImage = new CardImage(card, container, true, false)
-      .setOnClick(this.onClickCatalogCard(card))
-      .setFocusOptions(
-        'Add',
-        () => {
-          return this.scene.isOverfull()
-        },
-        () => {
-          return this.scene.getCount(card)
-        },
-      )
+    const cardImage = new CardImage(card, container, true, false).setOnClick(
+      this.onClickCatalogCard(card),
+    )
 
     // Add this cardImage to the maintained list of cardImages in the catalog
     this.cardCatalog.push(cardImage)
@@ -201,7 +189,7 @@ export default class CatalogRegion {
       this.scene.tweens.add({
         targets: this.panel,
         minWidth: width,
-        duration: Time.builderSlide(),
+        duration: Time.general.builderCatalogSlideMs,
         ease: Ease.slide,
         onUpdate: () => {
           this.panel.layout()
@@ -224,7 +212,7 @@ export default class CatalogRegion {
       this.scene.tweens.add({
         targets: this.panel,
         minWidth: width,
-        duration: Time.builderSlide(),
+        duration: Time.general.builderCatalogSlideMs,
         ease: Ease.slide,
         onUpdate: () => {
           this.panel.layout()

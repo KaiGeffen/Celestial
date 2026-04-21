@@ -3,6 +3,7 @@ export class Statuses {
   public inspired = 0
   public nourish = 0
   public vision = 0
+  public possibility = 0
   public unlocked = false
 
   public getDeepCopy(): Statuses {
@@ -11,6 +12,7 @@ export class Statuses {
     copy.inspired = this.inspired
     copy.nourish = this.nourish
     copy.vision = this.vision
+    copy.possibility = this.possibility
     return copy
   }
 }

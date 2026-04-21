@@ -13,14 +13,14 @@ class SpecialStory extends Story {
     this.enabledModes = enabledModes
   }
 
-  addAct(card: Card, owner: number, i?: number) {
+  addAct(card: Card, owner: number, i?: number, revealed = false) {
     // Mode 2: When a card is added to the story, increase its points by 1
     if (this.enabledModes.includes(2)) {
       card = card.copy()
       card.points += 1
     }
 
-    super.addAct(card, owner, i)
+    super.addAct(card, owner, i, revealed)
   }
 
   run(game: GameModel) {

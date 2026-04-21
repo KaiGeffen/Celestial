@@ -24,12 +24,12 @@ export default class FilterRegion {
   filterCostAry: boolean[] = []
   searchText: string = ''
   searchObj // TODO Type as RexInputText
-  filterUnowned: boolean
+  isJourneyMode: boolean
 
   // Create this region, offset by the given width
-  create(scene: BuilderBase, filterUnowned: boolean) {
+  create(scene: BuilderBase, isJourneyMode: boolean) {
     this.scene = scene
-    this.filterUnowned = filterUnowned
+    this.isJourneyMode = isJourneyMode
 
     const background = scene.add.rectangle(
       0,
@@ -180,6 +180,7 @@ export default class FilterRegion {
       name: 'SmallX',
       within: sizer,
       f: this.onClearFilters(btns),
+      size: 32,
     })
 
     return sizer
@@ -244,8 +245,9 @@ export default class FilterRegion {
       if (!this.searchText.trim()) return true
 
       // Parse search query into tokens (handling quotes)
-      const tokens = this.parseSearchQuery(this.searchText)
-      .filter((token) => token.field !== 'deck')
+      const tokens = this.parseSearchQuery(this.searchText).filter(
+        (token) => token.field !== 'deck',
+      )
 
       // Check each token against the card
       for (const token of tokens) {
@@ -257,9 +259,19 @@ export default class FilterRegion {
       return true
     }
 
-    // Filter cards based on whether you have unlocked them (Only for journey mode)
+    // Journey mode filters based on journey inventory
+    // Non-journey mode based on permanent collection
     let ownershipFilter = (card: Card) => {
-      return !this.filterUnowned || UserSettings._get('inventory')[card.id]
+      if (Flags.devCardsEnabled) {
+        return true
+      }
+
+      // TODO These sql row names are horribly confusing - rename them
+      if (this.isJourneyMode) {
+        return UserSettings._get('inventory')[card.id]
+      } else {
+        return UserSettings._get('cardInventory')[card.id]
+      }
     }
 
     // Filter based on the overlap of all above filters
@@ -398,7 +410,7 @@ export default class FilterRegion {
     const lowerQuery = query.toLowerCase()
 
     // Build searchable string
-    let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points}`
+    let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points} ${card.beta ? 'beta' : ''}`
 
     // Keyword reminder text
     for (const [keyword, _] of Catalog.getReferencedKeywords(card)) {

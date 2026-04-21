@@ -14,8 +14,8 @@ class Story {
   roundEndedForced: boolean = false
 
   // Add a card to the story with given owner and at given position
-  addAct(card: Card, owner: number, i?: number) {
-    const act = new Act(card, owner)
+  addAct(card: Card, owner: number, i?: number, revealed = false) {
+    const act = new Act(card, owner, revealed)
     if (i === undefined) {
       this.acts.push(act)
     } else {
@@ -62,6 +62,13 @@ class Story {
 
       // Add to the list of resolved acts
       this.resolvedActs.push(act)
+
+      // Trigger onBigResolve effects (Just Zoomies for now)
+      if (act.card.cost >= 7) {
+        for (let i = game.pile[act.owner].length - 1; i >= 0; i--) {
+          game.pile[act.owner][i].onBigResolve(act.owner, game, i)
+        }
+      }
 
       index++
       addRecentModels(game)

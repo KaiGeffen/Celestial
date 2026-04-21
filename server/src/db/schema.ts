@@ -197,6 +197,13 @@ export const analytics = pgTable(
   }),
 )
 
+/** Aggregate PvE mission outcomes across all players (one row per mission id). */
+export const missionStats = pgTable('mission_stats', {
+  mission_id: integer('mission_id').primaryKey(),
+  wins: integer('wins').notNull().default(0),
+  losses: integer('losses').notNull().default(0),
+})
+
 export const matches = pgTable(
   'matches',
   {

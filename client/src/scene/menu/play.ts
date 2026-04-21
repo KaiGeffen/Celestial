@@ -11,6 +11,7 @@ import {
   BBStyle,
   UserSettings,
   Ease,
+  Time,
 } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
@@ -819,7 +820,7 @@ export default class PlayMenu extends Menu {
       targets: goldText,
       y: rewardPosition.y,
       alpha: 0,
-      duration: 800,
+      duration: Time.general.rewardFloatMs,
       ease: Ease.basic,
       onComplete: () => goldText.destroy(),
     })
@@ -898,7 +899,7 @@ export default class PlayMenu extends Menu {
                 targets: plant,
                 delay: i * 200,
                 alpha: 0.5,
-                duration: 800,
+                duration: Time.general.gardenReadyPulseMs,
                 ease: 'Sine.easeInOut',
                 yoyo: true,
                 repeat: -1, // Repeat forever

@@ -71,7 +71,7 @@ module.exports = (_, argv) => {
       : {},
     plugins: [
       new HtmlWebpackPlugin({
-        title: 'Caching',
+        title: isProd ? 'Celestial' : 'LOCAL',
         template: 'template.html',
         filename: '../index.html',
         scriptLoading: 'defer',

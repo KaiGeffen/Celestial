@@ -6,65 +6,37 @@ import GameModel from '../../../../shared/state/gameModel'
 import { Space, Flags } from '../../settings/settings'
 
 // TODO Remove this, deck and discard are no longer used
-const todoTheirHandHeight = -Space.todoHandOffset
+const todoTheirHandHeight = Space.todoHandOffset - 150
 
 // This describes where on screen each card in each region should appear
 // so that regions can move their cards to the appropriate locations for
 // other regions
 export default class CardLocation {
-  private static ourHandDistanceFromCenter(state: GameModel, i: number): number {
-    if (state === undefined) {
-      return 0
-    }
-
-    const totalCards = state.hand[0].length
-    if (totalCards <= 1) {
-      return 0
-    }
-
-    return i - (totalCards - 1) / 2
-  }
-
-  private static ourHandNormalizedDistance(state: GameModel, i: number): number {
-    if (state === undefined) {
-      return 0
-    }
-
-    const totalCards = state.hand[0].length
-    if (totalCards <= 1) {
-      return 0
-    }
-
-    const maxOffset = (totalCards - 1) / 2
-    return CardLocation.ourHandDistanceFromCenter(state, i) / maxOffset
-  }
-
   static ourHand(
     state: GameModel,
     i: number,
     container?: Phaser.GameObjects.Container,
+    /** When set (e.g. optimistic layout after a play), used instead of `state.hand[0].length` for dx / centering. */
+    handCountForLayout?: number,
   ): [number, number] {
-    let dx = Space.cardWidth * 0.44
+    let dx = Space.cardWidth - 1
 
     if (state !== undefined) {
-      const totalCards = state.hand[0].length
+      const totalCards = handCountForLayout ?? state.hand[0].length
 
       // If total width exceeds max, scale down spacing
-      const maxWidth = Space.windowWidth - (200 + 200 + Space.cardWidth)
+      const maxWidth = Space.windowWidth - 1200
       const totalWidth = dx * (totalCards - 1)
       if (totalWidth > maxWidth) {
         dx *= maxWidth / totalWidth
       }
 
-      const x =
-        Space.windowWidth / 2 + CardLocation.ourHandDistanceFromCenter(state, i) * dx
-      const normalizedOffset = CardLocation.ourHandNormalizedDistance(state, i)
-      let y =
-        Space.windowHeight +
-        Space.cardHeight / 2 -
-        Space.todoHandOffset -
-        24 +
-        Math.abs(normalizedOffset) * 54
+      // Center the whole hand horizontally: first/last card centers span
+      // symmetrically around `Space.windowWidth / 2`.
+      const firstCardCenterX =
+        Space.windowWidth / 2 - (dx * (totalCards - 1)) / 2
+      const x = firstCardCenterX + i * dx
+      let y = Space.windowHeight + Space.cardHeight / 2 - Space.todoHandOffset
 
       if (container !== undefined) {
         return [x - container.x, y - container.y]
@@ -75,30 +47,27 @@ export default class CardLocation {
     return [0, 0]
   }
 
-  static ourHandRotation(state: GameModel, i: number): number {
-    return CardLocation.ourHandNormalizedDistance(state, i) * 10
-  }
-
   static theirHand(
     state: GameModel,
     i: number,
     container: Phaser.GameObjects.Container,
   ): [number, number] {
-    const leftEdge = 200 + Space.cardWidth / 2
-    let dx = Space.cardWidth + Space.pad
+    // Mirror `ourHand`: centered row along the top edge (opponent).
+    let dx = Space.cardWidth
 
     if (state !== undefined) {
       const totalCards = state.hand[1].length
 
-      // If total width exceeds max, scale down spacing
-      const maxWidth = Space.windowWidth - (200 + 200 + Space.cardWidth)
+      const maxWidth = Space.windowWidth - 1200
       const totalWidth = dx * (totalCards - 1)
       if (totalWidth > maxWidth) {
         dx *= maxWidth / totalWidth
       }
 
-      const x = leftEdge + i * dx
-      let y = -Space.cardHeight / 2 + Space.todoHandOffset
+      const firstCardCenterX =
+        Space.windowWidth / 2 - (dx * (totalCards - 1)) / 2
+      const x = firstCardCenterX + i * dx
+      const y = -Space.cardHeight / 2 + Space.todoHandOffset
 
       return [x - container.x, y - container.y]
     }
@@ -112,11 +81,11 @@ export default class CardLocation {
     container: Phaser.GameObjects.Container,
     owner: number,
   ): [number, number] {
-    const x0 = 300
-    let dx = Space.cardWidth - Space.storyXOverlap
+    const x0 = 230
+    let dx = Space.cardWidth * 0.8 - Space.storyXOverlap
 
     // Space to the right of the last card
-    const rightPad = 300
+    const rightPad = 200
     const maxOffset = Space.windowWidth - x0 - Space.cardWidth / 2 - rightPad
     if (state !== undefined) {
       // Find the amount that we must scale down by
@@ -159,36 +128,64 @@ export default class CardLocation {
     container?: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const x = 200 + Space.cardWidth / 2
+    const x = 320
     const y = Space.windowHeight - todoTheirHandHeight
-    return [x - (container?.x || 0), y - (container?.y || 0)]
+
+    // Small stagger so multiple cardbacks are visible.
+    const deckBackXOffsetPx = -3
+    const deckBackYOffsetPx = -3
+    const ox = deckBackXOffsetPx * i
+    const oy = deckBackYOffsetPx * i
+
+    return [x + ox - (container?.x || 0), y + oy - (container?.y || 0)]
   }
 
   static theirDeck(
     container?: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const x = 200 + Space.cardWidth / 2
+    // Mirror `ourDeck` along the top edge (same x / stagger pattern; y from top).
+    const x = 320
     const y = todoTheirHandHeight
-    return [x - (container?.x || 0), y - (container?.y || 0)]
+
+    const deckBackXOffsetPx = -3
+    const deckBackYOffsetPx = 3
+    const ox = deckBackXOffsetPx * i
+    const oy = deckBackYOffsetPx * i
+
+    return [x + ox - (container?.x || 0), y + oy - (container?.y || 0)]
   }
 
   static ourDiscard(
     container: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const x = Space.windowWidth - Space.cardWidth / 2 - 200
+    const x = Space.windowWidth - 320
     const y = Space.windowHeight - todoTheirHandHeight
-    return [x - container.x, y - container.y]
+
+    // Small stagger so multiple cardbacks are visible.
+    const deckBackXOffsetPx = -3
+    const deckBackYOffsetPx = -3
+    const ox = -deckBackXOffsetPx * i
+    const oy = deckBackYOffsetPx * i
+
+    return [x + ox - (container?.x || 0), y + oy - (container?.y || 0)]
   }
 
   static theirDiscard(
     container: Phaser.GameObjects.Container,
     i = 0,
   ): [number, number] {
-    const x = Space.windowWidth - Space.cardWidth / 2 - 200
+    // Mirror `ourDiscard` along the top edge (same x as bottom-right; y from top).
+    const x = Space.windowWidth - 320
     const y = todoTheirHandHeight
-    return [x - container.x, y - container.y]
+
+    const deckBackXOffsetPx = -3
+    const deckBackYOffsetPx = 3
+    const ox = -deckBackXOffsetPx * i
+    const oy = deckBackYOffsetPx * i
+
+    return [x + ox - (container?.x || 0), y + oy - (container?.y || 0)]
   }
 
   static overlay(

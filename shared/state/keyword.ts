@@ -13,11 +13,13 @@ export class Keywords {
   static getAll(): Keyword[] {
     return [
       Keywords.visible,
+      Keywords.revealed,
       Keywords.fleeting,
       Keywords.morning,
       Keywords.sight,
       Keywords.inspire,
       Keywords.inspired,
+      Keywords.possibility,
       Keywords.nourish,
       Keywords.birth,
       Keywords.exhale,
@@ -29,6 +31,11 @@ export class Keywords {
   static visible = new Keyword(
     'Visible',
     "[color=#FABD5D]Visible[/color]: Both players can see this card while it's in the story.",
+    false,
+  )
+  static revealed = new Keyword(
+    'Revealed',
+    '[color=#FABD5D]Revealed[/color]: Both players can see this card until it leaves the story.',
     false,
   )
   static fleeting = new Keyword(
@@ -65,6 +72,11 @@ export class Keywords {
   static inspired = new Keyword(
     'Inspired',
     '[color=#FABD5D]Inspired X[/color]: This round you have X extra breath.',
+    true,
+  )
+  static possibility = new Keyword(
+    'Possibility',
+    '[color=#FABD5D]Possibility X[/color]: At the start of each round, you gain X extra breath.',
     true,
   )
   static nourish = new Keyword(
