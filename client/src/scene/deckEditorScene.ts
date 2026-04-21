@@ -80,13 +80,27 @@ export default class DeckEditorScene extends BaseScene {
     leftSizer.add(filterHeader, { proportion: 0, expand: true })
     leftSizer.add(this.catalogPanel, { proportion: 1, expand: true })
 
-    // Right column: roster (expands) + buttons (fixed)
+    // Right column: roster (expands) + buttons (fixed); center deck cutouts in column
     this.decklist = new Decklist(this, this.onClickCutout())
+    const rosterDeckSizer = this.rexUI.add
+      .sizer({
+        width: ROSTER_WIDTH,
+        orientation: 0,
+      })
+      .setOrigin(0)
+    rosterDeckSizer
+      .addSpace(1)
+      .add(this.decklist.sizer, {
+        proportion: 0,
+        align: 'center',
+        expand: true,
+      })
+      .addSpace(1)
     this.rosterPanel = newScrollablePanel(this, {
       width: ROSTER_WIDTH,
       height: Space.windowHeight,
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
-      panel: { child: this.decklist.sizer },
+      panel: { child: rosterDeckSizer },
       header: this.createRosterHeader(),
       footer: this.createRightPanel(),
     }).setOrigin(0)
@@ -550,6 +564,7 @@ export default class DeckEditorScene extends BaseScene {
         space: {
           top: Space.pad,
           bottom: Space.pad,
+          left: 14,
         },
         align: 'left',
       })

@@ -37,13 +37,6 @@ export default class DeckThumbnail {
     // Root container for this tile
     this.container = new ContainerLite(scene, 0, 0, width, height)
 
-    // Bounding box (decorative outline; behind card art)
-    const boundsOutline = scene.add
-      .rectangle(0, 0, width, height)
-      .setFillStyle(0x000000, 0)
-      .setStrokeStyle(2, Color.border)
-    this.container.add(boundsOutline)
-
     // CARD BACK – top-left, using the deck's equipped cardback
     const angleFirst = -3
     const angleStepDeg = 3

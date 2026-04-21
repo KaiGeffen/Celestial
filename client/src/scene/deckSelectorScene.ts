@@ -52,13 +52,23 @@ export default class DeckSelectorScene extends BaseScene {
 
     const bodyScrollHeight = Space.windowHeight - sharedMainHeaderScrollOffset()
 
-    // Right column: deck preview + footer buttons (no column header)
+    // Right column: deck preview + footer buttons (center Decklist cutouts in column)
     this.decklist = new Decklist(this, () => () => {}) // no-op cutout callback
+    const rosterDeckSizer = this.rexUI.add
+      .sizer({
+        width: ROSTER_WIDTH,
+        orientation: 0,
+      })
+      .setOrigin(0)
+    rosterDeckSizer
+      .addSpace(1)
+      .add(this.decklist.sizer, { proportion: 0, align: 'center', expand: true })
+      .addSpace(1)
     this.rosterPanel = newScrollablePanel(this, {
       width: ROSTER_WIDTH,
       height: bodyScrollHeight,
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
-      panel: { child: this.decklist.sizer },
+      panel: { child: rosterDeckSizer },
       footer: this.createRightPanel(),
     }).setOrigin(0)
 
