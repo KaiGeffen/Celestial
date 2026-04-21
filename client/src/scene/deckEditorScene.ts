@@ -580,7 +580,7 @@ export default class DeckEditorScene extends BaseScene {
       cosmeticSet: this.cosmeticSet,
       cardback: this.cosmeticSet.cardback ?? 0,
       isValid,
-      onClick: () => this.openStylesMenu(),
+      onClick: () => this.openDeckNameMenu(),
     })
 
     const copyContainer = new ContainerLite(
@@ -684,6 +684,17 @@ export default class DeckEditorScene extends BaseScene {
     sizer.add(rowSizer)
 
     return sizer
+  }
+
+  private openDeckNameMenu(): void {
+    this.scene.launch('MenuScene', {
+      menu: 'editDeckName',
+      deckName: this.deckName,
+      callback: (name: string) => {
+        this.updateSavedDeck(undefined, name)
+      },
+      activeScene: this,
+    })
   }
 
   private openStylesMenu(): void {
