@@ -74,8 +74,8 @@ export default class DeckEditorScene extends BaseScene {
 
     // Left column: filter header (fixed) + catalog (expands). Catalog height must not include the
     // filter strip or rex layout overflows and the right roster column / scroll bounds break.
-    const filterHeader = this.createFilterHeader(catalogWidth)
     this.catalogPanel = this.createCatalogPanel(catalogWidth, catalogBodyHeight)
+    const filterHeader = this.createFilterHeader(catalogWidth)
 
     const leftSizer = this.rexUI.add
       .sizer({
