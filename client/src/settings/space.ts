@@ -6,6 +6,13 @@ export function refreshSpace() {
   Space = getSpace()
 }
 
+/** Deck editor filter strip / deck selector title row — keep heights in sync. */
+export function deckFilterBarHeight(): number {
+  return Space.filterBarHeight > 0
+    ? Space.filterBarHeight
+    : Space.padSmall * 2 + Space.textboxHeight
+}
+
 function getSpace() {
   let width = Math.floor(window.innerWidth)
   let height = Math.floor(window.innerHeight)

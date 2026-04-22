@@ -10,7 +10,13 @@ import Buttons from '../lib/buttons/buttons'
 import DeckThumbnail from '../lib/deckThumbnail'
 import UButton from '../lib/buttons/underlined'
 import { CardImage } from '../lib/cardImage'
-import { Color, Space, UserSettings, Flags } from '../settings/settings'
+import {
+  Color,
+  Space,
+  UserSettings,
+  Flags,
+  deckFilterBarHeight,
+} from '../settings/settings'
 import newScrollablePanel from '../lib/scrollablePanel'
 import { Deck } from '../../../shared/types/deck'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
@@ -77,7 +83,7 @@ export default class DeckEditorScene extends BaseScene {
         orientation: 1,
       })
       .setOrigin(0)
-    leftSizer.add(filterHeader, { proportion: 0, expand: true })
+    leftSizer.add(filterHeader, { proportion: 0, expand: false })
     leftSizer.add(this.catalogPanel, { proportion: 1, expand: true })
 
     // Right column: roster (expands) + buttons (fixed); center deck cutouts in column
@@ -197,6 +203,7 @@ export default class DeckEditorScene extends BaseScene {
     const sizer = this.rexUI.add
       .sizer({
         width,
+        height: deckFilterBarHeight(),
         orientation: 0,
         space: {
           left: Space.pad,
@@ -220,11 +227,11 @@ export default class DeckEditorScene extends BaseScene {
       text: 'Back',
       f: () => this.scene.start('DeckSelectorScene'),
     })
-    sizer.add(backContainer)
+    sizer.add(backContainer, { align: 'center' })
 
-    sizer.add(this.createSearchText())
-    sizer.add(this.createCostFilterButtons())
-    sizer.add(this.createSortButton())
+    sizer.add(this.createSearchText(), { align: 'center' })
+    sizer.add(this.createCostFilterButtons(), { align: 'center' })
+    sizer.add(this.createSortButton(), { align: 'center' })
 
     return sizer
   }

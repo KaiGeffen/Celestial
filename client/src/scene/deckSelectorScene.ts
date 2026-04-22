@@ -7,7 +7,13 @@ import BaseScene from './baseScene'
 import Decklist from '../lib/decklist'
 import Buttons from '../lib/buttons/buttons'
 import DeckThumbnail from '../lib/deckThumbnail'
-import { Color, Space, Style, UserSettings } from '../settings/settings'
+import {
+  Color,
+  Space,
+  Style,
+  UserSettings,
+  deckFilterBarHeight,
+} from '../settings/settings'
 import newScrollablePanel from '../lib/scrollablePanel'
 import { MechanicsSettings } from '../../../shared/settings'
 import { Deck } from '../../../shared/types/deck'
@@ -16,11 +22,6 @@ import Catalog from '../../../shared/state/catalog'
 
 const ROSTER_WIDTH = Space.cutoutWidth + 20
 const CENTER_WIDTH = 280
-
-/** Vertical space taken by the shared full-width header (pads + announcement line). */
-function sharedMainHeaderScrollOffset(): number {
-  return Space.pad * 2 + 52
-}
 
 export default class DeckSelectorScene extends BaseScene {
   savedDeckIndex: number | undefined
@@ -48,9 +49,8 @@ export default class DeckSelectorScene extends BaseScene {
     this.savedDeckIndex = undefined
 
     this.createBackground()
-    this.createBackButton()
 
-    const bodyScrollHeight = Space.windowHeight - sharedMainHeaderScrollOffset()
+    const bodyScrollHeight = Space.windowHeight - deckFilterBarHeight()
 
     // Right column: deck preview + footer buttons (center Decklist cutouts in column)
     this.decklist = new Decklist(this, () => () => {}) // no-op cutout callback
@@ -91,7 +91,7 @@ export default class DeckSelectorScene extends BaseScene {
     mainSizer.add(this.createMainHeader(), {
       proportion: 0,
       align: 'center',
-      expand: true,
+      expand: false,
     })
     mainSizer.add(columnSizer, { proportion: 1, expand: true })
     mainSizer.layout()
@@ -130,21 +130,56 @@ export default class DeckSelectorScene extends BaseScene {
     })
   }
 
-  /** Full-width header spanning both deck list and roster columns. */
-  private createMainHeader(): FixWidthSizer {
+  /** Full-width header — same layout/padding as `DeckEditorScene` `createFilterHeader`. */
+  private createMainHeader(): any {
+    const barH = deckFilterBarHeight()
     const background = this.add.rectangle(0, 0, 1, 1, Color.backgroundDark)
     this.addShadow(background, -90)
-    const sizer = this.rexUI.add
-      .fixWidthSizer({
-        width: Space.windowWidth,
-        space: { top: Space.pad, bottom: Space.pad },
-        align: 'center',
-      })
-      .addBackground(background)
+
+    const backContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: backContainer,
+      text: 'Back',
+      f: () => this.scene.start('HomeScene'),
+    })
+
+    const balanceContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+
     const title = this.add
       .text(0, 0, 'MY DECKS', Style.announcement)
       .setOrigin(0.5)
-    sizer.add(title)
+
+    const sizer = this.rexUI.add
+      .sizer({
+        width: Space.windowWidth,
+        height: barH,
+        orientation: 0,
+        space: {
+          left: Space.pad,
+          right: Space.pad,
+          top: Space.padSmall,
+          bottom: Space.padSmall,
+          item: Space.pad,
+        },
+      } as any)
+      .addBackground(background)
+
+    sizer
+      .add(backContainer, { align: 'center' })
+      .add(title, { align: 'center', proportion: 1, expand: true })
+      .add(balanceContainer, { align: 'center' })
     return sizer
   }
 
@@ -253,17 +288,6 @@ export default class DeckSelectorScene extends BaseScene {
     this.savedDeckIndex = undefined
     this.deckThumbnails.forEach((t) => t.setSelected(false))
     this.decklist.setDeck([])
-  }
-
-  private createBackButton(): void {
-    new Buttons.Basic({
-      within: this,
-      text: 'Back',
-      x: Space.pad + Space.buttonWidth / 2,
-      y: Space.pad + Space.buttonHeight / 2,
-      f: () => this.scene.start('HomeScene'),
-      depth: 10,
-    })
   }
 
   private createRightPanel(): any {
