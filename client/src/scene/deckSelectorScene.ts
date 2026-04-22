@@ -141,7 +141,9 @@ export default class DeckSelectorScene extends BaseScene {
   /** Full-width header — same layout/padding as `DeckEditorScene` `createFilterHeader`. */
   private createMainHeader(): any {
     const barH = deckFilterBarHeight()
-    const background = this.add.rectangle(0, 0, 1, 1, Color.backgroundDark)
+    const background = this.add
+      .rectangle(0, 0, 1, 1, Color.backgroundDark)
+      .setInteractive()
     this.addShadow(background, -90)
 
     const backContainer = new ContainerLite(
