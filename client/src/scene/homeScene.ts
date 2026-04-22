@@ -123,7 +123,7 @@ export default class HomeScene extends BaseScene {
     const sizer = this.rexUI.add.fixWidthSizer({
       width: NAVIGATION_BUTTON_WIDTH,
       space: {
-        line: Space.pad,
+        line: 5,
       },
     })
 
