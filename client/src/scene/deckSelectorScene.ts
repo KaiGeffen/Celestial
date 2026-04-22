@@ -261,6 +261,7 @@ export default class DeckSelectorScene extends BaseScene {
       cosmeticSet: { avatar: 0, border: 0, cardback: 0 },
     })
     const newIndex = (UserSettings._get('decks') || []).length - 1
+    UserSettings._set('equippedDeckIndex', newIndex)
     this.scene.start('DeckEditorScene', { deckIndex: newIndex })
   }
 
