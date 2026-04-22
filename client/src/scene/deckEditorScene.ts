@@ -87,18 +87,37 @@ export default class DeckEditorScene extends BaseScene {
     leftSizer.add(filterHeader, { proportion: 0, expand: false })
     leftSizer.add(this.catalogPanel, { proportion: 1, expand: true })
 
-    // Right column: roster scroll (same pattern as builder deck region — panel child is the decklist
-    // sizer only; extra horizontal sizers confuse ScrollablePanel + mask placement).
+    // Right column: background first, then deck content, then header/footer
+    const rosterBg = this.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
     this.decklist = new Decklist(this, this.onClickCutout())
+    this.decklist.setDeck(
+      this.cardsFromDeckIds(deck.cards || []),
+      Flags.devCardsEnabled ? false : true,
+    )
+
+    // Create header and footer AFTER cutouts — their backgrounds are now above cutouts in z-order
+    const rosterHeader = this.createRosterHeader()
+    ;(rosterHeader as any).layout()
+    const headerH = (rosterHeader as any).height as number
+
+    const rightPanel = this.createRightPanel()
+    ;(rightPanel as any).layout()
+    const rightPanelH = (rightPanel as any).height as number
+
     this.rosterPanel = newScrollablePanel(this, {
       width: ROSTER_WIDTH,
-      height: Space.windowHeight,
-      background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
+      height: Space.windowHeight - headerH - rightPanelH,
+      background: rosterBg,
       panel: { child: this.decklist.sizer },
-      header: this.createRosterHeader(),
-      footer: this.createRightPanel(),
       scrollMode: 'y',
     }).setOrigin(0)
+
+    const rosterColumn = this.rexUI.add
+      .sizer({ width: ROSTER_WIDTH, orientation: 1 })
+      .setOrigin(0)
+    rosterColumn.add(rosterHeader, { proportion: 0 })
+    rosterColumn.add(this.rosterPanel, { proportion: 0 })
+    rosterColumn.add(rightPanel, { proportion: 0 })
 
     const outerSizer = this.rexUI.add
       .sizer({
@@ -108,7 +127,7 @@ export default class DeckEditorScene extends BaseScene {
       })
       .setOrigin(0)
     outerSizer.add(leftSizer, { proportion: 1, expand: true })
-    outerSizer.add(this.rosterPanel, { proportion: 0, expand: true })
+    outerSizer.add(rosterColumn, { proportion: 0, expand: true })
     outerSizer.layout()
     ;(this.plugins.get('rexAnchor') as any).add(outerSizer, {
       width: '100%',
@@ -119,7 +138,7 @@ export default class DeckEditorScene extends BaseScene {
       },
     })
 
-    this.setDeck(this.cardsFromDeckIds(deck.cards || []))
+    this.syncDeckThumbnail()
 
     //
     this.filterCatalog()
@@ -234,6 +253,7 @@ export default class DeckEditorScene extends BaseScene {
     new Buttons.Basic({
       within: backContainer,
       text: 'Back',
+      muteClick: true,
       f: () => {
         this.scene.launch('MenuScene', {
           menu: 'confirm',
@@ -508,6 +528,7 @@ export default class DeckEditorScene extends BaseScene {
 
   addCardToDeck(card: Card): void {
     this.decklist.addCard(card)
+    this.rosterPanel?.layout()
     this.syncDeckThumbnail()
   }
 
@@ -585,7 +606,7 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   private createRosterHeader(): FixWidthSizer {
-    const background = this.add.rectangle(0, 0, 1, 1, Color.backgroundDark)
+    const background = this.add.rectangle(0, 0, 1, 1, Color.backgroundDark).setInteractive()
     this.addShadow(background, -90)
     const sizer = this.rexUI.add
       .fixWidthSizer({
@@ -612,7 +633,6 @@ export default class DeckEditorScene extends BaseScene {
       onClick: () => this.openDeckNameMenu(),
       tuckHeaderArt: true,
     })
-
     const copyContainer = new ContainerLite(
       this,
       0,
@@ -628,7 +648,6 @@ export default class DeckEditorScene extends BaseScene {
       f: () => this.copyDeckCodeToClipboard(),
       hint: 'Export deck-code',
     })
-
     const headerRow = this.rexUI.add
       .sizer({
         orientation: 0,
@@ -670,7 +689,7 @@ export default class DeckEditorScene extends BaseScene {
       } as any)
       .addBackground(background)
 
-    const makeBtn = (text: string, f: () => void) => {
+    const makeBtn = (text: string, f: () => void, muteClick = false) => {
       const container = new ContainerLite(
         this,
         0,
@@ -678,7 +697,7 @@ export default class DeckEditorScene extends BaseScene {
         Space.buttonWidth,
         Space.buttonHeight,
       )
-      new Buttons.Basic({ within: container, text, f })
+      new Buttons.Basic({ within: container, text, f, muteClick })
       return container
     }
 
@@ -692,7 +711,7 @@ export default class DeckEditorScene extends BaseScene {
         this.scene.start('DeckSelectorScene')
       }),
     )
-    colSizer.add(makeBtn('Cosmetics', () => this.openStylesMenu()))
+    colSizer.add(makeBtn('Cosmetics', () => this.openStylesMenu(), true))
 
     const playContainer = new ContainerLite(
       this,
