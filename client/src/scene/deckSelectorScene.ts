@@ -194,6 +194,7 @@ export default class DeckSelectorScene extends BaseScene {
   }
 
   private createCenterPanel(bodyScrollHeight: number): ScrollablePanel {
+    const centerColumnWidth = Space.windowWidth - ROSTER_WIDTH
     const panel = this.rexUI.add.fixWidthSizer({
       width: CENTER_WIDTH,
       align: 'center',
@@ -206,7 +207,7 @@ export default class DeckSelectorScene extends BaseScene {
     })
 
     const scrollable = newScrollablePanel(this, {
-      width: CENTER_WIDTH,
+      width: centerColumnWidth,
       height: bodyScrollHeight,
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
       panel: { child: panel },
