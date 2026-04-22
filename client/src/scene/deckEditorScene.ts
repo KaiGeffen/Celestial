@@ -606,7 +606,9 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   private createRosterHeader(): FixWidthSizer {
-    const background = this.add.rectangle(0, 0, 1, 1, Color.backgroundDark).setInteractive()
+    const background = this.add
+      .rectangle(0, 0, 1, 1, Color.backgroundDark)
+      .setInteractive()
     this.addShadow(background, -90)
     const sizer = this.rexUI.add
       .fixWidthSizer({
@@ -724,7 +726,11 @@ export default class DeckEditorScene extends BaseScene {
       within: playContainer,
       text: 'Play',
       f: () => {
+        // Save any changes to the current deck
+        this.saveCurrentDeck()
         UserSettings._set('equippedDeckIndex', this.deckIndex)
+
+        // Open the play menu
         this.scene.launch('MenuScene', { menu: 'play', activeScene: this })
       },
     })
