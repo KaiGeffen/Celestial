@@ -323,6 +323,7 @@ export default class UserProfileMenu extends Menu {
         .setDisplaySize(width, height)
         .setInteractive()
         .on('pointerdown', () => {
+          this.scene.sound.play('click')
           const newSet = {
             avatar: Server.getUserData().cosmeticSet.avatar,
             border: Server.getUserData().cosmeticSet.border,

@@ -144,7 +144,7 @@ function fitBackgroundWidth(
 
   // Space for the portion of the border above that (Roughly)
   const imageHeight = source.height
-  const ratioUpperPortion = 230 / 540
+  const ratioUpperPortion = 230 / 675
   const heightAboveAvatar = imageHeight * ratioUpperPortion * scale
 
   const magnitude = avatarHeight + heightAboveAvatar
