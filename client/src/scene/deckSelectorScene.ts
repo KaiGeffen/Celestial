@@ -200,7 +200,7 @@ export default class DeckSelectorScene extends BaseScene {
       space: {
         top: Space.pad,
         bottom: Space.pad,
-        item: Space.pad,
+        item: Space.pad * 2,
         line: Space.pad * 2,
       },
     })
