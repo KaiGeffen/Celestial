@@ -94,9 +94,9 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   button: {
     fontFamily: mainFont,
     fontSize: '20px',
-    color: Color.button,
-    stroke: '#000000',
-    strokeThickness: 3,
+    color: '#58291b',
+    stroke: '#1e0502',
+    strokeThickness: 1,
   },
   stackCountButton: {
     fontFamily: mainFont,

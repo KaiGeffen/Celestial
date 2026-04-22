@@ -55,28 +55,35 @@ class BaseButton extends Button {
     return super.setText(s)
   }
 
-  // Button is a spritesheet with different states
+  /** `BigButton` uses a 3-frame spritesheet; plain `BasicButton` uses a single image (`icon-Button`). */
+  private iconIsSpritesheet(): boolean {
+    return this.icon.texture.frameTotal > 1
+  }
+
   enable(): this {
     super.enable()
-    this.icon.setFrame(0)
+    if (this.iconIsSpritesheet()) this.icon.setFrame(0)
 
     return this
   }
+
   disable(): this {
     super.disable()
-    this.icon.setFrame(1)
+    if (this.iconIsSpritesheet()) this.icon.setFrame(1)
 
     return this
   }
 
-  // Button is a spritesheet with different states
   glow(): this {
-    this.icon.setFrame(2)
+    super.glow()
+    if (this.iconIsSpritesheet()) this.icon.setFrame(2)
 
     return this
   }
+
   stopGlow(): this {
-    this.icon.setFrame(0)
+    super.stopGlow()
+    if (this.iconIsSpritesheet()) this.icon.setFrame(0)
 
     return this
   }
