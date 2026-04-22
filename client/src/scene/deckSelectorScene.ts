@@ -21,7 +21,6 @@ import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import Catalog from '../../../shared/state/catalog'
 
 const ROSTER_WIDTH = Space.cutoutWidth + 20
-const CENTER_WIDTH = 280
 
 export default class DeckSelectorScene extends BaseScene {
   savedDeckIndex: number | undefined
@@ -31,6 +30,8 @@ export default class DeckSelectorScene extends BaseScene {
   private centerPanel: ScrollablePanel | null
   private deckThumbnails: DeckThumbnail[] = []
   private background: Phaser.GameObjects.Image | null
+  /** Root layout; `windowResizeManager` calls `onWindowResize` so this relayouts after `Space` updates. */
+  private mainSizer: any = null
 
   constructor() {
     super({
@@ -82,36 +83,29 @@ export default class DeckSelectorScene extends BaseScene {
 
     const columnSizer = this.rexUI.add
       .sizer({
-        width: Space.windowWidth,
-        height: bodyScrollHeight,
         orientation: 0,
       })
       .setOrigin(0)
     columnSizer.add(this.centerPanel, { proportion: 1, expand: true })
     columnSizer.add(this.rosterPanel, { proportion: 0, expand: true })
 
-    const mainSizer = this.rexUI.add
+    this.mainSizer = this.rexUI.add
       .sizer({
-        width: Space.windowWidth,
-        height: Space.windowHeight,
         orientation: 1,
       })
       .setOrigin(0)
-    mainSizer.add(this.createMainHeader(), {
+    this.mainSizer.add(this.createMainHeader(), {
       proportion: 0,
-      align: 'center',
-      expand: false,
+      expand: true,
     })
-    mainSizer.add(columnSizer, { proportion: 1, expand: true })
-    mainSizer.layout()
-    ;(this.plugins.get('rexAnchor') as any).add(mainSizer, {
+    this.mainSizer.add(columnSizer, { proportion: 1, expand: true })
+    ;(this.plugins.get('rexAnchor') as any).add(this.mainSizer, {
       width: '100%',
       height: '100%',
-      onResizeCallback: (width: number, height: number, go: any) => {
-        go.setMinSize(width, height)
-        go.layout()
-      },
+      left: 'left',
+      top: 'top',
     })
+    this.mainSizer.layout()
 
     // Restore selection
     const equippedDeckIndex = UserSettings._get('equippedDeckIndex')
@@ -128,6 +122,24 @@ export default class DeckSelectorScene extends BaseScene {
       this.savedDeckIndex = undefined
       this.decklist.setDeck([])
     }
+  }
+
+  onWindowResize(): void {
+    if (!this.mainSizer) return
+    // Like `CatalogRegion.resize`: scroll panels get an explicit `setMinSize` on every resize so
+    // they shrink when the window narrows (root `layout()` alone mostly grows proportion slots).
+    const bodyH = Math.max(1, Space.windowHeight - deckFilterBarHeight())
+    const centerW = Math.max(1, Space.windowWidth - ROSTER_WIDTH)
+    if (this.centerPanel) {
+      const ratio = this.centerPanel.t
+      this.centerPanel.setMinSize(centerW, bodyH).layout()
+      this.centerPanel.t = Math.min(0.999999, ratio)
+    }
+    if (this.rosterPanel) {
+      this.rosterPanel.setMinSize(ROSTER_WIDTH, bodyH).layout()
+    }
+    this.mainSizer.setMinSize(Space.windowWidth, Space.windowHeight)
+    this.mainSizer.layout()
   }
 
   private createBackground(): void {
@@ -173,7 +185,6 @@ export default class DeckSelectorScene extends BaseScene {
 
     const sizer = this.rexUI.add
       .sizer({
-        width: Space.windowWidth,
         height: barH,
         orientation: 0,
         space: {
@@ -196,7 +207,6 @@ export default class DeckSelectorScene extends BaseScene {
   private createCenterPanel(bodyScrollHeight: number): ScrollablePanel {
     const centerColumnWidth = Space.windowWidth - ROSTER_WIDTH
     const panel = this.rexUI.add.fixWidthSizer({
-      width: CENTER_WIDTH,
       align: 'center',
       space: {
         top: Space.pad,
