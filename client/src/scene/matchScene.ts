@@ -379,6 +379,9 @@ export class MatchScene extends BaseScene {
         this.currentVersion++
       }
     }
+
+    // After layout/state so backdrop pulse/drift wins the frame (and stays above night layer in z-order).
+    this.view.backgroundRegion.update(time, delta)
   }
 
   // Display the given game state, returns false if the state isn't shown immediately

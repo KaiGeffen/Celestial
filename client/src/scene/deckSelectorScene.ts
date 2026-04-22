@@ -255,10 +255,8 @@ export default class DeckSelectorScene extends BaseScene {
       cards: [],
       cosmeticSet: { avatar: 0, border: 0, cardback: 0 },
     })
-    if (!this.centerPanel) return
-    this.refreshDeckList(this.centerPanel.getElement('panel') as FixWidthSizer)
-    this.centerPanel.layout()
-    this.selectDeck((UserSettings._get('decks') || []).length - 1)
+    const newIndex = (UserSettings._get('decks') || []).length - 1
+    this.scene.start('DeckEditorScene', { deckIndex: newIndex })
   }
 
   private onDeckClick(i: number): void {

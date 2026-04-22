@@ -389,6 +389,7 @@ export const assetLists = {
       "matchBottom",
       "matchDay",
       "matchNight",
+      "matchTile",
       "matchTop"
     ],
     "pixelArt": false
