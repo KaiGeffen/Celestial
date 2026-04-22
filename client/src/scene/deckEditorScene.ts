@@ -120,7 +120,6 @@ export default class DeckEditorScene extends BaseScene {
     })
 
     this.setDeck(this.cardsFromDeckIds(deck.cards || []))
-    this.updateSavedDeck(this.getDeckCode())
 
     //
     this.filterCatalog()
@@ -235,7 +234,14 @@ export default class DeckEditorScene extends BaseScene {
     new Buttons.Basic({
       within: backContainer,
       text: 'Back',
-      f: () => this.scene.start('DeckSelectorScene'),
+      f: () => {
+        this.scene.launch('MenuScene', {
+          menu: 'confirm',
+          text: 'Discard your changes and return to deck selection screen?',
+          callback: () => this.scene.start('DeckSelectorScene'),
+          activeScene: this,
+        })
+      },
     })
     sizer.add(backContainer, { align: 'center' })
 
@@ -502,7 +508,7 @@ export default class DeckEditorScene extends BaseScene {
 
   addCardToDeck(card: Card): void {
     this.decklist.addCard(card)
-    this.updateSavedDeck(this.getDeckCode())
+    this.syncDeckThumbnail()
   }
 
   private removeCardFromDeck(card: Card): boolean {
@@ -572,7 +578,7 @@ export default class DeckEditorScene extends BaseScene {
             this.rosterPanel.layout()
             this.rosterPanel.t = Math.min(0.999999, this.rosterPanel.t)
           }
-          this.updateSavedDeck(this.getDeckCode())
+          this.syncDeckThumbnail()
         }
       }
     }
@@ -680,7 +686,12 @@ export default class DeckEditorScene extends BaseScene {
       orientation: 1,
       space: { item: Space.padSmall },
     } as any)
-    colSizer.add(makeBtn('Save', () => this.scene.start('DeckSelectorScene')))
+    colSizer.add(
+      makeBtn('Save', () => {
+        this.saveCurrentDeck()
+        this.scene.start('DeckSelectorScene')
+      }),
+    )
     colSizer.add(makeBtn('Cosmetics', () => this.openStylesMenu()))
 
     const playContainer = new ContainerLite(
@@ -715,7 +726,8 @@ export default class DeckEditorScene extends BaseScene {
       menu: 'editDeckName',
       deckName: this.deckName,
       callback: (name: string) => {
-        this.updateSavedDeck(undefined, name)
+        this.deckName = name
+        this.syncDeckThumbnail()
       },
       activeScene: this,
     })
@@ -732,17 +744,32 @@ export default class DeckEditorScene extends BaseScene {
         deckCode: number[],
       ) => {
         this.setCosmeticSet(cosmeticSet)
-        this.updateSavedDeck(undefined, name, cosmeticSet)
+        this.deckName = name
         if (deckCode && deckCode.length > 0) {
           this.setDeck(this.cardsFromDeckIds(deckCode))
-          this.updateSavedDeck(this.getDeckCode())
         }
+        this.syncDeckThumbnail()
       },
       deckName: deck?.name ?? `Deck ${this.deckIndex + 1}`,
       cosmeticSet: this.cosmeticSet,
       deckCode: this.getDeckCode(),
       activeScene: this,
     })
+  }
+
+  /** Persist current draft into UserSettings (called by Save). */
+  private saveCurrentDeck(): void {
+    this.ensureDeckAtIndex()
+    const decks = UserSettings._get('decks') || []
+    const deck = decks[this.deckIndex]
+    if (!deck) return
+    const updated: Deck = {
+      name: this.deckName ?? deck.name,
+      cards: this.getDeckCode(),
+      cosmeticSet: this.cosmeticSet ??
+        deck.cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 },
+    }
+    UserSettings._setIndex('decks', this.deckIndex, updated)
   }
 }
 

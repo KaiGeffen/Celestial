@@ -80,19 +80,23 @@ export default class DeckSelectorScene extends BaseScene {
     // Left: list of decks (no column header — shared header below)
     this.centerPanel = this.createCenterPanel(bodyScrollHeight)
 
-    const columnSizer = this.rexUI.add.sizer({
-      width: Space.windowWidth,
-      height: bodyScrollHeight,
-      orientation: 0,
-    }).setOrigin(0)
+    const columnSizer = this.rexUI.add
+      .sizer({
+        width: Space.windowWidth,
+        height: bodyScrollHeight,
+        orientation: 0,
+      })
+      .setOrigin(0)
     columnSizer.add(this.centerPanel, { proportion: 1, expand: true })
     columnSizer.add(this.rosterPanel, { proportion: 0, expand: true })
 
-    const mainSizer = this.rexUI.add.sizer({
-      width: Space.windowWidth,
-      height: Space.windowHeight,
-      orientation: 1,
-    }).setOrigin(0)
+    const mainSizer = this.rexUI.add
+      .sizer({
+        width: Space.windowWidth,
+        height: Space.windowHeight,
+        orientation: 1,
+      })
+      .setOrigin(0)
     mainSizer.add(this.createMainHeader(), {
       proportion: 0,
       align: 'center',
@@ -100,7 +104,6 @@ export default class DeckSelectorScene extends BaseScene {
     })
     mainSizer.add(columnSizer, { proportion: 1, expand: true })
     mainSizer.layout()
-
     ;(this.plugins.get('rexAnchor') as any).add(mainSizer, {
       width: '100%',
       height: '100%',

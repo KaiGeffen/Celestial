@@ -26,6 +26,7 @@ export default class DeckThumbnail {
     cardback: number
     isValid: boolean
     onClick: () => void
+    tuckHeaderArt?: boolean
   }) {
     const { scene } = opts
     this.scene = scene
