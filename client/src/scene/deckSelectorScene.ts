@@ -273,10 +273,7 @@ export default class DeckSelectorScene extends BaseScene {
   private onDeckClick(i: number): void {
     const thumb = this.deckThumbnails[i]
     if (!thumb) return
-    if (this.savedDeckIndex === i) {
-      this.deselect()
-      return
-    }
+    if (this.savedDeckIndex === i) return
     this.deckThumbnails.forEach((t, j) => {
       t.setSelected(j === i)
     })
@@ -291,12 +288,6 @@ export default class DeckSelectorScene extends BaseScene {
   selectDeck(i: number): void {
     if (i < 0 || i >= (UserSettings._get('decks') || []).length) return
     this.onDeckClick(i)
-  }
-
-  deselect(): void {
-    this.savedDeckIndex = undefined
-    this.deckThumbnails.forEach((t) => t.setSelected(false))
-    this.decklist.setDeck([])
   }
 
   private createRightPanel(): any {
