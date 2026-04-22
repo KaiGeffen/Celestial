@@ -55,7 +55,8 @@ export default class DeckEditorScene extends BaseScene {
   create(params: { deckIndex: number }) {
     super.create()
 
-    this.deckIndex = params.deckIndex
+    this.deckIndex = Math.max(0, Math.floor(Number(params?.deckIndex)))
+    this.ensureDeckAtIndex()
     const decks = UserSettings._get('decks') || []
     const deck: Deck = decks[this.deckIndex] || {
       name: `Deck ${this.deckIndex + 1}`,
@@ -68,13 +69,13 @@ export default class DeckEditorScene extends BaseScene {
     this.createBackground()
 
     const catalogWidth = Space.windowWidth - ROSTER_WIDTH
+    const filterBarH = deckFilterBarHeight()
+    const catalogBodyHeight = Space.windowHeight - filterBarH
 
-    // Left column: filter header (fixed) + catalog (expands)
+    // Left column: filter header (fixed) + catalog (expands). Catalog height must not include the
+    // filter strip or rex layout overflows and the right roster column / scroll bounds break.
     const filterHeader = this.createFilterHeader(catalogWidth)
-    this.catalogPanel = this.createCatalogPanel(
-      catalogWidth,
-      Space.windowHeight,
-    )
+    this.catalogPanel = this.createCatalogPanel(catalogWidth, catalogBodyHeight)
 
     const leftSizer = this.rexUI.add
       .sizer({
@@ -86,29 +87,17 @@ export default class DeckEditorScene extends BaseScene {
     leftSizer.add(filterHeader, { proportion: 0, expand: false })
     leftSizer.add(this.catalogPanel, { proportion: 1, expand: true })
 
-    // Right column: roster (expands) + buttons (fixed); center deck cutouts in column
+    // Right column: roster scroll (same pattern as builder deck region — panel child is the decklist
+    // sizer only; extra horizontal sizers confuse ScrollablePanel + mask placement).
     this.decklist = new Decklist(this, this.onClickCutout())
-    const rosterDeckSizer = this.rexUI.add
-      .sizer({
-        width: ROSTER_WIDTH,
-        orientation: 0,
-      })
-      .setOrigin(0)
-    rosterDeckSizer
-      .addSpace(1)
-      .add(this.decklist.sizer, {
-        proportion: 0,
-        align: 'center',
-        expand: true,
-      })
-      .addSpace(1)
     this.rosterPanel = newScrollablePanel(this, {
       width: ROSTER_WIDTH,
       height: Space.windowHeight,
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
-      panel: { child: rosterDeckSizer },
+      panel: { child: this.decklist.sizer },
       header: this.createRosterHeader(),
       footer: this.createRightPanel(),
+      scrollMode: 'y',
     }).setOrigin(0)
 
     const outerSizer = this.rexUI.add
@@ -130,11 +119,32 @@ export default class DeckEditorScene extends BaseScene {
       },
     })
 
-    this.setDeck((deck.cards || []).map((id) => Catalog.getCardById(id)))
+    this.setDeck(this.cardsFromDeckIds(deck.cards || []))
     this.updateSavedDeck(this.getDeckCode())
 
     //
     this.filterCatalog()
+  }
+
+  /** Ensure `UserSettings.decks[this.deckIndex]` exists so loading/saving never no-op on a stale index. */
+  private ensureDeckAtIndex(): void {
+    const decks: Deck[] = [...(UserSettings._get('decks') || [])]
+    if (decks[this.deckIndex]) return
+
+    while (decks.length <= this.deckIndex) {
+      decks.push({
+        name: `Deck ${decks.length + 1}`,
+        cards: [],
+        cosmeticSet: { avatar: 0, border: 0, cardback: 0 },
+      })
+    }
+    UserSettings._set('decks', decks)
+  }
+
+  private cardsFromDeckIds(ids: number[]): Card[] {
+    return ids
+      .map((id) => Catalog.getCardById(id))
+      .filter((c): c is Card => c != null)
   }
 
   private createBackground(): void {
@@ -509,13 +519,15 @@ export default class DeckEditorScene extends BaseScene {
     name?: string,
     cosmeticSet?: CosmeticSet,
   ): void {
+    this.ensureDeckAtIndex()
     const decks = UserSettings._get('decks') || []
     const deck = decks[this.deckIndex]
     if (!deck) return
     const updated: Deck = {
       name: name ?? deck.name,
       cards: deckCode ?? deck.cards ?? [],
-      cosmeticSet: cosmeticSet ?? deck.cosmeticSet ?? { avatar: 0, border: 0 },
+      cosmeticSet: cosmeticSet ??
+        deck.cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 },
     }
     UserSettings._setIndex('decks', this.deckIndex, updated)
     if (name !== undefined) this.deckName = name
@@ -537,7 +549,11 @@ export default class DeckEditorScene extends BaseScene {
 
   setDeck(cards: Card[]): void {
     this.decklist.setDeck(cards, Flags.devCardsEnabled ? false : true)
-    this.rosterPanel?.layout()
+    if (this.rosterPanel) {
+      this.rosterPanel.childOY = 0
+      this.rosterPanel.t = 0
+      this.rosterPanel.layout()
+    }
   }
 
   setCosmeticSet(set: CosmeticSet): void {
@@ -588,6 +604,7 @@ export default class DeckEditorScene extends BaseScene {
       cardback: this.cosmeticSet.cardback ?? 0,
       isValid,
       onClick: () => this.openDeckNameMenu(),
+      tuckHeaderArt: true,
     })
 
     const copyContainer = new ContainerLite(
@@ -717,7 +734,7 @@ export default class DeckEditorScene extends BaseScene {
         this.setCosmeticSet(cosmeticSet)
         this.updateSavedDeck(undefined, name, cosmeticSet)
         if (deckCode && deckCode.length > 0) {
-          this.setDeck(deckCode.map((id) => Catalog.getCardById(id)))
+          this.setDeck(this.cardsFromDeckIds(deckCode))
           this.updateSavedDeck(this.getDeckCode())
         }
       },

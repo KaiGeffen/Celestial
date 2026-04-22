@@ -62,7 +62,11 @@ export default class DeckSelectorScene extends BaseScene {
       .setOrigin(0)
     rosterDeckSizer
       .addSpace(1)
-      .add(this.decklist.sizer, { proportion: 0, align: 'center', expand: true })
+      .add(this.decklist.sizer, {
+        proportion: 0,
+        align: 'top',
+        expand: false,
+      })
       .addSpace(1)
     this.rosterPanel = newScrollablePanel(this, {
       width: ROSTER_WIDTH,
@@ -70,6 +74,7 @@ export default class DeckSelectorScene extends BaseScene {
       background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
       panel: { child: rosterDeckSizer },
       footer: this.createRightPanel(),
+      scrollMode: 'y',
     }).setOrigin(0)
 
     // Left: list of decks (no column header — shared header below)
