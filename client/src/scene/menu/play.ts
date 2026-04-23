@@ -28,6 +28,7 @@ import { GardenSettings, MechanicsSettings } from '../../../../shared/settings'
 import { decodeShareableDeckCode } from '../../../../shared/codec'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import newScrollablePanel from '../../lib/scrollablePanel'
+import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
 const menuWidth = 1000
 const deckPanelWidth = Space.cutoutWidth + Space.pad * 2
@@ -52,6 +53,7 @@ export default class PlayMenu extends Menu {
   gardenSizer: any // Store reference to garden sizer for updates
   btnPrevDeck: Button
   btnNextDeck: Button
+  scrollableDeck: ScrollablePanel
 
   private activeScene: Phaser.Scene
 
@@ -158,6 +160,10 @@ export default class PlayMenu extends Menu {
 
     this.decklist.setDeck(deckCards, false)
     this.decklist.sizer.layout()
+    if (this.scrollableDeck) {
+      this.scrollableDeck.layout()
+      this.scrollableDeck.t = 0
+    }
 
     // Update validation message
     const deckSize = this.deck.cards ? this.deck.cards.length : 0
@@ -390,7 +396,7 @@ export default class PlayMenu extends Menu {
     }
 
     // Create scrollable panel for the deck
-    const scrollableDeck = newScrollablePanel(this.scene, {
+    this.scrollableDeck = newScrollablePanel(this.scene, {
       width: deckPanelWidth - Space.pad * 2,
       height: 420,
       panel: {
@@ -399,7 +405,7 @@ export default class PlayMenu extends Menu {
       scrollMode: 'y',
     })
 
-    panelSizer.add(scrollableDeck)
+    panelSizer.add(this.scrollableDeck)
 
     return panelSizer
   }
