@@ -29,8 +29,6 @@ export type DeckEditorDeckOptions = {
   onSave: () => void
   onCosmetics: () => void
   onPlay: () => void
-  /** Override column width; default matches editor layout constant. */
-  deckWidth?: number
 }
 
 /** Right column: deck thumbnail header, scrolling decklist, Save / Cosmetics / Play. */
@@ -53,7 +51,8 @@ export class DeckEditorDeck {
   constructor(scene: BaseScene, opts: DeckEditorDeckOptions) {
     this.scene = scene
     this.opts = opts
-    this.deckWidth = opts.deckWidth ?? DECK_EDITOR_DECK_WIDTH
+    // TODO Remove constant and arg
+    this.deckWidth = Space.cutoutWidth + 20
 
     const deckBg = scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
     this.decklist = new Decklist(scene, opts.createCutoutInteraction())
@@ -68,7 +67,7 @@ export class DeckEditorDeck {
     this.footerHeight = (footer as any).height as number
 
     this.scrollPanel = newScrollablePanel(scene, {
-      width: this.deckWidth,
+      // width: this.deckWidth,
       height: Space.windowHeight - this.headerHeight - this.footerHeight,
       background: deckBg,
       panel: { child: this.decklist.sizer },
@@ -76,9 +75,7 @@ export class DeckEditorDeck {
     }).setOrigin(0)
 
     const ui = rexUi(scene)
-    const deckColumn = ui.add
-      .sizer({ width: this.deckWidth, orientation: 1 })
-      .setOrigin(0)
+    const deckColumn = ui.add.sizer({ orientation: 1 }).setOrigin(0)
     deckColumn.add(deckHeader, { proportion: 0 })
     deckColumn.add(this.scrollPanel, { proportion: 0 })
     deckColumn.add(footer, { proportion: 0 })
@@ -86,7 +83,8 @@ export class DeckEditorDeck {
     this.columnSizer = deckColumn
   }
 
-  resizeScrollArea(windowHeight: number): void {
+  onWindowResize(): void {
+    const windowHeight = Space.windowHeight
     const deckScrollH = Math.max(
       1,
       windowHeight - this.headerHeight - this.footerHeight,

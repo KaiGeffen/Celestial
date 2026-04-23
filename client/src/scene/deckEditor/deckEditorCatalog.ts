@@ -18,7 +18,10 @@ import {
 import newScrollablePanel from '../../lib/scrollablePanel'
 import Catalog from '../../../../shared/state/catalog'
 import Card from '../../../../shared/state/card'
-import { DECK_EDITOR_DECK_WIDTH, DECK_EDITOR_MAX_COST_FILTER } from './constants'
+import {
+  DECK_EDITOR_DECK_WIDTH,
+  DECK_EDITOR_MAX_COST_FILTER,
+} from './constants'
 import { cardPassesDeckEditorFilters } from './cardSearchFilter'
 import { rexUi } from './rexUi'
 
@@ -81,10 +84,12 @@ export class DeckEditorCatalog {
     }
 
     pool.forEach((card) => {
-      const cardImage = new CardImage(card, panel, true, false).setOnClick(() => {
-        opts.onCardPick(card)
-        scene.sound.play('click')
-      })
+      const cardImage = new CardImage(card, panel, true, false).setOnClick(
+        () => {
+          opts.onCardPick(card)
+          scene.sound.play('click')
+        },
+      )
       this.cardImages.push(cardImage)
     })
 
@@ -109,7 +114,8 @@ export class DeckEditorCatalog {
     this.applyVisibleCards()
   }
 
-  resize(windowHeight: number): void {
+  onWindowResize(): void {
+    const windowHeight = Space.windowHeight
     const catalogWidth = Math.max(1, Space.windowWidth - DECK_EDITOR_DECK_WIDTH)
     if (this.headerSizer) {
       ;(this.headerSizer as any).runLayout?.(undefined, catalogWidth, undefined)

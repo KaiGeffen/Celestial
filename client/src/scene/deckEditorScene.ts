@@ -3,7 +3,7 @@ import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
 import BaseScene from './baseScene'
 import Cutout from '../lib/buttons/cutout'
-import { Space, UserSettings, Flags } from '../settings/settings'
+import { UserSettings, Flags } from '../settings/settings'
 import Catalog from '../../../shared/state/catalog'
 import Card from '../../../shared/state/card'
 import { Deck } from '../../../shared/types/deck'
@@ -14,7 +14,6 @@ import { encodeShareableDeckCode } from '../../../shared/codec'
 import Server from '../server'
 import { DeckEditorCatalog } from './deckEditor/deckEditorCatalog'
 import { DeckEditorDeck } from './deckEditor/deckEditorDeck'
-import { DECK_EDITOR_DECK_WIDTH } from './deckEditor/constants'
 
 export type { DeckEditorCatalogOptions } from './deckEditor/deckEditorCatalog'
 export type { DeckEditorDeckOptions } from './deckEditor/deckEditorDeck'
@@ -278,8 +277,9 @@ export default class DeckEditorScene extends BaseScene {
   onWindowResize(): void {
     if (!this.sizer || !this.catalogRegion || !this.deckRegion) return
 
-    this.catalogRegion.resize(Space.windowHeight)
-    this.deckRegion.resizeScrollArea(Space.windowHeight)
+    // Resize both regions
+    this.catalogRegion.onWindowResize()
+    this.deckRegion.onWindowResize()
 
     this.sizer.layout()
   }
