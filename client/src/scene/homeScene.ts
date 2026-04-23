@@ -523,7 +523,7 @@ export default class HomeScene extends BaseScene {
   }
 }
 
-const PATCH_NUMBER = '0.7.16.2'
+const PATCH_NUMBER = '0.7.16.3'
 
 const URL = 'https://luma.com/1lsziprm'
 
