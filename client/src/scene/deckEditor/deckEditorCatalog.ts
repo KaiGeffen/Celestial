@@ -18,14 +18,11 @@ import {
 import newScrollablePanel from '../../lib/scrollablePanel'
 import Catalog from '../../../../shared/state/catalog'
 import Card from '../../../../shared/state/card'
-import { DECK_EDITOR_MAX_COST_FILTER } from './constants'
+import { DECK_EDITOR_DECK_WIDTH, DECK_EDITOR_MAX_COST_FILTER } from './constants'
 import { cardPassesDeckEditorFilters } from './cardSearchFilter'
 import { rexUi } from './rexUi'
 
 export type DeckEditorCatalogOptions = {
-  catalogWidth: number
-  catalogBodyHeight: number
-  onBack: () => void
   onCardPick: (card: Card) => void
 }
 
@@ -54,6 +51,12 @@ export class DeckEditorCatalog {
     for (let i = 0; i <= DECK_EDITOR_MAX_COST_FILTER; i++) {
       this.filterCostAry[i] = false
     }
+
+    const catalogWidth = Math.max(1, Space.windowWidth - DECK_EDITOR_DECK_WIDTH)
+    const catalogBodyHeight = Math.max(
+      1,
+      Space.windowHeight - deckFilterBarHeight(),
+    )
 
     const ui = rexUi(scene)
     const panel = ui.add.fixWidthSizer({
@@ -87,15 +90,15 @@ export class DeckEditorCatalog {
 
     this.gridSizer = panel
     this.scrollPanel = newScrollablePanel(scene, {
-      width: opts.catalogWidth,
-      height: opts.catalogBodyHeight,
+      width: catalogWidth,
+      height: catalogBodyHeight,
       panel: { child: panel },
       slider: Scroll(scene, false),
     }).setOrigin(0)
 
     this.scrollPanel.layout()
 
-    const headerRow = this.buildFilterHeaderRow(opts.onBack)
+    const headerRow = this.buildFilterHeaderRow()
 
     const column = ui.add.sizer({ orientation: 1 }).setOrigin(0)
     column.add(headerRow, { proportion: 0, expand: true })
@@ -106,7 +109,8 @@ export class DeckEditorCatalog {
     this.applyVisibleCards()
   }
 
-  resize(catalogWidth: number, windowHeight: number): void {
+  resize(windowHeight: number): void {
+    const catalogWidth = Math.max(1, Space.windowWidth - DECK_EDITOR_DECK_WIDTH)
     if (this.headerSizer) {
       ;(this.headerSizer as any).runLayout?.(undefined, catalogWidth, undefined)
     }
@@ -139,7 +143,7 @@ export class DeckEditorCatalog {
     panel.runLayout?.(undefined, innerWidth, undefined)
   }
 
-  private buildFilterHeaderRow(onBack: () => void): any {
+  private buildFilterHeaderRow(): any {
     const scene = this.scene
     const background = scene.add
       .rectangle(0, 0, 1, 1, Color.backgroundLight)
@@ -173,7 +177,13 @@ export class DeckEditorCatalog {
       within: backContainer,
       text: 'Back',
       muteClick: true,
-      f: onBack,
+      f: () => {
+        scene.scene.launch('MenuScene', {
+          menu: 'confirm',
+          text: 'Discard your changes and return to deck selection screen?',
+          callback: () => scene.scene.start('DeckSelectorScene'),
+        })
+      },
     })
     row.add(backContainer, { align: 'center' })
 

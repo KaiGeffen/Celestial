@@ -2,12 +2,7 @@ import 'phaser'
 
 import BaseScene from './baseScene'
 import Cutout from '../lib/buttons/cutout'
-import {
-  Space,
-  UserSettings,
-  Flags,
-  deckFilterBarHeight,
-} from '../settings/settings'
+import { Space, UserSettings, Flags } from '../settings/settings'
 import Catalog from '../../../shared/state/catalog'
 import Card from '../../../shared/state/card'
 import { Deck } from '../../../shared/types/deck'
@@ -74,15 +69,9 @@ export default class DeckEditorScene extends BaseScene {
     this.createBackground()
 
     const deckColW = DECK_EDITOR_DECK_WIDTH
-    const catalogWidth = Space.windowWidth - deckColW
-    const filterBarH = deckFilterBarHeight()
-    const catalogBodyHeight = Space.windowHeight - filterBarH
 
     // Catalog
     this.catalogRegion = new DeckEditorCatalog(this, {
-      catalogWidth,
-      catalogBodyHeight,
-      onBack: () => this.confirmLeaveToDeckSelector(),
       onCardPick: (card) => this.addCardToDeck(card),
     })
 
@@ -132,7 +121,7 @@ export default class DeckEditorScene extends BaseScene {
 
     const catalogW = Math.max(1, Space.windowWidth - DECK_EDITOR_DECK_WIDTH)
 
-    this.catalogRegion.resize(catalogW, Space.windowHeight)
+    this.catalogRegion.resize(Space.windowHeight)
     this.deckRegion.resizeScrollArea(Space.windowHeight)
 
     this.catalogRegion.columnSizer.setMinSize(catalogW, Space.windowHeight).layout()
@@ -162,14 +151,6 @@ export default class DeckEditorScene extends BaseScene {
     return ids
       .map((id) => Catalog.getCardById(id))
       .filter((c): c is Card => c != null)
-  }
-
-  private confirmLeaveToDeckSelector(): void {
-    this.scene.launch('MenuScene', {
-      menu: 'confirm',
-      text: 'Discard your changes and return to deck selection screen?',
-      callback: () => this.scene.start('DeckSelectorScene'),
-    })
   }
 
   private createBackground(): void {
