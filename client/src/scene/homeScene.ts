@@ -391,10 +391,10 @@ export default class HomeScene extends BaseScene {
     })
 
     // Container with an image + tip that rotates daily
-    const rotatingContainer = this.rexUI.add.sizer({
+    const dailyContainer = this.rexUI.add.sizer({
       orientation: 'vertical',
       space: {
-        item: Space.pad,
+        item: Space.padSmall,
       },
     })
 
@@ -412,16 +412,22 @@ export default class HomeScene extends BaseScene {
     const newsImageName = newsImages[dayOfWeek]
     const image = this.add.image(0, 0, `news-${newsImageName}`).setOrigin(0, 0)
 
-    rotatingContainer.add(image, { align: 'top' })
+    dailyContainer.add(image)
 
-    const tipText = this.add
-      .text(0, 0, getDailyHomeTip(), Style.basic)
-      .setWordWrapWidth(image.displayWidth)
+    const tipText = this.rexUI.add
+      .BBCodeText(0, 0, getDailyHomeTip(), {
+        ...BBStyle.description,
+        wrap: {
+          mode: 'word',
+          width: image.displayWidth - Space.pad,
+        },
+        fixedWidth: image.displayWidth,
+      })
       .setOrigin(0, 0)
-    rotatingContainer.add(tipText, { align: 'top' })
+    dailyContainer.add(tipText, { align: 'top' })
 
     // Add the image container to contentSizer
-    contentSizer.add(rotatingContainer, { align: 'top' })
+    contentSizer.add(dailyContainer, { align: 'top' })
 
     // Make news content as BBCode to have hoverable card names and links
     const text = this.rexUI.add
