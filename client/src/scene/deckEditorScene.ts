@@ -45,6 +45,14 @@ export default class DeckEditorScene extends BaseScene {
   private deckThumbnail: DeckThumbnail
   private orderedByCost = true
 
+  /** Root + left column for `onWindowResize` (explicit sizes like deck selector / catalog resize). */
+  private outerSizer: any = null
+  private leftSizer: any = null
+  /** Wrapping filter strip — must not use a horizontal `Sizer` (min width = sum of all controls). */
+  private filterHeaderSizer: any = null
+  private rosterHeaderHeight = 0
+  private rosterFooterHeight = 0
+
   constructor() {
     super({
       key: 'DeckEditorScene',
@@ -75,16 +83,15 @@ export default class DeckEditorScene extends BaseScene {
     // Left column: filter header (fixed) + catalog (expands). Catalog height must not include the
     // filter strip or rex layout overflows and the right roster column / scroll bounds break.
     this.catalogPanel = this.createCatalogPanel(catalogWidth, catalogBodyHeight)
-    const filterHeader = this.createFilterHeader(catalogWidth)
+    const filterHeader = this.createFilterHeader()
 
     const leftSizer = this.rexUI.add
       .sizer({
-        width: catalogWidth,
-        height: Space.windowHeight,
         orientation: 1,
       })
       .setOrigin(0)
-    leftSizer.add(filterHeader, { proportion: 0, expand: false })
+    // Full width of left column — must shrink with window (fixed-width filter bar blocked collapse).
+    leftSizer.add(filterHeader, { proportion: 0, expand: true })
     leftSizer.add(this.catalogPanel, { proportion: 1, expand: true })
 
     // Right column: background first, then deck content, then header/footer
@@ -99,10 +106,12 @@ export default class DeckEditorScene extends BaseScene {
     const rosterHeader = this.createRosterHeader()
     ;(rosterHeader as any).layout()
     const headerH = (rosterHeader as any).height as number
+    this.rosterHeaderHeight = headerH
 
     const rightPanel = this.createRightPanel()
     ;(rightPanel as any).layout()
     const rightPanelH = (rightPanel as any).height as number
+    this.rosterFooterHeight = rightPanelH
 
     this.rosterPanel = newScrollablePanel(this, {
       width: ROSTER_WIDTH,
@@ -119,29 +128,78 @@ export default class DeckEditorScene extends BaseScene {
     rosterColumn.add(this.rosterPanel, { proportion: 0 })
     rosterColumn.add(rightPanel, { proportion: 0 })
 
-    const outerSizer = this.rexUI.add
+    this.outerSizer = this.rexUI.add
       .sizer({
         width: Space.windowWidth,
         height: Space.windowHeight,
         orientation: 0,
       })
       .setOrigin(0)
-    outerSizer.add(leftSizer, { proportion: 1, expand: true })
-    outerSizer.add(rosterColumn, { proportion: 0, expand: true })
-    outerSizer.layout()
-    ;(this.plugins.get('rexAnchor') as any).add(outerSizer, {
+    this.leftSizer = leftSizer
+    this.outerSizer.add(leftSizer, { proportion: 1, expand: true })
+    this.outerSizer.add(rosterColumn, { proportion: 0, expand: true })
+    ;(this.plugins.get('rexAnchor') as any).add(this.outerSizer, {
       width: '100%',
       height: '100%',
-      onResizeCallback: (width: number, height: number, go: any) => {
-        go.setMinSize(width, height)
-        go.layout()
-      },
+      left: 'left',
+      top: 'top',
     })
+    this.outerSizer.layout()
 
     this.syncDeckThumbnail()
 
     //
     this.filterCatalog()
+  }
+
+  onWindowResize(): void {
+    if (!this.outerSizer || !this.leftSizer) return
+    const catalogW = Math.max(1, Space.windowWidth - ROSTER_WIDTH)
+    const rosterScrollH = Math.max(
+      1,
+      Space.windowHeight - this.rosterHeaderHeight - this.rosterFooterHeight,
+    )
+
+    // Filter bar wraps: measure at catalog width, then give remaining height to the card grid.
+    if (this.filterHeaderSizer) {
+      ;(this.filterHeaderSizer as any).runLayout?.(undefined, catalogW, undefined)
+    }
+    const filterH = Math.max(
+      deckFilterBarHeight(),
+      this.filterHeaderSizer?.height ?? deckFilterBarHeight(),
+    )
+    const catalogBodyH = Math.max(1, Space.windowHeight - filterH)
+
+    const catalogRatio = this.catalogPanel.t
+    this.catalogPanel.setMinSize(catalogW, catalogBodyH)
+    this.relayoutCatalogCardGrid(catalogW)
+    this.catalogPanel.layout()
+    this.catalogPanel.t = Math.min(0.999999, catalogRatio)
+
+    const rosterRatio = this.rosterPanel.t
+    this.rosterPanel.setMinSize(ROSTER_WIDTH, rosterScrollH).layout()
+    this.rosterPanel.t = Math.min(0.999999, rosterRatio)
+
+    this.leftSizer.setMinSize(catalogW, Space.windowHeight).layout()
+
+    this.outerSizer.setMinSize(Space.windowWidth, Space.windowHeight)
+    this.outerSizer.layout()
+  }
+
+  /**
+   * Nested `FixWidthSizer` may not re-run `runWidthWrap` when sized as a non-topmost child, so
+   * column count can stick (e.g. ~4 cards wide). Topmost `runLayout` recomputes `wrapResult`.
+   */
+  private relayoutCatalogCardGrid(innerWidth: number): void {
+    const panel = this.catalogPanelSizer as any
+    panel.wrapResult = undefined
+    if (panel.rexSizer) panel.rexSizer.resolved = false
+    panel._maxChildWidth = undefined
+    panel._maxChildHeight = undefined
+    panel._childrenWidth = undefined
+    panel._childrenHeight = undefined
+    panel.setDirty?.(true)
+    panel.runLayout?.(undefined, innerWidth, undefined)
   }
 
   /** Ensure `UserSettings.decks[this.deckIndex]` exists so loading/saving never no-op on a stale index. */
@@ -222,23 +280,23 @@ export default class DeckEditorScene extends BaseScene {
     return scrollable
   }
 
-  private createFilterHeader(width = Space.windowWidth): any {
+  /** Wrapping strip so min width ≈ widest control, not the full row (horizontal `Sizer` sums widths). */
+  private createFilterHeader(): any {
     const background = this.add
-      .rectangle(0, 0, width, 1, Color.backgroundLight)
+      .rectangle(0, 0, 1, 1, Color.backgroundLight)
       .setInteractive()
     this.addShadow(background, -90)
 
     const sizer = this.rexUI.add
-      .sizer({
-        width,
-        height: deckFilterBarHeight(),
-        orientation: 0,
+      .fixWidthSizer({
+        align: 'left',
         space: {
           left: Space.pad,
           right: Space.pad,
           top: Space.padSmall,
           bottom: Space.padSmall,
           item: Space.pad,
+          line: Space.pad,
         },
       } as any)
       .addBackground(background)
@@ -263,12 +321,40 @@ export default class DeckEditorScene extends BaseScene {
         })
       },
     })
-    sizer.add(backContainer, { align: 'center' })
+    sizer.add(backContainer)
 
-    sizer.add(this.createSearchText(), { align: 'center' })
-    sizer.add(this.createCostFilterButtons(), { align: 'center' })
-    sizer.add(this.createSortButton(), { align: 'center' })
+    sizer.add(this.createSearchText())
 
+    this.costFilterBtns = []
+    for (let i = 0; i <= MAX_COST_FILTER; i++) {
+      const container = new ContainerLite(this, 0, 0, 41, Space.buttonHeight)
+      sizer.add(container)
+      const label = i === MAX_COST_FILTER ? '7+' : i.toString()
+      const btn = new UButton(container, 0, 0, label)
+      btn.setOnClick(this.onClickCostFilter(i))
+      if (this.filterCostAry[i]) {
+        btn.toggle()
+      }
+      this.costFilterBtns.push(btn)
+    }
+
+    const clearContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonHeight,
+      Space.buttonHeight,
+    )
+    new Buttons.Icon({
+      name: 'SmallX',
+      within: clearContainer,
+      f: this.onClearFilters(),
+    })
+    sizer.add(clearContainer)
+
+    sizer.add(this.createSortButton())
+
+    this.filterHeaderSizer = sizer
     return sizer
   }
 
@@ -299,40 +385,6 @@ export default class DeckEditorScene extends BaseScene {
       })
     container.add([this.searchObj, this.add.image(0, 0, 'icon-InputText')])
     return container
-  }
-
-  private createCostFilterButtons(): any {
-    const row = this.rexUI.add.sizer({
-      space: { item: Space.padSmall },
-    })
-    const buttonsSizer = this.rexUI.add.sizer()
-    row.add(buttonsSizer)
-    this.costFilterBtns = []
-    for (let i = 0; i <= MAX_COST_FILTER; i++) {
-      const container = new ContainerLite(this, 0, 0, 41, Space.buttonHeight)
-      buttonsSizer.add(container)
-      const label = i === MAX_COST_FILTER ? '7+' : i.toString()
-      const btn = new UButton(container, 0, 0, label)
-      btn.setOnClick(this.onClickCostFilter(i))
-      if (this.filterCostAry[i]) {
-        btn.toggle()
-      }
-      this.costFilterBtns.push(btn)
-    }
-    const clearContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonHeight,
-      Space.buttonHeight,
-    )
-    new Buttons.Icon({
-      name: 'SmallX',
-      within: clearContainer,
-      f: this.onClearFilters(),
-    })
-    row.add(clearContainer)
-    return row
   }
 
   private onClickCostFilter(thisI: number): () => void {
