@@ -48,8 +48,17 @@ export default class Catalog {
   static getCard(s: string): Card {
     return allCards.find((c) => c.name === s)
   }
+
+  // Get a single card by its id (Might be undefined)
   static getCardById(id: number): Card {
     return allCards.find((c) => c.id === id)
+  }
+
+  // Get a list of cards by their ids, filtering out any invalid
+  static getCardListByIds(ids: number[]): Card[] {
+    return ids
+      .map((id) => Catalog.getCardById(id))
+      .filter((c): c is Card => c != null)
   }
 
   // Get all card names that are referenced in a given card's text

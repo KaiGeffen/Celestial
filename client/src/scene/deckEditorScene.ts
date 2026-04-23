@@ -78,7 +78,7 @@ export default class DeckEditorScene extends BaseScene {
       deckIndex: this.deckIndex,
       deckName: this.deckName,
       cosmeticSet: this.cosmeticSet,
-      deckCards: this.cardsFromDeckIds(deck.cards),
+      deckCards: Catalog.getCardListByIds(deck.cards),
       mustOwnCardsInList: Flags.devCardsEnabled ? false : true,
       createCutoutInteraction: () => this.onClickCutout(),
       onDeckNameClick: () => this.openDeckNameMenu(),
@@ -173,7 +173,8 @@ export default class DeckEditorScene extends BaseScene {
 
         // TODO If copy/paste is removed, this is no longer needed
         if (deckCode && deckCode.length > 0) {
-          this.setDeck(this.cardsFromDeckIds(deckCode))
+          const cards = Catalog.getCardListByIds(deckCode)
+          this.setDeck(cards)
         }
 
         // Ensure the thumbnail is updated
@@ -276,7 +277,6 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   // TODO STILL TO READ
-
   onWindowResize(): void {
     return
     if (!this.sizer || !this.catalogRegion || !this.deckRegion) return
@@ -292,12 +292,6 @@ export default class DeckEditorScene extends BaseScene {
 
     this.sizer.setMinSize(Space.windowWidth, Space.windowHeight)
     this.sizer.layout()
-  }
-
-  private cardsFromDeckIds(ids: number[]): Card[] {
-    return ids
-      .map((id) => Catalog.getCardById(id))
-      .filter((c): c is Card => c != null)
   }
 
   // TODO Removed? Is this used at all?
