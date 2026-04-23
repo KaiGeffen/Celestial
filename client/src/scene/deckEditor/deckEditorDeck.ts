@@ -154,12 +154,8 @@ export class DeckEditorDeck {
       .addBackground(bg)
 
     // Create the thumbnail
-    // TODO Allow for default args
     this.deckThumbnail = new DeckThumbnail({
       scene: this.scene,
-      name: '',
-      cosmeticSet: { avatar: 0, border: 0, cardback: 0 },
-      isValid: true,
       onClick: () => this.opts.onDeckNameClick(),
     })
 

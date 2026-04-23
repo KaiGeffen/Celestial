@@ -21,12 +21,19 @@ export default class DeckThumbnail {
 
   constructor(opts: {
     scene: BaseScene
-    name: string
-    cosmeticSet: CosmeticSet
-    isValid: boolean
     onClick: () => void
+    name?: string
+    cosmeticSet?: CosmeticSet
+    isValid?: boolean
   }) {
-    const { scene } = opts
+    const { scene, onClick } = opts
+    const name = opts.name ?? ''
+    const cosmeticSet = opts.cosmeticSet ?? {
+      avatar: 0,
+      border: 0,
+      cardback: 0,
+    }
+    const isValid = opts.isValid ?? true
     this.scene = scene
 
     // Standard size for all deck thumbnails (85% of the previous tile width)
@@ -39,7 +46,7 @@ export default class DeckThumbnail {
     // CARD BACK – top-left, using the deck's equipped cardback
     const angleFirst = -3
     const angleStepDeg = 3
-    const cardbackId = opts.cosmeticSet.cardback ?? 0
+    const cardbackId = cosmeticSet.cardback ?? 0
     const cardbackName = cardbackNames[cardbackId] ?? 'Default'
     for (let i = 3; i >= 0; i--) {
       const cardBack = scene.add
@@ -54,8 +61,8 @@ export default class DeckThumbnail {
     // AVATAR – top-right
     this.avatarButton = new Buttons.Avatar({
       within: this.container,
-      avatarId: opts.cosmeticSet?.avatar ?? 0,
-      border: opts.cosmeticSet?.border ?? 0,
+      avatarId: cosmeticSet.avatar ?? 0,
+      border: cosmeticSet.border ?? 0,
       muteClick: true,
       x: Space.avatarSize / 4,
       y: -10,
@@ -64,7 +71,7 @@ export default class DeckThumbnail {
     // DECK NAME – full width of the thumbnail
     const nameBarWidth = width
     const nameBarY = height / 2 - Space.buttonHeight / 2
-    this.isValid = opts.isValid
+    this.isValid = isValid
     this.nameBackground = scene.add
       .rectangle(
         0,
@@ -90,7 +97,7 @@ export default class DeckThumbnail {
       .setInteractive({ useHandCursor: true })
       .on('pointerdown', () => {
         scene.sound.play('click')
-        opts.onClick()
+        onClick()
       })
       .on('pointerover', () => {
         if (!this.selected) {
@@ -111,12 +118,12 @@ export default class DeckThumbnail {
     this.container.add(hitbox)
 
     this.nameText = scene.add
-      .text(0, nameBarY, opts.name, (Style as any).deckName ?? Style.builder)
+      .text(0, nameBarY, name, (Style as any).deckName ?? Style.builder)
       .setOrigin(0.5, 0.5)
     this.container.add(this.nameText)
 
     // If deck invalid, slightly grey out the name bar (no extra objects)
-    if (!opts.isValid) {
+    if (!isValid) {
       this.nameBackground.setFillStyle(Color.cardGreyed)
     }
   }
