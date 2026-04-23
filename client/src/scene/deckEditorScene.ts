@@ -162,16 +162,21 @@ export default class DeckEditorScene extends BaseScene {
     // Open the styles menu
     this.scene.launch('MenuScene', {
       menu: 'editDeck',
+      // When confirming, set the values for this scene with the new selected values
       callback: (
         name: string,
         cosmeticSet: CosmeticSet,
         deckCode: number[],
       ) => {
-        this.setCosmeticSet(cosmeticSet)
+        this.cosmeticSet = cosmeticSet
         this.deckName = name
+
+        // TODO If copy/paste is removed, this is no longer needed
         if (deckCode && deckCode.length > 0) {
           this.setDeck(this.cardsFromDeckIds(deckCode))
         }
+
+        // Ensure the thumbnail is updated
         this.syncDeckThumbnail()
       },
       deckName: deck.name,
@@ -180,6 +185,28 @@ export default class DeckEditorScene extends BaseScene {
       deckCode: this.getDeckCode(),
       activeScene: this,
     })
+  }
+
+  private onClickCutout(): (cutout: Cutout) => () => void {
+    return (cutout: Cutout) => {
+      return () => {
+        const pointer = this.input.activePointer
+        if (pointer.rightButtonDown()) {
+          this.addCardToDeck(cutout.card)
+        } else {
+          // Remove 1 of the card
+          const fullyRemoved = this.deckRegion.decklist.removeCard(cutout.card)
+
+          // If no more of the card exists, update the layout
+          if (fullyRemoved) {
+            this.deckRegion.layoutDecklist()
+          }
+
+          // Update the thumbnail
+          this.syncDeckThumbnail()
+        }
+      }
+    }
   }
 
   // Persist current version of deck into UserSettings
@@ -208,6 +235,23 @@ export default class DeckEditorScene extends BaseScene {
     return this.deckRegion.decklist.getDeckCode()
   }
 
+  // Ensure there is a deck at this index in users account (Fill with default cosmetics if not)
+  private ensureDeckAtIndex(): void {
+    const decks: Deck[] = [...(UserSettings._get('decks') || [])]
+    if (decks[this.deckIndex]) return
+
+    // Push enough decks for there to be one at the given index
+    while (decks.length <= this.deckIndex) {
+      decks.push({
+        name: `Deck ${decks.length + 1}`,
+        cards: [],
+        cosmeticSet: Server.getUserData().cosmeticSet,
+      })
+    }
+
+    UserSettings._set('decks', decks)
+  }
+
   // TODO STILL TO READ
 
   onWindowResize(): void {
@@ -227,31 +271,10 @@ export default class DeckEditorScene extends BaseScene {
     this.sizer.layout()
   }
 
-  /** Ensure `UserSettings.decks[this.deckIndex]` exists so loading/saving never no-op on a stale index. */
-  private ensureDeckAtIndex(): void {
-    const decks: Deck[] = [...(UserSettings._get('decks') || [])]
-    if (decks[this.deckIndex]) return
-
-    // Push enough decks for there to be one at the given index
-    while (decks.length <= this.deckIndex) {
-      decks.push({
-        name: `Deck ${decks.length + 1}`,
-        cards: [],
-        cosmeticSet: Server.getUserData().cosmeticSet,
-      })
-    }
-
-    UserSettings._set('decks', decks)
-  }
-
   private cardsFromDeckIds(ids: number[]): Card[] {
     return ids
       .map((id) => Catalog.getCardById(id))
       .filter((c): c is Card => c != null)
-  }
-
-  private removeCardFromDeck(card: Card): boolean {
-    return this.deckRegion.decklist.removeCard(card)
   }
 
   updateSavedDeck(
@@ -293,28 +316,5 @@ export default class DeckEditorScene extends BaseScene {
       Flags.devCardsEnabled ? false : true,
     )
     this.deckRegion.scrollDecklistToTop()
-  }
-
-  setCosmeticSet(set: CosmeticSet): void {
-    this.cosmeticSet = set ?? { avatar: 0, border: 0, cardback: 0 }
-  }
-
-  private onClickCutout(): (cutout: Cutout) => () => void {
-    return (cutout: Cutout) => {
-      return () => {
-        const pointer = this.input.activePointer
-        if (pointer.rightButtonDown()) {
-          this.addCardToDeck(cutout.card)
-        } else {
-          const fullyRemoved = this.removeCardFromDeck(cutout.card)
-          if (fullyRemoved) {
-            this.deckRegion.layoutDecklist()
-            const panel = this.deckRegion.scrollPanel
-            panel.t = Math.min(0.999999, panel.t)
-          }
-          this.syncDeckThumbnail()
-        }
-      }
-    }
   }
 }

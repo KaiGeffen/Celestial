@@ -69,8 +69,7 @@ export class DeckEditorDeck {
 
     this.scrollPanel = newScrollablePanel(scene, {
       width: this.deckWidth,
-      height:
-        Space.windowHeight - this.headerHeight - this.footerHeight,
+      height: Space.windowHeight - this.headerHeight - this.footerHeight,
       background: deckBg,
       panel: { child: this.decklist.sizer },
       scrollMode: 'y',
@@ -107,6 +106,10 @@ export class DeckEditorDeck {
   }
 
   layoutDecklist(): void {
+    // Ensure the panel is within scroll bounds
+    const panel = this.scrollPanel
+    panel.t = Math.min(0.999999, panel.t)
+
     this.scrollPanel.layout()
   }
 
