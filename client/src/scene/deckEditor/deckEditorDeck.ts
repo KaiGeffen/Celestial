@@ -9,7 +9,7 @@ import Cutout from '../../lib/buttons/cutout'
 import Buttons from '../../lib/buttons/buttons'
 import DeckThumbnail from '../../lib/deckThumbnail'
 import Decklist from '../../lib/decklist'
-import { Color, Space, UserSettings } from '../../settings/settings'
+import { Color, Space } from '../../settings/settings'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import Card from '../../../../shared/state/card'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
@@ -19,7 +19,6 @@ import { rexUi } from './rexUi'
 
 /** Props for the deck editor right column — initial list + thumbnails + actions by callback. */
 export type DeckEditorDeckOptions = {
-  deckIndex: number
   deckName: string
   cosmeticSet: CosmeticSet
   deckCards: Card[]
@@ -135,19 +134,15 @@ export class DeckEditorDeck {
     this.scrollPanel.layout()
   }
 
-  /**
-   * Deck name tile + share — “valid” reflects last *saved* deck length in settings,
-   * until `syncThumbnail` applies the live draft from the scene.
-   */
+  // Deck thumbnail and share button
   private createHeader(): FixWidthSizer {
-    const scene = this.scene
-    const ui = rexUi(scene)
-    const backdrop = scene.add
+    const bg = this.scene.add
       .rectangle(0, 0, 1, 1, Color.backgroundDark)
       .setInteractive()
-    scene.addShadow(backdrop, -90)
+    this.scene.addShadow(bg, -90)
 
-    const outer = ui.add
+    // Sizer with custom space to get thumbnail to line up with cutout edge
+    const sizer = this.scene.rexUI.add
       .fixWidthSizer({
         width: this.deckWidth,
         space: {
@@ -157,25 +152,25 @@ export class DeckEditorDeck {
         },
         align: 'left',
       })
-      .addBackground(backdrop)
+      .addBackground(bg)
 
-    const decks = UserSettings._get('decks') || []
-    const savedDeck = decks[this.opts.deckIndex]
-    const savedLen = savedDeck?.cards?.length ?? 0
-    const thumbnailShowsSavedValid = savedLen === MechanicsSettings.DECK_SIZE
-
+    // Create the thumbnail
+    // TODO Allow for default args
     this.deckThumbnail = new DeckThumbnail({
-      scene,
-      name: this.opts.deckName,
-      cosmeticSet: this.opts.cosmeticSet,
-      cardback: this.opts.cosmeticSet.cardback ?? 0,
-      isValid: thumbnailShowsSavedValid,
+      scene: this.scene,
+      name: '',
+      cosmeticSet: { avatar: 0, border: 0, cardback: 0 },
+      // TODO Why is this a separate arg from cosmeticSet?
+      cardback: 0,
+      isValid: true,
       onClick: () => this.opts.onDeckNameClick(),
+      // TODO Remove this functionality
       tuckHeaderArt: true,
     })
 
+    // Create the share button
     const shareWrap = new ContainerLite(
-      scene,
+      this.scene,
       0,
       0,
       Space.buttonWidth / 3,
@@ -184,25 +179,31 @@ export class DeckEditorDeck {
     new Buttons.Icon({
       name: 'Share',
       within: shareWrap,
-      x: 0,
-      y: 0,
       f: () => this.opts.onShareDeckCode(),
       hint: 'Export deck-code',
     })
 
-    const thumbRow = ui.add
-      .sizer({
-        orientation: 0,
-        space: { item: Space.padSmall },
-      } as any)
-      .add(this.deckThumbnail.container, { align: 'center' })
-      .add(shareWrap, { align: 'center' })
+    // TODO A bit sus, this is a sizer inside the above sizer
+    const subSizer = this.scene.rexUI.add
+      .sizer()
+      .add(this.deckThumbnail.container)
+      .add(shareWrap)
 
-    outer.add(thumbRow)
-    return outer
+    sizer.add(subSizer)
+
+    // Populate the thumbnail with the current set
+    this.syncThumbnail({
+      name: this.opts.deckName,
+      cosmeticSet: this.opts.cosmeticSet,
+      cardback: this.opts.cosmeticSet.cardback ?? 0,
+      isValid:
+        this.decklist.getDeckCode().length === MechanicsSettings.DECK_SIZE,
+    })
+
+    return sizer
   }
 
-  /** Save / Cosmetics column + Play — actions forward to scene via opts. */
+  // Buttons
   private createFooter(): RexUIPlugin.Sizer {
     const scene = this.scene
     const ui = rexUi(scene)

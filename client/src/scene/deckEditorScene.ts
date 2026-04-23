@@ -59,9 +59,6 @@ export default class DeckEditorScene extends BaseScene {
     // Create the elements of the scene
     this.createElements(deck)
     this.sizer.layout()
-
-    // Ensure the deck thumbnail is properly displayed
-    this.syncDeckThumbnail()
   }
 
   private createElements(deck: Deck): void {
@@ -74,7 +71,6 @@ export default class DeckEditorScene extends BaseScene {
 
     // Deck region
     this.deckRegion = new DeckEditorDeck(this, {
-      deckIndex: this.deckIndex,
       deckName: this.deckName,
       cosmeticSet: this.cosmeticSet,
       deckCards: Catalog.getCardListByIds(deck.cards),
