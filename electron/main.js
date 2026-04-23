@@ -50,7 +50,7 @@ function getClientPath() {
 function startServer(clientPath) {
   return new Promise((resolve, reject) => {
     const server = http.createServer((req, res) => {
-      const urlPath = req.url.split('?')[0]
+      const urlPath = decodeURIComponent(req.url.split('?')[0])
       const filePath = path.join(clientPath, urlPath === '/' ? 'index.html' : urlPath)
 
       fs.readFile(filePath, (err, data) => {
