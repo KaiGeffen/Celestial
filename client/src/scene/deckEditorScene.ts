@@ -17,11 +17,11 @@ import { encodeShareableDeckCode } from '../../../shared/codec'
 
 import Server from '../server'
 import { DeckEditorCatalog } from './deckEditor/deckEditorCatalog'
-import { DeckEditorRoster } from './deckEditor/deckEditorRoster'
-import { DECK_EDITOR_ROSTER_WIDTH } from './deckEditor/constants'
+import { DeckEditorDeck } from './deckEditor/deckEditorDeck'
+import { DECK_EDITOR_DECK_WIDTH } from './deckEditor/constants'
 
 export type { DeckEditorCatalogOptions } from './deckEditor/deckEditorCatalog'
-export type { DeckEditorRosterOptions } from './deckEditor/deckEditorRoster'
+export type { DeckEditorDeckOptions } from './deckEditor/deckEditorDeck'
 
 export default class DeckEditorScene extends BaseScene {
   // Currently selected deck index
@@ -35,7 +35,7 @@ export default class DeckEditorScene extends BaseScene {
 
   // Regions
   private catalog: DeckEditorCatalog
-  private roster: DeckEditorRoster
+  private deck: DeckEditorDeck
 
   // TODO Type this
   private sizer: any = null
@@ -55,8 +55,6 @@ export default class DeckEditorScene extends BaseScene {
     // Ensure there is a deck at this index
     this.ensureDeckAtIndex()
 
-    //
-    const preferredCosmetics = Server.getUserData().cosmeticSet
     const decks = UserSettings._get('decks')
     const deck: Deck = decks[this.deckIndex]
 
@@ -75,8 +73,8 @@ export default class DeckEditorScene extends BaseScene {
   private createElements(deck: Deck): void {
     this.createBackground()
 
-    const rosterW = DECK_EDITOR_ROSTER_WIDTH
-    const catalogWidth = Space.windowWidth - rosterW
+    const deckColW = DECK_EDITOR_DECK_WIDTH
+    const catalogWidth = Space.windowWidth - deckColW
     const filterBarH = deckFilterBarHeight()
     const catalogBodyHeight = Space.windowHeight - filterBarH
 
@@ -94,8 +92,8 @@ export default class DeckEditorScene extends BaseScene {
       onCardPick: (card) => this.addCardToDeck(card),
     })
 
-    this.roster = new DeckEditorRoster(this, {
-      rosterWidth: rosterW,
+    this.deck = new DeckEditorDeck(this, {
+      deckWidth: deckColW,
       deckIndex: this.deckIndex,
       deckName: this.deckName,
       cosmeticSet: this.cosmeticSet,
@@ -116,6 +114,7 @@ export default class DeckEditorScene extends BaseScene {
       },
     })
 
+    // Make the main sizer
     this.sizer = this.rexUI.add
       .sizer({
         width: Space.windowWidth,
@@ -124,7 +123,7 @@ export default class DeckEditorScene extends BaseScene {
       })
       .setOrigin(0)
     this.sizer.add(this.catalog.columnSizer, { proportion: 1, expand: true })
-    this.sizer.add(this.roster.columnSizer, { proportion: 0, expand: true })
+    this.sizer.add(this.deck.columnSizer, { proportion: 0, expand: true })
     ;(this.plugins.get('rexAnchor') as any).add(this.sizer, {
       width: '100%',
       height: '100%',
@@ -134,12 +133,12 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   onWindowResize(): void {
-    if (!this.sizer || !this.catalog || !this.roster) return
+    if (!this.sizer || !this.catalog || !this.deck) return
 
-    const catalogW = Math.max(1, Space.windowWidth - DECK_EDITOR_ROSTER_WIDTH)
+    const catalogW = Math.max(1, Space.windowWidth - DECK_EDITOR_DECK_WIDTH)
 
     this.catalog.resize(catalogW, Space.windowHeight)
-    this.roster.resizeScrollArea(Space.windowHeight)
+    this.deck.resizeScrollArea(Space.windowHeight)
 
     this.catalog.columnSizer.setMinSize(catalogW, Space.windowHeight).layout()
 
@@ -179,17 +178,17 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   addCardToDeck(card: Card): void {
-    this.roster!.decklist.addCard(card)
-    this.roster!.layoutDecklist()
+    this.deck!.decklist.addCard(card)
+    this.deck!.layoutDecklist()
     this.syncDeckThumbnail()
   }
 
   private removeCardFromDeck(card: Card): boolean {
-    return this.roster!.decklist.removeCard(card)
+    return this.deck!.decklist.removeCard(card)
   }
 
   getDeckCode(): number[] {
-    return this.roster!.decklist.getDeckCode()
+    return this.deck!.decklist.getDeckCode()
   }
 
   updateSavedDeck(
@@ -217,7 +216,7 @@ export default class DeckEditorScene extends BaseScene {
 
   private syncDeckThumbnail(): void {
     const isValid = this.getDeckCode().length === MechanicsSettings.DECK_SIZE
-    this.roster?.syncThumbnail({
+    this.deck?.syncThumbnail({
       name: this.deckName,
       cosmeticSet: this.cosmeticSet,
       cardback: this.cosmeticSet.cardback ?? 0,
@@ -226,8 +225,8 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   setDeck(cards: Card[]): void {
-    this.roster!.decklist.setDeck(cards, Flags.devCardsEnabled ? false : true)
-    this.roster!.scrollDecklistToTop()
+    this.deck!.decklist.setDeck(cards, Flags.devCardsEnabled ? false : true)
+    this.deck!.scrollDecklistToTop()
   }
 
   setCosmeticSet(set: CosmeticSet): void {
@@ -243,8 +242,8 @@ export default class DeckEditorScene extends BaseScene {
         } else {
           const fullyRemoved = this.removeCardFromDeck(cutout.card)
           if (fullyRemoved) {
-            this.roster!.layoutDecklist()
-            const panel = this.roster!.scrollPanel
+            this.deck!.layoutDecklist()
+            const panel = this.deck!.scrollPanel
             panel.t = Math.min(0.999999, panel.t)
           }
           this.syncDeckThumbnail()

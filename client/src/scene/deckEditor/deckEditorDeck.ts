@@ -13,11 +13,11 @@ import newScrollablePanel from '../../lib/scrollablePanel'
 import Card from '../../../../shared/state/card'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import { MechanicsSettings } from '../../../../shared/settings'
-import { DECK_EDITOR_ROSTER_WIDTH } from './constants'
+import { DECK_EDITOR_DECK_WIDTH } from './constants'
 import { rexUi } from './rexUi'
 
-export type DeckEditorRosterOptions = {
-  rosterWidth?: number
+export type DeckEditorDeckOptions = {
+  deckWidth?: number
   deckIndex: number
   deckName: string
   cosmeticSet: CosmeticSet
@@ -35,9 +35,9 @@ export type DeckEditorRosterOptions = {
 }
 
 /** Right column: deck thumbnail header, scrolling decklist, Save / Cosmetics / Play. */
-export class DeckEditorRoster {
+export class DeckEditorDeck {
   readonly scene: BaseScene
-  readonly rosterWidth: number
+  readonly deckWidth: number
 
   readonly decklist: Decklist
   readonly scrollPanel: ScrollablePanel
@@ -49,53 +49,53 @@ export class DeckEditorRoster {
 
   readonly columnSizer: any
 
-  private readonly opts: DeckEditorRosterOptions
+  private readonly opts: DeckEditorDeckOptions
 
-  constructor(scene: BaseScene, opts: DeckEditorRosterOptions) {
+  constructor(scene: BaseScene, opts: DeckEditorDeckOptions) {
     this.scene = scene
     this.opts = opts
-    this.rosterWidth = opts.rosterWidth ?? DECK_EDITOR_ROSTER_WIDTH
+    this.deckWidth = opts.deckWidth ?? DECK_EDITOR_DECK_WIDTH
 
-    const rosterBg = scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
+    const deckBg = scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
     this.decklist = new Decklist(scene, opts.createCutoutInteraction())
     this.decklist.setDeck(opts.deckCards, opts.mustOwnCardsInList)
 
-    const rosterHeader = this.buildHeader()
-    ;(rosterHeader as any).layout()
-    this.headerHeight = (rosterHeader as any).height as number
+    const deckHeader = this.buildHeader()
+    ;(deckHeader as any).layout()
+    this.headerHeight = (deckHeader as any).height as number
 
     const footer = this.buildFooter()
     ;(footer as any).layout()
     this.footerHeight = (footer as any).height as number
 
     this.scrollPanel = newScrollablePanel(scene, {
-      width: this.rosterWidth,
+      width: this.deckWidth,
       height:
         Space.windowHeight - this.headerHeight - this.footerHeight,
-      background: rosterBg,
+      background: deckBg,
       panel: { child: this.decklist.sizer },
       scrollMode: 'y',
     }).setOrigin(0)
 
     const ui = rexUi(scene)
-    const rosterColumn = ui.add
-      .sizer({ width: this.rosterWidth, orientation: 1 })
+    const deckColumn = ui.add
+      .sizer({ width: this.deckWidth, orientation: 1 })
       .setOrigin(0)
-    rosterColumn.add(rosterHeader, { proportion: 0 })
-    rosterColumn.add(this.scrollPanel, { proportion: 0 })
-    rosterColumn.add(footer, { proportion: 0 })
+    deckColumn.add(deckHeader, { proportion: 0 })
+    deckColumn.add(this.scrollPanel, { proportion: 0 })
+    deckColumn.add(footer, { proportion: 0 })
 
-    this.columnSizer = rosterColumn
+    this.columnSizer = deckColumn
   }
 
   resizeScrollArea(windowHeight: number): void {
-    const rosterScrollH = Math.max(
+    const deckScrollH = Math.max(
       1,
       windowHeight - this.headerHeight - this.footerHeight,
     )
-    const rosterRatio = this.scrollPanel.t
-    this.scrollPanel.setMinSize(this.rosterWidth, rosterScrollH).layout()
-    this.scrollPanel.t = Math.min(0.999999, rosterRatio)
+    const deckRatio = this.scrollPanel.t
+    this.scrollPanel.setMinSize(this.deckWidth, deckScrollH).layout()
+    this.scrollPanel.t = Math.min(0.999999, deckRatio)
   }
 
   syncThumbnail(args: {
@@ -126,7 +126,7 @@ export class DeckEditorRoster {
     scene.addShadow(background, -90)
     const sizer = ui.add
       .fixWidthSizer({
-        width: this.rosterWidth,
+        width: this.deckWidth,
         space: {
           top: Space.pad,
           bottom: Space.pad,
@@ -183,13 +183,13 @@ export class DeckEditorRoster {
   private buildFooter(): any {
     const scene = this.scene
     const ui = rexUi(scene)
-    const rosterWidth = this.rosterWidth
+    const deckWidth = this.deckWidth
     const background = scene.add
-      .rectangle(0, 0, rosterWidth, 1, Color.backgroundLight)
+      .rectangle(0, 0, deckWidth, 1, Color.backgroundLight)
       .setInteractive()
     const sizer = ui.add
       .sizer({
-        width: rosterWidth,
+        width: deckWidth,
         orientation: 1,
         space: {
           left: Space.pad,
