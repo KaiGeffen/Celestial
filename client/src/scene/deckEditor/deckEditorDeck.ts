@@ -15,7 +15,6 @@ import Card from '../../../../shared/state/card'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { DECK_EDITOR_DECK_WIDTH } from './constants'
-import { rexUi } from './rexUi'
 
 /** Props for the deck editor right column — initial list + thumbnails + actions by callback. */
 export type DeckEditorDeckOptions = {
@@ -37,7 +36,6 @@ export type DeckEditorDeckOptions = {
  */
 export class DeckEditorDeck {
   readonly scene: BaseScene
-  readonly deckWidth: number
 
   readonly decklist: Decklist
   readonly scrollPanel: ScrollablePanel
@@ -54,7 +52,6 @@ export class DeckEditorDeck {
   constructor(scene: BaseScene, opts: DeckEditorDeckOptions) {
     this.scene = scene
     this.opts = opts
-    this.deckWidth = DECK_EDITOR_DECK_WIDTH
 
     // Contents of scroll panel (Lowest depth)
     const bgScroll = scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
@@ -75,15 +72,14 @@ export class DeckEditorDeck {
 
     // Create the scroll panel
     this.scrollPanel = newScrollablePanel(scene, {
-      width: this.deckWidth,
       height: scrollBodyH,
       background: bgScroll,
       panel: { child: this.decklist.sizer },
     })
 
     // Create the sizer
-    this.columnSizer = rexUi(scene)
-      .add.sizer({
+    this.columnSizer = this.scene.rexUI.add
+      .sizer({
         orientation: 1,
       })
       .add(headerSizer)
@@ -107,7 +103,7 @@ export class DeckEditorDeck {
       1,
       Space.windowHeight - this.headerHeight - this.footerHeight,
     )
-    this.scrollPanel.setMinSize(this.deckWidth, scrollH)
+    this.scrollPanel.setMinSize(DECK_EDITOR_DECK_WIDTH, scrollH)
 
     // Reset scroll
     this.scrollPanel.t = 0
@@ -158,7 +154,7 @@ export class DeckEditorDeck {
     // Sizer with custom space to get thumbnail to line up with cutout edge
     const sizer = this.scene.rexUI.add
       .fixWidthSizer({
-        width: this.deckWidth,
+        width: DECK_EDITOR_DECK_WIDTH,
         space: {
           top: Space.pad,
           bottom: Space.pad,

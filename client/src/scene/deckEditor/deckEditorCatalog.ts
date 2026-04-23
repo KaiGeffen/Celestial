@@ -23,7 +23,6 @@ import {
   DECK_EDITOR_MAX_COST_FILTER,
 } from './constants'
 import { cardPassesDeckEditorFilters } from './cardSearchFilter'
-import { rexUi } from './rexUi'
 
 export type DeckEditorCatalogOptions = {
   onCardPick: (card: Card) => void
@@ -61,7 +60,7 @@ export class DeckEditorCatalog {
       Space.windowHeight - deckFilterBarHeight(),
     )
 
-    const ui = rexUi(scene)
+    const ui = this.scene.rexUI
     const panel = ui.add.fixWidthSizer({
       space: {
         left: Space.pad,
@@ -156,7 +155,7 @@ export class DeckEditorCatalog {
       .setInteractive()
     scene.addShadow(background, -90)
 
-    const ui = rexUi(scene)
+    const ui = this.scene.rexUI
     const row = ui.add
       .sizer({
         orientation: 0,
