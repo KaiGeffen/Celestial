@@ -77,7 +77,6 @@ export default class DeckEditorScene extends BaseScene {
       mustOwnCardsInList: Flags.devCardsEnabled ? false : true,
       createCutoutInteraction: () => this.onClickCutout(),
       onDeckNameClick: () => this.openDeckNameMenu(),
-      onShareDeckCode: () => this.copyDeckCodeToClipboard(),
       onSave: () => {
         this.saveCurrentDeck()
         this.scene.start('DeckSelectorScene')
@@ -130,21 +129,6 @@ export default class DeckEditorScene extends BaseScene {
       },
       activeScene: this,
     })
-  }
-
-  private copyDeckCodeToClipboard(): void {
-    const deckCode = this.getDeckCode()
-    const encodedDeck = encodeShareableDeckCode(deckCode)
-
-    // Write to clipboard
-    navigator.clipboard.writeText(encodedDeck)
-
-    // Local uses a different format
-    if (Flags.local) {
-      navigator.clipboard.writeText(deckCode.toString())
-    }
-
-    this.showMessage('Deck code copied to clipboard.')
   }
 
   private openStylesMenu(): void {

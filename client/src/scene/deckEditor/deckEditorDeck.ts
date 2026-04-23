@@ -24,14 +24,13 @@ export type DeckEditorDeckOptions = {
   mustOwnCardsInList: boolean
   createCutoutInteraction: () => (cutout: Cutout) => () => void
   onDeckNameClick: () => void
-  onShareDeckCode: () => void
   onSave: () => void
   onCosmetics: () => void
   onPlay: () => void
 }
 
 /**
- * Deck editor right column: thumbnail + share row, scrolling decklist, footer actions.
+ * Deck editor right column: thumbnail, scrolling decklist, footer actions.
  * Rex child order: header → scroll panel → footer (fixed heights on header/footer).
  */
 export class DeckEditorDeck {
@@ -129,7 +128,6 @@ export class DeckEditorDeck {
     this.scrollPanel.layout()
   }
 
-  // Deck thumbnail and share button
   private createHeader(): FixWidthSizer {
     const bg = this.scene.add
       .rectangle(0, 0, 1, 1, Color.backgroundDark)
@@ -142,15 +140,6 @@ export class DeckEditorDeck {
       onClick: () => this.opts.onDeckNameClick(),
     })
 
-    // Create the share button
-    const shareWrap = new ContainerLite(this.scene, 0, 0, 50, Space.avatarSize)
-    new Buttons.Icon({
-      name: 'Share',
-      within: shareWrap,
-      f: () => this.opts.onShareDeckCode(),
-      hint: 'Export deck-code',
-    })
-
     // Sizer with custom space to get thumbnail to line up with cutout edge
     const sizer = this.scene.rexUI.add
       .fixWidthSizer({
@@ -160,11 +149,10 @@ export class DeckEditorDeck {
           bottom: Space.pad,
           left: 14,
         },
-        align: 'left',
+        align: 'center',
       })
       .addBackground(bg)
       .add(this.deckThumbnail.container)
-      .add(shareWrap)
 
     // Populate the thumbnail with the current set
     this.syncThumbnail({
