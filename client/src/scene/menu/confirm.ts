@@ -57,6 +57,7 @@ export default class ConfirmMenu extends Menu {
         this.close()
       },
       returnHotkey: true,
+      muteClick: true,
     })
 
     return container
