@@ -68,8 +68,6 @@ export default class DeckEditorScene extends BaseScene {
   private createElements(deck: Deck): void {
     this.createBackground()
 
-    const deckColW = DECK_EDITOR_DECK_WIDTH
-
     // Catalog
     this.catalogRegion = new DeckEditorCatalog(this, {
       onCardPick: (card) => this.addCardToDeck(card),
@@ -77,7 +75,6 @@ export default class DeckEditorScene extends BaseScene {
 
     // Deck region
     this.deckRegion = new DeckEditorDeck(this, {
-      deckWidth: deckColW,
       deckIndex: this.deckIndex,
       deckName: this.deckName,
       cosmeticSet: this.cosmeticSet,
@@ -99,14 +96,11 @@ export default class DeckEditorScene extends BaseScene {
     })
 
     // Make the main sizer
-    this.sizer = this.rexUI.add
-      .sizer({
-        width: Space.windowWidth,
-        height: Space.windowHeight,
-        orientation: 0,
-      })
-      .setOrigin(0)
-    this.sizer.add(this.catalogRegion.columnSizer, { proportion: 1, expand: true })
+    this.sizer = this.rexUI.add.sizer()
+    this.sizer.add(this.catalogRegion.columnSizer, {
+      proportion: 1,
+      expand: true,
+    })
     this.sizer.add(this.deckRegion.columnSizer, { proportion: 0, expand: true })
     ;(this.plugins.get('rexAnchor') as any).add(this.sizer, {
       width: '100%',
@@ -116,7 +110,16 @@ export default class DeckEditorScene extends BaseScene {
     })
   }
 
+  private createBackground(): void {
+    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
+    ;(this.plugins.get('rexAnchor') as any).add(background, {
+      width: '100%',
+      height: '100%',
+    })
+  }
+
   onWindowResize(): void {
+    return
     if (!this.sizer || !this.catalogRegion || !this.deckRegion) return
 
     const catalogW = Math.max(1, Space.windowWidth - DECK_EDITOR_DECK_WIDTH)
@@ -124,7 +127,9 @@ export default class DeckEditorScene extends BaseScene {
     this.catalogRegion.resize(Space.windowHeight)
     this.deckRegion.resizeScrollArea(Space.windowHeight)
 
-    this.catalogRegion.columnSizer.setMinSize(catalogW, Space.windowHeight).layout()
+    this.catalogRegion.columnSizer
+      .setMinSize(catalogW, Space.windowHeight)
+      .layout()
 
     this.sizer.setMinSize(Space.windowWidth, Space.windowHeight)
     this.sizer.layout()
@@ -151,14 +156,6 @@ export default class DeckEditorScene extends BaseScene {
     return ids
       .map((id) => Catalog.getCardById(id))
       .filter((c): c is Card => c != null)
-  }
-
-  private createBackground(): void {
-    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
-    ;(this.plugins.get('rexAnchor') as any).add(background, {
-      width: '100%',
-      height: '100%',
-    })
   }
 
   addCardToDeck(card: Card): void {
@@ -209,7 +206,10 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   setDeck(cards: Card[]): void {
-    this.deckRegion!.decklist.setDeck(cards, Flags.devCardsEnabled ? false : true)
+    this.deckRegion!.decklist.setDeck(
+      cards,
+      Flags.devCardsEnabled ? false : true,
+    )
     this.deckRegion!.scrollDecklistToTop()
   }
 
@@ -282,7 +282,7 @@ export default class DeckEditorScene extends BaseScene {
     })
   }
 
-  /** Persist current draft into UserSettings (called by Save). */
+  /** Persist current draft into UserSettings (called by Save / Play). */
   private saveCurrentDeck(): void {
     this.ensureDeckAtIndex()
     const decks = UserSettings._get('decks') || []

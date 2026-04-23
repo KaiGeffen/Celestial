@@ -16,22 +16,21 @@ import { MechanicsSettings } from '../../../../shared/settings'
 import { DECK_EDITOR_DECK_WIDTH } from './constants'
 import { rexUi } from './rexUi'
 
+/** Initial deck column state + callbacks — scene owns persistence and menus. */
 export type DeckEditorDeckOptions = {
-  deckWidth?: number
   deckIndex: number
   deckName: string
   cosmeticSet: CosmeticSet
-  /** Cards shown in the list when the editor opens */
   deckCards: Card[]
-  /** If true, only owned cards count in decklist validation display */
   mustOwnCardsInList: boolean
-  /** Primary / secondary click on decklist cutouts */
   createCutoutInteraction: () => (cutout: Cutout) => () => void
   onDeckNameClick: () => void
   onShareDeckCode: () => void
   onSave: () => void
   onCosmetics: () => void
   onPlay: () => void
+  /** Override column width; default matches editor layout constant. */
+  deckWidth?: number
 }
 
 /** Right column: deck thumbnail header, scrolling decklist, Save / Cosmetics / Play. */
