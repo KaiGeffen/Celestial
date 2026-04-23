@@ -102,7 +102,7 @@ export class DeckEditorDeck {
     cardback: number
     isValid: boolean
   }): void {
-    this.deckThumbnail?.updateDisplay(args)
+    this.deckThumbnail.updateDisplay(args)
   }
 
   layoutDecklist(): void {

@@ -235,6 +235,29 @@ export default class DeckEditorScene extends BaseScene {
     return this.deckRegion.decklist.getDeckCode()
   }
 
+  private syncDeckThumbnail(): void {
+    const isValid = this.getDeckCode().length === MechanicsSettings.DECK_SIZE
+
+    // Update the thumbnail
+    this.deckRegion.syncThumbnail({
+      name: this.deckName,
+      cosmeticSet: this.cosmeticSet,
+      cardback: this.cosmeticSet.cardback,
+      isValid,
+    })
+  }
+
+  private setDeck(cards: Card[]): void {
+    // TODO Why is flag passed here?
+    this.deckRegion.decklist.setDeck(
+      cards,
+      Flags.devCardsEnabled ? false : true,
+    )
+
+    // Scroll to the top of the decklist
+    this.deckRegion.scrollDecklistToTop()
+  }
+
   // Ensure there is a deck at this index in users account (Fill with default cosmetics if not)
   private ensureDeckAtIndex(): void {
     const decks: Deck[] = [...(UserSettings._get('decks') || [])]
@@ -277,6 +300,7 @@ export default class DeckEditorScene extends BaseScene {
       .filter((c): c is Card => c != null)
   }
 
+  // TODO Removed? Is this used at all?
   updateSavedDeck(
     deckCode?: number[],
     name?: string,
@@ -298,23 +322,5 @@ export default class DeckEditorScene extends BaseScene {
       this.cosmeticSet = cosmeticSet
     }
     this.syncDeckThumbnail()
-  }
-
-  private syncDeckThumbnail(): void {
-    const isValid = this.getDeckCode().length === MechanicsSettings.DECK_SIZE
-    this.deckRegion?.syncThumbnail({
-      name: this.deckName,
-      cosmeticSet: this.cosmeticSet,
-      cardback: this.cosmeticSet.cardback ?? 0,
-      isValid,
-    })
-  }
-
-  setDeck(cards: Card[]): void {
-    this.deckRegion.decklist.setDeck(
-      cards,
-      Flags.devCardsEnabled ? false : true,
-    )
-    this.deckRegion.scrollDecklistToTop()
   }
 }
