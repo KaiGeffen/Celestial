@@ -164,7 +164,6 @@ export class DeckEditorCatalog {
           right: Space.pad,
           top: Space.padSmall,
           bottom: Space.padSmall,
-          item: Space.pad,
         },
       } as any)
       .addBackground(background)
@@ -197,8 +196,6 @@ export class DeckEditorCatalog {
       space: { item: 8 },
     })
 
-    middle.add(this.createSearchField())
-
     this.costFilterBtns = []
     for (let i = 0; i <= DECK_EDITOR_MAX_COST_FILTER; i++) {
       const container = new ContainerLite(scene, 0, 0, 35, Space.buttonHeight)
@@ -226,7 +223,11 @@ export class DeckEditorCatalog {
     })
     middle.add(clearContainer)
 
+    middle.add(this.createSearchField())
+
     row.add(middle, { proportion: 1, expand: true, align: 'center' })
+
+    // Sort button
     row.add(this.createSortButton(), { align: 'center' })
 
     return row
