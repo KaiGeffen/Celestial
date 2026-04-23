@@ -34,8 +34,8 @@ export default class DeckEditorScene extends BaseScene {
   private deckName: string
 
   // Regions
-  private catalog: DeckEditorCatalog
-  private deck: DeckEditorDeck
+  private catalogRegion: DeckEditorCatalog
+  private deckRegion: DeckEditorDeck
 
   // TODO Type this
   private sizer: any = null
@@ -79,20 +79,15 @@ export default class DeckEditorScene extends BaseScene {
     const catalogBodyHeight = Space.windowHeight - filterBarH
 
     // Catalog
-    this.catalog = new DeckEditorCatalog(this, {
+    this.catalogRegion = new DeckEditorCatalog(this, {
       catalogWidth,
       catalogBodyHeight,
-      onBack: () =>
-        this.scene.launch('MenuScene', {
-          menu: 'confirm',
-          text: 'Discard your changes and return to deck selection screen?',
-          callback: () => this.scene.start('DeckSelectorScene'),
-          activeScene: this,
-        }),
+      onBack: () => this.confirmLeaveToDeckSelector(),
       onCardPick: (card) => this.addCardToDeck(card),
     })
 
-    this.deck = new DeckEditorDeck(this, {
+    // Deck region
+    this.deckRegion = new DeckEditorDeck(this, {
       deckWidth: deckColW,
       deckIndex: this.deckIndex,
       deckName: this.deckName,
@@ -122,8 +117,8 @@ export default class DeckEditorScene extends BaseScene {
         orientation: 0,
       })
       .setOrigin(0)
-    this.sizer.add(this.catalog.columnSizer, { proportion: 1, expand: true })
-    this.sizer.add(this.deck.columnSizer, { proportion: 0, expand: true })
+    this.sizer.add(this.catalogRegion.columnSizer, { proportion: 1, expand: true })
+    this.sizer.add(this.deckRegion.columnSizer, { proportion: 0, expand: true })
     ;(this.plugins.get('rexAnchor') as any).add(this.sizer, {
       width: '100%',
       height: '100%',
@@ -133,14 +128,14 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   onWindowResize(): void {
-    if (!this.sizer || !this.catalog || !this.deck) return
+    if (!this.sizer || !this.catalogRegion || !this.deckRegion) return
 
     const catalogW = Math.max(1, Space.windowWidth - DECK_EDITOR_DECK_WIDTH)
 
-    this.catalog.resize(catalogW, Space.windowHeight)
-    this.deck.resizeScrollArea(Space.windowHeight)
+    this.catalogRegion.resize(catalogW, Space.windowHeight)
+    this.deckRegion.resizeScrollArea(Space.windowHeight)
 
-    this.catalog.columnSizer.setMinSize(catalogW, Space.windowHeight).layout()
+    this.catalogRegion.columnSizer.setMinSize(catalogW, Space.windowHeight).layout()
 
     this.sizer.setMinSize(Space.windowWidth, Space.windowHeight)
     this.sizer.layout()
@@ -169,6 +164,14 @@ export default class DeckEditorScene extends BaseScene {
       .filter((c): c is Card => c != null)
   }
 
+  private confirmLeaveToDeckSelector(): void {
+    this.scene.launch('MenuScene', {
+      menu: 'confirm',
+      text: 'Discard your changes and return to deck selection screen?',
+      callback: () => this.scene.start('DeckSelectorScene'),
+    })
+  }
+
   private createBackground(): void {
     const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
     ;(this.plugins.get('rexAnchor') as any).add(background, {
@@ -178,17 +181,17 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   addCardToDeck(card: Card): void {
-    this.deck!.decklist.addCard(card)
-    this.deck!.layoutDecklist()
+    this.deckRegion!.decklist.addCard(card)
+    this.deckRegion!.layoutDecklist()
     this.syncDeckThumbnail()
   }
 
   private removeCardFromDeck(card: Card): boolean {
-    return this.deck!.decklist.removeCard(card)
+    return this.deckRegion!.decklist.removeCard(card)
   }
 
   getDeckCode(): number[] {
-    return this.deck!.decklist.getDeckCode()
+    return this.deckRegion!.decklist.getDeckCode()
   }
 
   updateSavedDeck(
@@ -216,7 +219,7 @@ export default class DeckEditorScene extends BaseScene {
 
   private syncDeckThumbnail(): void {
     const isValid = this.getDeckCode().length === MechanicsSettings.DECK_SIZE
-    this.deck?.syncThumbnail({
+    this.deckRegion?.syncThumbnail({
       name: this.deckName,
       cosmeticSet: this.cosmeticSet,
       cardback: this.cosmeticSet.cardback ?? 0,
@@ -225,8 +228,8 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   setDeck(cards: Card[]): void {
-    this.deck!.decklist.setDeck(cards, Flags.devCardsEnabled ? false : true)
-    this.deck!.scrollDecklistToTop()
+    this.deckRegion!.decklist.setDeck(cards, Flags.devCardsEnabled ? false : true)
+    this.deckRegion!.scrollDecklistToTop()
   }
 
   setCosmeticSet(set: CosmeticSet): void {
@@ -242,8 +245,8 @@ export default class DeckEditorScene extends BaseScene {
         } else {
           const fullyRemoved = this.removeCardFromDeck(cutout.card)
           if (fullyRemoved) {
-            this.deck!.layoutDecklist()
-            const panel = this.deck!.scrollPanel
+            this.deckRegion!.layoutDecklist()
+            const panel = this.deckRegion!.scrollPanel
             panel.t = Math.min(0.999999, panel.t)
           }
           this.syncDeckThumbnail()
