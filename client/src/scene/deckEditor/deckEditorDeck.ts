@@ -140,6 +140,21 @@ export class DeckEditorDeck {
       .setInteractive()
     this.scene.addShadow(bg, -90)
 
+    // Create the thumbnail
+    this.deckThumbnail = new DeckThumbnail({
+      scene: this.scene,
+      onClick: () => this.opts.onDeckNameClick(),
+    })
+
+    // Create the share button
+    const shareWrap = new ContainerLite(this.scene, 0, 0, 50, Space.avatarSize)
+    new Buttons.Icon({
+      name: 'Share',
+      within: shareWrap,
+      f: () => this.opts.onShareDeckCode(),
+      hint: 'Export deck-code',
+    })
+
     // Sizer with custom space to get thumbnail to line up with cutout edge
     const sizer = this.scene.rexUI.add
       .fixWidthSizer({
@@ -152,35 +167,8 @@ export class DeckEditorDeck {
         align: 'left',
       })
       .addBackground(bg)
-
-    // Create the thumbnail
-    this.deckThumbnail = new DeckThumbnail({
-      scene: this.scene,
-      onClick: () => this.opts.onDeckNameClick(),
-    })
-
-    // Create the share button
-    const shareWrap = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth / 3,
-      Space.avatarSize / 2,
-    )
-    new Buttons.Icon({
-      name: 'Share',
-      within: shareWrap,
-      f: () => this.opts.onShareDeckCode(),
-      hint: 'Export deck-code',
-    })
-
-    // TODO A bit sus, this is a sizer inside the above sizer
-    const subSizer = this.scene.rexUI.add
-      .sizer()
       .add(this.deckThumbnail.container)
       .add(shareWrap)
-
-    sizer.add(subSizer)
 
     // Populate the thumbnail with the current set
     this.syncThumbnail({
