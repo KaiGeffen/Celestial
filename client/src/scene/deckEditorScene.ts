@@ -1,4 +1,5 @@
 import 'phaser'
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
 import BaseScene from './baseScene'
 import Cutout from '../lib/buttons/cutout'
@@ -32,8 +33,7 @@ export default class DeckEditorScene extends BaseScene {
   private catalogRegion: DeckEditorCatalog
   private deckRegion: DeckEditorDeck
 
-  // TODO Type this
-  private sizer: any = null
+  private sizer: RexUIPlugin.Sizer
 
   constructor() {
     super({
@@ -78,7 +78,7 @@ export default class DeckEditorScene extends BaseScene {
       deckIndex: this.deckIndex,
       deckName: this.deckName,
       cosmeticSet: this.cosmeticSet,
-      deckCards: this.cardsFromDeckIds(deck.cards || []),
+      deckCards: this.cardsFromDeckIds(deck.cards),
       mustOwnCardsInList: Flags.devCardsEnabled ? false : true,
       createCutoutInteraction: () => this.onClickCutout(),
       onDeckNameClick: () => this.openDeckNameMenu(),
@@ -90,6 +90,7 @@ export default class DeckEditorScene extends BaseScene {
       onCosmetics: () => this.openStylesMenu(),
       onPlay: () => {
         this.saveCurrentDeck()
+        // NOTE Necessary because play menu could change this, and if closed+reopened it be desync
         UserSettings._set('equippedDeckIndex', this.deckIndex)
         this.scene.launch('MenuScene', { menu: 'play', activeScene: this })
       },
@@ -117,6 +118,97 @@ export default class DeckEditorScene extends BaseScene {
       height: '100%',
     })
   }
+
+  // Callbacks
+  private addCardToDeck(card: Card): void {
+    this.deckRegion.decklist.addCard(card)
+    this.deckRegion.layoutDecklist()
+    this.syncDeckThumbnail()
+  }
+
+  private openDeckNameMenu(): void {
+    this.scene.launch('MenuScene', {
+      menu: 'editDeckName',
+      deckName: this.deckName,
+      callback: (name: string) => {
+        this.deckName = name
+        this.syncDeckThumbnail()
+      },
+      activeScene: this,
+    })
+  }
+
+  private copyDeckCodeToClipboard(): void {
+    const deckCode = this.getDeckCode()
+    const encodedDeck = encodeShareableDeckCode(deckCode)
+
+    // Write to clipboard
+    navigator.clipboard.writeText(encodedDeck)
+
+    // Local uses a different format
+    if (Flags.local) {
+      navigator.clipboard.writeText(deckCode.toString())
+    }
+
+    this.showMessage('Deck code copied to clipboard.')
+  }
+
+  private openStylesMenu(): void {
+    // Get the deck
+    this.ensureDeckAtIndex()
+    const decks = UserSettings._get('decks')
+    const deck = decks[this.deckIndex]
+
+    // Open the styles menu
+    this.scene.launch('MenuScene', {
+      menu: 'editDeck',
+      callback: (
+        name: string,
+        cosmeticSet: CosmeticSet,
+        deckCode: number[],
+      ) => {
+        this.setCosmeticSet(cosmeticSet)
+        this.deckName = name
+        if (deckCode && deckCode.length > 0) {
+          this.setDeck(this.cardsFromDeckIds(deckCode))
+        }
+        this.syncDeckThumbnail()
+      },
+      deckName: deck.name,
+      cosmeticSet: this.cosmeticSet,
+      // TODO If copy/paste is removed, this is no longer needed
+      deckCode: this.getDeckCode(),
+      activeScene: this,
+    })
+  }
+
+  // Persist current version of deck into UserSettings
+  private saveCurrentDeck(): void {
+    this.ensureDeckAtIndex()
+
+    // Get the deck
+    const decks: Deck[] = UserSettings._get('decks')
+    const deck = decks[this.deckIndex]
+    if (!deck) return
+
+    // Update its values
+    const updated: Deck = {
+      name: this.deckName ?? deck.name,
+      cards: this.getDeckCode(),
+      cosmeticSet: this.cosmeticSet ??
+        deck.cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 },
+    }
+
+    // Save it
+    UserSettings._setIndex('decks', this.deckIndex, updated)
+  }
+
+  // Utitility
+  private getDeckCode(): number[] {
+    return this.deckRegion.decklist.getDeckCode()
+  }
+
+  // TODO STILL TO READ
 
   onWindowResize(): void {
     return
@@ -158,18 +250,8 @@ export default class DeckEditorScene extends BaseScene {
       .filter((c): c is Card => c != null)
   }
 
-  addCardToDeck(card: Card): void {
-    this.deckRegion!.decklist.addCard(card)
-    this.deckRegion!.layoutDecklist()
-    this.syncDeckThumbnail()
-  }
-
   private removeCardFromDeck(card: Card): boolean {
-    return this.deckRegion!.decklist.removeCard(card)
-  }
-
-  getDeckCode(): number[] {
-    return this.deckRegion!.decklist.getDeckCode()
+    return this.deckRegion.decklist.removeCard(card)
   }
 
   updateSavedDeck(
@@ -206,11 +288,11 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   setDeck(cards: Card[]): void {
-    this.deckRegion!.decklist.setDeck(
+    this.deckRegion.decklist.setDeck(
       cards,
       Flags.devCardsEnabled ? false : true,
     )
-    this.deckRegion!.scrollDecklistToTop()
+    this.deckRegion.scrollDecklistToTop()
   }
 
   setCosmeticSet(set: CosmeticSet): void {
@@ -226,74 +308,13 @@ export default class DeckEditorScene extends BaseScene {
         } else {
           const fullyRemoved = this.removeCardFromDeck(cutout.card)
           if (fullyRemoved) {
-            this.deckRegion!.layoutDecklist()
-            const panel = this.deckRegion!.scrollPanel
+            this.deckRegion.layoutDecklist()
+            const panel = this.deckRegion.scrollPanel
             panel.t = Math.min(0.999999, panel.t)
           }
           this.syncDeckThumbnail()
         }
       }
     }
-  }
-
-  private copyDeckCodeToClipboard(): void {
-    const deckCode = this.getDeckCode()
-    const encodedDeck = encodeShareableDeckCode(deckCode)
-    navigator.clipboard.writeText(encodedDeck)
-    if (Flags.local) {
-      navigator.clipboard.writeText(deckCode.toString())
-    }
-    this.showMessage('Deck code copied to clipboard.')
-  }
-
-  private openDeckNameMenu(): void {
-    this.scene.launch('MenuScene', {
-      menu: 'editDeckName',
-      deckName: this.deckName,
-      callback: (name: string) => {
-        this.deckName = name
-        this.syncDeckThumbnail()
-      },
-      activeScene: this,
-    })
-  }
-
-  private openStylesMenu(): void {
-    const decks = UserSettings._get('decks') || []
-    const deck = decks[this.deckIndex]
-    this.scene.launch('MenuScene', {
-      menu: 'editDeck',
-      callback: (
-        name: string,
-        cosmeticSet: CosmeticSet,
-        deckCode: number[],
-      ) => {
-        this.setCosmeticSet(cosmeticSet)
-        this.deckName = name
-        if (deckCode && deckCode.length > 0) {
-          this.setDeck(this.cardsFromDeckIds(deckCode))
-        }
-        this.syncDeckThumbnail()
-      },
-      deckName: deck?.name ?? `Deck ${this.deckIndex + 1}`,
-      cosmeticSet: this.cosmeticSet,
-      deckCode: this.getDeckCode(),
-      activeScene: this,
-    })
-  }
-
-  /** Persist current draft into UserSettings (called by Save / Play). */
-  private saveCurrentDeck(): void {
-    this.ensureDeckAtIndex()
-    const decks = UserSettings._get('decks') || []
-    const deck = decks[this.deckIndex]
-    if (!deck) return
-    const updated: Deck = {
-      name: this.deckName ?? deck.name,
-      cards: this.getDeckCode(),
-      cosmeticSet: this.cosmeticSet ??
-        deck.cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 },
-    }
-    UserSettings._setIndex('decks', this.deckIndex, updated)
   }
 }
