@@ -1,57 +1,44 @@
 import 'phaser'
-import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
-import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
 import BaseScene from './baseScene'
-import Decklist from '../lib/decklist'
 import Cutout from '../lib/buttons/cutout'
-import Buttons from '../lib/buttons/buttons'
-import DeckThumbnail from '../lib/deckThumbnail'
-import UButton from '../lib/buttons/underlined'
-import { CardImage } from '../lib/cardImage'
 import {
-  Color,
   Space,
   UserSettings,
   Flags,
   deckFilterBarHeight,
 } from '../settings/settings'
-import newScrollablePanel from '../lib/scrollablePanel'
-import { Deck } from '../../../shared/types/deck'
-import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import Catalog from '../../../shared/state/catalog'
 import Card from '../../../shared/state/card'
-import { encodeShareableDeckCode } from '../../../shared/codec'
+import { Deck } from '../../../shared/types/deck'
+import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import { MechanicsSettings } from '../../../shared/settings'
-import { Scroll } from '../settings/settings'
+import { encodeShareableDeckCode } from '../../../shared/codec'
 
-const ROSTER_WIDTH = Space.cutoutWidth + 20
-const MAX_COST_FILTER = 7
+import Server from '../server'
+import { DeckEditorCatalog } from './deckEditor/deckEditorCatalog'
+import { DeckEditorRoster } from './deckEditor/deckEditorRoster'
+import { DECK_EDITOR_ROSTER_WIDTH } from './deckEditor/constants'
+
+export type { DeckEditorCatalogOptions } from './deckEditor/deckEditorCatalog'
+export type { DeckEditorRosterOptions } from './deckEditor/deckEditorRoster'
 
 export default class DeckEditorScene extends BaseScene {
+  // Currently selected deck index
   deckIndex: number
-  private decklist: Decklist
-  private rosterPanel: ScrollablePanel
-  private catalogPanel: ScrollablePanel
-  private catalogPanelSizer: FixWidthSizer
-  private cardCatalog: CardImage[] = []
-  private searchText = ''
-  private searchObj: any
-  private filterCostAry: boolean[] = []
-  private costFilterBtns: UButton[] = []
-  private cosmeticSet: CosmeticSet
-  private deckName: string
-  private deckThumbnail: DeckThumbnail
-  private orderedByCost = true
 
-  /** Root + left column for `onWindowResize` (explicit sizes like deck selector / catalog resize). */
-  private outerSizer: any = null
-  private leftSizer: any = null
-  /** Wrapping filter strip — must not use a horizontal `Sizer` (min width = sum of all controls). */
-  private filterHeaderSizer: any = null
-  private rosterHeaderHeight = 0
-  private rosterFooterHeight = 0
+  // Equipped cosmetics
+  private cosmeticSet: CosmeticSet
+
+  // Name of the deck
+  private deckName: string
+
+  // Regions
+  private catalog: DeckEditorCatalog
+  private roster: DeckEditorRoster
+
+  // TODO Type this
+  private sizer: any = null
 
   constructor() {
     super({
@@ -63,143 +50,101 @@ export default class DeckEditorScene extends BaseScene {
   create(params: { deckIndex: number }) {
     super.create()
 
-    this.deckIndex = Math.max(0, Math.floor(Number(params?.deckIndex)))
-    this.ensureDeckAtIndex()
-    const decks = UserSettings._get('decks') || []
-    const deck: Deck = decks[this.deckIndex] || {
-      name: `Deck ${this.deckIndex + 1}`,
-      cards: [],
-      cosmeticSet: { avatar: 0, border: 0, cardback: 0 },
-    }
-    this.deckName = deck.name
-    this.cosmeticSet = deck.cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 }
+    this.deckIndex = params.deckIndex
 
+    // Ensure there is a deck at this index
+    this.ensureDeckAtIndex()
+
+    //
+    const preferredCosmetics = Server.getUserData().cosmeticSet
+    const decks = UserSettings._get('decks')
+    const deck: Deck = decks[this.deckIndex]
+
+    // Set this classes variables
+    this.deckName = deck.name
+    this.cosmeticSet = deck.cosmeticSet
+
+    // Create the elements of the scene
+    this.createElements(deck)
+    this.sizer.layout()
+
+    // Ensure the deck thumbnail is properly displayed
+    this.syncDeckThumbnail()
+  }
+
+  private createElements(deck: Deck): void {
     this.createBackground()
 
-    const catalogWidth = Space.windowWidth - ROSTER_WIDTH
+    const rosterW = DECK_EDITOR_ROSTER_WIDTH
+    const catalogWidth = Space.windowWidth - rosterW
     const filterBarH = deckFilterBarHeight()
     const catalogBodyHeight = Space.windowHeight - filterBarH
 
-    // Left column: filter header (fixed) + catalog (expands). Catalog height must not include the
-    // filter strip or rex layout overflows and the right roster column / scroll bounds break.
-    this.catalogPanel = this.createCatalogPanel(catalogWidth, catalogBodyHeight)
-    const filterHeader = this.createFilterHeader()
+    // Catalog
+    this.catalog = new DeckEditorCatalog(this, {
+      catalogWidth,
+      catalogBodyHeight,
+      onBack: () =>
+        this.scene.launch('MenuScene', {
+          menu: 'confirm',
+          text: 'Discard your changes and return to deck selection screen?',
+          callback: () => this.scene.start('DeckSelectorScene'),
+          activeScene: this,
+        }),
+      onCardPick: (card) => this.addCardToDeck(card),
+    })
 
-    const leftSizer = this.rexUI.add
-      .sizer({
-        orientation: 1,
-      })
-      .setOrigin(0)
-    // Full width of left column — must shrink with window (fixed-width filter bar blocked collapse).
-    leftSizer.add(filterHeader, { proportion: 0, expand: true })
-    leftSizer.add(this.catalogPanel, { proportion: 1, expand: true })
+    this.roster = new DeckEditorRoster(this, {
+      rosterWidth: rosterW,
+      deckIndex: this.deckIndex,
+      deckName: this.deckName,
+      cosmeticSet: this.cosmeticSet,
+      deckCards: this.cardsFromDeckIds(deck.cards || []),
+      mustOwnCardsInList: Flags.devCardsEnabled ? false : true,
+      createCutoutInteraction: () => this.onClickCutout(),
+      onDeckNameClick: () => this.openDeckNameMenu(),
+      onShareDeckCode: () => this.copyDeckCodeToClipboard(),
+      onSave: () => {
+        this.saveCurrentDeck()
+        this.scene.start('DeckSelectorScene')
+      },
+      onCosmetics: () => this.openStylesMenu(),
+      onPlay: () => {
+        this.saveCurrentDeck()
+        UserSettings._set('equippedDeckIndex', this.deckIndex)
+        this.scene.launch('MenuScene', { menu: 'play', activeScene: this })
+      },
+    })
 
-    // Right column: background first, then deck content, then header/footer
-    const rosterBg = this.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
-    this.decklist = new Decklist(this, this.onClickCutout())
-    this.decklist.setDeck(
-      this.cardsFromDeckIds(deck.cards || []),
-      Flags.devCardsEnabled ? false : true,
-    )
-
-    // Create header and footer AFTER cutouts — their backgrounds are now above cutouts in z-order
-    const rosterHeader = this.createRosterHeader()
-    ;(rosterHeader as any).layout()
-    const headerH = (rosterHeader as any).height as number
-    this.rosterHeaderHeight = headerH
-
-    const rightPanel = this.createRightPanel()
-    ;(rightPanel as any).layout()
-    const rightPanelH = (rightPanel as any).height as number
-    this.rosterFooterHeight = rightPanelH
-
-    this.rosterPanel = newScrollablePanel(this, {
-      width: ROSTER_WIDTH,
-      height: Space.windowHeight - headerH - rightPanelH,
-      background: rosterBg,
-      panel: { child: this.decklist.sizer },
-      scrollMode: 'y',
-    }).setOrigin(0)
-
-    const rosterColumn = this.rexUI.add
-      .sizer({ width: ROSTER_WIDTH, orientation: 1 })
-      .setOrigin(0)
-    rosterColumn.add(rosterHeader, { proportion: 0 })
-    rosterColumn.add(this.rosterPanel, { proportion: 0 })
-    rosterColumn.add(rightPanel, { proportion: 0 })
-
-    this.outerSizer = this.rexUI.add
+    this.sizer = this.rexUI.add
       .sizer({
         width: Space.windowWidth,
         height: Space.windowHeight,
         orientation: 0,
       })
       .setOrigin(0)
-    this.leftSizer = leftSizer
-    this.outerSizer.add(leftSizer, { proportion: 1, expand: true })
-    this.outerSizer.add(rosterColumn, { proportion: 0, expand: true })
-    ;(this.plugins.get('rexAnchor') as any).add(this.outerSizer, {
+    this.sizer.add(this.catalog.columnSizer, { proportion: 1, expand: true })
+    this.sizer.add(this.roster.columnSizer, { proportion: 0, expand: true })
+    ;(this.plugins.get('rexAnchor') as any).add(this.sizer, {
       width: '100%',
       height: '100%',
       left: 'left',
       top: 'top',
     })
-    this.outerSizer.layout()
-
-    this.syncDeckThumbnail()
-
-    //
-    this.filterCatalog()
   }
 
   onWindowResize(): void {
-    if (!this.outerSizer || !this.leftSizer) return
-    const catalogW = Math.max(1, Space.windowWidth - ROSTER_WIDTH)
-    const rosterScrollH = Math.max(
-      1,
-      Space.windowHeight - this.rosterHeaderHeight - this.rosterFooterHeight,
-    )
+    if (!this.sizer || !this.catalog || !this.roster) return
 
-    // Filter bar wraps: measure at catalog width, then give remaining height to the card grid.
-    if (this.filterHeaderSizer) {
-      ;(this.filterHeaderSizer as any).runLayout?.(undefined, catalogW, undefined)
-    }
-    const filterH = Math.max(
-      deckFilterBarHeight(),
-      this.filterHeaderSizer?.height ?? deckFilterBarHeight(),
-    )
-    const catalogBodyH = Math.max(1, Space.windowHeight - filterH)
+    const catalogW = Math.max(1, Space.windowWidth - DECK_EDITOR_ROSTER_WIDTH)
 
-    const catalogRatio = this.catalogPanel.t
-    this.catalogPanel.setMinSize(catalogW, catalogBodyH)
-    this.relayoutCatalogCardGrid(catalogW)
-    this.catalogPanel.layout()
-    this.catalogPanel.t = Math.min(0.999999, catalogRatio)
+    this.catalog.resize(catalogW, Space.windowHeight)
+    this.roster.resizeScrollArea(Space.windowHeight)
 
-    const rosterRatio = this.rosterPanel.t
-    this.rosterPanel.setMinSize(ROSTER_WIDTH, rosterScrollH).layout()
-    this.rosterPanel.t = Math.min(0.999999, rosterRatio)
+    this.catalog.columnSizer.setMinSize(catalogW, Space.windowHeight).layout()
 
-    this.leftSizer.setMinSize(catalogW, Space.windowHeight).layout()
-
-    this.outerSizer.setMinSize(Space.windowWidth, Space.windowHeight)
-    this.outerSizer.layout()
-  }
-
-  /**
-   * Nested `FixWidthSizer` may not re-run `runWidthWrap` when sized as a non-topmost child, so
-   * column count can stick (e.g. ~4 cards wide). Topmost `runLayout` recomputes `wrapResult`.
-   */
-  private relayoutCatalogCardGrid(innerWidth: number): void {
-    const panel = this.catalogPanelSizer as any
-    panel.wrapResult = undefined
-    if (panel.rexSizer) panel.rexSizer.resolved = false
-    panel._maxChildWidth = undefined
-    panel._maxChildHeight = undefined
-    panel._childrenWidth = undefined
-    panel._childrenHeight = undefined
-    panel.setDirty?.(true)
-    panel.runLayout?.(undefined, innerWidth, undefined)
+    this.sizer.setMinSize(Space.windowWidth, Space.windowHeight)
+    this.sizer.layout()
   }
 
   /** Ensure `UserSettings.decks[this.deckIndex]` exists so loading/saving never no-op on a stale index. */
@@ -207,13 +152,15 @@ export default class DeckEditorScene extends BaseScene {
     const decks: Deck[] = [...(UserSettings._get('decks') || [])]
     if (decks[this.deckIndex]) return
 
+    // Push enough decks for there to be one at the given index
     while (decks.length <= this.deckIndex) {
       decks.push({
         name: `Deck ${decks.length + 1}`,
         cards: [],
-        cosmeticSet: { avatar: 0, border: 0, cardback: 0 },
+        cosmeticSet: Server.getUserData().cosmeticSet,
       })
     }
+
     UserSettings._set('decks', decks)
   }
 
@@ -231,366 +178,18 @@ export default class DeckEditorScene extends BaseScene {
     })
   }
 
-  private createCatalogPanel(width: number, height: number): ScrollablePanel {
-    const panel = this.rexUI.add.fixWidthSizer({
-      space: {
-        left: Space.pad,
-        right: Space.pad,
-        top: Space.pad,
-        bottom: Space.pad,
-        item: Space.pad,
-        line: Space.pad,
-      },
-    })
-
-    // Reset the card catalog
-    this.cardCatalog = []
-
-    let pool: Card[] = []
-    if (Flags.devCardsEnabled) {
-      pool = [...Catalog.collectibleCardsWithBetaCards]
-    } else {
-      pool = [...Catalog.collectibleCards]
-
-      // Only show owned cards
-      const inventory = UserSettings._get('cardInventory') || []
-      pool = pool.filter((c) => inventory[c.id] === true)
-    }
-
-    // Create all the cards in pool and add to the panel
-    pool.forEach((card) => {
-      const cardImage = new CardImage(card, panel, true, false).setOnClick(
-        () => {
-          this.addCardToDeck(card)
-          this.sound.play('click')
-        },
-      )
-      this.cardCatalog.push(cardImage)
-    })
-
-    const scrollable = newScrollablePanel(this, {
-      width,
-      height,
-      panel: { child: panel },
-      slider: Scroll(this, false),
-    }).setOrigin(0)
-    this.catalogPanelSizer = panel
-    scrollable.layout()
-
-    return scrollable
-  }
-
-  /** Wrapping strip so min width ≈ widest control, not the full row (horizontal `Sizer` sums widths). */
-  private createFilterHeader(): any {
-    const background = this.add
-      .rectangle(0, 0, 1, 1, Color.backgroundLight)
-      .setInteractive()
-    this.addShadow(background, -90)
-
-    const sizer = this.rexUI.add
-      .fixWidthSizer({
-        align: 'left',
-        space: {
-          left: Space.pad,
-          right: Space.pad,
-          top: Space.padSmall,
-          bottom: Space.padSmall,
-          item: Space.pad,
-          line: Space.pad,
-        },
-      } as any)
-      .addBackground(background)
-
-    const backContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: backContainer,
-      text: 'Back',
-      muteClick: true,
-      f: () => {
-        this.scene.launch('MenuScene', {
-          menu: 'confirm',
-          text: 'Discard your changes and return to deck selection screen?',
-          callback: () => this.scene.start('DeckSelectorScene'),
-          activeScene: this,
-        })
-      },
-    })
-    sizer.add(backContainer)
-
-    sizer.add(this.createSearchText())
-
-    this.costFilterBtns = []
-    for (let i = 0; i <= MAX_COST_FILTER; i++) {
-      const container = new ContainerLite(this, 0, 0, 41, Space.buttonHeight)
-      sizer.add(container)
-      const label = i === MAX_COST_FILTER ? '7+' : i.toString()
-      const btn = new UButton(container, 0, 0, label)
-      btn.setOnClick(this.onClickCostFilter(i))
-      if (this.filterCostAry[i]) {
-        btn.toggle()
-      }
-      this.costFilterBtns.push(btn)
-    }
-
-    const clearContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonHeight,
-      Space.buttonHeight,
-    )
-    new Buttons.Icon({
-      name: 'SmallX',
-      within: clearContainer,
-      f: this.onClearFilters(),
-    })
-    sizer.add(clearContainer)
-
-    sizer.add(this.createSortButton())
-
-    this.filterHeaderSizer = sizer
-    return sizer
-  }
-
-  private createSearchText(): ContainerLite {
-    const container = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.textboxWidth,
-      Space.textboxHeight,
-    )
-    this.searchObj = this.add
-      .rexInputText(0, 0, Space.textboxWidth, Space.textboxHeight, {
-        type: 'text',
-        text: this.searchText,
-        align: 'center',
-        placeholder: 'Search',
-        tooltip: 'Search for cards by text.',
-        fontFamily: 'Mulish',
-        fontSize: '24px',
-        color: Color.textboxText,
-        maxLength: 40,
-        id: 'deck-editor-search',
-      })
-      .on('textchange', (inputText: any) => {
-        this.searchText = inputText.text
-        this.filterCatalog()
-      })
-    container.add([this.searchObj, this.add.image(0, 0, 'icon-InputText')])
-    return container
-  }
-
-  private onClickCostFilter(thisI: number): () => void {
-    return () => {
-      for (let i = 0; i < this.costFilterBtns.length; i++) {
-        if (i === thisI) {
-          this.costFilterBtns[i].toggle()
-          this.filterCostAry[i] = !this.filterCostAry[i]
-        } else {
-          this.costFilterBtns[i].toggleOff()
-          this.filterCostAry[i] = false
-        }
-      }
-      this.filterCatalog()
-    }
-  }
-
-  private onClearFilters(): () => void {
-    return () => {
-      for (let i = 0; i < this.costFilterBtns.length; i++) {
-        this.costFilterBtns[i].toggleOff()
-        this.filterCostAry[i] = false
-      }
-      this.searchObj.setText('')
-      this.searchText = ''
-      this.filterCatalog()
-    }
-  }
-
-  private createSortButton(): ContainerLite {
-    const container = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: container,
-      text: 'Sort',
-      f: () => {
-        this.orderedByCost = !this.orderedByCost
-        this.filterCatalog()
-      },
-    })
-    return container
-  }
-
-  private filterCatalog(): void {
-    this.catalogPanelSizer.clear()
-
-    const filterFunction = this.getFilterFunction()
-    const sorted = [...this.cardCatalog]
-    if (this.orderedByCost) {
-      sorted.sort((a, b) => a.card.cost - b.card.cost)
-    }
-    for (const cardImage of sorted) {
-      if (filterFunction(cardImage.card)) {
-        cardImage.container.setVisible(true)
-        this.catalogPanelSizer.add(cardImage.container)
-      } else {
-        cardImage.container.setVisible(false)
-      }
-    }
-    this.catalogPanel.t = 0
-    this.catalogPanel.layout()
-  }
-
-  // Same filter logic as builder filter.ts (cost + search tokens: name:, text:, cost:, points:, quotes, negation)
-  private getFilterFunction(): (card: Card) => boolean {
-    const costFilter = (card: Card) => {
-      if (!this.filterCostAry.includes(true)) return true
-      return this.filterCostAry[Math.min(card.cost, MAX_COST_FILTER)]
-    }
-    const searchTextFilter = (card: Card) => {
-      if (!this.searchText.trim()) return true
-      const tokens = this.parseSearchQuery(this.searchText).filter(
-        (token) => token.field !== 'deck',
-      )
-      for (const token of tokens) {
-        if (!this.matchesToken(card, token)) return false
-      }
-      return true
-    }
-    return (card: Card) => costFilter(card) && searchTextFilter(card)
-  }
-
-  private parseSearchQuery(query: string): SearchToken[] {
-    const tokens: SearchToken[] = []
-    let current = ''
-    let inQuotes = false
-    for (let i = 0; i < query.length; i++) {
-      const char = query[i]
-      if (char === '"') {
-        if (inQuotes) {
-          if (current) {
-            tokens.push(this.createToken(current, true))
-            current = ''
-          }
-          inQuotes = false
-        } else {
-          if (current.trim()) {
-            tokens.push(this.createToken(current.trim(), false))
-            current = ''
-          }
-          inQuotes = true
-        }
-      } else if (char === ' ' && !inQuotes) {
-        if (current.trim()) {
-          tokens.push(this.createToken(current.trim(), false))
-          current = ''
-        }
-      } else {
-        current += char
-      }
-    }
-    if (current.trim()) {
-      tokens.push(this.createToken(current.trim(), inQuotes))
-    }
-    return tokens
-  }
-
-  private createToken(text: string, isPhrase: boolean): SearchToken {
-    const token: SearchToken = {
-      text: text,
-      isPhrase: isPhrase,
-      negated: false,
-      field: null,
-      rangeMin: null,
-      rangeMax: null,
-    }
-    if (text.startsWith('!')) {
-      token.negated = true
-      text = text.substring(1)
-      token.text = text
-    }
-    const fieldMatch = text.match(/^(cost|points|name|text|deck):(.+)$/i)
-    if (fieldMatch) {
-      token.field = fieldMatch[1].toLowerCase()
-      const value = fieldMatch[2]
-      token.text = value
-      if (token.field === 'cost' || token.field === 'points') {
-        const rangeMatch = value.match(/^(\d+)-(\d+)$/)
-        if (rangeMatch) {
-          token.rangeMin = parseInt(rangeMatch[1])
-          token.rangeMax = parseInt(rangeMatch[2])
-        } else if (value.endsWith('+')) {
-          token.rangeMin = parseInt(value)
-          token.rangeMax = Infinity
-        } else if (value.endsWith('-')) {
-          token.rangeMin = -Infinity
-          token.rangeMax = parseInt(value)
-        } else if (/^\d+$/.test(value)) {
-          token.rangeMin = parseInt(value)
-          token.rangeMax = parseInt(value)
-        }
-      }
-    }
-    return token
-  }
-
-  private matchesToken(card: Card, token: SearchToken): boolean {
-    let matches = false
-    if (token.field === 'cost') {
-      if (token.rangeMin !== null && token.rangeMax !== null) {
-        matches = card.cost >= token.rangeMin && card.cost <= token.rangeMax
-      }
-    } else if (token.field === 'points') {
-      if (token.rangeMin !== null && token.rangeMax !== null) {
-        matches = card.points >= token.rangeMin && card.points <= token.rangeMax
-      }
-    } else if (token.field === 'name') {
-      matches = card.name.toLowerCase().includes(token.text.toLowerCase())
-    } else if (token.field === 'text') {
-      matches = card.text.toLowerCase().includes(token.text.toLowerCase())
-    } else {
-      matches = this.searchEverywhere(card, token.text)
-    }
-    return token.negated ? !matches : matches
-  }
-
-  private searchEverywhere(card: Card, query: string): boolean {
-    let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points}`
-    for (const [keyword] of Catalog.getReferencedKeywords(card)) {
-      searchableText += ` ${keyword.text}`
-    }
-    for (const cardName of Catalog.getReferencedCardNames(card)) {
-      const ref = Catalog.getCard(cardName)
-      if (ref) searchableText += ` ${ref.text}`
-    }
-    return searchableText.toLowerCase().includes(query.toLowerCase())
-  }
-
   addCardToDeck(card: Card): void {
-    this.decklist.addCard(card)
-    this.rosterPanel?.layout()
+    this.roster!.decklist.addCard(card)
+    this.roster!.layoutDecklist()
     this.syncDeckThumbnail()
   }
 
   private removeCardFromDeck(card: Card): boolean {
-    const removed = this.decklist.removeCard(card)
-    return removed
+    return this.roster!.decklist.removeCard(card)
   }
 
   getDeckCode(): number[] {
-    return this.decklist.getDeckCode()
+    return this.roster!.decklist.getDeckCode()
   }
 
   updateSavedDeck(
@@ -618,7 +217,7 @@ export default class DeckEditorScene extends BaseScene {
 
   private syncDeckThumbnail(): void {
     const isValid = this.getDeckCode().length === MechanicsSettings.DECK_SIZE
-    this.deckThumbnail?.updateDisplay({
+    this.roster?.syncThumbnail({
       name: this.deckName,
       cosmeticSet: this.cosmeticSet,
       cardback: this.cosmeticSet.cardback ?? 0,
@@ -627,12 +226,8 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   setDeck(cards: Card[]): void {
-    this.decklist.setDeck(cards, Flags.devCardsEnabled ? false : true)
-    if (this.rosterPanel) {
-      this.rosterPanel.childOY = 0
-      this.rosterPanel.t = 0
-      this.rosterPanel.layout()
-    }
+    this.roster!.decklist.setDeck(cards, Flags.devCardsEnabled ? false : true)
+    this.roster!.scrollDecklistToTop()
   }
 
   setCosmeticSet(set: CosmeticSet): void {
@@ -648,71 +243,14 @@ export default class DeckEditorScene extends BaseScene {
         } else {
           const fullyRemoved = this.removeCardFromDeck(cutout.card)
           if (fullyRemoved) {
-            this.rosterPanel.layout()
-            this.rosterPanel.t = Math.min(0.999999, this.rosterPanel.t)
+            this.roster!.layoutDecklist()
+            const panel = this.roster!.scrollPanel
+            panel.t = Math.min(0.999999, panel.t)
           }
           this.syncDeckThumbnail()
         }
       }
     }
-  }
-
-  private createRosterHeader(): FixWidthSizer {
-    const background = this.add
-      .rectangle(0, 0, 1, 1, Color.backgroundDark)
-      .setInteractive()
-    this.addShadow(background, -90)
-    const sizer = this.rexUI.add
-      .fixWidthSizer({
-        width: ROSTER_WIDTH,
-        space: {
-          top: Space.pad,
-          bottom: Space.pad,
-          left: 14,
-        },
-        align: 'left',
-      })
-      .addBackground(background)
-
-    const decks = UserSettings._get('decks') || []
-    const savedDeck = decks[this.deckIndex]
-    const savedCount = savedDeck?.cards?.length ?? 0
-    const isValid = savedCount === MechanicsSettings.DECK_SIZE
-    this.deckThumbnail = new DeckThumbnail({
-      scene: this,
-      name: this.deckName,
-      cosmeticSet: this.cosmeticSet,
-      cardback: this.cosmeticSet.cardback ?? 0,
-      isValid,
-      onClick: () => this.openDeckNameMenu(),
-      tuckHeaderArt: true,
-    })
-    const copyContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth / 3,
-      Space.avatarSize / 2,
-    )
-    new Buttons.Icon({
-      name: 'Share',
-      within: copyContainer,
-      x: 0,
-      y: 0,
-      f: () => this.copyDeckCodeToClipboard(),
-      hint: 'Export deck-code',
-    })
-    const headerRow = this.rexUI.add
-      .sizer({
-        orientation: 0,
-        space: { item: Space.padSmall },
-      } as any)
-      .add(this.deckThumbnail.container, { align: 'center' })
-      .add(copyContainer, { align: 'center' })
-
-    sizer.add(headerRow)
-
-    return sizer
   }
 
   private copyDeckCodeToClipboard(): void {
@@ -723,79 +261,6 @@ export default class DeckEditorScene extends BaseScene {
       navigator.clipboard.writeText(deckCode.toString())
     }
     this.showMessage('Deck code copied to clipboard.')
-  }
-
-  private createRightPanel(): any {
-    const background = this.add
-      .rectangle(0, 0, ROSTER_WIDTH, 1, Color.backgroundLight)
-      .setInteractive()
-    const sizer = this.rexUI.add
-      .sizer({
-        width: ROSTER_WIDTH,
-        orientation: 1,
-        space: {
-          left: Space.pad,
-          right: Space.pad,
-          top: Space.pad,
-          bottom: Space.pad,
-          item: Space.padSmall,
-        },
-      } as any)
-      .addBackground(background)
-
-    const makeBtn = (text: string, f: () => void, muteClick = false) => {
-      const container = new ContainerLite(
-        this,
-        0,
-        0,
-        Space.buttonWidth,
-        Space.buttonHeight,
-      )
-      new Buttons.Basic({ within: container, text, f, muteClick })
-      return container
-    }
-
-    const colSizer = this.rexUI.add.sizer({
-      orientation: 1,
-      space: { item: Space.padSmall },
-    } as any)
-    colSizer.add(
-      makeBtn('Save', () => {
-        this.saveCurrentDeck()
-        this.scene.start('DeckSelectorScene')
-      }),
-    )
-    colSizer.add(makeBtn('Cosmetics', () => this.openStylesMenu(), true))
-
-    const playContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.bigButtonHeight,
-    )
-    new Buttons.Big({
-      within: playContainer,
-      text: 'Play',
-      f: () => {
-        // Save any changes to the current deck
-        this.saveCurrentDeck()
-        UserSettings._set('equippedDeckIndex', this.deckIndex)
-
-        // Open the play menu
-        this.scene.launch('MenuScene', { menu: 'play', activeScene: this })
-      },
-    })
-
-    const rowSizer = this.rexUI.add.sizer({
-      orientation: 0,
-      space: { item: Space.padSmall },
-    } as any)
-    rowSizer.add(colSizer)
-    rowSizer.add(playContainer)
-    sizer.add(rowSizer)
-
-    return sizer
   }
 
   private openDeckNameMenu(): void {
@@ -848,13 +313,4 @@ export default class DeckEditorScene extends BaseScene {
     }
     UserSettings._setIndex('decks', this.deckIndex, updated)
   }
-}
-
-interface SearchToken {
-  text: string
-  isPhrase: boolean
-  negated: boolean
-  field: string | null
-  rangeMin: number | null
-  rangeMax: number | null
 }
