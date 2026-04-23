@@ -324,10 +324,10 @@ export default class PlayMenu extends Menu {
         if (activeScene) {
           activeScene.scene.stop()
         }
-        this.scene.scene.start('DeckSelectorScene', { isTutorial: false })
+        const deckIndex = UserSettings._get('equippedDeckIndex') || 0
+        this.scene.scene.start('DeckEditorScene', { deckIndex })
         logEvent('change_deck_from_play_menu')
       },
-      muteClick: true,
     })
     buttonAvatarSizer.add(changeDeckContainer)
 
