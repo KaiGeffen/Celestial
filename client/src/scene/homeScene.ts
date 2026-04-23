@@ -8,6 +8,7 @@ import { openDiscord } from '../utils/externalLinks'
 import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
+import { getDailyHomeTip } from '../data/homeTips'
 
 const NAVIGATION_BUTTON_WIDTH = 278
 
@@ -389,8 +390,8 @@ export default class HomeScene extends BaseScene {
       },
     })
 
-    // Image container - vertical sizer for image and button
-    const imageContainer = this.rexUI.add.sizer({
+    // Container with an image + tip that rotates daily
+    const rotatingContainer = this.rexUI.add.sizer({
       orientation: 'vertical',
       space: {
         item: Space.pad,
@@ -411,9 +412,16 @@ export default class HomeScene extends BaseScene {
     const newsImageName = newsImages[dayOfWeek]
     const image = this.add.image(0, 0, `news-${newsImageName}`).setOrigin(0, 0)
 
-    imageContainer.add(image, { align: 'top' })
+    rotatingContainer.add(image, { align: 'top' })
+
+    const tipText = this.add
+      .text(0, 0, getDailyHomeTip(), Style.basic)
+      .setWordWrapWidth(image.displayWidth)
+      .setOrigin(0, 0)
+    rotatingContainer.add(tipText, { align: 'top' })
+
     // Add the image container to contentSizer
-    contentSizer.add(imageContainer, { align: 'top' })
+    contentSizer.add(rotatingContainer, { align: 'top' })
 
     // Make news content as BBCode to have hoverable card names and links
     const text = this.rexUI.add
