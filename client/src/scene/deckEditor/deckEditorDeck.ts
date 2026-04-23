@@ -195,31 +195,14 @@ export class DeckEditorDeck {
 
   // Buttons
   private createFooter(): RexUIPlugin.Sizer {
-    const scene = this.scene
-    const ui = rexUi(scene)
-    const w = this.deckWidth
-
-    const backdrop = scene.add
-      .rectangle(0, 0, w, 1, Color.backgroundLight)
+    const bg = this.scene.add
+      .rectangle(0, 0, 1, 1, Color.backgroundLight)
       .setInteractive()
 
-    const outer = ui.add
-      .sizer({
-        width: w,
-        orientation: 1,
-        space: {
-          left: Space.pad,
-          right: Space.pad,
-          top: Space.pad,
-          bottom: Space.pad,
-          item: Space.padSmall,
-        },
-      } as any)
-      .addBackground(backdrop)
-
+    // Lambda for creating buttons
     const smallBtn = (text: string, fn: () => void, muteClick = false) => {
       const wrap = new ContainerLite(
-        scene,
+        this.scene,
         0,
         0,
         Space.buttonWidth,
@@ -229,34 +212,43 @@ export class DeckEditorDeck {
       return wrap
     }
 
-    const secondaryCol = ui.add.sizer({
+    // On the left are 2 small buttons
+    const leftCol = this.scene.rexUI.add.sizer({
       orientation: 1,
       space: { item: Space.padSmall },
-    } as any)
-    secondaryCol.add(smallBtn('Save', () => this.opts.onSave()))
-    secondaryCol.add(smallBtn('Cosmetics', () => this.opts.onCosmetics(), true))
+    })
+    leftCol.add(smallBtn('Save', () => this.opts.onSave()))
+    leftCol.add(smallBtn('Cosmetics', () => this.opts.onCosmetics(), true))
 
-    const playWrap = new ContainerLite(
-      scene,
+    // Play button
+    const rightCol = new ContainerLite(
+      this.scene,
       0,
       0,
       Space.buttonWidth,
       Space.bigButtonHeight,
     )
     new Buttons.Big({
-      within: playWrap,
+      within: rightCol,
       text: 'Play',
       f: () => this.opts.onPlay(),
     })
 
-    const actionsRow = ui.add.sizer({
-      orientation: 0,
-      space: { item: Space.padSmall },
-    } as any)
-    actionsRow.add(secondaryCol)
-    actionsRow.add(playWrap)
-    outer.add(actionsRow)
+    // Main sizer
+    const sizer = this.scene.rexUI.add
+      .sizer({
+        space: {
+          left: Space.pad,
+          right: Space.pad,
+          top: Space.pad,
+          bottom: Space.pad,
+          item: Space.padSmall,
+        },
+      })
+      .addBackground(bg)
+      .add(leftCol)
+      .add(rightCol)
 
-    return outer
+    return sizer
   }
 }
