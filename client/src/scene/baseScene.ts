@@ -137,6 +137,10 @@ export default class BaseScene extends SharedBaseScene {
     this.lastScene = args.lastScene
   }
 
+  protected setLastScene(lastScene: string): void {
+    this.lastScene = lastScene
+  }
+
   create(params = {}): void {
     super.create(params)
 

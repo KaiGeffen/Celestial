@@ -63,6 +63,12 @@ export class MatchScene extends BaseScene {
     lastScene?: string
   }) {
     this.params = params
+
+    // Set which scene to return to
+    if (params.lastScene) {
+      this.setLastScene(params.lastScene)
+    }
+
     // Reset variables
     this.queuedStates = {}
     this.currentVersion = this.maxVersion = -1
@@ -499,6 +505,10 @@ export class MatchScene extends BaseScene {
     this.view.theirStacks.onWindowResize()
     this.view.theirBoard.onWindowResize()
   }
+
+  doExit(): () => void {
+    return () => this.doBack()
+  }
 }
 
 // The View of MVC - What is presented to the user
@@ -691,18 +701,6 @@ export class StandardMatchScene extends MatchScene {
   constructor(args = { key: 'StandardMatchScene', lastScene: 'BuilderScene' }) {
     super(args)
   }
-
-  doExit(): () => void {
-    return () => {
-      if (this.params?.lastScene) {
-        this.beforeExit()
-        this.scene.stop('MenuScene')
-        this.scene.start(this.params.lastScene)
-        return
-      }
-      this.doBack()
-    }
-  }
 }
 
 // TODO Consider removing this if it's not adding anything
@@ -710,22 +708,10 @@ export class JourneyMatchScene extends MatchScene {
   constructor(args = { key: 'JourneyMatchScene', lastScene: 'JourneyScene' }) {
     super(args)
   }
-
-  doExit(): () => void {
-    return () => {
-      this.doBack()
-    }
-  }
 }
 
 export class RaceMatchScene extends MatchScene {
   constructor(args = { key: 'RaceMatchScene', lastScene: 'RaceScene' }) {
     super(args)
-  }
-
-  doExit(): () => void {
-    return () => {
-      this.doBack()
-    }
   }
 }
