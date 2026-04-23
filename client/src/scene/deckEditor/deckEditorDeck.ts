@@ -2,6 +2,7 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
 import BaseScene from '../baseScene'
 import Cutout from '../../lib/buttons/cutout'
@@ -16,7 +17,7 @@ import { MechanicsSettings } from '../../../../shared/settings'
 import { DECK_EDITOR_DECK_WIDTH } from './constants'
 import { rexUi } from './rexUi'
 
-/** Initial deck column state + callbacks — scene owns persistence and menus. */
+/** Props for the deck editor right column — initial list + thumbnails + actions by callback. */
 export type DeckEditorDeckOptions = {
   deckIndex: number
   deckName: string
@@ -31,7 +32,10 @@ export type DeckEditorDeckOptions = {
   onPlay: () => void
 }
 
-/** Right column: deck thumbnail header, scrolling decklist, Save / Cosmetics / Play. */
+/**
+ * Deck editor right column: thumbnail + share row, scrolling decklist, footer actions.
+ * Rex child order: header → scroll panel → footer (fixed heights on header/footer).
+ */
 export class DeckEditorDeck {
   readonly scene: BaseScene
   readonly deckWidth: number
@@ -40,58 +44,74 @@ export class DeckEditorDeck {
   readonly scrollPanel: ScrollablePanel
   deckThumbnail!: DeckThumbnail
 
-  /** Measured once at build time; used with window height for scroll bounds. */
+  /** Pixel heights after first layout — used with window height for scroll viewport. */
   headerHeight = 0
   footerHeight = 0
 
-  readonly columnSizer: any
+  readonly columnSizer: RexUIPlugin.Sizer
 
   private readonly opts: DeckEditorDeckOptions
 
   constructor(scene: BaseScene, opts: DeckEditorDeckOptions) {
     this.scene = scene
     this.opts = opts
-    // TODO Remove constant and arg
-    this.deckWidth = Space.cutoutWidth + 20
+    this.deckWidth = DECK_EDITOR_DECK_WIDTH
 
-    const deckBg = scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
+    // Contents of scroll panel (Lowest depth)
+    const bgScroll = scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
     this.decklist = new Decklist(scene, opts.createCutoutInteraction())
     this.decklist.setDeck(opts.deckCards, opts.mustOwnCardsInList)
 
-    const deckHeader = this.buildHeader()
-    ;(deckHeader as any).layout()
-    this.headerHeight = (deckHeader as any).height as number
+    // Header
+    const headerSizer = this.createHeader()
+    this.headerHeight = DeckEditorDeck.layoutSizerHeight(headerSizer)
 
-    const footer = this.buildFooter()
-    ;(footer as any).layout()
-    this.footerHeight = (footer as any).height as number
+    // Footer
+    const footerSizer = this.createFooter()
+    this.footerHeight = DeckEditorDeck.layoutSizerHeight(footerSizer)
 
+    // Scroll panel takes up full height besides header and footer
+    const scrollBodyH =
+      Space.windowHeight - this.headerHeight - this.footerHeight
+
+    // Create the scroll panel
     this.scrollPanel = newScrollablePanel(scene, {
-      // width: this.deckWidth,
-      height: Space.windowHeight - this.headerHeight - this.footerHeight,
-      background: deckBg,
+      width: this.deckWidth,
+      height: scrollBodyH,
+      background: bgScroll,
       panel: { child: this.decklist.sizer },
-      scrollMode: 'y',
-    }).setOrigin(0)
+    })
 
-    const ui = rexUi(scene)
-    const deckColumn = ui.add.sizer({ orientation: 1 }).setOrigin(0)
-    deckColumn.add(deckHeader, { proportion: 0 })
-    deckColumn.add(this.scrollPanel, { proportion: 0 })
-    deckColumn.add(footer, { proportion: 0 })
+    // Create the sizer
+    this.columnSizer = rexUi(scene)
+      .add.sizer({
+        orientation: 1,
+      })
+      .add(headerSizer)
+      .add(this.scrollPanel)
+      .add(footerSizer)
+  }
 
-    this.columnSizer = deckColumn
+  /** RexUI sizers expose `.height` after `layout()`; rex typings omit it so we normalize here. */
+  private static layoutSizerHeight(sizer: {
+    layout(): unknown
+    height?: number
+  }): number {
+    sizer.layout()
+    const h = (sizer as { height?: number }).height
+    return typeof h === 'number' ? h : 0
   }
 
   onWindowResize(): void {
-    const windowHeight = Space.windowHeight
-    const deckScrollH = Math.max(
+    // Resize the scroll panel to be window - header - footer
+    const scrollH = Math.max(
       1,
-      windowHeight - this.headerHeight - this.footerHeight,
+      Space.windowHeight - this.headerHeight - this.footerHeight,
     )
-    const deckRatio = this.scrollPanel.t
-    this.scrollPanel.setMinSize(this.deckWidth, deckScrollH).layout()
-    this.scrollPanel.t = Math.min(0.999999, deckRatio)
+    this.scrollPanel.setMinSize(this.deckWidth, scrollH)
+
+    // Reset scroll
+    this.scrollPanel.t = 0
   }
 
   syncThumbnail(args: {
@@ -100,15 +120,13 @@ export class DeckEditorDeck {
     cardback: number
     isValid: boolean
   }): void {
-    this.deckThumbnail.updateDisplay(args)
+    this.deckThumbnail?.updateDisplay(args)
   }
 
   layoutDecklist(): void {
-    // Ensure the panel is within scroll bounds
     const panel = this.scrollPanel
     panel.t = Math.min(0.999999, panel.t)
-
-    this.scrollPanel.layout()
+    panel.layout()
   }
 
   scrollDecklistToTop(): void {
@@ -117,14 +135,19 @@ export class DeckEditorDeck {
     this.scrollPanel.layout()
   }
 
-  private buildHeader(): FixWidthSizer {
+  /**
+   * Deck name tile + share — “valid” reflects last *saved* deck length in settings,
+   * until `syncThumbnail` applies the live draft from the scene.
+   */
+  private createHeader(): FixWidthSizer {
     const scene = this.scene
     const ui = rexUi(scene)
-    const background = scene.add
+    const backdrop = scene.add
       .rectangle(0, 0, 1, 1, Color.backgroundDark)
       .setInteractive()
-    scene.addShadow(background, -90)
-    const sizer = ui.add
+    scene.addShadow(backdrop, -90)
+
+    const outer = ui.add
       .fixWidthSizer({
         width: this.deckWidth,
         space: {
@@ -134,24 +157,24 @@ export class DeckEditorDeck {
         },
         align: 'left',
       })
-      .addBackground(background)
+      .addBackground(backdrop)
 
     const decks = UserSettings._get('decks') || []
     const savedDeck = decks[this.opts.deckIndex]
-    const savedCount = savedDeck?.cards?.length ?? 0
-    const isValid = savedCount === MechanicsSettings.DECK_SIZE
+    const savedLen = savedDeck?.cards?.length ?? 0
+    const thumbnailShowsSavedValid = savedLen === MechanicsSettings.DECK_SIZE
 
     this.deckThumbnail = new DeckThumbnail({
       scene,
       name: this.opts.deckName,
       cosmeticSet: this.opts.cosmeticSet,
       cardback: this.opts.cosmeticSet.cardback ?? 0,
-      isValid,
+      isValid: thumbnailShowsSavedValid,
       onClick: () => this.opts.onDeckNameClick(),
       tuckHeaderArt: true,
     })
 
-    const copyContainer = new ContainerLite(
+    const shareWrap = new ContainerLite(
       scene,
       0,
       0,
@@ -160,36 +183,38 @@ export class DeckEditorDeck {
     )
     new Buttons.Icon({
       name: 'Share',
-      within: copyContainer,
+      within: shareWrap,
       x: 0,
       y: 0,
       f: () => this.opts.onShareDeckCode(),
       hint: 'Export deck-code',
     })
 
-    const headerRow = ui.add
+    const thumbRow = ui.add
       .sizer({
         orientation: 0,
         space: { item: Space.padSmall },
       } as any)
       .add(this.deckThumbnail.container, { align: 'center' })
-      .add(copyContainer, { align: 'center' })
+      .add(shareWrap, { align: 'center' })
 
-    sizer.add(headerRow)
-
-    return sizer
+    outer.add(thumbRow)
+    return outer
   }
 
-  private buildFooter(): any {
+  /** Save / Cosmetics column + Play — actions forward to scene via opts. */
+  private createFooter(): RexUIPlugin.Sizer {
     const scene = this.scene
     const ui = rexUi(scene)
-    const deckWidth = this.deckWidth
-    const background = scene.add
-      .rectangle(0, 0, deckWidth, 1, Color.backgroundLight)
+    const w = this.deckWidth
+
+    const backdrop = scene.add
+      .rectangle(0, 0, w, 1, Color.backgroundLight)
       .setInteractive()
-    const sizer = ui.add
+
+    const outer = ui.add
       .sizer({
-        width: deckWidth,
+        width: w,
         orientation: 1,
         space: {
           left: Space.pad,
@@ -199,28 +224,28 @@ export class DeckEditorDeck {
           item: Space.padSmall,
         },
       } as any)
-      .addBackground(background)
+      .addBackground(backdrop)
 
-    const makeBtn = (text: string, f: () => void, muteClick = false) => {
-      const container = new ContainerLite(
+    const smallBtn = (text: string, fn: () => void, muteClick = false) => {
+      const wrap = new ContainerLite(
         scene,
         0,
         0,
         Space.buttonWidth,
         Space.buttonHeight,
       )
-      new Buttons.Basic({ within: container, text, f, muteClick })
-      return container
+      new Buttons.Basic({ within: wrap, text, f: fn, muteClick })
+      return wrap
     }
 
-    const colSizer = ui.add.sizer({
+    const secondaryCol = ui.add.sizer({
       orientation: 1,
       space: { item: Space.padSmall },
     } as any)
-    colSizer.add(makeBtn('Save', () => this.opts.onSave()))
-    colSizer.add(makeBtn('Cosmetics', () => this.opts.onCosmetics(), true))
+    secondaryCol.add(smallBtn('Save', () => this.opts.onSave()))
+    secondaryCol.add(smallBtn('Cosmetics', () => this.opts.onCosmetics(), true))
 
-    const playContainer = new ContainerLite(
+    const playWrap = new ContainerLite(
       scene,
       0,
       0,
@@ -228,19 +253,19 @@ export class DeckEditorDeck {
       Space.bigButtonHeight,
     )
     new Buttons.Big({
-      within: playContainer,
+      within: playWrap,
       text: 'Play',
       f: () => this.opts.onPlay(),
     })
 
-    const rowSizer = ui.add.sizer({
+    const actionsRow = ui.add.sizer({
       orientation: 0,
       space: { item: Space.padSmall },
     } as any)
-    rowSizer.add(colSizer)
-    rowSizer.add(playContainer)
-    sizer.add(rowSizer)
+    actionsRow.add(secondaryCol)
+    actionsRow.add(playWrap)
+    outer.add(actionsRow)
 
-    return sizer
+    return outer
   }
 }

@@ -97,12 +97,11 @@ export default class DeckEditorScene extends BaseScene {
 
     // Make the main sizer
     this.sizer = this.rexUI.add.sizer()
-    this.sizer.add(this.catalogRegion.columnSizer, {
-      proportion: 1,
-      expand: true,
-    })
-    this.sizer.add(this.deckRegion.columnSizer, { proportion: 0, expand: true })
-    ;(this.plugins.get('rexAnchor') as any).add(this.sizer, {
+    this.sizer.add(this.catalogRegion.columnSizer)
+    this.sizer.add(this.deckRegion.columnSizer)
+
+    // Anchor this to take up full screen
+    this.plugins.get('rexAnchor')['add'](this.sizer, {
       width: '100%',
       height: '100%',
       left: 'left',
