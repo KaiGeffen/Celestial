@@ -34,8 +34,8 @@ export default class HistoryRegion extends Region {
       this.chromeRecap.setVisible(true)
     } else {
       this.btnRecap.disable()
-      this.btnRecap.setVisible(false)
-      this.chromeRecap.setVisible(false)
+      this.btnRecap.setVisible(true)
+      this.chromeRecap.setVisible(true)
     }
   }
 
