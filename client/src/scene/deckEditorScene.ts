@@ -68,7 +68,7 @@ export default class DeckEditorScene extends BaseScene {
   private createElements(deck: Deck): void {
     this.createBackground()
 
-    // Catalog
+    // Catalog region
     this.catalogRegion = new DeckEditorCatalog(this, {
       onCardPick: (card) => this.addCardToDeck(card),
     })
@@ -119,7 +119,7 @@ export default class DeckEditorScene extends BaseScene {
     })
   }
 
-  // Callbacks
+  /** Callbacks */
   private addCardToDeck(card: Card): void {
     this.deckRegion.decklist.addCard(card)
     this.deckRegion.layoutDecklist()
@@ -231,7 +231,7 @@ export default class DeckEditorScene extends BaseScene {
     UserSettings._setIndex('decks', this.deckIndex, updated)
   }
 
-  // Utitility
+  /** Utility */
   private getDeckCode(): number[] {
     return this.deckRegion.decklist.getDeckCode()
   }
@@ -249,7 +249,6 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   private setDeck(cards: Card[]): void {
-    // TODO Why is flag passed here?
     this.deckRegion.decklist.setDeck(
       cards,
       Flags.devCardsEnabled ? false : true,
@@ -276,21 +275,12 @@ export default class DeckEditorScene extends BaseScene {
     UserSettings._set('decks', decks)
   }
 
-  // TODO STILL TO READ
   onWindowResize(): void {
-    return
     if (!this.sizer || !this.catalogRegion || !this.deckRegion) return
-
-    const catalogW = Math.max(1, Space.windowWidth - DECK_EDITOR_DECK_WIDTH)
 
     this.catalogRegion.resize(Space.windowHeight)
     this.deckRegion.resizeScrollArea(Space.windowHeight)
 
-    this.catalogRegion.columnSizer
-      .setMinSize(catalogW, Space.windowHeight)
-      .layout()
-
-    this.sizer.setMinSize(Space.windowWidth, Space.windowHeight)
     this.sizer.layout()
   }
 
