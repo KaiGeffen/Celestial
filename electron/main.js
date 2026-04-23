@@ -16,16 +16,15 @@ try {
   console.warn('Steam not available:', e.message)
 }
 
-// Fixed port for the local file server.
-// Must NOT be 4949 — that would set Flags.local=true and point the game at
-// the local WebSocket server instead of the production server.
-const PORT = 8082
+// Port 4949 sets Flags.local=true, pointing the game at the local WebSocket server.
+// Port 8082 is used for production builds served via Electron.
+const PORT = process.env.LOCAL_DEV ? 4949 : 8082
 
 const MIME_TYPES = {
-  '.html': 'text/html',
-  '.js':   'application/javascript',
-  '.css':  'text/css',
-  '.json': 'application/json',
+  '.html': 'text/html; charset=utf-8',
+  '.js':   'application/javascript; charset=utf-8',
+  '.css':  'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
   '.webp': 'image/webp',
   '.png':  'image/png',
   '.jpg':  'image/jpeg',

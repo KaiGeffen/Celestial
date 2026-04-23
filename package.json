@@ -9,6 +9,7 @@
     "dev:server": "npm run dev --prefix server",
     "build:server": "npm run build --prefix server",
     "electron": "npm run build --prefix client && npm start --prefix electron",
+    "electron:local": "npm run build --prefix client && LOCAL_DEV=true npm start --prefix electron",
     "electron:prod": "npm run build:prod --prefix client && npm start --prefix electron",
     "electron:dist": "npm run build:prod --prefix client && npm run dist --prefix electron",
     "electron:dist:win": "npm run build:prod --prefix client && npm run dist:win --prefix electron",
