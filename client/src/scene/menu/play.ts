@@ -55,6 +55,10 @@ export default class PlayMenu extends Menu {
 
   private activeScene: Phaser.Scene
 
+  private getReturnSceneKey(): string {
+    return this.activeScene?.scene?.key ?? 'HomeScene'
+  }
+
   constructor(scene: MenuScene, params) {
     super(scene, menuWidth)
 
@@ -478,6 +482,7 @@ export default class PlayMenu extends Menu {
             isPvp: false,
             deck: this.deck,
             aiDeck,
+            lastScene: this.getReturnSceneKey(),
           })
           logEvent('queue_pve')
         }),
@@ -500,6 +505,7 @@ export default class PlayMenu extends Menu {
             isPvp: true,
             deck: this.deck,
             password: '',
+            lastScene: this.getReturnSceneKey(),
           })
           logEvent('queue_pvp')
         }),
@@ -527,6 +533,7 @@ export default class PlayMenu extends Menu {
           isPvp: true,
           deck: this.deck,
           password: this.password,
+          lastScene: this.getReturnSceneKey(),
         })
         logEvent('queue_pwd')
       },

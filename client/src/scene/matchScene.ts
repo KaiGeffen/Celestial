@@ -60,6 +60,7 @@ export class MatchScene extends BaseScene {
     aiDeck?: Deck
     gameStartState?: GameModel
     enabledModes?: number[]
+    lastScene?: string
   }) {
     this.params = params
     // Reset variables
@@ -693,8 +694,13 @@ export class StandardMatchScene extends MatchScene {
 
   doExit(): () => void {
     return () => {
-      this.beforeExit()
-      this.scene.start('BuilderScene')
+      if (this.params?.lastScene) {
+        this.beforeExit()
+        this.scene.stop('MenuScene')
+        this.scene.start(this.params.lastScene)
+        return
+      }
+      this.doBack()
     }
   }
 }
