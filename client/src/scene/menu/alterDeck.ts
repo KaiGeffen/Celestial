@@ -444,6 +444,6 @@ export class NewDeckMenu extends AlterDeckMenu {
 
 export class EditDeckMenu extends AlterDeckMenu {
   constructor(scene: MenuScene, params) {
-    super(scene, params, 'Update Deck', 'Update')
+    super(scene, params, 'Deck Cosmetics', 'Update')
   }
 }
