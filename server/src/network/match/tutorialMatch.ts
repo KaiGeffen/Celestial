@@ -12,8 +12,8 @@ class TutorialMatch extends PveMatch {
     super(
       ws,
       uuid,
-      { name: '', cards: [], cosmeticSet: { avatar: 0, border: 0 } },
-      { name: '', cards: [], cosmeticSet: { avatar: 0, border: 0 } },
+      { name: '', cards: [], cosmeticSet: { avatar: 0, border: 0, cardback: 0 } },
+      { name: '', cards: [], cosmeticSet: { avatar: 0, border: 0, cardback: 0 } },
     )
 
     this.tutorialNum = num

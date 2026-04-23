@@ -1,7 +1,7 @@
 import { Quality } from './quality'
 import { Act } from './story'
 import GameModel from './gameModel'
-import { Animation } from '../animation'
+import { Animation, Visibility } from '../animation'
 import { Zone } from './zone'
 import { Keyword } from './keyword'
 
@@ -105,6 +105,12 @@ export default class Card {
   exhale(amt: number, game: GameModel, player: number): boolean {
     if (game.breath[player] >= amt) {
       game.breath[player] -= amt
+
+      // Increment the exhale count for the given player
+      if (amt > 0) {
+        game.exhaleCountLastRound[player] += 1
+      }
+
       return true
     } else {
       return false
@@ -179,6 +185,7 @@ export default class Card {
     player: number,
     game: GameModel,
     index: number,
+    handSizeAtStart?: number,
   ): [boolean, boolean] {
     return [false, false]
   }
@@ -200,28 +207,53 @@ export default class Card {
 
   onShuffle(player: number, game: GameModel, index: number): void {}
 
-  // Called when a card is played while this is in the story
-  onCardPlayedAfter(player: number, game: GameModel, index: number): void {}
+  // Called when a card is played while this is in the story, return whether the card was removed
+  onCardPlayedAfter(
+    index: number,
+    owner: number,
+    playedCardOwner: number,
+    game: GameModel,
+  ): boolean {
+    return false
+  }
+
+  // Trigger when you pass while this is in the story
+  onPass(playerWhoPassed: number, owner: number, game: GameModel): void {}
+
+  // When given player resolves a card with base-cost 7 or more
+  onBigResolve(player: number, game: GameModel, index: number): void {}
 
   /* Common functions */
   reset(game: GameModel) {
     game.score = [0, 0]
+    game.animations[0].push(new Animation({ from: Zone.Reset }))
   }
 
   inspired(amt: number, game: GameModel, player: number) {
     game.breath[player] += amt
     game.status[player].inspired += amt
-  }
 
-  inspire(amt: number, game: GameModel, player: number) {
-    // TODO Handle status animations
+    // NOTE Inspired, not Inspire, is what fades in
     game.animations[player].push(
       new Animation({
         from: Zone.Status,
         index: 0,
       }),
     )
+  }
+
+  inspire(amt: number, game: GameModel, player: number) {
     game.status[player].inspire += amt
+  }
+
+  possibility(amt: number, game: GameModel, player: number) {
+    game.animations[player].push(
+      new Animation({
+        from: Zone.Status,
+        index: 3,
+      }),
+    )
+    game.status[player].possibility += amt
   }
 
   nourish(amt: number, game: GameModel, player: number) {
@@ -256,7 +288,10 @@ export default class Card {
   rateReset(world: any): number {
     let knownValue = 0
     let theirUnknownCards = 0
-    let theirBreath = world.maxBreath[1] + world.status[1].inspired
+    let theirBreath =
+      world.maxBreath[1] +
+      world.status[1].inspired +
+      world.status[1].possibility
 
     for (const act of world.story.acts) {
       const card = act.card
@@ -322,8 +357,19 @@ export class SightCard extends Card {
 export class RefreshCard extends Card {
   onPlay(player: number, game: GameModel): void {
     if (game.hand[player].length > 0) {
+      // Move leftmost card to bottom of deck
       const card = game.hand[player].shift()
       game.deck[player].unshift(card)
+      game.animations[player].push(
+        new Animation({
+          from: Zone.Hand,
+          to: Zone.Deck,
+          card: card,
+          index: 0,
+          visibility: Visibility.FullyUnknown,
+        }),
+      )
+
       game.draw(player, 1)
     }
   }

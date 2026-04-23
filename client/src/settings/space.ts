@@ -6,6 +6,13 @@ export function refreshSpace() {
   Space = getSpace()
 }
 
+/** Deck editor filter strip / deck selector title row — keep heights in sync. */
+export function deckFilterBarHeight(): number {
+  return Space.filterBarHeight > 0
+    ? Space.filterBarHeight
+    : Space.padSmall * 2 + Space.textboxHeight
+}
+
 function getSpace() {
   let width = Math.floor(window.innerWidth)
   let height = Math.floor(window.innerHeight)
@@ -59,13 +66,13 @@ function getSpace() {
 
     // Dimensions for common buttons
     buttonWidth: 150,
-    buttonHeight: 58,
+    buttonHeight: 51,
     bigButtonHeight: 130,
     textboxWidth: 296,
     textboxHeight: 58,
 
     avatarSize: Flags.mobile ? 80 : 130,
-    iconSize: 32,
+    iconSize: 40,
 
     sliderWidth: 40,
 

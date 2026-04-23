@@ -43,6 +43,14 @@ export const assetLists = {
     },
     "pixelArt": false
   },
+  "cardback": {
+    "files": [
+      "Astrology",
+      "Blossom",
+      "Default"
+    ],
+    "pixelArt": false
+  },
   "card": {
     "files": [],
     "pixelArt": true
@@ -205,6 +213,12 @@ export const assetLists = {
     ],
     "pixelArt": false
   },
+  "card/effects": {
+    "files": [
+      "shadow"
+    ],
+    "pixelArt": false
+  },
   "cutout": {
     "files": [
       "Abundance",
@@ -315,56 +329,39 @@ export const assetLists = {
     ],
     "pixelArt": true
   },
-  "cardback": {
-    "files": [
-      "default"
-    ],
-    "pixelArt": false
-  },
   "icon": {
     "files": [
+      "Wins",
       "Mission",
-      "Arrow",
-      "Border",
       "BreathBasic",
       "BreathExtra",
       "BreathHover",
       "BreathOom",
       "BreathSpent",
       "CustomDeck",
-      "Deck",
       "DeckbuilderTab",
-      "Discard",
       "Discord",
-      "Edit",
-      "Friends",
-      "History",
-      "HomeButton",
       "InputText",
       "Inspire",
-      "JourneyClearStamp",
       "JourneyStar",
       "JourneyTab",
-      "Leaderboard",
       "LeaderboardTab",
       "MatchHistoryTab",
       "Moon",
       "Network",
-      "New",
       "Nourish",
       "Options",
       "PlayTab",
       "Pointer",
       "ProfileTab",
       "Quest",
-      "QuestionMark",
       "QuestsTab",
       "Recap",
       "Search",
       "Share",
       "Sight",
-      "Skip",
       "SmallX",
+      "Social",
       "Speed",
       "Status",
       "Store",
@@ -372,10 +369,13 @@ export const assetLists = {
       "Sun",
       "Thumb",
       "Underline",
-      "Wins",
       "XOut"
     ],
     "dimensions": {
+      "Wins": {
+        "width": 157,
+        "height": 1080
+      },
       "Mission": {
         "width": 80,
         "height": 80
@@ -385,8 +385,14 @@ export const assetLists = {
   },
   "background": {
     "files": [
-      "Dark",
-      "Light"
+      "Light",
+      "matchBottom",
+      "matchBottom",
+      "matchDay",
+      "matchNight",
+      "matchTile",
+      "matchTop",
+      "matchTop"
     ],
     "pixelArt": false
   },
@@ -441,11 +447,18 @@ export const assetLists = {
   },
   "chrome": {
     "files": [
-      "Avatar",
       "CloudBottom",
       "CloudTop",
-      "Hand",
-      "ResultGlow"
+      "Recap",
+      "ResultGlow",
+      "breathWheel",
+      "bubble",
+      "bubbleEffect",
+      "bubbleNourish",
+      "nameplate",
+      "stackCount",
+      "sundial",
+      "wins"
     ],
     "pixelArt": false
   },
@@ -500,13 +513,6 @@ export const assetLists = {
     ]
   },
   "dialog": {
-    "files": [
-      "Adonis",
-      "Imani",
-      "Jules",
-      "Kitz",
-      "Mia",
-      "Mitra"
-    ]
+    "files": []
   }
 } as const;

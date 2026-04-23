@@ -3,8 +3,13 @@ import AvatarButton from './avatar'
 import DecklistButton from './decklist'
 import TextButton from './text'
 import MissionButton from './mission'
-import { DeckButton, DiscardButton } from './stacks'
-import { InspireButton, NourishButton, SightButton } from './keywords'
+import StackCountButton from './stackCountButton'
+import {
+  InspireButton,
+  NourishButton,
+  SightButton,
+  PossibilityButton,
+} from './statuses'
 import HomeSceneButton from './homeSceneButton'
 import Icon from './icon'
 import Sun from './sun'
@@ -19,13 +24,13 @@ export default class Buttons {
   static Decklist = DecklistButton
   static Text = TextButton
   static Stacks = {
-    Deck: DeckButton,
-    Discard: DiscardButton,
+    StackCount: StackCountButton,
   }
   static Keywords = {
     Inspire: InspireButton,
     Nourish: NourishButton,
     Sight: SightButton,
+    Possibility: PossibilityButton,
   }
   static Mission = MissionButton
   static HomeScene = HomeSceneButton

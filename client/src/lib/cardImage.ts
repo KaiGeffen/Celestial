@@ -1,15 +1,25 @@
 import 'phaser'
 import Catalog from '../../../shared/state/catalog'
-import { Color, Style, BBStyle, Space, Flags } from '../settings/settings'
+import { Color, Style, BBStyle, Space, Flags, Time } from '../settings/settings'
 import Card from '../../../shared/state/card'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import BaseScene from '../scene/baseScene'
 import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 import { Keywords } from '../../../shared/state/keyword'
+import cardbackNames from '../data/cardbackNames'
 
 const COLOR_BETTER = '#55dd55'
 const COLOR_WORSE = '#e45555'
 const STAT_STROKE = '#000000'
+
+/** Name on the story points-resolve bubble container so setResolved can keep it visible. */
+export const STORY_RESOLVE_BUBBLE_NAME = 'storyPointsBubble'
+
+/** Name on the story nourish-resolve bubble (from status row to card). */
+export const STORY_RESOLVE_NOURISH_BUBBLE_NAME = 'storyNourishBubble'
+
+/** Bonus/malus from card text (story position, etc.); not the points stat nor nourish. */
+export const STORY_RESOLVE_EFFECTS_BUBBLE_NAME = 'storyEffectsBubble'
 
 // TODO Many fields should be private
 
@@ -17,16 +27,21 @@ export class CardImage {
   scene: BaseScene
 
   card: Card
+  cardback: number
   visible = true
   interactive = false
   doBurstEffect = true
 
-  // Image layers
+  // Image layers (shadow is drawn first / behind everything)
+  imageShadow: CardShadow
   imageBackground: Phaser.GameObjects.Image
   imageSubject: Phaser.GameObjects.Image
   imageArc: Phaser.GameObjects.Image
   imageContainer: Phaser.GameObjects.Image
   imageCardback: Phaser.GameObjects.Image
+
+  /** Image layers only; alpha dims on resolve while text stays opaque (sibling of text under `container`). */
+  private artContainer: Phaser.GameObjects.Container
 
   // Text elements
   txtCost: BBCodeText
@@ -58,9 +73,15 @@ export class CardImage {
     container: any,
     interactive: boolean = true,
     shadow: boolean = true,
+    cardback: number = 0,
   ) {
     card = card || Catalog.cardback
-    this.init(card, container, interactive, shadow)
+    this.init(card, container, interactive, shadow, cardback)
+  }
+
+  private getCardbackTextureKey(): string {
+    const name = cardbackNames[this.cardback] ?? cardbackNames[0]
+    return `cardback-${name}`
   }
 
   private init(
@@ -68,8 +89,10 @@ export class CardImage {
     outerContainer: any,
     interactive: boolean,
     shadow: boolean,
+    cardback: number,
   ) {
     this.card = card
+    this.cardback = cardback
     this.scene = outerContainer.scene
     this.createContainer(outerContainer)
 
@@ -95,15 +118,7 @@ export class CardImage {
   }
 
   destroy(): void {
-    ;[
-      this.imageBackground,
-      this.imageSubject,
-      this.imageArc,
-      this.imageContainer,
-      this.txtCost,
-      this.txtPoints,
-      this.container,
-    ].forEach((obj) => obj.destroy())
+    this.container.destroy()
   }
 
   show(): this {
@@ -146,17 +161,63 @@ export class CardImage {
     return this
   }
 
+  /**
+   * Undo the hover behavior, and call the exit callback
+   */
+  onHoverExitBehavior(): void {
+    this.scene.tweens.killTweensOf(this.imageSubject)
+    this.scene.tweens.add({
+      targets: this.imageSubject,
+      displayWidth: Space.cardWidth,
+      displayHeight: Space.cardHeight,
+      duration: 120,
+      ease: 'Quad.Out',
+    })
+    this.exitCallback()
+  }
+
   setPlayable(isPlayable: boolean): void {
     if (isPlayable) {
       this.clearTint()
     } else {
       this.setTint(Color.cardGreyed)
+
+      // Set to grey shadow
+      this.imageShadow.clearGlow()
     }
   }
 
-  // Set that a card has resolved (In the story)
-  setResolved(): this {
-    this.setTint(Color.cardGreyed)
+  private static readonly RESOLVED_ALPHA = 0.6
+  private static readonly RESOLVED_SCALE = 0.7
+
+  /**
+   * Mark a story card as resolved (dim + shrink).
+   * @param animate — if true, tween; if false, set immediately (earlier resolves, or bulk recap).
+   */
+  setResolved(animate: boolean): this {
+    // this.setTint(Color.cardGreyed)
+    this.scene.tweens.killTweensOf(this.container)
+    this.scene.tweens.killTweensOf(this.artContainer)
+    if (animate) {
+      const d = Time.match.cardSink
+      const ease = 'Sine.easeOut'
+      this.scene.tweens.add({
+        targets: this.container,
+        scaleX: CardImage.RESOLVED_SCALE,
+        scaleY: CardImage.RESOLVED_SCALE,
+        duration: d,
+        ease,
+      })
+      this.scene.tweens.add({
+        targets: this.artContainer,
+        alpha: CardImage.RESOLVED_ALPHA,
+        duration: d,
+        ease,
+      })
+    } else {
+      this.container.setScale(CardImage.RESOLVED_SCALE)
+      this.artContainer.setAlpha(CardImage.RESOLVED_ALPHA)
+    }
     return this
   }
 
@@ -174,10 +235,13 @@ export class CardImage {
 
       if (this.card.cost > cost) {
         this.txtCost.setColor(COLOR_BETTER)
+        this.imageShadow.setGlow(0x55dd55)
       } else if (this.card.cost < cost) {
         this.txtCost.setColor(COLOR_WORSE)
+        this.imageShadow.setGlow(0xe45555)
       } else {
         this.txtCost.setColor(Color.cardCost)
+        this.imageShadow.clearGlow()
       }
     }
     return this
@@ -187,7 +251,8 @@ export class CardImage {
   setCard(card: Card): this {
     if (
       this.card.id !== card.id ||
-      this.card.upgradeVersion !== card.upgradeVersion
+      this.card.upgradeVersion !== card.upgradeVersion ||
+      this.points !== card.points
     ) {
       this.card = card
 
@@ -201,7 +266,11 @@ export class CardImage {
       )
 
       // Set to cardback if valid
-      this.imageCardback.setAlpha(this.card.id === Catalog.cardback.id ? 1 : 0)
+      const showingBack = this.card.id === Catalog.cardback.id
+      this.imageCardback.setAlpha(showingBack ? 1 : 0)
+      if (showingBack) {
+        this.imageCardback.setTexture(this.getCardbackTextureKey())
+      }
 
       // Set the textures of the images
       this.imageBackground.setTexture(`card/background-${this.card.theme}`)
@@ -253,6 +322,13 @@ export class CardImage {
   }
 
   private createImages(shadow: boolean): void {
+    this.artContainer = this.scene.add.container()
+    this.container.add(this.artContainer)
+
+    this.imageShadow = new CardShadow(this.scene, 0, 0)
+    this.artContainer.add(this.imageShadow)
+    this.imageShadow.setVisible(shadow)
+
     // Card background wash
     this.imageBackground = this.scene.add.image(
       0,
@@ -260,20 +336,16 @@ export class CardImage {
       `card/background-${this.card.theme}`,
     )
     this.imageBackground.setDisplaySize(Space.cardWidth, Space.cardHeight)
-    this.container.add(this.imageBackground)
+    this.artContainer.add(this.imageBackground)
 
     this.imageSubject = this.scene.add.image(0, 0, this.getSubjectImageName())
     this.imageSubject.setDisplaySize(Space.cardWidth, Space.cardHeight)
 
-    if (shadow) {
-      this.scene.addShadow(this.imageBackground)
-    }
-
-    this.container.add(this.imageSubject)
+    this.artContainer.add(this.imageSubject)
 
     this.imageArc = this.scene.add.image(0, 0, `card/arc-${this.card.theme}`)
     this.imageArc.setDisplaySize(Space.cardWidth, Space.cardHeight)
-    this.container.add(this.imageArc)
+    this.artContainer.add(this.imageArc)
 
     this.imageContainer = this.scene.add.image(
       0,
@@ -281,16 +353,12 @@ export class CardImage {
       `card/container-${this.card.theme}`,
     )
     this.imageContainer.setDisplaySize(Space.cardWidth, Space.cardHeight)
-    this.container.add(this.imageContainer)
+    this.artContainer.add(this.imageContainer)
 
     // Cardback
-    this.imageCardback = this.scene.add.image(0, 0, 'cardback-default')
+    this.imageCardback = this.scene.add.image(0, 0, this.getCardbackTextureKey())
     this.imageCardback.setDisplaySize(Space.cardWidth, Space.cardHeight)
-    this.container.add(this.imageCardback)
-
-    if (shadow) {
-      this.scene.addShadow(this.imageCardback)
-    }
+    this.artContainer.add(this.imageCardback)
 
     this.imageCardback.setAlpha(this.card.id === Catalog.cardback.id ? 1 : 0)
   }
@@ -531,17 +599,8 @@ export class CardImage {
         return
       }
 
-      this.scene.tweens.killTweensOf(this.imageSubject)
-      this.scene.tweens.add({
-        targets: this.imageSubject,
-        displayWidth: Space.cardWidth,
-        displayHeight: Space.cardHeight,
-        duration: 120,
-        ease: 'Quad.Out',
-      })
-
-      // Do the callback
-      this.exitCallback()
+      // Do the exit behavior
+      this.onHoverExitBehavior()
     }
   }
 
@@ -572,10 +631,10 @@ export class CardImage {
       this.imageSubject.displayHeight,
     )
     burst.setAngle(this.imageSubject.angle)
+    burst.setOrigin(this.imageSubject.originX, this.imageSubject.originY)
     burst.setAlpha(1)
-    this.scene.children.bringToTop(burst)
-
-    this.container.add(burst)
+    this.artContainer.add(burst)
+    this.artContainer.bringToTop(burst)
 
     this.scene.tweens.add({
       targets: burst,
@@ -593,8 +652,7 @@ export class CardImage {
     this.imageSubject.setTint(color)
     this.imageArc.setTint(color)
     this.imageContainer.setTint(color)
-    this.txtCost.setTint(color)
-    this.txtPoints.setTint(color)
+    // Keep txtCost / txtPoints untinted so stats stay readable when greyed
     // this.txtText.setTint(color)
   }
 
@@ -603,9 +661,45 @@ export class CardImage {
     this.imageSubject.clearTint()
     this.imageArc.clearTint()
     this.imageContainer.clearTint()
-    this.txtCost.clearTint()
-    this.txtPoints.clearTint()
     // this.txtText.clearTint()
+  }
+
+  setMorningGlow(): this {
+    this.imageShadow.setGlow(0xffff9f)
+    return this
+  }
+
+  setVisibleGlow(): this {
+    this.imageShadow.setGlow(0xffff9f)
+    return this
+  }
+
+  setSeenGlow(): this {
+    this.imageShadow.setGlow(0xedb282)
+    return this
+  }
+}
+
+class CardShadow extends Phaser.GameObjects.Image {
+  constructor(scene: BaseScene, x: number, y: number) {
+    super(scene, x, y, 'card/effects-shadow')
+
+    // Set the size slightly larger than a card
+    this.setDisplaySize(Space.cardWidth + 30, Space.cardHeight + 30)
+
+    // Alpha is typically 0.25
+    this.setAlpha(0.25)
+  }
+
+  clearGlow(): void {
+    this.clearTint()
+    this.setAlpha(0.25)
+  }
+
+  setGlow(color: number): void {
+    this.setTintFill(color)
+    this.setAlpha(1)
+    this.setVisible(true)
   }
 }
 

@@ -4,6 +4,7 @@ import { Keywords } from '../keyword'
 import { Animation } from '../../animation'
 import { Zone } from '../zone'
 import { Quality } from '../quality'
+import { ice } from './tokens'
 
 class Mercy extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -231,9 +232,24 @@ class DamBreaks extends Card {
       game.discard(player, 3)
 
       // Add the hand to the story
-      while (game.hand[player].length > 0) {
-        const card = game.hand[player].pop()
-        game.story.addAct(card, player, 0)
+      for (let i = 0; game.hand[player].length > 0; i++) {
+        const card = game.hand[player].shift()
+        if (!card) {
+          console.error('Card is undefined for Dam Breaks')
+          continue
+        }
+
+        game.story.addAct(card, player, i)
+
+        game.animations[player].push(
+          new Animation({
+            from: Zone.Hand,
+            to: Zone.Story,
+            card,
+            index: 0,
+            index2: i,
+          }),
+        )
       }
     }
   }
@@ -246,56 +262,42 @@ const damBreaks = new DamBreaks({
   text: 'Exhale 1: Discard 3 cards. Add your hand to the story after this.',
 })
 
-class Drip extends Card {
-  onDraw(player: number, game: GameModel): void {
-    // Remove from hand
-    game.hand[player].splice(game.hand[player].length - 1, 1)
-
-    // At night, add to the beginning of the story. During the day, add to the end.
-    const index = game.isRecap ? 0 : game.story.acts.length
-    game.story.addAct(this, player, index)
-
-    // TODO Add animation
-    game.animations[player].push(
-      new Animation({
-        from: Zone.Hand,
-        to: Zone.Story,
-        card: this,
-        // Not -1 because it has been removed by this point
-        index: game.hand[player].length,
-        // TODO This goes to where the triggering card is, not to where this ends up, and has bugs with multiple triggers (Fishing Boat)
-        index2: index,
-      }),
-    )
+// TODO
+class Crabs extends Card {
+  onRoundEndIfThisResolved(player: number, game: GameModel) {
+    // If we won, discard a card
+    if (game.score[player] > game.score[player ^ 1]) {
+      game.discard(player, 1)
+    } else if (game.score[player] < game.score[player ^ 1]) {
+      game.draw(player, 1)
+    }
   }
 }
-const drip = new Drip({
-  name: 'Drip',
-  id: 8005,
-  cost: 1,
-  points: 1,
-  qualities: [Quality.VISIBLE],
-  text: 'Visible\nWhen drawn, add this to the story.',
+const crabs = new Crabs({
+  name: 'Crabs',
+  id: 7035,
+  cost: 2,
+  points: 3,
+  text: 'When you win this round, discard a card.\nWhen you lose this round, draw a card.',
   beta: true,
 })
 
-;[
-  mercy,
-  excess,
-  fishingBoat,
-  drown,
-  iceberg,
-  dew,
-  gentleRain,
-  refresh,
-  fish,
-  cloud,
-  gainAndLoss,
-  damBreaks,
-  overflow,
-  drip,
-].forEach((card) => {
-  card.theme = 7
+class Rime extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    for (let i = 0; i < 2; i++) {
+      game.createOnDeckBottom(player, ice)
+    }
+  }
+}
+const rime = new Rime({
+  name: 'Rime',
+  id: 7036,
+  cost: 4,
+  points: 5,
+  text: 'Create 2 copies of Ice on the bottom of your deck.',
+  beta: true,
 })
 
 // TODO
@@ -315,5 +317,6 @@ export {
   damBreaks,
   overflow,
   // NEW
-  drip,
+  crabs,
+  rime,
 }

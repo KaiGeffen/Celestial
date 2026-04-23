@@ -64,3 +64,7 @@ export function getUnlockedBorders(): number[] {
   // Sort and return
   return Array.from(unlockedBorders).sort((a, b) => a - b)
 }
+
+export function getUnlockedCardbacks(): number[] {
+  return [0, 1, 2]
+}

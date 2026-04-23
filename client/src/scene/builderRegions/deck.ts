@@ -250,7 +250,7 @@ export default class DeckRegion {
   }
 
   setCosmeticSet(set: CosmeticSet): DeckRegion {
-    set = set === undefined ? { avatar: 0, border: 0 } : set
+    set = set === undefined ? { avatar: 0, border: 0, cardback: 0 } : set
 
     this.cosmeticSet = set
 

@@ -3,7 +3,7 @@
 import { Flags } from './flags'
 
 import { Color } from './color'
-import { Space } from './space'
+import { Space, deckFilterBarHeight } from './space'
 import { Style, BBStyle } from './style'
 import { Time } from './time'
 import { Url } from './url'
@@ -16,6 +16,7 @@ import { Messages } from './messages'
 export {
   Color,
   Space,
+  deckFilterBarHeight,
   Style,
   BBStyle,
   Time,

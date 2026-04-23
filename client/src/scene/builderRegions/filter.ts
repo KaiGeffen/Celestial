@@ -180,6 +180,7 @@ export default class FilterRegion {
       name: 'SmallX',
       within: sizer,
       f: this.onClearFilters(btns),
+      size: 32,
     })
 
     return sizer
@@ -261,6 +262,10 @@ export default class FilterRegion {
     // Journey mode filters based on journey inventory
     // Non-journey mode based on permanent collection
     let ownershipFilter = (card: Card) => {
+      if (Flags.devCardsEnabled) {
+        return true
+      }
+
       // TODO These sql row names are horribly confusing - rename them
       if (this.isJourneyMode) {
         return UserSettings._get('inventory')[card.id]
@@ -405,7 +410,7 @@ export default class FilterRegion {
     const lowerQuery = query.toLowerCase()
 
     // Build searchable string
-    let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points}`
+    let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points} ${card.beta ? 'beta' : ''}`
 
     // Keyword reminder text
     for (const [keyword, _] of Catalog.getReferencedKeywords(card)) {

@@ -82,13 +82,6 @@ export default class MulliganRegion extends Region {
       },
       returnHotkey: true,
     })
-    this.addHotkeyHint(
-      [
-        Space.windowWidth / 2,
-        Space.windowHeight / 2 + Space.cardHeight / 2 + Space.pad * 4,
-      ],
-      'SPACE',
-    )
 
     this.addHotkeyListeners()
 
@@ -117,7 +110,11 @@ export default class MulliganRegion extends Region {
     // Show the cards as toggleable objects
     for (let i = 0; i < state.hand[0].length; i++) {
       const position = CardLocation.mulligan(this.container, i)
-      let card = this.addCard(state.hand[0][i], position)
+      let card = this.addCard(
+        state.hand[0][i],
+        position,
+        state.cosmeticSets[0].cardback ?? 0,
+      )
         .setCost(state.hand[0][i].cost)
         .setOnClick(this.onCardClick(i))
 
@@ -125,8 +122,6 @@ export default class MulliganRegion extends Region {
       card.doBurstEffect = false
 
       this.cards.push(card)
-
-      this.addHotkeyHint(position, `${i + 1}`)
     }
 
     // Update the text saying who starts with priority

@@ -16,13 +16,14 @@ interface AssetList {
 // Directories to scan
 const DIRECTORIES = [
   'img/avatar',
+  'img/cardback',
   'img/card',
   'img/card/background',
   'img/card/subject',
   'img/card/arc',
   'img/card/container',
+  'img/card/effects',
   'img/cutout',
-  'img/cardback',
   'img/icon',
   'img/background',
   'img/border',
@@ -37,6 +38,7 @@ const DIRECTORIES = [
 // Directories that should not use pixel art
 const NON_PIXEL_ART_DIRS = [
   'avatar',
+  'cardback',
   'sfx',
   'dialog',
   'roundResult',
@@ -45,6 +47,7 @@ const NON_PIXEL_ART_DIRS = [
   'card/subject',
   'card/arc',
   'card/container',
+  'card/effects',
   'chrome',
   'icon',
   'cardback',

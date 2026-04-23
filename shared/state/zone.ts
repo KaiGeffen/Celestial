@@ -10,4 +10,5 @@ export enum Zone {
   Shuffle,
   Status,
   Transform,
+  Reset,
 }

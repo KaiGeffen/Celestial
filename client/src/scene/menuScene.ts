@@ -25,7 +25,7 @@ export default class MenuScene extends BaseMenuScene {
     this.tweens.add({
       targets: camera,
       alpha: 1,
-      duration: Time.menuTransition,
+      duration: Time.general.menuPanelTransitionMs,
     })
   }
 
@@ -89,7 +89,7 @@ export default class MenuScene extends BaseMenuScene {
       this.tweens.add({
         targets: this.cameras.main,
         alpha: 0,
-        duration: Time.menuTransition,
+        duration: Time.general.menuPanelTransitionMs,
         onStart: () => {
           this.playSound('close')
         },

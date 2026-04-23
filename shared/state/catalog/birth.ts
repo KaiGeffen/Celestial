@@ -165,13 +165,7 @@ class Pregnant extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    const card = new Card({
-      name: child.name,
-      id: child.id,
-      text: child.text,
-      qualities: child.qualities,
-      basePoints: child.basePoints,
-    })
+    const card = child.copy()
     game.createOnDeck(player, card)
   }
 }
@@ -336,24 +330,21 @@ const beginnersMind = new BeginnersMind({
   text: 'When this is shuffled, move it to the top of your deck.',
 })
 
-;[
-  nascence,
-  birth,
-  ancestry,
-  theFuture,
-  posterity,
-  rebirth,
-  cradle,
-  uprising,
-  storytime,
-  pregnant,
-  passOn,
-  justLikeDad,
-  hug,
-  genesis,
-  beginnersMind,
-].forEach((card) => {
-  card.theme = 4
+class GrowingUp extends Card {
+  onPlay(player: number, game: GameModel): void {
+    const handHasChild = game.hand[player].some(
+      (card) => card.name === child.name,
+    )
+    if (handHasChild) {
+      super.birth(1, game, player)
+    }
+  }
+}
+const growingUp = new GrowingUp({
+  name: 'Growing Up',
+  id: 7046,
+  cost: 1,
+  text: 'When played, Birth 1 if you have a Child in your hand.',
 })
 
 export {
@@ -373,4 +364,5 @@ export {
   // NEW
   genesis,
   beginnersMind,
+  // growingUp,
 }

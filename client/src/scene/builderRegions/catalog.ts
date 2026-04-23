@@ -29,7 +29,7 @@ export default class CatalogRegion {
     // In dev mode, show beta cards and cards you don't own
     let pool = []
     if (Flags.devCardsEnabled) {
-      pool = [...Catalog.collectibleCards, ...Catalog.betaCards]
+      pool = Catalog.collectibleCardsWithBetaCards
     } else {
       pool = Catalog.collectibleCards
     }
@@ -189,7 +189,7 @@ export default class CatalogRegion {
       this.scene.tweens.add({
         targets: this.panel,
         minWidth: width,
-        duration: Time.builderSlide(),
+        duration: Time.general.builderCatalogSlideMs,
         ease: Ease.slide,
         onUpdate: () => {
           this.panel.layout()
@@ -212,7 +212,7 @@ export default class CatalogRegion {
       this.scene.tweens.add({
         targets: this.panel,
         minWidth: width,
-        duration: Time.builderSlide(),
+        duration: Time.general.builderCatalogSlideMs,
         ease: Ease.slide,
         onUpdate: () => {
           this.panel.layout()

@@ -259,6 +259,7 @@ export default class DeckRegion {
       cosmeticSet: {
         avatar: this.avatarID,
         border: 0,
+        cardback: 0,
       },
     }
   }

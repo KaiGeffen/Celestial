@@ -11,6 +11,8 @@ import {
 import { SpectatorMatchScene } from './scene/spectatorMatchScene'
 import TutorialMatchScene from './scene/tutorialScene'
 import { BuilderScene, MapJourneyBuilderScene } from './scene/builderScene'
+import DeckSelectorScene from './scene/deckSelectorScene'
+import DeckEditorScene from './scene/deckEditorScene'
 import MatchHistoryScene from './scene/matchHistoryScene'
 
 import PlaceholderScene from './scene/placeholderScene'
@@ -25,11 +27,8 @@ import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import RoundRectanglePlugin from 'phaser3-rex-plugins/plugins/roundrectangle-plugin.js'
 import InputTextPlugin from 'phaser3-rex-plugins/plugins/inputtext-plugin.js'
 import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin.js'
-import GlowFilterPipelinePlugin from 'phaser3-rex-plugins/plugins/glowfilterpipeline-plugin.js'
-import DissolvePipelinePlugin from 'phaser3-rex-plugins/plugins/dissolvepipeline-plugin.js'
 import OutlinePipelinePlugin from 'phaser3-rex-plugins/plugins/outlinepipeline-plugin.js'
 import DropShadowPipelinePlugin from 'phaser3-rex-plugins/plugins/dropshadowpipeline-plugin.js'
-import LineProgressPlugin from 'phaser3-rex-plugins/plugins/lineprogress-plugin.js'
 import ContainerLitePlugin from 'phaser3-rex-plugins/plugins/containerlite-plugin.js'
 import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
 import StoreScene from './scene/storeScene'
@@ -58,6 +57,8 @@ const config: Phaser.Types.Core.GameConfig = {
     TutorialMatchScene,
     PlaceholderScene,
     BuilderScene,
+    DeckSelectorScene,
+    DeckEditorScene,
     MapScene,
     MatchHistoryScene,
     StoreScene,
@@ -100,16 +101,6 @@ const config: Phaser.Types.Core.GameConfig = {
         start: true,
       },
       {
-        key: 'rexGlowFilterPipeline',
-        plugin: GlowFilterPipelinePlugin,
-        start: true,
-      },
-      {
-        key: 'rexDissolvePipeline',
-        plugin: DissolvePipelinePlugin,
-        start: true,
-      },
-      {
         key: 'rexOutlinePipeline',
         plugin: OutlinePipelinePlugin,
         start: true,
@@ -127,11 +118,6 @@ const config: Phaser.Types.Core.GameConfig = {
       {
         key: 'rexAnchor',
         plugin: AnchorPlugin,
-        start: true,
-      },
-      {
-        key: 'rexLineProgress',
-        plugin: LineProgressPlugin,
         start: true,
       },
     ],

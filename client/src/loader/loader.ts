@@ -22,11 +22,8 @@ export default class Loader {
     // Set the load path
     scene.load.path = 'assets/'
 
-    // Load buttons spritesheets, normal one is used in this scene
-    scene.load.spritesheet(`icon-Button`, `img/Button.${EXTENSION}`, {
-      frameWidth: Space.buttonWidth,
-      frameHeight: Space.buttonHeight,
-    })
+    // Single image (`BigButton` below remains a spritesheet).
+    scene.load.image(`icon-Button`, `img/Button.png`)
     scene.load.spritesheet(`icon-BigButton`, `img/BigButton.${EXTENSION}`, {
       frameWidth: Space.buttonWidth,
       frameHeight: Space.bigButtonHeight,

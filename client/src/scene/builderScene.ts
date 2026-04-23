@@ -162,6 +162,7 @@ export class MapJourneyBuilderScene extends BuilderBase {
         cosmeticSet: {
           avatar: 0,
           border: 0,
+          cardback: 0,
           relic: 0,
         },
       }
@@ -185,7 +186,6 @@ export class MapJourneyBuilderScene extends BuilderBase {
     return this.journeyRegion.getCount(card)
   }
 }
-
 
 export class BuilderScene extends BuilderBase {
   lastDecklist: number
@@ -269,6 +269,7 @@ export class BuilderScene extends BuilderBase {
         // Resize the catalog
         this.catalogRegion.resize(this.sizer.width)
       },
+      size: 32,
     }).setDepth(100)
   }
 

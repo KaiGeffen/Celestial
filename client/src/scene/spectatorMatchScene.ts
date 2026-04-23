@@ -27,6 +27,7 @@ export class SpectatorMatchScene extends MatchScene {
     this.currentVersion = this.maxVersion = -1
     this.hasSeededInitialVersion = false
     this.paused = false
+    this.autoAdvance = true
 
     // Register each hook for a message from the server.
     this.registerMatchServerHooks()
@@ -49,7 +50,6 @@ export class SpectatorMatchScene extends MatchScene {
     this.view.results = new MatchResultsSimplifiedRegion().create(this)
     this.view.searching.hide()
     this.view.mulligan.hide()
-
     // Callbacks common to this and the match scene
     this.setCommonCallbacks(this.view)
 

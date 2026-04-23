@@ -100,6 +100,7 @@ export default class Decklist {
     let someCardsNotOwned = false
     for (let i = 0; i < deck.length; i++) {
       let card = deck[i]
+      if (!card) continue
 
       // Only add cards that the player owns
       if (cardInventory[card.id] || !mustOwn) {

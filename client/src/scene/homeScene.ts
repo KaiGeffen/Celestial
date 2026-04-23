@@ -8,6 +8,7 @@ import { openDiscord } from '../utils/externalLinks'
 import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
+import { getDailyHomeTip } from '../data/homeTips'
 
 const NAVIGATION_BUTTON_WIDTH = 278
 
@@ -123,7 +124,7 @@ export default class HomeScene extends BaseScene {
     const sizer = this.rexUI.add.fixWidthSizer({
       width: NAVIGATION_BUTTON_WIDTH,
       space: {
-        line: Space.pad,
+        line: 5,
       },
     })
 
@@ -161,7 +162,7 @@ export default class HomeScene extends BaseScene {
       within: this,
       iconName: 'DeckbuilderTab',
       f: () => {
-        this.scene.start('BuilderScene', { isTutorial: false })
+        this.scene.start('DeckSelectorScene', { isTutorial: false })
         logEvent('view_deckbuilder')
       },
     })
@@ -389,11 +390,11 @@ export default class HomeScene extends BaseScene {
       },
     })
 
-    // Image container - vertical sizer for image and button
-    const imageContainer = this.rexUI.add.sizer({
+    // Container with an image + tip that rotates daily
+    const dailyContainer = this.rexUI.add.sizer({
       orientation: 'vertical',
       space: {
-        item: Space.pad,
+        item: Space.padSmall,
       },
     })
 
@@ -411,9 +412,22 @@ export default class HomeScene extends BaseScene {
     const newsImageName = newsImages[dayOfWeek]
     const image = this.add.image(0, 0, `news-${newsImageName}`).setOrigin(0, 0)
 
-    imageContainer.add(image, { align: 'top' })
+    dailyContainer.add(image)
+
+    const tipText = this.rexUI.add
+      .BBCodeText(0, 0, getDailyHomeTip(), {
+        ...BBStyle.description,
+        wrap: {
+          mode: 'word',
+          width: image.displayWidth - Space.pad,
+        },
+        fixedWidth: image.displayWidth,
+      })
+      .setOrigin(0, 0)
+    dailyContainer.add(tipText, { align: 'top' })
+
     // Add the image container to contentSizer
-    contentSizer.add(imageContainer, { align: 'top' })
+    contentSizer.add(dailyContainer, { align: 'top' })
 
     // Make news content as BBCode to have hoverable card names and links
     const text = this.rexUI.add
@@ -523,19 +537,20 @@ export default class HomeScene extends BaseScene {
   }
 }
 
-const PATCH_NUMBER = '0.7.16'
+const PATCH_NUMBER = '0.7.16.3'
 
 const URL = 'https://luma.com/1lsziprm'
 
-const NEWS_TEXT = `🕊️ A warm welcome to all our new players!
-Please consider joining our [area=_link_discord][color=#FABD5D]Discord server[/color][/area] to collect a one-time reward, receive strategy tips, and play excellent matches with excellent people.
+const NEWS_TEXT = `🕊️ [b]Thank you to our wonderful Celestial community![/b]
+Many changes this month as we ramp up to a [color=#4090DD]Steam demo release[/color], let us know your thoughts! 
 
-🏆 Our 11th tournament approaches!
-On April 4th, play for the chance to win 120$ in cash prizes, plus exclusive cosmetic rewards! [area=_link_register][color=#FABD5D]Register here[/color][/area]
+🏆 Congrats to Sherlock for reclaiming his tournament title! And to Redrame for getting #1 on ladder.
+With the launch of the demo, we plan to snapshot the top players as we transition to a more public release.
 
-🌄 Card Redesign
-Our redesigned border and look for the cards is now live! Let us know your thoughts in the [area=_link_discord][color=#FABD5D]Discord[/color][/area]. Also try out a new cardback for a limited time.
+🐚 Shell Mode
+On Saturdays we play a new [color=#4090DD]Shell Mode[/color], hop in to the [area=_link_discord][color=#FABD5D]Discord server[/color][/area] to learn more!
 
-👀 Spectator Mode
-Watch your friends play matchs in real time by clicking 'Spectate' from the players list (Top right).
-Can be disabled through the options menu.`
+🎴 Card Changes
+👇 Hero - Exhale point +3 > +2
+👇 Seen - Clear View sight 4 > 3
+👆 Phoenix - Points 3 > 4`
