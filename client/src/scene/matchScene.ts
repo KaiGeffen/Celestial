@@ -698,7 +698,7 @@ export class View {
 }
 
 export class StandardMatchScene extends MatchScene {
-  constructor(args = { key: 'StandardMatchScene', lastScene: 'BuilderScene' }) {
+  constructor(args = { key: 'StandardMatchScene', lastScene: 'HomeScene' }) {
     super(args)
   }
 }
