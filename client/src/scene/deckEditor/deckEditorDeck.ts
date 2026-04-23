@@ -116,7 +116,6 @@ export class DeckEditorDeck {
   syncThumbnail(args: {
     name: string
     cosmeticSet: CosmeticSet
-    cardback: number
     isValid: boolean
   }): void {
     this.deckThumbnail?.updateDisplay(args)
@@ -160,12 +159,8 @@ export class DeckEditorDeck {
       scene: this.scene,
       name: '',
       cosmeticSet: { avatar: 0, border: 0, cardback: 0 },
-      // TODO Why is this a separate arg from cosmeticSet?
-      cardback: 0,
       isValid: true,
       onClick: () => this.opts.onDeckNameClick(),
-      // TODO Remove this functionality
-      tuckHeaderArt: true,
     })
 
     // Create the share button
@@ -195,7 +190,6 @@ export class DeckEditorDeck {
     this.syncThumbnail({
       name: this.opts.deckName,
       cosmeticSet: this.opts.cosmeticSet,
-      cardback: this.opts.cosmeticSet.cardback ?? 0,
       isValid:
         this.decklist.getDeckCode().length === MechanicsSettings.DECK_SIZE,
     })

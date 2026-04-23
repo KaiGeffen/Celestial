@@ -237,7 +237,6 @@ export default class DeckEditorScene extends BaseScene {
     this.deckRegion.syncThumbnail({
       name: this.deckName,
       cosmeticSet: this.cosmeticSet,
-      cardback: this.cosmeticSet.cardback,
       isValid,
     })
   }

@@ -23,10 +23,8 @@ export default class DeckThumbnail {
     scene: BaseScene
     name: string
     cosmeticSet: CosmeticSet
-    cardback: number
     isValid: boolean
     onClick: () => void
-    tuckHeaderArt?: boolean
   }) {
     const { scene } = opts
     this.scene = scene
@@ -41,7 +39,8 @@ export default class DeckThumbnail {
     // CARD BACK – top-left, using the deck's equipped cardback
     const angleFirst = -3
     const angleStepDeg = 3
-    const cardbackName = cardbackNames[opts.cardback] ?? 'Default'
+    const cardbackId = opts.cosmeticSet.cardback ?? 0
+    const cardbackName = cardbackNames[cardbackId] ?? 'Default'
     for (let i = 3; i >= 0; i--) {
       const cardBack = scene.add
         .image(-40, 70, `cardback-${cardbackName}`)
@@ -139,18 +138,17 @@ export default class DeckThumbnail {
   updateDisplay(opts: {
     name?: string
     cosmeticSet?: CosmeticSet
-    cardback?: number
     isValid?: boolean
   }): void {
     if (opts.name !== undefined) {
       this.nameText.setText(opts.name)
     }
     if (opts.cosmeticSet !== undefined) {
-      this.avatarButton.setAvatar(opts.cosmeticSet.avatar)
-      this.avatarButton.setBorder(opts.cosmeticSet.border ?? 0)
-    }
-    if (opts.cardback !== undefined) {
-      const textureKey = `cardback-${cardbackNames[opts.cardback] ?? 'Default'}`
+      const cs = opts.cosmeticSet
+      this.avatarButton.setAvatar(cs.avatar)
+      this.avatarButton.setBorder(cs.border ?? 0)
+      const cb = cs.cardback ?? 0
+      const textureKey = `cardback-${cardbackNames[cb] ?? 'Default'}`
       this.cardbackImages.forEach((img) => img.setTexture(textureKey))
     }
     if (opts.isValid !== undefined) {
