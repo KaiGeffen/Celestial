@@ -234,6 +234,7 @@ export default abstract class StacksRegionBase {
     }
 
     const desiredDeckCount = state.deck[o]?.length ?? 0
+    const ownerCardback = state.cosmeticSets[o]?.cardback ?? 0
 
     while (this.deckCardbacks.length < desiredDeckCount) {
       const cardback = new CardImage(
@@ -241,6 +242,7 @@ export default abstract class StacksRegionBase {
         this.deckContainer,
         true,
         false,
+        ownerCardback,
       )
       cardback.doBurstEffect = false
       if (this.deckCallback) cardback.setOnClick(this.deckCallback)

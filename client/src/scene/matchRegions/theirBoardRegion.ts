@@ -45,6 +45,7 @@ export default class TheirBoardRegion extends Region {
 
     // Their hand
     const handN = state.hand[1].length
+    const opponentCardback = state.cosmeticSets[1]?.cardback ?? 0
     this.cards = []
     for (let i = 0; i < handN; i++) {
       const card = new CardImage(
@@ -52,6 +53,7 @@ export default class TheirBoardRegion extends Region {
         this.container,
         false,
         true,
+        opponentCardback,
       ).setPosition(CardLocation.theirHand(state, i, this.container))
 
       card.container.setRotation(this.theirHandFanRotation(i, handN))
