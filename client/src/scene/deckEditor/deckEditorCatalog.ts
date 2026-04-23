@@ -193,22 +193,15 @@ export class DeckEditorCatalog {
     row.add(backContainer, { align: 'center' })
 
     const middle = ui.add.fixWidthSizer({
-      align: 'left',
-      space: {
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        item: Space.padSmall,
-        line: Space.padSmall,
-      },
-    } as any)
+      align: 'center',
+      space: { item: 8 },
+    })
 
     middle.add(this.createSearchField())
 
     this.costFilterBtns = []
     for (let i = 0; i <= DECK_EDITOR_MAX_COST_FILTER; i++) {
-      const container = new ContainerLite(scene, 0, 0, 41, Space.buttonHeight)
+      const container = new ContainerLite(scene, 0, 0, 35, Space.buttonHeight)
       middle.add(container)
       const label = i === DECK_EDITOR_MAX_COST_FILTER ? '7+' : i.toString()
       const btn = new UButton(container, 0, 0, label)
@@ -223,7 +216,7 @@ export class DeckEditorCatalog {
       scene,
       0,
       0,
-      Space.buttonHeight,
+      32,
       Space.buttonHeight,
     )
     new Buttons.Icon({
