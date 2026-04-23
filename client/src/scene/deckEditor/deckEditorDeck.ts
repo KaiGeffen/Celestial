@@ -138,6 +138,7 @@ export class DeckEditorDeck {
     this.deckThumbnail = new DeckThumbnail({
       scene: this.scene,
       onClick: () => this.opts.onDeckNameClick(),
+      muteClick: true,
     })
 
     // Sizer with custom space to get thumbnail to line up with cutout edge
@@ -204,6 +205,7 @@ export class DeckEditorDeck {
       within: rightCol,
       text: 'Play',
       f: () => this.opts.onPlay(),
+      muteClick: true,
     })
 
     // Main sizer

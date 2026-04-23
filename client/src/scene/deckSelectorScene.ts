@@ -347,6 +347,7 @@ export default class DeckSelectorScene extends BaseScene {
       within: playContainer,
       text: 'Play',
       f: () => this.onPlayMatch(),
+      muteClick: true,
     })
 
     const rowSizer = this.rexUI.add.sizer({

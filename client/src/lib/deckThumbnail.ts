@@ -22,11 +22,13 @@ export default class DeckThumbnail {
   constructor(opts: {
     scene: BaseScene
     onClick: () => void
+    muteClick?: boolean
     name?: string
     cosmeticSet?: CosmeticSet
     isValid?: boolean
   }) {
     const { scene, onClick } = opts
+    const muteClick = opts.muteClick ?? false
     const name = opts.name ?? ''
     const cosmeticSet = opts.cosmeticSet ?? {
       avatar: 0,
@@ -96,7 +98,9 @@ export default class DeckThumbnail {
       .setOrigin(0.5, 1)
       .setInteractive({ useHandCursor: true })
       .on('pointerdown', () => {
-        scene.sound.play('click')
+        if (!muteClick) {
+          scene.sound.play('click')
+        }
         onClick()
       })
       .on('pointerover', () => {
