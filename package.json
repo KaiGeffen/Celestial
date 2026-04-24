@@ -14,7 +14,9 @@
     "electron:dist": "npm run build:prod --prefix client && npm run dist --prefix electron",
     "electron:dist:win": "npm run build:prod --prefix client && npm run dist:win --prefix electron",
     "electron:dist:mac": "npm run build:prod --prefix client && npm run dist:mac --prefix electron",
-    "electron:dist:linux": "npm run build:prod --prefix client && npm run dist:linux --prefix electron"
+    "electron:dist:linux": "npm run build:prod --prefix client && npm run dist:linux --prefix electron",
+    "electron:upload": "npm run upload --prefix electron",
+    "electron:ship": "npm run build:prod --prefix client && npm run ship --prefix electron"
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
