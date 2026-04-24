@@ -186,12 +186,21 @@ export default class CatalogRegion {
 
     // Animate shift
     if (this.panel.minWidth > width) {
+      let lastLayout = 0
       this.scene.tweens.add({
         targets: this.panel,
         minWidth: width,
         duration: Time.general.builderCatalogSlideMs,
         ease: Ease.slide,
         onUpdate: () => {
+          this.panel.t = ratio
+          const now = this.scene.time.now
+          if (now - lastLayout >= 33) {
+            this.panel.layout()
+            lastLayout = now
+          }
+        },
+        onComplete: () => {
           this.panel.layout()
           this.panel.t = ratio
         },
@@ -209,12 +218,21 @@ export default class CatalogRegion {
 
     // Animate shift
     if (this.panel.minWidth < width) {
+      let lastLayout = 0
       this.scene.tweens.add({
         targets: this.panel,
         minWidth: width,
         duration: Time.general.builderCatalogSlideMs,
         ease: Ease.slide,
         onUpdate: () => {
+          this.panel.t = ratio
+          const now = this.scene.time.now
+          if (now - lastLayout >= 33) {
+            this.panel.layout()
+            lastLayout = now
+          }
+        },
+        onComplete: () => {
           this.panel.layout()
           this.panel.t = ratio
         },
