@@ -16,6 +16,7 @@
     "icon": "icon.png",
     "files": [
       "main.js",
+      "preload.js",
       "icon.png"
     ],
     "extraResources": [
