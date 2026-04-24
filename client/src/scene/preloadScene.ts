@@ -33,6 +33,7 @@ export class SigninScene extends Phaser.Scene {
   // True when user is signed or chose to be a guest
   signedInOrGuest: boolean = false
   guestButton: Button
+  quitButton: Button
   private txt: Phaser.GameObjects.Text
   private timeSceneStart: number
 
@@ -111,6 +112,11 @@ export class SigninScene extends Phaser.Scene {
       within: guestButtonContainer,
       text: 'Guest',
       f: () => {
+        if (this.isElectronBuild()) {
+          Server.loginGuest(this.game, () => this.onOptionClick())
+          return
+        }
+
         this.scene.launch('MenuScene', {
           menu: 'confirm',
           text: 'Playing as Guest:\nYour progress is saved on this device only and is not tied to an account.\n\nSign in with Google to save progress across devices and access additional features.',
@@ -129,6 +135,23 @@ export class SigninScene extends Phaser.Scene {
       x: `50%`,
       y: `100%-${Space.pad + Space.buttonHeight / 2}`,
     })
+
+    if (this.isElectronBuild()) {
+      const quitButtonContainer = this.add.container()
+      this.quitButton = new Buttons.Basic({
+        within: quitButtonContainer,
+        text: 'Quit Game',
+        f: () => {
+          ;(window as any).electronAPI.quit()
+        },
+        depth: -1,
+      })
+
+      this.plugins.get('rexAnchor')['add'](quitButtonContainer, {
+        x: `50%`,
+        y: `100%-${Space.pad * 2 + Space.buttonHeight * 1.5}`,
+      })
+    }
 
     if (!this.isElectronBuild()) {
       this.createGoogleGSIButton()
