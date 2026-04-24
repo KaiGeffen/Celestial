@@ -15,6 +15,7 @@ export default class Decklist {
   cutouts: Cutout[] = []
   countCards: number = 0
   cutoutClickCallback: (cutout: Cutout) => () => void
+  private layoutDeferred = false
 
   constructor(
     scene: BaseScene,
@@ -98,6 +99,7 @@ export default class Decklist {
 
     // Add the new deck, only including cards the player owns
     let someCardsNotOwned = false
+    this.layoutDeferred = true
     for (let i = 0; i < deck.length; i++) {
       let card = deck[i]
       if (!card) continue
@@ -109,6 +111,8 @@ export default class Decklist {
         someCardsNotOwned = true
       }
     }
+    this.layoutDeferred = false
+    this.sizer.layout()
 
     // Signal to user if they're missing any cards
     if (someCardsNotOwned && mustOwn) {
@@ -169,7 +173,8 @@ export default class Decklist {
             (cutoutI.card.name === card.name &&
               (cutoutI.card.upgradeVersion || 0) > (card.upgradeVersion || 0))))
       ) {
-        this.sizer.insert(i, container).layout()
+        this.sizer.insert(i, container)
+        if (!this.layoutDeferred) this.sizer.layout()
 
         // Update values
         this.cutouts.splice(i, 0, newCutout)
@@ -180,7 +185,8 @@ export default class Decklist {
     }
 
     // If no position was found, add to the end
-    this.sizer.add(container).layout()
+    this.sizer.add(container)
+    if (!this.layoutDeferred) this.sizer.layout()
     this.cutouts.push(newCutout)
     this.countCards++
   }
