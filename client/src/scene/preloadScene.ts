@@ -68,7 +68,7 @@ export class SigninScene extends Phaser.Scene {
       // TODO If this fails because the token is invalid or the server is offline, show options or say network offline
     }
     // If user is not signed in, show gsi and guest button
-    else {
+    else if (!this.isElectronBuild()) {
       // Sign in is visible on this page, hidden on all other pages
       document.getElementById('signin').hidden = false
     }
@@ -130,7 +130,13 @@ export class SigninScene extends Phaser.Scene {
       y: `100%-${Space.pad + Space.buttonHeight / 2}`,
     })
 
-    this.createGoogleGSIButton()
+    if (!this.isElectronBuild()) {
+      this.createGoogleGSIButton()
+    }
+  }
+
+  private isElectronBuild(): boolean {
+    return typeof (window as any).electronAPI !== 'undefined'
   }
 
   private onOptionClick(): void {

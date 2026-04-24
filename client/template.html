@@ -22,8 +22,10 @@
   <!-- Optimize Google Sign-in loading -->
   <meta name="google-signin-client_id" content="574352055172-n1nqdc2nvu3172levk2kl5jf7pbkp4ig.apps.googleusercontent.com">
   <script>
-    // Load Google Sign-in only when needed
+    // Load Google Sign-in only when needed and not in Electron builds
     function loadGoogleSignIn() {
+      if (typeof window.electronAPI !== 'undefined') return;
+
       const script1 = document.createElement('script');
       script1.src = 'https://accounts.google.com/gsi/client';
       script1.async = true;
