@@ -5,10 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "node run-electron-builder.js",
-    "dist:win": "node run-electron-builder.js --win",
-    "dist:mac": "node run-electron-builder.js --mac",
-    "dist:linux": "node run-electron-builder.js --linux"
+    "dist": "node run-electron-builder.js --win --mac --linux"
   },
   "build": {
     "appId": "gg.celestialdecks.celestial",
