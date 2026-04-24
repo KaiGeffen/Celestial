@@ -6,6 +6,8 @@
   "scripts": {
     "start": "electron .",
     "dist": "node run-electron-builder.js --win --mac --linux",
+    "upload": "bash ./upload-to-steam.sh",
+    "ship": "node run-electron-builder.js --win --mac --linux && bash ./upload-to-steam.sh",
     "dist:win": "node run-electron-builder.js --win",
     "dist:mac": "node run-electron-builder.js --mac",
     "dist:linux": "node run-electron-builder.js --linux"
