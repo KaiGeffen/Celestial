@@ -9,8 +9,11 @@ import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import { getDailyHomeTip } from '../data/homeTips'
+import packageJson from '../../package.json'
 
 const NAVIGATION_BUTTON_WIDTH = 278
+
+const GAME_VERSION = packageJson.version
 
 export default class HomeScene extends BaseScene {
   private coinsDisplayText: Phaser.GameObjects.Text
@@ -374,7 +377,7 @@ export default class HomeScene extends BaseScene {
 
     // Title with line below
     const title = this.add
-      .text(0, 0, `New Update [${PATCH_NUMBER}]`, Style.announcement)
+      .text(0, 0, `New Update [${GAME_VERSION}]`, Style.announcement)
       .setOrigin(0.5, 0)
     panelSizer.add(title)
 
@@ -537,9 +540,7 @@ export default class HomeScene extends BaseScene {
   }
 }
 
-const PATCH_NUMBER = '0.7.16.3'
-
-const URL = 'https://luma.com/1lsziprm'
+const URL = ''
 
 const NEWS_TEXT = `🕊️ [b]Thank you to our wonderful Celestial community![/b]
 Many changes this month as we ramp up to a [color=#4090DD]Steam demo release[/color], let us know your thoughts! 
