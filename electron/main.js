@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell } = require('electron')
+const { app, BrowserWindow, shell, ipcMain } = require('electron')
 const path = require('path')
 const http = require('http')
 const fs = require('fs')
@@ -82,6 +82,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js'),
     },
     title: 'Celestial',
     icon: iconPath,
@@ -109,6 +110,8 @@ app.whenReady().then(async () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
+
+ipcMain.on('quit', () => app.quit())
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()

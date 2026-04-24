@@ -395,7 +395,8 @@ export default class OptionsMenu extends Menu {
     sizer.add(txtHint)
     sizer.addSpace()
 
-    const s = UserSettings._get('canBeSpectated') !== false ? 'Enabled' : 'Disabled'
+    const s =
+      UserSettings._get('canBeSpectated') !== false ? 'Enabled' : 'Disabled'
     let container = new ContainerLite(
       this.scene,
       0,
@@ -459,12 +460,26 @@ export default class OptionsMenu extends Menu {
     let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
     let container = new ContainerLite(this.scene, 0, 0, Space.buttonWidth, 50)
-    sizer
-      .addSpace()
-      .add(this.createCancelButton())
-      .addSpace()
-      .add(container)
-      .addSpace()
+    sizer.addSpace().add(this.createCancelButton()).addSpace()
+
+    // For Electron builds, add an exit game button
+    if (typeof (window as any).electronAPI !== 'undefined') {
+      const exitContainer = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        Space.buttonWidth,
+        50,
+      )
+      new Buttons.Basic({
+        within: exitContainer,
+        text: 'Exit Game',
+        f: () => (window as any).electronAPI.quit(),
+      })
+      sizer.add(exitContainer).addSpace()
+    }
+
+    sizer.add(container).addSpace()
 
     // Check if tutorials have been completed
     const missions = UserSettings._get('completedMissions')
