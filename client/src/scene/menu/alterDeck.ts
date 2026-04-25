@@ -428,7 +428,6 @@ class AlterDeckMenu extends Menu {
         // Close this scene
         this.scene.scene.stop()
       },
-      muteClick: true,
       returnHotkey: true,
     })
 

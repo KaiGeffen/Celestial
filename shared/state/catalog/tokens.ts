@@ -132,9 +132,9 @@ class Ice extends Card {
     // Remove from hand
     game.hand[player].splice(game.hand[player].length - 1, 1)
 
-    // At night, add to the beginning of the story. During the day, add to the end.
-    const index = game.isRecap ? 0 : game.story.acts.length
-    game.story.addAct(this, player, index)
+    // Move to the beginning of the (unresolved) story
+    const index2 = 0
+    game.story.addAct(this, player, index2)
 
     // TODO Add animation
     game.animations[player].push(
@@ -145,7 +145,7 @@ class Ice extends Card {
         // Not -1 because it has been removed by this point
         index: game.hand[player].length,
         // TODO This goes to where the triggering card is, not to where this ends up, and has bugs with multiple triggers (Fishing Boat)
-        index2: index,
+        index2,
       }),
     )
   }
@@ -157,6 +157,7 @@ const ice = new Ice({
   points: 1,
   qualities: [Quality.VISIBLE],
   text: 'Visible\nWhen drawn, add this to the story.',
+  theme: 7,
   beta: true,
 })
 
