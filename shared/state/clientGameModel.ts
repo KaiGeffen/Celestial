@@ -57,7 +57,7 @@ function reverseAttributes(model: GameModel): void {
   ]
 
   for (const attr of listAttributes) {
-    model[attr].reverse()
+    model[attr]?.reverse()
   }
 
   // Flip these attributes

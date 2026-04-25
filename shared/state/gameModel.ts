@@ -38,12 +38,9 @@ export default class GameModel {
   mulligansComplete: boolean[] = [false, false]
   roundCount: number = 0
 
-  // How many ms each player has left
-  timers: [number, number] = [
-    MechanicsSettings.TIMER_START,
-    MechanicsSettings.TIMER_START,
-  ]
-  lastTime: number = Date.now()
+  // How many ms each player has left (PvP only; null for PvE/tutorial)
+  timers: [number, number] | null = null
+  lastTime: number | null = null
 
   // Effects
   sound: SoundEffect | null = null
@@ -185,7 +182,7 @@ export default class GameModel {
     // copy.avatars = [...this.avatars]
     // copy.elos = [...this.elos]
     copy.roundCount = this.roundCount
-    copy.timers = [...this.timers]
+    copy.timers = this.timers ? [...this.timers] : null
     copy.lastTime = this.lastTime
     return copy
   }

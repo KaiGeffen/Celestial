@@ -21,7 +21,11 @@ class PvpMatch extends Match {
     this.ws2 = ws2
     this.uuid2 = uuid2
 
-    this.startTimerCheck()
+  }
+
+  async startMatch() {
+    await super.startMatch()
+    this.startTimer()
   }
 
   protected async updateDatabases() {
@@ -93,8 +97,11 @@ class PvpMatch extends Match {
     )
   }
 
-  // Start an interval to autopass if the user has no time left
-  private startTimerCheck() {
+  // Initialize timers and start the interval to autopass if a player runs out of time
+  private startTimer() {
+    this.game.model.timers = [MechanicsSettings.TIMER_START, MechanicsSettings.TIMER_START]
+    this.game.model.lastTime = Date.now()
+
     this.timerCheckInterval = setInterval(async () => {
       if (this.game === null) return
 
