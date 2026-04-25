@@ -9,7 +9,7 @@ import Cutout from '../../lib/buttons/cutout'
 import Buttons from '../../lib/buttons/buttons'
 import DeckThumbnail from '../../lib/deckThumbnail'
 import Decklist from '../../lib/decklist'
-import { Color, Space } from '../../settings/settings'
+import { Color, Space, Style } from '../../settings/settings'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import Card from '../../../../shared/state/card'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
@@ -39,6 +39,7 @@ export class DeckEditorDeck {
   readonly decklist: Decklist
   readonly scrollPanel: ScrollablePanel
   deckThumbnail!: DeckThumbnail
+  private deckCountText!: Phaser.GameObjects.Text
 
   /** Pixel heights after first layout — used with window height for scroll viewport. */
   headerHeight = 0
@@ -116,6 +117,13 @@ export class DeckEditorDeck {
     this.deckThumbnail?.updateDisplay(args)
   }
 
+  syncDeckCount(): void {
+    if (!this.deckCountText) return
+    const count = this.decklist.getDeckCode().length
+    this.deckCountText.setText(`${count}/${MechanicsSettings.DECK_SIZE}`)
+    this.deckCountText.setVisible(count !== MechanicsSettings.DECK_SIZE)
+  }
+
   layoutDecklist(): void {
     const panel = this.scrollPanel
     panel.t = Math.min(0.999999, panel.t)
@@ -141,6 +149,16 @@ export class DeckEditorDeck {
       muteClick: true,
     })
 
+    this.deckCountText = this.scene.add
+      .text(
+        -DECK_EDITOR_DECK_WIDTH / 2,
+        this.deckThumbnail.container.height / 2 + Space.pad,
+        '',
+        Style.basic,
+      )
+      .setOrigin(0, 1)
+    this.deckThumbnail.container.add(this.deckCountText)
+
     // Sizer with custom space to get thumbnail to line up with cutout edge
     const sizer = this.scene.rexUI.add
       .fixWidthSizer({
@@ -162,6 +180,7 @@ export class DeckEditorDeck {
       isValid:
         this.decklist.getDeckCode().length === MechanicsSettings.DECK_SIZE,
     })
+    this.syncDeckCount()
 
     return sizer
   }

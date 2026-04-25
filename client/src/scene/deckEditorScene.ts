@@ -127,6 +127,7 @@ export default class DeckEditorScene extends BaseScene {
   private addCardToDeck(card: Card): void {
     this.deckRegion.decklist.addCard(card)
     this.deckRegion.layoutDecklist()
+    this.deckRegion.syncDeckCount()
     this.syncDeckThumbnail()
   }
 
@@ -191,6 +192,8 @@ export default class DeckEditorScene extends BaseScene {
           if (fullyRemoved) {
             this.deckRegion.layoutDecklist()
           }
+
+          this.deckRegion.syncDeckCount()
 
           // Update the thumbnail
           this.syncDeckThumbnail()
@@ -283,6 +286,7 @@ export default class DeckEditorScene extends BaseScene {
       cards,
       Flags.devCardsEnabled ? false : true,
     )
+    this.deckRegion.syncDeckCount()
 
     // Scroll to the top of the decklist
     this.deckRegion.scrollDecklistToTop()
