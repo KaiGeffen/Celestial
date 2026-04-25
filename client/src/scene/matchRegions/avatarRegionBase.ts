@@ -37,6 +37,12 @@ export default abstract class AvatarRegionBase extends Region {
     return false
   }
 
+  /** Hook for subclasses that need per-second timer side effects. */
+  protected onClockDisplayUpdate(
+    _totalSec: number,
+    _shouldLiveTick: boolean,
+  ): void {}
+
   protected createUsernames(): void {
     const x = this.avatar.icon.x
     const y0 = this.avatar.icon.y + this.avatar.icon.height / 2
@@ -157,6 +163,7 @@ export default abstract class AvatarRegionBase extends Region {
       const m = Math.floor(totalSec / 60)
       const s = totalSec % 60
       this.txtTime.setText(`${m}:${s.toString().padStart(2, '0')}`)
+      this.onClockDisplayUpdate(totalSec, shouldLiveTick)
     }
     applyText()
 
