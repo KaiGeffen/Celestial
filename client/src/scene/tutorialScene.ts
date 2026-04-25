@@ -67,6 +67,7 @@ export default class TutorialMatchScene extends MatchScene {
       )
       .setOrigin(0.5, 1)
       .setDepth(Depth.tutorial)
+      .setInteractive()
 
     // Add a background and outline
     this.txt
