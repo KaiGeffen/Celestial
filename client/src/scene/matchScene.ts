@@ -36,9 +36,6 @@ export class MatchScene extends BaseScene {
 
   view: View
   ws: ClientWS
-  // If true, skip pausing at recap-end states (spectator mode).
-  autoAdvance = false
-
   // Whether the match is paused (Awaiting user to click a button, for example)
   paused: boolean
 
@@ -419,7 +416,6 @@ export class MatchScene extends BaseScene {
     }
 
     if (
-      !this.autoAdvance &&
       state.isRecap &&
       (state.sound === SoundEffect.Win ||
         state.sound === SoundEffect.Lose ||

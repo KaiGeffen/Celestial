@@ -74,11 +74,6 @@ export default class PassRegion extends Region {
       state.sound !== null &&
       ['win', 'lose', 'tie'].includes(state.sound)
 
-    if (this.scene.autoAdvance && isRecapEndPause) {
-      this.skipCallback()
-      return
-    }
-
     this.btnMoon.setText(`${state.score[1]}\n\n${state.score[0]}`)
     this.btnMoon.txtAction.setText(isRecapEndPause ? 'Continue' : '')
 
