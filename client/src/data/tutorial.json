@@ -73,7 +73,7 @@
   {
     "hints": [
       {
-        "bold": "If you play a card with Inspire, you will have extra breath on the next round.\n\nPlay Stars now so you can afford Mercy next round.",
+        "bold": "If you play a card with Inspire, you will have extra breath on the next round.",
         "align": "center",
         "final": true
       },
@@ -83,8 +83,7 @@
       null,
       {
         "bold": "This round you're Inspired for 1 extra breath.\n\nInspired and other statuses appear above your hand.",
-        "align": "center",
-        "final": true
+        "align": "center"
       },
       {
         "bold": "With your 3 breath you can afford Mercy.\n\nBut if you gained extra breath from Stars, you might have nothing to spend it on next round...",
@@ -94,7 +93,7 @@
       null,
       {
         "bold": "Sometimes it's better to pass instead of playing a card. Click the sun to pass.",
-        "align": "right",
+        "align": "center",
         "final": true
       },
       null,
@@ -109,26 +108,25 @@
     ],
     "night": [
       null,
-      null,
       null
     ]
   },
   {
     "hints": [
       {
-        "bold": "You draw cards from your deck. Your deck starts with 15 cards in it. Click to see everything in your deck.",
-        "align": "left"
+        "bold": "You draw cards from your deck, which starts with 15 cards in it.\n\nClick your deck to see everything in it.",
+        "align": "center"
       },
       {
-        "bold": "When cards resolve or are discarded, they go to your discard pile.",
-        "align": "left"
+        "bold": "When cards resolve, they go to the discard pile.",
+        "align": "center"
       },
       {
         "bold": "If your deck is empty when you would draw a card, your discard pile is shuffled to form a new deck.",
         "align": "center"
       },
       {
-        "bold": "Nourish will make the next card you resolve worth extra points, even if that card is played on a future round. Use it carefully to get points when you need them.",
+        "bold": "Nourish will make the next card you resolve worth extra points, even if it's played on a future round.",
         "align": "center"
       },
       {
@@ -139,9 +137,6 @@
       null
     ],
     "night": [
-      null,
-      null,
-      null
     ]
   }
 ]

@@ -35,7 +35,6 @@ export default class TutorialMatchScene extends MatchScene {
   // A card that is being shown
   card: CardImage
 
-  // Whether a night hint is currently being shown (Next dismisses and unpauses)
   isTutorial = true
 
   constructor(args = { key: 'TutorialMatchScene', lastScene: 'JourneyScene' }) {
@@ -285,20 +284,23 @@ export default class TutorialMatchScene extends MatchScene {
     // Hide pass until a point
     if (this.progress === 0) {
       this.view.pass.tutorialSimplifyPass(true)
+      this.view.ourStacks.hide()
+      this.view.theirStacks.hide()
+      this.view.historyRegion.hide()
     } else if (this.progress === 7) {
       this.view.pass.tutorialSimplifyPass(false)
     }
 
     // Hide different elements on the screen based on progress
     switch (this.progress) {
-      case 5:
+      case 6:
         this.view.ourBoard.cards[1].setOnClick(() => {
           this.signalError('Try playing Mercy then passing...')
         })
         break
 
-      case 7:
-      case 9:
+      case 8:
+      case 10:
         this.view.ourBoard.cards[0].setOnClick(() => {
           this.signalError('Try passing instead...')
         })
