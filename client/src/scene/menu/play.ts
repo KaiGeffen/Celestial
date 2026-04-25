@@ -120,7 +120,7 @@ export default class PlayMenu extends Menu {
     if (!decks || decks.length <= 1) return
 
     const currentIndex = UserSettings._get('equippedDeckIndex') || 0
-    const newIndex = (currentIndex - 1 + decks.length) % decks.length
+    const newIndex = (currentIndex + 1) % decks.length
     UserSettings._set('equippedDeckIndex', newIndex)
     this.updateDeck(decks[newIndex])
   }
@@ -130,7 +130,7 @@ export default class PlayMenu extends Menu {
     if (!decks || decks.length <= 1) return
 
     const currentIndex = UserSettings._get('equippedDeckIndex') || 0
-    const newIndex = (currentIndex + 1) % decks.length
+    const newIndex = (currentIndex - 1 + decks.length) % decks.length
     UserSettings._set('equippedDeckIndex', newIndex)
     this.updateDeck(decks[newIndex])
   }
@@ -310,7 +310,7 @@ export default class PlayMenu extends Menu {
     })
     buttonAvatarSizer.addSpace() // Add space before to center
 
-    // Change Deck button
+    // Edit the deck button
     const changeDeckContainer = new ContainerLite(
       this.scene,
       0,
@@ -320,7 +320,7 @@ export default class PlayMenu extends Menu {
     )
     new Buttons.Big({
       within: changeDeckContainer,
-      text: 'Change\n  Deck',
+      text: 'Edit',
       f: () => {
         this.scene.scene.stop()
         const activeScene = this.scene.scene.manager

@@ -99,7 +99,9 @@ export default class Animator {
               permanentCard,
               this.getSound(animation),
               animation.to === Zone.Story ? SHRUNKEN_CARD_SCALE : undefined,
-              animation.to === Zone.Mulligan ? Time.match.mulliganPause : undefined,
+              animation.to === Zone.Mulligan
+                ? Time.match.mulliganPause
+                : undefined,
             )
 
             // Shift remaining story cards when a card is removed mid-story
@@ -420,9 +422,11 @@ export default class Animator {
 
   // Animate a card being emphasized in its place, such as showing that a Morning card is proccing
   private animateEmphasis(card: CardImage, i: number): void {
-    let cardCopy = this.createCard(card.card, [0, 0], card.cardback).copyLocation(
-      card,
-    )
+    let cardCopy = this.createCard(
+      card.card,
+      [0, 0],
+      card.cardback,
+    ).copyLocation(card)
 
     // Animate card scaling up and disappearing
     this.scene.tweens.add({
@@ -569,7 +573,8 @@ export default class Animator {
       this.scene.tweens.add({
         targets: card.container,
         x: card.container.x - shiftX,
-        delay: slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
+        delay:
+          slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
         duration: Time.match.recapTween,
         ease: Ease.card,
       })
@@ -603,7 +608,11 @@ export default class Animator {
       }
     }
 
-    for (let k = insertionActiveIndex + 1; k < this.view.story.cards.length; k++) {
+    for (
+      let k = insertionActiveIndex + 1;
+      k < this.view.story.cards.length;
+      k++
+    ) {
       if (newlyInsertedActiveIndices.has(k)) continue
       const card = this.view.story.cards[k]
       if (!card) continue
@@ -617,7 +626,8 @@ export default class Animator {
       this.scene.tweens.add({
         targets: card.container,
         x: card.container.x - shiftX,
-        delay: slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
+        delay:
+          slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
         duration: Time.match.recapTween,
         ease: Ease.card,
       })
@@ -726,7 +736,8 @@ class StoryResolveBubbles {
 
   popBubbles(slot: number, resolvedCountAtReset: number): void {
     this.resetBeforeResolvedCount = resolvedCountAtReset
-    const delay = slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens)
+    const delay =
+      slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens)
     this.pendingPopDelay = delay
     const targets = [...this.layer.list] as Phaser.GameObjects.Container[]
     for (const bubble of targets) {
@@ -734,7 +745,10 @@ class StoryResolveBubbles {
     }
   }
 
-  private scheduleBubblePop(bubble: Phaser.GameObjects.Container, delay: number): void {
+  private scheduleBubblePop(
+    bubble: Phaser.GameObjects.Container,
+    delay: number,
+  ): void {
     this.scene.tweens.add({
       targets: bubble,
       scaleX: 0,
@@ -758,7 +772,11 @@ class StoryResolveBubbles {
    * Draws resolve bubbles for each settled act (staggered when a single act just resolved).
    * Returns recap tween slots to align other recap animations with those bubble tweens.
    */
-  playForResolvedActs(state: GameModel, resolvedCards: CardImage[], isResetState = false): number {
+  playForResolvedActs(
+    state: GameModel,
+    resolvedCards: CardImage[],
+    isResetState = false,
+  ): number {
     this.syncBookkeeping(state)
 
     const resolvedCount = state.story.resolvedActs.length
@@ -775,7 +793,10 @@ class StoryResolveBubbles {
 
     for (let resolvedI = 0; resolvedI < resolvedCount; resolvedI++) {
       // Skip acts whose bubbles were popped by a reset
-      if (this.resetBeforeResolvedCount !== -1 && resolvedI < this.resetBeforeResolvedCount) {
+      if (
+        this.resetBeforeResolvedCount !== -1 &&
+        resolvedI < this.resetBeforeResolvedCount
+      ) {
         continue
       }
       const act = state.story.resolvedActs[resolvedI]
@@ -791,7 +812,13 @@ class StoryResolveBubbles {
       const pointsEarned = this.resolvedPointsEarnedByActIndex[resolvedI] ?? 0
       const printedPoints = act.card.points
       const effectAmt = pointsEarned - printedPoints - nourishAmt
+
+      // The card Pet is special
       const showEffectsBubble = act.card.name !== 'Pet'
+      const mainBubblePts =
+        act.card.name === 'Pet'
+          ? pointsEarned - nourishAmt
+          : (card.points ?? card.card.points)
 
       const tweenNourishFromStatus =
         oneNewResolvedAct && resolvedI === resolvedCount - 1 && nourishAmt !== 0
@@ -815,7 +842,7 @@ class StoryResolveBubbles {
 
       if (shouldStagger) {
         pushBubbleStep(0, () => {
-          this.addPointsResolveCircle(card, tweenBubbleFromStat)
+          this.addPointsResolveCircle(card, tweenBubbleFromStat, mainBubblePts)
         })
         let delay = r
         if (nourishAmt !== 0) {
@@ -841,7 +868,7 @@ class StoryResolveBubbles {
           })
         }
       } else {
-        this.addPointsResolveCircle(card, tweenBubbleFromStat)
+        this.addPointsResolveCircle(card, tweenBubbleFromStat, mainBubblePts)
         this.addNourishResolveCircle(
           card,
           tweenNourishFromStatus,
@@ -955,8 +982,12 @@ class StoryResolveBubbles {
   }
 
   /** Main printed-points bubble; optionally tweens from the card’s points stat to center. */
-  addPointsResolveCircle(card: CardImage, tweenFromStat: boolean): void {
-    const pts = card.points ?? card.card.points
+  addPointsResolveCircle(
+    card: CardImage,
+    tweenFromStat: boolean,
+    mainBubblePts?: number,
+  ): void {
+    const pts = mainBubblePts ?? card.points ?? card.card.points
     const start = tweenFromStat
       ? this.localToWorld(card.container, card.txtPoints.x, card.txtPoints.y)
       : this.localToWorld(card.container, 0, 0)
