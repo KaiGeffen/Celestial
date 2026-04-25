@@ -41,7 +41,7 @@ export default class OurAvatarRegion extends AvatarRegionBase {
     totalSec: number,
     shouldLiveTick: boolean,
   ): void {
-    if (!shouldLiveTick || totalSec >= 10 || totalSec <= 0) {
+    if (!shouldLiveTick || totalSec >= 5 || totalSec <= 0) {
       this.lastWarnSecond = null
       return
     }

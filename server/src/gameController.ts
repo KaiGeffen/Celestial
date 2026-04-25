@@ -328,11 +328,11 @@ class ServerController {
 
     this.model.story.run(this.model)
 
-    // Player with priority gets time back per resolved act
-    const resolvedActs = this.model.story.resolvedActs.length
+    // Player with priority gets time back per tic that player will watch (If they don't skip)
+    const stepsRefunded = this.model.story.resolvedActs.length + 2
     if (this.model.timers) {
       this.model.timers[this.model.priority] +=
-        resolvedActs * MechanicsSettings.TIMER_RECAP_PER_ACT
+        stepsRefunded * MechanicsSettings.TIMER_RECAP_PER_ACT
     }
 
     // If a player has more points, they win the round
