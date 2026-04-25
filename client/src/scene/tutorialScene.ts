@@ -16,6 +16,7 @@ import Buttons from '../lib/buttons/buttons'
 import { CardImage } from '../lib/cardImage'
 import Catalog from '../../../shared/state/catalog'
 import { ResultsRegionTutorial } from './matchRegions/matchResults'
+import RoundResultRegion from './matchRegions/roundResultRegion'
 import { Animation } from '../../../shared/animation'
 import { Zone } from '../../../shared/state/zone'
 import GameModel from '../../../shared/state/gameModel'
@@ -95,7 +96,6 @@ export default class TutorialMatchScene extends MatchScene {
       },
       returnHotkey: true,
     })
-
   }
 
   protected displayState(state: GameModel): boolean {
@@ -156,10 +156,14 @@ export default class TutorialMatchScene extends MatchScene {
         break
     }
 
-    // At the end of the night, show a hint if there is one
+    // At the end of the night, show a hint after the round result animation finishes
     if (parentPaused) {
       this.paused = true
-      this.displayNightHint(this.params.missionID, state.roundCount - 1)
+      const round = state.roundCount - 1
+      const mission = this.params.missionID
+      ;(this.view.scores as RoundResultRegion).onAnimationComplete = () => {
+        this.displayNightHint(mission, round)
+      }
     }
 
     return result
@@ -177,7 +181,9 @@ export default class TutorialMatchScene extends MatchScene {
       targets: this.txt,
       alpha: 1,
       duration: Time.match.hintFade,
-      onStart: () => { this.txt.alpha = 0 },
+      onStart: () => {
+        this.txt.alpha = 0
+      },
     })
 
     this.align(datum)
@@ -344,7 +350,8 @@ export default class TutorialMatchScene extends MatchScene {
           Space.cardWidth / 2 +
           Space.pad +
           this.txt.displayWidth / 2
-        btnX = textX - this.txt.displayWidth / 2 + Space.buttonWidth / 2 + Space.pad
+        btnX =
+          textX - this.txt.displayWidth / 2 + Space.buttonWidth / 2 + Space.pad
         break
 
       case 'bottom':
