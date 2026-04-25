@@ -220,9 +220,6 @@ class ServerController {
     this.model.amtCardsPlayedLastRound = this.model.amtCardsPlayedThisRound
     this.model.amtCardsPlayedThisRound = [0, 0]
 
-    // Set priority
-    this.model.priority = this.model.lastPlayerWhoPlayed
-
     // Determine order of player triggers
     const players = this.model.priority === 0 ? [0, 1] : [1, 0]
 
@@ -307,12 +304,21 @@ class ServerController {
 
   // The resolution phase, after both players have passed. Points and effects happen as cards resolve
   protected doResolvePhase(): void {
+    // Last player who played gets priority
+    this.model.priority = this.model.lastPlayerWhoPlayed
+
+    // Keep track of the score for the round
     this.model.score = [0, 0]
 
     // Reset the exhale count since a new resolution is beginning
     this.model.exhaleCountLastRound = [0, 0]
 
     this.model.story.run(this.model)
+
+    // Player with priority gets time back per resolved act
+    const resolvedActs = this.model.story.resolvedActs.length
+    this.model.timers[this.model.priority] +=
+      resolvedActs * MechanicsSettings.TIMER_RECAP_PER_ACT
 
     // If a player has more points, they win the round
     if (this.model.score[0] > this.model.score[1]) {
