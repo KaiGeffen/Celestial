@@ -23,7 +23,7 @@ export class UserSettings {
       canBeSpectated: true,
 
       // Whether hotkeys are enabled
-      hotkeys: false,
+      hotkeys: true,
 
       // Settings tied to user's account
       decks: [

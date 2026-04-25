@@ -97,10 +97,14 @@
         "final": true
       },
       null,
-      null,
+      {
+        "bold": "A round only ends when both players pass in a row.",
+        "align": "story",
+        "final": true
+      },
       null,
       {
-        "bold": "With just a Dove, you probably can't win this round. But if you play enough Stars you can play Uprising next round to win for sure!",
+        "bold": "Dove probably isn't enough to win this round.\n\nBut if you play enough Stars you can play Uprising next round to win for sure!",
         "align": "center",
         "final": true
       },

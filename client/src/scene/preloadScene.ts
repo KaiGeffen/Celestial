@@ -120,6 +120,7 @@ export class SigninScene extends Phaser.Scene {
           },
         })
       },
+      muteClick: true,
       depth: -1,
     })
     // Hide the guest button if user is already signed in
