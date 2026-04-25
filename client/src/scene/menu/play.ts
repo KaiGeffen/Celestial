@@ -30,9 +30,10 @@ import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
-const menuWidth = 1000
+const menuWidth = 975
 const deckPanelWidth = Space.cutoutWidth + Space.pad * 2
-const playPanelWidth = 500
+const playPanelWidth = 527
+const PLANT_SIZER_HEIGHT = 244
 
 export default class PlayMenu extends Menu {
   password: string
@@ -697,6 +698,7 @@ export default class PlayMenu extends Menu {
         orientation: 'vertical',
         space: { item: Space.padSmall },
       })
+      plantSizer.setMinSize(0, PLANT_SIZER_HEIGHT)
 
       // Check if there's a plant at this index
       if (i < serverGarden.length && serverGarden[i]) {
