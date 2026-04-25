@@ -26,6 +26,7 @@ import { cardPassesDeckEditorFilters } from './cardSearchFilter'
 
 export type DeckEditorCatalogOptions = {
   onCardPick: (card: Card) => void
+  onBack: () => void
 }
 
 /** Left column: wrapping filter strip + scrolling card grid. */
@@ -41,6 +42,8 @@ export class DeckEditorCatalog {
   /** Outer filter row (`runLayout(width)` used on window resize). */
   headerSizer: any = null
 
+  private readonly onBack: () => void
+
   private cardImages: CardImage[] = []
   private searchText = ''
   private searchObj: any
@@ -50,6 +53,7 @@ export class DeckEditorCatalog {
 
   constructor(scene: BaseScene, opts: DeckEditorCatalogOptions) {
     this.scene = scene
+    this.onBack = opts.onBack
     for (let i = 0; i <= DECK_EDITOR_MAX_COST_FILTER; i++) {
       this.filterCostAry[i] = false
     }
@@ -181,13 +185,7 @@ export class DeckEditorCatalog {
       within: backContainer,
       text: 'Back',
       muteClick: true,
-      f: () => {
-        scene.scene.launch('MenuScene', {
-          menu: 'confirm',
-          text: 'Discard your changes and return to deck selection screen?',
-          callback: () => scene.scene.start('DeckSelectorScene'),
-        })
-      },
+      f: () => this.onBack(),
     })
     row.add(backContainer, { align: 'center' })
 

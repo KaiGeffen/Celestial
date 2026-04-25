@@ -28,6 +28,11 @@ export default class DeckEditorScene extends BaseScene {
   // Name of the deck
   private deckName: string
 
+  // Snapshot of the deck state at scene open, for change detection
+  private originalCards: number[]
+  private originalName: string
+  private originalCosmeticSet: CosmeticSet
+
   // Regions
   private catalogRegion: DeckEditorCatalog
   private deckRegion: DeckEditorDeck
@@ -56,6 +61,11 @@ export default class DeckEditorScene extends BaseScene {
     this.deckName = deck.name
     this.cosmeticSet = deck.cosmeticSet
 
+    // Snapshot for change detection
+    this.originalCards = [...(deck.cards ?? [])]
+    this.originalName = deck.name
+    this.originalCosmeticSet = { ...deck.cosmeticSet }
+
     // Create the elements of the scene
     this.createElements(deck)
     this.sizer.layout()
@@ -67,6 +77,7 @@ export default class DeckEditorScene extends BaseScene {
     // Catalog region
     this.catalogRegion = new DeckEditorCatalog(this, {
       onCardPick: (card) => this.addCardToDeck(card),
+      onBack: () => this.handleBack(),
     })
 
     // Deck region
@@ -207,6 +218,48 @@ export default class DeckEditorScene extends BaseScene {
 
     // Save it
     UserSettings._setIndex('decks', this.deckIndex, updated)
+  }
+
+  private handleBack(): void {
+    if (!this.hasChanges()) {
+      // Menu isn't opening, so play the click sound
+      this.playSound('click')
+      this.scene.start('DeckSelectorScene')
+      return
+    }
+
+    // Open confirmation menu to confirm changes
+    this.scene.launch('MenuScene', {
+      menu: 'confirm',
+      text: 'Discard your changes and return to deck selection screen?',
+      callback: () => this.scene.start('DeckSelectorScene'),
+    })
+  }
+
+  private hasChanges(): boolean {
+    if (this.deckName !== this.originalName) return true
+
+    const cs = this.cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 }
+    const ocs = this.originalCosmeticSet ?? {
+      avatar: 0,
+      border: 0,
+      cardback: 0,
+    }
+    if (
+      cs.avatar !== ocs.avatar ||
+      cs.border !== ocs.border ||
+      cs.cardback !== ocs.cardback
+    )
+      return true
+
+    const current = [...this.getDeckCode()].sort((a, b) => a - b)
+    const original = [...this.originalCards].sort((a, b) => a - b)
+    if (current.length !== original.length) return true
+    for (let i = 0; i < current.length; i++) {
+      if (current[i] !== original[i]) return true
+    }
+
+    return false
   }
 
   /** Utility */
