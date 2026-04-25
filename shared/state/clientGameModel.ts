@@ -53,6 +53,7 @@ function reverseAttributes(model: GameModel): void {
     'exhaleCountLastRound',
     'usernames',
     'subtitles',
+    'timers',
   ]
 
   for (const attr of listAttributes) {

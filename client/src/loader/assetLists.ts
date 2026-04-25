@@ -387,11 +387,9 @@ export const assetLists = {
     "files": [
       "Light",
       "matchBottom",
-      "matchBottom",
       "matchDay",
       "matchNight",
       "matchTile",
-      "matchTop",
       "matchTop"
     ],
     "pixelArt": false

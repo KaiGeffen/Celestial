@@ -118,7 +118,7 @@ export default class GameModel {
   // Get how many ms the active player has left
   getPlayerTimeLeft(player: number): number {
     const elapsed = Date.now() - this.lastTime
-    return this.timers[player] - elapsed
+    return Math.max(0, this.timers[player] - elapsed)
   }
 
   switchPriority() {
@@ -186,6 +186,7 @@ export default class GameModel {
     // copy.elos = [...this.elos]
     copy.roundCount = this.roundCount
     copy.timers = [...this.timers]
+    copy.lastTime = this.lastTime
     return copy
   }
 
