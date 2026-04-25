@@ -28,7 +28,8 @@ export default class HistoryRegion extends Region {
   }
 
   displayState(state: GameModel): void {
-    if (!state.isRecap) {
+    const canReplay = !state.isRecap && state.roundCount >= 1
+    if (canReplay) {
       this.btnRecap.enable()
       this.btnRecap.setVisible(true)
       this.chromeRecap.setVisible(true)
