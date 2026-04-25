@@ -16,7 +16,6 @@ import Buttons from '../lib/buttons/buttons'
 import { CardImage } from '../lib/cardImage'
 import Catalog from '../../../shared/state/catalog'
 import { ResultsRegionTutorial } from './matchRegions/matchResults'
-import { SearchingRegionTutorial } from './matchRegions/searchingRegion'
 import { Animation } from '../../../shared/animation'
 import { Zone } from '../../../shared/state/zone'
 import GameModel from '../../../shared/state/gameModel'
@@ -55,12 +54,7 @@ export default class TutorialMatchScene extends MatchScene {
     this.view.results = new ResultsRegionTutorial().create(this)
     this.view.results['missionID'] = this.params.missionID + 1
 
-    // Replace the searching screen with still frames
     this.view.searching.hide()
-    this.view.searching = new SearchingRegionTutorial().create(
-      this,
-      this.params.missionID,
-    )
 
     // Must reset progress
     this.progress = -1
@@ -183,9 +177,7 @@ export default class TutorialMatchScene extends MatchScene {
     }
 
     // Set the appropriate text
-    let s = `[i]${datum.italic}[/i]`
-    if (datum.italic) s += '\n\n'
-    s += `[b]${datum.bold}[/b]`
+    const s = `[b]${datum.bold}[/b]`
 
     this.txt.setText(s).setVisible(s !== '')
 

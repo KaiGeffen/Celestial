@@ -2,14 +2,14 @@
   [
     {
       "italic": "In this city we tell stories - each day we craft them, and each night they come to life before a crowd. When you’ve won 5 times, you may pass on. To ease your journey into the city, I’ve given you 2 wins for now.",
-      "bold": "Win the game by winning 5 rounds.\nFor the tutorial, you start with 2 wins.",
-      "align": "right"
+      "bold": "Win 5 rounds to win the match.\nFor the tutorial, you start with 2 wins.",
+      "align": "center"
     },
 
     {
       "italic": "With our sacred breath we create the stories that we tell here. Each card takes some breath to play as we add it to our shared story. And each morning we awake with more breath in our lungs.",
       "bold": "Spend Breath to play cards from your hand. You start with 1 breath and gain 1 more each round.",
-      "align": "right"
+      "align": "center"
     },
     {
       "italic": "These cards are the elements of the stories we tell - wisps and imagery brought here to form something greater. With our breath we weave them into the story, and when night falls they come to life, to enchant and delight the audience.",
