@@ -70,7 +70,7 @@ export default class TutorialMatchScene extends MatchScene {
         '',
         BBStyle.basic,
       )
-      .setOrigin(0.5, 0.5)
+      .setOrigin(0.5, 1)
       .setDepth(Depth.tutorial)
 
     // Add a background and outline
@@ -340,125 +340,90 @@ export default class TutorialMatchScene extends MatchScene {
 
   // Align the elements based on the type of tutorial
   private align(datum): void {
-    // Reset flipping the pointer
     this.pointer.resetFlip()
 
-    let x, y
+    // Fixed anchor: text bottom and button are always at the same Y
+    const textBottomY = Space.windowHeight / 2 + Space.pad * 4
+    const btnY = textBottomY + Space.pad + Space.buttonHeight / 2
+
+    let textX = Space.windowWidth / 2
+    let btnX = Space.windowWidth / 2
+
     switch (datum.align) {
       case 'right':
         this.pointer.setRotation(0)
-
-        x = Space.windowWidth - this.pointer.width / 2 - 72
-        y = Space.windowHeight - 168 - this.pointer.height
-        this.pointer.setPosition(x, y)
-
-        // Text to the left of pointer
-        x -= this.pointer.width / 2 + Space.pad + this.txt.displayWidth / 2
-        y -= this.pointer.height / 2
-        this.txt.setPosition(x, y)
-
-        // Move next button just below the text
-        y += this.txt.displayHeight / 2 + Space.pad + Space.buttonHeight / 2
-        this.btnNext.setPosition(x, y)
+        this.pointer.setPosition(
+          Space.windowWidth - this.pointer.width / 2 - 72,
+          Space.windowHeight - 168 - this.pointer.height,
+        )
+        textX =
+          this.pointer.x -
+          this.pointer.width / 2 -
+          Space.pad -
+          this.txt.displayWidth / 2
+        btnX = textX
         break
 
       case 'left':
         this.pointer.setRotation(0).setFlipX(true)
-
-        x = Space.pad + this.pointer.width / 2 + 50
-        y = Space.windowHeight - 200 - this.pointer.height
-        this.pointer.setPosition(x, y)
-
-        // Text to the right of pointer
-        x += this.pointer.width / 2 + Space.pad + this.txt.displayWidth / 2
-        y -= this.pointer.height / 2
-        this.txt.setPosition(x, y)
-
-        // Move next button just below the text
-        y += this.txt.displayHeight / 2 + Space.pad + Space.buttonHeight / 2
-        this.btnNext.setPosition(x, y)
+        this.pointer.setPosition(
+          Space.pad + this.pointer.width / 2 + 50,
+          Space.windowHeight - 200 - this.pointer.height,
+        )
+        textX =
+          this.pointer.x +
+          this.pointer.width / 2 +
+          Space.pad +
+          this.txt.displayWidth / 2
+        btnX = textX
         break
 
       case 'card':
         this.pointer.setRotation(Math.PI / 2)
-
-        x =
+        this.pointer.setPosition(
           Space.windowWidth / 2 +
-          Space.cardWidth / 2 +
-          Space.pad +
-          this.pointer.width / 2 +
-          50
-        y = Space.windowHeight / 2 + this.pointer.height / 2
-        this.pointer.setPosition(x, y)
-
-        // Text above the pointer
-        x =
+            Space.cardWidth / 2 +
+            Space.pad +
+            this.pointer.width / 2 +
+            50,
+          Space.windowHeight / 2 + this.pointer.height / 2,
+        )
+        textX =
           Space.windowWidth / 2 +
           Space.cardWidth / 2 +
           Space.pad +
           this.txt.displayWidth / 2
-        y -= this.pointer.height / 2 + Space.pad + this.txt.displayHeight / 2
-        this.txt.setPosition(x, y)
-
-        // Move next button below and to the left of
-        x -= this.txt.displayWidth / 2 - Space.buttonWidth / 2 - Space.pad
-        y += this.txt.displayHeight / 2 + Space.pad + Space.buttonHeight / 2
-        this.btnNext.setPosition(x, y)
+        btnX = textX - this.txt.displayWidth / 2 + Space.buttonWidth / 2 + Space.pad
         break
 
       case 'bottom':
         this.pointer.setRotation(0).setFlipX(true)
-
-        x = Space.windowWidth / 2 - Space.cardWidth
-        y =
+        this.pointer.setPosition(
+          Space.windowWidth / 2 - Space.cardWidth,
           Space.windowHeight -
-          Space.handHeight -
-          this.pointer.displayHeight / 2 -
-          Space.pad * 2
-        this.pointer.setPosition(x, y)
-
-        // Text left of the pointer
-        // NOTE Get right instead of left because x is flipped
-        x =
-          this.pointer.getRightCenter().x +
-          this.txt.displayWidth / 2 +
-          Space.pad
-        y -= this.pointer.displayHeight / 2
-        this.txt.setPosition(x, y)
-
-        // Button just below text
-        y += this.txt.displayHeight / 2 + Space.pad + Space.buttonHeight / 2
-        this.btnNext.setPosition(x, y)
-
+            Space.handHeight -
+            this.pointer.displayHeight / 2 -
+            Space.pad * 2,
+        )
+        // NOTE getRightCenter because x is flipped
+        textX =
+          this.pointer.getRightCenter().x + this.txt.displayWidth / 2 + Space.pad
+        btnX = textX
         break
 
       case 'center':
         this.pointer.setVisible(false)
-
-        x = Space.windowWidth / 2
-        y = Space.windowHeight / 2
-        this.txt.setPosition(x, y)
-
-        // Button just below text
-        y += this.txt.displayHeight / 2 + Space.pad + Space.buttonHeight / 2
-        this.btnNext.setPosition(x, y)
-
         break
 
       case 'story':
         this.pointer.setVisible(false)
-
-        // Text to the right of center
-        x = Space.windowWidth / 2 + this.txt.displayWidth / 2 + Space.pad
-        y = Space.windowHeight / 2
-        this.txt.setPosition(x, y)
-
-        // Button just below text
-        y += this.txt.displayHeight / 2 + Space.pad + Space.buttonHeight / 2
-        this.btnNext.setPosition(x, y)
-
+        textX = Space.windowWidth / 2 + this.txt.displayWidth / 2 + Space.pad
+        btnX = textX
         break
     }
+
+    this.txt.setPosition(textX, textBottomY)
+    this.btnNext.setPosition(btnX, btnY)
   }
 
   private addCard(name: string): CardImage {
