@@ -13,7 +13,7 @@ export class MechanicsSettings {
 
   static readonly TIMER_START = 120000 // 2 minutes
   static readonly TIMER_RECOUP = 8000 // 8 seconds
-  static readonly TIMER_RECAP_PER_ACT = 10000 // 1 second per act in the story
+  static readonly TIMER_RECAP_PER_ACT = 1000 // 1 second per act in the story
 
   // The code to communicate passing, TODO is this a mechanic
   static readonly PASS = 10
