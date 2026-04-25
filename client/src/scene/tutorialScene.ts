@@ -9,7 +9,6 @@ import {
   BBStyle,
   Time,
   Depth,
-  Flags,
   UserSettings,
 } from '../settings/settings'
 import Button from '../lib/buttons/button'
@@ -74,7 +73,7 @@ export default class TutorialMatchScene extends MatchScene {
         '',
         BBStyle.basic,
       )
-      .setOrigin(0.5, Flags.mobile ? 0 : 0.5)
+      .setOrigin(0.5, 0.5)
       .setDepth(Depth.tutorial)
 
     // Add a background and outline
@@ -107,7 +106,7 @@ export default class TutorialMatchScene extends MatchScene {
     // Pointer for showing area of interest to user
     this.pointer = this.add
       .image(0, 0, 'icon-Pointer')
-      .setAlpha(Flags.mobile ? 0.0001 : 1)
+      .setAlpha(1)
   }
 
   protected displayState(state: GameModel): boolean {
@@ -188,8 +187,7 @@ export default class TutorialMatchScene extends MatchScene {
     // Set the appropriate text
     let s = `[i]${datum.italic}[/i]`
     if (datum.italic) s += '\n\n'
-    if (Flags.mobile && datum.mobile) s += `[b]${datum.mobile}[/b]`
-    else s += `[b]${datum.bold}[/b]`
+    s += `[b]${datum.bold}[/b]`
 
     this.txt.setText(s).setVisible(s !== '')
 
@@ -310,17 +308,6 @@ export default class TutorialMatchScene extends MatchScene {
   private align(datum): void {
     // Reset flipping the pointer
     this.pointer.resetFlip()
-
-    // On mobile, text always in top left
-    if (Flags.mobile) {
-      const x = Space.windowWidth / 2
-      this.txt.setPosition(x, Space.pad)
-
-      // Button just below text
-      const y = this.txt.displayHeight + Space.pad * 2 + Space.buttonHeight / 2
-      this.btnNext.setPosition(x, y)
-      return
-    }
 
     let x, y
     switch (datum.align) {
@@ -445,10 +432,8 @@ export default class TutorialMatchScene extends MatchScene {
       this.card.destroy()
     }
 
-    const x = Flags.mobile ? Space.cardWidth / 2 : Space.windowWidth / 2
-    const y = Flags.mobile
-      ? Space.windowHeight - Space.cardHeight / 2
-      : Space.windowHeight / 2
+    const x = Space.windowWidth / 2
+    const y = Space.windowHeight / 2
     this.card = new CardImage(Catalog.getCard(name), this.add.container(x, y))
 
     return this.card
