@@ -144,7 +144,7 @@ class Ice extends Card {
         card: this,
         // Not -1 because it has been removed by this point
         index: game.hand[player].length,
-        // TODO This goes to where the triggering card is, not to where this ends up, and has bugs with multiple triggers (Fishing Boat)
+        // TODO This is slightly bugged - the animation if a card in the story causes you to drop this will be off by 1
         index2,
       }),
     )
