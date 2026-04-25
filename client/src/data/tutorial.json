@@ -6,7 +6,7 @@
         "align": "center"
       },
       {
-        "bold": "Spend Breath to play cards from your hand.\n\nYou start with 1 breath and gain 1 more each round.",
+        "bold": "Breath is the energy used to play cards.\n\nYou start with 1 breath and gain 1 more each round.",
         "align": "center"
       },
       {
@@ -14,7 +14,7 @@
         "align": "card"
       },
       {
-        "bold": "Dove costs 1 breath to play and earns one points.\nMouse over its keywords to learn more.",
+        "bold": "Dove costs 1 breath to play and earns 1 point.\n\nMouse over its keywords to learn more.",
         "align": "card"
       },
       {
@@ -40,17 +40,13 @@
         "align": "story"
       },
       {
-        "bold": "You're out of cards to play.\nThe round ends now, and the cards we've played resolve from left to right.",
+        "bold": "You can't afford to play any more cards, so you pass.\n\nThe round ends now, and the cards we've played resolve from left to right.",
         "align": "story"
       },
       null,
       null,
       {
-        "bold": "Last round, we both earned 1 point, so we tied and neither of us earned a win.",
-        "align": "center"
-      },
-      {
-        "bold": "A new round begins.\n\nWe each draw 2 new cards.\n\n Our max breath goes up by 1, and refills completely.",
+        "bold": "A new round begins.\n\nWe each draw 2 new cards.\n\nOur max breath goes up by 1, and refills completely.",
         "align": "center"
       },
       {
@@ -61,25 +57,35 @@
     ],
     "night": [
       {
-        "bold": "We both earned 1 point, so it's a tie!\n\nClick the moon when you're ready for another round.",
-        "align": "center",
-        "final": true
+        "bold": "We both earned 1 point, so it's a tie!\n\nClick the moon when you're ready for the next round to begin.",
+        "align": "story"
       },
-      null,
-      null
+      {
+        "bold": "Another round ends.\n\nClick the moon to continue.",
+        "align": "story"
+      },
+      {
+        "bold": "Card effects happen when the card resolve (At night), not when it's played.",
+        "align": "story"
+      }
     ]
   },
   {
     "hints": [
       {
         "bold": "If you play a card with Inspire, you will have extra breath on the next round.\n\nPlay Stars now so you can afford Mercy next round.",
-        "align": "bottom",
+        "align": "center",
         "final": true
       },
       null,
       null,
       null,
       null,
+      {
+        "bold": "This round you're Inspired for 1 extra breath.\n\nInspired and other statuses appear above your hand.",
+        "align": "center",
+        "final": true
+      },
       {
         "bold": "With your 3 breath you can afford Mercy.\n\nBut if you gained extra breath from Stars, you might have nothing to spend it on next round...",
         "align": "center",

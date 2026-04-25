@@ -31,15 +31,10 @@ export default class TutorialMatchScene extends MatchScene {
   // Text button to continue the hint text
   btnNext: Button
 
-  // Pointer for showing area of interest to user
-  pointer: Phaser.GameObjects.Image
-
   // A card that is being shown
   card: CardImage
 
   // Whether a night hint is currently being shown (Next dismisses and unpauses)
-  private nightHintActive = false
-
   isTutorial = true
 
   constructor(args = { key: 'TutorialMatchScene', lastScene: 'JourneyScene' }) {
@@ -84,15 +79,6 @@ export default class TutorialMatchScene extends MatchScene {
       within: this,
       text: 'Next',
       f: () => {
-        if (this.nightHintActive) {
-          this.nightHintActive = false
-          this.txt.setVisible(false)
-          this.btnNext.setVisible(false)
-          this.pointer.setVisible(false)
-          this.paused = false
-          return
-        }
-
         this.progress += 1
         switch (this.params.missionID) {
           case 0:
@@ -109,8 +95,6 @@ export default class TutorialMatchScene extends MatchScene {
       returnHotkey: true,
     })
 
-    // Pointer for showing area of interest to user
-    this.pointer = this.add.image(0, 0, 'icon-Pointer').setAlpha(1)
   }
 
   protected displayState(state: GameModel): boolean {
@@ -171,6 +155,7 @@ export default class TutorialMatchScene extends MatchScene {
         break
     }
 
+    // At the end of the night, show a hint if there is one
     if (parentPaused) {
       this.paused = true
       this.displayNightHint(this.params.missionID, state.roundCount - 1)
@@ -184,8 +169,6 @@ export default class TutorialMatchScene extends MatchScene {
     const datum = data[mission].night[round]
     if (!datum) return
 
-    this.nightHintActive = true
-
     const s = `[b]${datum.bold}[/b]`
     this.txt.setText(s).setVisible(true)
 
@@ -196,8 +179,6 @@ export default class TutorialMatchScene extends MatchScene {
       onStart: () => { this.txt.alpha = 0 },
     })
 
-    this.btnNext.setVisible(true)
-    this.pointer.setVisible(false)
     this.align(datum)
   }
 
@@ -209,7 +190,6 @@ export default class TutorialMatchScene extends MatchScene {
       // Hide all elements
       this.txt.setVisible(false)
       this.btnNext.setVisible(false)
-      this.pointer.setVisible(false)
 
       // Ensure that scene is not paused
       this.paused = false
@@ -234,7 +214,6 @@ export default class TutorialMatchScene extends MatchScene {
 
     // If this is the final hint before the player must do something, hide the button
     this.btnNext.setVisible(!datum.final)
-    this.pointer.setVisible(!datum.final)
 
     // Align the elements based on the type of hint
     this.align(datum)
@@ -340,8 +319,6 @@ export default class TutorialMatchScene extends MatchScene {
 
   // Align the elements based on the type of tutorial
   private align(datum): void {
-    this.pointer.resetFlip()
-
     // Fixed anchor: text bottom and button are always at the same Y
     const textBottomY = Space.windowHeight / 2 + Space.pad * 4
     const btnY = textBottomY + Space.pad + Space.buttonHeight / 2
@@ -351,43 +328,16 @@ export default class TutorialMatchScene extends MatchScene {
 
     switch (datum.align) {
       case 'right':
-        this.pointer.setRotation(0)
-        this.pointer.setPosition(
-          Space.windowWidth - this.pointer.width / 2 - 72,
-          Space.windowHeight - 168 - this.pointer.height,
-        )
-        textX =
-          this.pointer.x -
-          this.pointer.width / 2 -
-          Space.pad -
-          this.txt.displayWidth / 2
+        textX = Space.windowWidth - this.txt.displayWidth / 2 - Space.pad
         btnX = textX
         break
 
       case 'left':
-        this.pointer.setRotation(0).setFlipX(true)
-        this.pointer.setPosition(
-          Space.pad + this.pointer.width / 2 + 50,
-          Space.windowHeight - 200 - this.pointer.height,
-        )
-        textX =
-          this.pointer.x +
-          this.pointer.width / 2 +
-          Space.pad +
-          this.txt.displayWidth / 2
+        textX = this.txt.displayWidth / 2 + Space.pad
         btnX = textX
         break
 
       case 'card':
-        this.pointer.setRotation(Math.PI / 2)
-        this.pointer.setPosition(
-          Space.windowWidth / 2 +
-            Space.cardWidth / 2 +
-            Space.pad +
-            this.pointer.width / 2 +
-            50,
-          Space.windowHeight / 2 + this.pointer.height / 2,
-        )
         textX =
           Space.windowWidth / 2 +
           Space.cardWidth / 2 +
@@ -397,26 +347,10 @@ export default class TutorialMatchScene extends MatchScene {
         break
 
       case 'bottom':
-        this.pointer.setRotation(0).setFlipX(true)
-        this.pointer.setPosition(
-          Space.windowWidth / 2 - Space.cardWidth,
-          Space.windowHeight -
-            Space.handHeight -
-            this.pointer.displayHeight / 2 -
-            Space.pad * 2,
-        )
-        // NOTE getRightCenter because x is flipped
-        textX =
-          this.pointer.getRightCenter().x + this.txt.displayWidth / 2 + Space.pad
-        btnX = textX
-        break
-
       case 'center':
-        this.pointer.setVisible(false)
         break
 
       case 'story':
-        this.pointer.setVisible(false)
         textX = Space.windowWidth / 2 + this.txt.displayWidth / 2 + Space.pad
         btnX = textX
         break
