@@ -42,7 +42,7 @@ export default abstract class AvatarRegionBase extends Region {
     const y0 = this.avatar.icon.y + this.avatar.icon.height / 2
     const usernameY = y0 + 8 + Space.padSmall
     const subtitleY = usernameY + 22
-    const timeY = subtitleY + 24
+    const timeY = subtitleY + 20
     const nameplateY = (usernameY + subtitleY) / 2
 
     this.imgNameplate = this.scene.add
