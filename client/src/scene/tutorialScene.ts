@@ -104,9 +104,7 @@ export default class TutorialMatchScene extends MatchScene {
     })
 
     // Pointer for showing area of interest to user
-    this.pointer = this.add
-      .image(0, 0, 'icon-Pointer')
-      .setAlpha(1)
+    this.pointer = this.add.image(0, 0, 'icon-Pointer').setAlpha(1)
   }
 
   protected displayState(state: GameModel): boolean {
@@ -223,6 +221,9 @@ export default class TutorialMatchScene extends MatchScene {
         this.view.ourAvatar.hide()
         this.view.theirAvatar.hide()
         this.view.theirBoard.hide()
+        this.view.ourStacks.hide()
+        this.view.theirStacks.hide()
+        this.view.historyRegion.hide()
         // Hide cards in hand until later
         this.view.ourBoard.tutorialSetHandVisibility(false)
         break

@@ -130,6 +130,20 @@ export default abstract class StacksRegionBase {
     return this
   }
 
+  hide(): this {
+    this.deckContainer.setVisible(false)
+    this.discardContainer.setVisible(false)
+    this.stackIconsContainer.setVisible(false)
+    return this
+  }
+
+  show(): this {
+    this.deckContainer.setVisible(true)
+    this.discardContainer.setVisible(true)
+    this.stackIconsContainer.setVisible(true)
+    return this
+  }
+
   setOverlayCallbacks(fDeck: () => void, fDiscard: () => void): void {
     this.deckCallback = fDeck
     this.discardCallback = fDiscard
