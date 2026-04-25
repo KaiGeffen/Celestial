@@ -41,6 +41,7 @@ export default class SearchingRegion extends Region {
   }
 
   sum = 0
+  private lastDisplayedSecond: number = -1
   update(time, delta): void {
     // Keep the avatar size ratio right in case window resizes
     // TODO This should be in a on-resize callback
@@ -65,15 +66,18 @@ export default class SearchingRegion extends Region {
     if (this.startTime === undefined) {
       this.startTime = time
     }
-    const elapsedSeconds = (time - this.startTime) / 1000
-    const seconds = Math.floor(elapsedSeconds) % 60
-    const minutes = Math.floor(elapsedSeconds / 60) % 60
-    const hours = Math.floor(elapsedSeconds / 3600)
-    const timeString =
-      hours > 0
-        ? `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
-        : `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
-    this.txtTime.setText(timeString)
+    const elapsedSeconds = Math.floor((time - this.startTime) / 1000)
+    if (elapsedSeconds !== this.lastDisplayedSecond) {
+      this.lastDisplayedSecond = elapsedSeconds
+      const seconds = elapsedSeconds % 60
+      const minutes = Math.floor(elapsedSeconds / 60) % 60
+      const hours = Math.floor(elapsedSeconds / 3600)
+      const timeString =
+        hours > 0
+          ? `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+          : `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+      this.txtTime.setText(timeString)
+    }
   }
 
   displayState(state: GameModel): void {

@@ -159,7 +159,6 @@ export default class PlayMenu extends Menu {
       .filter((card) => card !== null && card !== undefined)
 
     this.decklist.setDeck(deckCards, false)
-    this.decklist.sizer.layout()
     if (this.scrollableDeck) {
       this.scrollableDeck.layout()
       this.scrollableDeck.t = 0

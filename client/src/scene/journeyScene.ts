@@ -30,8 +30,8 @@ import avatarStories from '../data/avatarStories/avatarStories'
 import Server from '../server'
 
 const OVERLAY_WIDTH = 575
-const OVERLAY_HEIGHT = 660
-const OVERLAY_TOP = 100
+const OVERLAY_HEIGHT = 595
+const OVERLAY_TOP = 80
 
 /** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Imani, Mitra, Water, Stars */
 const THEME_CAMERA_POSITIONS: { x: number; y: number }[] = [
@@ -132,9 +132,9 @@ export default class JourneyScene extends BaseScene {
     this.createBackButton()
 
     // Add race button if dev mode is enabled
-    if (Flags.devCardsEnabled) {
-      this.createRaceButton()
-    }
+    // if (Flags.devCardsEnabled) {
+    //   this.createRaceButton()
+    // }
 
     if (params.stillframe !== undefined) {
       this.createStillframe(params)
@@ -147,7 +147,6 @@ export default class JourneyScene extends BaseScene {
       this.createTipPopup(params)
     }
 
-    const camera = this.cameras.main
     // Start at selected theme position immediately (no transition on open)
     this.snapCameraToTheme(this.selectedThemeIndex)
 
@@ -215,7 +214,7 @@ export default class JourneyScene extends BaseScene {
       .setOrigin(0)
 
     this.overlayPanel = newScrollablePanel(this, {
-      x: Space.windowWidth - OVERLAY_WIDTH - Space.pad,
+      x: Space.windowWidth - OVERLAY_WIDTH - 20,
       y: OVERLAY_TOP,
       width: OVERLAY_WIDTH,
       height: OVERLAY_HEIGHT,
