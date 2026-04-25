@@ -68,7 +68,7 @@ class ServerController {
     // Do action: Pass or play a card
     if (choice === MechanicsSettings.PASS) {
       // NOTE Animations cleared here to capture any from pass() call
-      this.model.animations = [[],[]]
+      this.model.animations = [[], []]
 
       // Handle the pass occuring and trigger any effects
       this.pass(player)
@@ -77,8 +77,7 @@ class ServerController {
       if (this.model.passes === 2) {
         this.doResolvePhase()
         this.doUpkeep()
-      }
-      else {
+      } else {
         // Just increment the version, don't reset the animations
         this.model.versionNo++
       }
@@ -331,8 +330,10 @@ class ServerController {
 
     // Player with priority gets time back per resolved act
     const resolvedActs = this.model.story.resolvedActs.length
-    this.model.timers[this.model.priority] +=
-      resolvedActs * MechanicsSettings.TIMER_RECAP_PER_ACT
+    if (this.model.timers) {
+      this.model.timers[this.model.priority] +=
+        resolvedActs * MechanicsSettings.TIMER_RECAP_PER_ACT
+    }
 
     // If a player has more points, they win the round
     if (this.model.score[0] > this.model.score[1]) {
@@ -390,15 +391,14 @@ class ServerController {
 
   // Update the given player's in-game timer
   private updatePlayerTimer(player: number, updateLastTime: boolean): void {
+    if (!this.model.timers) return
+
     const timeElapsed = Date.now() - this.model.lastTime
     if (updateLastTime) {
       this.model.lastTime = Date.now()
     }
 
-    // Lose the time they took to act
     this.model.timers[player] -= timeElapsed
-
-    // Recoup time for having acted
     this.model.timers[player] += MechanicsSettings.TIMER_RECOUP
   }
 
