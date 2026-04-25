@@ -37,6 +37,9 @@ export default class TutorialMatchScene extends MatchScene {
   // A card that is being shown
   card: CardImage
 
+  // Whether a night hint is currently being shown (Next dismisses and unpauses)
+  private nightHintActive = false
+
   isTutorial = true
 
   constructor(args = { key: 'TutorialMatchScene', lastScene: 'JourneyScene' }) {
@@ -81,6 +84,15 @@ export default class TutorialMatchScene extends MatchScene {
       within: this,
       text: 'Next',
       f: () => {
+        if (this.nightHintActive) {
+          this.nightHintActive = false
+          this.txt.setVisible(false)
+          this.btnNext.setVisible(false)
+          this.pointer.setVisible(false)
+          this.paused = false
+          return
+        }
+
         this.progress += 1
         switch (this.params.missionID) {
           case 0:
@@ -142,9 +154,11 @@ export default class TutorialMatchScene extends MatchScene {
       this.progress += 1
     }
 
+    // Preserve any pause the parent set (e.g. end-of-round recap pause)
+    const parentPaused = this.paused
+
     switch (this.params.missionID) {
       case 0:
-        // this.view.ourStacks.tutorialHide()
         this.displayHints1()
         break
 
@@ -157,12 +171,39 @@ export default class TutorialMatchScene extends MatchScene {
         break
     }
 
+    if (parentPaused) {
+      this.paused = true
+      this.displayNightHint(this.params.missionID, state.roundCount - 1)
+    }
+
     return result
+  }
+
+  // Display a night hint (end-of-round pause) for the given mission and round
+  private displayNightHint(mission: number, round: number): void {
+    const datum = data[mission].night[round]
+    if (!datum) return
+
+    this.nightHintActive = true
+
+    const s = `[b]${datum.bold}[/b]`
+    this.txt.setText(s).setVisible(true)
+
+    this.tweens.add({
+      targets: this.txt,
+      alpha: 1,
+      duration: Time.match.hintFade,
+      onStart: () => { this.txt.alpha = 0 },
+    })
+
+    this.btnNext.setVisible(true)
+    this.pointer.setVisible(false)
+    this.align(datum)
   }
 
   // Display the current hint for the given mission id
   private displayHint(i: number): void {
-    const datum = data[i][this.progress]
+    const datum = data[i].hints[this.progress]
 
     if (datum === undefined || datum === null) {
       // Hide all elements
