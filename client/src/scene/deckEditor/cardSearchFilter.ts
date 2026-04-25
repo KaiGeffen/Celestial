@@ -12,7 +12,9 @@ export interface DeckEditorSearchToken {
   rangeMax: number | null
 }
 
-export function parseDeckEditorSearchQuery(query: string): DeckEditorSearchToken[] {
+export function parseDeckEditorSearchQuery(
+  query: string,
+): DeckEditorSearchToken[] {
   const tokens: DeckEditorSearchToken[] = []
   let current = ''
   let inQuotes = false
@@ -47,7 +49,10 @@ export function parseDeckEditorSearchQuery(query: string): DeckEditorSearchToken
   return tokens
 }
 
-function createSearchToken(text: string, isPhrase: boolean): DeckEditorSearchToken {
+function createSearchToken(
+  text: string,
+  isPhrase: boolean,
+): DeckEditorSearchToken {
   const token: DeckEditorSearchToken = {
     text,
     isPhrase,
@@ -107,7 +112,7 @@ function matchesToken(card: Card, token: DeckEditorSearchToken): boolean {
 }
 
 function searchEverywhere(card: Card, query: string): boolean {
-  let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points}`
+  let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points} ${card.beta ? 'beta' : ''}`
   for (const [keyword] of Catalog.getReferencedKeywords(card)) {
     searchableText += ` ${keyword.text}`
   }
