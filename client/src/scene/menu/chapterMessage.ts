@@ -8,6 +8,7 @@ import Button from '../../lib/buttons/button'
 import Server from '../../server'
 import { Ease, Space, Style, Time } from '../../settings/settings'
 import REWARD_AMOUNTS from '../../../../shared/config/rewardAmounts'
+import newScrollablePanel from '../../lib/scrollablePanel'
 
 export default class ChapterMessageMenu extends MessageMenu {
   private claimGoldMissionId: number | undefined
@@ -19,8 +20,52 @@ export default class ChapterMessageMenu extends MessageMenu {
 
   protected createContent(params): void {
     this.claimGoldMissionId = params.claimGoldMissionId
-    this.createHeader(params.title, undefined, Style.chapterHeader)
-    this.createText(params.s, Style.chapterBody)
+
+    const contentWidth = this.width - 100 // 50px gap on each side
+    const sidePad = { padding: { left: 50, right: 50 } }
+
+    // Header: title text centered, then chrome-divider below it
+    const headerSizer = this.scene.rexUI.add.sizer({
+      orientation: 'vertical',
+      width: contentWidth,
+      space: { item: Space.padSmall },
+    })
+
+    const headerTxt = this.scene.add
+      .text(0, 0, params.title, Style.chapterHeader)
+      .setOrigin(0.5, 0)
+    headerSizer.add(headerTxt, { align: 'center' })
+
+    const divider = this.scene.add
+      .image(0, 0, 'chrome-divider')
+      .setScale(0.35)
+    const dH = divider.displayHeight
+    divider.setDisplaySize(contentWidth, dH)
+    headerSizer.add(divider, { align: 'center' })
+
+    this.sizer
+      .add(headerSizer, { padding: { left: 50, right: 50, top: Space.padSmall, bottom: 0 } })
+      .addNewLine()
+
+    // Body: scrollable text, no scrollbar
+    const maxTextHeight = Space.windowHeight - 300
+    const textPanel = this.scene.rexUI.add.sizer({ width: contentWidth })
+    const bodyTxt = this.scene.add
+      .text(0, 0, params.s, Style.chapterBody)
+      .setWordWrapWidth(contentWidth)
+    textPanel.add(bodyTxt)
+
+    const scrollableText = newScrollablePanel(this.scene, {
+      width: contentWidth,
+      height: Math.min(bodyTxt.height, maxTextHeight),
+      panel: { child: textPanel },
+      scrollMode: 'y',
+      slider: false,
+    })
+    this.textScrollablePanel = scrollableText
+
+    this.sizer.add(scrollableText, sidePad).addNewLine()
+
     this.addFooter()
   }
 

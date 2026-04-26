@@ -214,6 +214,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   // Chapter story popup (journeyScene chapterMessage menu)
   chapterHeader: {
     fontFamily: 'Typey McTypeface',
+    fontStyle: 'italic',
     fontSize: '36px',
     color: Color.darkUmberS,
   },

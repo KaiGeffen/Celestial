@@ -524,15 +524,15 @@ const PATCH_NUMBER = '0.7.16.3'
 const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   {
     subheader: 'Thank you to our wonderful Celestial community!',
-    body: 'Many changes this month as we ramp up to a [color=#4090DD]Steam demo release[/color], let us know your thoughts!',
+    body: 'Many changes this month as we ramp up to a Steam demo release, let us know your thoughts!',
   },
-  {
-    subheader: 'Congrats to Sherlock!',
-    body: 'Congrats to Sherlock for reclaiming his tournament title! And to Redrame for getting #1 on ladder.\nWith the launch of the demo, we plan to snapshot the top players as we transition to a more public release.',
-  },
+  // {
+  //   subheader: 'Congrats to Sherlock!',
+  //   body: 'Congrats to Sherlock for reclaiming his tournament title! And to Redrame for getting #1 on ladder.\nWith the launch of the demo, we plan to snapshot the top players as we transition to a more public release.',
+  // },
   {
     subheader: 'Shell Mode',
-    body: 'On Saturdays we play a new [color=#4090DD]Shell Mode[/color], hop in to the [area=_link_discord][color=#FABD5D]Discord server[/color][/area] to learn more!',
+    body: `Each Saturday in May, we'll be playing a new mode called Shell Mode. Hop in to the [area=_link_discord][color=#FABD5D]Discord server[/color][/area] to learn more!`,
   },
   {
     subheader: 'Card Changes',
