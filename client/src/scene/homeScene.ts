@@ -390,8 +390,18 @@ export default class HomeScene extends BaseScene {
       space: { item: Space.padSmall },
     })
     const dayOfWeek = new Date().getDay()
-    const newsImages = ['Birth', 'Goliath', 'LayBare', 'MeAndHer', 'Nightmare', 'Possibilities', 'Refresh']
-    const image = this.add.image(0, 0, `news-${newsImages[dayOfWeek]}`).setOrigin(0, 0)
+    const newsImages = [
+      'Birth',
+      'Goliath',
+      'LayBare',
+      'MeAndHer',
+      'Nightmare',
+      'Possibilities',
+      'Refresh',
+    ]
+    const image = this.add
+      .image(0, 0, `news-${newsImages[dayOfWeek]}`)
+      .setOrigin(0, 0)
     dailyContainer.add(image)
     const tipText = this.rexUI.add
       .BBCodeText(0, 0, getDailyHomeTip(), {
@@ -410,11 +420,13 @@ export default class HomeScene extends BaseScene {
     })
     for (const pair of ANNOUNCEMENT_PAIRS) {
       announcementSizer.add(
-        this.add.text(0, 0, pair.subheader, Style.announcementSubheader).setOrigin(0.5, 0),
+        this.add
+          .text(0, 0, pair.subheader, Style.announcementSubheader)
+          .setOrigin(0.5, 0),
         { align: 'center' },
       )
       announcementSizer.add(
-        this.add.image(0, 0, 'chrome-divider').setOrigin(0.5, 0).setScale(0.3),
+        this.add.image(0, 0, 'chrome-divider').setOrigin(0.5, 0).setScale(0.25),
         { align: 'center' },
       )
       const bodyText = this.rexUI.add

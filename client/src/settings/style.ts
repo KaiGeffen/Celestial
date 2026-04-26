@@ -15,6 +15,9 @@ const FontSettings: Record<string, Record<string, string>> = {
   title: { size: '128px' },
 }
 
+// Home screen announcement width
+const ANNOUNCEMENT_WIDTH = 500
+
 export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   // Cost hint text
   builder: {
@@ -99,7 +102,13 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     color: Color.skyBlueS,
     stroke: Color.darkBlueS,
     strokeThickness: 4,
-    shadow: { offsetX: 2, offsetY: 2, color: 'rgba(0,0,0,0.5)', blur: 4, fill: true },
+    shadow: {
+      offsetX: 2,
+      offsetY: 2,
+      color: 'rgba(0,0,0,0.5)',
+      blur: 4,
+      fill: true,
+    },
   },
   announcementOverBlack: {
     fontFamily: altFont,
@@ -197,11 +206,17 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     stroke: '#000000',
     strokeThickness: 1.5,
   },
+
+  /**
+   * HOME SCREEN ANNOUNCEMENT
+   */
   announcementSubheader: {
     fontFamily: 'Killam',
-    fontStyle: 'bold',
-    fontSize: '20px',
+    // fontStyle: 'bold',
+    fontSize: '24px',
     color: Color.darkUmberS,
+    wordWrap: { width: ANNOUNCEMENT_WIDTH },
+    align: 'center',
   },
   // Journey scene overlay header / navigation arrows
   journeyOverlay: {
@@ -332,17 +347,6 @@ export const BBStyle: Record<string, any> = {
       width: Space.maxTextWidth,
     },
   },
-  // Main body copy for announcements/news
-  announcementCopy: {
-    fontFamily: 'Berylium',
-    fontStyle: 'bold',
-    fontSize: '16px',
-    color: Color.darkUmberS,
-    wrap: {
-      mode: 'word',
-      width: Space.maxTextWidth,
-    },
-  },
   // Journey scene deck-name BBCodeText (basic at 18px)
   journeyDeckName: {
     fontFamily: mainFont,
@@ -375,6 +379,17 @@ export const BBStyle: Record<string, any> = {
     wrap: {
       mode: 'word',
       width: Space.maxTextWidth,
+    },
+  },
+  // Copy for announcement on home screen
+  announcementCopy: {
+    fontFamily: 'Berylium',
+    fontStyle: 'bold',
+    fontSize: '20px',
+    color: Color.darkUmberS,
+    wrap: {
+      mode: 'word',
+      width: ANNOUNCEMENT_WIDTH,
     },
   },
 }
