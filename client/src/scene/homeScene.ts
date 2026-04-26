@@ -410,8 +410,12 @@ export default class HomeScene extends BaseScene {
     })
     for (const pair of ANNOUNCEMENT_PAIRS) {
       announcementSizer.add(
-        this.add.text(0, 0, pair.subheader, Style.announcementSubheader).setOrigin(0, 0),
-        { align: 'left' },
+        this.add.text(0, 0, pair.subheader, Style.announcementSubheader).setOrigin(0.5, 0),
+        { align: 'center' },
+      )
+      announcementSizer.add(
+        this.add.image(0, 0, 'chrome-divider').setOrigin(0.5, 0).setScale(0.3),
+        { align: 'center' },
       )
       const bodyText = this.rexUI.add
         .BBCodeText(0, 0, pair.body, BBStyle.announcementCopy)
@@ -509,19 +513,19 @@ const PATCH_NUMBER = '0.7.16.3'
 
 const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   {
-    subheader: '🕊️ Thank you to our wonderful Celestial community!',
+    subheader: 'Thank you to our wonderful Celestial community!',
     body: 'Many changes this month as we ramp up to a [color=#4090DD]Steam demo release[/color], let us know your thoughts!',
   },
   {
-    subheader: '🏆 Congrats to Sherlock!',
+    subheader: 'Congrats to Sherlock!',
     body: 'Congrats to Sherlock for reclaiming his tournament title! And to Redrame for getting #1 on ladder.\nWith the launch of the demo, we plan to snapshot the top players as we transition to a more public release.',
   },
   {
-    subheader: '🐚 Shell Mode',
+    subheader: 'Shell Mode',
     body: 'On Saturdays we play a new [color=#4090DD]Shell Mode[/color], hop in to the [area=_link_discord][color=#FABD5D]Discord server[/color][/area] to learn more!',
   },
   {
-    subheader: '🎴 Card Changes',
-    body: '👇 Hero - Exhale point +3 > +2\n👇 Seen - Clear View sight 4 > 3\n👆 Phoenix - Points 3 > 4',
+    subheader: 'Card Changes',
+    body: '👇 [area=_Hero][color=#FABD5D]Hero[/color][/area] - Exhale point +3 > +2\n👇 [area=_Seen][color=#FABD5D]Seen[/color][/area] - Clear View sight 4 > 3\n👆 [area=_Phoenix][color=#FABD5D]Phoenix[/color][/area] - Points 3 > 4',
   },
 ]

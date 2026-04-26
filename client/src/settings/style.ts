@@ -200,7 +200,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   announcementSubheader: {
     fontFamily: 'Killam',
     fontStyle: 'bold',
-    fontSize: '16px',
+    fontSize: '20px',
     color: Color.darkUmberS,
   },
   // Journey scene overlay header / navigation arrows
@@ -336,7 +336,7 @@ export const BBStyle: Record<string, any> = {
   announcementCopy: {
     fontFamily: 'Berylium',
     fontStyle: 'bold',
-    fontSize: '14px',
+    fontSize: '16px',
     color: Color.darkUmberS,
     wrap: {
       mode: 'word',
