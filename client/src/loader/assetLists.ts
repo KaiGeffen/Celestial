@@ -13,7 +13,8 @@ export const assetLists = {
       "JulesFull",
       "KitzFull",
       "MiaFull",
-      "MitraFull"
+      "MitraFull",
+      "hidden"
     ],
     "dimensions": {
       "Adonis": {
@@ -352,7 +353,6 @@ export const assetLists = {
       "Nourish",
       "Options",
       "PlayTab",
-      "Pointer",
       "ProfileTab",
       "Quest",
       "QuestsTab",
