@@ -15,12 +15,6 @@ const FontSettings: Record<string, Record<string, string>> = {
 }
 
 export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
-  // When a card resolves in the story, show the points it earns
-  cardResolution: {
-    fontFamily: mainFont,
-    fontSize: FontSettings.huge.size,
-    color: Color.whiteS,
-  },
   // Cost hint text
   builder: {
     fontFamily: mainFont,
@@ -70,14 +64,6 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     fontSize: '34px',
     color: Color.basicText,
   },
-  // The text saying if you won/lost/tied
-  roundResult: {
-    fontFamily: altFont,
-    fontSize: '60px',
-    color: Color.roundResult,
-    // stroke: Color.roundResult,
-    // strokeThickness: 4
-  },
   // Text that plays over the stillframes in journey
   stillframe: {
     fontFamily: altFont,
@@ -126,33 +112,15 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     stroke: '#000',
     strokeThickness: 3,
   },
-  // Title for menus
-  menutitle: {
-    fontFamily: mainFont,
-    fontSize: FontSettings.title.size,
-    color: '#fff',
-    stroke: '#000',
-    strokeThickness: 6,
-  },
   // Title for the home scene
   homeTitle: {
     fontFamily: altFont,
     fontSize: '70px',
     color: '#353F4E',
   },
-  homeButtonText: {
-    fontFamily: altFont,
-    fontSize: '70px',
-    color: '#F5F2EB',
-  },
   username: {
     fontFamily: mainFont,
     fontSize: '16px',
-    color: Color.username,
-  },
-  usernameElo: {
-    fontFamily: mainFont,
-    fontSize: '10px',
     color: Color.username,
   },
   todoScore: {
@@ -167,11 +135,6 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     stroke: '#fff',
     strokeThickness: 2,
   },
-  todoSubtext: {
-    fontFamily: mainFont,
-    fontSize: '12px',
-    color: Color.todoSubtext,
-  },
   cardTitle: {
     fontFamily: altFont,
     fontSize: '20px',
@@ -185,13 +148,6 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     color: Color.goldS,
     stroke: Color.blackS,
     strokeThickness: 3,
-  },
-  todoJourneyTitle: {
-    fontFamily: mainFont,
-    fontSize: '26px',
-    color: Color.basicText,
-    stroke: Color.whiteS,
-    strokeThickness: 2,
   },
   // FPS counter in debug mode
   fps: {
@@ -365,7 +321,6 @@ export const BBStyle: Record<string, any> = {
       offset: 7,
     },
   },
-  // Deck names in builder
   // Journey scene deck-name BBCodeText (basic at 18px)
   journeyDeckName: {
     fontFamily: mainFont,
@@ -398,28 +353,6 @@ export const BBStyle: Record<string, any> = {
     wrap: {
       mode: 'word',
       width: Space.maxTextWidth,
-    },
-  },
-  // Hints showing which hotkey to press for each stack / card
-  hotkeyHint: {
-    fontFamily: mainFont,
-    fontSize: '50px',
-
-    color: Color.hintFill,
-    backgroundColor: Color.hintBackground,
-    backgroundStrokeColor: '#0005',
-    backgroundStrokeLineWidth: 2,
-    backgroundCornerRadius: 5,
-    wrap: {
-      mode: 'word',
-      width: Space.maxTextWidth,
-    },
-    // strokeThickness: 3,
-    padding: {
-      left: Space.padSmall,
-      right: Space.padSmall,
-      top: Space.padSmall,
-      bottom: Space.padSmall,
     },
   },
 }
