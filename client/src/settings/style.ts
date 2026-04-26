@@ -135,10 +135,11 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   username: {
     fontFamily: 'Typey McTypeface',
     fontStyle: 'Bold',
-    fontSize: '12px',
+    fontSize: '18px',
     color: Color.whiteS,
     stroke: Color.darkUmberS,
     strokeThickness: 4,
+    align: 'center',
   },
   usernameInfo: {
     fontFamily: 'OptimusPrinceps',

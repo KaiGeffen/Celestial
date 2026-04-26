@@ -308,12 +308,10 @@ export default class HomeScene extends BaseScene {
 
     const usernameText = this.add
       .text(0, 0, username, Style.username)
-      .setOrigin(0, 0.5)
-      // Advanced wrapping helps even for "single long words" usernames
+      .setOrigin(0.5, 0.5)
       .setWordWrapWidth(maxTextWidth, true)
-      // Lock width in the layout (important when rexUI measures text)
-      .setFixedSize(maxTextWidth, usernameFontSize)
-    textSizer.add(usernameText, { align: 'left' })
+      .setFixedSize(maxTextWidth, usernameFontSize + 5)
+    textSizer.add(usernameText, { align: 'center' })
 
     // Line 2: Divider line (thin black line)
     const divider = this.add
