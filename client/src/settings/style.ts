@@ -197,6 +197,21 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     color: '#555555',
     wordWrap: { width: Space.maxTextWidth },
   },
+  // Cost / Points stats shown above each card
+  cardCost: {
+    fontFamily: altFont,
+    fontSize: '24px',
+    color: Color.cardCost,
+    stroke: '#000000',
+    strokeThickness: 1,
+  },
+  cardPoints: {
+    fontFamily: altFont,
+    fontSize: '24px',
+    color: Color.cardPoints,
+    stroke: '#000000',
+    strokeThickness: 1,
+  },
 }
 
 // The styling for BBCode objects, from the rexui module
@@ -216,23 +231,6 @@ export const BBStyle: Record<string, any> = {
       mode: 'word',
       width: Space.maxTextWidth,
     },
-  },
-  // Cost / Points stats that are shown above each card
-  cardCost: {
-    fontFamily: altFont,
-    fontSize: '24px',
-    color: Color.cardCost,
-    stroke: '#000000',
-    strokeThickness: 1,
-    // TODO Add letter spacing after at least Phaser 3.6.0
-  },
-  cardPoints: {
-    fontFamily: altFont,
-    fontSize: '24px',
-    color: Color.cardPoints,
-    stroke: '#000000',
-    strokeThickness: 1,
-    // TODO Add letter spacing after at least Phaser 3.6.0
   },
   // The textbox for the card
   cardText: {

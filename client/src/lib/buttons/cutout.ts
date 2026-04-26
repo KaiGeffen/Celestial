@@ -85,14 +85,14 @@ export default class Cutout extends Button {
       -161,
       -18,
       `[stroke=#353F4E]${card.cost}[/stroke]`,
-      BBStyle.cardCost,
+      Style.cardCost,
     )
     const txtPoints = this.scene.add
       .rexBBCodeText(
         -121,
         5,
         `[stroke=#353F4E]${card.points}[/stroke]`,
-        BBStyle.cardPoints,
+        Style.cardPoints,
       )
       .setOrigin(0.5)
     const txtName = this.scene.add
