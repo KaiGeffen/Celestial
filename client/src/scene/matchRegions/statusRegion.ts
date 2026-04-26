@@ -58,14 +58,22 @@ export default class StatusRegion extends Region {
       this.ourRow,
       -ICON_SPREAD,
       0,
-    )
-    this.btnOurNourish = new Buttons.Keywords.Nourish(this.ourRow, 0, 0)
-    this.btnOurSight = new Buttons.Keywords.Sight(this.ourRow, ICON_SPREAD, 0)
+    ).setVisible(false)
+    this.btnOurNourish = new Buttons.Keywords.Nourish(
+      this.ourRow,
+      0,
+      0,
+    ).setVisible(false)
+    this.btnOurSight = new Buttons.Keywords.Sight(
+      this.ourRow,
+      ICON_SPREAD,
+      0,
+    ).setVisible(false)
     this.btnOurPossibility = new Buttons.Keywords.Possibility(
       this.ourRow,
       2 * ICON_SPREAD,
       0,
-    )
+    ).setVisible(false)
 
     this.btnTheirInspire = new Buttons.Keywords.Inspire(
       this.theirRow,
