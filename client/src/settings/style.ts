@@ -5,12 +5,13 @@ import { Space, Color, Flags } from './settings'
 // All fonts used
 const mainFont = 'Mulish'
 const altFont = 'Cinzel'
+const cardTextFont = 'Cinzel'
 
-// Settings for the font sizes
+// Font sizes
 const FontSettings: Record<string, Record<string, string>> = {
-  standard: { size: Flags.mobile ? '20px' : '24px' },
-  huge: { size: Flags.mobile ? '40px' : '50px' },
-  large: { size: Flags.mobile ? '32px' : '44px' },
+  standard: { size: '24px' },
+  huge: { size: '50px' },
+  large: { size: '44px' },
   title: { size: '128px' },
 }
 
@@ -67,7 +68,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   // Text that plays over the stillframes in journey
   stillframe: {
     fontFamily: altFont,
-    fontSize: Flags.mobile ? FontSettings.large.size : FontSettings.huge.size,
+    fontSize: FontSettings.huge.size,
     color: Color.blackS,
   },
 
@@ -151,7 +152,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   },
   // FPS counter in debug mode
   fps: {
-    fontFamily: 'Arial',
+    fontFamily: mainFont,
     fontSize: '16px',
     color: '#009900',
   },
@@ -218,7 +219,7 @@ export const BBStyle: Record<string, any> = {
   },
   // Cost / Points stats that are shown above each card
   cardCost: {
-    fontFamily: 'GrandCentral',
+    fontFamily: altFont,
     fontSize: '24px',
     color: Color.cardCost,
     stroke: '#000000',
@@ -226,7 +227,7 @@ export const BBStyle: Record<string, any> = {
     // TODO Add letter spacing after at least Phaser 3.6.0
   },
   cardPoints: {
-    fontFamily: 'GrandCentral',
+    fontFamily: altFont,
     fontSize: '24px',
     color: Color.cardPoints,
     stroke: '#000000',
@@ -235,7 +236,7 @@ export const BBStyle: Record<string, any> = {
   },
   // The textbox for the card
   cardText: {
-    fontFamily: 'Upgrade',
+    fontFamily: cardTextFont,
     fontSize: '16px',
     color: Color.whiteS,
     strokeThickness: 1,
