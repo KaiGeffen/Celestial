@@ -1,3 +1,14 @@
+/* Drop font files (.ttf, .otf, .woff2) into assets/fonts/ and add an @font-face here */
+@font-face {
+    font-family: 'Berylium';
+    src: url('assets/fonts/Berylium.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Typey McTypeface';
+    src: url('assets/fonts/Typey.otf') format('opentype');
+}
+
 body, html {
     height: 100%;
     margin: 0;

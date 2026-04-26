@@ -352,7 +352,6 @@ export const assetLists = {
       "Nourish",
       "Options",
       "PlayTab",
-      "Pointer",
       "ProfileTab",
       "Quest",
       "QuestsTab",
