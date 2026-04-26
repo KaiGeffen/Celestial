@@ -40,7 +40,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
 
   // Sun
   sun: {
-    fontFamily: altFont,
+    fontFamily: 'OptimusPrinceps',
     fontSize: '32px',
     color: Color.passText,
   },
@@ -128,9 +128,10 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     color: Color.username,
   },
   todoScore: {
-    fontFamily: mainFont,
-    fontSize: '36px',
-    color: Color.todoScore,
+    fontFamily: 'Typey McTypeface',
+    fontStyle: 'Bold',
+    fontSize: '30px',
+    color: Color.blackS,
   },
   todoCloud: {
     fontFamily: altFont,
@@ -171,14 +172,14 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     fontSize: '24px',
     color: Color.whiteS,
     stroke: Color.darkUmberS,
-    strokeThickness: 2,
+    strokeThickness: 4,
   },
   matchSubtitle: {
     fontFamily: 'Berylium',
     fontSize: '18px',
     color: Color.whiteS,
     stroke: Color.darkUmberS,
-    strokeThickness: 1,
+    strokeThickness: 2,
   },
   matchTime: {
     fontFamily: mainFont,

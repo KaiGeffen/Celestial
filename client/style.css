@@ -5,6 +5,11 @@
 }
 
 @font-face {
+    font-family: 'OptimusPrinceps';
+    src: url('assets/fonts/OptimusPrinceps.ttf') format('truetype');
+}
+
+@font-face {
     font-family: 'Typey McTypeface';
     src: url('assets/fonts/Typey.otf') format('opentype');
 }
