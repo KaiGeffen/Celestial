@@ -18,6 +18,11 @@ export default class ChapterMessageMenu extends MessageMenu {
     super(scene, params, 700)
   }
 
+  protected createSizer(): void {
+    super.createSizer()
+    this.sizer.space.line = 0
+  }
+
   protected createContent(params): void {
     this.claimGoldMissionId = params.claimGoldMissionId
 
@@ -57,7 +62,7 @@ export default class ChapterMessageMenu extends MessageMenu {
 
     const scrollableText = newScrollablePanel(this.scene, {
       width: contentWidth,
-      height: Math.min(bodyTxt.height, maxTextHeight),
+      height: maxTextHeight,
       panel: { child: textPanel },
       scrollMode: 'y',
       slider: false,
@@ -129,6 +134,7 @@ export default class ChapterMessageMenu extends MessageMenu {
       padding: {
         left: Space.pad,
         right: Space.pad,
+        top: Space.pad,
       },
     }
 
