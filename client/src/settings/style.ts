@@ -193,6 +193,53 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     stroke: Color.whiteS,
     strokeThickness: 2,
   },
+  // FPS counter in debug mode
+  fps: {
+    fontFamily: 'Arial',
+    fontSize: '16px',
+    color: '#009900',
+  },
+  // Input text fields (rexInputText)
+  inputText: {
+    fontFamily: mainFont,
+    fontSize: '24px',
+    color: Color.textboxText,
+  },
+  // In-match avatar nameplate rows
+  matchUsername: {
+    fontFamily: mainFont,
+    fontSize: '22px',
+    color: Color.whiteS,
+    stroke: '#000000',
+    strokeThickness: 1.5,
+  },
+  matchSubtitle: {
+    fontFamily: mainFont,
+    fontSize: '18px',
+    color: Color.whiteS,
+    stroke: '#000000',
+    strokeThickness: 1.5,
+  },
+  matchTime: {
+    fontFamily: mainFont,
+    fontSize: '16px',
+    color: Color.whiteS,
+    stroke: '#000000',
+    strokeThickness: 1.5,
+  },
+  // Journey scene overlay header / navigation arrows
+  journeyOverlay: {
+    fontFamily: altFont,
+    fontSize: '30px',
+    color: '#f5f2eb',
+  },
+  // Locked deck label in journey
+  journeyLocked: {
+    fontFamily: mainFont,
+    fontSize: '16px',
+    color: '#555555',
+    wordWrap: { width: Space.maxTextWidth },
+  },
 }
 
 // The styling for BBCode objects, from the rexui module
@@ -334,6 +381,40 @@ export const BBStyle: Record<string, any> = {
     fontSize: FontSettings.huge.size,
     color: '#353F4E',
     halign: 'center',
+  },
+  // Journey scene deck-name BBCodeText (basic at 18px)
+  journeyDeckName: {
+    fontFamily: mainFont,
+    fontSize: '18px',
+    color: Color.basicText,
+    wordWrap: { width: Space.maxTextWidth },
+    underline: {
+      color: Color.basicText,
+      thickness: 3,
+      offset: 7,
+    },
+    halign: 'center',
+    wrap: {
+      mode: 'word',
+      width: Space.maxTextWidth,
+    },
+  },
+  // Match results header (basic at 30px)
+  resultsHeader: {
+    fontFamily: mainFont,
+    fontSize: '30px',
+    color: Color.basicText,
+    wordWrap: { width: Space.maxTextWidth },
+    underline: {
+      color: Color.basicText,
+      thickness: 3,
+      offset: 7,
+    },
+    halign: 'center',
+    wrap: {
+      mode: 'word',
+      width: Space.maxTextWidth,
+    },
   },
   // Hints showing which hotkey to press for each stack / card
   hotkeyHint: {

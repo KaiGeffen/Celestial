@@ -338,19 +338,11 @@ export default class JourneyScene extends BaseScene {
       .addBackground(headerBg)
 
     this.overlayHeaderText = this.add
-      .text(0, 0, '', {
-        ...Style.announcement,
-        fontSize: '30px',
-        color: '#f5f2eb',
-      })
+      .text(0, 0, '', Style.journeyOverlay)
       .setOrigin(0.5, 0.5)
 
     const leftArrow = this.add
-      .text(0, 0, '‹', {
-        ...Style.announcement,
-        fontSize: '30px',
-        color: '#f5f2eb',
-      })
+      .text(0, 0, '‹', Style.journeyOverlay)
       .setOrigin(0.5, 0.5)
       .setInteractive({ useHandCursor: true })
     leftArrow.on('pointerdown', () => {
@@ -361,11 +353,7 @@ export default class JourneyScene extends BaseScene {
       this.refreshOverlayContent()
     })
     const rightArrow = this.add
-      .text(0, 0, '›', {
-        ...Style.announcement,
-        fontSize: '30px',
-        color: '#f5f2eb',
-      })
+      .text(0, 0, '›', Style.journeyOverlay)
       .setOrigin(0.5, 0.5)
       .setInteractive({ useHandCursor: true })
     rightArrow.on('pointerdown', () => {
@@ -668,10 +656,7 @@ export default class JourneyScene extends BaseScene {
       }
     }
     const nameText = this.rexUI.add
-      .BBCodeText(0, 0, nameBBCode, {
-        ...BBStyle.basic,
-        fontSize: '18px',
-      })
+      .BBCodeText(0, 0, nameBBCode, BBStyle.journeyDeckName)
       .setInteractive()
       .on('areaover', (key: string) => {
         if (key.startsWith('card_')) {
@@ -739,11 +724,7 @@ export default class JourneyScene extends BaseScene {
         Space.buttonHeight,
       )
       const lockedText = this.add
-        .text(0, 0, 'Locked', {
-          ...Style.basic,
-          fontSize: '16px',
-          color: Color.grey,
-        })
+        .text(0, 0, 'Locked', Style.journeyLocked)
         .setOrigin(0.5, 0.5)
       lockedContainer.add(lockedText)
       row.add(lockedContainer, { align: 'center' })

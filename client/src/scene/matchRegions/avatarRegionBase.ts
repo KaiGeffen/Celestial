@@ -56,35 +56,16 @@ export default abstract class AvatarRegionBase extends Region {
       .setOrigin(0.5)
     this.container.add(this.imgNameplate)
 
-    // TODO Move to style file
     this.txtUsername = this.scene.add
-      .text(x, usernameY, '', {
-        fontFamily: Style.username.fontFamily,
-        fontSize: '22px',
-        color: Color.whiteS,
-        stroke: '#000000',
-        strokeThickness: 1.5,
-      })
+      .text(x, usernameY, '', Style.matchUsername)
       .setOrigin(0.5)
 
     this.txtSubtitle = this.scene.add
-      .text(x, subtitleY, '', {
-        fontFamily: Style.username.fontFamily,
-        fontSize: '18px',
-        color: Color.whiteS,
-        stroke: '#000000',
-        strokeThickness: 1.5,
-      })
+      .text(x, subtitleY, '', Style.matchSubtitle)
       .setOrigin(0.5)
 
     this.txtTime = this.scene.add
-      .text(x, timeY, '', {
-        fontFamily: Style.username.fontFamily,
-        fontSize: '16px',
-        color: Color.whiteS,
-        stroke: '#000000',
-        strokeThickness: 1.5,
-      })
+      .text(x, timeY, '', Style.matchTime)
       .setOrigin(0.5)
 
     this.container.add(this.txtUsername)

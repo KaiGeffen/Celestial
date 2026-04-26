@@ -97,9 +97,7 @@ export class RegisterUsernameMenu extends Menu {
         align: 'center',
         placeholder: 'Username',
         tooltip: 'Choose your username',
-        fontFamily: 'Mulish',
-        fontSize: '24px',
-        color: Color.textboxText,
+        ...Style.inputText,
         maxLength: 20,
         selectAll: true,
       })

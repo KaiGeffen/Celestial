@@ -43,9 +43,7 @@ export default class EditDeckNameMenu extends Menu {
         align: 'center',
         placeholder: 'Deck name',
         tooltip: 'Name shown for this deck.',
-        fontFamily: 'Mulish',
-        fontSize: '24px',
-        color: Color.textboxText,
+        ...Style.inputText,
         maxLength: 40,
         id: 'edit-deck-name',
       })
