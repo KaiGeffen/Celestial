@@ -445,7 +445,7 @@ export default class JourneyScene extends BaseScene {
   private createOverlayCharacterText(): Phaser.GameObjects.GameObject {
     const padding = Space.padSmall
     const text = this.add
-      .text(0, 0, '', Style.basic)
+      .text(0, 0, '', Style.chapterBody)
       .setWordWrapWidth(OVERLAY_WIDTH - padding * 2)
       .setOrigin(0)
 
