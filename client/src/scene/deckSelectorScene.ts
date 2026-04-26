@@ -232,12 +232,10 @@ export default class DeckSelectorScene extends BaseScene {
     panel.removeAll(true)
     this.deckThumbnails = []
 
-    const defaultCosmetics: CosmeticSet = { avatar: 0, border: 0, cardback: 0 }
     const newDeckThumb = new DeckThumbnail({
       scene: this,
       name: 'New Deck',
-      cosmeticSet: defaultCosmetics,
-      isValid: true,
+      hiddenAvatar: true,
       onClick: () => this.onNewDeckClick(),
     })
     panel.add(newDeckThumb.container)

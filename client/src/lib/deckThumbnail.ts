@@ -26,6 +26,7 @@ export default class DeckThumbnail {
     name?: string
     cosmeticSet?: CosmeticSet
     isValid?: boolean
+    hiddenAvatar?: boolean
   }) {
     const { scene, onClick } = opts
     const muteClick = opts.muteClick ?? false
@@ -36,6 +37,7 @@ export default class DeckThumbnail {
       cardback: 0,
     }
     const isValid = opts.isValid ?? true
+    const hiddenAvatar = opts.hiddenAvatar ?? false
     this.scene = scene
 
     // Standard size for all deck thumbnails (85% of the previous tile width)
@@ -69,6 +71,9 @@ export default class DeckThumbnail {
       x: Space.avatarSize / 4,
       y: -10,
     })
+    if (hiddenAvatar) {
+      this.avatarButton.icon.setTexture(`avatar-hidden`)
+    }
 
     // DECK NAME – full width of the thumbnail
     const nameBarWidth = width
