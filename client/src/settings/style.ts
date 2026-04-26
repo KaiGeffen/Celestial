@@ -99,8 +99,8 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   announcement: {
     fontFamily: 'Typey McTypeface',
     fontSize: '40px',
-    color: Color.skyBlueS,
-    stroke: Color.darkBlueS,
+    color: Color.goldS,
+    stroke: Color.blackS,
     strokeThickness: 4,
     shadow: {
       offsetX: 2,

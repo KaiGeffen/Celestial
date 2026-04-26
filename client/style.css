@@ -6,6 +6,17 @@
 
 @font-face {
     font-family: 'Berylium';
+    src: url('assets/fonts/Berylium Rg It.otf') format('opentype');
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'BeryliumItalic';
+    src: url('assets/fonts/Berylium Rg It.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Berylium';
     src: url('assets/fonts/Berylium-Bold.otf') format('opentype');
     font-weight: bold;
 }
