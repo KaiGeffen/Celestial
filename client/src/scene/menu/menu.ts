@@ -56,7 +56,7 @@ export default class Menu {
   }
 
   // Create the menu header
-  protected createHeader(s: string, width: number = this.width): any {
+  protected createHeader(s: string, width: number = this.width, style = Style.announcement): any {
     let background = this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
 
     let sizer = this.scene.rexUI.add.sizer({
@@ -65,7 +65,7 @@ export default class Menu {
     })
     sizer.addBackground(background)
 
-    let txt = this.scene.add.text(0, 0, s, Style.announcement)
+    let txt = this.scene.add.text(0, 0, s, style)
     sizer.addSpace().add(txt).addSpace()
 
     // Background shadow

@@ -211,9 +211,20 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   /**
    * HOME SCREEN ANNOUNCEMENT
    */
+  // Chapter story popup (journeyScene chapterMessage menu)
+  chapterHeader: {
+    fontFamily: 'Typey McTypeface',
+    fontSize: '36px',
+    color: Color.darkUmberS,
+  },
+  chapterBody: {
+    fontFamily: 'Berylium',
+    fontStyle: 'italic',
+    fontSize: '22px',
+    color: Color.darkUmberS,
+  },
   announcementSubheader: {
     fontFamily: 'Killam',
-    // fontStyle: 'bold',
     fontSize: '24px',
     color: Color.darkUmberS,
     wordWrap: { width: ANNOUNCEMENT_WIDTH },

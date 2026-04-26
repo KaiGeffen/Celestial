@@ -14,12 +14,13 @@ export default class ChapterMessageMenu extends MessageMenu {
   private claimGoldButton: Button
 
   constructor(scene: MenuScene, params) {
-    super(scene, params)
+    super(scene, params, 700)
   }
 
   protected createContent(params): void {
     this.claimGoldMissionId = params.claimGoldMissionId
-    super.createContent(params)
+    this.createHeader(params.title, undefined, Style.chapterHeader)
+    this.createText(params.s, Style.chapterBody)
     this.addFooter()
   }
 
