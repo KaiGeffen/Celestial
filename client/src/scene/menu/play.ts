@@ -283,7 +283,8 @@ export default class PlayMenu extends Menu {
     this.txtDeckName = this.scene.rexUI.add
       .BBCodeText()
       .setStyle({
-        ...BBStyle.deckName,
+        ...Style.announcement,
+        halign: 'center',
         fixedHeight: 50 + Space.padSmall,
         fixedWidth: deckPanelWidth - 25,
       })

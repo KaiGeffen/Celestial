@@ -365,23 +365,7 @@ export const BBStyle: Record<string, any> = {
       offset: 7,
     },
   },
-  // Blocks of text in the options menu
-  optionsBlock: {
-    fontFamily: mainFont,
-    fontSize: FontSettings.standard.size,
-    color: Color.basicText,
-    wrap: {
-      mode: 'word',
-      width: Space.maxTextWidth,
-    },
-  },
   // Deck names in builder
-  deckName: {
-    fontFamily: altFont,
-    fontSize: FontSettings.huge.size,
-    color: '#353F4E',
-    halign: 'center',
-  },
   // Journey scene deck-name BBCodeText (basic at 18px)
   journeyDeckName: {
     fontFamily: mainFont,
