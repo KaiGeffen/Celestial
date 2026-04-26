@@ -5,6 +5,18 @@
 }
 
 @font-face {
+    font-family: 'Berylium';
+    src: url('assets/fonts/Berylium-Bold.otf') format('opentype');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: 'Killam';
+    src: url('assets/fonts/Killam-Bold.ttf') format('truetype');
+    font-weight: bold;
+}
+
+@font-face {
     font-family: 'OptimusPrinceps';
     src: url('assets/fonts/OptimusPrinceps.ttf') format('truetype');
 }

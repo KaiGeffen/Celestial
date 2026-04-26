@@ -94,11 +94,12 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     strokeThickness: 4,
   },
   announcement: {
-    fontFamily: altFont,
-    fontSize: FontSettings.huge.size,
-    color: '#353F4E', //Color.basicText,
-    // stroke: '#000',
-    // strokeThickness: 1
+    fontFamily: 'Typey McTypeface',
+    fontSize: '40px',
+    color: Color.skyBlueS,
+    stroke: Color.darkBlueS,
+    strokeThickness: 4,
+    shadow: { offsetX: 2, offsetY: 2, color: 'rgba(0,0,0,0.5)', blur: 4, fill: true },
   },
   announcementOverBlack: {
     fontFamily: altFont,
@@ -123,9 +124,17 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     color: '#353F4E',
   },
   username: {
-    fontFamily: mainFont,
-    fontSize: '16px',
-    color: Color.username,
+    fontFamily: 'Typey McTypeface',
+    fontStyle: 'Bold',
+    fontSize: '12px',
+    color: Color.whiteS,
+    stroke: Color.darkUmberS,
+    strokeThickness: 4,
+  },
+  usernameInfo: {
+    fontFamily: 'OptimusPrinceps',
+    fontSize: '14px',
+    color: Color.darkUmberS,
   },
   todoScore: {
     fontFamily: 'Typey McTypeface',
@@ -187,6 +196,12 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     color: Color.whiteS,
     stroke: '#000000',
     strokeThickness: 1.5,
+  },
+  announcementSubheader: {
+    fontFamily: 'Killam',
+    fontStyle: 'bold',
+    fontSize: '16px',
+    color: Color.darkUmberS,
   },
   // Journey scene overlay header / navigation arrows
   journeyOverlay: {
@@ -299,15 +314,13 @@ export const BBStyle: Record<string, any> = {
       width: Space.windowWidth - Space.pad * 2,
     },
   },
-  // Description for avatars in premade menu
+  // Description for avatars in premade menu / daily tip
   description: {
-    fontFamily: mainFont,
-    fontSize: FontSettings.standard.size,
-    color: Color.basicText,
+    fontFamily: 'Berylium',
+    fontSize: '20px',
+    color: Color.blueS,
     backgroundColor: Color.backgroundLight,
     backgroundCornerRadius: 5,
-    // backgroundStrokeColor: Color.outline,
-    // backgroundStrokeLineWidth: 2,
     padding: {
       left: Space.padSmall,
       right: Space.padSmall,
@@ -318,10 +331,16 @@ export const BBStyle: Record<string, any> = {
       mode: 'word',
       width: Space.maxTextWidth,
     },
-    underline: {
-      color: Color.basicText,
-      thickness: 3,
-      offset: 7,
+  },
+  // Main body copy for announcements/news
+  announcementCopy: {
+    fontFamily: 'Berylium',
+    fontStyle: 'bold',
+    fontSize: '14px',
+    color: Color.darkUmberS,
+    wrap: {
+      mode: 'word',
+      width: Space.maxTextWidth,
     },
   },
   // Journey scene deck-name BBCodeText (basic at 18px)

@@ -18,6 +18,11 @@ const CoreColors: Record<string, number | string> = {
   darkUmber: 0x321a0f,
   darkUmberS: '#321A0F',
 
+  skyBlue: 0x87ceeb,
+  skyBlueS: '#87CEEB',
+  darkBlue: 0x1a237e,
+  darkBlueS: '#1A237E',
+
   grey: 0x555555,
   greyA: 0x555555e0,
   lightGrey: 0x888888,
@@ -39,6 +44,14 @@ export const Color: Record<string, any> = {
   whiteS: CoreColors.whiteS,
   gold: CoreColors.gold,
   goldS: CoreColors.goldS,
+  blue: CoreColors.blue,
+  blueS: CoreColors.blueS,
+  darkUmber: CoreColors.darkUmber,
+  darkUmberS: CoreColors.darkUmberS,
+  skyBlue: CoreColors.skyBlue,
+  skyBlueS: CoreColors.skyBlueS,
+  darkBlue: CoreColors.darkBlue,
+  darkBlueS: CoreColors.darkBlueS,
   grey: CoreColors.grey,
 
   // GENERAL
