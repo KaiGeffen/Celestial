@@ -86,9 +86,12 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     strokeThickness: 1,
   },
   stackCountButton: {
-    fontFamily: mainFont,
+    fontFamily: 'Typey McTypeface',
+    fontStyle: 'Bold',
     fontSize: '24px',
-    color: Color.black,
+    color: Color.whiteS,
+    stroke: Color.darkUmberS,
+    strokeThickness: 4,
   },
   announcement: {
     fontFamily: altFont,
@@ -164,18 +167,18 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   },
   // In-match avatar nameplate rows
   matchUsername: {
-    fontFamily: mainFont,
-    fontSize: '22px',
+    fontFamily: 'Typey McTypeface',
+    fontSize: '24px',
     color: Color.whiteS,
-    stroke: '#000000',
-    strokeThickness: 1.5,
+    stroke: Color.darkUmberS,
+    strokeThickness: 2,
   },
   matchSubtitle: {
-    fontFamily: mainFont,
+    fontFamily: 'Berylium',
     fontSize: '18px',
     color: Color.whiteS,
-    stroke: '#000000',
-    strokeThickness: 1.5,
+    stroke: Color.darkUmberS,
+    strokeThickness: 1,
   },
   matchTime: {
     fontFamily: mainFont,
