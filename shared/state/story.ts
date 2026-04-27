@@ -72,6 +72,9 @@ class Story {
 
       index++
       addRecentModels(game)
+
+      act.scoreAtResolution = [game.score[0], game.score[1]]
+      act.nourishAtResolution = [game.status[0].nourish, game.status[1].nourish]
     }
 
     // Do all round end effects

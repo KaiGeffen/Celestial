@@ -928,9 +928,25 @@ class StoryResolveBubbles {
           state.score[owner] - this.snapshotScore[owner],
         )
       } else {
-        for (let k = 0; k < delta; k++) {
-          this.resolvedNourishByActIndex.push(0)
-          this.resolvedPointsEarnedByActIndex.push(0)
+        const prevScore: [number, number] = [this.snapshotScore[0], this.snapshotScore[1]]
+        const prevNourish: [number, number] = [this.snapshotStatusNourish[0], this.snapshotStatusNourish[1]]
+        const firstNewIdx = resolvedCount - delta
+        for (let k = firstNewIdx; k < resolvedCount; k++) {
+          const act = state.story.resolvedActs[k]
+          const owner = act.owner
+          const pointsEarned = act.scoreAtResolution
+            ? act.scoreAtResolution[owner] - prevScore[owner]
+            : 0
+          this.resolvedNourishByActIndex.push(prevNourish[owner])
+          this.resolvedPointsEarnedByActIndex.push(pointsEarned)
+          if (act.scoreAtResolution) {
+            prevScore[0] = act.scoreAtResolution[0]
+            prevScore[1] = act.scoreAtResolution[1]
+          }
+          if (act.nourishAtResolution) {
+            prevNourish[0] = act.nourishAtResolution[0]
+            prevNourish[1] = act.nourishAtResolution[1]
+          }
         }
       }
     }
