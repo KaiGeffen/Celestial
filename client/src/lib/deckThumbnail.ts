@@ -97,15 +97,19 @@ export default class DeckThumbnail {
     // INVALID INDICATOR – top-right corner of nameplate
     const indicatorW = 54
     const indicatorH = 22
-    const indicatorX = nameBarWidth / 2 - indicatorW / 2
-    const indicatorY = nameBarY - Space.buttonHeight / 2 + indicatorH / 2
+    const indicatorX = (Space.avatarSize * 3) / 4 - indicatorW / 2
+    const indicatorY = nameBarY - Space.buttonHeight / 2
     this.invalidIndicator = scene.add
       .rectangle(indicatorX, indicatorY, indicatorW, indicatorH, 0xcc2200)
       .setStrokeStyle(2, Color.border)
       .setVisible(false)
     this.container.add(this.invalidIndicator)
     this.invalidText = scene.add
-      .text(indicatorX, indicatorY, '', { fontFamily: 'Berylium', fontSize: '13px', color: '#ffffff' })
+      .text(indicatorX, indicatorY, '', {
+        fontFamily: 'Berylium',
+        fontSize: '13px',
+        color: '#ffffff',
+      })
       .setOrigin(0.5, 0.5)
       .setVisible(false)
     this.container.add(this.invalidText)
