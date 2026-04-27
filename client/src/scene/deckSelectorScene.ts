@@ -272,7 +272,7 @@ export default class DeckSelectorScene extends BaseScene {
     UserSettings._push('decks', {
       name: `Deck ${(UserSettings._get('decks') || []).length + 1}`,
       cards: [],
-      cosmeticSet: { avatar: 0, border: 0, cardback: 0 },
+      cosmeticSet: Server.getUserData().cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 },
     })
     const newIndex = (UserSettings._get('decks') || []).length - 1
     UserSettings._set('equippedDeckIndex', newIndex)
