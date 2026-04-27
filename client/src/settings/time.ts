@@ -15,12 +15,12 @@ export const MatchTiming = {
   cardReveal: 400,
 
   /** How long for a card to sink in the water */
-  cardSink: 1000,
+  cardSink: 900,
 
   /** Base duration for anything to happen in the recap (Card flips, discard, etc.) */
-  recapTween: 470,
+  recapTween: 420,
   /** Pause between anything happening in the recap */
-  recapPauseBetweenTweens: 60,
+  recapPauseBetweenTweens: 50,
   /** A special pause for actions during mulligan */
   mulliganPause: -120,
 
