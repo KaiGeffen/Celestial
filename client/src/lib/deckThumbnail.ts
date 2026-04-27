@@ -97,7 +97,7 @@ export default class DeckThumbnail {
     // INVALID INDICATOR – top-right corner of nameplate
     const indicatorW = 54
     const indicatorH = 22
-    const indicatorX = (Space.avatarSize * 3) / 4 - indicatorW / 2
+    const indicatorX = nameBarWidth / 2 - indicatorW / 2
     const indicatorY = nameBarY - Space.buttonHeight / 2
     this.invalidIndicator = scene.add
       .rectangle(indicatorX, indicatorY, indicatorW, indicatorH, 0xcc2200)
