@@ -380,8 +380,9 @@ export default class GameModel {
     card: Card,
     i?: number,
     from: Zone = Zone.Gone,
+    revealed = false,
   ) {
-    this.story.addAct(card, player, i)
+    this.story.addAct(card, player, i, revealed)
     const storySlot = i === undefined ? this.story.acts.length - 1 : i
     // Any existing Zone.Story animations targeting positions >= storySlot get shifted right
     // because this insertion displaces them (e.g. Immolant onDiscard followed by createInStory at 0).
