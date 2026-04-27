@@ -6,6 +6,7 @@ import Buttons from './buttons/buttons'
 import { Color, Space, Style } from '../settings/settings'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import cardbackNames from '../data/cardbackNames'
+import Server from '../server'
 
 // Composite visual for a deck tile: cardback, avatar, and name bar
 export default class DeckThumbnail {
@@ -17,7 +18,9 @@ export default class DeckThumbnail {
   private avatarButton: any
   private cardbackImages: Phaser.GameObjects.Image[] = []
   private selected = false
+  private hovered = false
   private isValid: boolean
+  private isNewDeckButton: boolean
 
   constructor(opts: {
     scene: BaseScene
@@ -26,19 +29,23 @@ export default class DeckThumbnail {
     name?: string
     cosmeticSet?: CosmeticSet
     isValid?: boolean
-    hiddenAvatar?: boolean
+    isNewDeckButton?: boolean
   }) {
     const { scene, onClick } = opts
     const muteClick = opts.muteClick ?? false
     const name = opts.name ?? ''
-    const cosmeticSet = opts.cosmeticSet ?? {
-      avatar: 0,
-      border: 0,
-      cardback: 0,
+    const userDefaultCosmeticSet: Partial<CosmeticSet> =
+      Server.getUserData().cosmeticSet ?? {}
+    const cosmeticSet = {
+      avatar: opts.cosmeticSet?.avatar ?? userDefaultCosmeticSet.avatar ?? 0,
+      border: opts.cosmeticSet?.border ?? userDefaultCosmeticSet.border ?? 0,
+      cardback:
+        opts.cosmeticSet?.cardback ?? userDefaultCosmeticSet.cardback ?? 0,
     }
     const isValid = opts.isValid ?? true
-    const hiddenAvatar = opts.hiddenAvatar ?? false
+    const isNewDeckButton = opts.isNewDeckButton ?? false
     this.scene = scene
+    this.isNewDeckButton = isNewDeckButton
 
     // Standard size for all deck thumbnails (85% of the previous tile width)
     const width = Space.avatarSize * 2 * 0.85
@@ -71,24 +78,16 @@ export default class DeckThumbnail {
       x: Space.avatarSize / 4,
       y: -10,
     })
-    if (hiddenAvatar) {
-      this.avatarButton.icon.setTexture(`avatar-hidden`)
-    }
 
     // DECK NAME – full width of the thumbnail
     const nameBarWidth = width
     const nameBarY = height / 2 - Space.buttonHeight / 2
     this.isValid = isValid
     this.nameBackground = scene.add
-      .rectangle(
-        0,
-        nameBarY,
-        nameBarWidth,
-        Space.buttonHeight,
-        Color.backgroundLight,
-      )
+      .rectangle(0, nameBarY, nameBarWidth, Space.buttonHeight, Color.white)
       .setStrokeStyle(2, Color.border)
     this.container.add(this.nameBackground)
+    this.updateNameBackgroundStyle()
 
     // Hitbox is the full thumbnail
     const hitbox = scene.add
@@ -109,20 +108,12 @@ export default class DeckThumbnail {
         onClick()
       })
       .on('pointerover', () => {
-        if (!this.selected) {
-          this.nameBackground.setFillStyle(Color.gold)
-          this.nameBackground.setStrokeStyle(2, Color.gold)
-        }
+        this.hovered = true
+        this.updateNameBackgroundStyle()
       })
       .on('pointerout', () => {
-        if (!this.selected) {
-          if (this.isValid) {
-            this.nameBackground.setFillStyle(Color.backgroundLight)
-            this.nameBackground.setStrokeStyle(2, Color.border)
-          } else {
-            this.nameBackground.setFillStyle(Color.cardGreyed)
-          }
-        }
+        this.hovered = false
+        this.updateNameBackgroundStyle()
       })
     this.container.add(hitbox)
 
@@ -131,23 +122,15 @@ export default class DeckThumbnail {
       .setOrigin(0.5, 0.5)
     this.container.add(this.nameText)
 
-    // If deck invalid, slightly grey out the name bar (no extra objects)
-    if (!isValid) {
-      this.nameBackground.setFillStyle(Color.cardGreyed)
+    if (isNewDeckButton) {
+      this.nameText.setFontStyle('italic')
     }
+    this.updateNameBackgroundStyle()
   }
 
   setSelected(selected: boolean): void {
     this.selected = selected
-    if (selected) {
-      this.nameBackground.setFillStyle(Color.buttonSelected)
-      this.nameBackground.setStrokeStyle(3, Color.outline)
-    } else if (this.isValid) {
-      this.nameBackground.setFillStyle(Color.backgroundLight)
-      this.nameBackground.setStrokeStyle(2, Color.border)
-    } else {
-      this.nameBackground.setFillStyle(Color.cardGreyed)
-    }
+    this.updateNameBackgroundStyle()
   }
 
   /** Refresh visuals after deck name or cosmetics change (e.g. from editor). */
@@ -169,14 +152,33 @@ export default class DeckThumbnail {
     }
     if (opts.isValid !== undefined) {
       this.isValid = opts.isValid
-      if (!this.selected) {
-        if (opts.isValid) {
-          this.nameBackground.setFillStyle(Color.backgroundLight)
-          this.nameBackground.setStrokeStyle(2, Color.border)
-        } else {
-          this.nameBackground.setFillStyle(Color.cardGreyed)
-        }
-      }
+      this.updateNameBackgroundStyle()
     }
+  }
+
+  private updateNameBackgroundStyle(): void {
+    if (this.isNewDeckButton) {
+      this.nameBackground.setFillStyle(Color.black)
+      if (this.nameText) this.nameText.setColor(Color.whiteS)
+      return
+    }
+
+    if (!this.isValid) {
+      this.nameBackground.setFillStyle(Color.cardGreyed)
+      if (this.nameText) this.nameText.setColor(Color.basicText)
+      return
+    }
+    if (this.selected) {
+      this.nameBackground.setFillStyle(Color.gold)
+      if (this.nameText) this.nameText.setColor(Color.basicText)
+      return
+    }
+    if (this.hovered) {
+      this.nameBackground.setFillStyle(Color.gold)
+      if (this.nameText) this.nameText.setColor(Color.basicText)
+      return
+    }
+    this.nameBackground.setFillStyle(Color.white)
+    if (this.nameText) this.nameText.setColor(Color.basicText)
   }
 }

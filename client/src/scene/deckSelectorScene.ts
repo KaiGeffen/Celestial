@@ -14,6 +14,7 @@ import {
   UserSettings,
   deckFilterBarHeight,
 } from '../settings/settings'
+import Server from '../server'
 import newScrollablePanel from '../lib/scrollablePanel'
 import { MechanicsSettings } from '../../../shared/settings'
 import { Deck } from '../../../shared/types/deck'
@@ -235,7 +236,8 @@ export default class DeckSelectorScene extends BaseScene {
     const newDeckThumb = new DeckThumbnail({
       scene: this,
       name: 'New Deck',
-      hiddenAvatar: true,
+      cosmeticSet: Server.getUserData().cosmeticSet,
+      isNewDeckButton: true,
       onClick: () => this.onNewDeckClick(),
     })
     panel.add(newDeckThumb.container)

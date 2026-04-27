@@ -369,7 +369,8 @@ export const assetLists = {
       "Sun",
       "Thumb",
       "Underline",
-      "XOut"
+      "XOut",
+      "thumbnailNameplate"
     ],
     "dimensions": {
       "Wins": {
