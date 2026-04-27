@@ -258,6 +258,7 @@ export default class DeckSelectorScene extends BaseScene {
         name,
         cosmeticSet,
         isValid,
+        cardCount: deck.cards?.length || 0,
         onClick: () => this.onDeckClick(i),
       })
 

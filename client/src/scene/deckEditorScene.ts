@@ -127,7 +127,6 @@ export default class DeckEditorScene extends BaseScene {
   private addCardToDeck(card: Card): void {
     this.deckRegion.decklist.addCard(card)
     this.deckRegion.layoutDecklist()
-    this.deckRegion.syncDeckCount()
     this.syncDeckThumbnail()
   }
 
@@ -192,8 +191,6 @@ export default class DeckEditorScene extends BaseScene {
           if (fullyRemoved) {
             this.deckRegion.layoutDecklist()
           }
-
-          this.deckRegion.syncDeckCount()
 
           // Update the thumbnail
           this.syncDeckThumbnail()
@@ -271,13 +268,13 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   private syncDeckThumbnail(): void {
-    const isValid = this.getDeckCode().length === MechanicsSettings.DECK_SIZE
-
-    // Update the thumbnail
+    const cardCount = this.getDeckCode().length
+    const isValid = cardCount === MechanicsSettings.DECK_SIZE
     this.deckRegion.syncThumbnail({
       name: this.deckName,
       cosmeticSet: this.cosmeticSet,
       isValid,
+      cardCount,
     })
   }
 
@@ -286,8 +283,6 @@ export default class DeckEditorScene extends BaseScene {
       cards,
       Flags.devCardsEnabled ? false : true,
     )
-    this.deckRegion.syncDeckCount()
-
     // Scroll to the top of the decklist
     this.deckRegion.scrollDecklistToTop()
   }

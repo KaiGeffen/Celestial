@@ -7,6 +7,7 @@ import { Color, Space, Style } from '../settings/settings'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import cardbackNames from '../data/cardbackNames'
 import Server from '../server'
+import { MechanicsSettings } from '../../../shared/settings'
 
 // Composite visual for a deck tile: cardback, avatar, and name bar
 export default class DeckThumbnail {
@@ -21,6 +22,9 @@ export default class DeckThumbnail {
   private hovered = false
   private isValid: boolean
   private isNewDeckButton: boolean
+  private cardCount: number
+  private invalidIndicator: Phaser.GameObjects.Rectangle
+  private invalidText: Phaser.GameObjects.Text
 
   constructor(opts: {
     scene: BaseScene
@@ -30,6 +34,7 @@ export default class DeckThumbnail {
     cosmeticSet?: CosmeticSet
     isValid?: boolean
     isNewDeckButton?: boolean
+    cardCount?: number
   }) {
     const { scene, onClick } = opts
     const muteClick = opts.muteClick ?? false
@@ -46,6 +51,7 @@ export default class DeckThumbnail {
     const isNewDeckButton = opts.isNewDeckButton ?? false
     this.scene = scene
     this.isNewDeckButton = isNewDeckButton
+    this.cardCount = opts.cardCount ?? 0
 
     // Standard size for all deck thumbnails (85% of the previous tile width)
     const width = Space.avatarSize * 2 * 0.85
@@ -87,6 +93,23 @@ export default class DeckThumbnail {
       .rectangle(0, nameBarY, nameBarWidth, Space.buttonHeight, Color.white)
       .setStrokeStyle(2, Color.border)
     this.container.add(this.nameBackground)
+
+    // INVALID INDICATOR – top-right corner of nameplate
+    const indicatorW = 54
+    const indicatorH = 22
+    const indicatorX = nameBarWidth / 2 - indicatorW / 2
+    const indicatorY = nameBarY - Space.buttonHeight / 2 + indicatorH / 2
+    this.invalidIndicator = scene.add
+      .rectangle(indicatorX, indicatorY, indicatorW, indicatorH, 0xcc2200)
+      .setStrokeStyle(2, Color.border)
+      .setVisible(false)
+    this.container.add(this.invalidIndicator)
+    this.invalidText = scene.add
+      .text(indicatorX, indicatorY, '', { fontFamily: 'Berylium', fontSize: '13px', color: '#ffffff' })
+      .setOrigin(0.5, 0.5)
+      .setVisible(false)
+    this.container.add(this.invalidText)
+
     this.updateNameBackgroundStyle()
 
     // Hitbox is the full thumbnail
@@ -138,6 +161,7 @@ export default class DeckThumbnail {
     name?: string
     cosmeticSet?: CosmeticSet
     isValid?: boolean
+    cardCount?: number
   }): void {
     if (opts.name !== undefined) {
       this.nameText.setText(opts.name)
@@ -150,6 +174,9 @@ export default class DeckThumbnail {
       const textureKey = `cardback-${cardbackNames[cb] ?? 'Default'}`
       this.cardbackImages.forEach((img) => img.setTexture(textureKey))
     }
+    if (opts.cardCount !== undefined) {
+      this.cardCount = opts.cardCount
+    }
     if (opts.isValid !== undefined) {
       this.isValid = opts.isValid
       this.updateNameBackgroundStyle()
@@ -157,17 +184,22 @@ export default class DeckThumbnail {
   }
 
   private updateNameBackgroundStyle(): void {
+    const showInvalid = !this.isValid && !this.isNewDeckButton
+    if (this.invalidIndicator) {
+      this.invalidIndicator.setVisible(showInvalid)
+    }
+    if (this.invalidText) {
+      this.invalidText
+        .setText(`${this.cardCount}/${MechanicsSettings.DECK_SIZE}`)
+        .setVisible(showInvalid)
+    }
+
     if (this.isNewDeckButton) {
       this.nameBackground.setFillStyle(Color.black)
       if (this.nameText) this.nameText.setColor(Color.whiteS)
       return
     }
 
-    if (!this.isValid) {
-      this.nameBackground.setFillStyle(Color.cardGreyed)
-      if (this.nameText) this.nameText.setColor(Color.basicText)
-      return
-    }
     if (this.selected) {
       this.nameBackground.setFillStyle(Color.gold)
       if (this.nameText) this.nameText.setColor(Color.basicText)
