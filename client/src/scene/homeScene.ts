@@ -402,7 +402,7 @@ export default class HomeScene extends BaseScene {
       .setOrigin(0, 0)
     dailyContainer.add(image)
     const tipText = this.rexUI.add
-      .BBCodeText(0, 0, getDailyHomeTip(), {
+      .BBCodeText(0, 0, `[b]Daily Tip:[/b] ${getDailyHomeTip()}`, {
         ...BBStyle.description,
         fontFamily: 'BeryliumItalic',
         wrap: { mode: 'word', width: image.displayWidth - Space.pad },
