@@ -113,7 +113,7 @@ export class SigninScene extends Phaser.Scene {
       f: () => {
         this.scene.launch('MenuScene', {
           menu: 'confirm',
-          text: 'Playing as Guest:\nYour progress is saved on this device only and is not tied to an account.\n\nSign in with Google to save progress across devices and access additional features.',
+          text: 'Guest accounts have limited features. Sign in with Google to access additional features.',
           hint: 'Play as Guest',
           callback: () => {
             Server.loginGuest(this.game, () => this.onOptionClick())
