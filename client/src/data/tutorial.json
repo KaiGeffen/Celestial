@@ -36,36 +36,37 @@
       },
       null,
       {
-        "bold": "I play a Dove, too.\n\nYou can see it in the story because it's Visible.",
+        "bold": "Your opponent has played a card, too.\n\nYour can't see the cards they play until nighttime.",
         "align": "story"
       },
       {
-        "bold": "You can't afford to play any more cards, so you pass.\n\nThe round ends now, and the cards we've played resolve from left to right.",
+        "bold": "You don't have enough breath to play another card, so you must pass.\n\nOnce both players pass, night begins, and the cards in the story resolve from left to right.",
         "align": "story"
       },
       null,
       null,
       {
-        "bold": "A new round begins.\n\nWe each draw 2 new cards.\n\nOur max breath goes up by 1, and refills completely.",
+        "bold": "A new round begins, both players draw 2 cards.\n\nMax breath goes up by 1, and refills completely.",
         "align": "center"
       },
       {
-        "bold": "Playing Dash here earns 3 points - surely beating whatever I play...",
+        "bold": "Playing Dash here earns 3 points, an exceptionally strong play in round 2.",
         "align": "center",
         "final": true
+      },
+      null,
+      {
+        "bold": "You're on your own for the rest of this match, good luck!",
+        "align": "center"
       }
     ],
     "night": [
       {
-        "bold": "We both earned 1 point, so it's a tie!\n\nClick the moon when you're ready for the next round to begin.",
+        "bold": "Both players earned 1 point, so it's a tie!\n\nClick the moon when you're ready for the next round to begin.",
         "align": "story"
       },
       {
         "bold": "Another round ends.\n\nClick the moon to continue.",
-        "align": "story"
-      },
-      {
-        "bold": "Card effects happen when the card resolves (At night), not when it's played.",
         "align": "story"
       }
     ]
@@ -86,7 +87,7 @@
         "align": "center"
       },
       {
-        "bold": "With your 3 breath you can afford Mercy.\n\nBut if you gained extra breath from Stars, you might have nothing to spend it on next round...",
+        "bold": "With your 3 breath you can afford Mercy.\n\nConsider saving Stars as it would put you at 5 breath next round, not enough to play Uprising.",
         "align": "center",
         "final": true
       },
@@ -110,10 +111,7 @@
       },
       null
     ],
-    "night": [
-      null,
-      null
-    ]
+    "night": []
   },
   {
     "hints": [
@@ -130,7 +128,7 @@
         "align": "center"
       },
       {
-        "bold": "Nourish will make the next card you resolve worth extra points, even if it's played on a future round.",
+        "bold": "Fruit gives Nourish when it resolves.\n\nNourish will make the next card you resolve worth extra points, even if it's played on a future round.",
         "align": "center"
       },
       {
@@ -140,7 +138,6 @@
       },
       null
     ],
-    "night": [
-    ]
+    "night": []
   }
 ]
