@@ -82,7 +82,7 @@ export default class StatusRegion extends Region {
       '',
       () => {},
       true,
-    )
+    ).setVisible(false)
     this.btnTheirNourish = new Buttons.Keywords.Nourish(
       this.theirRow,
       0,
@@ -90,12 +90,12 @@ export default class StatusRegion extends Region {
       '',
       () => {},
       true,
-    )
+    ).setVisible(false)
     this.btnTheirSight = new Buttons.Keywords.Sight(
       this.theirRow,
       ICON_SPREAD,
       0,
-    )
+    ).setVisible(false)
     this.btnTheirPossibility = new Buttons.Keywords.Possibility(
       this.theirRow,
       2 * ICON_SPREAD,
@@ -103,7 +103,7 @@ export default class StatusRegion extends Region {
       '',
       () => {},
       true,
-    )
+    ).setVisible(false)
 
     return this
   }
@@ -145,7 +145,11 @@ export default class StatusRegion extends Region {
     for (let owner = 0; owner < 2; owner++) {
       for (const animation of state.animations[owner]) {
         if (animation.from !== Zone.Status) continue
-        if (animation.index !== 0 && animation.index !== 1 && animation.index !== 3)
+        if (
+          animation.index !== 0 &&
+          animation.index !== 1 &&
+          animation.index !== 3
+        )
           continue
 
         const btn = this.getStatusButton(owner, animation.index)
@@ -183,7 +187,11 @@ export default class StatusRegion extends Region {
     const delay = slot * StatusRegion.SLOT_MS
 
     // Positive status gain: reveal at this slot with a simple alpha fade.
-    if (animation.index === 0 || animation.index === 1 || animation.index === 3) {
+    if (
+      animation.index === 0 ||
+      animation.index === 1 ||
+      animation.index === 3
+    ) {
       this.scene.tweens.add({
         targets: [btn.icon, btn.txt].filter(Boolean),
         alpha: 1,
