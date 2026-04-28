@@ -35,7 +35,7 @@ export const MatchTiming = {
   recapBackgroundTintMs: 400,
 
   /** TUTORIAL: How long a hint text takes to fade in */
-  hintFade: 400,
+  hintFade: 300,
 } as const
 
 /**

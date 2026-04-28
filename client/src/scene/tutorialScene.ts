@@ -22,6 +22,9 @@ import { Zone } from '../../../shared/state/zone'
 import GameModel from '../../../shared/state/gameModel'
 import Loader from '../loader/loader'
 
+/** Hint text starts this many px left of its laid-out position and slides in with the fade. */
+const HINT_TWEEN_X_DELTA = -10
+
 export default class TutorialMatchScene extends MatchScene {
   // How far into the tutorial (How many lines of text you have seen)
   progress: number
@@ -179,11 +182,7 @@ export default class TutorialMatchScene extends MatchScene {
 
     this.align(datum)
 
-    this.tweens.add({
-      targets: this.txt,
-      alpha: 1,
-      duration: Time.match.hintFade,
-    })
+    this.playHintEntranceTween()
   }
 
   // Display the current hint for the given mission id
@@ -214,15 +213,23 @@ export default class TutorialMatchScene extends MatchScene {
     this.align(datum)
 
     if (s !== '') {
-      this.tweens.add({
-        targets: this.txt,
-        alpha: 1,
-        duration: Time.match.hintFade,
-      })
+      this.playHintEntranceTween()
     }
 
     // If next button is visible, pause match until it's clicked
     this.paused = this.btnNext.isVisible()
+  }
+
+  /** After `align`, slide from `HINT_TWEEN_X_DELTA` and fade in in one tween. */
+  private playHintEntranceTween(): void {
+    const endX = this.txt.x
+    this.txt.x = endX + HINT_TWEEN_X_DELTA
+    this.tweens.add({
+      targets: this.txt,
+      x: endX,
+      alpha: 1,
+      duration: Time.match.hintFade,
+    })
   }
 
   // Display hints for the first tutorial
