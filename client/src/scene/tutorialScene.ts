@@ -24,6 +24,8 @@ import Loader from '../loader/loader'
 
 /** Hint text starts this many px left of its laid-out position and slides in with the fade. */
 const HINT_TWEEN_X_DELTA = -10
+const TUTORIAL_FINAL_LOSS_MESSAGE =
+  "Oh... I didn't think we'd lose.\n\nAurora, can we have a win, just this one time?"
 
 export default class TutorialMatchScene extends MatchScene {
   // How far into the tutorial (How many lines of text you have seen)
@@ -200,8 +202,15 @@ export default class TutorialMatchScene extends MatchScene {
       this.paused = true
       const round = state.roundCount - 1
       const mission = this.params.missionID
+
+      // Do this after animations finish
       ;(this.view.scores as RoundResultRegion).onAnimationComplete = () => {
-        this.displayNightHint(mission, round)
+        // If the player lost the tutorial, show a final loss hint
+        if (state.winner === 1) {
+          this.displayFinalLossHint()
+        } else {
+          this.displayNightHint(mission, round)
+        }
       }
     }
 
@@ -219,6 +228,14 @@ export default class TutorialMatchScene extends MatchScene {
 
     this.align(datum)
 
+    this.playHintEntranceTween()
+  }
+
+  private displayFinalLossHint(): void {
+    this.txt.setAlpha(0)
+    this.txt.setText(TUTORIAL_FINAL_LOSS_MESSAGE).setVisible(true)
+    this.btnNext.setVisible(false)
+    this.align({ align: 'center' })
     this.playHintEntranceTween()
   }
 
