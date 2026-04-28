@@ -174,18 +174,16 @@ export default class TutorialMatchScene extends MatchScene {
     if (!datum) return
 
     const s = `[b]${datum.bold}[/b]`
+    this.txt.setAlpha(0)
     this.txt.setText(s).setVisible(true)
+
+    this.align(datum)
 
     this.tweens.add({
       targets: this.txt,
       alpha: 1,
       duration: Time.match.hintFade,
-      onStart: () => {
-        this.txt.alpha = 0
-      },
     })
-
-    this.align(datum)
   }
 
   // Display the current hint for the given mission id
@@ -206,23 +204,22 @@ export default class TutorialMatchScene extends MatchScene {
     // Set the appropriate text
     const s = `[b]${datum.bold}[/b]`
 
+    this.txt.setAlpha(0)
     this.txt.setText(s).setVisible(s !== '')
-
-    // Fade that text in
-    this.tweens.add({
-      targets: this.txt,
-      alpha: 1,
-      duration: Time.match.hintFade,
-      onStart: () => {
-        this.txt.alpha = 0
-      },
-    })
 
     // If this is the final hint before the player must do something, hide the button
     this.btnNext.setVisible(!datum.final)
 
     // Align the elements based on the type of hint
     this.align(datum)
+
+    if (s !== '') {
+      this.tweens.add({
+        targets: this.txt,
+        alpha: 1,
+        duration: Time.match.hintFade,
+      })
+    }
 
     // If next button is visible, pause match until it's clicked
     this.paused = this.btnNext.isVisible()
