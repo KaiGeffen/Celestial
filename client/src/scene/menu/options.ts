@@ -395,7 +395,8 @@ export default class OptionsMenu extends Menu {
     sizer.add(txtHint)
     sizer.addSpace()
 
-    const s = UserSettings._get('canBeSpectated') !== false ? 'Enabled' : 'Disabled'
+    const s =
+      UserSettings._get('canBeSpectated') !== false ? 'Enabled' : 'Disabled'
     let container = new ContainerLite(
       this.scene,
       0,
@@ -477,18 +478,22 @@ export default class OptionsMenu extends Menu {
     if (!tutorialsCompleted) {
       s = 'Skip Tutorial'
       action = () => {
-        // Complete each mission in the intro
-        for (let i = 0; i < TUTORIAL_LENGTH; i++) {
-          UserSettings._setIndex('completedMissions', i, true)
-        }
+        // Complete all tutorial missions in one write.
+        // Also mirror to localStorage so a quick reload can't race account sync.
+        const completedMissions = Array(TUTORIAL_LENGTH).fill(true)
+        UserSettings._set('completedMissions', completedMissions)
+        localStorage.setItem(
+          'completedMissions',
+          JSON.stringify(completedMissions),
+        )
 
         // Stop the other active scene
         activeScene.beforeExit()
         activeScene.scene.stop()
 
-        // Stop this menu scene and start the journey scene
+        // Stop this menu scene and go to home
         this.scene.scene.stop()
-        this.scene.scene.start('JourneyScene')
+        this.scene.scene.start('HomeScene')
       }
     } else {
       if (activeScene instanceof SpectatorMatchScene) {
