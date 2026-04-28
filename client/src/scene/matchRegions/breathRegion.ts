@@ -18,6 +18,7 @@ export default class BreathRegion extends Region {
   currentBreath: number
 
   txtBreath: Phaser.GameObjects.Text
+  private breathWheel: Phaser.GameObjects.Image
 
   // Icons for each of the states of breath
   breathBasic: Phaser.GameObjects.Image[] = []
@@ -77,12 +78,12 @@ export default class BreathRegion extends Region {
   }
 
   private createBreath(): void {
-    const breathWheel = this.scene.add.image(
+    this.breathWheel = this.scene.add.image(
       this.BREATH_X,
       this.BREATH_Y,
       'chrome-breathWheel',
     )
-    this.container.add(breathWheel)
+    this.container.add(this.breathWheel)
 
     this.createBreathIcons()
 
@@ -133,5 +134,60 @@ export default class BreathRegion extends Region {
       this.container.add(image)
       images.push(image)
     }
+  }
+
+  // Tutorial glow is just for tutorial
+  private glowTween: Phaser.Tweens.Tween | null = null
+  private glowFx: any[] = []
+
+  startTutorialGlow(): void {
+    this.stopTutorialGlow()
+    if (this.glowFx.length === 0) {
+      const plugin = this.scene.plugins.get('rexOutlinePipeline')
+      const targets: Phaser.GameObjects.GameObject[] = [
+        this.breathWheel,
+        ...this.breathBasic,
+        // ...this.breathSpent,
+        // ...this.breathExtra,
+        // ...this.breathHover,
+        // ...this.breathOom,
+      ]
+      this.glowFx = targets.map((target) =>
+        plugin['add'](target, {
+          thickness: 0,
+          outlineColor: Color.white,
+          quality: 4,
+        }),
+      )
+    }
+    this.glowFx.forEach((fx) => {
+      fx.thickness = 0
+      fx.active = true
+    })
+    this.glowTween = this.scene.tweens.add({
+      targets: { v: 0 },
+      v: 1,
+      duration: 600,
+      yoyo: true,
+      repeat: -1,
+      onUpdate: (tween) => {
+        const v = tween.getValue() as number
+        const thickness = 0.2 + 3 * v
+        this.glowFx.forEach((fx) => {
+          fx.thickness = thickness
+        })
+      },
+    })
+  }
+
+  stopTutorialGlow(): void {
+    if (this.glowTween) {
+      this.glowTween.stop()
+      this.glowTween = null
+    }
+    this.glowFx.forEach((fx) => {
+      fx.thickness = 0
+      fx.active = false
+    })
   }
 }

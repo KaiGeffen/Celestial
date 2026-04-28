@@ -59,6 +59,7 @@ export default class TutorialMatchScene extends MatchScene {
     switch (missionID) {
       case 0:
         this.view.pass.tutorialSimplifyPass(true)
+        this.view.pass.hide()
         this.view.ourAvatar.hide()
         this.view.theirAvatar.hide()
         this.view.theirBoard.hide()
@@ -273,6 +274,16 @@ export default class TutorialMatchScene extends MatchScene {
   private displayHints1(): void {
     this.displayHint(0)
 
+    // Have glows only for the first two hints
+    this.view.wins.stopTutorialGlow()
+    this.view.breathRegion.stopTutorialGlow()
+
+    if (this.progress === 0) {
+      this.view.wins.startTutorialGlow()
+    } else if (this.progress === 1) {
+      this.view.breathRegion.startTutorialGlow()
+    }
+
     // Hide different elements on the screen based on progress
     switch (this.progress) {
       case 1:
@@ -334,19 +345,6 @@ export default class TutorialMatchScene extends MatchScene {
   // Display hints for the third tutorial
   private displayHints3(): void {
     this.displayHint(2)
-
-    // Hide stacks
-    // this.view.discardPiles.hide()
-    // this.view.commands.hide()
-    // this.view.ourHand['hideStacks']()
-    // this.view.theirHand['hideStacks']()
-
-    // // Hide pass until a point
-    // if (this.progress < 8) {
-    // 	this.view.pass.hide()
-    // } else {
-    // 	this.view.pass.show()
-    // }
   }
 
   // Align the elements based on the type of tutorial
