@@ -54,7 +54,6 @@ export default class TutorialMatchScene extends MatchScene {
   private applyTutorialMissionInitialRegions(missionID: number): void {
     this.view.searching.hide()
     this.view.mulligan.hide()
-    this.view.theirBoard.hide()
 
     switch (missionID) {
       case 0:
