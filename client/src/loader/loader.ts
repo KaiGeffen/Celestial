@@ -129,6 +129,11 @@ export default class Loader {
     scene.load.image('tutorial-2', 'img/tutorial/2.webp')
     scene.load.image('tutorial-3', 'img/tutorial/3.webp')
     scene.load.image('tutorial-4', 'img/tutorial/4.webp')
+    scene.load.image('tutorial-5', 'img/tutorial/5.webp')
+    scene.load.image('tutorial-6', 'img/tutorial/6.webp')
+    scene.load.image('tutorial-7', 'img/tutorial/7.webp')
+    scene.load.image('tutorial-8', 'img/tutorial/8.webp')
+    scene.load.image('tutorial-9', 'img/tutorial/9.webp')
   }
 
   // Load journey map and mission images
