@@ -22,7 +22,11 @@
         "align": "card"
       },
       {
-        "bold": "Mercy draws cards when it resolves, not when it's played.",
+        "bold": "When a round is over, day turns to night.",
+        "align": "card"
+      },
+      {
+        "bold": "A card like Mercy will draw cards at night when it resolves, not during the day when it's played.",
         "align": "card"
       },
       {

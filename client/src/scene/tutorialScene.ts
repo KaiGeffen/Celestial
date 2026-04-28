@@ -297,15 +297,23 @@ export default class TutorialMatchScene extends MatchScene {
         break
 
       case 5:
-        this.addCard('Mercy')
+        this.card.destroy()
+        // Show night time
+        this.view.backgroundRegion.tweenTintForRecap(true)
         break
 
       case 6:
-        this.card.destroy()
-        this.view.ourBoard.tutorialSetHandVisibility(true)
+        this.addCard('Mercy')
         break
 
       case 7:
+        this.card.destroy()
+        this.view.ourBoard.tutorialSetHandVisibility(true)
+        // Show day time
+        this.view.backgroundRegion.tweenTintForRecap(false)
+        break
+
+      case 8:
         this.view.theirBoard.show()
 
         // User can't pass during first tutorial
