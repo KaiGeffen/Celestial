@@ -44,6 +44,45 @@ export default class TutorialMatchScene extends MatchScene {
     super(args)
   }
 
+  init(...args: Parameters<MatchScene['init']>): void {
+    super.init(...args)
+    const params = args[0]
+    this.applyTutorialMissionInitialRegions(params.missionID ?? 0)
+  }
+
+  /** Regions hidden at tutorial start depend on which mission is running. */
+  private applyTutorialMissionInitialRegions(missionID: number): void {
+    this.view.searching.hide()
+    this.view.mulligan.hide()
+    this.view.theirBoard.hide()
+
+    switch (missionID) {
+      case 0:
+        this.view.pass.tutorialSimplifyPass(true)
+        this.view.ourAvatar.hide()
+        this.view.theirAvatar.hide()
+        this.view.theirBoard.hide()
+        this.view.ourStacks.hide()
+        this.view.theirStacks.hide()
+        this.view.historyRegion.hide()
+        this.view.ourBoard.tutorialSetHandVisibility(false)
+        break
+
+      case 1:
+        this.view.pass.tutorialSimplifyPass(true)
+        this.view.ourStacks.hide()
+        this.view.theirStacks.hide()
+        this.view.historyRegion.hide()
+        break
+
+      case 2:
+        break
+
+      default:
+        break
+    }
+  }
+
   preload(): void {
     Loader.loadTutorialCutscenes(this)
   }
@@ -54,8 +93,6 @@ export default class TutorialMatchScene extends MatchScene {
     // Replace the results screen with tutorial results
     this.view.results = new ResultsRegionTutorial().create(this)
     this.view.results['missionID'] = this.params.missionID + 1
-
-    this.view.searching.hide()
 
     // Must reset progress
     this.progress = -1
@@ -238,18 +275,6 @@ export default class TutorialMatchScene extends MatchScene {
 
     // Hide different elements on the screen based on progress
     switch (this.progress) {
-      case 0:
-        this.view.pass.hide()
-        this.view.ourAvatar.hide()
-        this.view.theirAvatar.hide()
-        this.view.theirBoard.hide()
-        this.view.ourStacks.hide()
-        this.view.theirStacks.hide()
-        this.view.historyRegion.hide()
-        // Hide cards in hand until later
-        this.view.ourBoard.tutorialSetHandVisibility(false)
-        break
-
       case 1:
         break
 
@@ -285,13 +310,7 @@ export default class TutorialMatchScene extends MatchScene {
   private displayHints2(): void {
     this.displayHint(1)
 
-    // Hide pass until a point
-    if (this.progress === 0) {
-      this.view.pass.tutorialSimplifyPass(true)
-      this.view.ourStacks.hide()
-      this.view.theirStacks.hide()
-      this.view.historyRegion.hide()
-    } else if (this.progress === 7) {
+    if (this.progress === 7) {
       this.view.pass.tutorialSimplifyPass(false)
     }
 
