@@ -205,7 +205,6 @@ export default class OpeningScene extends BaseScene {
   }
 
   private finish(): void {
-    UserSettings._set('hasSeenOpening', true)
     const missions: boolean[] = UserSettings._get('completedMissions') || []
     for (let i = 0; i < TUTORIAL_LENGTH; i++) {
       if (!missions[i]) {

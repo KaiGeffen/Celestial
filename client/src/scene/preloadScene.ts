@@ -202,30 +202,14 @@ export class SigninScene extends Phaser.Scene {
       return
     }
 
-    // Show opening cinematic for first-time users
-    if (!UserSettings._get('hasSeenOpening')) {
+    // If tutorials aren't all finished, show the opening cinematic
+    const missions = UserSettings._get('completedMissions')
+    if (!missions[TUTORIAL_LENGTH - 1]) {
       this.scene.start('OpeningScene')
       return
     }
 
-    // If the last tutorial isn't complete, start the next tutorial
-    const missions = UserSettings._get('completedMissions')
-    if (!missions[TUTORIAL_LENGTH - 1]) {
-      for (let i = 0; i < TUTORIAL_LENGTH; i++) {
-        // If this tutorial mission hasn't been completed, jump to that mission
-        if (!missions[i]) {
-          this.scene.start('TutorialMatchScene', {
-            isTutorial: false, // TODO This is old, remove
-            deck: undefined,
-            mmCode: `ai:t${i}`,
-            missionID: i,
-          })
-          return
-        }
-      }
-    } else {
-      this.scene.start('HomeScene')
-    }
+    this.scene.start('HomeScene')
   }
 }
 

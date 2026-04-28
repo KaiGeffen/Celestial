@@ -101,9 +101,6 @@ export class UserSettings {
 
       // A list of all new user tooltips that have been seen
       tooltipsSeen: [],
-
-      // Whether the opening cinematic has been seen
-      hasSeenOpening: false,
     }
 
     for (var key in defaultSettings) {
