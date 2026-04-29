@@ -7,9 +7,7 @@ import { MatchResultsSimplifiedRegion } from './matchRegions/matchResults'
 import { MatchScene, View } from './matchScene'
 
 export class SpectatorMatchScene extends MatchScene {
-  constructor(
-    args = { key: 'SpectatorMatchScene', lastScene: 'BuilderScene' },
-  ) {
+  constructor(args = { key: 'SpectatorMatchScene', lastScene: 'HomeScene' }) {
     super(args)
   }
 
