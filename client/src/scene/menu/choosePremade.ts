@@ -195,11 +195,11 @@ export default class ChoosePremade extends Menu {
       Space.windowWidth - this.avatarFull.displayWidth - Space.pad * 3,
     )
     this.txtDescription = this.scene.rexUI.add
-      .BBCodeText(0, 0, '', BBStyle.description)
+      .BBCodeText(0, 0, '', BBStyle.dailyHint)
       .setWrapWidth(
         width -
-          BBStyle.description.padding.left -
-          BBStyle.description.padding.right,
+          BBStyle.dailyHint.padding.left -
+          BBStyle.dailyHint.padding.right,
       )
       .setInteractive()
     if (!Flags.mobile) {

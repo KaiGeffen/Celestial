@@ -103,7 +103,32 @@ const StyleGeneral: StyleDict = {
   },
 }
 
-const MatchStyle: StyleDict = {
+// Used on cards
+const StyleCards: StyleDict = {
+  cardTitle: {
+    fontFamily: altFont,
+    fontSize: '20px',
+    color: Color.cardText,
+    stroke: '#000000',
+    strokeThickness: 1,
+  },
+  cardCost: {
+    fontFamily: altFont,
+    fontSize: '24px',
+    color: Color.cardCost,
+    stroke: '#000000',
+    strokeThickness: 1,
+  },
+  cardPoints: {
+    fontFamily: altFont,
+    fontSize: '24px',
+    color: Color.cardPoints,
+    stroke: '#000000',
+    strokeThickness: 1,
+  },
+}
+
+const StyleMatch: StyleDict = {
   // Count of cards in each stack (deck, discard)
   stackCountButton: {
     fontFamily: primaryFont,
@@ -175,56 +200,6 @@ const MatchStyle: StyleDict = {
   },
 }
 
-// Styles that are no longer in in-use scenes
-const StyleDeprecated: StyleDict = {
-  // Cost hint text
-  builder: {
-    fontFamily: mainFont,
-    fontSize: '22px',
-    color: Color.basicText,
-    // fontStyle: "Bold",
-  },
-
-  // Surname for characters in premade deck
-  surname: {
-    fontFamily: mainFont,
-    fontSize: '34px',
-    color: Color.basicText,
-  },
-  // Text that plays over the stillframes in journey
-  stillframe: {
-    fontFamily: altFont,
-    fontSize: FontSettings.huge.size,
-    color: Color.blackS,
-  },
-}
-
-// Used on cards
-const StyleCards: StyleDict = {
-  cardTitle: {
-    fontFamily: altFont,
-    fontSize: '20px',
-    color: Color.cardText,
-    stroke: '#000000',
-    strokeThickness: 1,
-  },
-  cardCost: {
-    fontFamily: altFont,
-    fontSize: '24px',
-    color: Color.cardCost,
-    stroke: '#000000',
-    strokeThickness: 1,
-  },
-  cardPoints: {
-    fontFamily: altFont,
-    fontSize: '24px',
-    color: Color.cardPoints,
-    stroke: '#000000',
-    strokeThickness: 1,
-  },
-}
-
-// Styles only appearing on home scene
 const StyleHome: StyleDict = {
   username: {
     fontFamily: primaryFont,
@@ -250,8 +225,14 @@ const StyleHome: StyleDict = {
   },
 }
 
-// Styles only appearing on journey scene
 const StyleJourney: StyleDict = {
+  // The name each row has as its title
+  missionName: {
+    fontFamily: sansFont,
+    fontSize: '18px',
+    color: Color.basicText,
+  },
+
   // Chapter story popup (journeyScene chapterMessage menu)
   chapterHeader: {
     fontFamily: primaryFont,
@@ -280,12 +261,36 @@ const StyleJourney: StyleDict = {
   },
 }
 
+// Styles that are no longer used in any in-use scenes
+const StyleDeprecated: StyleDict = {
+  // Cost hint text
+  builder: {
+    fontFamily: mainFont,
+    fontSize: '22px',
+    color: Color.basicText,
+    // fontStyle: "Bold",
+  },
+
+  // Surname for characters in premade deck
+  surname: {
+    fontFamily: mainFont,
+    fontSize: '34px',
+    color: Color.basicText,
+  },
+  // Text that plays over the stillframes in journey
+  stillframe: {
+    fontFamily: altFont,
+    fontSize: FontSettings.huge.size,
+    color: Color.blackS,
+  },
+}
+
 // Add further `StyleType` consts above, then spread them here.
 export const Style: StyleDict = {
   ...StyleDeprecated,
   ...StyleCards,
   ...StyleGeneral,
-  ...MatchStyle,
+  ...StyleMatch,
   ...StyleHome,
   ...StyleJourney,
 }
@@ -293,10 +298,7 @@ export const Style: StyleDict = {
 // The styling for BBCode objects, from the rexui module
 export const BBStyle: Record<string, any> = {
   basic: {
-    fontFamily: mainFont,
-    fontSize: FontSettings.standard.size,
-    color: Color.basicText,
-    wordWrap: { width: Space.maxTextWidth },
+    ...Style.basic,
     underline: {
       color: Color.basicText,
       thickness: 3,
@@ -371,8 +373,8 @@ export const BBStyle: Record<string, any> = {
       width: Space.windowWidth - Space.pad * 2,
     },
   },
-  // Description for avatars in premade menu / daily tip
-  description: {
+  // Daily Hint on home screen
+  dailyHint: {
     fontFamily: secondaryFont,
     fontSize: '20px',
     color: Color.blueS,
@@ -389,25 +391,8 @@ export const BBStyle: Record<string, any> = {
       width: Space.maxTextWidth,
     },
   },
-  // Journey scene deck-name BBCodeText (basic at 18px)
-  journeyDeckName: {
-    fontFamily: mainFont,
-    fontSize: '18px',
-    color: Color.basicText,
-    wordWrap: { width: Space.maxTextWidth },
-    underline: {
-      color: Color.basicText,
-      thickness: 3,
-      offset: 7,
-    },
-    halign: 'center',
-    wrap: {
-      mode: 'word',
-      width: Space.maxTextWidth,
-    },
-  },
-  // Match results header (basic at 30px)
-  resultsHeader: {
+  // Last screen of match
+  matchResultsHeader: {
     fontFamily: mainFont,
     fontSize: '30px',
     color: Color.basicText,
@@ -423,7 +408,7 @@ export const BBStyle: Record<string, any> = {
       width: Space.maxTextWidth,
     },
   },
-  // Copy for announcement on home screen
+  // Writing for announcements on home screen
   announcementCopy: {
     fontFamily: secondaryFont,
     fontStyle: 'bold',

@@ -259,7 +259,7 @@ export default class MatchResultsRegion extends Region {
       .setDepth(Depth.results)
 
     let txt = this.scene.add
-      .rexBBCodeText(0, 0, 'Results:', BBStyle.resultsHeader)
+      .rexBBCodeText(0, 0, 'Results:', BBStyle.matchResultsHeader)
       .setOrigin(0.5)
       .setDepth(Depth.results)
     sizer.add(txt)
