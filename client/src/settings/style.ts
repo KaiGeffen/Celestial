@@ -122,20 +122,6 @@ const StyleCards: StyleDict = {
     stroke: '#000000',
     strokeThickness: 1,
   },
-  cardCost: {
-    fontFamily: altFont,
-    fontSize: '24px',
-    color: Color.cardCost,
-    stroke: '#000000',
-    strokeThickness: 1,
-  },
-  cardPoints: {
-    fontFamily: altFont,
-    fontSize: '24px',
-    color: Color.cardPoints,
-    stroke: '#000000',
-    strokeThickness: 1,
-  },
 }
 
 const StyleMatch: StyleDict = {
@@ -236,13 +222,6 @@ const StyleHome: StyleDict = {
 }
 
 const StyleJourney: StyleDict = {
-  // The name each row has as its title
-  missionName: {
-    fontFamily: sansFont,
-    fontSize: '18px',
-    color: Color.basicText,
-  },
-
   // Chapter story popup (journeyScene chapterMessage menu)
   chapterHeader: {
     fontFamily: primaryFont,
@@ -430,20 +409,34 @@ export const BBStyle: Record<string, any> = {
     },
   },
   missionName: {
-    ...Style.missionName,
+    fontFamily: sansFont,
+    fontSize: '18px',
+    color: Color.basicText,
   },
   cardCost: {
-    ...Style.cardCost,
+    fontFamily: altFont,
+    fontSize: '24px',
+    color: Color.cardCost,
+    stroke: '#000000',
+    strokeThickness: 1,
   },
   cardPoints: {
-    ...Style.cardPoints,
+    fontFamily: altFont,
+    fontSize: '24px',
+    color: Color.cardPoints,
+    stroke: '#000000',
+    strokeThickness: 1,
   },
   deckBuilderTitle: {
     ...Style.header,
     halign: 'center',
   },
   storyResolveBubble: {
-    ...Style.cardCost,
+    fontFamily: altFont,
+    fontSize: '24px',
+    color: Color.cardCost,
+    stroke: '#000000',
+    strokeThickness: 1,
   },
   deckname: {
     ...Style.header,
