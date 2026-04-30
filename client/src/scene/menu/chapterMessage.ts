@@ -41,15 +41,15 @@ export default class ChapterMessageMenu extends MessageMenu {
       .setOrigin(0.5, 0)
     headerSizer.add(headerTxt, { align: 'center' })
 
-    const divider = this.scene.add
-      .image(0, 0, 'chrome-divider')
-      .setScale(0.35)
+    const divider = this.scene.add.image(0, 0, 'chrome-divider').setScale(0.35)
     const dH = divider.displayHeight
     divider.setDisplaySize(contentWidth, dH)
     headerSizer.add(divider, { align: 'center' })
 
     this.sizer
-      .add(headerSizer, { padding: { left: 50, right: 50, top: Space.padSmall, bottom: 0 } })
+      .add(headerSizer, {
+        padding: { left: 50, right: 50, top: Space.padSmall, bottom: 0 },
+      })
       .addNewLine()
 
     // Body: scrollable text, no scrollbar
@@ -103,12 +103,7 @@ export default class ChapterMessageMenu extends MessageMenu {
           let [x, y] = this.claimGoldButton.getGlobalPosition()
           y -= Space.buttonHeight / 4
           const rewardText = this.scene.add
-            .text(
-              x,
-              y,
-              `+${REWARD_AMOUNTS.missionComplete}💰`,
-              Style.homeSceneButton,
-            )
+            .text(x, y, `+${REWARD_AMOUNTS.missionComplete}💰`, Style.reward)
             .setOrigin(0.5, 1)
 
           this.scene.tweens.add({

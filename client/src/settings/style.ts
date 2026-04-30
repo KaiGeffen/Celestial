@@ -170,8 +170,9 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     stroke: '#000000',
     strokeThickness: 1,
   },
-  homeSceneButton: {
-    fontFamily: altFont,
+  // Reward text for gold gain
+  reward: {
+    fontFamily: primaryFont,
     fontSize: '40px',
     color: Color.goldS,
     stroke: Color.blackS,

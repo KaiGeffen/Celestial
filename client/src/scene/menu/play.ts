@@ -825,7 +825,7 @@ export default class PlayMenu extends Menu {
         rewardPosition.x,
         rewardPosition.y + 40,
         `+${data.goldReward}💰`,
-        Style.homeSceneButton,
+        Style.reward,
       )
       .setOrigin(0.5, 1)
 
