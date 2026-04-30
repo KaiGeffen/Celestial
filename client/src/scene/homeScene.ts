@@ -428,7 +428,7 @@ export default class HomeScene extends BaseScene {
         { align: 'center' },
       )
       blockSizer.add(
-        this.add.image(0, 0, 'chrome-divider').setOrigin(0.5, 0).setScale(0.25),
+        this.add.image(0, 0, 'chrome-divider').setOrigin(0.5, 0).setScale(0.3),
         { align: 'center' },
       )
       const bodyText = this.rexUI.add

@@ -20,7 +20,7 @@ class BaseButton extends Button {
   ) {
     super(within, x, y, {
       text: {
-        text: text,
+        text: text.toUpperCase(),
         interactive: false,
       },
       icon: {
@@ -52,7 +52,7 @@ class BaseButton extends Button {
   }
 
   setText(s: string): Button {
-    return super.setText(s)
+    return super.setText(s.toUpperCase())
   }
 
   /** `BigButton` uses a 3-frame spritesheet; plain `BasicButton` uses a single image (`icon-Button`). */
