@@ -2,11 +2,12 @@
 import 'phaser'
 import { Space, Color, Flags } from './settings'
 
-// All fonts used
+// TODO Deprecate
 const mainFont = 'Mulish'
 const altFont = 'Cinzel'
 const cardTextFont = 'Cinzel'
 
+// The only fonts used
 const primaryFont = 'Typey McTypeface'
 const secondaryFont = 'Berylium'
 const sansFont = 'Mulish'
@@ -58,7 +59,7 @@ const StyleGeneral: StyleDict = {
   },
   // Text for the buttons that are just text
   textButton: {
-    fontFamily: mainFont,
+    fontFamily: sansFont,
     fontSize: '20px',
     color: Color.textButton,
   },
@@ -72,8 +73,8 @@ const StyleGeneral: StyleDict = {
 
   // Count of a card in the deck
   cutoutCardCount: {
-    fontFamily: mainFont,
-    fontSize: '24px', //FontSettings.standard.size,
+    fontFamily: sansFont,
+    fontSize: '24px',
     color: Color.cardCount,
     stroke: '#0009',
     strokeThickness: 3,
@@ -84,6 +85,8 @@ const StyleGeneral: StyleDict = {
     fontFamily: secondaryFont,
     fontSize: FontSettings.huge.size,
     color: Color.whiteS,
+    stroke: Color.blackS,
+    strokeThickness: 2,
   },
 
   // Reward text for gold gain
@@ -97,7 +100,7 @@ const StyleGeneral: StyleDict = {
 
   // FPS counter in debug mode
   fps: {
-    fontFamily: mainFont,
+    fontFamily: sansFont,
     fontSize: '16px',
     color: '#009900',
   },
@@ -154,7 +157,7 @@ const StyleMatch: StyleDict = {
     color: Color.passText,
   },
   moonPoints: {
-    fontFamily: altFont,
+    fontFamily: secondaryFont,
     fontSize: '48px',
     color: Color.passText,
     stroke: Color.backgroundLightS,
@@ -162,13 +165,13 @@ const StyleMatch: StyleDict = {
   },
   // The action that the moon is expressing instead of the points
   moonAction: {
-    fontFamily: altFont,
+    fontFamily: secondaryFont,
     fontSize: '36px',
     color: Color.passText,
     stroke: Color.backgroundLightS,
     strokeThickness: 2,
   },
-  todoCloud: {
+  cloud: {
     fontFamily: secondaryFont,
     fontSize: '24px',
     color: Color.passText,
@@ -182,17 +185,17 @@ const StyleMatch: StyleDict = {
     fontSize: '24px',
     color: Color.whiteS,
     stroke: Color.darkUmberS,
-    strokeThickness: 4,
+    strokeThickness: 2,
   },
   matchSubtitle: {
-    fontFamily: secondaryFont,
+    fontFamily: sansFont,
     fontSize: '18px',
     color: Color.whiteS,
     stroke: Color.darkUmberS,
-    strokeThickness: 2,
+    strokeThickness: 1,
   },
   matchTime: {
-    fontFamily: mainFont,
+    fontFamily: sansFont,
     fontSize: '16px',
     color: Color.whiteS,
     stroke: '#000000',
@@ -254,7 +257,7 @@ const StyleJourney: StyleDict = {
   },
   // Locked deck label in journey
   journeyLocked: {
-    fontFamily: mainFont,
+    fontFamily: sansFont,
     fontSize: '16px',
     color: '#555555',
     wordWrap: { width: Space.maxTextWidth },
@@ -331,7 +334,7 @@ export const BBStyle: Record<string, any> = {
   },
   // Hint text shown when something onscreen is hovered
   hint: {
-    fontFamily: mainFont,
+    fontFamily: sansFont,
     fontSize: FontSettings.standard.size,
     color: Color.hintFill,
     backgroundColor: Color.hintBackground,
@@ -393,7 +396,7 @@ export const BBStyle: Record<string, any> = {
   },
   // Last screen of match
   matchResultsHeader: {
-    fontFamily: mainFont,
+    fontFamily: primaryFont,
     fontSize: '30px',
     color: Color.basicText,
     wordWrap: { width: Space.maxTextWidth },

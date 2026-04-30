@@ -157,7 +157,6 @@ export default class MatchResultsRegion extends Region {
 
   private createContent() {
     // Win/Lose text
-    //this.HEIGHT / 2 - Space.pad
     this.txtResult = this.scene.add
       .text(
         0,
