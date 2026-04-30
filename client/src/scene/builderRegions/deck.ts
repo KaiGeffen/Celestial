@@ -162,12 +162,10 @@ export default class DeckRegion {
     this.txtDeckName = this.scene.rexUI.add
       .BBCodeText()
       .setStyle({
-        ...Style.header,
-        halign: 'center',
+        ...BBStyle.deckBuilderTitle,
         fixedWidth: width,
-        // NOTE This handles the padding, and prevents text cropping
         fixedHeight: 50 + Space.padSmall,
-      } as any)
+      })
       .setOrigin(0.5)
 
     if (Flags.mobile) {

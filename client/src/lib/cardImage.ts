@@ -378,7 +378,7 @@ export class CardImage {
         -Space.cardWidth / 2 + 27,
         -Space.cardHeight / 2 + 58,
         `[stroke=${STAT_STROKE}]${this.card.cost}[/stroke]`,
-        Style.cardCost as any,
+        BBStyle.cardCost,
       )
       .setVisible(this.card.id !== Catalog.cardback.id)
       .setOrigin(0.5)
@@ -401,7 +401,7 @@ export class CardImage {
         -Space.cardWidth / 2 + 27,
         -Space.cardHeight / 2 + 102,
         `[stroke=${STAT_STROKE}]${this.card.points}[/stroke]`,
-        Style.cardPoints as any,
+        BBStyle.cardPoints,
       )
       .setVisible(this.card.id !== Catalog.cardback.id)
       .setOrigin(0.5)

@@ -429,13 +429,21 @@ export const BBStyle: Record<string, any> = {
       width: ANNOUNCEMENT_WIDTH,
     },
   },
-  /** Story resolve bubbles (printed points / nourish / effects) on settled acts — see animator */
+  missionName: {
+    ...Style.missionName,
+  },
+  cardCost: {
+    ...Style.cardCost,
+  },
+  cardPoints: {
+    ...Style.cardPoints,
+  },
+  deckBuilderTitle: {
+    ...Style.header,
+    halign: 'center',
+  },
   storyResolveBubble: {
-    fontFamily: altFont,
-    fontSize: '24px',
-    color: Color.cardCost,
-    stroke: '#000000',
-    strokeThickness: 1,
+    ...Style.cardCost,
   },
   deckname: {
     ...Style.header,
