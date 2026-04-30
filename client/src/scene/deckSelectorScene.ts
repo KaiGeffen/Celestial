@@ -180,7 +180,7 @@ export default class DeckSelectorScene extends BaseScene {
       Space.buttonHeight,
     )
 
-    const title = this.add.text(0, 0, 'MY DECKS', Style.header).setOrigin(0.5)
+    const title = this.add.text(0, 0, 'Decks', Style.header).setOrigin(0.5)
 
     const sizer = this.rexUI.add
       .sizer({
@@ -271,7 +271,11 @@ export default class DeckSelectorScene extends BaseScene {
     UserSettings._push('decks', {
       name: `Deck ${(UserSettings._get('decks') || []).length + 1}`,
       cards: [],
-      cosmeticSet: Server.getUserData().cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 },
+      cosmeticSet: Server.getUserData().cosmeticSet ?? {
+        avatar: 0,
+        border: 0,
+        cardback: 0,
+      },
     })
     const newIndex = (UserSettings._get('decks') || []).length - 1
     UserSettings._set('equippedDeckIndex', newIndex)

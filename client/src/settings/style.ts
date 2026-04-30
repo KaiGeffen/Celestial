@@ -209,7 +209,7 @@ const StyleHome: StyleDict = {
     fontSize: '18px',
     color: Color.whiteS,
     stroke: Color.darkUmberS,
-    strokeThickness: 4,
+    strokeThickness: 3,
     align: 'center',
   },
   usernameInfo: {
