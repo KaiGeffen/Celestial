@@ -369,7 +369,7 @@ export default class HomeScene extends BaseScene {
     this.addShadow(background)
 
     const title = this.add
-      .text(0, 0, `New Update [${PATCH_NUMBER}]`, Style.announcement)
+      .text(0, 0, `New Update [${PATCH_NUMBER}]`, Style.header)
       .setOrigin(0.5, 0)
     panelSizer.add(title)
 

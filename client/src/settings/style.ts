@@ -99,7 +99,8 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     stroke: Color.darkUmberS,
     strokeThickness: 4,
   },
-  announcement: {
+  // Header text in all places (Menus, sizers, etc)
+  header: {
     fontFamily: primaryFont,
     fontSize: '40px',
     color: Color.goldS,
@@ -211,9 +212,14 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     strokeThickness: 1.5,
   },
 
-  /**
-   * HOME SCREEN ANNOUNCEMENT
-   */
+  // Home screen announcement subheader
+  announcementSubheader: {
+    fontFamily: primaryFont,
+    fontSize: '24px',
+    color: Color.darkUmberS,
+    wordWrap: { width: ANNOUNCEMENT_WIDTH },
+    align: 'center',
+  },
   // Chapter story popup (journeyScene chapterMessage menu)
   chapterHeader: {
     fontFamily: primaryFont,
@@ -226,14 +232,6 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     fontStyle: 'italic',
     fontSize: '22px',
     color: Color.darkUmberS,
-  },
-  // Announcements on the home screen
-  announcementSubheader: {
-    fontFamily: secondaryFont,
-    fontSize: '24px',
-    color: Color.darkUmberS,
-    wordWrap: { width: ANNOUNCEMENT_WIDTH },
-    align: 'center',
   },
   // Journey scene overlay header / navigation arrows
   journeyOverlay: {

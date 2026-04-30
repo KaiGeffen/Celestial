@@ -187,7 +187,7 @@ export default class ChoosePremade extends Menu {
     // Hint on which information is displayed
     let hint = new Hint(this.scene)
 
-    this.txtName = this.scene.add.text(0, 0, '', Style.announcement)
+    this.txtName = this.scene.add.text(0, 0, '', Style.header)
     this.txtSurname = this.scene.add.text(0, 0, '', Style.surname)
 
     const width = Math.min(

@@ -283,7 +283,7 @@ export default class PlayMenu extends Menu {
     this.txtDeckName = this.scene.rexUI.add
       .BBCodeText()
       .setStyle({
-        ...Style.announcement,
+        ...Style.header,
         halign: 'center',
         fixedHeight: 50 + Space.padSmall,
         fixedWidth: deckPanelWidth - 25,
@@ -458,7 +458,7 @@ export default class PlayMenu extends Menu {
     titleSizer.addBackground(titleBackground)
 
     const txtTitle = this.scene.add
-      .text(0, 0, 'Game Mode', Style.announcement)
+      .text(0, 0, 'Game Mode', Style.header)
       .setOrigin(0.5)
     titleSizer.add(txtTitle)
     contentSizer.add(titleSizer).addNewLine()

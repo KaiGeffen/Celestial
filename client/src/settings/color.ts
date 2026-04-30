@@ -6,8 +6,8 @@ const CoreColors: Record<string, number | string> = {
   black: 0x353f4e,
   blackS: '#353F4E',
 
-  gold: 0xfabd5d,
-  goldS: '#FABD5D',
+  gold: 0xedaa24,
+  goldS: '#EDAA24',
 
   blue: 0x5f99dc,
   blueS: '#5F99DC',

@@ -56,7 +56,11 @@ export default class Menu {
   }
 
   // Create the menu header
-  protected createHeader(s: string, width: number = this.width, style = Style.announcement): any {
+  protected createHeader(
+    s: string,
+    width: number = this.width,
+    style = Style.header,
+  ): any {
     let background = this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
 
     let sizer = this.scene.rexUI.add.sizer({

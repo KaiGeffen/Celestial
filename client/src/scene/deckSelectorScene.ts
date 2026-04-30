@@ -179,9 +179,7 @@ export default class DeckSelectorScene extends BaseScene {
       Space.buttonHeight,
     )
 
-    const title = this.add
-      .text(0, 0, 'MY DECKS', Style.announcement)
-      .setOrigin(0.5)
+    const title = this.add.text(0, 0, 'MY DECKS', Style.header).setOrigin(0.5)
 
     const sizer = this.rexUI.add
       .sizer({

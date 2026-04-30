@@ -77,7 +77,7 @@ export default class StoreScene extends BaseSceneWithHeader {
         height: Space.windowHeight - this.headerHeight,
       })
       const messageText = this.add
-        .text(0, 0, 'All cards owned', Style.announcement)
+        .text(0, 0, 'All cards owned', Style.header)
         .setOrigin(0.5)
       messageSizer.addSpace()
       messageSizer.add(messageText)
