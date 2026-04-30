@@ -157,7 +157,6 @@ export default class MatchResultsRegion extends Region {
 
   private createContent() {
     // Win/Lose text
-    //this.HEIGHT / 2 - Space.pad
     this.txtResult = this.scene.add
       .text(
         0,
@@ -259,10 +258,7 @@ export default class MatchResultsRegion extends Region {
       .setDepth(Depth.results)
 
     let txt = this.scene.add
-      .rexBBCodeText(0, 0, 'Results:', {
-        ...BBStyle.basic,
-        fontSize: '30px',
-      })
+      .rexBBCodeText(0, 0, 'Results:', BBStyle.matchResultsHeader)
       .setOrigin(0.5)
       .setDepth(Depth.results)
     sizer.add(txt)

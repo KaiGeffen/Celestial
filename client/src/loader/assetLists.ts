@@ -454,6 +454,7 @@ export const assetLists = {
       "bubble",
       "bubbleEffect",
       "bubbleNourish",
+      "divider",
       "nameplate",
       "stackCount",
       "sundial",

@@ -74,12 +74,7 @@ export default class PurchaseItemMenu extends Menu {
     })
 
     // Add cost text
-    const costText = this.scene.add.text(
-      0,
-      0,
-      `Cost: ${COST} 💰`,
-      Style.announcement,
-    )
+    const costText = this.scene.add.text(0, 0, `Cost: ${COST} 💰`, Style.header)
     rightSizer.add(costText)
 
     // Add right side sizer to main content

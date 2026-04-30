@@ -75,12 +75,7 @@ export class SigninScene extends Phaser.Scene {
 
     // Text describing anything going on
     this.txt = this.add
-      .text(
-        Space.windowWidth / 2,
-        Space.windowHeight / 2,
-        '',
-        Style.announcement,
-      )
+      .text(Space.windowWidth / 2, Space.windowHeight / 2, '', Style.header)
       .setOrigin(0.5)
       .setDepth(10)
   }

@@ -1,3 +1,49 @@
+/* Drop font files (.ttf, .otf, .woff2) into assets/fonts/ and add an @font-face here */
+@font-face {
+    font-family: 'Berylium';
+    src: url('assets/fonts/Berylium.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Berylium';
+    src: url('assets/fonts/Berylium Rg It.otf') format('opentype');
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'BeryliumItalic';
+    src: url('assets/fonts/Berylium Rg It.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Berylium';
+    src: url('assets/fonts/Berylium-Bold.otf') format('opentype');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: 'Berylium';
+    src: url('assets/fonts/Berylium Bd It.otf') format('opentype');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Killam';
+    src: url('assets/fonts/Killam-Bold.ttf') format('truetype');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: 'OptimusPrinceps';
+    src: url('assets/fonts/OptimusPrinceps.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Typey McTypeface';
+    src: url('assets/fonts/Typey.otf') format('opentype');
+}
+
 body, html {
     height: 100%;
     margin: 0;

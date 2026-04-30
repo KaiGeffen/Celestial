@@ -8,18 +8,69 @@ import Button from '../../lib/buttons/button'
 import Server from '../../server'
 import { Ease, Space, Style, Time } from '../../settings/settings'
 import REWARD_AMOUNTS from '../../../../shared/config/rewardAmounts'
+import newScrollablePanel from '../../lib/scrollablePanel'
 
 export default class ChapterMessageMenu extends MessageMenu {
   private claimGoldMissionId: number | undefined
   private claimGoldButton: Button
 
   constructor(scene: MenuScene, params) {
-    super(scene, params)
+    super(scene, params, 700)
+  }
+
+  protected createSizer(): void {
+    super.createSizer()
+    this.sizer.space.line = 0
   }
 
   protected createContent(params): void {
     this.claimGoldMissionId = params.claimGoldMissionId
-    super.createContent(params)
+
+    const contentWidth = this.width - 100 // 50px gap on each side
+    const sidePad = { padding: { left: 50, right: 50 } }
+
+    // Header: title text centered, then chrome-divider below it
+    const headerSizer = this.scene.rexUI.add.sizer({
+      orientation: 'vertical',
+      width: contentWidth,
+      space: { item: Space.padSmall },
+    })
+
+    const headerTxt = this.scene.add
+      .text(0, 0, params.title, Style.chapterHeader)
+      .setOrigin(0.5, 0)
+    headerSizer.add(headerTxt, { align: 'center' })
+
+    const divider = this.scene.add.image(0, 0, 'chrome-divider').setScale(0.35)
+    const dH = divider.displayHeight
+    divider.setDisplaySize(contentWidth, dH)
+    headerSizer.add(divider, { align: 'center' })
+
+    this.sizer
+      .add(headerSizer, {
+        padding: { left: 50, right: 50, top: Space.padSmall, bottom: 0 },
+      })
+      .addNewLine()
+
+    // Body: scrollable text, no scrollbar
+    const maxTextHeight = Space.windowHeight - 300
+    const textPanel = this.scene.rexUI.add.sizer({ width: contentWidth })
+    const bodyTxt = this.scene.add
+      .text(0, 0, params.s, Style.chapterBody)
+      .setWordWrapWidth(contentWidth)
+    textPanel.add(bodyTxt)
+
+    const scrollableText = newScrollablePanel(this.scene, {
+      width: contentWidth,
+      height: maxTextHeight,
+      panel: { child: textPanel },
+      scrollMode: 'y',
+      slider: false,
+    })
+    this.textScrollablePanel = scrollableText
+
+    this.sizer.add(scrollableText, sidePad).addNewLine()
+
     this.addFooter()
   }
 
@@ -52,12 +103,7 @@ export default class ChapterMessageMenu extends MessageMenu {
           let [x, y] = this.claimGoldButton.getGlobalPosition()
           y -= Space.buttonHeight / 4
           const rewardText = this.scene.add
-            .text(
-              x,
-              y,
-              `+${REWARD_AMOUNTS.missionComplete}💰`,
-              Style.homeSceneButton,
-            )
+            .text(x, y, `+${REWARD_AMOUNTS.missionComplete}💰`, Style.reward)
             .setOrigin(0.5, 1)
 
           this.scene.tweens.add({
@@ -83,6 +129,7 @@ export default class ChapterMessageMenu extends MessageMenu {
       padding: {
         left: Space.pad,
         right: Space.pad,
+        top: Space.pad,
       },
     }
 

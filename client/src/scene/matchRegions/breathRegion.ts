@@ -88,7 +88,7 @@ export default class BreathRegion extends Region {
     this.createBreathIcons()
 
     this.txtBreath = this.scene.add
-      .text(this.BREATH_X, this.BREATH_Y, '', Style.todoScore)
+      .text(this.BREATH_X, this.BREATH_Y, '', Style.breathWheel)
       .setOrigin(0.5)
     this.container.add(this.txtBreath)
   }

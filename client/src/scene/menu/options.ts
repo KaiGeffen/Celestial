@@ -312,7 +312,8 @@ export default class OptionsMenu extends Menu {
 
     // Add text to the scrollable panel
     let txt = this.scene.rexUI.add.BBCodeText(0, 0, rulebookString, {
-      ...BBStyle.optionsBlock,
+      ...BBStyle.basic,
+      halign: 'left',
       wrap: { width: this.subwidth },
     })
 
@@ -345,7 +346,8 @@ export default class OptionsMenu extends Menu {
 
     // Add text to the scrollable panel
     let txt = this.scene.rexUI.add.BBCodeText(0, 0, creditsString, {
-      ...BBStyle.optionsBlock,
+      ...BBStyle.basic,
+      halign: 'left',
       wrap: { width: this.subwidth },
     })
 

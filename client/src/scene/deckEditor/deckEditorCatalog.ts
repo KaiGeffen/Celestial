@@ -15,6 +15,7 @@ import {
   deckFilterBarHeight,
   Scroll,
 } from '../../settings/settings'
+import { Style } from '../../settings/style'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import Catalog from '../../../../shared/state/catalog'
 import Card from '../../../../shared/state/card'
@@ -247,9 +248,7 @@ export class DeckEditorCatalog {
         align: 'center',
         placeholder: 'Search',
         tooltip: 'Search for cards by text.',
-        fontFamily: 'Mulish',
-        fontSize: '24px',
-        color: Color.textboxText,
+        ...Style.inputText,
         maxLength: 40,
         id: 'deck-editor-search',
       })

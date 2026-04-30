@@ -52,7 +52,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     ) as Phaser.GameObjects.Text | undefined
     defaultTitle?.destroy()
 
-    const titleText = this.add.text(0, 0, 'Match History', Style.homeTitle)
+    const titleText = this.add.text(0, 0, 'Match History', Style.header)
     const matchTypeContainer = new ContainerLite(
       this,
       0,
@@ -167,9 +167,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         align: 'center',
         placeholder: 'Search...',
         tooltip: 'Search decks and opponents',
-        fontFamily: 'Mulish',
-        fontSize: '24px',
-        color: Color.textboxText,
+        ...Style.inputText,
         maxLength: 40,
         selectAll: true,
         id: 'search-field',

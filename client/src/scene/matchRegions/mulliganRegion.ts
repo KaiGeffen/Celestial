@@ -63,7 +63,7 @@ export default class MulliganRegion extends Region {
         0,
         txtHint.y - Space.pad / 2 - txtHint.height,
         'Starting Hand',
-        Style.announcement,
+        Style.header,
       )
       .setOrigin(0.5, 1)
 

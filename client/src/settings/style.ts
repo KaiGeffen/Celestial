@@ -2,176 +2,112 @@
 import 'phaser'
 import { Space, Color, Flags } from './settings'
 
-// All fonts used
+// TODO Deprecate
 const mainFont = 'Mulish'
 const altFont = 'Cinzel'
+const cardTextFont = 'Cinzel'
 
-// Settings for the font sizes
+// The only fonts used
+const primaryFont = 'Typey McTypeface'
+const secondaryFont = 'Berylium'
+const sansFont = 'Mulish'
+
+// Font sizes
 const FontSettings: Record<string, Record<string, string>> = {
-  standard: { size: Flags.mobile ? '20px' : '24px' },
-  huge: { size: Flags.mobile ? '40px' : '50px' },
-  large: { size: Flags.mobile ? '32px' : '44px' },
+  standard: { size: '24px' },
+  huge: { size: '50px' },
+  large: { size: '44px' },
   title: { size: '128px' },
 }
 
-export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
-  // When a card resolves in the story, show the points it earns
-  cardResolution: {
-    fontFamily: mainFont,
-    fontSize: FontSettings.huge.size,
-    color: Color.whiteS,
-  },
-  // Cost hint text
-  builder: {
-    fontFamily: mainFont,
-    fontSize: '22px',
-    color: Color.basicText,
-    // fontStyle: "Bold",
-  },
-  // Count of a card in the deck
-  cardCount: {
-    fontFamily: mainFont,
-    fontSize: '24px', //FontSettings.standard.size,
-    color: Color.cardCount,
-    stroke: '#0009',
-    strokeThickness: 3,
-  },
-  // Text for the buttons that are just text
-  textButton: {
-    fontFamily: mainFont,
-    fontSize: '20px',
-    color: Color.textButton,
-  },
+// Home screen announcement width
+const ANNOUNCEMENT_WIDTH = 500
 
-  // Sun
-  sun: {
-    fontFamily: altFont,
-    fontSize: '32px',
-    color: Color.passText,
-  },
-  // Moon
-  moonPoints: {
-    fontFamily: altFont,
-    fontSize: '48px',
-    color: Color.passText,
-    stroke: Color.backgroundLightS,
-    strokeThickness: 2,
-  },
-  moonAction: {
-    fontFamily: altFont,
-    fontSize: '36px',
-    color: Color.passText,
-    stroke: Color.backgroundLightS,
-    strokeThickness: 2,
-  },
-  // Surname for characters in premade deck
-  surname: {
-    fontFamily: mainFont,
-    fontSize: '34px',
-    color: Color.basicText,
-  },
-  // The text saying if you won/lost/tied
-  roundResult: {
-    fontFamily: altFont,
-    fontSize: '60px',
-    color: Color.roundResult,
-    // stroke: Color.roundResult,
-    // strokeThickness: 4
-  },
-  // Text that plays over the stillframes in journey
-  stillframe: {
-    fontFamily: altFont,
-    fontSize: Flags.mobile ? FontSettings.large.size : FontSettings.huge.size,
-    color: Color.blackS,
-  },
+type StyleDict = Record<string, Phaser.Types.GameObjects.Text.TextStyle>
 
+// General / used everywhere
+const StyleGeneral: StyleDict = {
   basic: {
-    fontFamily: mainFont,
+    fontFamily: sansFont,
     fontSize: FontSettings.standard.size,
     color: Color.basicText,
     wordWrap: { width: Space.maxTextWidth },
   },
+  // Header for menus, sizers, etc
+  header: {
+    fontFamily: primaryFont,
+    fontSize: '40px',
+    color: Color.goldS,
+    stroke: Color.blackS,
+    strokeThickness: 4,
+    shadow: {
+      offsetX: 2,
+      offsetY: 2,
+      color: 'rgba(0,0,0,0.5)',
+      blur: 4,
+      fill: true,
+    },
+  },
+
+  // Text on basic buttons
   button: {
-    fontFamily: mainFont,
+    fontFamily: secondaryFont,
     fontSize: '20px',
     color: '#58291b',
     stroke: '#1e0502',
     strokeThickness: 1,
   },
-  stackCountButton: {
-    fontFamily: mainFont,
+  // Text for the buttons that are just text
+  textButton: {
+    fontFamily: sansFont,
+    fontSize: '20px',
+    color: Color.textButton,
+  },
+
+  // Input text fields
+  inputText: {
+    fontFamily: sansFont,
     fontSize: '24px',
-    color: Color.black,
+    color: Color.textboxText,
   },
-  announcement: {
-    fontFamily: altFont,
-    fontSize: FontSettings.huge.size,
-    color: '#353F4E', //Color.basicText,
-    // stroke: '#000',
-    // strokeThickness: 1
-  },
-  announcementOverBlack: {
-    fontFamily: altFont,
-    fontSize: FontSettings.huge.size,
-    color: Color.whiteS,
-  },
-  tutorial: {
-    fontFamily: mainFont,
-    fontSize: FontSettings.large.size,
-    color: '#fff',
-    backgroundColor: Color.tutorialBackground,
-    wordWrap: { width: Space.windowWidth - 200 },
-    fixedWidth: Space.windowWidth - 200,
-    padding: { x: 10, y: 5 },
-    stroke: '#000',
+
+  // Count of a card in the deck
+  cutoutCardCount: {
+    fontFamily: sansFont,
+    fontSize: '24px',
+    color: Color.cardCount,
+    stroke: '#0009',
     strokeThickness: 3,
   },
-  // Title for menus
-  menutitle: {
-    fontFamily: mainFont,
-    fontSize: FontSettings.title.size,
-    color: '#fff',
-    stroke: '#000',
-    strokeThickness: 6,
-  },
-  // Title for the home scene
-  homeTitle: {
-    fontFamily: altFont,
-    fontSize: '70px',
-    color: '#353F4E',
-  },
-  homeButtonText: {
-    fontFamily: altFont,
-    fontSize: '70px',
-    color: '#F5F2EB',
-  },
-  username: {
-    fontFamily: mainFont,
-    fontSize: '16px',
-    color: Color.username,
-  },
-  usernameElo: {
-    fontFamily: mainFont,
-    fontSize: '10px',
-    color: Color.username,
-  },
-  todoScore: {
-    fontFamily: mainFont,
-    fontSize: '36px',
-    color: Color.todoScore,
-  },
-  todoCloud: {
-    fontFamily: altFont,
-    fontSize: '24px',
-    color: Color.passText,
-    stroke: '#fff',
+
+  // Any place where header text appears over a dark background
+  announcementOverBlack: {
+    fontFamily: secondaryFont,
+    fontSize: FontSettings.huge.size,
+    color: Color.whiteS,
+    stroke: Color.blackS,
     strokeThickness: 2,
   },
-  todoSubtext: {
-    fontFamily: mainFont,
-    fontSize: '12px',
-    color: Color.todoSubtext,
+
+  // Reward text for gold gain
+  reward: {
+    fontFamily: primaryFont,
+    fontSize: '40px',
+    color: Color.goldS,
+    stroke: Color.blackS,
+    strokeThickness: 3,
   },
+
+  // FPS counter in debug mode
+  fps: {
+    fontFamily: sansFont,
+    fontSize: '16px',
+    color: '#009900',
+  },
+}
+
+// Used on cards
+const StyleCards: StyleDict = {
   cardTitle: {
     fontFamily: altFont,
     fontSize: '20px',
@@ -179,29 +115,193 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     stroke: '#000000',
     strokeThickness: 1,
   },
-  homeSceneButton: {
+  cardCost: {
     fontFamily: altFont,
-    fontSize: '40px',
-    color: Color.goldS,
-    stroke: Color.blackS,
-    strokeThickness: 3,
+    fontSize: '24px',
+    color: Color.cardCost,
+    stroke: '#000000',
+    strokeThickness: 1,
   },
-  todoJourneyTitle: {
-    fontFamily: mainFont,
-    fontSize: '26px',
-    color: Color.basicText,
-    stroke: Color.whiteS,
+  cardPoints: {
+    fontFamily: altFont,
+    fontSize: '24px',
+    color: Color.cardPoints,
+    stroke: '#000000',
+    strokeThickness: 1,
+  },
+}
+
+const StyleMatch: StyleDict = {
+  // Count of cards in each stack (deck, discard)
+  stackCountButton: {
+    fontFamily: primaryFont,
+    fontStyle: 'Bold',
+    fontSize: '24px',
+    color: Color.whiteS,
+    stroke: Color.darkUmberS,
+    strokeThickness: 4,
+  },
+
+  // Numbers on the breath wheel in match
+  breathWheel: {
+    fontFamily: primaryFont,
+    fontStyle: 'Bold',
+    fontSize: '30px',
+    color: Color.blackS,
+  },
+
+  // PASS REGION
+  sun: {
+    fontFamily: secondaryFont,
+    fontSize: '36px',
+    color: Color.passText,
+  },
+  moonPoints: {
+    fontFamily: secondaryFont,
+    fontSize: '48px',
+    color: Color.passText,
+    stroke: Color.backgroundLightS,
     strokeThickness: 2,
   },
+  // The action that the moon is expressing instead of the points
+  moonAction: {
+    fontFamily: secondaryFont,
+    fontSize: '36px',
+    color: Color.passText,
+    stroke: Color.backgroundLightS,
+    strokeThickness: 2,
+  },
+  cloud: {
+    fontFamily: secondaryFont,
+    fontSize: '24px',
+    color: Color.passText,
+    stroke: '#fff',
+    strokeThickness: 2,
+  },
+
+  // In-match avatar nameplate rows
+  matchUsername: {
+    fontFamily: primaryFont,
+    fontSize: '24px',
+    color: Color.whiteS,
+    stroke: Color.darkUmberS,
+    strokeThickness: 2,
+  },
+  matchSubtitle: {
+    fontFamily: sansFont,
+    fontSize: '18px',
+    color: Color.whiteS,
+    stroke: Color.darkUmberS,
+    strokeThickness: 1,
+  },
+  matchTime: {
+    fontFamily: sansFont,
+    fontSize: '16px',
+    color: Color.whiteS,
+    stroke: '#000000',
+    strokeThickness: 1.5,
+  },
+}
+
+const StyleHome: StyleDict = {
+  username: {
+    fontFamily: primaryFont,
+    fontStyle: 'Bold',
+    fontSize: '18px',
+    color: Color.whiteS,
+    stroke: Color.darkUmberS,
+    strokeThickness: 4,
+    align: 'center',
+  },
+  usernameInfo: {
+    fontFamily: sansFont,
+    fontSize: '14px',
+    color: Color.darkUmberS,
+  },
+  // Subheader (Copy in BBStyle)
+  announcementSubheader: {
+    fontFamily: primaryFont,
+    fontSize: '24px',
+    color: Color.darkUmberS,
+    wordWrap: { width: ANNOUNCEMENT_WIDTH },
+    align: 'center',
+  },
+}
+
+const StyleJourney: StyleDict = {
+  // The name each row has as its title
+  missionName: {
+    fontFamily: sansFont,
+    fontSize: '18px',
+    color: Color.basicText,
+  },
+
+  // Chapter story popup (journeyScene chapterMessage menu)
+  chapterHeader: {
+    fontFamily: primaryFont,
+    fontStyle: 'italic',
+    fontSize: '36px',
+    color: Color.darkUmberS,
+  },
+  chapterBody: {
+    fontFamily: secondaryFont,
+    fontStyle: 'italic',
+    fontSize: '22px',
+    color: Color.darkUmberS,
+  },
+  // Journey scene overlay header / navigation arrows
+  journeyOverlay: {
+    fontFamily: altFont,
+    fontSize: '30px',
+    color: '#f5f2eb',
+  },
+  // Locked deck label in journey
+  journeyLocked: {
+    fontFamily: sansFont,
+    fontSize: '16px',
+    color: '#555555',
+    wordWrap: { width: Space.maxTextWidth },
+  },
+}
+
+// Styles that are no longer used in any in-use scenes
+const StyleDeprecated: StyleDict = {
+  // Cost hint text
+  builder: {
+    fontFamily: mainFont,
+    fontSize: '22px',
+    color: Color.basicText,
+    // fontStyle: "Bold",
+  },
+
+  // Surname for characters in premade deck
+  surname: {
+    fontFamily: mainFont,
+    fontSize: '34px',
+    color: Color.basicText,
+  },
+  // Text that plays over the stillframes in journey
+  stillframe: {
+    fontFamily: altFont,
+    fontSize: FontSettings.huge.size,
+    color: Color.blackS,
+  },
+}
+
+// Add further `StyleType` consts above, then spread them here.
+export const Style: StyleDict = {
+  ...StyleDeprecated,
+  ...StyleCards,
+  ...StyleGeneral,
+  ...StyleMatch,
+  ...StyleHome,
+  ...StyleJourney,
 }
 
 // The styling for BBCode objects, from the rexui module
 export const BBStyle: Record<string, any> = {
   basic: {
-    fontFamily: mainFont,
-    fontSize: FontSettings.standard.size,
-    color: Color.basicText,
-    wordWrap: { width: Space.maxTextWidth },
+    ...Style.basic,
     underline: {
       color: Color.basicText,
       thickness: 3,
@@ -213,26 +313,9 @@ export const BBStyle: Record<string, any> = {
       width: Space.maxTextWidth,
     },
   },
-  // Cost / Points stats that are shown above each card
-  cardCost: {
-    fontFamily: 'GrandCentral',
-    fontSize: '24px',
-    color: Color.cardCost,
-    stroke: '#000000',
-    strokeThickness: 1,
-    // TODO Add letter spacing after at least Phaser 3.6.0
-  },
-  cardPoints: {
-    fontFamily: 'GrandCentral',
-    fontSize: '24px',
-    color: Color.cardPoints,
-    stroke: '#000000',
-    strokeThickness: 1,
-    // TODO Add letter spacing after at least Phaser 3.6.0
-  },
   // The textbox for the card
   cardText: {
-    fontFamily: 'Upgrade',
+    fontFamily: cardTextFont,
     fontSize: '16px',
     color: Color.whiteS,
     strokeThickness: 1,
@@ -251,7 +334,7 @@ export const BBStyle: Record<string, any> = {
   },
   // Hint text shown when something onscreen is hovered
   hint: {
-    fontFamily: mainFont,
+    fontFamily: sansFont,
     fontSize: FontSettings.standard.size,
     color: Color.hintFill,
     backgroundColor: Color.hintBackground,
@@ -293,15 +376,13 @@ export const BBStyle: Record<string, any> = {
       width: Space.windowWidth - Space.pad * 2,
     },
   },
-  // Description for avatars in premade menu
-  description: {
-    fontFamily: mainFont,
-    fontSize: FontSettings.standard.size,
-    color: Color.basicText,
+  // Daily Hint on home screen
+  dailyHint: {
+    fontFamily: secondaryFont,
+    fontSize: '20px',
+    color: Color.blueS,
     backgroundColor: Color.backgroundLight,
     backgroundCornerRadius: 5,
-    // backgroundStrokeColor: Color.outline,
-    // backgroundStrokeLineWidth: 2,
     padding: {
       left: Space.padSmall,
       right: Space.padSmall,
@@ -312,49 +393,33 @@ export const BBStyle: Record<string, any> = {
       mode: 'word',
       width: Space.maxTextWidth,
     },
+  },
+  // Last screen of match
+  matchResultsHeader: {
+    fontFamily: primaryFont,
+    fontSize: '30px',
+    color: Color.basicText,
+    wordWrap: { width: Space.maxTextWidth },
     underline: {
       color: Color.basicText,
       thickness: 3,
       offset: 7,
     },
-  },
-  // Blocks of text in the options menu
-  optionsBlock: {
-    fontFamily: mainFont,
-    fontSize: FontSettings.standard.size,
-    color: Color.basicText,
-    wrap: {
-      mode: 'word',
-      width: Space.maxTextWidth,
-    },
-  },
-  // Deck names in builder
-  deckName: {
-    fontFamily: altFont,
-    fontSize: FontSettings.huge.size,
-    color: '#353F4E',
     halign: 'center',
-  },
-  // Hints showing which hotkey to press for each stack / card
-  hotkeyHint: {
-    fontFamily: mainFont,
-    fontSize: '50px',
-
-    color: Color.hintFill,
-    backgroundColor: Color.hintBackground,
-    backgroundStrokeColor: '#0005',
-    backgroundStrokeLineWidth: 2,
-    backgroundCornerRadius: 5,
     wrap: {
       mode: 'word',
       width: Space.maxTextWidth,
     },
-    // strokeThickness: 3,
-    padding: {
-      left: Space.padSmall,
-      right: Space.padSmall,
-      top: Space.padSmall,
-      bottom: Space.padSmall,
+  },
+  // Writing for announcements on home screen
+  announcementCopy: {
+    fontFamily: secondaryFont,
+    fontStyle: 'bold',
+    fontSize: '20px',
+    color: Color.darkUmberS,
+    wrap: {
+      mode: 'word',
+      width: ANNOUNCEMENT_WIDTH,
     },
   },
 }

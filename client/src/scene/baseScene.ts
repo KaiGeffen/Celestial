@@ -146,11 +146,7 @@ export default class BaseScene extends SharedBaseScene {
 
     // FPS display (top-right corner) - created first so it's behind other UI
     this.txtFPS = this.add
-      .text(Space.windowWidth, 0, '', {
-        fontFamily: 'Arial',
-        fontSize: '16px',
-        color: '#009900',
-      })
+      .text(Space.windowWidth, 0, '', Style.fps)
       .setOrigin(1, 0)
       .setDepth(5)
       .setScrollFactor(0)

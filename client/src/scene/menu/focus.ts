@@ -93,9 +93,7 @@ export default class FocusMenu extends Menu {
     let txt
     if (getCount) {
       const y = Space.windowHeight / 3 - Space.buttonHeight / 2 - Space.pad
-      txt = this.scene.add
-        .text(x, y, `x${getCount()}`, Style.announcementOverBlack)
-        .setOrigin(0.5, 1)
+      txt = this.scene.add.text(x, y, `x${getCount()}`).setOrigin(0.5, 1)
     }
 
     if (btnString !== '') {

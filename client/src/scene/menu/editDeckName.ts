@@ -2,7 +2,7 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 import Buttons from '../../lib/buttons/buttons'
-import { Color, Space } from '../../settings/settings'
+import { Color, Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 
@@ -43,9 +43,7 @@ export default class EditDeckNameMenu extends Menu {
         align: 'center',
         placeholder: 'Deck name',
         tooltip: 'Name shown for this deck.',
-        fontFamily: 'Mulish',
-        fontSize: '24px',
-        color: Color.textboxText,
+        ...Style.inputText,
         maxLength: 40,
         id: 'edit-deck-name',
       })

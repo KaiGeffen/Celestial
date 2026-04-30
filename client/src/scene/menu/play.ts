@@ -283,7 +283,8 @@ export default class PlayMenu extends Menu {
     this.txtDeckName = this.scene.rexUI.add
       .BBCodeText()
       .setStyle({
-        ...BBStyle.deckName,
+        ...Style.header,
+        halign: 'center',
         fixedHeight: 50 + Space.padSmall,
         fixedWidth: deckPanelWidth - 25,
       })
@@ -457,7 +458,7 @@ export default class PlayMenu extends Menu {
     titleSizer.addBackground(titleBackground)
 
     const txtTitle = this.scene.add
-      .text(0, 0, 'Game Mode', Style.announcement)
+      .text(0, 0, 'Game Mode', Style.header)
       .setOrigin(0.5)
     titleSizer.add(txtTitle)
     contentSizer.add(titleSizer).addNewLine()
@@ -559,9 +560,7 @@ export default class PlayMenu extends Menu {
         align: 'center',
         placeholder: 'Password',
         tooltip: 'Password for PWD mode.',
-        fontFamily: 'Mulish',
-        fontSize: '24px',
-        color: Color.textboxText,
+        ...Style.inputText,
         maxLength: MechanicsSettings.DECK_SIZE * 4,
         selectAll: true,
         id: 'search-field',
@@ -826,7 +825,7 @@ export default class PlayMenu extends Menu {
         rewardPosition.x,
         rewardPosition.y + 40,
         `+${data.goldReward}💰`,
-        Style.homeSceneButton,
+        Style.reward,
       )
       .setOrigin(0.5, 1)
 
