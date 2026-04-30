@@ -415,16 +415,19 @@ export default class HomeScene extends BaseScene {
     // Right: subheader + body pairs
     const announcementSizer = this.rexUI.add.sizer({
       orientation: 'vertical',
-      space: { item: Space.padSmall },
+      space: { item: Space.pad * 2 },
     })
     for (const pair of ANNOUNCEMENT_PAIRS) {
-      announcementSizer.add(
+      const blockSizer = this.rexUI.add.sizer({
+        orientation: 'vertical',
+      })
+      blockSizer.add(
         this.add
           .text(0, 0, pair.subheader, Style.announcementSubheader)
           .setOrigin(0.5, 0),
         { align: 'center' },
       )
-      announcementSizer.add(
+      blockSizer.add(
         this.add.image(0, 0, 'chrome-divider').setOrigin(0.5, 0).setScale(0.25),
         { align: 'center' },
       )
@@ -443,7 +446,9 @@ export default class HomeScene extends BaseScene {
           if (key === '_link_discord') openDiscord()
         })
         .setOrigin(0, 0)
-      announcementSizer.add(bodyText, { align: 'left' })
+      blockSizer.add(bodyText, { align: 'left' })
+      blockSizer.layout()
+      announcementSizer.add(blockSizer, { align: 'left' })
     }
     contentSizer.add(announcementSizer, { align: 'top' })
 

@@ -122,7 +122,7 @@ export default class DeckThumbnail {
     this.container.add(hitbox)
 
     this.nameText = scene.add
-      .text(0, nameBarY, name, (Style as any).deckName ?? Style.builder)
+      .text(0, nameBarY, name, Style.builder)
       .setOrigin(0.5, 0.5)
     this.container.add(this.nameText)
 
