@@ -7,6 +7,9 @@ const mainFont = 'Mulish'
 const altFont = 'Cinzel'
 const cardTextFont = 'Cinzel'
 
+const primaryFont = 'Typey McTypeface'
+const secondaryFont = 'Berylium'
+
 // Font sizes
 const FontSettings: Record<string, Record<string, string>> = {
   standard: { size: '24px' },
@@ -89,7 +92,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     strokeThickness: 1,
   },
   stackCountButton: {
-    fontFamily: 'Typey McTypeface',
+    fontFamily: primaryFont,
     fontStyle: 'Bold',
     fontSize: '24px',
     color: Color.whiteS,
@@ -97,7 +100,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     strokeThickness: 4,
   },
   announcement: {
-    fontFamily: 'Typey McTypeface',
+    fontFamily: primaryFont,
     fontSize: '40px',
     color: Color.goldS,
     stroke: Color.blackS,
@@ -133,7 +136,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     color: '#353F4E',
   },
   username: {
-    fontFamily: 'Typey McTypeface',
+    fontFamily: primaryFont,
     fontStyle: 'Bold',
     fontSize: '18px',
     color: Color.whiteS,
@@ -147,7 +150,7 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     color: Color.darkUmberS,
   },
   todoScore: {
-    fontFamily: 'Typey McTypeface',
+    fontFamily: primaryFont,
     fontStyle: 'Bold',
     fontSize: '30px',
     color: Color.blackS,
@@ -187,14 +190,14 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
   },
   // In-match avatar nameplate rows
   matchUsername: {
-    fontFamily: 'Typey McTypeface',
+    fontFamily: primaryFont,
     fontSize: '24px',
     color: Color.whiteS,
     stroke: Color.darkUmberS,
     strokeThickness: 4,
   },
   matchSubtitle: {
-    fontFamily: 'Berylium',
+    fontFamily: secondaryFont,
     fontSize: '18px',
     color: Color.whiteS,
     stroke: Color.darkUmberS,
@@ -213,19 +216,20 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
    */
   // Chapter story popup (journeyScene chapterMessage menu)
   chapterHeader: {
-    fontFamily: 'Typey McTypeface',
+    fontFamily: primaryFont,
     fontStyle: 'italic',
     fontSize: '36px',
     color: Color.darkUmberS,
   },
   chapterBody: {
-    fontFamily: 'Berylium',
+    fontFamily: secondaryFont,
     fontStyle: 'italic',
     fontSize: '22px',
     color: Color.darkUmberS,
   },
+  // Announcements on the home screen
   announcementSubheader: {
-    fontFamily: 'Killam',
+    fontFamily: secondaryFont,
     fontSize: '24px',
     color: Color.darkUmberS,
     wordWrap: { width: ANNOUNCEMENT_WIDTH },
@@ -344,7 +348,7 @@ export const BBStyle: Record<string, any> = {
   },
   // Description for avatars in premade menu / daily tip
   description: {
-    fontFamily: 'Berylium',
+    fontFamily: secondaryFont,
     fontSize: '20px',
     color: Color.blueS,
     backgroundColor: Color.backgroundLight,
@@ -396,7 +400,7 @@ export const BBStyle: Record<string, any> = {
   },
   // Copy for announcement on home screen
   announcementCopy: {
-    fontFamily: 'Berylium',
+    fontFamily: secondaryFont,
     fontStyle: 'bold',
     fontSize: '20px',
     color: Color.darkUmberS,
