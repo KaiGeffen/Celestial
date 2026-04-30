@@ -62,6 +62,14 @@ const StyleGeneral: StyleDict = {
     fontSize: '20px',
     color: Color.textButton,
   },
+
+  // Input text fields
+  inputText: {
+    fontFamily: sansFont,
+    fontSize: '24px',
+    color: Color.textboxText,
+  },
+
   // Count of a card in the deck
   cutoutCardCount: {
     fontFamily: mainFont,
@@ -77,6 +85,22 @@ const StyleGeneral: StyleDict = {
     fontSize: FontSettings.huge.size,
     color: Color.whiteS,
   },
+
+  // Reward text for gold gain
+  reward: {
+    fontFamily: primaryFont,
+    fontSize: '40px',
+    color: Color.goldS,
+    stroke: Color.blackS,
+    strokeThickness: 3,
+  },
+
+  // FPS counter in debug mode
+  fps: {
+    fontFamily: mainFont,
+    fontSize: '16px',
+    color: '#009900',
+  },
 }
 
 const MatchStyle: StyleDict = {
@@ -90,10 +114,18 @@ const MatchStyle: StyleDict = {
     strokeThickness: 4,
   },
 
+  // Numbers on the breath wheel in match
+  breathWheel: {
+    fontFamily: primaryFont,
+    fontStyle: 'Bold',
+    fontSize: '30px',
+    color: Color.blackS,
+  },
+
   // PASS REGION
   sun: {
-    fontFamily: 'OptimusPrinceps',
-    fontSize: '32px',
+    fontFamily: secondaryFont,
+    fontSize: '36px',
     color: Color.passText,
   },
   moonPoints: {
@@ -111,59 +143,6 @@ const MatchStyle: StyleDict = {
     stroke: Color.backgroundLightS,
     strokeThickness: 2,
   },
-}
-
-const StyleDeprecated: StyleDict = {
-  // Cost hint text
-  builder: {
-    fontFamily: mainFont,
-    fontSize: '22px',
-    color: Color.basicText,
-    // fontStyle: "Bold",
-  },
-
-  // Surname for characters in premade deck
-  surname: {
-    fontFamily: mainFont,
-    fontSize: '34px',
-    color: Color.basicText,
-  },
-  // Text that plays over the stillframes in journey
-  stillframe: {
-    fontFamily: altFont,
-    fontSize: FontSettings.huge.size,
-    color: Color.blackS,
-  },
-
-  // ABOVE IS DEPRECATED
-  // Title for the home scene
-  homeTitle: {
-    fontFamily: altFont,
-    fontSize: '70px',
-    color: '#353F4E',
-  },
-  username: {
-    fontFamily: primaryFont,
-    fontStyle: 'Bold',
-    fontSize: '18px',
-    color: Color.whiteS,
-    stroke: Color.darkUmberS,
-    strokeThickness: 4,
-    align: 'center',
-  },
-  usernameInfo: {
-    fontFamily: 'OptimusPrinceps',
-    fontSize: '14px',
-    color: Color.darkUmberS,
-  },
-  // Numbers on the breath wheel in match
-  breathWheel: {
-    fontFamily: primaryFont,
-    fontStyle: 'Bold',
-    fontSize: '30px',
-    color: Color.blackS,
-  },
-  // PASS REGION
   todoCloud: {
     fontFamily: secondaryFont,
     fontSize: '24px',
@@ -171,41 +150,7 @@ const StyleDeprecated: StyleDict = {
     stroke: '#fff',
     strokeThickness: 2,
   },
-}
 
-// Used on cards
-const StyleCards: StyleDict = {
-  cardTitle: {
-    fontFamily: altFont,
-    fontSize: '20px',
-    color: Color.cardText,
-    stroke: '#000000',
-    strokeThickness: 1,
-  },
-}
-
-// Misc
-const StyleMisc: StyleDict = {
-  // Reward text for gold gain
-  reward: {
-    fontFamily: primaryFont,
-    fontSize: '40px',
-    color: Color.goldS,
-    stroke: Color.blackS,
-    strokeThickness: 3,
-  },
-  // FPS counter in debug mode
-  fps: {
-    fontFamily: mainFont,
-    fontSize: '16px',
-    color: '#009900',
-  },
-  // Input text fields (rexInputText)
-  inputText: {
-    fontFamily: mainFont,
-    fontSize: '24px',
-    color: Color.textboxText,
-  },
   // In-match avatar nameplate rows
   matchUsername: {
     fontFamily: primaryFont,
@@ -228,8 +173,74 @@ const StyleMisc: StyleDict = {
     stroke: '#000000',
     strokeThickness: 1.5,
   },
+}
 
-  // Home screen announcement subheader
+// Styles that are no longer in in-use scenes
+const StyleDeprecated: StyleDict = {
+  // Cost hint text
+  builder: {
+    fontFamily: mainFont,
+    fontSize: '22px',
+    color: Color.basicText,
+    // fontStyle: "Bold",
+  },
+
+  // Surname for characters in premade deck
+  surname: {
+    fontFamily: mainFont,
+    fontSize: '34px',
+    color: Color.basicText,
+  },
+  // Text that plays over the stillframes in journey
+  stillframe: {
+    fontFamily: altFont,
+    fontSize: FontSettings.huge.size,
+    color: Color.blackS,
+  },
+}
+
+// Used on cards
+const StyleCards: StyleDict = {
+  cardTitle: {
+    fontFamily: altFont,
+    fontSize: '20px',
+    color: Color.cardText,
+    stroke: '#000000',
+    strokeThickness: 1,
+  },
+  cardCost: {
+    fontFamily: altFont,
+    fontSize: '24px',
+    color: Color.cardCost,
+    stroke: '#000000',
+    strokeThickness: 1,
+  },
+  cardPoints: {
+    fontFamily: altFont,
+    fontSize: '24px',
+    color: Color.cardPoints,
+    stroke: '#000000',
+    strokeThickness: 1,
+  },
+}
+
+// Styles only appearing on home scene
+const StyleHome: StyleDict = {
+  username: {
+    fontFamily: primaryFont,
+    fontStyle: 'Bold',
+    fontSize: '18px',
+    color: Color.whiteS,
+    stroke: Color.darkUmberS,
+    strokeThickness: 4,
+    align: 'center',
+  },
+  usernameInfo: {
+    fontFamily: sansFont,
+    fontSize: '14px',
+    color: Color.darkUmberS,
+  },
+  // Subheader (Copy in BBStyle)
   announcementSubheader: {
     fontFamily: primaryFont,
     fontSize: '24px',
@@ -237,6 +248,10 @@ const StyleMisc: StyleDict = {
     wordWrap: { width: ANNOUNCEMENT_WIDTH },
     align: 'center',
   },
+}
+
+// Styles only appearing on journey scene
+const StyleJourney: StyleDict = {
   // Chapter story popup (journeyScene chapterMessage menu)
   chapterHeader: {
     fontFamily: primaryFont,
@@ -263,30 +278,16 @@ const StyleMisc: StyleDict = {
     color: '#555555',
     wordWrap: { width: Space.maxTextWidth },
   },
-  // Cost / Points stats shown above each card
-  cardCost: {
-    fontFamily: altFont,
-    fontSize: '24px',
-    color: Color.cardCost,
-    stroke: '#000000',
-    strokeThickness: 1,
-  },
-  cardPoints: {
-    fontFamily: altFont,
-    fontSize: '24px',
-    color: Color.cardPoints,
-    stroke: '#000000',
-    strokeThickness: 1,
-  },
 }
 
 // Add further `StyleType` consts above, then spread them here.
 export const Style: StyleDict = {
   ...StyleDeprecated,
   ...StyleCards,
-  ...StyleMisc,
   ...StyleGeneral,
   ...MatchStyle,
+  ...StyleHome,
+  ...StyleJourney,
 }
 
 // The styling for BBCode objects, from the rexui module

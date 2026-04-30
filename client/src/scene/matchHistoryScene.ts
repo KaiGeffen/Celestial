@@ -52,7 +52,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     ) as Phaser.GameObjects.Text | undefined
     defaultTitle?.destroy()
 
-    const titleText = this.add.text(0, 0, 'Match History', Style.homeTitle)
+    const titleText = this.add.text(0, 0, 'Match History', Style.header)
     const matchTypeContainer = new ContainerLite(
       this,
       0,
