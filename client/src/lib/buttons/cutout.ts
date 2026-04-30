@@ -7,7 +7,6 @@ import {
   Color,
   Time,
   Flags,
-  BBStyle,
 } from '../../settings/settings'
 import Button from './button'
 import Card from '../../../../shared/state/card'
@@ -85,14 +84,14 @@ export default class Cutout extends Button {
       -161,
       -18,
       `[stroke=#353F4E]${card.cost}[/stroke]`,
-      Style.cardCost,
+      Style.cardCost as any,
     )
     const txtPoints = this.scene.add
       .rexBBCodeText(
         -121,
         5,
         `[stroke=#353F4E]${card.points}[/stroke]`,
-        Style.cardPoints,
+        Style.cardPoints as any,
       )
       .setOrigin(0.5)
     const txtName = this.scene.add

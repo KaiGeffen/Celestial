@@ -167,7 +167,7 @@ export default class DeckRegion {
         fixedWidth: width,
         // NOTE This handles the padding, and prevents text cropping
         fixedHeight: 50 + Space.padSmall,
-      })
+      } as any)
       .setOrigin(0.5)
 
     if (Flags.mobile) {

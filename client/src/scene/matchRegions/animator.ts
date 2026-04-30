@@ -11,7 +11,6 @@ import {
   Depth,
   Ease,
   BBStyle,
-  Style,
   Color,
 } from '../../settings/settings'
 import Catalog from '../../../../shared/state/catalog'
@@ -1029,7 +1028,7 @@ class StoryResolveBubbles {
         0,
         `[stroke=${StoryResolveBubbles.STAT_STROKE}]${pts}[/stroke]`,
         tweenFromStat
-          ? Style.cardCost
+          ? BBStyle.storyResolveBubble
           : StoryResolveBubbles.resolvePointsBubbleTextStyle(
               StoryResolveBubbles.POINTS_RESOLVE_FONT_LARGE_PX,
             ),
@@ -1115,7 +1114,7 @@ class StoryResolveBubbles {
         0,
         `[stroke=${StoryResolveBubbles.STAT_STROKE}]${label}[/stroke]`,
         tweenFromStatus
-          ? Style.cardCost
+          ? BBStyle.storyResolveBubble
           : StoryResolveBubbles.nourishResolveBubbleTextStyle(
               StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
             ),
@@ -1206,7 +1205,7 @@ class StoryResolveBubbles {
         0,
         `[stroke=${StoryResolveBubbles.STAT_STROKE}]${label}[/stroke]`,
         tweenFromEffectText
-          ? Style.cardCost
+          ? BBStyle.storyResolveBubble
           : StoryResolveBubbles.effectsResolveBubbleTextStyle(
               StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
             ),
@@ -1247,7 +1246,7 @@ class StoryResolveBubbles {
   }
 
   private static resolvePointsBubbleTextStyle(fontPx: number) {
-    const base = Style.cardCost
+    const base = BBStyle.storyResolveBubble
     const t = base.strokeThickness ?? 1
     return {
       ...base,
@@ -1262,7 +1261,7 @@ class StoryResolveBubbles {
   }
 
   private static nourishResolveBubbleTextStyle(fontPx: number) {
-    const base = Style.cardCost
+    const base = BBStyle.storyResolveBubble
     const t = base.strokeThickness ?? 1
     return {
       ...base,
@@ -1278,7 +1277,7 @@ class StoryResolveBubbles {
   }
 
   private static effectsResolveBubbleTextStyle(fontPx: number) {
-    const base = Style.cardCost
+    const base = BBStyle.storyResolveBubble
     const t = base.strokeThickness ?? 1
     return {
       ...base,

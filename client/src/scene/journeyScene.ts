@@ -656,7 +656,7 @@ export default class JourneyScene extends BaseScene {
       }
     }
     const nameText = this.rexUI.add
-      .BBCodeText(0, 0, nameBBCode, Style.missionName)
+      .BBCodeText(0, 0, nameBBCode, Style.missionName as any)
       .setInteractive()
       .on('areaover', (key: string) => {
         if (key.startsWith('card_')) {
