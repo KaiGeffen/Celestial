@@ -107,7 +107,7 @@ const StyleGeneral: StyleDict = {
 
   // Deck thumbnails: card count on invalid-deck badge (white on red bar)
   thumbnailInvalidCount: {
-    fontFamily: secondaryFont,
+    fontFamily: sansFont,
     fontSize: '13px',
     color: Color.whiteS,
   },
