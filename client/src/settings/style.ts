@@ -33,6 +33,12 @@ const StyleGeneral: StyleDict = {
     color: Color.basicText,
     wordWrap: { width: Space.maxTextWidth },
   },
+  basicStylized: {
+    fontFamily: secondaryFont,
+    fontSize: FontSettings.standard.size,
+    color: Color.basicText,
+    wordWrap: { width: Space.maxTextWidth },
+  },
   // Header for menus, sizers, etc
   header: {
     fontFamily: primaryFont,
