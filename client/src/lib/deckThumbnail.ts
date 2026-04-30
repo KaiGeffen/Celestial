@@ -105,11 +105,7 @@ export default class DeckThumbnail {
       .setVisible(false)
     this.container.add(this.invalidIndicator)
     this.invalidText = scene.add
-      .text(indicatorX, indicatorY, '', {
-        fontFamily: 'Berylium',
-        fontSize: '13px',
-        color: '#ffffff',
-      })
+      .text(indicatorX, indicatorY, '', Style.thumbnailInvalidCount)
       .setOrigin(0.5, 0.5)
       .setVisible(false)
     this.container.add(this.invalidText)

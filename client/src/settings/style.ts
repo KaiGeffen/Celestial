@@ -104,6 +104,13 @@ const StyleGeneral: StyleDict = {
     fontSize: '16px',
     color: '#009900',
   },
+
+  // Deck thumbnails: card count on invalid-deck badge (white on red bar)
+  thumbnailInvalidCount: {
+    fontFamily: secondaryFont,
+    fontSize: '13px',
+    color: Color.whiteS,
+  },
 }
 
 // Used on cards
@@ -421,5 +428,12 @@ export const BBStyle: Record<string, any> = {
       mode: 'word',
       width: ANNOUNCEMENT_WIDTH,
     },
+  },
+  deckname: {
+    ...Style.header,
+    halign: 'center',
+    fixedHeight: 50,
+    stroke: Color.blackS,
+    strokeThickness: 4,
   },
 }
