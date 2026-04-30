@@ -9,6 +9,7 @@ const cardTextFont = 'Cinzel'
 
 const primaryFont = 'Typey McTypeface'
 const secondaryFont = 'Berylium'
+const sansFont = 'Mulish'
 
 // Font sizes
 const FontSettings: Record<string, Record<string, string>> = {
@@ -21,85 +22,17 @@ const FontSettings: Record<string, Record<string, string>> = {
 // Home screen announcement width
 const ANNOUNCEMENT_WIDTH = 500
 
-export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
-  // Cost hint text
-  builder: {
-    fontFamily: mainFont,
-    fontSize: '22px',
-    color: Color.basicText,
-    // fontStyle: "Bold",
-  },
-  // Count of a card in the deck
-  cardCount: {
-    fontFamily: mainFont,
-    fontSize: '24px', //FontSettings.standard.size,
-    color: Color.cardCount,
-    stroke: '#0009',
-    strokeThickness: 3,
-  },
-  // Text for the buttons that are just text
-  textButton: {
-    fontFamily: mainFont,
-    fontSize: '20px',
-    color: Color.textButton,
-  },
+type StyleDict = Record<string, Phaser.Types.GameObjects.Text.TextStyle>
 
-  // Sun
-  sun: {
-    fontFamily: 'OptimusPrinceps',
-    fontSize: '32px',
-    color: Color.passText,
-  },
-  // Moon
-  moonPoints: {
-    fontFamily: altFont,
-    fontSize: '48px',
-    color: Color.passText,
-    stroke: Color.backgroundLightS,
-    strokeThickness: 2,
-  },
-  moonAction: {
-    fontFamily: altFont,
-    fontSize: '36px',
-    color: Color.passText,
-    stroke: Color.backgroundLightS,
-    strokeThickness: 2,
-  },
-  // Surname for characters in premade deck
-  surname: {
-    fontFamily: mainFont,
-    fontSize: '34px',
-    color: Color.basicText,
-  },
-  // Text that plays over the stillframes in journey
-  stillframe: {
-    fontFamily: altFont,
-    fontSize: FontSettings.huge.size,
-    color: Color.blackS,
-  },
-
+// General / used everywhere
+const StyleGeneral: StyleDict = {
   basic: {
-    fontFamily: mainFont,
+    fontFamily: sansFont,
     fontSize: FontSettings.standard.size,
     color: Color.basicText,
     wordWrap: { width: Space.maxTextWidth },
   },
-  button: {
-    fontFamily: mainFont,
-    fontSize: '20px',
-    color: '#58291b',
-    stroke: '#1e0502',
-    strokeThickness: 1,
-  },
-  stackCountButton: {
-    fontFamily: primaryFont,
-    fontStyle: 'Bold',
-    fontSize: '24px',
-    color: Color.whiteS,
-    stroke: Color.darkUmberS,
-    strokeThickness: 4,
-  },
-  // Header text in all places (Menus, sizers, etc)
+  // Header for menus, sizers, etc
   header: {
     fontFamily: primaryFont,
     fontSize: '40px',
@@ -114,22 +47,95 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
       fill: true,
     },
   },
+
+  // Text on basic buttons
+  button: {
+    fontFamily: secondaryFont,
+    fontSize: '20px',
+    color: '#58291b',
+    stroke: '#1e0502',
+    strokeThickness: 1,
+  },
+  // Text for the buttons that are just text
+  textButton: {
+    fontFamily: mainFont,
+    fontSize: '20px',
+    color: Color.textButton,
+  },
+  // Count of a card in the deck
+  cutoutCardCount: {
+    fontFamily: mainFont,
+    fontSize: '24px', //FontSettings.standard.size,
+    color: Color.cardCount,
+    stroke: '#0009',
+    strokeThickness: 3,
+  },
+
+  // Any place where header text appears over a dark background
   announcementOverBlack: {
-    fontFamily: altFont,
+    fontFamily: secondaryFont,
     fontSize: FontSettings.huge.size,
     color: Color.whiteS,
   },
-  tutorial: {
-    fontFamily: mainFont,
-    fontSize: FontSettings.large.size,
-    color: '#fff',
-    backgroundColor: Color.tutorialBackground,
-    wordWrap: { width: Space.windowWidth - 200 },
-    fixedWidth: Space.windowWidth - 200,
-    padding: { x: 10, y: 5 },
-    stroke: '#000',
-    strokeThickness: 3,
+}
+
+const MatchStyle: StyleDict = {
+  // Count of cards in each stack (deck, discard)
+  stackCountButton: {
+    fontFamily: primaryFont,
+    fontStyle: 'Bold',
+    fontSize: '24px',
+    color: Color.whiteS,
+    stroke: Color.darkUmberS,
+    strokeThickness: 4,
   },
+
+  // PASS REGION
+  sun: {
+    fontFamily: 'OptimusPrinceps',
+    fontSize: '32px',
+    color: Color.passText,
+  },
+  moonPoints: {
+    fontFamily: altFont,
+    fontSize: '48px',
+    color: Color.passText,
+    stroke: Color.backgroundLightS,
+    strokeThickness: 2,
+  },
+  // The action that the moon is expressing instead of the points
+  moonAction: {
+    fontFamily: altFont,
+    fontSize: '36px',
+    color: Color.passText,
+    stroke: Color.backgroundLightS,
+    strokeThickness: 2,
+  },
+}
+
+const StyleDeprecated: StyleDict = {
+  // Cost hint text
+  builder: {
+    fontFamily: mainFont,
+    fontSize: '22px',
+    color: Color.basicText,
+    // fontStyle: "Bold",
+  },
+
+  // Surname for characters in premade deck
+  surname: {
+    fontFamily: mainFont,
+    fontSize: '34px',
+    color: Color.basicText,
+  },
+  // Text that plays over the stillframes in journey
+  stillframe: {
+    fontFamily: altFont,
+    fontSize: FontSettings.huge.size,
+    color: Color.blackS,
+  },
+
+  // ABOVE IS DEPRECATED
   // Title for the home scene
   homeTitle: {
     fontFamily: altFont,
@@ -150,19 +156,25 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     fontSize: '14px',
     color: Color.darkUmberS,
   },
-  todoScore: {
+  // Numbers on the breath wheel in match
+  breathWheel: {
     fontFamily: primaryFont,
     fontStyle: 'Bold',
     fontSize: '30px',
     color: Color.blackS,
   },
+  // PASS REGION
   todoCloud: {
-    fontFamily: altFont,
+    fontFamily: secondaryFont,
     fontSize: '24px',
     color: Color.passText,
     stroke: '#fff',
     strokeThickness: 2,
   },
+}
+
+// Used on cards
+const StyleCards: StyleDict = {
   cardTitle: {
     fontFamily: altFont,
     fontSize: '20px',
@@ -170,6 +182,10 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     stroke: '#000000',
     strokeThickness: 1,
   },
+}
+
+// Misc
+const StyleMisc: StyleDict = {
   // Reward text for gold gain
   reward: {
     fontFamily: primaryFont,
@@ -262,6 +278,15 @@ export const Style: Record<string, Phaser.Types.GameObjects.Text.TextStyle> = {
     stroke: '#000000',
     strokeThickness: 1,
   },
+}
+
+// Add further `StyleType` consts above, then spread them here.
+export const Style: StyleDict = {
+  ...StyleDeprecated,
+  ...StyleCards,
+  ...StyleMisc,
+  ...StyleGeneral,
+  ...MatchStyle,
 }
 
 // The styling for BBCode objects, from the rexui module

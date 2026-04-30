@@ -29,7 +29,7 @@ export default class Cutout extends Button {
       text: {
         text: '',
         interactive: false,
-        style: Style.cardCount,
+        style: Style.cutoutCardCount,
         offsetX: 150,
       },
       icon: {
@@ -100,7 +100,7 @@ export default class Cutout extends Button {
         -95,
         0,
         `${card.name}${'+'.repeat(card.upgradeVersion)}`,
-        Style.cardCount,
+        Style.cutoutCardCount,
       )
       .setOrigin(0, 0.5)
     within.add([txtCost, txtName, txtPoints])
