@@ -27,7 +27,9 @@ import showTooltip from '../utils/tooltips'
 import avatarBios from '../data/avatarBios/index'
 import avatarNames from '../../../shared/data/avatarNames'
 import avatarStories from '../data/avatarStories/avatarStories'
-import JOURNEY_CHOICES from '../data/journeyChoices'
+import JOURNEY_CHOICES, {
+  formatJourneyFinaleChapterBody,
+} from '../data/journeyChoices'
 import Server from '../server'
 
 const OVERLAY_WIDTH = 575
@@ -628,14 +630,10 @@ export default class JourneyScene extends BaseScene {
               )[]
               const existingChoice = choices[avatarIndex]
               if (existingChoice != null) {
-                const resultText =
-                  '      ' +
-                  (
-                    JOURNEY_CHOICES[avatarIndex]?.options[existingChoice]
-                      ?.result ?? 'Coming soon.'
-                  )
-                    .replace(/\n/g, '\n      ')
-                    .trim()
+                const resultText = formatJourneyFinaleChapterBody(
+                  avatarIndex,
+                  existingChoice as 0 | 1,
+                )
                 this.scene.launch('MenuScene', {
                   menu: 'chapterMessage',
                   title: `${avatarNames[avatarIndex]} — ${mission.name}`,

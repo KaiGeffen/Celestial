@@ -4,12 +4,13 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import MessageMenu from './message'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
-import { Space, Style, Color } from '../../settings/settings'
+import { Space, Style } from '../../settings/settings'
 import { UserSettings } from '../../settings/userSettings'
 import Server from '../../server'
-import JOURNEY_CHOICES from '../../data/journeyChoices'
+import JOURNEY_CHOICES, {
+  formatJourneyFinaleChapterBody,
+} from '../../data/journeyChoices'
 import newScrollablePanel from '../../lib/scrollablePanel'
-import avatarNames from '../../../../shared/data/avatarNames'
 
 export default class ChoiceChapterMessageMenu extends MessageMenu {
   constructor(scene: MenuScene, params) {
@@ -91,8 +92,6 @@ export default class ChoiceChapterMessageMenu extends MessageMenu {
         .setWordWrapWidth(optionWidth - textInset)
       colSizer.add(optionTxt, {
         padding: {
-          left: 0,
-          right: 0,
           top: Space.padSmall,
           bottom: Space.padSmall,
         },
@@ -144,12 +143,7 @@ export default class ChoiceChapterMessageMenu extends MessageMenu {
     UserSettings._setIndex('journeyChoices', avatarIndex, choiceIndex)
     Server.sendJourneyChoice(avatarIndex, choiceIndex)
 
-    const choiceData = JOURNEY_CHOICES[avatarIndex]
-    const resultText =
-      '      ' +
-      (choiceData?.options[choiceIndex]?.result ?? 'Coming soon.')
-        .replace(/\n/g, '\n      ')
-        .trim()
+    const resultText = formatJourneyFinaleChapterBody(avatarIndex, choiceIndex)
 
     // Restart MenuScene as a chapterMessage showing the result
     this.scene.scene.restart({
