@@ -33,13 +33,13 @@ const OVERLAY_WIDTH = 575
 const OVERLAY_HEIGHT = 595
 const OVERLAY_TOP = 80
 
-/** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Imani, Mitra, Water, Stars */
+/** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Renata, Mitra, Water, Stars */
 const THEME_CAMERA_POSITIONS: { x: number; y: number }[] = [
   { x: 4000, y: 670 }, // birds (Jules)
   { x: 2100, y: 1270 }, // ashes (Adonis)
   { x: 4860, y: 1940 }, // shadow (Mia)
   { x: 1260, y: 2250 }, // pet (Kitz)
-  { x: 1590, y: 4140 }, // birth (Imani)
+  { x: 1590, y: 4140 }, // birth (Renata)
   { x: 4850, y: 4130 }, // vision (Mitra)
   { x: 3180, y: 3100 }, // water
   { x: 3080, y: 2800 }, // stars

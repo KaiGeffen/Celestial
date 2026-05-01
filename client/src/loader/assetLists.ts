@@ -3,13 +3,13 @@ export const assetLists = {
   "avatar": {
     "files": [
       "Adonis",
-      "Imani",
+      "Renata",
       "Jules",
       "Kitz",
       "Mia",
       "Mitra",
       "AdonisFull",
-      "ImaniFull",
+      "RenataFull",
       "JulesFull",
       "KitzFull",
       "MiaFull",
@@ -21,7 +21,7 @@ export const assetLists = {
         "width": 130,
         "height": 130
       },
-      "Imani": {
+      "Renata": {
         "width": 130,
         "height": 130
       },

@@ -49,7 +49,7 @@ export const THEME_DISPLAY_NAMES: Record<string, string> = {
   ashes: 'Adonis Blazes a Path',
   shadow: 'Mia Survives her Shadows',
   pet: 'Kitz Finds his Love',
-  birth: 'Imani Births the Future',
+  birth: 'Renata Births the Future',
   vision: 'Mitra Seeks the Truth',
   water: 'Tales Carried on the River',
   stars: 'Written in the Stars',

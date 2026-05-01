@@ -42,16 +42,16 @@ import Kitz7 from './Kitz7'
 import Kitz8 from './Kitz8'
 import Kitz9 from './Kitz9'
 
-// Imani chapters
-import Imani1 from './Imani1'
-import Imani2 from './Imani2'
-import Imani3 from './Imani3'
-import Imani4 from './Imani4'
-import Imani5 from './Imani5'
-import Imani6 from './Imani6'
-import Imani7 from './Imani7'
-import Imani8 from './Imani8'
-import Imani9 from './Imani9'
+// Renata chapters
+import Renata1 from './Renata1'
+import Renata2 from './Renata2'
+import Renata3 from './Renata3'
+import Renata4 from './Renata4'
+import Renata5 from './Renata5'
+import Renata6 from './Renata6'
+import Renata7 from './Renata7'
+import Renata8 from './Renata8'
+import Renata9 from './Renata9'
 
 // Mitra chapters
 import Mitra1 from './Mitra1'
@@ -113,15 +113,15 @@ const kitzStories = [
 ]
 
 const imaniStories = [
-  Imani1,
-  Imani2,
-  Imani3,
-  Imani4,
-  Imani5,
-  Imani6,
-  Imani7,
-  Imani8,
-  Imani9,
+  Renata1,
+  Renata2,
+  Renata3,
+  Renata4,
+  Renata5,
+  Renata6,
+  Renata7,
+  Renata8,
+  Renata9,
 ]
 
 const mitraStories = [
