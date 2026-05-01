@@ -64,6 +64,9 @@ const ALT_MAP_SWAY_SPEED = 0.0004
 const ALT_MAP_SWAY_PHASE = 1.5
 const ALT_MAP_SWAY_RADIUS = 80
 
+/** Rex TextBox delay between characters (ms). 0 = full text at once. */
+const JOURNEY_TEXTBOX_TYPE_MS = 0
+
 export default class JourneyScene extends BaseScene {
   map: Phaser.GameObjects.Image
   private altMap: Phaser.GameObjects.Image
@@ -304,7 +307,7 @@ export default class JourneyScene extends BaseScene {
   }
 
   private showMissionTip(text: string): void {
-    this.missionTipTextBox.start(text, 5)
+    this.missionTipTextBox.start(text, JOURNEY_TEXTBOX_TYPE_MS)
     this.tweens.add({
       targets: this.missionTipContainer,
       alpha: 1,
@@ -469,9 +472,9 @@ export default class JourneyScene extends BaseScene {
     const bioText =
       '    ' +
       (avatarBios[this.selectedThemeIndex] ?? 'Bio coming soon.')
-        .replace(/\n/g, '\n\n    ')
+        .replace(/\n/g, '\n    ')
         .trim()
-    textBox.start(bioText, 5)
+    textBox.start(bioText, JOURNEY_TEXTBOX_TYPE_MS)
 
     return this.rexUI.add
       .sizer({
@@ -851,7 +854,7 @@ export default class JourneyScene extends BaseScene {
           maxLines: 0, // 0 = unlimited lines
         },
       })
-      .start(s, 50)
+      .start(s, JOURNEY_TEXTBOX_TYPE_MS)
       .setOrigin(0)
 
     container.add([img, background, txt, textbox])
