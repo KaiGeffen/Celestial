@@ -4,7 +4,7 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import MessageMenu from './message'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
-import { Space, Style } from '../../settings/settings'
+import { Space, Style, Color } from '../../settings/settings'
 import { UserSettings } from '../../settings/userSettings'
 import Server from '../../server'
 import JOURNEY_CHOICES from '../../data/journeyChoices'
@@ -13,7 +13,7 @@ import avatarNames from '../../../../shared/data/avatarNames'
 
 export default class ChoiceChapterMessageMenu extends MessageMenu {
   constructor(scene: MenuScene, params) {
-    super(scene, params, 700)
+    super(scene, params, 1000)
   }
 
   protected createSizer(): void {
@@ -85,20 +85,21 @@ export default class ChoiceChapterMessageMenu extends MessageMenu {
         .setStrokeStyle(1, 0xc0b8a8)
       colSizer.addBackground(bg)
 
+      const textInset = 2
       const optionTxt = this.scene.add
         .text(0, 0, option.text, Style.chapterBody)
-        .setWordWrapWidth(optionWidth - Space.pad * 2)
+        .setWordWrapWidth(optionWidth - textInset)
       colSizer.add(optionTxt, {
         padding: {
-          left: Space.padSmall,
-          right: Space.padSmall,
+          left: 0,
+          right: 0,
           top: Space.padSmall,
           bottom: Space.padSmall,
         },
-        align: 'center',
+        align: 'top',
       })
 
-      colSizer.addSpace()
+      colSizer.addSpace(1)
 
       const btnContainer = new ContainerLite(
         this.scene,
@@ -124,8 +125,7 @@ export default class ChoiceChapterMessageMenu extends MessageMenu {
         align: 'center',
       })
 
-      colSizer.layout()
-      optionsSizer.add(colSizer, { align: 'top' })
+      optionsSizer.add(colSizer, { proportion: 1, expand: true })
     })
 
     this.sizer
