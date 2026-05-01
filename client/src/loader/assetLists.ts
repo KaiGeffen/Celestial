@@ -3,25 +3,21 @@ export const assetLists = {
   "avatar": {
     "files": [
       "Adonis",
-      "Renata",
       "Jules",
       "Kitz",
       "Mia",
       "Mitra",
+      "Renata",
       "AdonisFull",
-      "RenataFull",
       "JulesFull",
       "KitzFull",
       "MiaFull",
       "MitraFull",
+      "RenataFull",
       "hidden"
     ],
     "dimensions": {
       "Adonis": {
-        "width": 130,
-        "height": 130
-      },
-      "Renata": {
         "width": 130,
         "height": 130
       },
@@ -38,6 +34,10 @@ export const assetLists = {
         "height": 130
       },
       "Mitra": {
+        "width": 130,
+        "height": 130
+      },
+      "Renata": {
         "width": 130,
         "height": 130
       }
@@ -80,6 +80,7 @@ export const assetLists = {
       "Balance",
       "Begging Bowl",
       "Beginner's Mind",
+      "Birdsong",
       "Birth",
       "Boa",
       "Bounty",
@@ -229,6 +230,7 @@ export const assetLists = {
       "Balance",
       "Begging Bowl",
       "Beginner's Mind",
+      "Birdsong",
       "Birth",
       "Boa",
       "Bounty",
