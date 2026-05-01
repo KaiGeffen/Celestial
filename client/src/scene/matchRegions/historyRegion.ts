@@ -17,7 +17,7 @@ export default class HistoryRegion extends Region {
     this.container = scene.add.container(0, 0)
 
     scene.plugins.get('rexAnchor')['add'](this.container, {
-      x: '100%-225',
+      x: '100%-200',
       y: '30%',
     })
 
