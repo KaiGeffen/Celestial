@@ -22,7 +22,7 @@ export default interface messagesToClient {
     achievements: Achievement[]
     cardInventory: string
     missionGoldClaimed: string
-    journeyChoices: string
+    journeyChoices: (number | null)[]
   }
   purchaseItemSuccess: {
     itemId: number

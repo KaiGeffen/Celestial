@@ -290,7 +290,7 @@ export default class Server {
   }
 
   // Send player's choice for the ending to a character's journey
-  static sendJourneyChoice(characterIndex: number, choice: 1 | 2): void {
+  static sendJourneyChoice(characterIndex: number, choice: 0 | 1): void {
     if (!server || !server.isOpen()) return
     server.send({
       type: 'sendJourneyChoice',
@@ -493,7 +493,7 @@ export default class Server {
       ),
     )
     sessionStorage.setItem('decks', JSON.stringify(data.decks))
-    sessionStorage.setItem('journeyChoices', data.journeyChoices)
+    sessionStorage.setItem('journeyChoices', JSON.stringify(data.journeyChoices))
     sessionStorage.setItem(
       'avatar_experience',
       JSON.stringify(data.avatar_experience),

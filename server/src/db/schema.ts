@@ -62,10 +62,8 @@ export const players = pgTable(
     }).notNull(),
     avatar_experience: integer('avatar_experience').array().notNull(),
 
-    // One char per character: '0'=unchosen, '1'=option A, '2'=option B
-    journey_choices: varchar('journey_choices', { length: 6 })
-      .notNull()
-      .default('000000'),
+    // Per avatar: null = not chosen, 0 = choice A, 1 = choice B
+    journey_choices: integer('journey_choices').array().notNull(),
 
     // TODO Rename this inventory after the map journey mode is removed
     card_inventory: varchar('card_inventory', { length: 1000 }).notNull(),

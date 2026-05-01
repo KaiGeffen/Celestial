@@ -111,7 +111,12 @@ export default class ChoiceChapterMessageMenu extends MessageMenu {
         within: btnContainer,
         text: 'Choose',
         f: () =>
-          this.onChoose(avatarIndex, idx, claimGoldMissionId, params.title),
+          this.onChoose(
+            avatarIndex,
+            idx as 0 | 1,
+            claimGoldMissionId,
+            params.title,
+          ),
         muteClick: true,
       })
       colSizer.add(btnContainer, {
@@ -132,7 +137,7 @@ export default class ChoiceChapterMessageMenu extends MessageMenu {
 
   private onChoose(
     avatarIndex: number,
-    choiceIndex: 1 | 2,
+    choiceIndex: 0 | 1,
     claimGoldMissionId: number | undefined,
     title: string,
   ): void {
@@ -142,7 +147,7 @@ export default class ChoiceChapterMessageMenu extends MessageMenu {
     const choiceData = JOURNEY_CHOICES[avatarIndex]
     const resultText =
       '      ' +
-      (choiceData?.options[choiceIndex - 1]?.result ?? 'Coming soon.')
+      (choiceData?.options[choiceIndex]?.result ?? 'Coming soon.')
         .replace(/\n/g, '\n      ')
         .trim()
 

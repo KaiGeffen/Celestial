@@ -23,7 +23,7 @@ export default interface messagesToServer {
   }
   sendJourneyChoice: {
     characterIndex: number
-    choice: 1 | 2
+    choice: 0 | 1
   }
   sendInitialUserData: {
     username: string

@@ -622,9 +622,12 @@ export default class JourneyScene extends BaseScene {
 
             // For the finale, show the choice, or the result if a choice has already been made
             if (isChapter9) {
-              const choices: string = UserSettings._get('journeyChoices')
-              const existingChoice = choices?.charAt(avatarIndex)
-              if (existingChoice !== null && existingChoice !== '0') {
+              const choices = UserSettings._get('journeyChoices') as (
+                | number
+                | null
+              )[]
+              const existingChoice = choices[avatarIndex]
+              if (existingChoice != null) {
                 const resultText =
                   '      ' +
                   (

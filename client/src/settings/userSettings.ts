@@ -103,7 +103,7 @@ export class UserSettings {
       tooltipsSeen: [],
 
       // Ending choices for each character's journey (0=unchosen, 1=option A, 2=option B)
-      journeyChoices: '000000',
+      journeyChoices: [null, null, null, null, null, null],
     }
 
     for (var key in defaultSettings) {

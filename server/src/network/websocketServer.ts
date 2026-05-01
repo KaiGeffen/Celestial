@@ -154,17 +154,25 @@ export default function createWebSocketServer() {
         })
         .on('sendJourneyChoice', async ({ characterIndex, choice }) => {
           if (!id) return
+          if (characterIndex < 0 || characterIndex > 5) return
+          if (choice !== 0 && choice !== 1) return
+
           const row = await db
             .select({ journey_choices: players.journey_choices })
             .from(players)
             .where(eq(players.id, id))
             .limit(1)
-          const current = (row[0]?.journey_choices ?? '000000').padEnd(6, '0')
-          const chars = current.split('')
-          chars[characterIndex] = String(choice)
+
+          const raw = row[0]?.journey_choices
+          const next: (number | null)[] =
+            raw && Array.isArray(raw) ? [...raw] : Array(6).fill(null)
+          while (next.length < 6) next.push(null)
+          next.length = 6
+          next[characterIndex] = choice
+
           await db
             .update(players)
-            .set({ journey_choices: chars.join('') })
+            .set({ journey_choices: next })
             .where(eq(players.id, id))
         })
         .on(
@@ -204,6 +212,7 @@ export default function createWebSocketServer() {
               completedmissions: missions,
               missiongoldclaimed: '',
               avatar_experience: [0, 0, 0, 0, 0, 0],
+              journey_choices: [null, null, null, null, null, null],
               card_inventory: getStartingInventoryBitString(),
               lastactive: new Date().toISOString(),
               garden: [],
