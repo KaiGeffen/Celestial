@@ -153,12 +153,12 @@ export default class DeckEditorScene extends BaseScene {
       menu: 'editDeck',
       // When confirming, set the values for this scene with the new selected values
       callback: (
-        name: string,
+        _name: string,
         cosmeticSet: CosmeticSet,
         deckCode: number[],
       ) => {
         this.cosmeticSet = cosmeticSet
-        this.deckName = name
+        // Don't set this.deckName — cosmetics menu doesn't edit it; echoed name would revert unsaved renames.
 
         // TODO If copy/paste is removed, this is no longer needed
         if (deckCode && deckCode.length > 0) {
@@ -169,7 +169,7 @@ export default class DeckEditorScene extends BaseScene {
         // Ensure the thumbnail is updated
         this.syncDeckThumbnail()
       },
-      deckName: deck.name,
+      deckName: this.deckName,
       cosmeticSet: this.cosmeticSet,
       // TODO If copy/paste is removed, this is no longer needed
       deckCode: this.getDeckCode(),
