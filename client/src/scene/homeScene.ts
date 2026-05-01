@@ -538,10 +538,10 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   // },
   {
     subheader: 'Shell Mode',
-    body: `Each Saturday in May, we'll be playing a new mode called Shell Mode. Hop in to the [area=_link_discord][color=#FABD5D]Discord server[/color][/area] to learn more!`,
+    body: `Each Saturday in May, we'll be playing a new mode called Shell Mode. Hop in to the [area=_link_discord][stroke=${Color.goldS}]Discord server[/stroke][/area] to learn more!`,
   },
   {
     subheader: 'Card Changes',
-    body: '👇 [area=_Hero][color=#FABD5D]Hero[/color][/area] - Exhale point +3 > +2\n👇 [area=_Seen][color=#FABD5D]Seen[/color][/area] - Clear View sight 4 > 3\n👆 [area=_Phoenix][color=#FABD5D]Phoenix[/color][/area] - Points 3 > 4',
+    body: `👇 [area=_Hero][stroke=${Color.goldS}]Hero[/stroke][/area] - Exhale point +3 > +2\n👇 [area=_Clear View][stroke=${Color.goldS}]Clear View[/stroke][/area] - [area=_Seen][stroke=${Color.goldS}]Seen[/area][/stroke] sight 4 > 3\n👆 [area=_Phoenix][stroke=${Color.goldS}]Phoenix[/stroke][/area] - Points 3 > 4`,
   },
 ]

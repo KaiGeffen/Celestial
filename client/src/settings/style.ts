@@ -419,6 +419,7 @@ export const BBStyle: Record<string, any> = {
       mode: 'word',
       width: ANNOUNCEMENT_WIDTH,
     },
+    strokeThickness: 2,
   },
   missionName: {
     fontFamily: sansFont,
