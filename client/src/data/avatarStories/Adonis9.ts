@@ -1,1 +1,7 @@
-export default `Coming soon...`
+export default `I don’t know what to think after looking back at everything. I’m left with nothing but questions. What became of all my efforts? What is the future of my home, my community? And most of all: am I wrong in the choices I made? I wish I could have been like Gavin, with hands that heal. In the end I don’t know what my own family thinks of me. Even though this was all for them. Was it worth it?
+
+Option A: [How at peace would you feel now if you’d done nothing and made no impact?]
+I wouldn’t be at peace. How could I? If I just sat by while everybody around me struggled, I’d be worse than guilty. I’d be continuing a cycle of barely getting by—of letting our homes and streets erode and crumble beneath us while we all try to run. If I hadn’t made any hard decisions, those same choices wouldn’t have just gone away. They’d have fallen on the next in line: my brother, my friends, my neighbors... If someone had to shoulder it, I’m glad it was me. I can be proud of that much.
+
+Option B: [Your choices were drops in the ocean of forces.]
+That’s the kind of talk I’d expect in a realm like this. From up here things look smaller. Or maybe the whole just looks larger when you can see it all. You’re right: I never had the power to make waves. I wasn’t born into that, and I didn’t chase after it either. If my hands could provide something better, at least for the people I knew, that’s all the impact I could want. Waves keep crashing down, and my current has already merged with the tide.`

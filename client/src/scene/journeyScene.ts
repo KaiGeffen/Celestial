@@ -616,7 +616,7 @@ export default class JourneyScene extends BaseScene {
             const storyText =
               '      ' +
               (avatarStories[avatarIndex]?.[chapterIndex] ?? 'Coming soon')
-                .replace(/\n/g, '\n\n      ')
+                .replace(/\n/g, '\n      ')
                 .trim()
             this.scene.launch('MenuScene', {
               menu: 'chapterMessage',

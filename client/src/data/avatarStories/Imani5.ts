@@ -1,2 +1,10 @@
-export default `
-`
+export default `I missed the years when my siblings would hold my hand and take naps in my arms, so looking after Nova felt like a treat. The first time I had to travel for work I ended up feeling her absence more than I expected. She promised me she would know how to write my name by the time I returned; she had already mastered both her own and her parents’.
+My client at the time, Mrs. Solano, had heard about me from a traveler. She sought me out and requested that I stay with her until delivery, one week away.
+“To be honest, it took me a while to finally conceive,” she told me over breakfast. “My mother-in-law thought I might be… infertile. In her first five years of marriage, she’d had five healthy boys, all homebirths.”
+Although I never encountered Mrs. Solano’s mother-in-law or husband, I saw them again and again through their impact on Mrs. Solano herself. I saw their heavy expectations weighing down, making her shoulders slouch and her back ache. I saw their inconsiderate criticisms and judgments possessing her from the inside. She would often fuss over the amount of seasoning she consumed or the number of steps she took—lashing out in fits of rage before breaking down into tears of apology and self-loathing. 
+“Mrs. Solano, do you know what a woman’s body does during pregnancy?” I asked one day. She shook her head and put down the childcare book she was rereading. “Your organs shift to make room for the womb, your blood volume increases by half to provide for the baby, you grow a placenta, and after birth you produce up to a liter of milk a day. If your baby becomes sick, your milk will thicken with antibodies.” 
+Her eyes widened; none of her books had told her this. 
+“No one is more prepared to have this baby than you,” I said, “and no one knows better than you how to do it. No one else can do it.”
+
+Throughout my stay, Mrs. Solano grew a little more confident, and by her due-date she was no longer in a state of panic. Despite the strong, drawn-out contractions, she didn’t turn to me with her usual questions and concerns. Instead she maintained steady breathing and held the positions I instructed. It was a long labor, but her composure broke only when the infant was settled in her arms, alive and well. 
+“I did it!” she sobbed, “I really did it—my baby is here and so beautiful!”`
