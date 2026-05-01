@@ -33,6 +33,12 @@ const StyleGeneral: StyleDict = {
     color: Color.basicText,
     wordWrap: { width: Space.maxTextWidth },
   },
+  /** Status row value numbers — no `wordWrap` so measured width matches the glyph run (for scale-to-fit). */
+  statusKeywordValue: {
+    fontFamily: sansFont,
+    fontSize: FontSettings.standard.size,
+    color: Color.basicText,
+  },
   basicStylized: {
     fontFamily: secondaryFont,
     fontSize: FontSettings.standard.size,

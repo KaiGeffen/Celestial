@@ -4,6 +4,7 @@ import { Animation } from '../../../../shared/animation'
 import { Zone } from '../../../../shared/state/zone'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
+import { fitStatusValueText } from '../../lib/buttons/statuses'
 import { Depth, Time } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
@@ -157,7 +158,10 @@ export default class StatusRegion extends Region {
 
         btn.setVisible(false).setAlpha(1)
         if (btn.icon) btn.icon.setScale(1)
-        if (btn.txt) btn.txt.setScale(1)
+        if (btn.txt) {
+          btn.txt.setScale(1)
+          fitStatusValueText(btn.txt)
+        }
       }
     }
   }
@@ -199,6 +203,7 @@ export default class StatusRegion extends Region {
         duration: 120,
         onStart: () => {
           btn.setVisible(true).setAlpha(0)
+          fitStatusValueText(btn.txt)
         },
       })
       return
