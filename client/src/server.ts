@@ -289,6 +289,16 @@ export default class Server {
     })
   }
 
+  // Send player's choice for the ending to a character's journey
+  static sendJourneyChoice(characterIndex: number, choice: 1 | 2): void {
+    if (!server || !server.isOpen()) return
+    server.send({
+      type: 'sendJourneyChoice',
+      characterIndex,
+      choice,
+    })
+  }
+
   // Send server user's experience with each avatar
   static sendAvatarExperience(experience: number[]): void {
     if (!server || !server.isOpen()) {
@@ -483,6 +493,7 @@ export default class Server {
       ),
     )
     sessionStorage.setItem('decks', JSON.stringify(data.decks))
+    sessionStorage.setItem('journeyChoices', data.journeyChoices)
     sessionStorage.setItem(
       'avatar_experience',
       JSON.stringify(data.avatar_experience),

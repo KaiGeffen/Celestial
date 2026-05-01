@@ -152,6 +152,21 @@ export default function createWebSocketServer() {
             .set({ avatar_experience: experience })
             .where(eq(players.id, id))
         })
+        .on('sendJourneyChoice', async ({ characterIndex, choice }) => {
+          if (!id) return
+          const row = await db
+            .select({ journey_choices: players.journey_choices })
+            .from(players)
+            .where(eq(players.id, id))
+            .limit(1)
+          const current = (row[0]?.journey_choices ?? '000000').padEnd(6, '0')
+          const chars = current.split('')
+          chars[characterIndex] = String(choice)
+          await db
+            .update(players)
+            .set({ journey_choices: chars.join('') })
+            .where(eq(players.id, id))
+        })
         .on(
           'sendInitialUserData',
           async ({ username, decks, inventory, missions, ref }) => {

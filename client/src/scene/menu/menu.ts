@@ -158,6 +158,7 @@ import EditDeckNameMenu from './editDeckName'
 import ConfirmMenu from './confirm'
 import MessageMenu from './message'
 import ChapterMessageMenu from './chapterMessage'
+import ChoiceChapterMessageMenu from './choiceChapterMessage'
 import FocusMenu from './focus'
 import SearchMenu from './search'
 import LeaderboardMenu from './leaderboard'
@@ -184,6 +185,7 @@ const menus = {
   confirm: ConfirmMenu,
   message: MessageMenu,
   chapterMessage: ChapterMessageMenu,
+  choiceChapterMessage: ChoiceChapterMessageMenu,
   focus: FocusMenu,
   search: SearchMenu,
   leaderboard: LeaderboardMenu,

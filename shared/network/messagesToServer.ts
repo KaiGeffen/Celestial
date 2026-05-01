@@ -21,6 +21,10 @@ export default interface messagesToServer {
   sendAvatarExperience: {
     experience: number[]
   }
+  sendJourneyChoice: {
+    characterIndex: number
+    choice: 1 | 2
+  }
   sendInitialUserData: {
     username: string
     decks: Deck[]

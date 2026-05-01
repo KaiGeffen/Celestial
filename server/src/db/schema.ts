@@ -57,8 +57,15 @@ export const players = pgTable(
     pve_losses: integer('pve_losses').notNull(),
     inventory: varchar('inventory', { length: 1000 }).notNull(),
     completedmissions: varchar('completedmissions', { length: 1000 }).notNull(),
-    missiongoldclaimed: varchar('missiongoldclaimed', { length: 1000 }).notNull(),
+    missiongoldclaimed: varchar('missiongoldclaimed', {
+      length: 1000,
+    }).notNull(),
     avatar_experience: integer('avatar_experience').array().notNull(),
+
+    // One char per character: '0'=unchosen, '1'=option A, '2'=option B
+    journey_choices: varchar('journey_choices', { length: 6 })
+      .notNull()
+      .default('000000'),
 
     // TODO Rename this inventory after the map journey mode is removed
     card_inventory: varchar('card_inventory', { length: 1000 }).notNull(),

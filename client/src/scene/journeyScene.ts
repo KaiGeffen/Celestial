@@ -27,6 +27,7 @@ import showTooltip from '../utils/tooltips'
 import avatarBios from '../data/avatarBios/index'
 import avatarNames from '../../../shared/data/avatarNames'
 import avatarStories from '../data/avatarStories/avatarStories'
+import JOURNEY_CHOICES from '../data/journeyChoices'
 import Server from '../server'
 
 const OVERLAY_WIDTH = 575
@@ -616,17 +617,49 @@ export default class JourneyScene extends BaseScene {
           if (mission.id < 700) {
             const avatarIndex = Math.floor(mission.id / 100) - 1
             const chapterIndex = mission.id % 100
-            const storyText =
-              '      ' +
-              (avatarStories[avatarIndex]?.[chapterIndex] ?? 'Coming soon')
-                .replace(/\n/g, '\n      ')
-                .trim()
-            this.scene.launch('MenuScene', {
-              menu: 'chapterMessage',
-              title: `${avatarNames[avatarIndex]} — ${mission.name}`,
-              s: storyText,
-              claimGoldMissionId: mission.id,
-            })
+            const isChapter9 =
+              chapterIndex === 8 && avatarIndex < JOURNEY_CHOICES.length
+
+            // For the finale, show the choice, or the result if a choice has already been made
+            if (isChapter9) {
+              const choices: string = UserSettings._get('journeyChoices')
+              const existingChoice = choices?.charAt(avatarIndex)
+              if (existingChoice !== null && existingChoice !== '0') {
+                const resultText =
+                  '      ' +
+                  (
+                    JOURNEY_CHOICES[avatarIndex]?.options[existingChoice]
+                      ?.result ?? 'Coming soon.'
+                  )
+                    .replace(/\n/g, '\n      ')
+                    .trim()
+                this.scene.launch('MenuScene', {
+                  menu: 'chapterMessage',
+                  title: `${avatarNames[avatarIndex]} — ${mission.name}`,
+                  s: resultText,
+                  claimGoldMissionId: mission.id,
+                })
+              } else {
+                this.scene.launch('MenuScene', {
+                  menu: 'choiceChapterMessage',
+                  title: `${avatarNames[avatarIndex]} — ${mission.name}`,
+                  avatarIndex,
+                  claimGoldMissionId: mission.id,
+                })
+              }
+            } else {
+              const storyText =
+                '      ' +
+                (avatarStories[avatarIndex]?.[chapterIndex] ?? 'Coming soon')
+                  .replace(/\n/g, '\n      ')
+                  .trim()
+              this.scene.launch('MenuScene', {
+                menu: 'chapterMessage',
+                title: `${avatarNames[avatarIndex]} — ${mission.name}`,
+                s: storyText,
+                claimGoldMissionId: mission.id,
+              })
+            }
           } else {
             this.scene.launch('MenuScene', {
               menu: 'chapterMessage',

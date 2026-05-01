@@ -22,6 +22,7 @@ export default interface messagesToClient {
     achievements: Achievement[]
     cardInventory: string
     missionGoldClaimed: string
+    journeyChoices: string
   }
   purchaseItemSuccess: {
     itemId: number
