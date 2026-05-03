@@ -30,6 +30,8 @@ import { SpectatorMatchScene } from '../spectatorMatchScene'
 
 // TODO Use a non-mock color for the menu background
 const COLOR = Color.backgroundLight
+/** Alpha for light rectangles: tabs column + tabbed option panels */
+const OPTIONS_PANEL_BG_ALPHA = 0.4
 
 // The currently selected tab, preserved if the menu is closed/opened
 var selectedTab = 'general'
@@ -183,7 +185,7 @@ export default class OptionsMenu extends Menu {
       name: 'Discord',
       within: container,
       f: openDiscord,
-    })
+    }).icon.setTintFill(Color.discordButton)
     tabsSizer.add(container)
 
     return tabsSizer
@@ -201,7 +203,9 @@ export default class OptionsMenu extends Menu {
         },
       })
       .addBackground(
-        this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
+        this.scene.add
+          .rectangle(0, 0, 1, 1, COLOR)
+          .setAlpha(OPTIONS_PANEL_BG_ALPHA),
       )
       .hide()
 
@@ -229,7 +233,9 @@ export default class OptionsMenu extends Menu {
         },
       })
       .addBackground(
-        this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
+        this.scene.add
+          .rectangle(0, 0, 1, 1, COLOR)
+          .setAlpha(OPTIONS_PANEL_BG_ALPHA),
       )
       .hide()
 
@@ -306,7 +312,9 @@ export default class OptionsMenu extends Menu {
         },
       })
       .addBackground(
-        this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
+        this.scene.add
+          .rectangle(0, 0, 1, 1, COLOR)
+          .setAlpha(OPTIONS_PANEL_BG_ALPHA),
       )
       .hide()
 
@@ -340,7 +348,9 @@ export default class OptionsMenu extends Menu {
         },
       })
       .addBackground(
-        this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
+        this.scene.add
+          .rectangle(0, 0, 1, 1, COLOR)
+          .setAlpha(OPTIONS_PANEL_BG_ALPHA),
       )
       .hide()
 

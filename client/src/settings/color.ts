@@ -77,6 +77,7 @@ export const Color: Record<string, any> = {
   filterSelected: CoreColors.gold,
   buttonTxtSelected: CoreColors.whiteS,
   textButton: '#817467',
+  discordButton: CoreColors.brown,
 
   // Input text
   textboxText: '#ffffff',
