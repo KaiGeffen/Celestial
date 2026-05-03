@@ -469,6 +469,7 @@ export const assetLists = {
       "selectorBody",
       "stackCount",
       "sundial",
+      "tabSelector",
       "thumbnailNameplate",
       "wins"
     ],

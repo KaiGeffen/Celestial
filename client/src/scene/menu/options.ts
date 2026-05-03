@@ -50,7 +50,7 @@ export default class OptionsMenu extends Menu {
   tabBtns: Record<string, Button> = {}
 
   // The highlight for the selected tab
-  highlight: Phaser.GameObjects.Rectangle
+  private tabSelector: Phaser.GameObjects.Image
 
   constructor(scene: MenuScene, params) {
     super(scene, Math.min(750, Space.windowWidth))
@@ -64,9 +64,9 @@ export default class OptionsMenu extends Menu {
     this.layout()
 
     // After layout is complete, move the highlight to the selected tab button
-    const x = (Space.windowWidth - this.width - Space.pad * 2) / 2
+    const x = (Space.windowWidth - this.width + Space.pad) / 2
     const y = this.tabBtns[selectedTab].getGlobalPosition()[1] - 4
-    this.highlight.setPosition(x, y)
+    this.tabSelector.setPosition(x, y)
   }
 
   private createContent(activeScene: BaseScene) {
@@ -102,27 +102,17 @@ export default class OptionsMenu extends Menu {
   }
 
   private createTabs() {
-    // Create a rectangle to show which tab is selected
-    const highlightWidth =
-      Space.buttonWidth +
-      Space.pad * 2 +
-      Space.padSmall +
-      (Flags.mobile ? 10 : 0)
-    const height = Flags.mobile ? 50 : 90
-    this.highlight = this.scene.add
-      .rectangle(0, 0, highlightWidth, height, COLOR, OPTIONS_PANEL_BG_ALPHA)
+    this.tabSelector = this.scene.add
+      .image(0, 0, 'chrome-tabSelector')
       .setOrigin(0, 0.5)
+      .setScale(0.3)
 
-    let tabsSizer = this.scene.rexUI.add.fixWidthSizer(
-      Flags.mobile
-        ? {}
-        : {
-            space: {
-              top: Space.pad,
-              line: Space.pad,
-            },
-          },
-    )
+    let tabsSizer = this.scene.rexUI.add.fixWidthSizer({
+      space: {
+        top: Space.pad,
+        line: Space.pad,
+      },
+    })
 
     tabsSizer.addNewLine()
 
@@ -164,7 +154,7 @@ export default class OptionsMenu extends Menu {
 
         this.layout()
 
-        this.tweenHighlight(btn.getGlobalPosition()[1])
+        this.tweenTabSelector(btn.getGlobalPosition()[1])
       })
 
       tabsSizer.add(container).addNewLine()
@@ -596,12 +586,10 @@ export default class OptionsMenu extends Menu {
   }
 
   // Tween the higlight moving to the given y (Flush with left side of menu)
-  private tweenHighlight(y: number): void {
+  private tweenTabSelector(y: number): void {
     this.scene.tweens.add({
-      targets: this.highlight,
-      x: (Space.windowWidth - this.width - Space.pad * 2) / 2,
+      targets: this.tabSelector,
       y: y - 4,
-
       duration: Time.general.optionsTabSlideMs,
       ease: 'Sine.easeInOut',
     })
