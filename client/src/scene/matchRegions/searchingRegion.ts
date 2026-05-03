@@ -187,7 +187,6 @@ export default class SearchingRegion extends Region {
 
     this.txtTitle = scene.add
       .text(0, -100, 'Searching for an opponent', Style.header)
-      .setStroke(Color.backgroundLightS, 4)
       .setOrigin(0.5)
 
     // Password text
@@ -200,10 +199,7 @@ export default class SearchingRegion extends Region {
     }
 
     // Time text
-    this.txtTime = scene.add
-      .text(0, 0, '', Style.header)
-      .setStroke(Color.backgroundLightS, 4)
-      .setOrigin(0.5)
+    this.txtTime = scene.add.text(0, 0, '', Style.header).setOrigin(0.5)
 
     this.container.add([this.txtTitle, this.txtTime])
   }
