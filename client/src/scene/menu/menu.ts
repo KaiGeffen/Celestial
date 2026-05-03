@@ -188,14 +188,21 @@ import PlayMenu from './play'
 
 const menus = {
   options: OptionsMenu,
+  // TODO Remove
   choosePremade: ChoosePremade,
   credits: CreditsMenu,
   rulebook: RulebookMenu,
   newDeck: NewDeckMenu,
+
+  // TODO Move the copy/paste
   editDeck: EditDeckMenu,
+
+  // TODO Higher min height
   editDeckName: EditDeckNameMenu,
   confirm: ConfirmMenu,
   message: MessageMenu,
+
+  //
   chapterMessage: ChapterMessageMenu,
   choiceChapterMessage: ChoiceChapterMessageMenu,
   focus: FocusMenu,

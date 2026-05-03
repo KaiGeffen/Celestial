@@ -223,7 +223,7 @@ export class MatchScene extends BaseScene {
   private signalOpponentSurrendered(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
-      title: 'Opponent Surrendered',
+      title: '',
       s: 'Your opponent surrendered, you win!',
     })
   }
@@ -231,15 +231,15 @@ export class MatchScene extends BaseScene {
   private signalOpponentDisconnect(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
-      title: 'Opponent Disconnected',
-      s: 'Your opponent disconnected, now we wait for them to reconnect...',
+      title: '',
+      s: 'Your opponent disconnected, waiting for them to reconnect.',
     })
   }
 
   private signalOpponentReconnected(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
-      title: 'Opponent Reconnected',
+      title: '',
       s: 'Your opponent has reconnected, resuming the game.',
     })
   }

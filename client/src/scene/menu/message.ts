@@ -12,7 +12,7 @@ import Decklist from '../../lib/decklist'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
 // A message to the user
-const DEFAULT_WIDTH = 900
+const DEFAULT_WIDTH = 700
 
 export default class ConfirmMenu extends Menu {
   protected textScrollablePanel: ScrollablePanel
@@ -95,9 +95,7 @@ export default class ConfirmMenu extends Menu {
       width: width,
     })
 
-    const text = this.scene.add
-      .text(0, 0, s, style)
-      .setWordWrapWidth(width)
+    const text = this.scene.add.text(0, 0, s, style).setWordWrapWidth(width)
     textPanel.add(text)
     const textNeedsScroll = text.height > maxTextHeight
 

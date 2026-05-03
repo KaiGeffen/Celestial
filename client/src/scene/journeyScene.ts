@@ -36,6 +36,8 @@ const OVERLAY_WIDTH = 575
 const OVERLAY_HEIGHT = 595
 const OVERLAY_TOP = 80
 
+// TODO Remove 'message' menus, they are no longer used
+
 /** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Renata, Mitra, Water, Stars */
 const THEME_CAMERA_POSITIONS: { x: number; y: number }[] = [
   { x: 4000, y: 670 }, // birds (Jules)
