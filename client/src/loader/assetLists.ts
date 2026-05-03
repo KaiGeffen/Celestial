@@ -463,6 +463,7 @@ export const assetLists = {
       "builderRightCorner",
       "builderVertical",
       "divider",
+      "header",
       "nameplate",
       "selectorBody",
       "stackCount",

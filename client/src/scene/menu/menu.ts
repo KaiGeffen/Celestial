@@ -61,17 +61,23 @@ export default class Menu {
     width: number = this.width,
     style = Style.header,
   ): any {
-    let background = this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
+    const background = this.scene.add.image(0, 0, 'chrome-header')
 
-    let sizer = this.scene.rexUI.add.sizer({
-      width: width,
-      space: { top: Space.padSmall, bottom: Space.padSmall },
-    })
-    sizer.addBackground(background)
+    const sizer = this.scene.rexUI.add
+      .sizer({
+        width,
+        orientation: 0,
+        space: {
+          top: Space.padSmall,
+          bottom: Space.padSmall,
+        },
+      })
+      .addBackground(background)
 
-    let txt = this.scene.add.text(0, 0, s, style)
+    const txt = this.scene.add.text(0, 0, s, style)
     sizer.addSpace().add(txt).addSpace()
 
+    // TODO Rasterize shadow
     // Background shadow
     this.scene.addShadow(background, -90)
 
