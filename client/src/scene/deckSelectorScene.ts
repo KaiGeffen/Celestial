@@ -187,6 +187,17 @@ export default class DeckSelectorScene extends BaseScene {
     this.plugins.get('rexAnchor')['add'](topRightCorner, {
       x: `100%-${dx}`,
     })
+
+    // Central sizer background (With deck thumbnails)
+    const centralSizerBackground = this.add
+      .image(0, Space.filterBarHeight, 'chrome-selectorBody')
+      .setOrigin(1, 0)
+      .setAlpha(0.7)
+    this.plugins.get('rexAnchor')['add'](centralSizerBackground, {
+      x: `100%-${ROSTER_WIDTH}`,
+      width: `100%-${ROSTER_WIDTH}`,
+      height: '100%',
+    })
   }
 
   /** Full-width header — same layout/padding as `DeckEditorScene` `createFilterHeader`. */
@@ -263,7 +274,6 @@ export default class DeckSelectorScene extends BaseScene {
     const scrollable = newScrollablePanel(this, {
       width: centerColumnWidth,
       height: bodyScrollHeight,
-      background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
       panel: { child: panel },
     }).setOrigin(0)
 

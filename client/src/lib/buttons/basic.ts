@@ -8,7 +8,7 @@ class BaseButton extends Button {
     icon: string,
     {
       within,
-      text = '',
+      text,
       x = 0,
       y = 0,
       f = () => {},
@@ -19,10 +19,14 @@ class BaseButton extends Button {
     },
   ) {
     super(within, x, y, {
-      text: {
-        text: text.toUpperCase(),
-        interactive: false,
-      },
+      ...(text != null && text !== ''
+        ? {
+            text: {
+              text: text.toUpperCase(),
+              interactive: false,
+            },
+          }
+        : {}),
       icon: {
         name: icon,
         interactive: true,
@@ -54,52 +58,18 @@ class BaseButton extends Button {
   setText(s: string): Button {
     return super.setText(s.toUpperCase())
   }
-
-  /** `BigButton` uses a 3-frame spritesheet; plain `BasicButton` uses a single image (`icon-Button`). */
-  private iconIsSpritesheet(): boolean {
-    return this.icon.texture.frameTotal > 1
-  }
-
-  enable(): this {
-    super.enable()
-    if (this.iconIsSpritesheet()) this.icon.setFrame(0)
-
-    return this
-  }
-
-  disable(): this {
-    super.disable()
-    if (this.iconIsSpritesheet()) this.icon.setFrame(1)
-
-    return this
-  }
-
-  glow(): this {
-    super.glow()
-    if (this.iconIsSpritesheet()) this.icon.setFrame(2)
-
-    return this
-  }
-
-  stopGlow(): this {
-    super.stopGlow()
-    if (this.iconIsSpritesheet()) this.icon.setFrame(0)
-
-    return this
-  }
 }
 
+/** Plain control — `icon-Button`, optional `text` when callers pass it. */
 export class BasicButton extends BaseButton {
   constructor(args) {
     super('Button', args)
   }
 }
 
+/** Large control — single `icon-PlayButton`, no label, no frames. */
 export class BigButton extends BaseButton {
   constructor(args) {
-    super('BigButton', args)
-
-    // Increase font size
-    this.txt.setFontSize(35)
+    super('PlayButton', { ...args, text: undefined })
   }
 }
