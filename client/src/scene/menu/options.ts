@@ -284,7 +284,7 @@ export default class OptionsMenu extends Menu {
       .scrollablePanel({
         space: {
           // top: Space.pad,
-          // bottom: Space.pad,
+          bottom: Space.pad,
           left: Space.pad,
           right: Space.pad,
         },
