@@ -51,7 +51,7 @@ export default class DeckSelectorScene extends BaseScene {
     this.savedDeckIndex = undefined
 
     this.createBackground()
-    this.createSelectorRightChrome()
+    this.createChrome()
 
     const bodyScrollHeight = Space.windowHeight - deckFilterBarHeight()
 
@@ -152,14 +152,40 @@ export default class DeckSelectorScene extends BaseScene {
     })
   }
 
-  /** Right-edge deck-selector chrome: full viewport height, anchored bottom-right. */
-  private createSelectorRightChrome(): void {
-    const img = this.add
-      .image(0, Space.filterBarHeight, 'chrome-builderSelectorRight')
+  /** All chrome that isn't background for a region */
+  private createChrome(): void {
+    const y = Space.filterBarHeight - 3.5
+    const y2 = y - 1
+
+    // Top left corner
+    const LeftVertical = this.add
+      .image(-3.5, y, 'chrome-builderVertical')
+      .setOrigin(0, 0)
+      .setDepth(1)
+    this.plugins.get('rexAnchor')['add'](LeftVertical, {
+      height: '100%',
+    })
+    const topLeftCorner = this.add
+      .image(0, y, 'chrome-builderLeftCorner')
+      .setOrigin(0, 0)
+      .setDepth(1)
+
+    // Top right corner
+    const dx = ROSTER_WIDTH - 5
+    const rightVertical = this.add
+      .image(0, y2, 'chrome-builderVertical')
       .setOrigin(1, 0)
       .setDepth(1)
-    this.plugins.get('rexAnchor')['add'](img, {
-      x: '100%',
+    this.plugins.get('rexAnchor')['add'](rightVertical, {
+      x: `100%-${dx}`,
+      height: '100%',
+    })
+    const topRightCorner = this.add
+      .image(0, y2, 'chrome-builderRightCorner')
+      .setOrigin(1, 0)
+      .setDepth(1)
+    this.plugins.get('rexAnchor')['add'](topRightCorner, {
+      x: `100%-${dx}`,
     })
   }
 
@@ -191,7 +217,7 @@ export default class DeckSelectorScene extends BaseScene {
       Space.buttonHeight,
     )
 
-    const title = this.add.text(0, 0, 'Decks', Style.header).setOrigin(0.5, 0.8)
+    const title = this.add.text(0, 0, '', Style.header).setOrigin(0.5, 0.8)
     const titleContainer = new ContainerLite(
       this,
       0,
