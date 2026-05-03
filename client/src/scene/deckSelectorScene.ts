@@ -288,7 +288,7 @@ export default class DeckSelectorScene extends BaseScene {
 
     const newDeckThumb = new DeckThumbnail({
       scene: this,
-      name: 'New Deck',
+      name: 'New Deck+',
       cosmeticSet: Server.getUserData().cosmeticSet,
       isNewDeckButton: true,
       onClick: () => this.onNewDeckClick(),

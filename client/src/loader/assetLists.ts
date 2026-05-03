@@ -458,7 +458,6 @@ export const assetLists = {
       "bubbleEffect",
       "bubbleNourish",
       "builderDecklist",
-      "builderHeader copy",
       "builderHeader",
       "builderLeftCorner",
       "builderRightCorner",
@@ -468,6 +467,7 @@ export const assetLists = {
       "selectorBody",
       "stackCount",
       "sundial",
+      "thumbnailNameplate",
       "wins"
     ],
     "pixelArt": false

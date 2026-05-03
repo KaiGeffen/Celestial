@@ -15,7 +15,7 @@ export default class DeckThumbnail {
   container: ContainerLite
 
   private nameText: Phaser.GameObjects.Text
-  private nameBackground: Phaser.GameObjects.Rectangle
+  private nameBackground: Phaser.GameObjects.Image
   private avatarButton: any
   private cardbackImages: Phaser.GameObjects.Image[] = []
   private selected = false
@@ -90,8 +90,8 @@ export default class DeckThumbnail {
     const nameBarY = height / 2 - Space.buttonHeight / 2
     this.isValid = isValid
     this.nameBackground = scene.add
-      .rectangle(0, nameBarY, nameBarWidth, Space.buttonHeight, Color.white)
-      .setStrokeStyle(2, Color.border)
+      .image(0, nameBarY, 'chrome-thumbnailNameplate')
+      .setScale(0.35)
     this.container.add(this.nameBackground)
 
     // INVALID INDICATOR – top-right corner of nameplate
@@ -195,22 +195,22 @@ export default class DeckThumbnail {
     }
 
     if (this.isNewDeckButton) {
-      this.nameBackground.setFillStyle(Color.black)
+      this.nameBackground.setTint(Color.black)
       if (this.nameText) this.nameText.setColor(Color.whiteS)
       return
     }
 
     if (this.selected) {
-      this.nameBackground.setFillStyle(Color.gold)
+      this.nameBackground.setTint(Color.gold)
       if (this.nameText) this.nameText.setColor(Color.basicText)
       return
     }
     if (this.hovered) {
-      this.nameBackground.setFillStyle(Color.gold)
+      this.nameBackground.setTint(Color.gold)
       if (this.nameText) this.nameText.setColor(Color.basicText)
       return
     }
-    this.nameBackground.setFillStyle(Color.white)
+    this.nameBackground.clearTint()
     if (this.nameText) this.nameText.setColor(Color.basicText)
   }
 }
