@@ -415,6 +415,7 @@ export const BBStyle: Record<string, any> = {
     fontStyle: 'bold',
     fontSize: '20px',
     color: Color.darkUmberS,
+    lineSpacing: 2,
     wrap: {
       mode: 'word',
       width: ANNOUNCEMENT_WIDTH,

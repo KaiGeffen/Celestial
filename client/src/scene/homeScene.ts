@@ -4,7 +4,7 @@ import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
 import Cinematic from '../lib/cinematic'
-import { openDiscord } from '../utils/externalLinks'
+import { openDiscord, openSteamStore } from '../utils/externalLinks'
 import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -415,7 +415,7 @@ export default class HomeScene extends BaseScene {
     // Right: subheader + body pairs
     const announcementSizer = this.rexUI.add.sizer({
       orientation: 'vertical',
-      space: { item: Space.pad * 2 },
+      space: { item: Space.pad * 3 },
     })
     for (const pair of ANNOUNCEMENT_PAIRS) {
       const blockSizer = this.rexUI.add.sizer({
@@ -435,15 +435,18 @@ export default class HomeScene extends BaseScene {
         .BBCodeText(0, 0, pair.body, BBStyle.announcementCopy)
         .setInteractive()
         .on('areaover', (key: string) => {
-          if (key === '_link_discord') this.input.setDefaultCursor('pointer')
+          if (key === '_link_discord' || key === '_link_steam')
+            this.input.setDefaultCursor('pointer')
           else if (key[0] === '_') this.hint.showCard(key.slice(1))
         })
         .on('areaout', (key: string) => {
-          if (key === '_link_discord') this.input.setDefaultCursor('default')
+          if (key === '_link_discord' || key === '_link_steam')
+            this.input.setDefaultCursor('default')
           this.hint.hide()
         })
         .on('areadown', (key: string) => {
           if (key === '_link_discord') openDiscord()
+          else if (key === '_link_steam') openSteamStore()
         })
         .setOrigin(0, 0)
       blockSizer.add(bodyText, { align: 'left' })
@@ -529,8 +532,8 @@ const PATCH_NUMBER = '0.7.16.3'
 
 const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   {
-    subheader: 'Thank you to our wonderful Celestial community!',
-    body: 'Many changes this month as we ramp up to a Steam demo release, let us know your thoughts!',
+    subheader: 'Celestial Decks on Steam',
+    body: `Our [area=_link_steam][stroke=${Color.goldS}]Steam page[/stroke][/area] is live! We'd love for you to wishlist it, and keep and eye out for the demo releasing soon.`,
   },
   // {
   //   subheader: 'Congrats to Sherlock!',
@@ -542,6 +545,6 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   },
   {
     subheader: 'Card Changes',
-    body: `👇 [area=_Hero][stroke=${Color.goldS}]Hero[/stroke][/area] - Exhale point +3 > +2\n👇 [area=_Clear View][stroke=${Color.goldS}]Clear View[/stroke][/area] - [area=_Seen][stroke=${Color.goldS}]Seen[/area][/stroke] sight 4 > 3\n👆 [area=_Phoenix][stroke=${Color.goldS}]Phoenix[/stroke][/area] - Points 3 > 4`,
+    body: `🌱 [area=_Birdsong][stroke=${Color.goldS}]Birdsong[/stroke][/area] - New card released!\n👇 [area=_Hero][stroke=${Color.goldS}]Hero[/stroke][/area] - Exhale point +3 > +2\n👇 [area=_Clear View][stroke=${Color.goldS}]Clear View[/stroke][/area] - [area=_Seen][stroke=${Color.goldS}]Seen[/area][/stroke] sight 4 > 3\n👆 [area=_Phoenix][stroke=${Color.goldS}]Phoenix[/stroke][/area] - Points 3 > 4`,
   },
 ]
