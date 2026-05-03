@@ -298,8 +298,8 @@ export const Style: StyleDict = {
 
 // The styling for BBCode objects, from the rexui module
 export const BBStyle: Record<string, any> = {
-  basic: {
-    ...Style.basic,
+  basicStylized: {
+    ...Style.basicStylized,
     underline: {
       color: Color.basicText,
       thickness: 3,

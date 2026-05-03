@@ -105,7 +105,7 @@ export default class TutorialMatchScene extends MatchScene {
         Space.windowWidth / 2,
         Space.windowHeight / 2,
         '',
-        BBStyle.basic,
+        BBStyle.basicStylized,
       )
       .setOrigin(0.5, 1)
       .setDepth(Depth.tutorial)

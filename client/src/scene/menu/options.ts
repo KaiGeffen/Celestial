@@ -188,7 +188,7 @@ export default class OptionsMenu extends Menu {
         space: {
           top: Space.pad,
           bottom: Space.pad,
-          left: Space.pad / 2,
+          left: Space.pad,
           right: Space.pad,
         },
       })
@@ -216,7 +216,7 @@ export default class OptionsMenu extends Menu {
         space: {
           top: Space.pad,
           bottom: Space.pad,
-          left: Space.pad / 2,
+          left: Space.pad,
           right: Space.pad,
         },
       })
@@ -285,7 +285,7 @@ export default class OptionsMenu extends Menu {
         space: {
           // top: Space.pad,
           // bottom: Space.pad,
-          left: Space.pad / 2,
+          left: Space.pad,
           right: Space.pad,
         },
 
@@ -304,7 +304,7 @@ export default class OptionsMenu extends Menu {
 
     // Add text to the scrollable panel
     let txt = this.scene.rexUI.add.BBCodeText(0, 0, rulebookString, {
-      ...BBStyle.basic,
+      ...BBStyle.basicStylized,
       halign: 'left',
       wrap: { width: this.subwidth },
     })
@@ -319,7 +319,7 @@ export default class OptionsMenu extends Menu {
     let scrollable = this.scene.rexUI.add
       .scrollablePanel({
         space: {
-          left: Space.pad / 2,
+          left: Space.pad,
           right: Space.pad,
         },
 
@@ -338,7 +338,7 @@ export default class OptionsMenu extends Menu {
 
     // Add text to the scrollable panel
     let txt = this.scene.rexUI.add.BBCodeText(0, 0, creditsString, {
-      ...BBStyle.basic,
+      ...BBStyle.basicStylized,
       halign: 'left',
       wrap: { width: this.subwidth },
     })
@@ -352,7 +352,7 @@ export default class OptionsMenu extends Menu {
   private createAutopass() {
     let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
-    let txtHint = this.scene.add.text(0, 0, 'Autopass:', Style.basic)
+    let txtHint = this.scene.add.text(0, 0, 'Autopass:', Style.basicStylized)
     sizer.add(txtHint)
     sizer.addSpace()
 
@@ -385,7 +385,12 @@ export default class OptionsMenu extends Menu {
   private createCanBeSpectated(): import('phaser').GameObjects.GameObject {
     let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
-    let txtHint = this.scene.add.text(0, 0, 'Can be spectated:', Style.basic)
+    let txtHint = this.scene.add.text(
+      0,
+      0,
+      'Can be spectated:',
+      Style.basicStylized,
+    )
     sizer.add(txtHint)
     sizer.addSpace()
 
@@ -420,7 +425,7 @@ export default class OptionsMenu extends Menu {
   private createHotkeys(): import('phaser').GameObjects.GameObject {
     let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
-    let txtHint = this.scene.add.text(0, 0, 'Hotkeys:', Style.basic)
+    let txtHint = this.scene.add.text(0, 0, 'Hotkeys:', Style.basicStylized)
     sizer.add(txtHint)
     sizer.addSpace()
 
@@ -545,7 +550,7 @@ export default class OptionsMenu extends Menu {
       space: { item: Space.pad },
     })
 
-    const txtHint = this.scene.add.text(0, 0, s, Style.basic)
+    const txtHint = this.scene.add.text(0, 0, s, Style.basicStylized)
     sizer.add(txtHint)
 
     const slider = this.getSlider(initialValue, callback)

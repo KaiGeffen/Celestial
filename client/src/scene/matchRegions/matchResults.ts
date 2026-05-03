@@ -314,7 +314,7 @@ export default class MatchResultsRegion extends Region {
       const theirs = state.roundResults[1][i]
       const s = `Round ${round}\n${ours} - ${theirs}`
       let txt = this.scene.add
-        .rexBBCodeText(0, 0, s, BBStyle.basic)
+        .rexBBCodeText(0, 0, s, BBStyle.basicStylized)
         .setDepth(Depth.results)
 
       // Visual to show who is the winner
