@@ -55,7 +55,7 @@ function getSpace() {
     maxTextWidth: 500, // Note must be more than twice cardWidth for hints
 
     // Height of the filter bar in the deck editor
-    filterBarHeight: Flags.mobile ? 0 : 80,
+    filterBarHeight: 100,
 
     decklistPanelWidth: 240,
     cutoutWidth: 348,

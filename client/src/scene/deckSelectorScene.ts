@@ -73,7 +73,7 @@ export default class DeckSelectorScene extends BaseScene {
     this.rosterPanel = newScrollablePanel(this, {
       width: ROSTER_WIDTH,
       height: bodyScrollHeight,
-      background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
+      background: this.add.image(0, 0, 'chrome-builderDecklist'),
       panel: { child: rosterDeckSizer },
       footer: this.createRightPanel(),
       scrollMode: 'y',
@@ -155,7 +155,7 @@ export default class DeckSelectorScene extends BaseScene {
   private createMainHeader(): any {
     const barH = deckFilterBarHeight()
     const background = this.add
-      .rectangle(0, 0, 1, 1, Color.backgroundDark)
+      .image(0, 0, 'chrome-builderHeader')
       .setInteractive()
     this.addShadow(background, -90)
 
@@ -180,7 +180,15 @@ export default class DeckSelectorScene extends BaseScene {
       Space.buttonHeight,
     )
 
-    const title = this.add.text(0, 0, 'Decks', Style.header).setOrigin(0.5)
+    const title = this.add.text(0, 0, 'Decks', Style.header).setOrigin(0.5, 0.8)
+    const titleContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    titleContainer.add(title)
 
     const sizer = this.rexUI.add
       .sizer({
@@ -197,8 +205,8 @@ export default class DeckSelectorScene extends BaseScene {
       .addBackground(background)
 
     sizer
-      .add(backContainer, { align: 'center' })
-      .add(title, { align: 'center', proportion: 1, expand: true })
+      .add(backContainer, { align: 'top' })
+      .add(titleContainer, { align: 'top', proportion: 1, expand: true })
       .add(balanceContainer, { align: 'center' })
     return sizer
   }
@@ -303,22 +311,17 @@ export default class DeckSelectorScene extends BaseScene {
   }
 
   private createRightPanel(): any {
-    const background = this.add
-      .rectangle(0, 0, ROSTER_WIDTH, 1, Color.backgroundLight)
-      .setInteractive()
-    const sizer = this.rexUI.add
-      .sizer({
-        width: ROSTER_WIDTH,
-        orientation: 1,
-        space: {
-          left: Space.pad,
-          right: Space.pad,
-          top: Space.pad,
-          bottom: Space.pad,
-          item: Space.padSmall,
-        },
-      } as any)
-      .addBackground(background)
+    const sizer = this.rexUI.add.sizer({
+      width: ROSTER_WIDTH,
+      orientation: 1,
+      space: {
+        left: Space.pad,
+        right: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+        item: Space.padSmall,
+      },
+    } as any)
 
     const makeBtn = (text: string, f: () => void, muteClick = false) => {
       const container = new ContainerLite(
@@ -353,12 +356,15 @@ export default class DeckSelectorScene extends BaseScene {
       muteClick: true,
     })
 
-    const rowSizer = this.rexUI.add.sizer({
-      orientation: 0,
-      space: { item: Space.padSmall },
-    } as any)
-    rowSizer.add(colSizer)
-    rowSizer.add(playContainer)
+    const rowSizer = this.rexUI.add
+      .sizer({
+        orientation: 0,
+        space: { item: Space.padSmall },
+      } as any)
+      .add(colSizer)
+      .add(playContainer)
+
+    // Add the row sizer to the sizer
     sizer.add(rowSizer)
 
     return sizer
