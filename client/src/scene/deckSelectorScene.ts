@@ -51,6 +51,7 @@ export default class DeckSelectorScene extends BaseScene {
     this.savedDeckIndex = undefined
 
     this.createBackground()
+    this.createSelectorRightChrome()
 
     const bodyScrollHeight = Space.windowHeight - deckFilterBarHeight()
 
@@ -151,13 +152,23 @@ export default class DeckSelectorScene extends BaseScene {
     })
   }
 
+  /** Right-edge deck-selector chrome: full viewport height, anchored bottom-right. */
+  private createSelectorRightChrome(): void {
+    const img = this.add
+      .image(0, Space.filterBarHeight, 'chrome-builderSelectorRight')
+      .setOrigin(1, 0)
+      .setDepth(1)
+    this.plugins.get('rexAnchor')['add'](img, {
+      x: '100%',
+    })
+  }
+
   /** Full-width header — same layout/padding as `DeckEditorScene` `createFilterHeader`. */
   private createMainHeader(): any {
     const barH = deckFilterBarHeight()
     const background = this.add
       .image(0, 0, 'chrome-builderHeader')
       .setInteractive()
-    this.addShadow(background, -90)
 
     const backContainer = new ContainerLite(
       this,
