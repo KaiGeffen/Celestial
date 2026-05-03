@@ -30,7 +30,7 @@ import { SpectatorMatchScene } from '../spectatorMatchScene'
 
 // TODO Use a non-mock color for the menu background
 const COLOR = Color.backgroundLight
-/** Alpha for light rectangles: tabs column + tabbed option panels */
+/** Alpha for light rectangles behind General / Audio / Rulebook / Credits panels */
 const OPTIONS_PANEL_BG_ALPHA = 0.4
 
 // The currently selected tab, preserved if the menu is closed/opened
@@ -110,7 +110,7 @@ export default class OptionsMenu extends Menu {
       (Flags.mobile ? 10 : 0)
     const height = Flags.mobile ? 50 : 90
     this.highlight = this.scene.add
-      .rectangle(0, 0, highlightWidth, height, COLOR, 1)
+      .rectangle(0, 0, highlightWidth, height, COLOR, OPTIONS_PANEL_BG_ALPHA)
       .setOrigin(0, 0.5)
 
     let tabsSizer = this.scene.rexUI.add.fixWidthSizer(
@@ -203,9 +203,7 @@ export default class OptionsMenu extends Menu {
         },
       })
       .addBackground(
-        this.scene.add
-          .rectangle(0, 0, 1, 1, COLOR)
-          .setAlpha(OPTIONS_PANEL_BG_ALPHA),
+        this.scene.add.rectangle(0, 0, 1, 1, COLOR, OPTIONS_PANEL_BG_ALPHA),
       )
       .hide()
 
@@ -233,9 +231,7 @@ export default class OptionsMenu extends Menu {
         },
       })
       .addBackground(
-        this.scene.add
-          .rectangle(0, 0, 1, 1, COLOR)
-          .setAlpha(OPTIONS_PANEL_BG_ALPHA),
+        this.scene.add.rectangle(0, 0, 1, 1, COLOR, OPTIONS_PANEL_BG_ALPHA),
       )
       .hide()
 
@@ -312,9 +308,7 @@ export default class OptionsMenu extends Menu {
         },
       })
       .addBackground(
-        this.scene.add
-          .rectangle(0, 0, 1, 1, COLOR)
-          .setAlpha(OPTIONS_PANEL_BG_ALPHA),
+        this.scene.add.rectangle(0, 0, 1, 1, COLOR, OPTIONS_PANEL_BG_ALPHA),
       )
       .hide()
 
@@ -348,9 +342,7 @@ export default class OptionsMenu extends Menu {
         },
       })
       .addBackground(
-        this.scene.add
-          .rectangle(0, 0, 1, 1, COLOR)
-          .setAlpha(OPTIONS_PANEL_BG_ALPHA),
+        this.scene.add.rectangle(0, 0, 1, 1, COLOR, OPTIONS_PANEL_BG_ALPHA),
       )
       .hide()
 
