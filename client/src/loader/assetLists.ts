@@ -453,6 +453,7 @@ export const assetLists = {
       "CloudTop",
       "Recap",
       "ResultGlow",
+      "body",
       "breathWheel",
       "bubble",
       "bubbleEffect",

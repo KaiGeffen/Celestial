@@ -2,7 +2,7 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
-import { Style, Color, Space } from '../../settings/settings'
+import { Style, Space, Color } from '../../settings/settings'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
 
@@ -104,10 +104,16 @@ export default class Menu {
     })
 
     // Add background
-    let rect = this.scene.rexUI.add
-      .roundRectangle(0, 0, 1, 1, Space.corner, Color.backgroundDark, 1)
+    // TODO Lighten the image itself instead of making a white rectangle
+    const whiteBg = this.scene.add
+      .rectangle(0, 0, 1, 1, Color.backgroundDark)
       .setInteractive()
-    this.sizer.addBackground(rect)
+    const bodyBg = this.scene.add
+      .image(0, 0, 'chrome-body')
+      .setInteractive()
+      .setAlpha(0.7)
+    this.sizer.addBackground(whiteBg)
+    this.sizer.addBackground(bodyBg)
 
     // Anchor in center of screen
     this.scene.plugins.get('rexAnchor')['add'](this.sizer, {
