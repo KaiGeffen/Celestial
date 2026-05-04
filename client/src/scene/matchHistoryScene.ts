@@ -16,6 +16,10 @@ const headerHeight = Space.iconSize + Space.pad * 2
 const width = Space.windowWidth - Space.sliderWidth
 const MATCH_HISTORY_FILTER_KEY = 'matchHistoryFilter'
 
+/** Left edge x for the match-type filter button (right-aligned in the header). */
+const matchHistoryFilterButtonX =
+  Space.windowWidth - Space.pad - Space.buttonWidth
+
 export default class MatchHistoryScene extends BaseSceneWithHeader {
   private matchHistoryData: MatchHistoryEntry[]
   private filteredMatchHistoryData: MatchHistoryEntry[]
@@ -201,8 +205,8 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       this.basePanel = this.rexUI.add
         .scrollablePanel({
           x: Space.windowWidth / 2,
-          y: headerHeight,
-          height: Space.windowHeight - headerHeight,
+          y: this.headerHeight,
+          height: Space.windowHeight - this.headerHeight,
 
           header: headerSizer,
 

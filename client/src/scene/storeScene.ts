@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Color, Space } from '../settings/settings'
+import { Style, Space } from '../settings/settings'
 import { BaseSceneWithHeader } from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
@@ -12,6 +12,7 @@ import { UserSettings } from '../settings/userSettings'
 
 export default class StoreScene extends BaseSceneWithHeader {
   private scrollablePanel: any = null
+  private userStatsDisplay: Phaser.GameObjects.Text
 
   constructor() {
     super({ key: 'StoreScene' })
@@ -20,12 +21,41 @@ export default class StoreScene extends BaseSceneWithHeader {
   create(): void {
     this.createBackground()
     super.create({ title: 'Store' })
+    this.createUserStatsDisplay()
     this.createStoreItems()
 
     // Refresh store when user data is updated (e.g., after purchase)
     this.game.events.on('userDataUpdated', () => {
       this.createStoreItems()
     })
+  }
+
+  update(time: number, delta: number): void {
+    super.update(time, delta)
+    this.updateUserStatsDisplay()
+  }
+
+  private createUserStatsDisplay(): void {
+    this.userStatsDisplay = this.add
+      .text(
+        Space.windowWidth - (Space.pad * 3 + Space.iconSize * 2),
+        this.headerHeight / 2,
+        '',
+        Style.basic,
+      )
+      .setOrigin(1, 0.5)
+      .setDepth(2)
+
+    this.updateUserStatsDisplay()
+  }
+
+  private updateUserStatsDisplay(): void {
+    const username = Server.getUserData().username
+    const elo = Server.getUserData().elo
+    const gems = Server.getUserData().gems
+    const coins = Server.getUserData().coins
+
+    this.userStatsDisplay.setText(`${username} (${elo}) ${gems}💎 ${coins}💰`)
   }
 
   private createBackground(): void {

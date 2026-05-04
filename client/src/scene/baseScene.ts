@@ -347,7 +347,6 @@ export default class BaseScene extends SharedBaseScene {
 
 export class BaseSceneWithHeader extends BaseScene {
   protected headerHeight = Space.iconSize + Space.pad * 2
-  private userStatsDisplay: Phaser.GameObjects.Text
 
   create(params): void {
     super.create(params)
@@ -355,36 +354,18 @@ export class BaseSceneWithHeader extends BaseScene {
     this.createHeader(params.title)
   }
 
-  update(time: number, delta: number): void {
-    super.update(time, delta)
-
-    this.updateUserStatsDisplay()
-  }
-
-  private updateUserStatsDisplay(): void {
-    const username = Server.getUserData().username
-    const elo = Server.getUserData().elo
-    const gems = Server.getUserData().gems
-    const coins = Server.getUserData().coins
-
-    // Set the text to the user's stats (Which might update)
-    this.userStatsDisplay.setText(`${username} (${elo}) ${gems}💎 ${coins}💰`)
-  }
-
   private createHeader(title: string): void {
-    // Make the background header
-    let background = this.add
-      .rectangle(
-        0,
-        0,
-        Space.windowWidth,
-        this.headerHeight,
-        Color.backgroundLight,
-      )
-      .setOrigin(0)
-    this.addShadow(background)
+    const frame = this.textures.getFrame('chrome-header')
+    const scale = Space.windowWidth / frame.width
+    this.headerHeight = Math.round(frame.height * scale)
 
-    // Create back button
+    const background = this.add
+      .image(0, 0, 'chrome-header')
+      .setOrigin(0, 0)
+      .setDisplaySize(Space.windowWidth, this.headerHeight)
+
+    this.addShadow(background, -90)
+
     new Buttons.Basic({
       within: this,
       text: 'Back',
@@ -393,34 +374,15 @@ export class BaseSceneWithHeader extends BaseScene {
       f: () => this.scene.start('HomeScene'),
     }).setDepth(2)
 
-    // Create title back in center
     this.add
       .text(
         Space.windowWidth / 2,
         this.headerHeight / 2,
         title,
-        Style.homeTitle,
+        Style.header,
       )
       .setOrigin(0.5)
-
-    // Add user info
-    this.createUserStatsDisplay()
-  }
-
-  private createUserStatsDisplay(): void {
-    // Create the text object displaying user stats
-    // Position accounts for: friends icon + padding + options icon + padding
-    this.userStatsDisplay = this.add
-      .text(
-        Space.windowWidth - (Space.pad * 3 + Space.iconSize * 2),
-        this.headerHeight / 2,
-        '',
-        Style.basic,
-      )
-      .setOrigin(1, 0.5)
-
-    // Set the text's values
-    this.updateUserStatsDisplay()
+      .setDepth(2)
   }
 }
 
