@@ -15,6 +15,9 @@ import { MATCH_HISTORY_PORT } from '../../../shared/network/settings'
 const width = Space.windowWidth - Space.sliderWidth
 const MATCH_HISTORY_FILTER_KEY = 'matchHistoryFilter'
 
+const MATCH_HISTORY_ROW_WIN_TEX = 'match-history-row-win-gradient'
+const MATCH_HISTORY_ROW_LOSS_TEX = 'match-history-row-loss-gradient'
+
 export default class MatchHistoryScene extends BaseSceneWithHeader {
   private matchHistoryData: MatchHistoryEntry[]
   private filteredMatchHistoryData: MatchHistoryEntry[]
@@ -35,6 +38,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
   create(): void {
     this.createBackground()
     super.create({ title: 'Match History' })
+    this.ensureMatchHistoryRowGradientTextures()
 
     // Reset scene state when creating
     this.matchHistoryData = []
@@ -53,6 +57,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     defaultTitle?.destroy()
 
     const titleText = this.add.text(0, 0, 'Match History', Style.header)
+
     const matchTypeContainer = new ContainerLite(
       this,
       0,
@@ -86,11 +91,46 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         Space.windowWidth / 2,
         Space.windowHeight / 2,
         'Loading matches...',
-        Style.basic,
+        Style.basicStylized,
       )
       .setOrigin(0.5, 0.5)
 
     this.fetchMatchHistoryData()
+  }
+
+  /**
+   * Win/loss row backgrounds: 0.2 alpha at horizontal center, fading to 0 at left and right edges.
+   */
+  private ensureMatchHistoryRowGradientTextures(): void {
+    if (this.textures.exists(MATCH_HISTORY_ROW_WIN_TEX)) {
+      return
+    }
+
+    const w = 512
+    const h = 64
+
+    const addCanvasGradient = (
+      key: string,
+      rgb: [number, number, number],
+    ): void => {
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        return
+      }
+      const grd = ctx.createLinearGradient(0, 0, w, 0)
+      const [r, g, b] = rgb
+      grd.addColorStop(0, `rgba(${r},${g},${b},0.2)`)
+      grd.addColorStop(1, `rgba(${r},${g},${b},0)`)
+      ctx.fillStyle = grd
+      ctx.fillRect(0, 0, w, h)
+      this.textures.addCanvas(key, canvas)
+    }
+
+    addCanvasGradient(MATCH_HISTORY_ROW_WIN_TEX, [0, 255, 0])
+    addCanvasGradient(MATCH_HISTORY_ROW_LOSS_TEX, [255, 0, 0])
   }
 
   private createBackground(): void {
@@ -169,10 +209,10 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         bottom: Space.pad,
       },
     })
-    let timeText = this.add.text(0, 0, '  Time', Style.basic)
-    let opponentText = this.add.text(0, 0, 'Opponent', Style.basic)
-    let resultsText = this.add.text(0, 0, 'W-L-T', Style.basic)
-    let deckText = this.add.text(0, 0, 'Deck Name', Style.basic)
+    let timeText = this.add.text(0, 0, '  Time', Style.basicStylized)
+    let opponentText = this.add.text(0, 0, 'Opponent', Style.basicStylized)
+    let resultsText = this.add.text(0, 0, 'W-L-T', Style.basicStylized)
+    let deckText = this.add.text(0, 0, 'Deck Name', Style.basicStylized)
 
     // Create search container to hold both text and background
     const searchContainer = new ContainerLite(this, 0, 0).setVisible(false)
@@ -281,22 +321,21 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       height: Space.avatarSize,
     })
 
-    // Add background color based on win/loss
-    const background = this.add.rectangle(
-      0,
-      0,
-      1,
-      1,
-      entry.wasWin ? 0x00ff00 : 0xff0000,
-      0.2,
-    )
+    // Win/loss tint: 0.2 alpha left → 0 alpha right (see ensureMatchHistoryRowGradientTextures)
+    const background = this.add
+      .image(
+        0,
+        0,
+        entry.wasWin ? MATCH_HISTORY_ROW_WIN_TEX : MATCH_HISTORY_ROW_LOSS_TEX,
+      )
+      .setOrigin(0, 0)
 
     // Time text
     const time = new Date(entry.time)
     const timeS = `  ${time.getMonth() + 1}/${time.getDate()}\n  ${time.getHours()}:${String(
       time.getMinutes(),
     ).padStart(2, '0')}`
-    const timeText = this.add.text(0, 0, `\t${timeS}`, Style.basic)
+    const timeText = this.add.text(0, 0, `\t${timeS}`, Style.basicStylized)
 
     // Opponent Info
     const oppSizer = this.rexUI.add.sizer({
@@ -318,15 +357,16 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       .text(
         0,
         0,
-        ` ${entry.opponentUsername}` + (isPVE ? '' : ` (${entry.opponentElo})`),
-        Style.basic,
+        `   ${entry.opponentUsername}` +
+          (isPVE ? '' : ` (${entry.opponentElo})`),
+        Style.basicStylized,
       )
       .setOrigin(0, 0.5)
     oppSizer.add(oppAvatarContainer).add(oppText)
 
     // Results text
-    const resultS = `     ${entry.wasWin ? 'Win' : 'Loss'}\n    ${entry.roundsWon}-${entry.roundsLost}-${entry.roundsTied}`
-    let resultsText = this.add.text(0, 0, resultS, Style.basic)
+    const resultS = `${entry.wasWin ? 'Win' : 'Loss'}\n${entry.roundsWon}-${entry.roundsLost}-${entry.roundsTied}`
+    let resultsText = this.add.text(0, 0, resultS, Style.basicStylized)
 
     // User Info
     const userSizer = this.rexUI.add.sizer({
@@ -348,15 +388,15 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       .text(
         0,
         0,
-        ` ${entry.deck.name}` + (isPVE ? '' : ` (${entry.elo})`),
-        Style.basic,
+        `   ${entry.deck.name}` + (isPVE ? '' : ` (${entry.elo})`),
+        Style.basicStylized,
       )
       .setOrigin(0, 0.5)
     userSizer.add(userAvatarContainer).add(userText)
 
     // Create expand button with arrow and make sure it's interactive
     let expandText = this.add
-      .text(0, 0, '▼', Style.basic)
+      .text(0, 0, '▼', Style.basicStylized)
       .setInteractive()
       .setDepth(1)
 
@@ -410,7 +450,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         align: 'right-top',
       })
       .add(ourList, { proportion: 2, align: 'top' })
-      .add(this.add.text(0, 0, '', Style.basic), {
+      .add(this.add.text(0, 0, '', Style.basicStylized), {
         proportion: 0.5,
         align: 'top',
       })
