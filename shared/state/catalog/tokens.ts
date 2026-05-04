@@ -134,7 +134,7 @@ class Ice extends Card {
 
     // Move to the beginning of the (unresolved) story
     const index2 = 0
-    game.story.addAct(this, player, index2)
+    game.story.addAct(this, player, index2, true)
 
     // TODO Add animation
     game.animations[player].push(
@@ -155,8 +155,7 @@ const ice = new Ice({
   id: 1008,
   cost: 1,
   points: 1,
-  qualities: [Quality.VISIBLE],
-  text: 'Visible\nWhen drawn, add this to the story.',
+  text: 'When drawn, add this to the story Revealed.',
   theme: 7,
   beta: true,
 })
