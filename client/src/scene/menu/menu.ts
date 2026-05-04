@@ -171,7 +171,6 @@ import ConfirmMenu from './confirm'
 import MessageMenu from './message'
 import ChapterMessageMenu from './chapterMessage'
 import ChoiceChapterMessageMenu from './choiceChapterMessage'
-import SearchMenu from './search'
 import LeaderboardMenu from './leaderboard'
 import OnlinePlayersMenu from './onlinePlayers'
 import { RegisterUsernameMenu } from './registerUsername'
@@ -192,8 +191,10 @@ const menus = {
   credits: CreditsMenu,
   rulebook: RulebookMenu,
   newDeck: NewDeckMenu,
+  play: PlayMenu,
 
-  // TODO Move the copy/paste
+  // TODO Move the copy/paste deck code somewhere.
+  // TODO Rename to be about cosmetics if that's what it is
   editDeck: EditDeckMenu,
 
   // TODO Higher min height
@@ -201,22 +202,23 @@ const menus = {
   confirm: ConfirmMenu,
   message: MessageMenu,
 
-  //
+  // Chapters
   chapterMessage: ChapterMessageMenu,
   choiceChapterMessage: ChoiceChapterMessageMenu,
-  search: SearchMenu,
+
   leaderboard: LeaderboardMenu,
   onlinePlayers: OnlinePlayersMenu,
   registerUsername: RegisterUsernameMenu,
   purchaseItem: PurchaseItemMenu,
   userProfile: UserProfileMenu,
   achievements: AchievementsMenu,
+
+  // RACE COMING SOON (tm)
   raceCardChoice: RaceCardChoiceMenu,
   raceDeckReplacement: RaceDeckReplacementMenu,
   raceDeckSelection: RaceDeckSelectionMenu,
   raceCardUpgrade: RaceCardUpgradeMenu,
   raceSpecialModes: RaceSpecialModesMenu,
-  play: PlayMenu,
 }
 
 // Function exposed for the creation of custom menus
