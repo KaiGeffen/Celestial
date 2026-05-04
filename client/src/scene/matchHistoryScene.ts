@@ -12,13 +12,8 @@ import { encodeShareableDeckCode } from '../../../shared/codec'
 import Decklist from '../lib/decklist'
 import { MATCH_HISTORY_PORT } from '../../../shared/network/settings'
 
-const headerHeight = Space.iconSize + Space.pad * 2
 const width = Space.windowWidth - Space.sliderWidth
 const MATCH_HISTORY_FILTER_KEY = 'matchHistoryFilter'
-
-/** Left edge x for the match-type filter button (right-aligned in the header). */
-const matchHistoryFilterButtonX =
-  Space.windowWidth - Space.pad - Space.buttonWidth
 
 export default class MatchHistoryScene extends BaseSceneWithHeader {
   private matchHistoryData: MatchHistoryEntry[]
@@ -38,6 +33,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
   }
 
   create(): void {
+    this.createBackground()
     super.create({ title: 'Match History' })
 
     // Reset scene state when creating
@@ -81,7 +77,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       })
       .add(titleText)
       .add(matchTypeContainer)
-      .setPosition(Space.windowWidth / 2, headerHeight / 2)
+      .setPosition(Space.windowWidth / 2, this.headerHeight / 2)
       .layout()
 
     // Show loading message
@@ -95,6 +91,24 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       .setOrigin(0.5, 0.5)
 
     this.fetchMatchHistoryData()
+  }
+
+  private createBackground(): void {
+    const whiteBg = this.add
+      .rectangle(0, 0, 1, 1, Color.backgroundDark)
+      .setOrigin(0, 0)
+      .setInteractive()
+    const bodyBg = this.add
+      .image(0, 0, 'chrome-body')
+      .setOrigin(0, 0)
+      .setAlpha(0.7)
+
+    const anchor = {
+      width: '100%',
+      height: '100%',
+    }
+    this.plugins.get('rexAnchor')['add'](whiteBg, anchor)
+    this.plugins.get('rexAnchor')['add'](bodyBg, anchor)
   }
 
   private async fetchMatchHistoryData() {
@@ -161,7 +175,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     let deckText = this.add.text(0, 0, 'Deck Name', Style.basic)
 
     // Create search container to hold both text and background
-    const searchContainer = new ContainerLite(this, 0, 0)
+    const searchContainer = new ContainerLite(this, 0, 0).setVisible(false)
 
     // Add search box
     this.searchObj = this.add
