@@ -47,7 +47,7 @@ export default class OnlinePlayersMenu extends Menu {
       scene,
       MENU_ROW_HIGHLIGHT_GRADIENT_KEY,
       Color.gold,
-      0.2,
+      0.5,
       0,
     )
 
@@ -181,7 +181,7 @@ export default class OnlinePlayersMenu extends Menu {
     // If no players data yet, show loading message
     if (this.playersData.length === 0) {
       const loadingText = this.scene.add
-        .text(0, 0, 'Getting players...', Style.basic)
+        .text(0, 0, 'Getting players...', Style.basicStylized)
         .setOrigin(0.5, 0.5)
       const loadingSizer = this.scene.rexUI.add.sizer({
         orientation: 'vertical',
@@ -250,12 +250,17 @@ export default class OnlinePlayersMenu extends Menu {
     })
 
     // Add each text object
-    let usernameText = this.scene.add.text(0, 0, player.username, Style.basic)
+    let usernameText = this.scene.add.text(
+      0,
+      0,
+      player.username,
+      Style.basicStylized,
+    )
     const statusText = this.scene.add.text(
       0,
       0,
       this.getStatusLabel(player.status),
-      Style.basic,
+      Style.basicStylized,
     )
 
     // Right column: vertically center status, then put the Spectate button below it.
