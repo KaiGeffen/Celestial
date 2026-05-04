@@ -141,7 +141,7 @@ export default class DeckThumbnail {
     this.container.add(hitbox)
 
     this.nameText = scene.add
-      .text(0, nameBarY, name, Style.builder)
+      .text(0, nameBarY, name, Style.deckThumbnail)
       .setOrigin(0.5, 0.5)
     this.container.add(this.nameText)
 
@@ -197,20 +197,35 @@ export default class DeckThumbnail {
     if (this.isNewDeckButton) {
       this.nameBackground.setTint(Color.black)
       if (this.nameText) this.nameText.setColor(Color.whiteS)
+      this.applyDeckNameStroke()
       return
     }
 
     if (this.selected) {
       this.nameBackground.setTint(Color.gold)
       if (this.nameText) this.nameText.setColor(Color.basicText)
+      this.applyDeckNameStroke()
       return
     }
     if (this.hovered) {
       this.nameBackground.setTint(Color.gold)
       if (this.nameText) this.nameText.setColor(Color.basicText)
+      this.applyDeckNameStroke()
       return
     }
     this.nameBackground.clearTint()
     if (this.nameText) this.nameText.setColor(Color.basicText)
+    this.applyDeckNameStroke()
+  }
+
+  /** No outline on the dark (black-tint) nameplate; default white stroke elsewhere. */
+  private applyDeckNameStroke(): void {
+    if (!this.nameText) return
+    const s = Style.deckThumbnail
+    if (this.isNewDeckButton) {
+      this.nameText.setStroke(s.stroke as string, 0)
+    } else {
+      this.nameText.setStroke(s.stroke as string, s.strokeThickness)
+    }
   }
 }

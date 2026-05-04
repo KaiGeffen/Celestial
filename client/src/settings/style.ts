@@ -83,6 +83,16 @@ const StyleGeneral: StyleDict = {
     color: Color.textboxText,
   },
 
+  // Deck thumbnail nameplate
+  deckThumbnail: {
+    fontFamily: secondaryFont,
+    fontSize: '24px',
+    color: Color.basicText,
+    fontStyle: 'Bold',
+    stroke: Color.whiteS,
+    strokeThickness: 1,
+  },
+
   // Count of a card in the deck
   cutoutCardCount: {
     fontFamily: sansFont,
@@ -264,14 +274,6 @@ const StyleJourney: StyleDict = {
 
 // Styles that are no longer used in any in-use scenes
 const StyleDeprecated: StyleDict = {
-  // Cost hint text
-  builder: {
-    fontFamily: mainFont,
-    fontSize: '22px',
-    color: Color.basicText,
-    // fontStyle: "Bold",
-  },
-
   // Surname for characters in premade deck
   surname: {
     fontFamily: mainFont,
