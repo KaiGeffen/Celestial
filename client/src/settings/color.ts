@@ -133,8 +133,6 @@ export const Color: Record<string, any> = {
   username: CoreColors.blackS,
   todoSubtext: CoreColors.blackS,
 
-  rowHighlight: CoreColors.gold,
-
   // Progress bar
   progressBar: 0x4e342e,
   progressBarTrack: 0x7b5e57,

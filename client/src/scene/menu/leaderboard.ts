@@ -9,6 +9,10 @@ import { Flags } from '../../settings/flags'
 import { LEADERBOARD_PORT } from '../../../../shared/network/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
+import {
+  ensureRowAlphaGradientTexture,
+  MENU_ROW_HIGHLIGHT_GRADIENT_KEY,
+} from '../../lib/rowAlphaGradientTexture'
 
 const height = (Space.windowHeight * 2) / 3
 const width = 1000
@@ -33,6 +37,14 @@ export default class LeaderboardMenu extends Menu {
     // Sizer has no pad between lines
     this.sizer.space.line = 0
     this.sizer.space.bottom = 0
+
+    ensureRowAlphaGradientTexture(
+      scene,
+      MENU_ROW_HIGHLIGHT_GRADIENT_KEY,
+      Color.gold,
+      0.5,
+      0,
+    )
 
     this.createHeader('Leaderboard')
     this.fetchLeaderboardData()
@@ -156,10 +168,12 @@ export default class LeaderboardMenu extends Menu {
       },
     })
 
-    // If the row is our account, highlight it
+    // If the row is our account, highlight it (gold; same L→R alpha gradient as match history)
     if (entry.username === Server.getUserData().username) {
       rowSizer.addBackground(
-        this.scene.add.rectangle(0, 0, 1, 1, Color.rowHighlight),
+        this.scene.add
+          .image(0, 0, MENU_ROW_HIGHLIGHT_GRADIENT_KEY)
+          .setOrigin(0, 0),
       )
     }
 

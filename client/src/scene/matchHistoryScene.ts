@@ -11,6 +11,7 @@ import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { encodeShareableDeckCode } from '../../../shared/codec'
 import Decklist from '../lib/decklist'
 import { MATCH_HISTORY_PORT } from '../../../shared/network/settings'
+import { ensureRowAlphaGradientTexture } from '../lib/rowAlphaGradientTexture'
 
 const width = Space.windowWidth - Space.sliderWidth
 const MATCH_HISTORY_FILTER_KEY = 'matchHistoryFilter'
@@ -98,39 +99,22 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     this.fetchMatchHistoryData()
   }
 
-  /**
-   * Win/loss row backgrounds: 0.2 alpha at horizontal center, fading to 0 at left and right edges.
-   */
+  /** Win/loss row backgrounds: 20% alpha on the left → 0 on the right. */
   private ensureMatchHistoryRowGradientTextures(): void {
-    if (this.textures.exists(MATCH_HISTORY_ROW_WIN_TEX)) {
-      return
-    }
-
-    const w = 512
-    const h = 64
-
-    const addCanvasGradient = (
-      key: string,
-      rgb: [number, number, number],
-    ): void => {
-      const canvas = document.createElement('canvas')
-      canvas.width = w
-      canvas.height = h
-      const ctx = canvas.getContext('2d')
-      if (!ctx) {
-        return
-      }
-      const grd = ctx.createLinearGradient(0, 0, w, 0)
-      const [r, g, b] = rgb
-      grd.addColorStop(0, `rgba(${r},${g},${b},0.2)`)
-      grd.addColorStop(1, `rgba(${r},${g},${b},0)`)
-      ctx.fillStyle = grd
-      ctx.fillRect(0, 0, w, h)
-      this.textures.addCanvas(key, canvas)
-    }
-
-    addCanvasGradient(MATCH_HISTORY_ROW_WIN_TEX, [0, 255, 0])
-    addCanvasGradient(MATCH_HISTORY_ROW_LOSS_TEX, [255, 0, 0])
+    ensureRowAlphaGradientTexture(
+      this,
+      MATCH_HISTORY_ROW_WIN_TEX,
+      0x00ff00,
+      0.2,
+      0,
+    )
+    ensureRowAlphaGradientTexture(
+      this,
+      MATCH_HISTORY_ROW_LOSS_TEX,
+      0xff0000,
+      0.2,
+      0,
+    )
   }
 
   private createBackground(): void {

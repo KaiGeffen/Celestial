@@ -9,6 +9,10 @@ import Buttons from '../../lib/buttons/buttons'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
+import {
+  ensureRowAlphaGradientTexture,
+  MENU_ROW_HIGHLIGHT_GRADIENT_KEY,
+} from '../../lib/rowAlphaGradientTexture'
 
 const height = (Space.windowHeight * 2) / 3
 const width = 600
@@ -38,6 +42,14 @@ export default class OnlinePlayersMenu extends Menu {
     // Sizer has no pad between lines
     this.sizer.space.line = 0
     this.sizer.space.bottom = 0
+
+    ensureRowAlphaGradientTexture(
+      scene,
+      MENU_ROW_HIGHLIGHT_GRADIENT_KEY,
+      Color.gold,
+      0.2,
+      0,
+    )
 
     this.createHeader('Online Players')
     this.createContent()
@@ -213,10 +225,12 @@ export default class OnlinePlayersMenu extends Menu {
       },
     })
 
-    // If the row is our account, highlight it
+    // If the row is our account, highlight it (gold; same L→R alpha as match history rows)
     if (player.username === Server.getUserData()?.username) {
       rowSizer.addBackground(
-        this.scene.add.rectangle(0, 0, 1, 1, Color.rowHighlight),
+        this.scene.add
+          .image(0, 0, MENU_ROW_HIGHLIGHT_GRADIENT_KEY)
+          .setOrigin(0, 0),
       )
     }
 
