@@ -208,8 +208,10 @@ const menus = {
 
   leaderboard: LeaderboardMenu,
   onlinePlayers: OnlinePlayersMenu,
-  registerUsername: RegisterUsernameMenu,
   purchaseItem: PurchaseItemMenu,
+
+  // TODO Not done yet
+  registerUsername: RegisterUsernameMenu,
   userProfile: UserProfileMenu,
   achievements: AchievementsMenu,
 

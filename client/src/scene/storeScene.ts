@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Space } from '../settings/settings'
+import { Color, Style, Space } from '../settings/settings'
 import { BaseSceneWithHeader } from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
@@ -41,7 +41,7 @@ export default class StoreScene extends BaseSceneWithHeader {
         Space.windowWidth - (Space.pad * 3 + Space.iconSize * 2),
         this.headerHeight / 2,
         '',
-        Style.basic,
+        Style.basicStylized,
       )
       .setOrigin(1, 0.5)
       .setDepth(2)
@@ -50,12 +50,12 @@ export default class StoreScene extends BaseSceneWithHeader {
   }
 
   private updateUserStatsDisplay(): void {
-    const username = Server.getUserData().username
-    const elo = Server.getUserData().elo
-    const gems = Server.getUserData().gems
-    const coins = Server.getUserData().coins
+    const gems = Server.getUserData().gems ?? 0
+    const coins = Server.getUserData().coins ?? 0
 
-    this.userStatsDisplay.setText(`${username} (${elo}) ${gems}💎 ${coins}💰`)
+    this.userStatsDisplay.setText(
+      `💰 ${coins.toLocaleString()}\n💎 ${gems.toLocaleString()}`,
+    )
   }
 
   private createBackground(): void {
