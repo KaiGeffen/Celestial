@@ -2,7 +2,7 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
-import { Style, Space, Color } from '../../settings/settings'
+import { Style, Space } from '../../settings/settings'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
 
@@ -103,16 +103,7 @@ export default class Menu {
       },
     })
 
-    // Add background
-    // TODO Lighten the image itself instead of making a white rectangle
-    const whiteBg = this.scene.add
-      .rectangle(0, 0, 1, 1, Color.backgroundDark)
-      .setInteractive()
-    const bodyBg = this.scene.add
-      .image(0, 0, 'chrome-body')
-      .setInteractive()
-      .setAlpha(0.7)
-    this.sizer.addBackground(whiteBg)
+    const bodyBg = this.scene.add.image(0, 0, 'chrome-body').setInteractive()
     this.sizer.addBackground(bodyBg)
 
     // Anchor in center of screen
@@ -202,18 +193,16 @@ const menus = {
   confirm: ConfirmMenu,
   message: MessageMenu,
 
-  // Chapters
+  // Chapters TODO
   chapterMessage: ChapterMessageMenu,
   choiceChapterMessage: ChoiceChapterMessageMenu,
 
   leaderboard: LeaderboardMenu,
   onlinePlayers: OnlinePlayersMenu,
   purchaseItem: PurchaseItemMenu,
-
-  // TODO Not done yet
-  registerUsername: RegisterUsernameMenu,
   userProfile: UserProfileMenu,
   achievements: AchievementsMenu,
+  registerUsername: RegisterUsernameMenu,
 
   // RACE COMING SOON (tm)
   raceCardChoice: RaceCardChoiceMenu,

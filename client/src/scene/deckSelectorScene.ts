@@ -190,7 +190,7 @@ export default class DeckSelectorScene extends BaseScene {
 
     // Central sizer background (With deck thumbnails)
     const centralSizerBackground = this.add
-      .image(0, Space.filterBarHeight, 'chrome-selectorBody')
+      .image(0, Space.filterBarHeight, 'chrome-body')
       .setOrigin(1, 0)
       .setAlpha(0.7)
     this.plugins.get('rexAnchor')['add'](centralSizerBackground, {

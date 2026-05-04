@@ -466,7 +466,6 @@ export const assetLists = {
       "divider",
       "header",
       "nameplate",
-      "selectorBody",
       "stackCount",
       "sundial",
       "tabSelector",

@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Color, Space, Flags, Scroll } from '../settings/settings'
+import { Style, Space, Flags, Scroll } from '../settings/settings'
 import { BaseSceneWithHeader } from './baseScene'
 import Server from '../server'
 import Buttons from '../lib/buttons/buttons'
@@ -118,20 +118,12 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
   }
 
   private createBackground(): void {
-    const whiteBg = this.add
-      .rectangle(0, 0, 1, 1, Color.backgroundDark)
-      .setOrigin(0, 0)
-      .setInteractive()
-    const bodyBg = this.add
-      .image(0, 0, 'chrome-body')
-      .setOrigin(0, 0)
-      .setAlpha(0.7)
+    const bodyBg = this.add.image(0, 0, 'chrome-body').setOrigin(0, 0)
 
     const anchor = {
       width: '100%',
       height: '100%',
     }
-    this.plugins.get('rexAnchor')['add'](whiteBg, anchor)
     this.plugins.get('rexAnchor')['add'](bodyBg, anchor)
   }
 

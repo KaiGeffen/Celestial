@@ -74,7 +74,7 @@ export class RegisterUsernameMenu extends Menu {
 
   private createDisclaimerText() {
     const disclaimerMessage =
-      'Celestial is in Beta!\n\nParts of the game may be buggy or subject to change, and your progress may be lost. We also collect gameplay analytics (such as tutorial completion rates) to help us improve the experience.\n\nPlease join the Discord!'
+      'Celestial is in Beta!\n\nParts of the game may be buggy or subject to change. We also collect gameplay analytics (such as tutorial completion rates) to help us improve the experience.\n\nPlease join the Discord!'
 
     let text = this.scene.add
       .text(0, 0, disclaimerMessage, Style.basic)
