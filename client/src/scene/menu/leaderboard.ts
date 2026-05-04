@@ -83,6 +83,7 @@ export default class LeaderboardMenu extends Menu {
       },
     })
 
+    const blankText = this.scene.add.text(0, 0, '', Style.basicStylized)
     let rankText = this.scene.add.text(0, 0, '\tRank', Style.basicStylized)
     const avatarText = this.scene.add.text(0, 0, '', Style.basicStylized)
     let usernameText = this.scene.add.text(
@@ -96,6 +97,7 @@ export default class LeaderboardMenu extends Menu {
     let eloText = this.scene.add.text(0, 0, 'ELO', Style.basicStylized)
 
     headerSizer
+      .add(blankText, { proportion: 0.2 })
       .add(rankText, { proportion: 0.5 })
       .add(avatarText, { proportion: 1.5 })
       .add(usernameText, { proportion: 2 })
@@ -193,6 +195,7 @@ export default class LeaderboardMenu extends Menu {
     })
 
     // Add each text object
+    const blankText = this.scene.add.text(0, 0, '', Style.basicStylized)
     let rankText = this.scene.add.text(
       0,
       0,
@@ -226,6 +229,7 @@ export default class LeaderboardMenu extends Menu {
 
     // Add each text with the right proportion
     rowSizer
+      .add(blankText, { proportion: 0.2 })
       .add(rankText, { proportion: 0.5 })
       .add(avatarContainer, { proportion: 1.5 })
       .add(usernameText, { proportion: 2 })
