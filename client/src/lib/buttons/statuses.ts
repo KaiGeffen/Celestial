@@ -3,6 +3,7 @@ import Button, { Config } from './button'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import { Style } from '../../settings/settings'
 import { Keywords } from '../../../../shared/state/keyword'
+import { fitTextToMaxWidth } from '../../utils/textFit'
 
 const STATUS_TEXT_INSPIRE = '#1c2962'
 const STATUS_TEXT_NOURISH = '#053327'
@@ -15,12 +16,7 @@ const STATUS_VALUE_MAX_WIDTH_PX = 20
 export function fitStatusValueText(
   txt: Phaser.GameObjects.Text | undefined,
 ): void {
-  if (!txt) return
-  txt.setScale(1)
-  const w = txt.displayWidth
-  if (w > STATUS_VALUE_MAX_WIDTH_PX) {
-    txt.setScale(STATUS_VALUE_MAX_WIDTH_PX / w)
-  }
+  fitTextToMaxWidth(txt, STATUS_VALUE_MAX_WIDTH_PX)
 }
 
 /** Reword second-person keyword lines for the opponent’s status row (“they” not “you”). */

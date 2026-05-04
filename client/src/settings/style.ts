@@ -228,6 +228,15 @@ const StyleHome: StyleDict = {
     strokeThickness: 3,
     align: 'center',
   },
+  usernameLarge: {
+    fontFamily: primaryFont,
+    fontStyle: 'Bold',
+    fontSize: '30px',
+    color: Color.whiteS,
+    stroke: Color.darkUmberS,
+    strokeThickness: 3,
+    align: 'center',
+  },
   usernameInfo: {
     fontFamily: sansFont,
     fontSize: '14px',
