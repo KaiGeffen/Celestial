@@ -68,8 +68,8 @@ function getSpace() {
     buttonWidth: 150,
     buttonHeight: 51,
     bigButtonHeight: 130,
-    textboxWidth: 296,
-    textboxHeight: 58,
+    textboxWidth: 330,
+    textboxHeight: 70,
 
     avatarSize: Flags.mobile ? 80 : 130,
     iconSize: 40,

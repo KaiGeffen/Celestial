@@ -1,3 +1,5 @@
+import { Core } from 'phaser'
+
 // The base colors used throughout this app
 const CoreColors: Record<string, number | string> = {
   white: 0xf5f2eb,
@@ -80,7 +82,7 @@ export const Color: Record<string, any> = {
   discordButton: CoreColors.brown,
 
   // Input text
-  textboxText: '#ffffff',
+  textboxText: CoreColors.blackS,
 
   // Line
   line: CoreColors.black,
