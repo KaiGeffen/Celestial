@@ -13,6 +13,9 @@ class Story {
   // Some effects cause a round to end immediately
   roundEndedForced: boolean = false
 
+  /** Max resolved-act count after a mid-story `Zone.Reset`; bubbles skip acts below this index. Persisted so skipped recap still matches sequential `popBubbles`. */
+  bubbleSkipBeforeResolvedIndex = 0
+
   // Add a card to the story with given owner and at given position
   addAct(card: Card, owner: number, i?: number, revealed = false) {
     const act = new Act(card, owner, revealed)
@@ -29,6 +32,7 @@ class Story {
     game.recentModels = [[], []]
     this.resolvedActs = []
     this.roundEndedForced = false
+    this.bubbleSkipBeforeResolvedIndex = 0
 
     // Add a model at the start
     game.versionIncrClearAnimations()
@@ -88,6 +92,7 @@ class Story {
     addRecentModels(game)
 
     this.resolvedActs = []
+    this.bubbleSkipBeforeResolvedIndex = 0
 
     // Set winner/loser/tie sfx
     if (game.score[0] > game.score[1]) {
@@ -141,6 +146,9 @@ class Story {
     this.resolvedActs.forEach((act) => {
       copy.resolvedActs.push({ ...act })
     })
+
+    copy.roundEndedForced = this.roundEndedForced
+    copy.bubbleSkipBeforeResolvedIndex = this.bubbleSkipBeforeResolvedIndex
 
     return copy
   }

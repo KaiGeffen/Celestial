@@ -768,6 +768,21 @@ class StoryResolveBubbles {
     this.staggerEvents = []
   }
 
+  /** Same cutoff as `popBubbles`: max `index` on `Zone.Reset` animations in this state's batch (often empty after recap skip). */
+  private bubbleSkipBeforeResolvedIndexFromResetAnimations(
+    state: GameModel,
+  ): number {
+    let max = 0
+    for (const anims of state.animations) {
+      for (const a of anims) {
+        if (a.from === Zone.Reset && typeof a.index === 'number') {
+          max = Math.max(max, a.index)
+        }
+      }
+    }
+    return max
+  }
+
   /**
    * Draws resolve bubbles for each settled act (staggered when a single act just resolved).
    * Returns recap tween slots to align other recap animations with those bubble tweens.
@@ -786,17 +801,25 @@ class StoryResolveBubbles {
       this.resetBeforeResolvedCount = -1
     }
 
+    const fromStoryField = state.story.bubbleSkipBeforeResolvedIndex ?? 0
+    const fromResetAnimations =
+      this.bubbleSkipBeforeResolvedIndexFromResetAnimations(state)
+    const animationBubbleSkipBefore =
+      this.resetBeforeResolvedCount === -1 ? 0 : this.resetBeforeResolvedCount
+    const bubbleSkipBeforeResolvedIndex = Math.max(
+      fromStoryField,
+      fromResetAnimations,
+      animationBubbleSkipBefore,
+    )
+
     // Same predicate as `StoryRegion` (lastStoryResolvedActCount vs snapshot): only the newest resolve gets stagger / settle tween.
     const oneNewResolvedAct =
       resolvedCount === this.snapshotResolvedActCount + 1 && resolvedCount > 0
     const r = Time.match.recapTween
 
     for (let resolvedI = 0; resolvedI < resolvedCount; resolvedI++) {
-      // Skip acts whose bubbles were popped by a reset
-      if (
-        this.resetBeforeResolvedCount !== -1 &&
-        resolvedI < this.resetBeforeResolvedCount
-      ) {
+      // Skip acts cleared by reset (sequential recap via popBubbles, or skipped recap via Story / Reset animation index)
+      if (resolvedI < bubbleSkipBeforeResolvedIndex) {
         continue
       }
       const act = state.story.resolvedActs[resolvedI]
