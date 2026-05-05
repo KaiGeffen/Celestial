@@ -208,19 +208,11 @@ export class DeckEditorCatalog {
       this.costFilterBtns.push(btn)
     }
 
-    const clearContainer = new ContainerLite(
-      scene,
-      0,
-      0,
-      32,
-      Space.buttonHeight,
-    )
     new Buttons.Icon({
       name: 'SmallX',
-      within: clearContainer,
+      within: middle,
       f: this.onClearFilters(),
     })
-    middle.add(clearContainer)
 
     middle.add(this.createSearchField())
 

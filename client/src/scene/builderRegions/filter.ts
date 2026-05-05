@@ -178,7 +178,6 @@ export default class FilterRegion {
       name: 'SmallX',
       within: sizer,
       f: this.onClearFilters(btns),
-      size: 32,
     })
 
     return sizer

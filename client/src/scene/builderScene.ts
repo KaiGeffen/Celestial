@@ -269,7 +269,6 @@ export class BuilderScene extends BuilderBase {
         // Resize the catalog
         this.catalogRegion.resize(this.sizer.width)
       },
-      size: 32,
     }).setDepth(100)
   }
 
