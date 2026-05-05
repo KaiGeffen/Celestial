@@ -99,6 +99,9 @@ export default class GameModel {
 
     // Starting priority is random
     this.priority = Math.floor(Math.random() * 2)
+    // Priority defaults to the same random player as starting priority
+    this.lastPlayerWhoPlayed = this.priority
+
     this.status = [new Statuses(), new Statuses()]
 
     // Draw starting hand
