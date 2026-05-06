@@ -13,8 +13,7 @@ export const assetLists = {
       "KitzFull",
       "MiaFull",
       "MitraFull",
-      "RenataFull",
-      "hidden"
+      "RenataFull"
     ],
     "dimensions": {
       "Adonis": {
@@ -335,13 +334,11 @@ export const assetLists = {
   "icon": {
     "files": [
       "Wins",
-      "Mission",
       "BreathBasic",
       "BreathExtra",
       "BreathHover",
       "BreathOom",
       "BreathSpent",
-      "CustomDeck",
       "DeckbuilderTab",
       "Discord",
       "InputText",
@@ -374,18 +371,12 @@ export const assetLists = {
       "ThumbVertical",
       "TrackVertical",
       "Underline",
-      "Underline",
-      "XOut",
-      "thumbnailNameplate"
+      "XOut"
     ],
     "dimensions": {
       "Wins": {
         "width": 157,
         "height": 1080
-      },
-      "Mission": {
-        "width": 80,
-        "height": 80
       }
     },
     "pixelArt": false
@@ -472,8 +463,7 @@ export const assetLists = {
       "stackCount",
       "sundial",
       "tabSelector",
-      "thumbnailNameplate",
-      "wins"
+      "thumbnailNameplate"
     ],
     "pixelArt": false
   },
