@@ -364,7 +364,6 @@ export const assetLists = {
       "Share",
       "Sight",
       "SmallX",
-      "SmallX",
       "Social",
       "Speed",
       "Status",
@@ -374,6 +373,7 @@ export const assetLists = {
       "ThumbHorizontal",
       "ThumbVertical",
       "TrackVertical",
+      "Underline",
       "Underline",
       "XOut",
       "thumbnailNameplate"

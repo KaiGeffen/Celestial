@@ -72,8 +72,10 @@ const StyleGeneral: StyleDict = {
   // Text for the buttons that are just text
   textButton: {
     fontFamily: sansFont,
-    fontSize: '20px',
+    fontSize: '24px',
     color: Color.textButton,
+    stroke: Color.blackS,
+    strokeThickness: 1,
   },
 
   // Input text fields

@@ -2,6 +2,8 @@ import 'phaser'
 import Button from './button'
 import { Style, Color } from '../../settings/settings'
 
+const DESELECTED_ALPHA = 0.3
+
 export default class UButton extends Button {
   selected: boolean = false
 
@@ -31,6 +33,9 @@ export default class UButton extends Button {
         click: f,
       },
     })
+
+    // Make icon barely visible
+    this.icon.setAlpha(DESELECTED_ALPHA)
   }
 
   // Toggle this button on or off and return its new value
@@ -38,9 +43,9 @@ export default class UButton extends Button {
     this.selected = !this.selected
 
     if (this.selected) {
-      this.icon.setTint(Color.filterSelected)
+      this.icon.setAlpha(1)
     } else {
-      this.icon.clearTint()
+      this.icon.setAlpha(DESELECTED_ALPHA)
     }
 
     return this.selected
@@ -48,6 +53,6 @@ export default class UButton extends Button {
 
   toggleOff(): void {
     this.selected = false
-    this.icon.clearTint()
+    this.icon.setAlpha(DESELECTED_ALPHA)
   }
 }
