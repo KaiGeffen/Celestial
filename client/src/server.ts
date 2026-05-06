@@ -23,6 +23,17 @@ const ip = '127.0.0.1'
 const port = 5555
 // Custom code for closing websocket connection due to invalid token
 const code = 1000
+const STEAM_UUID_NAMESPACE = UUID_NAMESPACE
+
+interface SteamAuthResult {
+  steamId: string
+  ticket: string
+}
+
+interface AuthHandlers {
+  onPromptUserInit?: () => void
+  onInvalidToken?: () => void
+}
 
 // The websocket connetion to the server
 export var server: ClientWS = undefined
@@ -53,6 +64,60 @@ export default class Server {
     canBeSpectated: boolean
   }[] = []
 
+  private static connectAndAuthenticate(
+    uuid: string,
+    game: Phaser.Game,
+    callback: () => void,
+    sendAuth: () => void,
+    handlers?: AuthHandlers,
+  ): void {
+    server = Server.getSocket()
+    server.onOpen(sendAuth)
+
+    if (handlers?.onPromptUserInit) {
+      server.on('promptUserInit', handlers.onPromptUserInit)
+    }
+    if (handlers?.onInvalidToken) {
+      server.on('invalidToken', handlers.onInvalidToken)
+    }
+
+    this.registerCommonHandlers(uuid, game, callback)
+  }
+
+  private static sendInitialDataForUsername(username: string): void {
+    const decks = UserSettings._get('decks')
+    const inventory = UserSettings._get('inventory')
+    const missions = UserSettings._get('completedMissions')
+    const ref = Server.getReferralCode()
+
+    server.send({
+      type: 'sendInitialUserData',
+      username,
+      decks: decks,
+      inventory: Server.convertBoolArrayToBitString(inventory),
+      missions: Server.convertBoolArrayToBitString(missions),
+      ref,
+    })
+  }
+
+  private static promptForUsernameRegistration(game: Phaser.Game): void {
+    // Hide the signin button while username menu is active
+    document.getElementById('signin').hidden = true
+
+    game.scene.getAt(0).scene.launch('MenuScene', {
+      menu: 'registerUsername',
+      // Ensure that user is logged out and can signin if they cancel
+      exitCallback: () => {
+        Server.logout()
+
+        // Ensure guest button is visible
+        game.scene.getScenes(true).forEach((scene) => {
+          scene.events.emit('showGuestButton')
+        })
+      },
+    })
+  }
+
   // Log in with the server for user with given OAuth token
   static login(payload: GoogleJwtPayload, game: Phaser.Game, callback) {
     /*
@@ -72,39 +137,23 @@ export default class Server {
     const uuid = uuidv5(payload.sub, UUID_NAMESPACE)
     const jti = payload.jti
 
-    server = Server.getSocket()
-
-    // Immediately send the payload information to server
-    server.onOpen(() => {
-      server.send({
-        type: 'signIn',
-        email,
-        uuid,
-        jti,
-      })
-    })
-
-    // Register OAuth-specific handlers
-    server
-      .on('promptUserInit', () => {
-        // Hide the signin button
-        document.getElementById('signin').hidden = true
-
-        // Open username registration menu
-        game.scene.getAt(0).scene.launch('MenuScene', {
-          menu: 'registerUsername',
-          // Ensure that user is logged out and can signin if they cancel
-          exitCallback: () => {
-            Server.logout()
-
-            // Ensure guest button is visible
-            game.scene.getScenes(true).forEach((scene) => {
-              scene.events.emit('showGuestButton')
-            })
-          },
+    this.connectAndAuthenticate(
+      uuid,
+      game,
+      callback,
+      () => {
+        server.send({
+          type: 'signIn',
+          email,
+          uuid,
+          jti,
         })
-      })
-      .on('invalidToken', () => {
+      },
+      {
+        onPromptUserInit: () => {
+          this.promptForUsernameRegistration(game)
+        },
+        onInvalidToken: () => {
         console.log(
           'Server has indicated that sent token is invalid. Logging out.',
         )
@@ -117,10 +166,45 @@ export default class Server {
 
         if (server) server.close(code)
         server = undefined
-      })
+        },
+      },
+    )
+  }
 
-    // Register common handlers
-    this.registerCommonHandlers(uuid, game, callback)
+  // Log in with Steam (Electron builds only)
+  static async loginSteam(game: Phaser.Game, callback): Promise<boolean> {
+    const api = window.electronAPI
+
+    // Return if no auth session
+    if (!api?.getSteamAuthSession) return false
+
+    const session = await api.getSteamAuthSession()
+    if (!session?.steamId || !session?.ticket) {
+      console.error('Steam auth session was not available')
+      return false
+    }
+
+    // Cache the UUID in case of reconnect
+    const uuid = uuidv5(session.steamId, STEAM_UUID_NAMESPACE)
+    localStorage.setItem('steam_uuid', uuid)
+
+    this.connectAndAuthenticate(
+      uuid,
+      game,
+      callback,
+      () => {
+        server.send({
+          type: 'loginSteam',
+          ticket: session.ticket,
+        })
+      },
+      {
+        onPromptUserInit: () => {
+          this.promptForUsernameRegistration(game)
+        },
+      },
+    )
+    return true
   }
 
   // Log in as a guest with a generated UUID
@@ -133,42 +217,26 @@ export default class Server {
       localStorage.setItem('guest_uuid', uuid)
     }
 
-    server = Server.getSocket()
-
-    // Send guest token with just UUID
-    server.onOpen(() => {
-      server.send({
-        type: 'signIn',
-        uuid,
-      })
-    })
-
-    // Register guest-specific handlers
-    server
-      .on('promptUserInit', () => {
-        const decks = UserSettings._get('decks')
-        const inventory = UserSettings._get('inventory')
-        const missions = UserSettings._get('completedMissions')
-        const ref = Server.getReferralCode()
-
+    this.connectAndAuthenticate(
+      uuid,
+      game,
+      callback,
+      () => {
         server.send({
-          type: 'sendInitialUserData',
-          username: 'Guest',
-          decks: decks,
-          inventory: Server.convertBoolArrayToBitString(inventory),
-          missions: Server.convertBoolArrayToBitString(missions),
-          ref,
+          type: 'signIn',
+          uuid,
         })
-      })
-      .on('invalidToken', () => {
-        console.error('Invalid guest token')
-      })
-
-    // Register common handlers
-    this.registerCommonHandlers(uuid, game, callback)
+      },
+      {
+        onPromptUserInit: () => this.sendInitialDataForUsername('Guest'),
+        onInvalidToken: () => {
+          console.error('Invalid guest token')
+        },
+      },
+    )
   }
 
-  // Register common websocket event handlers for both OAuth and guest login
+  // Register websocket event handlers common to all types of login flow
   private static registerCommonHandlers(
     uuid: string,
     game: Phaser.Game,
@@ -511,9 +579,6 @@ export default class Server {
       server = undefined
     }
 
-    // Create a new socket connection
-    server = Server.getSocket()
-
     const storedToken = localStorage.getItem(Url.gsi_token)
     if (storedToken !== null) {
       console.log('Reconnecting with stored token')
@@ -524,7 +589,7 @@ export default class Server {
         const uuid = uuidv5(payload.sub, UUID_NAMESPACE)
         const jti = payload.jti
 
-        server.onOpen(() => {
+        this.connectAndAuthenticate(uuid, game, () => {}, () => {
           server.send({
             type: 'signIn',
             email,
@@ -532,25 +597,44 @@ export default class Server {
             jti,
           })
         })
-
-        // Register handlers
-        this.registerCommonHandlers(uuid, game, () => {})
       } catch (e) {
         console.error('Failed to decode token during reconnect:', e)
       }
     } else {
+      const steamUuid = localStorage.getItem('steam_uuid')
+      if (steamUuid) {
+        const api = window.electronAPI
+        if (api?.getSteamAuthSession) {
+          api
+            .getSteamAuthSession()
+            .then((session: SteamAuthResult | null) => {
+              // If no verification ticket, don't attempt to connect
+              if (!session?.ticket) return
+
+              // Attempt login with the ticket
+              this.connectAndAuthenticate(steamUuid, game, () => {}, () => {
+                server.send({
+                  type: 'loginSteam',
+                  ticket: session.ticket,
+                })
+              })
+            })
+            .catch((e) =>
+              console.error('Failed to acquire Steam auth during reconnect:', e),
+            )
+          return
+        }
+      }
+
       // User signed in as guest - get guest UUID and send signIn
       const guestUuid = localStorage.getItem('guest_uuid')
       if (guestUuid) {
-        server.onOpen(() => {
+        this.connectAndAuthenticate(guestUuid, game, () => {}, () => {
           server.send({
             type: 'signIn',
             uuid: guestUuid,
           })
         })
-
-        // Register handlers
-        this.registerCommonHandlers(guestUuid, game, () => {})
       }
     }
   }

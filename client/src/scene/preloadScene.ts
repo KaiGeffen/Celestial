@@ -55,23 +55,27 @@ export class SigninScene extends Phaser.Scene {
     // Add buttons to sign in or play as a guest
     this.createButtons()
 
-    // If user is signed in with OAuth, log them in
-    const storedToken = localStorage.getItem(Url.gsi_token)
-    if (storedToken !== null) {
-      const payload = jwt_decode<GoogleJwtPayload>(storedToken)
-      Server.login(payload, this.game, () => this.onOptionClick())
+    // Electron + Steam login path
+    if (this.isElectronBuild()) {
+      Server.loginSteam(this.game, () => this.onOptionClick()).catch((e) =>
+        console.error('Steam login failed:', e),
+      )
+    } else {
+      const storedToken = localStorage.getItem(Url.gsi_token)
+      if (storedToken !== null) {
+        const payload = jwt_decode<GoogleJwtPayload>(storedToken)
+        Server.login(payload, this.game, () => this.onOptionClick())
 
-      // Show the guest button when menu closes
-      this.events.on('showGuestButton', () => {
-        this.guestButton.setVisible(true)
-      })
+        // Show the guest button when menu closes
+        this.events.on('showGuestButton', () => {
+          this.guestButton.setVisible(true)
+        })
 
-      // TODO If this fails because the token is invalid or the server is offline, show options or say network offline
-    }
-    // If user is not signed in, show gsi and guest button
-    else if (!this.isElectronBuild()) {
-      // Sign in is visible on this page, hidden on all other pages
-      document.getElementById('signin').hidden = false
+        // TODO If this fails because the token is invalid or the server is offline, show options or say network offline
+      } else {
+        // Sign in is visible on this page, hidden on all other pages
+        document.getElementById('signin').hidden = false
+      }
     }
 
     // Text describing anything going on
@@ -110,10 +114,11 @@ export class SigninScene extends Phaser.Scene {
       text: 'Guest',
       f: () => {
         if (this.isElectronBuild()) {
-          Server.loginGuest(this.game, () => this.onOptionClick())
+          Server.loginSteam(this.game, () => this.onOptionClick()).catch((e) =>
+            console.error('Steam login failed:', e),
+          )
           return
         }
-
         this.scene.launch('MenuScene', {
           menu: 'confirm',
           text: 'Guest accounts have limited features. Sign in with Google to access additional features.',

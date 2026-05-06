@@ -22,23 +22,23 @@ const PORT = process.env.LOCAL_DEV ? 4949 : 8082
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
-  '.js':   'application/javascript; charset=utf-8',
-  '.css':  'text/css; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.webp': 'image/webp',
-  '.png':  'image/png',
-  '.jpg':  'image/jpeg',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
-  '.gif':  'image/gif',
-  '.svg':  'image/svg+xml',
-  '.ico':  'image/x-icon',
-  '.ogg':  'audio/ogg',
-  '.mp3':  'audio/mpeg',
-  '.mp4':  'video/mp4',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.ogg': 'audio/ogg',
+  '.mp3': 'audio/mpeg',
+  '.mp4': 'video/mp4',
   '.webm': 'video/webm',
   '.woff': 'font/woff',
-  '.woff2':'font/woff2',
-  '.ttf':  'font/ttf',
+  '.woff2': 'font/woff2',
+  '.ttf': 'font/ttf',
 }
 
 function getClientPath() {
@@ -51,7 +51,10 @@ function startServer(clientPath) {
   return new Promise((resolve, reject) => {
     const server = http.createServer((req, res) => {
       const urlPath = decodeURIComponent(req.url.split('?')[0])
-      const filePath = path.join(clientPath, urlPath === '/' ? 'index.html' : urlPath)
+      const filePath = path.join(
+        clientPath,
+        urlPath === '/' ? 'index.html' : urlPath,
+      )
 
       fs.readFile(filePath, (err, data) => {
         if (err) {
@@ -60,7 +63,9 @@ function startServer(clientPath) {
           return
         }
         const ext = path.extname(filePath).toLowerCase()
-        res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] || 'application/octet-stream' })
+        res.writeHead(200, {
+          'Content-Type': MIME_TYPES[ext] || 'application/octet-stream',
+        })
         res.end(data)
       })
     })
@@ -102,6 +107,21 @@ function createWindow() {
   })
 }
 
+ipcMain.on('quit', () => app.quit())
+
+ipcMain.handle('steam:getAuthSession', async () => {
+  try {
+    if (!steam || !steam.localplayer) return null
+    const steamId = String(steam.localplayer.getSteamId())
+    const ticket = steam.localplayer.getAuthSessionTicket()
+    if (!steamId || !ticket) return null
+    return { steamId, ticket }
+  } catch (e) {
+    console.error('Failed to create Steam auth ticket:', e)
+    return null
+  }
+})
+
 app.whenReady().then(async () => {
   await startServer(getClientPath())
   createWindow()
@@ -110,8 +130,6 @@ app.whenReady().then(async () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
-
-ipcMain.on('quit', () => app.quit())
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()

@@ -1,6 +1,9 @@
 import { WebSocketServer } from 'ws'
 
-import { USER_DATA_PORT } from '../../../shared/network/settings'
+import {
+  USER_DATA_PORT,
+  UUID_NAMESPACE,
+} from '../../../shared/network/settings'
 import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 
 import { db } from '../db/db'
@@ -25,6 +28,7 @@ import PveSpecialMatch from './match/pveSpecialMatch'
 import getClientGameModel from '../../../shared/state/clientGameModel'
 import REWARD_AMOUNTS from '../../../shared/config/rewardAmounts'
 import { journeyData } from '../../../shared/journey/journey'
+import { v5 as uuidv5 } from 'uuid'
 
 // An ongoing match
 class ActiveGame {
@@ -62,6 +66,31 @@ const spectatorWsToMatch = new WeakMap<ServerWS, Match>()
 // User ids currently spectating another player's match (for online status)
 const spectatingUserIds = new Set<string>()
 
+// TODO Put this in a single place, and refactor steam specific code to a new file
+const STEAM_APP_ID = '3810590'
+
+async function verifySteamTicket(ticket: string): Promise<string | null> {
+  const steamKey = process.env.STEAM_WEB_API_KEY
+  if (!steamKey || !ticket) return null
+
+  const params = new URLSearchParams({
+    key: steamKey,
+    appid: STEAM_APP_ID,
+    ticket,
+  })
+  const endpoint = `https://api.steampowered.com/ISteamUserAuth/AuthenticateUserTicket/v1/?${params.toString()}`
+  const response = await fetch(endpoint)
+  if (!response.ok) return null
+
+  const body = (await response.json()) as {
+    response?: { params?: { result?: string; steamid?: string } }
+  }
+  const result = body?.response?.params?.result
+  const steamId = body?.response?.params?.steamid
+  if (result !== 'OK' || !steamId) return null
+  return steamId
+}
+
 // Create the websocket server
 export default function createWebSocketServer() {
   const wss = new WebSocketServer({ port: USER_DATA_PORT })
@@ -78,10 +107,8 @@ export default function createWebSocketServer() {
         playerNumber: null, // 0 or 1 for current match
       }
 
-      ws.on('signIn', async ({ email, uuid, jti }) => {
-        // TODO If user has sent an email, check their jti
-        potentialEmail = email
-
+      const handleSignInForUuid = async (uuid: string, email?: string) => {
+        potentialEmail = email ?? null
         id = uuid
 
         // Check if user is already connected with a live websocket
@@ -103,32 +130,49 @@ export default function createWebSocketServer() {
 
         if (result.length === 0) {
           ws.send({ type: 'promptUserInit' })
-        } else {
-          // Add to active users
-          activePlayers[uuid] = ws
-
-          // Handle achievements
-          await AchievementManager.onConnection(id)
-
-          // Send user their data
-          await sendUserData(ws, id)
-
-          // If user disconnected from a match, assign them back to that match and reconnect below
-          const savedActiveGame = userActiveGameMap[uuid]
-          if (savedActiveGame?.match && !savedActiveGame.match.isOver()) {
-            activeGame = savedActiveGame
-          }
-
-          // Map this user's entry in the dict to active game
-          // NOTE Changing activeGame then mutates the dict
-          userActiveGameMap[uuid] = activeGame
-
-          // Reconnect to match
-          if (activeGame.match) {
-            await activeGame.match.reconnectUser(ws, activeGame.playerNumber)
-          }
+          return
         }
+
+        // Add to active users
+        activePlayers[uuid] = ws
+
+        // Handle initial achievement
+        await AchievementManager.onConnection(id)
+
+        // Send user their data
+        await sendUserData(ws, id)
+
+        // If user disconnected from a match, assign them back to that match and reconnect below
+        const savedActiveGame = userActiveGameMap[uuid]
+        if (savedActiveGame?.match && !savedActiveGame.match.isOver()) {
+          activeGame = savedActiveGame
+        }
+
+        // Map this user's entry in the dict to active game
+        // NOTE Changing activeGame then mutates the dict
+        userActiveGameMap[uuid] = activeGame
+
+        // Reconnect to match
+        if (activeGame.match) {
+          await activeGame.match.reconnectUser(ws, activeGame.playerNumber)
+        }
+      }
+
+      ws.on('signIn', async ({ email, uuid, jti }) => {
+        // TODO If user has sent an email, check their jti
+        await handleSignInForUuid(uuid, email)
       })
+        .on('loginSteam', async ({ ticket }) => {
+          const steamId = await verifySteamTicket(ticket)
+          if (!steamId) {
+            ws.send({ type: 'invalidToken' })
+            // ws.close(1008, 'Invalid Steam ticket')
+            return
+          }
+
+          const steamUuid = uuidv5(steamId, UUID_NAMESPACE)
+          await handleSignInForUuid(steamUuid)
+        })
         .on('sendDecks', async ({ decks }) => {
           if (!id) return
           await db

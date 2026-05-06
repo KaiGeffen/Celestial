@@ -9,6 +9,9 @@ export default interface messagesToServer {
     uuid: string
     jti?: string
   }
+  loginSteam: {
+    ticket: string
+  }
   sendDecks: {
     decks: Deck[]
   }
