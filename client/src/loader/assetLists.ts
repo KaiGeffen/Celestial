@@ -370,7 +370,7 @@ export const assetLists = {
       "Store",
       "StoreTab",
       "Sun",
-      "Thumb",
+      "Track",
       "Underline",
       "XOut",
       "thumbnailNameplate"

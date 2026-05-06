@@ -2,7 +2,7 @@ import 'phaser'
 
 import Card from '../../../../shared/state/card'
 import { CardImage } from '../../lib/cardImage'
-import { Space, Time, Scroll, Ease, Flags } from '../../settings/settings'
+import { Space, Time, Ease, Flags } from '../../settings/settings'
 import Catalog from '../../../../shared/state/catalog'
 import { BuilderBase } from '../builderScene'
 import newScrollablePanel from '../../lib/scrollablePanel'
@@ -71,7 +71,7 @@ export default class CatalogRegion {
         slider: { top: Space.filterBarHeight },
       },
 
-      slider: Scroll(scene, false),
+      slider: false,
     }).setOrigin(1, 0)
   }
 

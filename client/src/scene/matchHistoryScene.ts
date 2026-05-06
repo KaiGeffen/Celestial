@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Space, Flags, Scroll } from '../settings/settings'
+import { Style, Space, Flags } from '../settings/settings'
 import { BaseSceneWithHeader } from './baseScene'
 import Server from '../server'
 import Buttons from '../lib/buttons/buttons'
@@ -243,8 +243,6 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
           panel: {
             child: this.createMatchRows(),
           },
-
-          slider: Scroll(this, false),
         })
         .setOrigin(0.5, 0)
         .layout()

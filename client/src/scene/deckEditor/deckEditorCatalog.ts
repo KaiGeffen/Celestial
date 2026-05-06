@@ -13,7 +13,6 @@ import {
   UserSettings,
   Flags,
   deckFilterBarHeight,
-  Scroll,
 } from '../../settings/settings'
 import { Style } from '../../settings/style'
 import newScrollablePanel from '../../lib/scrollablePanel'
@@ -102,7 +101,7 @@ export class DeckEditorCatalog {
       width: catalogWidth,
       height: catalogBodyHeight,
       panel: { child: panel },
-      slider: Scroll(scene, false),
+      slider: false,
     }).setOrigin(0)
 
     this.scrollPanel.layout()
