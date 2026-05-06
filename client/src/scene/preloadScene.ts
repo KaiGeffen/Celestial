@@ -32,8 +32,9 @@ export class SigninScene extends Phaser.Scene {
 
   // True when user is signed or chose to be a guest
   signedInOrGuest: boolean = false
-  guestButton: Button
-  quitButton: Button
+  guestButton?: Button
+  steamLoginButton?: Button
+  quitButton?: Button
   private txt: Phaser.GameObjects.Text
   private timeSceneStart: number
 
@@ -68,7 +69,7 @@ export class SigninScene extends Phaser.Scene {
 
         // Show the guest button when menu closes
         this.events.on('showGuestButton', () => {
-          this.guestButton.setVisible(true)
+          this.guestButton?.setVisible(true)
         })
 
         // TODO If this fails because the token is invalid or the server is offline, show options or say network offline
@@ -107,39 +108,8 @@ export class SigninScene extends Phaser.Scene {
 
   // Create buttons for each of the signin options (Guest, OAuth)
   private createButtons(): void {
-    // Guest button with confirmation
-    const guestButtonContainer = this.add.container()
-    this.guestButton = new Buttons.Basic({
-      within: guestButtonContainer,
-      text: 'Guest',
-      f: () => {
-        if (this.isElectronBuild()) {
-          Server.loginSteam(this.game, () => this.onOptionClick()).catch((e) =>
-            console.error('Steam login failed:', e),
-          )
-          return
-        }
-        this.scene.launch('MenuScene', {
-          menu: 'confirm',
-          text: 'Guest accounts have limited features. Sign in with Google to access additional features.',
-          hint: 'Play as Guest',
-          callback: () => {
-            Server.loginGuest(this.game, () => this.onOptionClick())
-          },
-        })
-      },
-      muteClick: true,
-      depth: -1,
-    })
-    // Hide the guest button if user is already signed in
-    this.guestButton.setVisible(localStorage.getItem(Url.gsi_token) === null)
-
-    this.plugins.get('rexAnchor')['add'](guestButtonContainer, {
-      x: `50%`,
-      y: `100%-${Space.pad + Space.buttonHeight / 2}`,
-    })
-
     if (this.isElectronBuild()) {
+      this.createSteamLoginButton()
       const quitButtonContainer = this.add.container()
       this.quitButton = new Buttons.Basic({
         within: quitButtonContainer,
@@ -154,11 +124,56 @@ export class SigninScene extends Phaser.Scene {
         x: `50%`,
         y: `100%-${Space.pad * 2 + Space.buttonHeight * 1.5}`,
       })
+      return
     }
 
-    if (!this.isElectronBuild()) {
-      this.createGoogleGSIButton()
-    }
+    const guestButtonContainer = this.add.container()
+    this.guestButton = new Buttons.Basic({
+      within: guestButtonContainer,
+      text: 'Guest',
+      f: () => {
+        this.scene.launch('MenuScene', {
+          menu: 'confirm',
+          text: 'Guest accounts have limited features. Sign in with Google to access additional features.',
+          hint: 'Play as Guest',
+          callback: () => {
+            Server.loginGuest(this.game, () => this.onOptionClick())
+          },
+        })
+      },
+      muteClick: true,
+      depth: -1,
+    })
+    this.guestButton.setVisible(localStorage.getItem(Url.gsi_token) === null)
+
+    this.plugins.get('rexAnchor')['add'](guestButtonContainer, {
+      x: `50%`,
+      y: `100%-${Space.pad + Space.buttonHeight / 2}`,
+    })
+
+    this.createGoogleGSIButton()
+  }
+
+  /** Electron only: retry Steam login without a confirmation dialog. */
+  private createSteamLoginButton(): void {
+    const container = this.add.container()
+    this.steamLoginButton = new Buttons.Basic({
+      within: container,
+      text: 'Login',
+      f: () => {
+        console.log('Logging in with Steam')
+        Server.loginSteam(this.game, () => this.onOptionClick()).catch((e) =>
+          console.error('Steam login failed:', e),
+        )
+      },
+      muteClick: true,
+      depth: -1,
+    })
+
+    this.plugins.get('rexAnchor')['add'](container, {
+      x: `50%`,
+      y: `100%-${Space.pad + Space.buttonHeight / 2}`,
+    })
   }
 
   private isElectronBuild(): boolean {
@@ -169,9 +184,8 @@ export class SigninScene extends Phaser.Scene {
     this.signedInOrGuest = true
 
     // Make the buttons unclickable
-    if (this.guestButton) {
-      this.guestButton.disable()
-    }
+    this.guestButton?.disable()
+    this.steamLoginButton?.disable()
     document.getElementById('signin').hidden = true
 
     // Ensure that music is playing
