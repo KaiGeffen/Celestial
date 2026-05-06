@@ -44,6 +44,10 @@ interface WaitingPlayer {
 }
 
 const CARD_COST = 1000
+
+/** Discord @Active Player role — used to ping matchmaking helpers via webhook. */
+const DISCORD_ACTIVE_PLAYER_ROLE_ID = '1369233011681398857'
+
 // Players searching for a match with password as key
 let searchingPlayers: { [key: string]: WaitingPlayer } = {}
 
@@ -772,7 +776,10 @@ export default function createWebSocketServer() {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                content: `${username} is searching for an opponent.`,
+                content: `${username} is searching for an opponent.\nAre any <@&${DISCORD_ACTIVE_PLAYER_ROLE_ID}> around to help them out?`,
+                allowed_mentions: {
+                  roles: [DISCORD_ACTIVE_PLAYER_ROLE_ID],
+                },
               }),
             }).catch((e) => console.error('Discord webhook error:', e))
           }
