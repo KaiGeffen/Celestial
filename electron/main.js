@@ -3,17 +3,23 @@ const path = require('path')
 const http = require('http')
 const fs = require('fs')
 const steamworks = require('steamworks.js')
+const { steamAppId } = require('../shared/steam.json')
 
 // Must be called before app is ready so the command-line switches are set in time
 steamworks.electronEnableSteamOverlay()
 
-// Initialize Steam. Fails gracefully if Steam isn't running.
+// Initialized in app.whenReady — Steamworks ticket APIs often fail with "channel closed"
+// if called before the Steam client API is fully connected ([API loaded no]).
 let steam = null
-try {
-  steam = steamworks.init(3810590)
-  console.log(`Steam initialized — logged in as: ${steam.localplayer.getName()}`)
-} catch (e) {
-  console.warn('Steam not available:', e.message)
+
+function initSteam() {
+  try {
+    steam = steamworks.init(steamAppId)
+    console.log(`Steam initialized — logged in as: ${steam.localplayer.getName()}`)
+  } catch (e) {
+    console.warn('Steam not available:', e.message)
+    steam = null
+  }
 }
 
 // Port 4949 sets Flags.local=true, pointing the game at the local WebSocket server.
@@ -109,13 +115,53 @@ function createWindow() {
 
 ipcMain.on('quit', () => app.quit())
 
+/**
+ * ISteamUserAuth/AuthenticateUserTicket expects an auth session ticket (GetAuthSessionTicket),
+ * not getAuthTicketForWebApi. Steamworks often returns GenericFailure / channel closed until the
+ * client API is ready — retry with backoff (see steamworks.js #165).
+ */
+async function createSteamSessionTicketHex() {
+  const player = steam.localplayer.getSteamId()
+  const steamId64 = player.steamId64
+  const steamId = String(steamId64)
+
+  let delayMs = 300
+  const maxAttempts = 12
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const ticketHandle = await steam.auth.getSessionTicketWithSteamId(
+        steamId64,
+        120,
+      )
+      const ticketHex = ticketHandle.getBytes().toString('hex')
+      if (ticketHex?.length) {
+        if (attempt > 1) {
+          console.log(`Steam session ticket obtained after ${attempt} attempts`)
+        }
+        return { steamId, ticket: ticketHex }
+      }
+      console.warn(
+        `Steam session ticket attempt ${attempt}/${maxAttempts}: empty ticket`,
+      )
+    } catch (e) {
+      console.warn(
+        `Steam session ticket attempt ${attempt}/${maxAttempts}:`,
+        e.message,
+      )
+    }
+    if (attempt < maxAttempts) {
+      await new Promise((r) => setTimeout(r, delayMs))
+      delayMs = Math.min(delayMs * 2, 8000)
+    }
+  }
+  return null
+}
+
 ipcMain.handle('steam:getAuthSession', async () => {
   try {
-    if (!steam || !steam.localplayer) return null
-    const steamId = String(steam.localplayer.getSteamId())
-    const ticket = steam.localplayer.getAuthSessionTicket()
-    if (!steamId || !ticket) return null
-    return { steamId, ticket }
+    if (!steam?.localplayer || !steam.auth) return null
+    return await createSteamSessionTicketHex()
   } catch (e) {
     console.error('Failed to create Steam auth ticket:', e)
     return null
@@ -123,6 +169,8 @@ ipcMain.handle('steam:getAuthSession', async () => {
 })
 
 app.whenReady().then(async () => {
+  initSteam()
+
   await startServer(getClientPath())
   createWindow()
 

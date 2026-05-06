@@ -4,6 +4,7 @@ import {
   USER_DATA_PORT,
   UUID_NAMESPACE,
 } from '../../../shared/network/settings'
+import { STEAM_APP_ID_STRING } from '../../../shared/steam'
 import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 
 import { db } from '../db/db'
@@ -66,16 +67,13 @@ const spectatorWsToMatch = new WeakMap<ServerWS, Match>()
 // User ids currently spectating another player's match (for online status)
 const spectatingUserIds = new Set<string>()
 
-// TODO Put this in a single place, and refactor steam specific code to a new file
-const STEAM_APP_ID = '3810590'
-
 async function verifySteamTicket(ticket: string): Promise<string | null> {
   const steamKey = process.env.STEAM_WEB_API_KEY
   if (!steamKey || !ticket) return null
 
   const params = new URLSearchParams({
     key: steamKey,
-    appid: STEAM_APP_ID,
+    appid: STEAM_APP_ID_STRING,
     ticket,
   })
   const endpoint = `https://api.steampowered.com/ISteamUserAuth/AuthenticateUserTicket/v1/?${params.toString()}`
