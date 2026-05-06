@@ -237,12 +237,10 @@ export default class DeckSelectorScene extends BaseScene {
         orientation: 0,
         space: {
           left: Space.pad,
-          right: Space.pad,
           top: Space.padSmall,
           bottom: Space.padSmall,
-          item: Space.pad,
         },
-      } as any)
+      })
       .addBackground(background)
 
     sizer
@@ -355,13 +353,11 @@ export default class DeckSelectorScene extends BaseScene {
       width: ROSTER_WIDTH,
       orientation: 1,
       space: {
-        left: Space.pad,
-        right: Space.pad,
         top: Space.pad,
         bottom: Space.pad,
         item: Space.padSmall,
       },
-    } as any)
+    })
 
     const makeBtn = (text: string, f: () => void, muteClick = false) => {
       const container = new ContainerLite(

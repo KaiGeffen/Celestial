@@ -129,8 +129,7 @@ export class DeckEditorDeck {
         width: DECK_EDITOR_DECK_WIDTH,
         space: {
           top: Space.pad,
-          bottom: Space.pad,
-          left: 14,
+          bottom: Space.padSmall,
         },
         align: 'center',
       })
