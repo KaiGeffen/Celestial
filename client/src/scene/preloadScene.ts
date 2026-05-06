@@ -90,7 +90,9 @@ export class SigninScene extends Phaser.Scene {
       !server.isOpen() &&
       Date.now() - this.timeSceneStart > GRACE_PERIOD_TO_CONNECT
     ) {
-      this.txt.setText(Messages.disconnectError)
+      // NOTE Removed because it would flicker on when first registering
+      // this.txt.setText(Messages.disconnectError)
+      this.txt.setText('')
     } else if (Server.pendingReconnect) {
       this.txt.setText('Reconnecting to match...')
     } else {
