@@ -32,6 +32,9 @@ export type DeckEditorCatalogOptions = {
   onBack: () => void
 }
 
+// The cost chip buttons
+const CHIP_WIDTH = 35
+
 /** Left column: wrapping filter strip + scrolling card grid. */
 export class DeckEditorCatalog {
   readonly scene: BaseScene
@@ -67,8 +70,7 @@ export class DeckEditorCatalog {
       Space.windowHeight - deckFilterBarHeight(),
     )
 
-    const ui = this.scene.rexUI
-    const panel = ui.add.fixWidthSizer({
+    const panel = this.scene.rexUI.add.fixWidthSizer({
       space: {
         left: Space.pad,
         right: Space.pad,
@@ -110,9 +112,9 @@ export class DeckEditorCatalog {
 
     this.scrollPanel.layout()
 
-    const headerRow = this.buildFilterHeaderRow()
+    const headerRow = this.createFilterHeaderRow()
 
-    const column = ui.add.sizer({ orientation: 1 }).setOrigin(0)
+    const column = this.scene.rexUI.add.sizer({ orientation: 1 }).setOrigin(0)
     column.add(headerRow, { proportion: 0, expand: true })
     column.add(this.scrollPanel, { proportion: 1, expand: true })
 
@@ -156,13 +158,13 @@ export class DeckEditorCatalog {
     panel.runLayout?.(undefined, innerWidth, undefined)
   }
 
-  private buildFilterHeaderRow(): any {
+  private createFilterHeaderRow(): any {
     const scene = this.scene
     const background = scene.add.image(0, 0, 'chrome-header').setInteractive()
     scene.addShadow(background, -90)
 
-    const ui = this.scene.rexUI
-    const row = ui.add
+    // Sizer
+    this.headerSizer = this.scene.rexUI.add
       .sizer({
         orientation: 0,
         space: {
@@ -171,58 +173,47 @@ export class DeckEditorCatalog {
           top: Space.padSmall,
           bottom: Space.padSmall,
         },
-      } as any)
+      })
       .addBackground(background)
 
-    this.headerSizer = row
-
-    const backContainer = new ContainerLite(
-      scene,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: backContainer,
-      text: 'Back',
-      muteClick: true,
-      f: () => this.onBack(),
-    })
-    row.add(backContainer, { align: 'center' })
-
-    const middle = ui.add.fixWidthSizer({
+    // Cost chips
+    const sizerCostChips = this.scene.rexUI.add.fixWidthSizer({
       align: 'center',
       space: { item: 8 },
     })
 
     this.costFilterBtns = []
     for (let i = 0; i <= DECK_EDITOR_MAX_COST_FILTER; i++) {
-      const container = new ContainerLite(scene, 0, 0, 35, Space.buttonHeight)
-      middle.add(container)
+      const container = new ContainerLite(
+        scene,
+        0,
+        0,
+        CHIP_WIDTH,
+        Space.buttonHeight,
+      )
+      sizerCostChips.add(container)
       const label = i === DECK_EDITOR_MAX_COST_FILTER ? '7+' : i.toString()
-      const btn = new UButton(container, 0, 0, label)
-      btn.setOnClick(() => this.onCostChipClick(i))
+      const btn = new UButton(container, 0, 0, label, () =>
+        this.onCostChipClick(i),
+      )
+
+      // If this is currently selected, toggle on
       if (this.filterCostAry[i]) {
         btn.toggle()
       }
       this.costFilterBtns.push(btn)
     }
 
-    new Buttons.Icon({
-      name: 'SmallX',
-      within: middle,
-      f: () => this.onClearFilters(),
+    // Populate sizer
+    this.headerSizer.add(this.createBackButton())
+    this.headerSizer.add(sizerCostChips, { proportion: 1, expand: true })
+    this.headerSizer.add(this.createSearchField(), {
+      proportion: 1,
+      expand: true,
     })
+    this.headerSizer.add(this.createSortButton())
 
-    middle.add(this.createSearchField())
-
-    row.add(middle, { proportion: 1, expand: true, align: 'center' })
-
-    // Sort button
-    row.add(this.createSortButton(), { align: 'center' })
-
-    return row
+    return this.headerSizer
   }
 
   private createSearchField(): ContainerLite {
@@ -276,10 +267,26 @@ export class DeckEditorCatalog {
     this.applyVisibleCards()
   }
 
-  private createSortButton(): ContainerLite {
-    const scene = this.scene
+  private createBackButton(): ContainerLite {
     const container = new ContainerLite(
-      scene,
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: container,
+      text: 'Back',
+      f: () => this.onBack(),
+      muteClick: true,
+    })
+    return container
+  }
+
+  private createSortButton(): ContainerLite {
+    const container = new ContainerLite(
+      this.scene,
       0,
       0,
       Space.buttonWidth,
