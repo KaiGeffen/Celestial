@@ -21,8 +21,12 @@ export default class Loader {
     // Set the load path
     scene.load.path = 'assets/'
 
+    // Button appears immediately
     scene.load.image(`icon-Button`, `img/Button.png`)
 
+    // Assets that appear in the menu to register username
+    scene.load.image(`chrome-header`, `img/chrome/header.${EXTENSION}`)
+    scene.load.image(`chrome-body`, `img/chrome/body.${EXTENSION}`)
     scene.load.image(`icon-InputText`, `img/icon/InputText.${EXTENSION}`)
   }
 
