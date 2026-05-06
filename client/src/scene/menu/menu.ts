@@ -16,9 +16,6 @@ export default class Menu {
   // The width of this menu
   width: number
 
-  // The minimum height of this menu
-  protected minHeight = 0
-
   // The main panel for this menu
   sizer: RexUIPlugin.FixWidthSizer
 
@@ -33,7 +30,6 @@ export default class Menu {
 
     if (params) {
       this.exitCallback = params.exitCallback
-      if (params.minHeight) this.minHeight = params.minHeight
     }
 
     if (width > 0) {
@@ -96,13 +92,10 @@ export default class Menu {
       x: Space.windowWidth / 2,
       y: Space.windowHeight / 2,
       width: this.width,
-      minHeight: this.minHeight,
 
       align: 'center',
 
       space: {
-        // left: Space.pad,
-        // right: Space.pad,
         bottom: Space.pad,
         line: Space.pad,
       },
@@ -186,6 +179,7 @@ const menus = {
   choosePremade: ChoosePremade,
   credits: CreditsMenu,
   rulebook: RulebookMenu,
+  // TODO Rename since it's just alter deck
   newDeck: NewDeckMenu,
   play: PlayMenu,
 

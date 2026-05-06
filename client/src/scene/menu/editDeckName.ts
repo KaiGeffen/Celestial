@@ -32,12 +32,14 @@ export default class EditDeckNameMenu extends Menu {
   private createContent(callback: (name: string) => void): void {
     this.createHeader('Deck name')
 
-    const row = this.scene.rexUI.add.sizer({
-      width: width - Space.pad * 2,
-    })
-
-    this.nameInput = this.scene.add
-      .rexInputText(0, 0, inputTextWidth, Space.textboxHeight, {
+    // Textbox row, with input and chrome
+    const textboxRow = this.scene.rexUI.add.sizer()
+    this.nameInput = this.scene.add.rexInputText(
+      0,
+      0,
+      inputTextWidth,
+      Space.textboxHeight,
+      {
         type: 'text',
         text: this.initialName,
         align: 'center',
@@ -46,7 +48,8 @@ export default class EditDeckNameMenu extends Menu {
         ...Style.inputText,
         maxLength: 40,
         id: 'edit-deck-name',
-      })
+      },
+    )
 
     const chrome = this.scene.add.image(0, 0, 'icon-InputText')
     const inputContainer = new ContainerLite(
@@ -58,17 +61,20 @@ export default class EditDeckNameMenu extends Menu {
       [this.nameInput, chrome],
     )
 
-    row.addSpace().add(inputContainer).addSpace()
-    this.sizer.add(row).addNewLine()
+    // Center text box
+    textboxRow.addSpace().add(inputContainer).addSpace()
 
-    const buttons = this.scene.rexUI.add.sizer({
-      width: width - Space.pad * 2,
-    })
-    buttons
+    // Buttons row
+    const buttonsRow = this.scene.rexUI.add
+      .sizer({
+        width: width - Space.pad * 2,
+      })
       .add(this.createCancelButton())
       .addSpace()
       .add(this.createSaveButton(callback))
-    this.sizer.add(buttons)
+
+    // Add to the sizer
+    this.sizer.add(textboxRow).add(buttonsRow)
   }
 
   private createSaveButton(callback: (name: string) => void): ContainerLite {
