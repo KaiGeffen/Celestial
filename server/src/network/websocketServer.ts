@@ -39,6 +39,8 @@ interface WaitingPlayer {
   id: string
   deck: Deck
   activeGame: ActiveGame
+  queuedAt: number
+  notifiedDiscord: boolean
 }
 
 const CARD_COST = 1000
@@ -511,6 +513,8 @@ export default function createWebSocketServer() {
               id: data.uuid,
               deck: data.deck,
               activeGame: activeGame,
+              queuedAt: Date.now(),
+              notifiedDiscord: false,
             }
             searchingPlayers[data.password] = waitingPlayer
           }
@@ -746,6 +750,34 @@ export default function createWebSocketServer() {
           })
         }
       })
+
+      // Notify Discord when a player has been searching for 2+ minutes
+      const webhookUrl = process.env.DISCORD_WEBHOOK_URL
+      if (webhookUrl) {
+        const now = Date.now()
+        const toNotify = Object.values(searchingPlayers).filter(
+          (p) => !p.notifiedDiscord && now - p.queuedAt >= 2 * 60 * 1000,
+        )
+        if (toNotify.length > 0) {
+          const ids = toNotify.map((p) => p.id)
+          const rows = await db
+            .select({ id: players.id, username: players.username })
+            .from(players)
+            .where(inArray(players.id, ids))
+          for (const player of toNotify) {
+            player.notifiedDiscord = true
+            const username =
+              rows.find((r) => r.id === player.id)?.username ?? 'A player'
+            fetch(webhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                content: `${username} is searching for an opponent.`,
+              }),
+            }).catch((e) => console.error('Discord webhook error:', e))
+          }
+        }
+      }
     } catch (e) {
       console.error('Error broadcasting online players:', e)
     }
