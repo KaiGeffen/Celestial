@@ -346,8 +346,9 @@ export default class BaseScene extends SharedBaseScene {
 }
 
 export class BaseSceneWithHeader extends BaseScene {
-  protected headerHeight = Space.iconSize + Space.pad * 2
+  protected readonly headerHeight = Space.padSmall * 2 + Space.buttonHeight
 
+  // Normal create but with a header
   create(params): void {
     super.create(params)
 
@@ -355,29 +356,29 @@ export class BaseSceneWithHeader extends BaseScene {
   }
 
   private createHeader(title: string): void {
-    const frame = this.textures.getFrame('chrome-header')
-    const scale = Space.windowWidth / frame.width
-    this.headerHeight = Math.round(frame.height * scale)
-
-    const background = this.add
-      .image(0, 0, 'chrome-header')
-      .setOrigin(0, 0)
-      .setDisplaySize(Space.windowWidth, this.headerHeight)
-
+    // Background
+    const background = this.add.image(0, 0, 'chrome-header').setOrigin(0, 0)
     this.addShadow(background, -90)
+    this.plugins.get('rexAnchor')['add'](background, {
+      width: `100%`,
+      height: `0%+${Space.padSmall * 2 + Space.buttonHeight}`,
+    })
 
-    new Buttons.Basic({
+    // Title
+    const txt = this.add.text(0, 0, title, Style.header).setOrigin(0.5)
+    this.plugins.get('rexAnchor')['add'](txt, {
+      x: `50%`,
+      y: `0%+${Space.padSmall + Space.buttonHeight / 2}`,
+    })
+
+    // Back button
+    const btnBack = new Buttons.Basic({
       within: this,
       text: 'Back',
       x: Space.pad + Space.buttonWidth / 2,
-      y: this.headerHeight / 2,
+      y: Space.padSmall + Space.buttonHeight / 2,
       f: () => this.scene.start('HomeScene'),
-    }).setDepth(2)
-
-    this.add
-      .text(Space.windowWidth / 2, this.headerHeight / 2, title, Style.header)
-      .setOrigin(0.5)
-      .setDepth(2)
+    })
   }
 }
 

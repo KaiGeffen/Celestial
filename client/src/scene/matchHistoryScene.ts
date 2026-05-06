@@ -13,7 +13,7 @@ import Decklist from '../lib/decklist'
 import { MATCH_HISTORY_PORT } from '../../../shared/network/settings'
 import { ensureRowAlphaGradientTexture } from '../lib/rowAlphaGradientTexture'
 
-const width = Space.windowWidth - Space.sliderWidth
+const width = Space.windowWidth
 const MATCH_HISTORY_FILTER_KEY = 'matchHistoryFilter'
 
 const MATCH_HISTORY_ROW_WIN_TEX = 'match-history-row-win-gradient'
@@ -50,41 +50,8 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     this.searchObj = null
     this.loadingText = null
 
-    // TODO This is insane code LMAO
-    const defaultTitle = this.children.list.find(
-      (obj) =>
-        obj instanceof Phaser.GameObjects.Text && obj.text === 'Match History',
-    ) as Phaser.GameObjects.Text | undefined
-    defaultTitle?.destroy()
-
-    const titleText = this.add.text(0, 0, 'Match History', Style.header)
-
-    const matchTypeContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    this.matchTypeBtn = new Buttons.Basic({
-      within: matchTypeContainer,
-      text: this.matchTypeFilter.toUpperCase(),
-      f: () => {
-        this.matchTypeFilter = this.matchTypeFilter === 'pvp' ? 'pve' : 'pvp'
-        localStorage.setItem(MATCH_HISTORY_FILTER_KEY, this.matchTypeFilter)
-        this.matchTypeBtn.setText(this.matchTypeFilter.toUpperCase())
-        this.filterAndRefreshContent()
-      },
-    })
-    this.rexUI.add
-      .sizer({
-        orientation: 'horizontal',
-        space: { item: Space.padSmall },
-      })
-      .add(titleText)
-      .add(matchTypeContainer)
-      .setPosition(Space.windowWidth / 2, this.headerHeight / 2)
-      .layout()
+    // Match type sort button
+    this.createSortButton()
 
     // Show loading message
     this.loadingText = this.add
@@ -96,7 +63,37 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       )
       .setOrigin(0.5, 0.5)
 
+    // Fetch the user data
     this.fetchMatchHistoryData()
+  }
+
+  private createSortButton(): void {
+    const container = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+
+    // Make the button
+    this.matchTypeBtn = new Buttons.Basic({
+      y: Space.buttonHeight / 2 + Space.padSmall,
+      within: container,
+      text: this.matchTypeFilter.toUpperCase(),
+      f: () => {
+        this.matchTypeFilter = this.matchTypeFilter === 'pvp' ? 'pve' : 'pvp'
+        localStorage.setItem(MATCH_HISTORY_FILTER_KEY, this.matchTypeFilter)
+        this.matchTypeBtn.setText(this.matchTypeFilter.toUpperCase())
+        this.filterAndRefreshContent()
+      },
+    })
+
+    // Anchor to left of icons in top-right
+    const dx = Space.iconSize * 2 + Space.buttonWidth / 2 + Space.padSmall * 1.5
+    this.plugins.get('rexAnchor')['add'](container, {
+      x: `100%-${dx}`,
+    })
   }
 
   /** Win/loss row backgrounds: 20% alpha on the left → 0 on the right. */
