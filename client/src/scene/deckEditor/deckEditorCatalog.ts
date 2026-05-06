@@ -22,7 +22,10 @@ import {
   DECK_EDITOR_DECK_WIDTH,
   DECK_EDITOR_MAX_COST_FILTER,
 } from './constants'
-import { cardPassesDeckEditorFilters } from './cardSearchFilter'
+import {
+  cardPassesDeckEditorFilters,
+  parseDeckEditorSearchQuery,
+} from './cardSearchFilter'
 
 export type DeckEditorCatalogOptions = {
   onCardPick: (card: Card) => void
@@ -199,7 +202,7 @@ export class DeckEditorCatalog {
       middle.add(container)
       const label = i === DECK_EDITOR_MAX_COST_FILTER ? '7+' : i.toString()
       const btn = new UButton(container, 0, 0, label)
-      btn.setOnClick(this.onCostChipClick(i))
+      btn.setOnClick(() => this.onCostChipClick(i))
       if (this.filterCostAry[i]) {
         btn.toggle()
       }
@@ -209,7 +212,7 @@ export class DeckEditorCatalog {
     new Buttons.Icon({
       name: 'SmallX',
       within: middle,
-      f: this.onClearFilters(),
+      f: () => this.onClearFilters(),
     })
 
     middle.add(this.createSearchField())
@@ -250,31 +253,27 @@ export class DeckEditorCatalog {
     return container
   }
 
-  private onCostChipClick(index: number): () => void {
-    return () => {
-      for (let i = 0; i < this.costFilterBtns.length; i++) {
-        if (i === index) {
-          this.costFilterBtns[i].toggle()
-          this.filterCostAry[i] = !(this.filterCostAry[i] ?? false)
-        } else {
-          this.costFilterBtns[i].toggleOff()
-          this.filterCostAry[i] = false
-        }
-      }
-      this.applyVisibleCards()
-    }
-  }
-
-  private onClearFilters(): () => void {
-    return () => {
-      for (let i = 0; i < this.costFilterBtns.length; i++) {
+  private onCostChipClick(index: number): void {
+    for (let i = 0; i < this.costFilterBtns.length; i++) {
+      if (i === index) {
+        this.costFilterBtns[i].toggle()
+        this.filterCostAry[i] = !(this.filterCostAry[i] ?? false)
+      } else {
         this.costFilterBtns[i].toggleOff()
         this.filterCostAry[i] = false
       }
-      this.searchObj.setText('')
-      this.searchText = ''
-      this.applyVisibleCards()
     }
+    this.applyVisibleCards()
+  }
+
+  private onClearFilters(): void {
+    for (let i = 0; i < this.costFilterBtns.length; i++) {
+      this.costFilterBtns[i].toggleOff()
+      this.filterCostAry[i] = false
+    }
+    this.searchObj.setText('')
+    this.searchText = ''
+    this.applyVisibleCards()
   }
 
   private createSortButton(): ContainerLite {
@@ -300,8 +299,9 @@ export class DeckEditorCatalog {
   private applyVisibleCards(): void {
     this.gridSizer.clear()
 
+    const tokens = parseDeckEditorSearchQuery(this.searchText)
     const passes = (card: Card) =>
-      cardPassesDeckEditorFilters(card, this.searchText, this.filterCostAry)
+      cardPassesDeckEditorFilters(card, tokens, this.filterCostAry)
 
     const sorted = [...this.cardImages]
     if (this.orderedByCost) {

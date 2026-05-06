@@ -66,7 +66,7 @@ function createSearchToken(
     text = text.substring(1)
     token.text = text
   }
-  const fieldMatch = text.match(/^(cost|points|name|text|deck):(.+)$/i)
+  const fieldMatch = text.match(/^(cost|points|name|text):(.+)$/i)
   if (fieldMatch) {
     token.field = fieldMatch[1].toLowerCase()
     const value = fieldMatch[2]
@@ -123,27 +123,21 @@ function searchEverywhere(card: Card, query: string): boolean {
   return searchableText.toLowerCase().includes(query.toLowerCase())
 }
 
-/** Combined cost chips + search text predicate for the catalog grid. */
+/** Combined cost chips + pre-parsed search token predicate for the catalog grid. */
 export function cardPassesDeckEditorFilters(
   card: Card,
-  searchText: string,
+  tokens: DeckEditorSearchToken[],
   filterCostAry: boolean[],
 ): boolean {
-  const costOk = (() => {
-    if (!filterCostAry.includes(true)) return true
-    return filterCostAry[Math.min(card.cost, DECK_EDITOR_MAX_COST_FILTER)]
-  })()
-
-  const searchOk = (() => {
-    if (!searchText.trim()) return true
-    const tokens = parseDeckEditorSearchQuery(searchText).filter(
-      (token) => token.field !== 'deck',
-    )
-    for (const token of tokens) {
-      if (!matchesToken(card, token)) return false
+  if (filterCostAry.includes(true)) {
+    if (!filterCostAry[Math.min(card.cost, DECK_EDITOR_MAX_COST_FILTER)]) {
+      return false
     }
-    return true
-  })()
+  }
 
-  return costOk && searchOk
+  for (const token of tokens) {
+    if (!matchesToken(card, token)) return false
+  }
+
+  return true
 }
