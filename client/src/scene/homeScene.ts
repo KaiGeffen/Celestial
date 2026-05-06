@@ -70,7 +70,7 @@ export default class HomeScene extends BaseScene {
 
     // Right panel: Title, image, and text - expand to fill remaining width
     const rightPanel = this.createRightPanel(leftHeight)
-    mainSizer.add(rightPanel, { align: 'top' })
+    mainSizer.add(rightPanel)
 
     // Anchor main sizer to fill entire screen (after layout so it positions correctly)
     this.plugins.get('rexAnchor')['add'](mainSizer, {
@@ -368,12 +368,15 @@ export default class HomeScene extends BaseScene {
     panelSizer.addBackground(background)
     this.addShadow(background)
 
-    const title = this.add
-      .text(0, 0, `New Update [${PATCH_NUMBER}]`, Style.header)
-      .setOrigin(0.5, 0)
+    const title = this.add.text(
+      0,
+      0,
+      `New Update [${PATCH_NUMBER}]`,
+      Style.header,
+    )
     panelSizer.add(title)
 
-    const line = this.add.rectangle(0, 0, 1, 3, 0x353f4e).setOrigin(0, 0)
+    const line = this.add.rectangle(0, 0, 1, 3, 0x353f4e)
     panelSizer.add(line, { expand: true })
 
     // Horizontal: left = daily image + tip, right = announcement pairs
@@ -388,6 +391,8 @@ export default class HomeScene extends BaseScene {
       space: { item: Space.padSmall },
     })
     const dayOfWeek = new Date().getDay()
+
+    // Daily image
     const newsImages = [
       'Birth',
       'Goliath',
@@ -401,16 +406,20 @@ export default class HomeScene extends BaseScene {
       .image(0, 0, `news-${newsImages[dayOfWeek]}`)
       .setOrigin(0, 0)
     dailyContainer.add(image)
-    const tipText = this.rexUI.add
-      .BBCodeText(0, 0, `[b]Daily Tip:[/b] ${getDailyHomeTip()}`, {
+
+    // Tip text
+    const tipText = this.rexUI.add.BBCodeText(
+      0,
+      0,
+      `[b]Daily Tip:[/b]\n${getDailyHomeTip()}`,
+      {
         ...BBStyle.dailyHint,
-        fontFamily: 'BeryliumItalic',
         wrap: { mode: 'word', width: image.displayWidth - Space.pad },
         fixedWidth: image.displayWidth,
-      })
-      .setOrigin(0, 0)
-    dailyContainer.add(tipText, { align: 'top' })
-    contentSizer.add(dailyContainer, { align: 'top' })
+      },
+    )
+    dailyContainer.add(tipText)
+    contentSizer.add(dailyContainer)
 
     // Right: subheader + body pairs
     const announcementSizer = this.rexUI.add.sizer({
