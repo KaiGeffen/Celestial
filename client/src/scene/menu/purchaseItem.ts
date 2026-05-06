@@ -88,6 +88,7 @@ export default class PurchaseItemMenu extends Menu {
       f: () => {
         this.handlePurchase()
       },
+      muteClick: true,
     })
 
     buttonsSizer.add(buyContainer)

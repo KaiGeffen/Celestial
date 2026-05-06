@@ -37,14 +37,14 @@ export default class StoreScene extends BaseSceneWithHeader {
 
   private createUserStatsDisplay(): void {
     this.userStatsDisplay = this.add
-      .text(
-        Space.windowWidth - (Space.pad * 3 + Space.iconSize * 2),
-        this.headerHeight / 2,
-        '',
-        Style.basicStylized,
-      )
+      .text(0, this.headerHeight / 2, '', Style.basicStylized)
       .setOrigin(1, 0.5)
       .setDepth(2)
+
+    // Anchor the user stats display to the right
+    this.plugins.get('rexAnchor')['add'](this.userStatsDisplay, {
+      right: `100%-${Space.pad * 1.5 + Space.iconSize * 2}`,
+    })
 
     this.updateUserStatsDisplay()
   }
@@ -87,6 +87,9 @@ export default class StoreScene extends BaseSceneWithHeader {
         left: Space.pad,
         right: Space.pad,
       },
+      anchor: {
+        width: '100%',
+      },
     })
 
     // Get card inventory (owned cards)
@@ -121,16 +124,15 @@ export default class StoreScene extends BaseSceneWithHeader {
       })
     }
 
-    sizer.layout()
-
     // Create scrollable panel
     this.scrollablePanel = newScrollablePanel(this, {
       x: 0,
       y: this.headerHeight,
-      width: Space.windowWidth,
-      height: Space.windowHeight - this.headerHeight,
       panel: {
         child: sizer,
+      },
+      anchor: {
+        height: `100%-${this.headerHeight}`,
       },
     })
   }
@@ -148,8 +150,6 @@ export default class StoreScene extends BaseSceneWithHeader {
 
     // Set click handler on the card image
     cardImage.setOnClick(() => {
-      this.sound.play('click')
-
       // Launch the purchase menu
       this.scene.launch('MenuScene', {
         menu: 'purchaseItem',
