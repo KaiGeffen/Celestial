@@ -3,7 +3,7 @@ const path = require('path')
 const http = require('http')
 const fs = require('fs')
 const steamworks = require('steamworks.js')
-const { steamAppId } = require('../shared/steam.json')
+const steamAppId = 4670650
 
 // Must be called before app is ready so the command-line switches are set in time
 steamworks.electronEnableSteamOverlay()
