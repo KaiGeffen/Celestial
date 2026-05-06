@@ -44,8 +44,6 @@ export class DeckEditorDeck {
   headerHeight = 0
   footerHeight = 0
 
-  readonly columnSizer: RexUIPlugin.Sizer
-
   private readonly opts: DeckEditorDeckOptions
 
   constructor(scene: BaseScene, opts: DeckEditorDeckOptions) {
@@ -53,7 +51,7 @@ export class DeckEditorDeck {
     this.opts = opts
 
     // Contents of scroll panel (Lowest depth)
-    const bgScroll = scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
+    const bgScroll = scene.add.image(0, 0, 'chrome-builderDecklist')
     this.decklist = new Decklist(scene, opts.createCutoutInteraction())
     this.decklist.setDeck(opts.deckCards, opts.mustOwnCardsInList)
 
@@ -65,25 +63,20 @@ export class DeckEditorDeck {
     const footerSizer = this.createFooter()
     this.footerHeight = DeckEditorDeck.layoutSizerHeight(footerSizer)
 
-    // Scroll panel takes up full height besides header and footer
-    const scrollBodyH =
-      Space.windowHeight - this.headerHeight - this.footerHeight
-
     // Create the scroll panel
     this.scrollPanel = newScrollablePanel(scene, {
-      height: scrollBodyH,
       background: bgScroll,
-      panel: { child: this.decklist.sizer },
-    })
 
-    // Create the sizer
-    this.columnSizer = this.scene.rexUI.add
-      .sizer({
-        orientation: 1,
-      })
-      .add(headerSizer)
-      .add(this.scrollPanel)
-      .add(footerSizer)
+      // Components
+      header: headerSizer,
+      footer: footerSizer,
+      panel: { child: this.decklist.sizer },
+
+      // Anchor
+      anchor: {
+        height: '100%',
+      },
+    })
   }
 
   /** RexUI sizers expose `.height` after `layout()`; rex typings omit it so we normalize here. */
@@ -94,18 +87,6 @@ export class DeckEditorDeck {
     sizer.layout()
     const h = (sizer as { height?: number }).height
     return typeof h === 'number' ? h : 0
-  }
-
-  onWindowResize(): void {
-    // Resize the scroll panel to be window - header - footer
-    const scrollH = Math.max(
-      1,
-      Space.windowHeight - this.headerHeight - this.footerHeight,
-    )
-    this.scrollPanel.setMinSize(DECK_EDITOR_DECK_WIDTH, scrollH)
-
-    // Reset scroll
-    this.scrollPanel.t = 0
   }
 
   syncThumbnail(args: {
@@ -131,9 +112,9 @@ export class DeckEditorDeck {
 
   private createHeader(): FixWidthSizer {
     const bg = this.scene.add
-      .rectangle(0, 0, 1, 1, Color.backgroundDark)
+      .rectangle(0, 0, 1, 1)
+      .setAlpha(0.01)
       .setInteractive()
-    this.scene.addShadow(bg, -90)
 
     // Create the thumbnail
     this.deckThumbnail = new DeckThumbnail({
@@ -168,10 +149,10 @@ export class DeckEditorDeck {
     return sizer
   }
 
-  // Buttons
   private createFooter(): RexUIPlugin.Sizer {
     const bg = this.scene.add
-      .rectangle(0, 0, 1, 1, Color.backgroundLight)
+      .rectangle(0, 0, 1, 1)
+      .setAlpha(0.01)
       .setInteractive()
 
     // Lambda for creating buttons

@@ -125,26 +125,6 @@ export class DeckEditorCatalog {
     this.scrollPanel.layout()
   }
 
-  onWindowResize(): void {
-    return
-    const windowHeight = Space.windowHeight
-    const catalogWidth = Math.max(1, Space.windowWidth - DECK_EDITOR_DECK_WIDTH)
-    if (this.headerSizer) {
-      ;(this.headerSizer as any).runLayout?.(undefined, catalogWidth, undefined)
-    }
-    const filterH = Math.max(
-      Space.filterBarHeight,
-      this.headerSizer?.height ?? Space.filterBarHeight,
-    )
-    const catalogBodyH = Math.max(1, windowHeight - filterH)
-
-    const catalogRatio = this.scrollPanel.t
-    this.scrollPanel.setMinSize(catalogWidth, catalogBodyH)
-    this.relayoutGridAtWidth(catalogWidth)
-    this.scrollPanel.layout()
-    this.scrollPanel.t = Math.min(0.999999, catalogRatio)
-  }
-
   /**
    * Nested `FixWidthSizer` may not re-run `runWidthWrap` when sized as a non-topmost child, so
    * column count can stick (e.g. ~4 cards wide). Topmost `runLayout` recomputes `wrapResult`.

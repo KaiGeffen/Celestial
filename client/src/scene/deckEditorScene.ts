@@ -104,7 +104,7 @@ export default class DeckEditorScene extends BaseScene {
     // Make the main sizer
     this.sizer = this.rexUI.add.sizer()
     this.sizer.add(this.catalogRegion.columnSizer)
-    this.sizer.add(this.deckRegion.columnSizer)
+    this.sizer.add(this.deckRegion.scrollPanel)
 
     // Anchor this to take up full screen
     this.plugins.get('rexAnchor')['add'](this.sizer, {
@@ -308,13 +308,7 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   onWindowResize(): void {
-    if (!this.sizer || !this.catalogRegion || !this.deckRegion) return
-
-    // Resize both regions
-    this.catalogRegion.onWindowResize()
-    this.deckRegion.onWindowResize()
-
-    this.sizer.layout()
+    this.sizer?.layout()
   }
 
   // TODO Removed? Is this used at all?
