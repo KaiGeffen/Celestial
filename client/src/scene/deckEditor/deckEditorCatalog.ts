@@ -7,12 +7,7 @@ import BaseScene from '../baseScene'
 import Buttons from '../../lib/buttons/buttons'
 import UButton from '../../lib/buttons/underlined'
 import { CardImage } from '../../lib/cardImage'
-import {
-  Color,
-  Space,
-  UserSettings,
-  Flags,
-} from '../../settings/settings'
+import { Color, Space, UserSettings, Flags } from '../../settings/settings'
 import { Style } from '../../settings/style'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import Catalog from '../../../../shared/state/catalog'
@@ -69,7 +64,7 @@ export class DeckEditorCatalog {
       Space.windowHeight - Space.filterBarHeight,
     )
 
-    const panel = this.scene.rexUI.add.fixWidthSizer({
+    this.gridSizer = this.scene.rexUI.add.fixWidthSizer({
       space: {
         left: Space.pad,
         right: Space.pad,
@@ -80,6 +75,7 @@ export class DeckEditorCatalog {
       },
     })
 
+    // Make all the card images
     this.cardImages = []
     let pool: Card[] = []
     if (Flags.devCardsEnabled) {
@@ -91,38 +87,46 @@ export class DeckEditorCatalog {
     }
 
     pool.forEach((card) => {
-      const cardImage = new CardImage(card, panel, true, false).setOnClick(
-        () => {
-          opts.onCardPick(card)
-          scene.sound.play('click')
-        },
-      )
+      const cardImage = new CardImage(
+        card,
+        this.gridSizer,
+        true,
+        false,
+      ).setOnClick(() => {
+        opts.onCardPick(card)
+        scene.sound.play('click')
+      })
       this.cardImages.push(cardImage)
     })
 
-    this.gridSizer = panel
     this.scrollPanel = newScrollablePanel(scene, {
-      width: catalogWidth,
-      height: catalogBodyHeight,
-      panel: { child: panel },
+      header: this.createFilterHeaderRow(),
+      // width: catalogWidth,
+      // height: catalogBodyHeight,
+      panel: { child: this.gridSizer },
       slider: false,
       background: scene.add.image(0, 0, 'chrome-body').setDepth(-1),
+      anchor: {
+        width: `100%-${DECK_EDITOR_DECK_WIDTH}`,
+        height: '100%',
+      },
     }).setOrigin(0)
 
-    this.scrollPanel.layout()
-
-    const headerRow = this.createFilterHeaderRow()
+    // const headerRow = this.createFilterHeaderRow()
 
     const column = this.scene.rexUI.add.sizer({ orientation: 1 }).setOrigin(0)
-    column.add(headerRow, { proportion: 0, expand: true })
+    // column.add(headerRow, { proportion: 0, expand: true })
     column.add(this.scrollPanel, { proportion: 1, expand: true })
 
     this.columnSizer = column
 
     this.applyVisibleCards()
+
+    this.scrollPanel.layout()
   }
 
   onWindowResize(): void {
+    return
     const windowHeight = Space.windowHeight
     const catalogWidth = Math.max(1, Space.windowWidth - DECK_EDITOR_DECK_WIDTH)
     if (this.headerSizer) {
@@ -165,12 +169,11 @@ export class DeckEditorCatalog {
     // Sizer
     this.headerSizer = this.scene.rexUI.add
       .sizer({
-        orientation: 0,
         space: {
           left: Space.pad,
           right: Space.pad,
-          top: Space.padSmall,
-          bottom: Space.padSmall,
+          top: 1.5,
+          bottom: 1.5,
         },
       })
       .addBackground(background)
@@ -205,10 +208,9 @@ export class DeckEditorCatalog {
 
     // Populate sizer
     this.headerSizer.add(this.createBackButton())
-    this.headerSizer.add(sizerCostChips, { proportion: 1, expand: true })
+    this.headerSizer.add(sizerCostChips, { proportion: 1 })
     this.headerSizer.add(this.createSearchField(), {
       proportion: 1,
-      expand: true,
     })
     this.headerSizer.add(this.createSortButton())
 
@@ -225,7 +227,7 @@ export class DeckEditorCatalog {
       Space.textboxHeight,
     )
     this.searchObj = scene.add
-      .rexInputText(0, 0, Space.textboxWidth, Space.textboxHeight, {
+      .rexInputText(-16, 0, Space.textboxWidth - 100, Space.textboxHeight, {
         type: 'text',
         text: this.searchText,
         align: 'center',
