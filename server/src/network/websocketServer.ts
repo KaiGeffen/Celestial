@@ -4,8 +4,8 @@ import {
   USER_DATA_PORT,
   UUID_NAMESPACE,
 } from '../../../shared/network/settings'
-import { STEAM_APP_ID_STRING } from '../../../shared/steam'
 import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
+import { verifySteamTicket } from './steamAuth'
 
 import { db } from '../db/db'
 import { players, approvedRefs } from '../db/schema'
@@ -66,99 +66,6 @@ const spectatorWsToMatch = new WeakMap<ServerWS, Match>()
 
 // User ids currently spectating another player's match (for online status)
 const spectatingUserIds = new Set<string>()
-
-/** Steamworks publisher keys use partner.steam-api.com; keys from steamcommunity.com/dev/apikey typically use api.steampowered.com. */
-async function verifySteamTicket(ticket: string): Promise<string | null> {
-  const steamKey = process.env.STEAM_WEB_API_KEY?.trim()
-  const ticketTrimmed = ticket?.trim()
-  if (!steamKey || !ticketTrimmed) {
-    if (!steamKey) {
-      console.warn(
-        '[Steam auth] STEAM_WEB_API_KEY is not set; cannot verify tickets.',
-      )
-    }
-    return null
-  }
-
-  const params = new URLSearchParams({
-    key: steamKey,
-    appid: STEAM_APP_ID_STRING,
-    ticket: ticketTrimmed,
-  })
-
-  const basesEnv = process.env.STEAM_WEB_API_BASE_URL?.trim().replace(/\/$/, '')
-  const bases = basesEnv
-    ? [basesEnv]
-    : [
-        'https://partner.steam-api.com',
-        'https://api.steampowered.com',
-      ]
-
-  let lastHttpError: string | null = null
-
-  for (const base of bases) {
-    const endpoint = `${base}/ISteamUserAuth/AuthenticateUserTicket/v1/?${params}`
-    let response: Response
-    try {
-      response = await fetch(endpoint)
-    } catch (e) {
-      lastHttpError = `${base}: ${e instanceof Error ? e.message : String(e)}`
-      continue
-    }
-
-    const text = await response.text()
-
-    if (!response.ok) {
-      lastHttpError = `${base}: HTTP ${response.status} ${text.slice(0, 240)}`
-      continue
-    }
-
-    let parsed: {
-      response?: {
-        params?: { result?: string; steamid?: string | number }
-        error?: { errorcode?: number; errordesc?: string }
-      }
-    }
-    try {
-      parsed = JSON.parse(text) as typeof parsed
-    } catch {
-      console.warn(
-        '[Steam auth] Non-JSON response from',
-        base + ':',
-        text.slice(0, 240),
-      )
-      continue
-    }
-
-    const apiErr = parsed.response?.error
-    if (apiErr) {
-      console.warn(
-        '[Steam auth] Steam API error:',
-        apiErr.errordesc ?? `errorcode=${apiErr.errorcode}`,
-      )
-      return null
-    }
-
-    const p = parsed.response?.params
-    const result = p?.result
-    const steamIdRaw = p?.steamid
-
-    if (result === 'OK' && steamIdRaw != null && `${steamIdRaw}` !== '') {
-      return String(steamIdRaw)
-    }
-
-    if (result && result !== 'OK') {
-      console.warn('[Steam auth] Ticket rejected:', result)
-      return null
-    }
-
-    console.warn('[Steam auth] Unexpected body:', text.slice(0, 320))
-    return null
-  }
-
-  console.warn('[Steam auth] Verification failed:', lastHttpError ?? 'unknown')
-  return null
-}
 
 // Create the websocket server
 export default function createWebSocketServer() {
@@ -234,10 +141,9 @@ export default function createWebSocketServer() {
         .on('loginSteam', async ({ ticket }) => {
           console.log('Login Steam...')
           const steamId = await verifySteamTicket(ticket)
-          console.log('Steam id verified', steamId)
           if (!steamId) {
             ws.send({ type: 'invalidToken' })
-            // ws.close(1008, 'Invalid Steam ticket')
+            ws.close(1008, 'Invalid Steam ticket')
             return
           }
 
