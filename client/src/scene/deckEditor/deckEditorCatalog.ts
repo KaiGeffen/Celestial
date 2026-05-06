@@ -12,7 +12,6 @@ import {
   Space,
   UserSettings,
   Flags,
-  deckFilterBarHeight,
 } from '../../settings/settings'
 import { Style } from '../../settings/style'
 import newScrollablePanel from '../../lib/scrollablePanel'
@@ -67,7 +66,7 @@ export class DeckEditorCatalog {
     const catalogWidth = Math.max(1, Space.windowWidth - DECK_EDITOR_DECK_WIDTH)
     const catalogBodyHeight = Math.max(
       1,
-      Space.windowHeight - deckFilterBarHeight(),
+      Space.windowHeight - Space.filterBarHeight,
     )
 
     const panel = this.scene.rexUI.add.fixWidthSizer({
@@ -130,8 +129,8 @@ export class DeckEditorCatalog {
       ;(this.headerSizer as any).runLayout?.(undefined, catalogWidth, undefined)
     }
     const filterH = Math.max(
-      deckFilterBarHeight(),
-      this.headerSizer?.height ?? deckFilterBarHeight(),
+      Space.filterBarHeight,
+      this.headerSizer?.height ?? Space.filterBarHeight,
     )
     const catalogBodyH = Math.max(1, windowHeight - filterH)
 

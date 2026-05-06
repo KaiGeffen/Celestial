@@ -7,13 +7,7 @@ import BaseScene from './baseScene'
 import Decklist from '../lib/decklist'
 import Buttons from '../lib/buttons/buttons'
 import DeckThumbnail from '../lib/deckThumbnail'
-import {
-  Color,
-  Space,
-  Style,
-  UserSettings,
-  deckFilterBarHeight,
-} from '../settings/settings'
+import { Color, Space, Style, UserSettings } from '../settings/settings'
 import Server from '../server'
 import newScrollablePanel from '../lib/scrollablePanel'
 import { MechanicsSettings } from '../../../shared/settings'
@@ -53,7 +47,7 @@ export default class DeckSelectorScene extends BaseScene {
     this.createBackground()
     this.createChrome()
 
-    const bodyScrollHeight = Space.windowHeight - deckFilterBarHeight()
+    const bodyScrollHeight = Space.windowHeight - Space.filterBarHeight
 
     // Right column: deck preview + footer buttons (center Decklist cutouts in column)
     this.decklist = new Decklist(this, () => () => {}) // no-op cutout callback
@@ -130,7 +124,7 @@ export default class DeckSelectorScene extends BaseScene {
     if (!this.mainSizer) return
     // Like `CatalogRegion.resize`: scroll panels get an explicit `setMinSize` on every resize so
     // they shrink when the window narrows (root `layout()` alone mostly grows proportion slots).
-    const bodyH = Math.max(1, Space.windowHeight - deckFilterBarHeight())
+    const bodyH = Math.max(1, Space.windowHeight - Space.filterBarHeight)
     const centerW = Math.max(1, Space.windowWidth - ROSTER_WIDTH)
     if (this.centerPanel) {
       const ratio = this.centerPanel.t
@@ -202,7 +196,6 @@ export default class DeckSelectorScene extends BaseScene {
 
   /** Full-width header — same layout/padding as `DeckEditorScene` `createFilterHeader`. */
   private createMainHeader(): any {
-    const barH = deckFilterBarHeight()
     const background = this.add
       .image(0, 0, 'chrome-builderHeader')
       .setInteractive()
@@ -240,7 +233,7 @@ export default class DeckSelectorScene extends BaseScene {
 
     const sizer = this.rexUI.add
       .sizer({
-        height: barH,
+        height: Space.filterBarHeight,
         orientation: 0,
         space: {
           left: Space.pad,
