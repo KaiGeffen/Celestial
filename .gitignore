@@ -13,6 +13,9 @@ scripts/
 # dist #
 dist/
 
+# Electron packaged output #
+electron-dist/
+
 # Compiled index.html in the client (Not about or privacy) #
 /client/index.html
 
