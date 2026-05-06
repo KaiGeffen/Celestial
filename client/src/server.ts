@@ -1,5 +1,7 @@
 import 'phaser'
 
+/// <reference path="./types/electron.d.ts" />
+
 import Card from '../../shared/state/card'
 import { Flags, Url, UserSettings } from './settings/settings'
 import BaseScene from './scene/baseScene'
