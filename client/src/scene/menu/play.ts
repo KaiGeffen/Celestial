@@ -266,18 +266,26 @@ export default class PlayMenu extends Menu {
     })
     deckNameSizer.addBackground(deckNameBackground)
 
-    // Previous deck button (<)
+    // Previous deck button
     const decks = UserSettings._get('decks')
     const hasMultipleDecks = decks && decks.length > 1
 
-    this.btnPrevDeck = new Buttons.Text(this.scene, 0, 0, '<', () =>
-      this.switchToPreviousDeck(),
+    const prevDeckContainer = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.iconSize,
+      Space.iconSize,
     )
+    this.btnPrevDeck = new Buttons.Icon({
+      within: prevDeckContainer,
+      name: 'Left',
+      f: () => this.switchToPreviousDeck(),
+    })
     if (!hasMultipleDecks) {
-      this.btnPrevDeck.txt.setAlpha(0.5)
-      this.btnPrevDeck.txt.disableInteractive()
+      this.btnPrevDeck.disable()
     }
-    deckNameSizer.add(this.btnPrevDeck.txt)
+    deckNameSizer.add(prevDeckContainer)
 
     // Deck name
     this.txtDeckName = this.scene.rexUI.add
@@ -287,15 +295,23 @@ export default class PlayMenu extends Menu {
       .setText(this.deck.name || '')
     deckNameSizer.add(this.txtDeckName, { expand: true })
 
-    // Next deck button (>)
-    this.btnNextDeck = new Buttons.Text(this.scene, 0, 0, '>', () =>
-      this.switchToNextDeck(),
+    // Next deck button
+    const nextDeckContainer = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.iconSize,
+      Space.iconSize,
     )
+    this.btnNextDeck = new Buttons.Icon({
+      within: nextDeckContainer,
+      name: 'Right',
+      f: () => this.switchToNextDeck(),
+    })
     if (!hasMultipleDecks) {
-      this.btnNextDeck.txt.setAlpha(0.5)
-      this.btnNextDeck.txt.disableInteractive()
+      this.btnNextDeck.disable()
     }
-    deckNameSizer.add(this.btnNextDeck.txt)
+    deckNameSizer.add(nextDeckContainer)
 
     panelSizer.add(deckNameSizer).addNewLine()
 

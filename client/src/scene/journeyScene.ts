@@ -349,26 +349,40 @@ export default class JourneyScene extends BaseScene {
       .text(0, 0, '', Style.journeyOverlay)
       .setOrigin(0.5, 0.5)
 
-    const leftArrow = this.add
-      .text(0, 0, '‹', Style.journeyOverlay)
-      .setOrigin(0.5, 0.5)
-      .setInteractive({ useHandCursor: true })
-    leftArrow.on('pointerdown', () => {
-      this.sound.play('click')
-      this.showOverlayCharacterView = false
-      this.selectedThemeIndex =
-        (this.selectedThemeIndex - 1 + themes.length) % themes.length
-      this.refreshOverlayContent()
+    const leftArrowContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      TODO_ICON_SIZE,
+      TODO_ICON_SIZE,
+    )
+    new Buttons.Icon({
+      within: leftArrowContainer,
+      name: 'Left',
+      f: () => {
+        this.showOverlayCharacterView = false
+        this.selectedThemeIndex =
+          (this.selectedThemeIndex - 1 + themes.length) % themes.length
+        this.refreshOverlayContent()
+      },
+      size: TODO_ICON_SIZE,
     })
-    const rightArrow = this.add
-      .text(0, 0, '›', Style.journeyOverlay)
-      .setOrigin(0.5, 0.5)
-      .setInteractive({ useHandCursor: true })
-    rightArrow.on('pointerdown', () => {
-      this.sound.play('click')
-      this.showOverlayCharacterView = false
-      this.selectedThemeIndex = (this.selectedThemeIndex + 1) % themes.length
-      this.refreshOverlayContent()
+    const rightArrowContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      TODO_ICON_SIZE,
+      TODO_ICON_SIZE,
+    )
+    new Buttons.Icon({
+      within: rightArrowContainer,
+      name: 'Right',
+      f: () => {
+        this.showOverlayCharacterView = false
+        this.selectedThemeIndex = (this.selectedThemeIndex + 1) % themes.length
+        this.refreshOverlayContent()
+      },
+      size: TODO_ICON_SIZE,
     })
 
     this.overlayArtButtonContainer = new ContainerLite(
@@ -390,14 +404,14 @@ export default class JourneyScene extends BaseScene {
     })
     overlayArtButton.icon.setTintFill(Color.backgroundLight)
 
-    const sideControlsWidth = leftArrow.width + Space.pad + TODO_ICON_SIZE
+    const sideControlsWidth = TODO_ICON_SIZE * 2 + Space.pad
     const leftControls = this.rexUI.add.sizer({
       orientation: 'horizontal',
       width: sideControlsWidth,
       space: { item: Space.pad },
     })
     leftControls
-      .add(leftArrow, { align: 'center' })
+      .add(leftArrowContainer, { align: 'center' })
       .add(this.overlayArtButtonContainer, {
         align: 'center',
       })
@@ -406,7 +420,7 @@ export default class JourneyScene extends BaseScene {
       orientation: 'horizontal',
       width: sideControlsWidth,
     })
-    rightControls.addSpace().add(rightArrow, { align: 'center' })
+    rightControls.addSpace().add(rightArrowContainer, { align: 'center' })
 
     headerSizer
       .add(leftControls, { align: 'center' })
