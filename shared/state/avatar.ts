@@ -3,6 +3,6 @@ export enum Avatar {
   Adonis = 2,
   Kitz = 3,
   Mia = 4,
-  Imani = 5,
+  Renata = 5,
   Mitra = 6,
 }

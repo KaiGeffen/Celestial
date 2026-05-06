@@ -1,6 +1,5 @@
 import avatarNames from '../../../shared/data/avatarNames'
 import Catalog from '../../../shared/state/catalog'
-import { Space, Flags } from '../settings/settings'
 import { assetLists } from './assetLists'
 
 const EXTENSION = 'webp'
@@ -22,12 +21,7 @@ export default class Loader {
     // Set the load path
     scene.load.path = 'assets/'
 
-    // Single image (`BigButton` below remains a spritesheet).
     scene.load.image(`icon-Button`, `img/Button.png`)
-    scene.load.spritesheet(`icon-BigButton`, `img/BigButton.${EXTENSION}`, {
-      frameWidth: Space.buttonWidth,
-      frameHeight: Space.bigButtonHeight,
-    })
 
     scene.load.image(`icon-InputText`, `img/icon/InputText.${EXTENSION}`)
   }
@@ -129,6 +123,11 @@ export default class Loader {
     scene.load.image('tutorial-2', 'img/tutorial/2.webp')
     scene.load.image('tutorial-3', 'img/tutorial/3.webp')
     scene.load.image('tutorial-4', 'img/tutorial/4.webp')
+    scene.load.image('tutorial-5', 'img/tutorial/5.webp')
+    scene.load.image('tutorial-6', 'img/tutorial/6.webp')
+    scene.load.image('tutorial-7', 'img/tutorial/7.webp')
+    scene.load.image('tutorial-8', 'img/tutorial/8.webp')
+    scene.load.image('tutorial-9', 'img/tutorial/9.webp')
   }
 
   // Load journey map and mission images

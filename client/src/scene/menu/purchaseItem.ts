@@ -9,6 +9,7 @@ import { CardImage } from '../../lib/cardImage'
 import Card from '../../../../shared/state/card'
 
 const COST = 1000
+const WIDTH = 600
 
 export default class PurchaseItemMenu extends Menu {
   private card: Card
@@ -23,7 +24,7 @@ export default class PurchaseItemMenu extends Menu {
       card: Card
     },
   ) {
-    super(scene, 800) // Wider menu to accommodate the image and description
+    super(scene, WIDTH) // Wider menu to accommodate the image and description
 
     // Set properties before creating content
     this.card = params.card
@@ -48,13 +49,7 @@ export default class PurchaseItemMenu extends Menu {
   }
 
   private createContent(): void {
-    this.createHeader(this.card.name)
-
-    // Create main content sizer
-    const contentSizer = this.scene.rexUI.add.sizer({
-      orientation: 'horizontal',
-      space: { item: Space.pad * 2 },
-    })
+    this.createHeader('Purchase (1,000)')
 
     // Add card image on the left
     const cardImageContainer = new ContainerLite(
@@ -65,33 +60,14 @@ export default class PurchaseItemMenu extends Menu {
       Space.cardHeight,
     )
     const cardImage = new CardImage(this.card, cardImageContainer, false, false)
-    contentSizer.add(cardImageContainer)
-
-    // Create right side sizer for purchase info
-    const rightSizer = this.scene.rexUI.add.sizer({
-      orientation: 'vertical',
-      space: { item: Space.pad * 2 },
-    })
-
-    // Add cost text
-    const costText = this.scene.add.text(
-      0,
-      0,
-      `Cost: ${COST} 💰`,
-      Style.announcement,
-    )
-    rightSizer.add(costText)
-
-    // Add right side sizer to main content
-    contentSizer.add(rightSizer)
 
     // Add the content sizer to the menu
-    this.sizer.add(contentSizer)
+    this.sizer.add(cardImageContainer)
 
     // Create bottom buttons sizer
     const buttonsSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
-      space: { item: Space.pad * 4 },
+      space: { item: Space.pad * 5 },
     })
 
     // Add cancel button
@@ -112,6 +88,7 @@ export default class PurchaseItemMenu extends Menu {
       f: () => {
         this.handlePurchase()
       },
+      muteClick: true,
     })
 
     buttonsSizer.add(buyContainer)

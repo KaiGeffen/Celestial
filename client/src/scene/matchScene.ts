@@ -36,9 +36,6 @@ export class MatchScene extends BaseScene {
 
   view: View
   ws: ClientWS
-  // If true, skip pausing at recap-end states (spectator mode).
-  autoAdvance = false
-
   // Whether the match is paused (Awaiting user to click a button, for example)
   paused: boolean
 
@@ -226,7 +223,7 @@ export class MatchScene extends BaseScene {
   private signalOpponentSurrendered(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
-      title: 'Opponent Surrendered',
+      title: '',
       s: 'Your opponent surrendered, you win!',
     })
   }
@@ -234,15 +231,15 @@ export class MatchScene extends BaseScene {
   private signalOpponentDisconnect(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
-      title: 'Opponent Disconnected',
-      s: 'Your opponent disconnected, now we wait for them to reconnect...',
+      title: '',
+      s: 'Your opponent disconnected, waiting for them to reconnect.',
     })
   }
 
   private signalOpponentReconnected(): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
-      title: 'Opponent Reconnected',
+      title: '',
       s: 'Your opponent has reconnected, resuming the game.',
     })
   }
@@ -419,7 +416,6 @@ export class MatchScene extends BaseScene {
     }
 
     if (
-      !this.autoAdvance &&
       state.isRecap &&
       (state.sound === SoundEffect.Win ||
         state.sound === SoundEffect.Lose ||
@@ -694,6 +690,8 @@ export class View {
 
   beforeExit(): void {
     this.searching.beforeExit()
+    this.ourAvatar.beforeExit()
+    this.theirAvatar.beforeExit()
   }
 }
 

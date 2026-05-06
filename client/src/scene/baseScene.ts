@@ -146,11 +146,7 @@ export default class BaseScene extends SharedBaseScene {
 
     // FPS display (top-right corner) - created first so it's behind other UI
     this.txtFPS = this.add
-      .text(Space.windowWidth, 0, '', {
-        fontFamily: 'Arial',
-        fontSize: '16px',
-        color: '#009900',
-      })
+      .text(Space.windowWidth, 0, '', Style.fps)
       .setOrigin(1, 0)
       .setDepth(5)
       .setScrollFactor(0)
@@ -350,81 +346,39 @@ export default class BaseScene extends SharedBaseScene {
 }
 
 export class BaseSceneWithHeader extends BaseScene {
-  protected headerHeight = Space.iconSize + Space.pad * 2
-  private userStatsDisplay: Phaser.GameObjects.Text
+  protected readonly headerHeight = Space.padSmall * 2 + Space.buttonHeight
 
+  // Normal create but with a header
   create(params): void {
     super.create(params)
 
     this.createHeader(params.title)
   }
 
-  update(time: number, delta: number): void {
-    super.update(time, delta)
-
-    this.updateUserStatsDisplay()
-  }
-
-  private updateUserStatsDisplay(): void {
-    const username = Server.getUserData().username
-    const elo = Server.getUserData().elo
-    const gems = Server.getUserData().gems
-    const coins = Server.getUserData().coins
-
-    // Set the text to the user's stats (Which might update)
-    this.userStatsDisplay.setText(`${username} (${elo}) ${gems}💎 ${coins}💰`)
-  }
-
   private createHeader(title: string): void {
-    // Make the background header
-    let background = this.add
-      .rectangle(
-        0,
-        0,
-        Space.windowWidth,
-        this.headerHeight,
-        Color.backgroundLight,
-      )
-      .setOrigin(0)
-    this.addShadow(background)
+    // Background
+    const background = this.add.image(0, 0, 'chrome-header').setOrigin(0, 0)
+    this.addShadow(background, -90)
+    this.plugins.get('rexAnchor')['add'](background, {
+      width: `100%`,
+      height: `0%+${Space.padSmall * 2 + Space.buttonHeight}`,
+    })
 
-    // Create back button
-    new Buttons.Basic({
+    // Title
+    const txt = this.add.text(0, 0, title, Style.header).setOrigin(0.5)
+    this.plugins.get('rexAnchor')['add'](txt, {
+      x: `50%`,
+      y: `0%+${Space.padSmall + Space.buttonHeight / 2}`,
+    })
+
+    // Back button
+    const btnBack = new Buttons.Basic({
       within: this,
       text: 'Back',
       x: Space.pad + Space.buttonWidth / 2,
-      y: this.headerHeight / 2,
+      y: Space.padSmall + Space.buttonHeight / 2,
       f: () => this.scene.start('HomeScene'),
-    }).setDepth(2)
-
-    // Create title back in center
-    this.add
-      .text(
-        Space.windowWidth / 2,
-        this.headerHeight / 2,
-        title,
-        Style.homeTitle,
-      )
-      .setOrigin(0.5)
-
-    // Add user info
-    this.createUserStatsDisplay()
-  }
-
-  private createUserStatsDisplay(): void {
-    // Create the text object displaying user stats
-    // Position accounts for: friends icon + padding + options icon + padding
-    this.userStatsDisplay = this.add
-      .text(
-        Space.windowWidth - (Space.pad * 3 + Space.iconSize * 2),
-        this.headerHeight / 2,
-        '',
-        Style.basic,
-      )
-      .setOrigin(1, 0.5)
-
-    // Set the text's values
-    this.updateUserStatsDisplay()
+    })
   }
 }
 

@@ -1,1 +1,1 @@
-export default ['Jules', 'Adonis', 'Mia', 'Kitz', 'Imani', 'Mitra']
+export default ['Jules', 'Adonis', 'Mia', 'Kitz', 'Renata', 'Mitra']

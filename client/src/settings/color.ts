@@ -1,3 +1,5 @@
+import { Core } from 'phaser'
+
 // The base colors used throughout this app
 const CoreColors: Record<string, number | string> = {
   white: 0xf5f2eb,
@@ -6,14 +8,22 @@ const CoreColors: Record<string, number | string> = {
   black: 0x353f4e,
   blackS: '#353F4E',
 
-  gold: 0xfabd5d,
-  goldS: '#FABD5D',
+  gold: 0xedaa24,
+  goldS: '#EDAA24',
 
   blue: 0x5f99dc,
   blueS: '#5F99DC',
 
   brown: 0x664930,
   brownS: '#664930',
+
+  darkUmber: 0x321a0f,
+  darkUmberS: '#321A0F',
+
+  skyBlue: 0x87ceeb,
+  skyBlueS: '#87CEEB',
+  darkBlue: 0x1a237e,
+  darkBlueS: '#1A237E',
 
   grey: 0x555555,
   greyA: 0x555555e0,
@@ -36,6 +46,14 @@ export const Color: Record<string, any> = {
   whiteS: CoreColors.whiteS,
   gold: CoreColors.gold,
   goldS: CoreColors.goldS,
+  blue: CoreColors.blue,
+  blueS: CoreColors.blueS,
+  darkUmber: CoreColors.darkUmber,
+  darkUmberS: CoreColors.darkUmberS,
+  skyBlue: CoreColors.skyBlue,
+  skyBlueS: CoreColors.skyBlueS,
+  darkBlue: CoreColors.darkBlue,
+  darkBlueS: CoreColors.darkBlueS,
   grey: CoreColors.grey,
 
   // GENERAL
@@ -61,9 +79,10 @@ export const Color: Record<string, any> = {
   filterSelected: CoreColors.gold,
   buttonTxtSelected: CoreColors.whiteS,
   textButton: '#817467',
+  discordButton: CoreColors.brown,
 
   // Input text
-  textboxText: '#ffffff',
+  textboxText: CoreColors.blackS,
 
   // Line
   line: CoreColors.black,
@@ -114,10 +133,7 @@ export const Color: Record<string, any> = {
 
   // TODO Organize
   username: CoreColors.blackS,
-  todoScore: CoreColors.blackS,
   todoSubtext: CoreColors.blackS,
-
-  rowHighlight: CoreColors.gold,
 
   // Progress bar
   progressBar: 0x4e342e,

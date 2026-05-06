@@ -7,9 +7,7 @@ import { MatchResultsSimplifiedRegion } from './matchRegions/matchResults'
 import { MatchScene, View } from './matchScene'
 
 export class SpectatorMatchScene extends MatchScene {
-  constructor(
-    args = { key: 'SpectatorMatchScene', lastScene: 'BuilderScene' },
-  ) {
+  constructor(args = { key: 'SpectatorMatchScene', lastScene: 'HomeScene' }) {
     super(args)
   }
 
@@ -27,7 +25,6 @@ export class SpectatorMatchScene extends MatchScene {
     this.currentVersion = this.maxVersion = -1
     this.hasSeededInitialVersion = false
     this.paused = false
-    this.autoAdvance = true
 
     // Register each hook for a message from the server.
     this.registerMatchServerHooks()

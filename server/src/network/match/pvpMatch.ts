@@ -5,8 +5,11 @@ import { Deck } from '../../../../shared/types/deck'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { AchievementManager } from '../../achievementManager'
 
+// Whether to use the timer
+const TIMER_ENABLED = false
+
 class PvpMatch extends Match {
-  timerCheckInterval: NodeJS.Timeout
+  timerCheckInterval: NodeJS.Timeout | null = null
 
   constructor(
     ws1: ServerWS,
@@ -20,8 +23,13 @@ class PvpMatch extends Match {
 
     this.ws2 = ws2
     this.uuid2 = uuid2
+  }
 
-    // this.startTimerCheck() TODO Enable once in prod
+  async startMatch() {
+    await super.startMatch()
+    if (TIMER_ENABLED) {
+      this.startTimer()
+    }
   }
 
   protected async updateDatabases() {
@@ -93,9 +101,17 @@ class PvpMatch extends Match {
     )
   }
 
-  // Start an interval to autopass if the user has no time left
-  private startTimerCheck() {
+  // Initialize timers and start the interval to autopass if a player runs out of time
+  private startTimer() {
+    this.game.model.timers = [
+      MechanicsSettings.TIMER_START,
+      MechanicsSettings.TIMER_START,
+    ]
+    this.game.model.lastTime = Date.now()
+
     this.timerCheckInterval = setInterval(async () => {
+      if (this.game === null) return
+
       // If game is over, stop checking
       if (
         this.game.model.winner !== null ||

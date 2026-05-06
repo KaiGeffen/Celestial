@@ -7,6 +7,7 @@ import { MatchScene } from '../matchScene'
 // Shows the current scores of the night's performance
 export default class RoundResultRegion extends Region {
   roundResult: Phaser.GameObjects.Sprite
+  onAnimationComplete: () => void
 
   create(scene: MatchScene): RoundResultRegion {
     this.scene = scene
@@ -66,6 +67,7 @@ export default class RoundResultRegion extends Region {
       },
       onComplete: () => {
         this.roundResult.setAlpha(0)
+        this.onAnimationComplete?.()
       },
     })
   }

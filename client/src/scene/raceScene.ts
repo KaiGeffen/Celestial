@@ -233,7 +233,7 @@ export default class RaceScene extends BaseScene {
         Space.windowWidth - Space.cutoutWidth / 2 - Space.pad,
         Space.pad * 2 + yOffset,
         'Current Deck',
-        Style.announcement,
+        Style.header,
       )
       .setOrigin(0.5, 0)
       .setDepth(6)

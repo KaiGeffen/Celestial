@@ -1,140 +1,147 @@
 [
-  [
-    {
-      "italic": "In this city we tell stories - each day we craft them, and each night they come to life before a crowd. When you’ve won 5 times, you may pass on. To ease your journey into the city, I’ve given you 2 wins for now.",
-      "bold": "Win the game by winning 5 rounds.\nFor the tutorial, you start with 2 wins.",
-      "align": "right"
-    },
-
-    {
-      "italic": "With our sacred breath we create the stories that we tell here. Each card takes some breath to play as we add it to our shared story. And each morning we awake with more breath in our lungs.",
-      "bold": "Spend Breath to play cards from your hand. You start with 1 breath and gain 1 more each round.",
-      "align": "right"
-    },
-    {
-      "italic": "These cards are the elements of the stories we tell - wisps and imagery brought here to form something greater. With our breath we weave them into the story, and when night falls they come to life, to enchant and delight the audience.",
-      "bold": "Mouse over each number and keyword on the card to learn more.",
-      "mobile": "Click on any card to learn more.",
-      "align": "card"
-    },
-    {
-      "italic": "Dove is about freedom and letting go. To fly unfettered to any height.",
-      "bold": "Dove costs 1 breath to play, and earns 1 point. Both players can see it in the story, and after earning points it is removed from the game.",
-      "align": "card"
-    },
-    {
-      "italic": "Dash is about the singular need to move fast. Run away from it all, never stop running!",
-      "bold": "Dash costs 2 breath, and is worth 3 points, minus the number of cards (Yours and your opponents) that appear to the left of it in the story that round.",
-      "align": "card"
-    },
-    {
-      "italic": "Mercy is a tale of the whole world’s compassion, it is that perfect moment when tension washes away completely.",
-      "bold": "Mercy costs 3 breath to play, is worth 3 points, and after earning points both players draw a card.",
-      "align": "card"
-    },
-    {
-      "italic": "",
-      "bold": "You start each match with 3 cards in hand.\n\nAt the start of each round, you draw 2 cards.\n\nYou can’t have more than 6 cards in hand.",
-      "align": "bottom"
-    },
-    {
-      "italic": "",
-      "bold": "When you’re ready, click a card in your hand to add it to the story.",
-      "align": "center",
-      "final": true
-    },
-    null,
-    {
-      "italic": "",
-      "bold": "I play a Dove, too.\n\nYou can see it in the story because it’s Visible.",
-      "align": "story"
-    },
-    {
-      "italic": "",
-      "bold": "You’re out of cards to play.\nThe round ends now, and the cards we’ve played resolve from left to right.",
-      "align": "story"
-    },
-    null,
-    null,
-    {
-      "italic": "",
-      "bold": "Last round, we both earned 1 point, so we tied and neither of us earned a win.",
-      "align": "center"
-    },
-    {
-      "italic": "",
-      "bold": "As this round starts, we each draw 2 cards, our max breath goes up by 1, and our breath refills completely.",
-      "align": "center"
-    },
-    {
-      "italic": "",
-      "bold": "Playing Dash here earns 3 points - surely beating whatever I play...",
-      "align": "center",
-      "final": true
-    }
-  ],
-  [
-    {
-      "italic": "",
-      "bold": "If you play a card with Inspire, you will have extra breath on the next round.\n\nPlay Stars now so you can afford Mercy next round.",
-      "align": "bottom",
-      "final": true
-    },
-    null,
-    null,
-    null,
-    null,
-    {
-      "italic": "",
-      "bold": "With your 3 breath you can afford Mercy.\n\nBut if you gained extra breath from Stars, you might have nothing to spend it on next round...",
-      "align": "center",
-      "final": true
-    },
-    null,
-    {
-      "italic": "",
-      "bold": "Sometimes it's better to pass instead of playing a card. Click the sun to pass.",
-      "align": "right",
-      "final": true
-    },
-    null,
-    null,
-    null,
-    {
-      "italic": "",
-      "bold": "With just a Dove, you probably can't win this round. But if you play enough Stars you can play Uprising next round to win for sure!",
-      "align": "center",
-      "final": true
-    },
-    null
-  ],
-  [
-    {
-      "italic": "",
-      "bold": "You draw cards from your deck. Your deck starts with 15 cards in it. Click to see everything in your deck.",
-      "align": "left"
-    },
-    {
-      "italic": "",
-      "bold": "When cards resolve or are discarded, they go to your discard pile.",
-      "align": "left"
-    },
-    {
-      "italic": "",
-      "bold": "If your deck is empty when you would draw a card, your discard pile is shuffled to form a new deck.",
-      "align": "center"
-    },
-    {
-      "italic": "",
-      "bold": "Nourish will make the next card you resolve worth extra points, even if that card is played on a future round. Use it carefully to get points when you need them.",
-      "align": "center"
-    },
-    {
-      "italic": "",
-      "bold": "From here on it's up to you, show me what you've learned!",
-      "align": "center",
-      "final": true
-    },
-    null
-  ]
+  {
+    "hints": [
+      {
+        "bold": "Win 5 rounds to win the match.\n\nIn the tutorial, you start with 2 wins.",
+        "align": "center"
+      },
+      {
+        "bold": "Breath is the energy used to play cards.\n\nYou start with 1 breath and gain 1 more each round.",
+        "align": "center"
+      },
+      {
+        "bold": "Mouse over each number and keyword on a card to learn more.",
+        "align": "card"
+      },
+      {
+        "bold": "Dove costs 1 breath to play and earns 1 point.\n\nMouse over its keywords to learn more.",
+        "align": "card"
+      },
+      {
+        "bold": "Dash is worth 3 points, minus 1 for each card that was played before it.",
+        "align": "card"
+      },
+      {
+        "bold": "When a round is over, day turns to night.",
+        "align": "card"
+      },
+      {
+        "bold": "A card like Mercy will draw cards at night when it resolves, not during the day when it's played.",
+        "align": "card"
+      },
+      {
+        "bold": "Start each match with 3 cards in hand.\n\nYour max hand size is 6.",
+        "align": "center"
+      },
+      {
+        "bold": "When you're ready, click a card in your hand to add it to the story.",
+        "align": "center",
+        "final": true
+      },
+      null,
+      {
+        "bold": "Your opponent has played a card, too.\n\nYour can't see the cards they play until nighttime.",
+        "align": "story"
+      },
+      {
+        "bold": "You don't have enough breath to play another card, so you must pass.\n\nOnce both players pass, night begins, and the cards in the story resolve from left to right.",
+        "align": "story"
+      },
+      null,
+      null,
+      {
+        "bold": "A new round begins, both players draw 2 cards.\n\nMax breath goes up by 1, and refills completely.",
+        "align": "center"
+      },
+      {
+        "bold": "Playing Dash here earns 3 points, an exceptionally strong play in round 2.",
+        "align": "center",
+        "final": true
+      },
+      null,
+      {
+        "bold": "You're on your own for the rest of this match, good luck!",
+        "align": "center"
+      }
+    ],
+    "night": [
+      {
+        "bold": "Both players earned 1 point, so it's a tie!\n\nClick the moon when you're ready for the next round to begin.",
+        "align": "story"
+      },
+      {
+        "bold": "Another round ends.\n\nClick the moon to continue.",
+        "align": "story"
+      }
+    ]
+  },
+  {
+    "hints": [
+      {
+        "bold": "If you play a card with Inspire, you will have extra breath on the next round.",
+        "align": "center",
+        "final": true
+      },
+      null,
+      null,
+      null,
+      null,
+      {
+        "bold": "This round you're Inspired for 1 extra breath.\n\nInspired and other statuses appear above your hand.",
+        "align": "center"
+      },
+      {
+        "bold": "With your 3 breath you can afford Mercy.\n\nConsider saving Stars as it would put you at 5 breath next round, not enough to play Uprising.",
+        "align": "center",
+        "final": true
+      },
+      null,
+      {
+        "bold": "Sometimes it's better to pass instead of playing a card. Click the sun to pass.",
+        "align": "center",
+        "final": true
+      },
+      null,
+      {
+        "bold": "A round only ends when both players pass in a row.",
+        "align": "story",
+        "final": true
+      },
+      null,
+      {
+        "bold": "Dove probably isn't enough to win this round.\n\nBut if you play enough Stars you can play Uprising next round to win for sure!",
+        "align": "center",
+        "final": true
+      },
+      null
+    ],
+    "night": []
+  },
+  {
+    "hints": [
+      {
+        "bold": "You draw cards from your deck, which starts with 15 cards in it.\n\nClick your deck to see everything in it.",
+        "align": "center"
+      },
+      {
+        "bold": "When cards resolve, they go to the discard pile.",
+        "align": "center"
+      },
+      {
+        "bold": "If your deck is empty when you would draw a card, your discard pile is shuffled to form a new deck.",
+        "align": "center"
+      },
+      {
+        "bold": "Fruit gives Nourish when it resolves.\n\nNourish will make the next card you resolve worth extra points, even if it's played on a future round.",
+        "align": "center"
+      },
+      {
+        "bold": "From here on it's up to you, show me what you've learned!",
+        "align": "center",
+        "final": true
+      },
+      null
+    ],
+    "night": []
+  }
 ]

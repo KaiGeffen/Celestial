@@ -115,9 +115,7 @@ export default class FilterRegion {
         align: 'center',
         placeholder: 'Search',
         tooltip: 'Search for cards by text.',
-        fontFamily: 'Mulish',
-        fontSize: '24px',
-        color: Color.textboxText,
+        ...Style.inputText,
         maxLength: 40,
         selectAll: true,
         id: 'search-field',
@@ -180,7 +178,6 @@ export default class FilterRegion {
       name: 'SmallX',
       within: sizer,
       f: this.onClearFilters(btns),
-      size: 32,
     })
 
     return sizer

@@ -40,80 +40,40 @@ export class DeckEditorDeck {
   readonly scrollPanel: ScrollablePanel
   deckThumbnail!: DeckThumbnail
 
-  /** Pixel heights after first layout — used with window height for scroll viewport. */
-  headerHeight = 0
-  footerHeight = 0
-
-  readonly columnSizer: RexUIPlugin.Sizer
-
   private readonly opts: DeckEditorDeckOptions
 
   constructor(scene: BaseScene, opts: DeckEditorDeckOptions) {
     this.scene = scene
     this.opts = opts
 
-    // Contents of scroll panel (Lowest depth)
-    const bgScroll = scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
+    // Create background before decklist to be behind
+    const background = scene.add.image(0, 0, 'chrome-builderDecklist')
     this.decklist = new Decklist(scene, opts.createCutoutInteraction())
     this.decklist.setDeck(opts.deckCards, opts.mustOwnCardsInList)
 
-    // Header
-    const headerSizer = this.createHeader()
-    this.headerHeight = DeckEditorDeck.layoutSizerHeight(headerSizer)
-
-    // Footer
-    const footerSizer = this.createFooter()
-    this.footerHeight = DeckEditorDeck.layoutSizerHeight(footerSizer)
-
-    // Scroll panel takes up full height besides header and footer
-    const scrollBodyH =
-      Space.windowHeight - this.headerHeight - this.footerHeight
-
     // Create the scroll panel
     this.scrollPanel = newScrollablePanel(scene, {
-      height: scrollBodyH,
-      background: bgScroll,
+      background: background,
+
+      // Components
+      header: this.createHeader(),
+      footer: this.createFooter(),
       panel: { child: this.decklist.sizer },
+
+      // Anchor
+      anchor: {
+        height: '100%',
+      },
     })
-
-    // Create the sizer
-    this.columnSizer = this.scene.rexUI.add
-      .sizer({
-        orientation: 1,
-      })
-      .add(headerSizer)
-      .add(this.scrollPanel)
-      .add(footerSizer)
-  }
-
-  /** RexUI sizers expose `.height` after `layout()`; rex typings omit it so we normalize here. */
-  private static layoutSizerHeight(sizer: {
-    layout(): unknown
-    height?: number
-  }): number {
-    sizer.layout()
-    const h = (sizer as { height?: number }).height
-    return typeof h === 'number' ? h : 0
-  }
-
-  onWindowResize(): void {
-    // Resize the scroll panel to be window - header - footer
-    const scrollH = Math.max(
-      1,
-      Space.windowHeight - this.headerHeight - this.footerHeight,
-    )
-    this.scrollPanel.setMinSize(DECK_EDITOR_DECK_WIDTH, scrollH)
-
-    // Reset scroll
-    this.scrollPanel.t = 0
   }
 
   syncThumbnail(args: {
     name: string
     cosmeticSet: CosmeticSet
     isValid: boolean
+    cardCount?: number
   }): void {
-    this.deckThumbnail?.updateDisplay(args)
+    this.deckThumbnail.updateDisplay(args)
   }
 
   layoutDecklist(): void {
@@ -123,16 +83,15 @@ export class DeckEditorDeck {
   }
 
   scrollDecklistToTop(): void {
-    this.scrollPanel.childOY = 0
     this.scrollPanel.t = 0
     this.scrollPanel.layout()
   }
 
   private createHeader(): FixWidthSizer {
     const bg = this.scene.add
-      .rectangle(0, 0, 1, 1, Color.backgroundDark)
+      .rectangle(0, 0, 1, 1)
+      .setAlpha(0.01)
       .setInteractive()
-    this.scene.addShadow(bg, -90)
 
     // Create the thumbnail
     this.deckThumbnail = new DeckThumbnail({
@@ -141,14 +100,12 @@ export class DeckEditorDeck {
       muteClick: true,
     })
 
-    // Sizer with custom space to get thumbnail to line up with cutout edge
+    // Sizer
     const sizer = this.scene.rexUI.add
       .fixWidthSizer({
-        width: DECK_EDITOR_DECK_WIDTH,
         space: {
           top: Space.pad,
-          bottom: Space.pad,
-          left: 14,
+          bottom: Space.padSmall,
         },
         align: 'center',
       })
@@ -156,20 +113,21 @@ export class DeckEditorDeck {
       .add(this.deckThumbnail.container)
 
     // Populate the thumbnail with the current set
+    const initialCount = this.decklist.getDeckCode().length
     this.syncThumbnail({
       name: this.opts.deckName,
       cosmeticSet: this.opts.cosmeticSet,
-      isValid:
-        this.decklist.getDeckCode().length === MechanicsSettings.DECK_SIZE,
+      isValid: initialCount === MechanicsSettings.DECK_SIZE,
+      cardCount: initialCount,
     })
 
     return sizer
   }
 
-  // Buttons
-  private createFooter(): RexUIPlugin.Sizer {
+  private createFooter(): FixWidthSizer {
     const bg = this.scene.add
-      .rectangle(0, 0, 1, 1, Color.backgroundLight)
+      .rectangle(0, 0, 1, 1)
+      .setAlpha(0.01)
       .setInteractive()
 
     // Lambda for creating buttons
@@ -188,7 +146,7 @@ export class DeckEditorDeck {
     // On the left are 2 small buttons
     const leftCol = this.scene.rexUI.add.sizer({
       orientation: 1,
-      space: { item: Space.padSmall },
+      space: { top: 9, item: Space.padSmall },
     })
     leftCol.add(smallBtn('Save', () => this.opts.onSave()))
     leftCol.add(smallBtn('Cosmetics', () => this.opts.onCosmetics(), true))
@@ -210,7 +168,7 @@ export class DeckEditorDeck {
 
     // Main sizer
     const sizer = this.scene.rexUI.add
-      .sizer({
+      .fixWidthSizer({
         space: {
           left: Space.pad,
           right: Space.pad,
@@ -218,6 +176,7 @@ export class DeckEditorDeck {
           bottom: Space.pad,
           item: Space.padSmall,
         },
+        align: 'center',
       })
       .addBackground(bg)
       .add(leftCol)

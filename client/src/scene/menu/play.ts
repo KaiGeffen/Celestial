@@ -30,9 +30,10 @@ import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
-const menuWidth = 1000
+const menuWidth = 975
 const deckPanelWidth = Space.cutoutWidth + Space.pad * 2
-const playPanelWidth = 500
+const playPanelWidth = 527
+const PLANT_SIZER_HEIGHT = 244
 
 export default class PlayMenu extends Menu {
   password: string
@@ -120,7 +121,7 @@ export default class PlayMenu extends Menu {
     if (!decks || decks.length <= 1) return
 
     const currentIndex = UserSettings._get('equippedDeckIndex') || 0
-    const newIndex = (currentIndex - 1 + decks.length) % decks.length
+    const newIndex = (currentIndex + 1) % decks.length
     UserSettings._set('equippedDeckIndex', newIndex)
     this.updateDeck(decks[newIndex])
   }
@@ -130,7 +131,7 @@ export default class PlayMenu extends Menu {
     if (!decks || decks.length <= 1) return
 
     const currentIndex = UserSettings._get('equippedDeckIndex') || 0
-    const newIndex = (currentIndex + 1) % decks.length
+    const newIndex = (currentIndex - 1 + decks.length) % decks.length
     UserSettings._set('equippedDeckIndex', newIndex)
     this.updateDeck(decks[newIndex])
   }
@@ -159,7 +160,6 @@ export default class PlayMenu extends Menu {
       .filter((card) => card !== null && card !== undefined)
 
     this.decklist.setDeck(deckCards, false)
-    this.decklist.sizer.layout()
     if (this.scrollableDeck) {
       this.scrollableDeck.layout()
       this.scrollableDeck.t = 0
@@ -266,40 +266,52 @@ export default class PlayMenu extends Menu {
     })
     deckNameSizer.addBackground(deckNameBackground)
 
-    // Previous deck button (<)
+    // Previous deck button
     const decks = UserSettings._get('decks')
     const hasMultipleDecks = decks && decks.length > 1
 
-    this.btnPrevDeck = new Buttons.Text(this.scene, 0, 0, '<', () =>
-      this.switchToPreviousDeck(),
+    const prevDeckContainer = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.iconSize,
+      Space.iconSize,
     )
+    this.btnPrevDeck = new Buttons.Icon({
+      within: prevDeckContainer,
+      name: 'Left',
+      f: () => this.switchToPreviousDeck(),
+    })
     if (!hasMultipleDecks) {
-      this.btnPrevDeck.txt.setAlpha(0.5)
-      this.btnPrevDeck.txt.disableInteractive()
+      this.btnPrevDeck.disable()
     }
-    deckNameSizer.add(this.btnPrevDeck.txt)
+    deckNameSizer.add(prevDeckContainer)
 
     // Deck name
     this.txtDeckName = this.scene.rexUI.add
       .BBCodeText()
-      .setStyle({
-        ...BBStyle.deckName,
-        fixedHeight: 50 + Space.padSmall,
-        fixedWidth: deckPanelWidth - 25,
-      })
+      .setStyle({ ...BBStyle.deckname, fixedWidth: deckPanelWidth - 25 })
       .setOrigin(0.5)
       .setText(this.deck.name || '')
     deckNameSizer.add(this.txtDeckName, { expand: true })
 
-    // Next deck button (>)
-    this.btnNextDeck = new Buttons.Text(this.scene, 0, 0, '>', () =>
-      this.switchToNextDeck(),
+    // Next deck button
+    const nextDeckContainer = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.iconSize,
+      Space.iconSize,
     )
+    this.btnNextDeck = new Buttons.Icon({
+      within: nextDeckContainer,
+      name: 'Right',
+      f: () => this.switchToNextDeck(),
+    })
     if (!hasMultipleDecks) {
-      this.btnNextDeck.txt.setAlpha(0.5)
-      this.btnNextDeck.txt.disableInteractive()
+      this.btnNextDeck.disable()
     }
-    deckNameSizer.add(this.btnNextDeck.txt)
+    deckNameSizer.add(nextDeckContainer)
 
     panelSizer.add(deckNameSizer).addNewLine()
 
@@ -311,7 +323,7 @@ export default class PlayMenu extends Menu {
     })
     buttonAvatarSizer.addSpace() // Add space before to center
 
-    // Change Deck button
+    // Edit the deck button
     const changeDeckContainer = new ContainerLite(
       this.scene,
       0,
@@ -321,7 +333,7 @@ export default class PlayMenu extends Menu {
     )
     new Buttons.Big({
       within: changeDeckContainer,
-      text: 'Change\n  Deck',
+      text: 'Edit',
       f: () => {
         this.scene.scene.stop()
         const activeScene = this.scene.scene.manager
@@ -457,7 +469,7 @@ export default class PlayMenu extends Menu {
     titleSizer.addBackground(titleBackground)
 
     const txtTitle = this.scene.add
-      .text(0, 0, 'Game Mode', Style.announcement)
+      .text(0, 0, 'Game Mode', Style.header)
       .setOrigin(0.5)
     titleSizer.add(txtTitle)
     contentSizer.add(titleSizer).addNewLine()
@@ -559,9 +571,7 @@ export default class PlayMenu extends Menu {
         align: 'center',
         placeholder: 'Password',
         tooltip: 'Password for PWD mode.',
-        fontFamily: 'Mulish',
-        fontSize: '24px',
-        color: Color.textboxText,
+        ...Style.inputText,
         maxLength: MechanicsSettings.DECK_SIZE * 4,
         selectAll: true,
         id: 'search-field',
@@ -698,6 +708,7 @@ export default class PlayMenu extends Menu {
         orientation: 'vertical',
         space: { item: Space.padSmall },
       })
+      plantSizer.setMinSize(0, PLANT_SIZER_HEIGHT)
 
       // Check if there's a plant at this index
       if (i < serverGarden.length && serverGarden[i]) {
@@ -825,7 +836,7 @@ export default class PlayMenu extends Menu {
         rewardPosition.x,
         rewardPosition.y + 40,
         `+${data.goldReward}💰`,
-        Style.homeSceneButton,
+        Style.reward,
       )
       .setOrigin(0.5, 1)
 

@@ -99,7 +99,9 @@ export default class Animator {
               permanentCard,
               this.getSound(animation),
               animation.to === Zone.Story ? SHRUNKEN_CARD_SCALE : undefined,
-              animation.to === Zone.Mulligan ? Time.match.mulliganPause : undefined,
+              animation.to === Zone.Mulligan
+                ? Time.match.mulliganPause
+                : undefined,
             )
 
             // Shift remaining story cards when a card is removed mid-story
@@ -420,9 +422,11 @@ export default class Animator {
 
   // Animate a card being emphasized in its place, such as showing that a Morning card is proccing
   private animateEmphasis(card: CardImage, i: number): void {
-    let cardCopy = this.createCard(card.card, [0, 0], card.cardback).copyLocation(
-      card,
-    )
+    let cardCopy = this.createCard(
+      card.card,
+      [0, 0],
+      card.cardback,
+    ).copyLocation(card)
 
     // Animate card scaling up and disappearing
     this.scene.tweens.add({
@@ -569,7 +573,8 @@ export default class Animator {
       this.scene.tweens.add({
         targets: card.container,
         x: card.container.x - shiftX,
-        delay: slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
+        delay:
+          slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
         duration: Time.match.recapTween,
         ease: Ease.card,
       })
@@ -603,7 +608,11 @@ export default class Animator {
       }
     }
 
-    for (let k = insertionActiveIndex + 1; k < this.view.story.cards.length; k++) {
+    for (
+      let k = insertionActiveIndex + 1;
+      k < this.view.story.cards.length;
+      k++
+    ) {
       if (newlyInsertedActiveIndices.has(k)) continue
       const card = this.view.story.cards[k]
       if (!card) continue
@@ -617,7 +626,8 @@ export default class Animator {
       this.scene.tweens.add({
         targets: card.container,
         x: card.container.x - shiftX,
-        delay: slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
+        delay:
+          slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
         duration: Time.match.recapTween,
         ease: Ease.card,
       })
@@ -726,7 +736,8 @@ class StoryResolveBubbles {
 
   popBubbles(slot: number, resolvedCountAtReset: number): void {
     this.resetBeforeResolvedCount = resolvedCountAtReset
-    const delay = slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens)
+    const delay =
+      slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens)
     this.pendingPopDelay = delay
     const targets = [...this.layer.list] as Phaser.GameObjects.Container[]
     for (const bubble of targets) {
@@ -734,7 +745,10 @@ class StoryResolveBubbles {
     }
   }
 
-  private scheduleBubblePop(bubble: Phaser.GameObjects.Container, delay: number): void {
+  private scheduleBubblePop(
+    bubble: Phaser.GameObjects.Container,
+    delay: number,
+  ): void {
     this.scene.tweens.add({
       targets: bubble,
       scaleX: 0,
@@ -754,11 +768,30 @@ class StoryResolveBubbles {
     this.staggerEvents = []
   }
 
+  /** Same cutoff as `popBubbles`: max `index` on `Zone.Reset` animations in this state's batch (often empty after recap skip). */
+  private bubbleSkipBeforeResolvedIndexFromResetAnimations(
+    state: GameModel,
+  ): number {
+    let max = 0
+    for (const anims of state.animations) {
+      for (const a of anims) {
+        if (a.from === Zone.Reset && typeof a.index === 'number') {
+          max = Math.max(max, a.index)
+        }
+      }
+    }
+    return max
+  }
+
   /**
    * Draws resolve bubbles for each settled act (staggered when a single act just resolved).
    * Returns recap tween slots to align other recap animations with those bubble tweens.
    */
-  playForResolvedActs(state: GameModel, resolvedCards: CardImage[], isResetState = false): number {
+  playForResolvedActs(
+    state: GameModel,
+    resolvedCards: CardImage[],
+    isResetState = false,
+  ): number {
     this.syncBookkeeping(state)
 
     const resolvedCount = state.story.resolvedActs.length
@@ -768,14 +801,25 @@ class StoryResolveBubbles {
       this.resetBeforeResolvedCount = -1
     }
 
+    const fromStoryField = state.story.bubbleSkipBeforeResolvedIndex ?? 0
+    const fromResetAnimations =
+      this.bubbleSkipBeforeResolvedIndexFromResetAnimations(state)
+    const animationBubbleSkipBefore =
+      this.resetBeforeResolvedCount === -1 ? 0 : this.resetBeforeResolvedCount
+    const bubbleSkipBeforeResolvedIndex = Math.max(
+      fromStoryField,
+      fromResetAnimations,
+      animationBubbleSkipBefore,
+    )
+
     // Same predicate as `StoryRegion` (lastStoryResolvedActCount vs snapshot): only the newest resolve gets stagger / settle tween.
     const oneNewResolvedAct =
       resolvedCount === this.snapshotResolvedActCount + 1 && resolvedCount > 0
     const r = Time.match.recapTween
 
     for (let resolvedI = 0; resolvedI < resolvedCount; resolvedI++) {
-      // Skip acts whose bubbles were popped by a reset
-      if (this.resetBeforeResolvedCount !== -1 && resolvedI < this.resetBeforeResolvedCount) {
+      // Skip acts cleared by reset (sequential recap via popBubbles, or skipped recap via Story / Reset animation index)
+      if (resolvedI < bubbleSkipBeforeResolvedIndex) {
         continue
       }
       const act = state.story.resolvedActs[resolvedI]
@@ -791,7 +835,13 @@ class StoryResolveBubbles {
       const pointsEarned = this.resolvedPointsEarnedByActIndex[resolvedI] ?? 0
       const printedPoints = act.card.points
       const effectAmt = pointsEarned - printedPoints - nourishAmt
+
+      // The card Pet is special
       const showEffectsBubble = act.card.name !== 'Pet'
+      const mainBubblePts =
+        act.card.name === 'Pet'
+          ? pointsEarned - nourishAmt
+          : (card.points ?? card.card.points)
 
       const tweenNourishFromStatus =
         oneNewResolvedAct && resolvedI === resolvedCount - 1 && nourishAmt !== 0
@@ -815,7 +865,7 @@ class StoryResolveBubbles {
 
       if (shouldStagger) {
         pushBubbleStep(0, () => {
-          this.addPointsResolveCircle(card, tweenBubbleFromStat)
+          this.addPointsResolveCircle(card, tweenBubbleFromStat, mainBubblePts)
         })
         let delay = r
         if (nourishAmt !== 0) {
@@ -841,7 +891,7 @@ class StoryResolveBubbles {
           })
         }
       } else {
-        this.addPointsResolveCircle(card, tweenBubbleFromStat)
+        this.addPointsResolveCircle(card, tweenBubbleFromStat, mainBubblePts)
         this.addNourishResolveCircle(
           card,
           tweenNourishFromStatus,
@@ -901,9 +951,25 @@ class StoryResolveBubbles {
           state.score[owner] - this.snapshotScore[owner],
         )
       } else {
-        for (let k = 0; k < delta; k++) {
-          this.resolvedNourishByActIndex.push(0)
-          this.resolvedPointsEarnedByActIndex.push(0)
+        const prevScore: [number, number] = [this.snapshotScore[0], this.snapshotScore[1]]
+        const prevNourish: [number, number] = [this.snapshotStatusNourish[0], this.snapshotStatusNourish[1]]
+        const firstNewIdx = resolvedCount - delta
+        for (let k = firstNewIdx; k < resolvedCount; k++) {
+          const act = state.story.resolvedActs[k]
+          const owner = act.owner
+          const pointsEarned = act.scoreAtResolution
+            ? act.scoreAtResolution[owner] - prevScore[owner]
+            : 0
+          this.resolvedNourishByActIndex.push(prevNourish[owner])
+          this.resolvedPointsEarnedByActIndex.push(pointsEarned)
+          if (act.scoreAtResolution) {
+            prevScore[0] = act.scoreAtResolution[0]
+            prevScore[1] = act.scoreAtResolution[1]
+          }
+          if (act.nourishAtResolution) {
+            prevNourish[0] = act.nourishAtResolution[0]
+            prevNourish[1] = act.nourishAtResolution[1]
+          }
         }
       }
     }
@@ -955,8 +1021,12 @@ class StoryResolveBubbles {
   }
 
   /** Main printed-points bubble; optionally tweens from the card’s points stat to center. */
-  addPointsResolveCircle(card: CardImage, tweenFromStat: boolean): void {
-    const pts = card.points ?? card.card.points
+  addPointsResolveCircle(
+    card: CardImage,
+    tweenFromStat: boolean,
+    mainBubblePts?: number,
+  ): void {
+    const pts = mainBubblePts ?? card.points ?? card.card.points
     const start = tweenFromStat
       ? this.localToWorld(card.container, card.txtPoints.x, card.txtPoints.y)
       : this.localToWorld(card.container, 0, 0)
@@ -981,7 +1051,7 @@ class StoryResolveBubbles {
         0,
         `[stroke=${StoryResolveBubbles.STAT_STROKE}]${pts}[/stroke]`,
         tweenFromStat
-          ? BBStyle.cardCost
+          ? BBStyle.storyResolveBubble
           : StoryResolveBubbles.resolvePointsBubbleTextStyle(
               StoryResolveBubbles.POINTS_RESOLVE_FONT_LARGE_PX,
             ),
@@ -1067,7 +1137,7 @@ class StoryResolveBubbles {
         0,
         `[stroke=${StoryResolveBubbles.STAT_STROKE}]${label}[/stroke]`,
         tweenFromStatus
-          ? BBStyle.cardCost
+          ? BBStyle.storyResolveBubble
           : StoryResolveBubbles.nourishResolveBubbleTextStyle(
               StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
             ),
@@ -1158,7 +1228,7 @@ class StoryResolveBubbles {
         0,
         `[stroke=${StoryResolveBubbles.STAT_STROKE}]${label}[/stroke]`,
         tweenFromEffectText
-          ? BBStyle.cardCost
+          ? BBStyle.storyResolveBubble
           : StoryResolveBubbles.effectsResolveBubbleTextStyle(
               StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
             ),
@@ -1199,7 +1269,7 @@ class StoryResolveBubbles {
   }
 
   private static resolvePointsBubbleTextStyle(fontPx: number) {
-    const base = BBStyle.cardCost
+    const base = BBStyle.storyResolveBubble
     const t = base.strokeThickness ?? 1
     return {
       ...base,
@@ -1214,7 +1284,7 @@ class StoryResolveBubbles {
   }
 
   private static nourishResolveBubbleTextStyle(fontPx: number) {
-    const base = BBStyle.cardCost
+    const base = BBStyle.storyResolveBubble
     const t = base.strokeThickness ?? 1
     return {
       ...base,
@@ -1230,7 +1300,7 @@ class StoryResolveBubbles {
   }
 
   private static effectsResolveBubbleTextStyle(fontPx: number) {
-    const base = BBStyle.cardCost
+    const base = BBStyle.storyResolveBubble
     const t = base.strokeThickness ?? 1
     return {
       ...base,

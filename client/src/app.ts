@@ -15,6 +15,7 @@ import DeckSelectorScene from './scene/deckSelectorScene'
 import DeckEditorScene from './scene/deckEditorScene'
 import MatchHistoryScene from './scene/matchHistoryScene'
 
+import OpeningScene from './scene/openingScene'
 import PlaceholderScene from './scene/placeholderScene'
 import JourneyScene from './scene/journeyScene'
 import RaceScene from './scene/raceScene'
@@ -55,6 +56,7 @@ const config: Phaser.Types.Core.GameConfig = {
     MenuScene,
     StandardMatchScene,
     TutorialMatchScene,
+    OpeningScene,
     PlaceholderScene,
     BuilderScene,
     DeckSelectorScene,

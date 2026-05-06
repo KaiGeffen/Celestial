@@ -4,7 +4,7 @@ import { mercy } from '../../shared/state/catalog/water'
 import { dash } from '../../shared/state/catalog/ashes'
 import { stars, cosmos } from '../../shared/state/catalog/stars'
 import { fruit } from '../../shared/state/catalog/pet'
-import { uprising } from '../../shared/state/catalog/birth'
+import { beginnersMind, uprising } from '../../shared/state/catalog/birth'
 
 class TutorialController extends ServerController {
   constructor(num?: number) {
@@ -61,38 +61,40 @@ class TutorialController extends ServerController {
     ]
     const o_decks = [
       [
+        beginnersMind,
         dove,
         dove,
+        beginnersMind,
         dove,
+        beginnersMind,
+
+        beginnersMind,
+        beginnersMind,
         dove,
-        dove,
-        dove,
-        dove,
-        dove,
-        dove,
-        dove,
-        dove,
-        dove,
-        dove,
-        dove,
-        dove,
+        beginnersMind,
+        beginnersMind,
+        beginnersMind,
+
+        beginnersMind,
+        beginnersMind,
+        beginnersMind,
       ],
       [
+        beginnersMind,
         dove,
         dove,
+        beginnersMind,
         dove,
+        beginnersMind,
+        beginnersMind,
+        beginnersMind,
         dove,
-        dove,
-        dove,
-        dove,
-        dove,
-        dove,
-        dove,
-        dove,
-        dove,
-        dove,
-        dove,
-        dove,
+        beginnersMind,
+        beginnersMind,
+        beginnersMind,
+        beginnersMind,
+        beginnersMind,
+        beginnersMind,
       ],
       [
         dove,

@@ -57,6 +57,7 @@ export default async function sendUserData(ws: ServerWS, id: string) {
     achievements,
     cardInventory: data.card_inventory,
     missionGoldClaimed: data.missiongoldclaimed,
+    journeyChoices: data.journey_choices,
   })
 
   // Update last active time

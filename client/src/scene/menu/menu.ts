@@ -2,7 +2,7 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
-import { Style, Color, Space } from '../../settings/settings'
+import { Style, Space } from '../../settings/settings'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
 
@@ -56,18 +56,28 @@ export default class Menu {
   }
 
   // Create the menu header
-  protected createHeader(s: string, width: number = this.width): any {
-    let background = this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight)
+  protected createHeader(
+    s: string,
+    width: number = this.width,
+    style = Style.header,
+  ): any {
+    const background = this.scene.add.image(0, 0, 'chrome-header')
 
-    let sizer = this.scene.rexUI.add.sizer({
-      width: width,
-      space: { top: Space.padSmall, bottom: Space.padSmall },
-    })
-    sizer.addBackground(background)
+    const sizer = this.scene.rexUI.add
+      .sizer({
+        width,
+        orientation: 0,
+        space: {
+          top: Space.padSmall,
+          bottom: Space.padSmall,
+        },
+      })
+      .addBackground(background)
 
-    let txt = this.scene.add.text(0, 0, s, Style.announcement)
+    const txt = this.scene.add.text(0, 0, s, style)
     sizer.addSpace().add(txt).addSpace()
 
+    // TODO Rasterize shadow
     // Background shadow
     this.scene.addShadow(background, -90)
 
@@ -86,18 +96,13 @@ export default class Menu {
       align: 'center',
 
       space: {
-        // left: Space.pad,
-        // right: Space.pad,
         bottom: Space.pad,
         line: Space.pad,
       },
     })
 
-    // Add background
-    let rect = this.scene.rexUI.add
-      .roundRectangle(0, 0, 1, 1, Space.corner, Color.backgroundDark, 1)
-      .setInteractive()
-    this.sizer.addBackground(rect)
+    const bodyBg = this.scene.add.image(0, 0, 'chrome-body').setInteractive()
+    this.sizer.addBackground(bodyBg)
 
     // Anchor in center of screen
     this.scene.plugins.get('rexAnchor')['add'](this.sizer, {
@@ -154,8 +159,7 @@ import EditDeckNameMenu from './editDeckName'
 import ConfirmMenu from './confirm'
 import MessageMenu from './message'
 import ChapterMessageMenu from './chapterMessage'
-import FocusMenu from './focus'
-import SearchMenu from './search'
+import ChoiceChapterMessageMenu from './choiceChapterMessage'
 import LeaderboardMenu from './leaderboard'
 import OnlinePlayersMenu from './onlinePlayers'
 import { RegisterUsernameMenu } from './registerUsername'
@@ -171,29 +175,40 @@ import PlayMenu from './play'
 
 const menus = {
   options: OptionsMenu,
+  // TODO Remove
   choosePremade: ChoosePremade,
   credits: CreditsMenu,
   rulebook: RulebookMenu,
+  // TODO Rename since it's just alter deck
   newDeck: NewDeckMenu,
+  play: PlayMenu,
+
+  // TODO Move the copy/paste deck code somewhere.
+  // TODO Rename to be about cosmetics if that's what it is
   editDeck: EditDeckMenu,
+
+  // TODO Higher min height
   editDeckName: EditDeckNameMenu,
   confirm: ConfirmMenu,
   message: MessageMenu,
+
+  // Chapters TODO
   chapterMessage: ChapterMessageMenu,
-  focus: FocusMenu,
-  search: SearchMenu,
+  choiceChapterMessage: ChoiceChapterMessageMenu,
+
   leaderboard: LeaderboardMenu,
   onlinePlayers: OnlinePlayersMenu,
-  registerUsername: RegisterUsernameMenu,
   purchaseItem: PurchaseItemMenu,
   userProfile: UserProfileMenu,
   achievements: AchievementsMenu,
+  registerUsername: RegisterUsernameMenu,
+
+  // RACE COMING SOON (tm)
   raceCardChoice: RaceCardChoiceMenu,
   raceDeckReplacement: RaceDeckReplacementMenu,
   raceDeckSelection: RaceDeckSelectionMenu,
   raceCardUpgrade: RaceCardUpgradeMenu,
   raceSpecialModes: RaceSpecialModesMenu,
-  play: PlayMenu,
 }
 
 // Function exposed for the creation of custom menus

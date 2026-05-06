@@ -4,6 +4,7 @@ import { Animation } from '../../../../shared/animation'
 import { Zone } from '../../../../shared/state/zone'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
+import { fitStatusValueText } from '../../lib/buttons/statuses'
 import { Depth, Time } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
@@ -58,14 +59,22 @@ export default class StatusRegion extends Region {
       this.ourRow,
       -ICON_SPREAD,
       0,
-    )
-    this.btnOurNourish = new Buttons.Keywords.Nourish(this.ourRow, 0, 0)
-    this.btnOurSight = new Buttons.Keywords.Sight(this.ourRow, ICON_SPREAD, 0)
+    ).setVisible(false)
+    this.btnOurNourish = new Buttons.Keywords.Nourish(
+      this.ourRow,
+      0,
+      0,
+    ).setVisible(false)
+    this.btnOurSight = new Buttons.Keywords.Sight(
+      this.ourRow,
+      ICON_SPREAD,
+      0,
+    ).setVisible(false)
     this.btnOurPossibility = new Buttons.Keywords.Possibility(
       this.ourRow,
       2 * ICON_SPREAD,
       0,
-    )
+    ).setVisible(false)
 
     this.btnTheirInspire = new Buttons.Keywords.Inspire(
       this.theirRow,
@@ -74,7 +83,7 @@ export default class StatusRegion extends Region {
       '',
       () => {},
       true,
-    )
+    ).setVisible(false)
     this.btnTheirNourish = new Buttons.Keywords.Nourish(
       this.theirRow,
       0,
@@ -82,12 +91,12 @@ export default class StatusRegion extends Region {
       '',
       () => {},
       true,
-    )
+    ).setVisible(false)
     this.btnTheirSight = new Buttons.Keywords.Sight(
       this.theirRow,
       ICON_SPREAD,
       0,
-    )
+    ).setVisible(false)
     this.btnTheirPossibility = new Buttons.Keywords.Possibility(
       this.theirRow,
       2 * ICON_SPREAD,
@@ -95,7 +104,7 @@ export default class StatusRegion extends Region {
       '',
       () => {},
       true,
-    )
+    ).setVisible(false)
 
     return this
   }
@@ -137,7 +146,11 @@ export default class StatusRegion extends Region {
     for (let owner = 0; owner < 2; owner++) {
       for (const animation of state.animations[owner]) {
         if (animation.from !== Zone.Status) continue
-        if (animation.index !== 0 && animation.index !== 1 && animation.index !== 3)
+        if (
+          animation.index !== 0 &&
+          animation.index !== 1 &&
+          animation.index !== 3
+        )
           continue
 
         const btn = this.getStatusButton(owner, animation.index)
@@ -145,7 +158,10 @@ export default class StatusRegion extends Region {
 
         btn.setVisible(false).setAlpha(1)
         if (btn.icon) btn.icon.setScale(1)
-        if (btn.txt) btn.txt.setScale(1)
+        if (btn.txt) {
+          btn.txt.setScale(1)
+          fitStatusValueText(btn.txt)
+        }
       }
     }
   }
@@ -175,7 +191,11 @@ export default class StatusRegion extends Region {
     const delay = slot * StatusRegion.SLOT_MS
 
     // Positive status gain: reveal at this slot with a simple alpha fade.
-    if (animation.index === 0 || animation.index === 1 || animation.index === 3) {
+    if (
+      animation.index === 0 ||
+      animation.index === 1 ||
+      animation.index === 3
+    ) {
       this.scene.tweens.add({
         targets: [btn.icon, btn.txt].filter(Boolean),
         alpha: 1,
@@ -183,6 +203,7 @@ export default class StatusRegion extends Region {
         duration: 120,
         onStart: () => {
           btn.setVisible(true).setAlpha(0)
+          fitStatusValueText(btn.txt)
         },
       })
       return

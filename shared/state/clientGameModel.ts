@@ -53,10 +53,11 @@ function reverseAttributes(model: GameModel): void {
     'exhaleCountLastRound',
     'usernames',
     'subtitles',
+    'timers',
   ]
 
   for (const attr of listAttributes) {
-    model[attr].reverse()
+    model[attr]?.reverse()
   }
 
   // Flip these attributes

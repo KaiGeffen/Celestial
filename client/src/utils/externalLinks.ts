@@ -8,6 +8,11 @@ export function openDiscord() {
   Server.accessDiscord()
 }
 
+export function openSteamStore() {
+  window.open(Url.steamStore, '_blank')
+  logEvent('opened_steam_store')
+}
+
 export function openPrivacyPolicy() {
   window.open(Url.privacyPolicy, '_blank')
   logEvent('opened_privacy_policy')

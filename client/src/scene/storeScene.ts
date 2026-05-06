@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Color, Space } from '../settings/settings'
+import { Color, Style, Space } from '../settings/settings'
 import { BaseSceneWithHeader } from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
@@ -12,6 +12,7 @@ import { UserSettings } from '../settings/userSettings'
 
 export default class StoreScene extends BaseSceneWithHeader {
   private scrollablePanel: any = null
+  private userStatsDisplay: Phaser.GameObjects.Text
 
   constructor() {
     super({ key: 'StoreScene' })
@@ -20,12 +21,41 @@ export default class StoreScene extends BaseSceneWithHeader {
   create(): void {
     this.createBackground()
     super.create({ title: 'Store' })
+    this.createUserStatsDisplay()
     this.createStoreItems()
 
     // Refresh store when user data is updated (e.g., after purchase)
     this.game.events.on('userDataUpdated', () => {
       this.createStoreItems()
     })
+  }
+
+  update(time: number, delta: number): void {
+    super.update(time, delta)
+    this.updateUserStatsDisplay()
+  }
+
+  private createUserStatsDisplay(): void {
+    this.userStatsDisplay = this.add
+      .text(0, this.headerHeight / 2, '', Style.basicStylized)
+      .setOrigin(1, 0.5)
+      .setDepth(2)
+
+    // Anchor the user stats display to the right
+    this.plugins.get('rexAnchor')['add'](this.userStatsDisplay, {
+      right: `100%-${Space.pad * 1.5 + Space.iconSize * 2}`,
+    })
+
+    this.updateUserStatsDisplay()
+  }
+
+  private updateUserStatsDisplay(): void {
+    const gems = Server.getUserData().gems ?? 0
+    const coins = Server.getUserData().coins ?? 0
+
+    this.userStatsDisplay.setText(
+      `💰 ${coins.toLocaleString()}\n💎 ${gems.toLocaleString()}`,
+    )
   }
 
   private createBackground(): void {
@@ -57,6 +87,9 @@ export default class StoreScene extends BaseSceneWithHeader {
         left: Space.pad,
         right: Space.pad,
       },
+      anchor: {
+        width: '100%',
+      },
     })
 
     // Get card inventory (owned cards)
@@ -77,7 +110,7 @@ export default class StoreScene extends BaseSceneWithHeader {
         height: Space.windowHeight - this.headerHeight,
       })
       const messageText = this.add
-        .text(0, 0, 'All cards owned', Style.announcement)
+        .text(0, 0, 'All cards owned', Style.header)
         .setOrigin(0.5)
       messageSizer.addSpace()
       messageSizer.add(messageText)
@@ -91,16 +124,15 @@ export default class StoreScene extends BaseSceneWithHeader {
       })
     }
 
-    sizer.layout()
-
     // Create scrollable panel
     this.scrollablePanel = newScrollablePanel(this, {
       x: 0,
       y: this.headerHeight,
-      width: Space.windowWidth,
-      height: Space.windowHeight - this.headerHeight,
       panel: {
         child: sizer,
+      },
+      anchor: {
+        height: `100%-${this.headerHeight}`,
       },
     })
   }
@@ -118,8 +150,6 @@ export default class StoreScene extends BaseSceneWithHeader {
 
     // Set click handler on the card image
     cardImage.setOnClick(() => {
-      this.sound.play('click')
-
       // Launch the purchase menu
       this.scene.launch('MenuScene', {
         menu: 'purchaseItem',

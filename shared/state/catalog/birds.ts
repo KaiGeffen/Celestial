@@ -326,12 +326,11 @@ class Birdsong extends Card {
 }
 const birdsong = new Birdsong({
   name: 'Birdsong',
-  id: 8094,
+  id: 106,
   cost: 3,
   points: 2,
   qualities: [Quality.VISIBLE],
   text: 'Visible\nWhen you pass while this is in the story, create a Dove in the story.',
-  beta: true,
 })
 
 class Sudden extends Card {

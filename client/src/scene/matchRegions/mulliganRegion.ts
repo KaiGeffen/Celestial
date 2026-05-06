@@ -55,7 +55,7 @@ export default class MulliganRegion extends Region {
         0,
         -(Space.cardHeight / 2 + Space.pad / 2),
         'Click cards to replace',
-        Style.basic,
+        Style.basicStylized,
       )
       .setOrigin(0.5, 1)
     let txtTitle = scene.add
@@ -63,12 +63,12 @@ export default class MulliganRegion extends Region {
         0,
         txtHint.y - Space.pad / 2 - txtHint.height,
         'Starting Hand',
-        Style.announcement,
+        Style.header,
       )
       .setOrigin(0.5, 1)
 
     this.txtPriority = scene.add
-      .text(0, Space.cardHeight / 2 + Space.pad * 2, '', Style.basic)
+      .text(0, Space.cardHeight / 2 + Space.pad * 2, '', Style.basicStylized)
       .setOrigin(0.5, 1)
 
     // Ready button

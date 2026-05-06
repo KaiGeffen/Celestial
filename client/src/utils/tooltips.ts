@@ -4,21 +4,9 @@ import { UserSettings } from '../settings/userSettings'
 
 // Mapping of scene names to their tooltip data (title and message)
 const SCENE_TOOLTIPS: Record<string, { title: string; message: string }> = {
-  //   HomeScene: {
-  //     title: 'Welcome to Celestial!',
-  //     message: `From here, you can play the single-player Journey mode to learn about the game as you unlock new cards.
-  // Or hop into Play mode to access the full card collection and play against other players or the computer.
-  // Click the icons in the top right to explore different features!`,
-  //   },
-  //   BuilderScene: {
-  //     title: 'Deck Builder Guide',
-  //     message: `Select a premade deck from the button in the top left.
-  // Or make a custom deck from scratch.
-  // Hit play to get into a match, or customize your avatar by clicking on it.`,
-  //   },
-  JourneyScene: {
-    title: 'Journey Mode',
-    message: `Unlock new cards as you play through missions in the Journey mode.\n\nFor more features, such as PvP, exit to the main menu with the Back button.`,
+  HomeScene: {
+    title: 'Welcome to Celestial!',
+    message: `Welcome to the Home Screen, your main hub for navigating the world of Celestial!\n\nThe PLAY button allows you to practice against computer opponents, or to test your skills in ranked player-vs-player matches!\n\nThe JOURNEY button takes you to a low-pressure single-player mode, designed to improve your understanding of game mechanics. This will also allow you to learn more about the Penumbra, who need a little help to resolve their own stories.\n\nHave fun!`,
   },
 }
 

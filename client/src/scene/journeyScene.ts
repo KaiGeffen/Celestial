@@ -27,19 +27,24 @@ import showTooltip from '../utils/tooltips'
 import avatarBios from '../data/avatarBios/index'
 import avatarNames from '../../../shared/data/avatarNames'
 import avatarStories from '../data/avatarStories/avatarStories'
+import JOURNEY_CHOICES, {
+  formatJourneyFinaleChapterBody,
+} from '../data/journeyChoices'
 import Server from '../server'
 
 const OVERLAY_WIDTH = 575
-const OVERLAY_HEIGHT = 660
-const OVERLAY_TOP = 100
+const OVERLAY_HEIGHT = 595
+const OVERLAY_TOP = 80
 
-/** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Imani, Mitra, Water, Stars */
+// TODO Remove 'message' menus, they are no longer used
+
+/** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Renata, Mitra, Water, Stars */
 const THEME_CAMERA_POSITIONS: { x: number; y: number }[] = [
   { x: 4000, y: 670 }, // birds (Jules)
   { x: 2100, y: 1270 }, // ashes (Adonis)
   { x: 4860, y: 1940 }, // shadow (Mia)
   { x: 1260, y: 2250 }, // pet (Kitz)
-  { x: 1590, y: 4140 }, // birth (Imani)
+  { x: 1590, y: 4140 }, // birth (Renata)
   { x: 4850, y: 4130 }, // vision (Mitra)
   { x: 3180, y: 3100 }, // water
   { x: 3080, y: 2800 }, // stars
@@ -63,6 +68,9 @@ const DEFAULT_MISSION_TIP =
 const ALT_MAP_SWAY_SPEED = 0.0004
 const ALT_MAP_SWAY_PHASE = 1.5
 const ALT_MAP_SWAY_RADIUS = 80
+
+/** Rex TextBox delay between characters (ms). 0 = full text at once. */
+const JOURNEY_TEXTBOX_TYPE_MS = 0
 
 export default class JourneyScene extends BaseScene {
   map: Phaser.GameObjects.Image
@@ -132,9 +140,9 @@ export default class JourneyScene extends BaseScene {
     this.createBackButton()
 
     // Add race button if dev mode is enabled
-    if (Flags.devCardsEnabled) {
-      this.createRaceButton()
-    }
+    // if (Flags.devCardsEnabled) {
+    //   this.createRaceButton()
+    // }
 
     if (params.stillframe !== undefined) {
       this.createStillframe(params)
@@ -147,7 +155,6 @@ export default class JourneyScene extends BaseScene {
       this.createTipPopup(params)
     }
 
-    const camera = this.cameras.main
     // Start at selected theme position immediately (no transition on open)
     this.snapCameraToTheme(this.selectedThemeIndex)
 
@@ -215,7 +222,7 @@ export default class JourneyScene extends BaseScene {
       .setOrigin(0)
 
     this.overlayPanel = newScrollablePanel(this, {
-      x: Space.windowWidth - OVERLAY_WIDTH - Space.pad,
+      x: Space.windowWidth - OVERLAY_WIDTH - 20,
       y: OVERLAY_TOP,
       width: OVERLAY_WIDTH,
       height: OVERLAY_HEIGHT,
@@ -305,7 +312,7 @@ export default class JourneyScene extends BaseScene {
   }
 
   private showMissionTip(text: string): void {
-    this.missionTipTextBox.start(text, 5)
+    this.missionTipTextBox.start(text, JOURNEY_TEXTBOX_TYPE_MS)
     this.tweens.add({
       targets: this.missionTipContainer,
       alpha: 1,
@@ -339,41 +346,43 @@ export default class JourneyScene extends BaseScene {
       .addBackground(headerBg)
 
     this.overlayHeaderText = this.add
-      .text(0, 0, '', {
-        ...Style.announcement,
-        fontSize: '30px',
-        color: '#f5f2eb',
-      })
+      .text(0, 0, '', Style.journeyOverlay)
       .setOrigin(0.5, 0.5)
 
-    const leftArrow = this.add
-      .text(0, 0, '‹', {
-        ...Style.announcement,
-        fontSize: '30px',
-        color: '#f5f2eb',
-      })
-      .setOrigin(0.5, 0.5)
-      .setInteractive({ useHandCursor: true })
-    leftArrow.on('pointerdown', () => {
-      this.sound.play('click')
-      this.showOverlayCharacterView = false
-      this.selectedThemeIndex =
-        (this.selectedThemeIndex - 1 + themes.length) % themes.length
-      this.refreshOverlayContent()
+    const leftArrowContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      TODO_ICON_SIZE,
+      TODO_ICON_SIZE,
+    )
+    new Buttons.Icon({
+      within: leftArrowContainer,
+      name: 'Left',
+      f: () => {
+        this.showOverlayCharacterView = false
+        this.selectedThemeIndex =
+          (this.selectedThemeIndex - 1 + themes.length) % themes.length
+        this.refreshOverlayContent()
+      },
+      size: TODO_ICON_SIZE,
     })
-    const rightArrow = this.add
-      .text(0, 0, '›', {
-        ...Style.announcement,
-        fontSize: '30px',
-        color: '#f5f2eb',
-      })
-      .setOrigin(0.5, 0.5)
-      .setInteractive({ useHandCursor: true })
-    rightArrow.on('pointerdown', () => {
-      this.sound.play('click')
-      this.showOverlayCharacterView = false
-      this.selectedThemeIndex = (this.selectedThemeIndex + 1) % themes.length
-      this.refreshOverlayContent()
+    const rightArrowContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      TODO_ICON_SIZE,
+      TODO_ICON_SIZE,
+    )
+    new Buttons.Icon({
+      within: rightArrowContainer,
+      name: 'Right',
+      f: () => {
+        this.showOverlayCharacterView = false
+        this.selectedThemeIndex = (this.selectedThemeIndex + 1) % themes.length
+        this.refreshOverlayContent()
+      },
+      size: TODO_ICON_SIZE,
     })
 
     this.overlayArtButtonContainer = new ContainerLite(
@@ -395,14 +404,14 @@ export default class JourneyScene extends BaseScene {
     })
     overlayArtButton.icon.setTintFill(Color.backgroundLight)
 
-    const sideControlsWidth = leftArrow.width + Space.pad + TODO_ICON_SIZE
+    const sideControlsWidth = TODO_ICON_SIZE * 2 + Space.pad
     const leftControls = this.rexUI.add.sizer({
       orientation: 'horizontal',
       width: sideControlsWidth,
       space: { item: Space.pad },
     })
     leftControls
-      .add(leftArrow, { align: 'center' })
+      .add(leftArrowContainer, { align: 'center' })
       .add(this.overlayArtButtonContainer, {
         align: 'center',
       })
@@ -411,7 +420,7 @@ export default class JourneyScene extends BaseScene {
       orientation: 'horizontal',
       width: sideControlsWidth,
     })
-    rightControls.addSpace().add(rightArrow, { align: 'center' })
+    rightControls.addSpace().add(rightArrowContainer, { align: 'center' })
 
     headerSizer
       .add(leftControls, { align: 'center' })
@@ -458,7 +467,7 @@ export default class JourneyScene extends BaseScene {
   private createOverlayCharacterText(): Phaser.GameObjects.GameObject {
     const padding = Space.padSmall
     const text = this.add
-      .text(0, 0, '', Style.basic)
+      .text(0, 0, '', Style.chapterBody)
       .setWordWrapWidth(OVERLAY_WIDTH - padding * 2)
       .setOrigin(0)
 
@@ -482,9 +491,9 @@ export default class JourneyScene extends BaseScene {
     const bioText =
       '    ' +
       (avatarBios[this.selectedThemeIndex] ?? 'Bio coming soon.')
-        .replace(/\n/g, '\n\n    ')
+        .replace(/\n/g, '\n    ')
         .trim()
-    textBox.start(bioText, 5)
+    textBox.start(bioText, JOURNEY_TEXTBOX_TYPE_MS)
 
     return this.rexUI.add
       .sizer({
@@ -626,17 +635,48 @@ export default class JourneyScene extends BaseScene {
           if (mission.id < 700) {
             const avatarIndex = Math.floor(mission.id / 100) - 1
             const chapterIndex = mission.id % 100
-            const storyText =
-              '      ' +
-              (avatarStories[avatarIndex]?.[chapterIndex] ?? 'Coming soon')
-                .replace(/\n/g, '\n\n      ')
-                .trim()
-            this.scene.launch('MenuScene', {
-              menu: 'chapterMessage',
-              title: `${avatarNames[avatarIndex]} — ${mission.name}`,
-              s: storyText,
-              claimGoldMissionId: mission.id,
-            })
+            const isChapter9 =
+              chapterIndex === 8 && avatarIndex < JOURNEY_CHOICES.length
+
+            // For the finale, show the choice, or the result if a choice has already been made
+            if (isChapter9) {
+              const choices = UserSettings._get('journeyChoices') as (
+                | number
+                | null
+              )[]
+              const existingChoice = choices[avatarIndex]
+              if (existingChoice != null) {
+                const resultText = formatJourneyFinaleChapterBody(
+                  avatarIndex,
+                  existingChoice as 0 | 1,
+                )
+                this.scene.launch('MenuScene', {
+                  menu: 'chapterMessage',
+                  title: `${avatarNames[avatarIndex]} — ${mission.name}`,
+                  s: resultText,
+                  claimGoldMissionId: mission.id,
+                })
+              } else {
+                this.scene.launch('MenuScene', {
+                  menu: 'choiceChapterMessage',
+                  title: `${avatarNames[avatarIndex]} — ${mission.name}`,
+                  avatarIndex,
+                  claimGoldMissionId: mission.id,
+                })
+              }
+            } else {
+              const storyText =
+                '      ' +
+                (avatarStories[avatarIndex]?.[chapterIndex] ?? 'Coming soon')
+                  .replace(/\n/g, '\n      ')
+                  .trim()
+              this.scene.launch('MenuScene', {
+                menu: 'chapterMessage',
+                title: `${avatarNames[avatarIndex]} — ${mission.name}`,
+                s: storyText,
+                claimGoldMissionId: mission.id,
+              })
+            }
           } else {
             this.scene.launch('MenuScene', {
               menu: 'chapterMessage',
@@ -669,10 +709,7 @@ export default class JourneyScene extends BaseScene {
       }
     }
     const nameText = this.rexUI.add
-      .BBCodeText(0, 0, nameBBCode, {
-        ...BBStyle.basic,
-        fontSize: '18px',
-      })
+      .BBCodeText(0, 0, nameBBCode, BBStyle.missionName)
       .setInteractive()
       .on('areaover', (key: string) => {
         if (key.startsWith('card_')) {
@@ -740,11 +777,7 @@ export default class JourneyScene extends BaseScene {
         Space.buttonHeight,
       )
       const lockedText = this.add
-        .text(0, 0, 'Locked', {
-          ...Style.basic,
-          fontSize: '16px',
-          color: Color.grey,
-        })
+        .text(0, 0, 'Locked', Style.journeyLocked)
         .setOrigin(0.5, 0.5)
       lockedContainer.add(lockedText)
       row.add(lockedContainer, { align: 'center' })
@@ -871,7 +904,7 @@ export default class JourneyScene extends BaseScene {
           maxLines: 0, // 0 = unlimited lines
         },
       })
-      .start(s, 50)
+      .start(s, JOURNEY_TEXTBOX_TYPE_MS)
       .setOrigin(0)
 
     container.add([img, background, txt, textbox])

@@ -30,6 +30,8 @@ import { SpectatorMatchScene } from '../spectatorMatchScene'
 
 // TODO Use a non-mock color for the menu background
 const COLOR = Color.backgroundLight
+/** Alpha for light rectangles behind General / Audio / Rulebook / Credits panels */
+const OPTIONS_PANEL_BG_ALPHA = 0.4
 
 // The currently selected tab, preserved if the menu is closed/opened
 var selectedTab = 'general'
@@ -48,7 +50,7 @@ export default class OptionsMenu extends Menu {
   tabBtns: Record<string, Button> = {}
 
   // The highlight for the selected tab
-  highlight: Phaser.GameObjects.Rectangle
+  private tabSelector: Phaser.GameObjects.Image
 
   constructor(scene: MenuScene, params) {
     super(scene, Math.min(750, Space.windowWidth))
@@ -62,9 +64,9 @@ export default class OptionsMenu extends Menu {
     this.layout()
 
     // After layout is complete, move the highlight to the selected tab button
-    const x = (Space.windowWidth - this.width - Space.pad * 2) / 2
+    const x = (Space.windowWidth - this.width + Space.pad) / 2
     const y = this.tabBtns[selectedTab].getGlobalPosition()[1] - 4
-    this.highlight.setPosition(x, y)
+    this.tabSelector.setPosition(x, y)
   }
 
   private createContent(activeScene: BaseScene) {
@@ -100,27 +102,17 @@ export default class OptionsMenu extends Menu {
   }
 
   private createTabs() {
-    // Create a rectangle to show which tab is selected
-    const highlightWidth =
-      Space.buttonWidth +
-      Space.pad * 2 +
-      Space.padSmall +
-      (Flags.mobile ? 10 : 0)
-    const height = Flags.mobile ? 50 : 90
-    this.highlight = this.scene.add
-      .rectangle(0, 0, highlightWidth, height, COLOR, 1)
+    this.tabSelector = this.scene.add
+      .image(0, 0, 'chrome-tabSelector')
       .setOrigin(0, 0.5)
+      .setScale(0.3)
 
-    let tabsSizer = this.scene.rexUI.add.fixWidthSizer(
-      Flags.mobile
-        ? {}
-        : {
-            space: {
-              top: Space.pad,
-              line: Space.pad,
-            },
-          },
-    )
+    let tabsSizer = this.scene.rexUI.add.fixWidthSizer({
+      space: {
+        top: Space.pad,
+        line: Space.pad,
+      },
+    })
 
     tabsSizer.addNewLine()
 
@@ -162,7 +154,7 @@ export default class OptionsMenu extends Menu {
 
         this.layout()
 
-        this.tweenHighlight(btn.getGlobalPosition()[1])
+        this.tweenTabSelector(btn.getGlobalPosition()[1])
       })
 
       tabsSizer.add(container).addNewLine()
@@ -183,7 +175,7 @@ export default class OptionsMenu extends Menu {
       name: 'Discord',
       within: container,
       f: openDiscord,
-    })
+    }).icon.setTintFill(Color.discordButton)
     tabsSizer.add(container)
 
     return tabsSizer
@@ -196,12 +188,12 @@ export default class OptionsMenu extends Menu {
         space: {
           top: Space.pad,
           bottom: Space.pad,
-          left: Space.pad / 2,
+          left: Space.pad,
           right: Space.pad,
         },
       })
       .addBackground(
-        this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
+        this.scene.add.rectangle(0, 0, 1, 1, COLOR, OPTIONS_PANEL_BG_ALPHA),
       )
       .hide()
 
@@ -224,12 +216,12 @@ export default class OptionsMenu extends Menu {
         space: {
           top: Space.pad,
           bottom: Space.pad,
-          left: Space.pad / 2,
+          left: Space.pad,
           right: Space.pad,
         },
       })
       .addBackground(
-        this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
+        this.scene.add.rectangle(0, 0, 1, 1, COLOR, OPTIONS_PANEL_BG_ALPHA),
       )
       .hide()
 
@@ -293,7 +285,7 @@ export default class OptionsMenu extends Menu {
         space: {
           // top: Space.pad,
           // bottom: Space.pad,
-          left: Space.pad / 2,
+          left: Space.pad,
           right: Space.pad,
         },
 
@@ -306,13 +298,14 @@ export default class OptionsMenu extends Menu {
         },
       })
       .addBackground(
-        this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
+        this.scene.add.rectangle(0, 0, 1, 1, COLOR, OPTIONS_PANEL_BG_ALPHA),
       )
       .hide()
 
     // Add text to the scrollable panel
     let txt = this.scene.rexUI.add.BBCodeText(0, 0, rulebookString, {
-      ...BBStyle.optionsBlock,
+      ...BBStyle.basicStylized,
+      halign: 'left',
       wrap: { width: this.subwidth },
     })
 
@@ -326,7 +319,7 @@ export default class OptionsMenu extends Menu {
     let scrollable = this.scene.rexUI.add
       .scrollablePanel({
         space: {
-          left: Space.pad / 2,
+          left: Space.pad,
           right: Space.pad,
         },
 
@@ -339,13 +332,14 @@ export default class OptionsMenu extends Menu {
         },
       })
       .addBackground(
-        this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
+        this.scene.add.rectangle(0, 0, 1, 1, COLOR, OPTIONS_PANEL_BG_ALPHA),
       )
       .hide()
 
     // Add text to the scrollable panel
     let txt = this.scene.rexUI.add.BBCodeText(0, 0, creditsString, {
-      ...BBStyle.optionsBlock,
+      ...BBStyle.basicStylized,
+      halign: 'left',
       wrap: { width: this.subwidth },
     })
 
@@ -358,7 +352,7 @@ export default class OptionsMenu extends Menu {
   private createAutopass() {
     let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
-    let txtHint = this.scene.add.text(0, 0, 'Autopass:', Style.basic)
+    let txtHint = this.scene.add.text(0, 0, 'Autopass:', Style.basicStylized)
     sizer.add(txtHint)
     sizer.addSpace()
 
@@ -391,7 +385,12 @@ export default class OptionsMenu extends Menu {
   private createCanBeSpectated(): import('phaser').GameObjects.GameObject {
     let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
-    let txtHint = this.scene.add.text(0, 0, 'Can be spectated:', Style.basic)
+    let txtHint = this.scene.add.text(
+      0,
+      0,
+      'Can be spectated:',
+      Style.basicStylized,
+    )
     sizer.add(txtHint)
     sizer.addSpace()
 
@@ -426,7 +425,7 @@ export default class OptionsMenu extends Menu {
   private createHotkeys(): import('phaser').GameObjects.GameObject {
     let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
-    let txtHint = this.scene.add.text(0, 0, 'Hotkeys:', Style.basic)
+    let txtHint = this.scene.add.text(0, 0, 'Hotkeys:', Style.basicStylized)
     sizer.add(txtHint)
     sizer.addSpace()
 
@@ -492,18 +491,22 @@ export default class OptionsMenu extends Menu {
     if (!tutorialsCompleted) {
       s = 'Skip Tutorial'
       action = () => {
-        // Complete each mission in the intro
-        for (let i = 0; i < TUTORIAL_LENGTH; i++) {
-          UserSettings._setIndex('completedMissions', i, true)
-        }
+        // Complete all tutorial missions in one write.
+        // Also mirror to localStorage so a quick reload can't race account sync.
+        const completedMissions = Array(TUTORIAL_LENGTH).fill(true)
+        UserSettings._set('completedMissions', completedMissions)
+        localStorage.setItem(
+          'completedMissions',
+          JSON.stringify(completedMissions),
+        )
 
         // Stop the other active scene
         activeScene.beforeExit()
         activeScene.scene.stop()
 
-        // Stop this menu scene and start the journey scene
+        // Stop this menu scene and go to home
         this.scene.scene.stop()
-        this.scene.scene.start('JourneyScene')
+        this.scene.scene.start('HomeScene')
       }
     } else {
       if (activeScene instanceof SpectatorMatchScene) {
@@ -561,7 +564,7 @@ export default class OptionsMenu extends Menu {
       space: { item: Space.pad },
     })
 
-    const txtHint = this.scene.add.text(0, 0, s, Style.basic)
+    const txtHint = this.scene.add.text(0, 0, s, Style.basicStylized)
     sizer.add(txtHint)
 
     const slider = this.getSlider(initialValue, callback)
@@ -577,23 +580,8 @@ export default class OptionsMenu extends Menu {
       height: 20,
       orientation: 'x',
 
-      track: this.scene.rexUI.add.roundRectangle(
-        0,
-        0,
-        this.subwidth,
-        8,
-        10,
-        Color.sliderTrack,
-      ),
-      indicator: this.scene.rexUI.add.roundRectangle(
-        0,
-        0,
-        0,
-        0,
-        12,
-        Color.sliderIndicator,
-      ),
-      thumb: this.scene.add.image(0, 0, 'icon-Thumb'),
+      track: this.scene.add.image(0, 0, 'icon-TrackVertical'),
+      thumb: this.scene.add.image(0, 0, 'icon-ThumbHorizontal').setScale(0.5),
       input: 'click',
 
       value: value,
@@ -602,12 +590,10 @@ export default class OptionsMenu extends Menu {
   }
 
   // Tween the higlight moving to the given y (Flush with left side of menu)
-  private tweenHighlight(y: number): void {
+  private tweenTabSelector(y: number): void {
     this.scene.tweens.add({
-      targets: this.highlight,
-      x: (Space.windowWidth - this.width - Space.pad * 2) / 2,
+      targets: this.tabSelector,
       y: y - 4,
-
       duration: Time.general.optionsTabSlideMs,
       ease: 'Sine.easeInOut',
     })

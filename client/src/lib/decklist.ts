@@ -29,8 +29,8 @@ export default class Decklist {
       // orientation: 'vertical',
       space: {
         top: Space.padSmall,
-        left: 5,
-        right: 5,
+        left: Space.padSmall,
+        right: Space.padSmall,
       },
     })
   }

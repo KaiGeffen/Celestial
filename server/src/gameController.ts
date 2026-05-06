@@ -68,7 +68,7 @@ class ServerController {
     // Do action: Pass or play a card
     if (choice === MechanicsSettings.PASS) {
       // NOTE Animations cleared here to capture any from pass() call
-      this.model.animations = [[],[]]
+      this.model.animations = [[], []]
 
       // Handle the pass occuring and trigger any effects
       this.pass(player)
@@ -77,8 +77,7 @@ class ServerController {
       if (this.model.passes === 2) {
         this.doResolvePhase()
         this.doUpkeep()
-      }
-      else {
+      } else {
         // Just increment the version, don't reset the animations
         this.model.versionNo++
       }
@@ -227,9 +226,6 @@ class ServerController {
     this.model.amtCardsPlayedLastRound = this.model.amtCardsPlayedThisRound
     this.model.amtCardsPlayedThisRound = [0, 0]
 
-    // Set priority
-    this.model.priority = this.model.lastPlayerWhoPlayed
-
     // Determine order of player triggers
     const players = this.model.priority === 0 ? [0, 1] : [1, 0]
 
@@ -321,12 +317,23 @@ class ServerController {
 
   // The resolution phase, after both players have passed. Points and effects happen as cards resolve
   protected doResolvePhase(): void {
+    // Last player who played gets priority
+    this.model.priority = this.model.lastPlayerWhoPlayed
+
+    // Keep track of the score for the round
     this.model.score = [0, 0]
 
     // Reset the exhale count since a new resolution is beginning
     this.model.exhaleCountLastRound = [0, 0]
 
     this.model.story.run(this.model)
+
+    // Player with priority gets time back per tic that player will watch (If they don't skip)
+    const stepsRefunded = this.model.story.resolvedActs.length + 2
+    if (this.model.timers) {
+      this.model.timers[this.model.priority] +=
+        stepsRefunded * MechanicsSettings.TIMER_RECAP_PER_ACT
+    }
 
     // If a player has more points, they win the round
     if (this.model.score[0] > this.model.score[1]) {
@@ -384,15 +391,14 @@ class ServerController {
 
   // Update the given player's in-game timer
   private updatePlayerTimer(player: number, updateLastTime: boolean): void {
+    if (!this.model.timers) return
+
     const timeElapsed = Date.now() - this.model.lastTime
     if (updateLastTime) {
       this.model.lastTime = Date.now()
     }
 
-    // Lose the time they took to act
     this.model.timers[player] -= timeElapsed
-
-    // Recoup time for having acted
     this.model.timers[player] += MechanicsSettings.TIMER_RECOUP
   }
 

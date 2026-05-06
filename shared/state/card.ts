@@ -226,7 +226,15 @@ export default class Card {
   /* Common functions */
   reset(game: GameModel) {
     game.score = [0, 0]
-    game.animations[0].push(new Animation({ from: Zone.Reset }))
+    // Resolved index cutoff matches `popBubbles(..., state.story.resolvedActs.length)` once this act is pushed.
+    const resolvedCountAfterThisAct = game.story.resolvedActs.length + 1
+    game.story.bubbleSkipBeforeResolvedIndex = Math.max(
+      game.story.bubbleSkipBeforeResolvedIndex,
+      resolvedCountAfterThisAct,
+    )
+    game.animations[0].push(
+      new Animation({ from: Zone.Reset, index: resolvedCountAfterThisAct }),
+    )
   }
 
   inspired(amt: number, game: GameModel, player: number) {

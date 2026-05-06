@@ -29,33 +29,16 @@ export default class Cutout extends Button {
       text: {
         text: '',
         interactive: false,
-        style: Style.cardCount,
+        style: Style.cutoutCardCount,
         offsetX: 150,
       },
       icon: {
         name: `cutout-${card.name}`,
-        // On mobile, interactive through scrollable panel
-        interactive: !Flags.mobile,
+        interactive: true,
         noGlow: true,
       },
       callbacks: {
-        click: Flags.mobile
-          ? () => {
-              this.scene.scene.launch('MenuScene', {
-                menu: 'focus',
-                card: card,
-                cost: undefined,
-                getCount: () => {
-                  return this.count
-                },
-                btnString: 'Remove',
-                closeOnClick: () => {
-                  return this.count === 0
-                },
-                callback: () => {},
-              })
-            }
-          : () => {},
+        click: () => {},
         // When hovered, show the given cards
         hover: () => {
           // If on the left half of the screen, left pin
@@ -100,7 +83,7 @@ export default class Cutout extends Button {
         -95,
         0,
         `${card.name}${'+'.repeat(card.upgradeVersion)}`,
-        Style.cardCount,
+        Style.cutoutCardCount,
       )
       .setOrigin(0, 0.5)
     within.add([txtCost, txtName, txtPoints])
@@ -119,25 +102,7 @@ export default class Cutout extends Button {
   }
 
   setOnClick(f: () => void): Cutout {
-    if (Flags.mobile) {
-      super.setOnClick(() => {
-        this.scene.scene.launch('MenuScene', {
-          menu: 'focus',
-          card: this.card,
-          cost: undefined,
-          getCount: () => {
-            return this.count
-          },
-          btnString: 'Remove',
-          closeOnClick: () => {
-            return this.count === 0
-          },
-          callback: f,
-        })
-      })
-    } else {
-      super.setOnClick(f)
-    }
+    super.setOnClick(f)
 
     return this
   }

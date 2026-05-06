@@ -6,13 +6,6 @@ export function refreshSpace() {
   Space = getSpace()
 }
 
-/** Deck editor filter strip / deck selector title row — keep heights in sync. */
-export function deckFilterBarHeight(): number {
-  return Space.filterBarHeight > 0
-    ? Space.filterBarHeight
-    : Space.padSmall * 2 + Space.textboxHeight
-}
-
 function getSpace() {
   let width = Math.floor(window.innerWidth)
   let height = Math.floor(window.innerHeight)
@@ -55,7 +48,7 @@ function getSpace() {
     maxTextWidth: 500, // Note must be more than twice cardWidth for hints
 
     // Height of the filter bar in the deck editor
-    filterBarHeight: Flags.mobile ? 0 : 80,
+    filterBarHeight: 100,
 
     decklistPanelWidth: 240,
     cutoutWidth: 348,
@@ -68,8 +61,8 @@ function getSpace() {
     buttonWidth: 150,
     buttonHeight: 51,
     bigButtonHeight: 130,
-    textboxWidth: 296,
-    textboxHeight: 58,
+    textboxWidth: 330,
+    textboxHeight: 70,
 
     avatarSize: Flags.mobile ? 80 : 130,
     iconSize: 40,

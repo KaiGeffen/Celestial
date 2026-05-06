@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Color, Space, Flags, Scroll } from '../settings/settings'
+import { Style, Space, Flags } from '../settings/settings'
 import { BaseSceneWithHeader } from './baseScene'
 import Server from '../server'
 import Buttons from '../lib/buttons/buttons'
@@ -11,10 +11,13 @@ import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import { encodeShareableDeckCode } from '../../../shared/codec'
 import Decklist from '../lib/decklist'
 import { MATCH_HISTORY_PORT } from '../../../shared/network/settings'
+import { ensureRowAlphaGradientTexture } from '../lib/rowAlphaGradientTexture'
 
-const headerHeight = Space.iconSize + Space.pad * 2
-const width = Space.windowWidth - Space.sliderWidth
+const width = Space.windowWidth
 const MATCH_HISTORY_FILTER_KEY = 'matchHistoryFilter'
+
+const MATCH_HISTORY_ROW_WIN_TEX = 'match-history-row-win-gradient'
+const MATCH_HISTORY_ROW_LOSS_TEX = 'match-history-row-loss-gradient'
 
 export default class MatchHistoryScene extends BaseSceneWithHeader {
   private matchHistoryData: MatchHistoryEntry[]
@@ -34,7 +37,9 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
   }
 
   create(): void {
+    this.createBackground()
     super.create({ title: 'Match History' })
+    this.ensureMatchHistoryRowGradientTextures()
 
     // Reset scene state when creating
     this.matchHistoryData = []
@@ -45,23 +50,36 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     this.searchObj = null
     this.loadingText = null
 
-    // TODO This is insane code LMAO
-    const defaultTitle = this.children.list.find(
-      (obj) =>
-        obj instanceof Phaser.GameObjects.Text && obj.text === 'Match History',
-    ) as Phaser.GameObjects.Text | undefined
-    defaultTitle?.destroy()
+    // Match type sort button
+    this.createSortButton()
 
-    const titleText = this.add.text(0, 0, 'Match History', Style.homeTitle)
-    const matchTypeContainer = new ContainerLite(
+    // Show loading message
+    this.loadingText = this.add
+      .text(
+        Space.windowWidth / 2,
+        Space.windowHeight / 2,
+        'Loading matches...',
+        Style.basicStylized,
+      )
+      .setOrigin(0.5, 0.5)
+
+    // Fetch the user data
+    this.fetchMatchHistoryData()
+  }
+
+  private createSortButton(): void {
+    const container = new ContainerLite(
       this,
       0,
       0,
       Space.buttonWidth,
       Space.buttonHeight,
     )
+
+    // Make the button
     this.matchTypeBtn = new Buttons.Basic({
-      within: matchTypeContainer,
+      y: Space.buttonHeight / 2 + Space.padSmall,
+      within: container,
       text: this.matchTypeFilter.toUpperCase(),
       f: () => {
         this.matchTypeFilter = this.matchTypeFilter === 'pvp' ? 'pve' : 'pvp'
@@ -70,27 +88,40 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         this.filterAndRefreshContent()
       },
     })
-    this.rexUI.add
-      .sizer({
-        orientation: 'horizontal',
-        space: { item: Space.padSmall },
-      })
-      .add(titleText)
-      .add(matchTypeContainer)
-      .setPosition(Space.windowWidth / 2, headerHeight / 2)
-      .layout()
 
-    // Show loading message
-    this.loadingText = this.add
-      .text(
-        Space.windowWidth / 2,
-        Space.windowHeight / 2,
-        'Loading matches...',
-        Style.basic,
-      )
-      .setOrigin(0.5, 0.5)
+    // Anchor to left of icons in top-right
+    const dx = Space.iconSize * 2 + Space.buttonWidth / 2 + Space.padSmall * 1.5
+    this.plugins.get('rexAnchor')['add'](container, {
+      x: `100%-${dx}`,
+    })
+  }
 
-    this.fetchMatchHistoryData()
+  /** Win/loss row backgrounds: 20% alpha on the left → 0 on the right. */
+  private ensureMatchHistoryRowGradientTextures(): void {
+    ensureRowAlphaGradientTexture(
+      this,
+      MATCH_HISTORY_ROW_WIN_TEX,
+      0x00ff00,
+      0.2,
+      0,
+    )
+    ensureRowAlphaGradientTexture(
+      this,
+      MATCH_HISTORY_ROW_LOSS_TEX,
+      0xff0000,
+      0.2,
+      0,
+    )
+  }
+
+  private createBackground(): void {
+    const bodyBg = this.add.image(0, 0, 'chrome-body').setOrigin(0, 0)
+
+    const anchor = {
+      width: '100%',
+      height: '100%',
+    }
+    this.plugins.get('rexAnchor')['add'](bodyBg, anchor)
   }
 
   private async fetchMatchHistoryData() {
@@ -151,13 +182,13 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         bottom: Space.pad,
       },
     })
-    let timeText = this.add.text(0, 0, '  Time', Style.basic)
-    let opponentText = this.add.text(0, 0, 'Opponent', Style.basic)
-    let resultsText = this.add.text(0, 0, 'W-L-T', Style.basic)
-    let deckText = this.add.text(0, 0, 'Deck Name', Style.basic)
+    let timeText = this.add.text(0, 0, '  Time', Style.basicStylized)
+    let opponentText = this.add.text(0, 0, 'Opponent', Style.basicStylized)
+    let resultsText = this.add.text(0, 0, 'W-L-T', Style.basicStylized)
+    let deckText = this.add.text(0, 0, 'Deck Name', Style.basicStylized)
 
     // Create search container to hold both text and background
-    const searchContainer = new ContainerLite(this, 0, 0)
+    const searchContainer = new ContainerLite(this, 0, 0).setVisible(false)
 
     // Add search box
     this.searchObj = this.add
@@ -167,9 +198,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         align: 'center',
         placeholder: 'Search...',
         tooltip: 'Search decks and opponents',
-        fontFamily: 'Mulish',
-        fontSize: '24px',
-        color: Color.textboxText,
+        ...Style.inputText,
         maxLength: 40,
         selectAll: true,
         id: 'search-field',
@@ -203,16 +232,14 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       this.basePanel = this.rexUI.add
         .scrollablePanel({
           x: Space.windowWidth / 2,
-          y: headerHeight,
-          height: Space.windowHeight - headerHeight,
+          y: this.headerHeight,
+          height: Space.windowHeight - this.headerHeight,
 
           header: headerSizer,
 
           panel: {
             child: this.createMatchRows(),
           },
-
-          slider: Scroll(this, false),
         })
         .setOrigin(0.5, 0)
         .layout()
@@ -265,22 +292,21 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       height: Space.avatarSize,
     })
 
-    // Add background color based on win/loss
-    const background = this.add.rectangle(
-      0,
-      0,
-      1,
-      1,
-      entry.wasWin ? 0x00ff00 : 0xff0000,
-      0.2,
-    )
+    // Win/loss tint: 0.2 alpha left → 0 alpha right (see ensureMatchHistoryRowGradientTextures)
+    const background = this.add
+      .image(
+        0,
+        0,
+        entry.wasWin ? MATCH_HISTORY_ROW_WIN_TEX : MATCH_HISTORY_ROW_LOSS_TEX,
+      )
+      .setOrigin(0, 0)
 
     // Time text
     const time = new Date(entry.time)
     const timeS = `  ${time.getMonth() + 1}/${time.getDate()}\n  ${time.getHours()}:${String(
       time.getMinutes(),
     ).padStart(2, '0')}`
-    const timeText = this.add.text(0, 0, `\t${timeS}`, Style.basic)
+    const timeText = this.add.text(0, 0, `\t${timeS}`, Style.basicStylized)
 
     // Opponent Info
     const oppSizer = this.rexUI.add.sizer({
@@ -302,15 +328,16 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       .text(
         0,
         0,
-        ` ${entry.opponentUsername}` + (isPVE ? '' : ` (${entry.opponentElo})`),
-        Style.basic,
+        `   ${entry.opponentUsername}` +
+          (isPVE ? '' : ` (${entry.opponentElo})`),
+        Style.basicStylized,
       )
       .setOrigin(0, 0.5)
     oppSizer.add(oppAvatarContainer).add(oppText)
 
     // Results text
-    const resultS = `     ${entry.wasWin ? 'Win' : 'Loss'}\n    ${entry.roundsWon}-${entry.roundsLost}-${entry.roundsTied}`
-    let resultsText = this.add.text(0, 0, resultS, Style.basic)
+    const resultS = `${entry.wasWin ? 'Win' : 'Loss'}\n${entry.roundsWon}-${entry.roundsLost}-${entry.roundsTied}`
+    let resultsText = this.add.text(0, 0, resultS, Style.basicStylized)
 
     // User Info
     const userSizer = this.rexUI.add.sizer({
@@ -332,15 +359,15 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       .text(
         0,
         0,
-        ` ${entry.deck.name}` + (isPVE ? '' : ` (${entry.elo})`),
-        Style.basic,
+        `   ${entry.deck.name}` + (isPVE ? '' : ` (${entry.elo})`),
+        Style.basicStylized,
       )
       .setOrigin(0, 0.5)
     userSizer.add(userAvatarContainer).add(userText)
 
     // Create expand button with arrow and make sure it's interactive
     let expandText = this.add
-      .text(0, 0, '▼', Style.basic)
+      .text(0, 0, '▼', Style.basicStylized)
       .setInteractive()
       .setDepth(1)
 
@@ -394,7 +421,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         align: 'right-top',
       })
       .add(ourList, { proportion: 2, align: 'top' })
-      .add(this.add.text(0, 0, '', Style.basic), {
+      .add(this.add.text(0, 0, '', Style.basicStylized), {
         proportion: 0.5,
         align: 'top',
       })

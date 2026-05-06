@@ -3,7 +3,7 @@ import MenuScene from '../menuScene'
 import Menu from './menu'
 import Card from '../../../../shared/state/card'
 import { CardImage } from '../../lib/cardImage'
-import { Style, Space, Scroll } from '../../settings/settings'
+import { Style, Space } from '../../settings/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import Catalog from '../../../../shared/state/catalog'
@@ -12,12 +12,12 @@ import Decklist from '../../lib/decklist'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
 // A message to the user
-const width = 900
+const DEFAULT_WIDTH = 700
 
 export default class ConfirmMenu extends Menu {
   protected textScrollablePanel: ScrollablePanel
 
-  constructor(scene: MenuScene, params) {
+  constructor(scene: MenuScene, params, width: number = DEFAULT_WIDTH) {
     super(scene, width)
 
     this.createContent(params)
@@ -70,7 +70,7 @@ export default class ConfirmMenu extends Menu {
         child: textPanel,
       },
       scrollMode: 'y',
-      slider: Scroll(this.scene, true),
+      slider: false,
     })
 
     sizer.add(container).add(scrollableText)
@@ -86,7 +86,7 @@ export default class ConfirmMenu extends Menu {
     this.sizer.add(sizer, padding).addNewLine()
   }
 
-  protected createText(s: string): void {
+  protected createText(s: string, style = Style.basic): void {
     const width = this.width - Space.pad * 2
     const maxTextHeight = Space.windowHeight - 300
 
@@ -95,12 +95,8 @@ export default class ConfirmMenu extends Menu {
       width: width,
     })
 
-    const text = this.scene.add
-      .text(0, 0, s, Style.basic)
-      .setWordWrapWidth(width)
+    const text = this.scene.add.text(0, 0, s, style).setWordWrapWidth(width)
     textPanel.add(text)
-    const textNeedsScroll = text.height > maxTextHeight
-
     const scrollableText = newScrollablePanel(this.scene, {
       width: width,
       height: Math.min(text.height, maxTextHeight),
@@ -108,7 +104,7 @@ export default class ConfirmMenu extends Menu {
         child: textPanel,
       },
       scrollMode: 'y',
-      slider: textNeedsScroll ? Scroll(this.scene, true) : false,
+      slider: false,
     })
     this.textScrollablePanel = scrollableText
 

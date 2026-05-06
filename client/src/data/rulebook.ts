@@ -51,4 +51,5 @@ Yes, they appear next to your avatar in the bottom left.
 A card counts as being "nourished" if it has any nourish effect applied to its points, even a negative one.
 
 [b]Why don't I get to choose what card to discard?[/b]
-Players can't make any choices while the story is resolving, so discard always takes the card on the left of your hand.`
+Players can't make any choices while the story is resolving, so discard always takes the card on the left of your hand.
+`

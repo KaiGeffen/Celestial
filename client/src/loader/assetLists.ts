@@ -3,24 +3,20 @@ export const assetLists = {
   "avatar": {
     "files": [
       "Adonis",
-      "Imani",
       "Jules",
       "Kitz",
       "Mia",
       "Mitra",
+      "Renata",
       "AdonisFull",
-      "ImaniFull",
       "JulesFull",
       "KitzFull",
       "MiaFull",
-      "MitraFull"
+      "MitraFull",
+      "RenataFull"
     ],
     "dimensions": {
       "Adonis": {
-        "width": 130,
-        "height": 130
-      },
-      "Imani": {
         "width": 130,
         "height": 130
       },
@@ -37,6 +33,10 @@ export const assetLists = {
         "height": 130
       },
       "Mitra": {
+        "width": 130,
+        "height": 130
+      },
+      "Renata": {
         "width": 130,
         "height": 130
       }
@@ -79,6 +79,7 @@ export const assetLists = {
       "Balance",
       "Begging Bowl",
       "Beginner's Mind",
+      "Birdsong",
       "Birth",
       "Boa",
       "Bounty",
@@ -228,6 +229,7 @@ export const assetLists = {
       "Balance",
       "Begging Bowl",
       "Beginner's Mind",
+      "Birdsong",
       "Birth",
       "Boa",
       "Bounty",
@@ -332,13 +334,11 @@ export const assetLists = {
   "icon": {
     "files": [
       "Wins",
-      "Mission",
       "BreathBasic",
       "BreathExtra",
       "BreathHover",
       "BreathOom",
       "BreathSpent",
-      "CustomDeck",
       "DeckbuilderTab",
       "Discord",
       "InputText",
@@ -346,17 +346,19 @@ export const assetLists = {
       "JourneyStar",
       "JourneyTab",
       "LeaderboardTab",
+      "Left",
       "MatchHistoryTab",
       "Moon",
       "Network",
       "Nourish",
       "Options",
+      "PlayButton",
       "PlayTab",
-      "Pointer",
       "ProfileTab",
       "Quest",
       "QuestsTab",
       "Recap",
+      "Right",
       "Search",
       "Share",
       "Sight",
@@ -367,7 +369,9 @@ export const assetLists = {
       "Store",
       "StoreTab",
       "Sun",
-      "Thumb",
+      "ThumbHorizontal",
+      "ThumbVertical",
+      "TrackVertical",
       "Underline",
       "XOut"
     ],
@@ -375,10 +379,6 @@ export const assetLists = {
       "Wins": {
         "width": 157,
         "height": 1080
-      },
-      "Mission": {
-        "width": 80,
-        "height": 80
       }
     },
     "pixelArt": false
@@ -387,11 +387,9 @@ export const assetLists = {
     "files": [
       "Light",
       "matchBottom",
-      "matchBottom",
       "matchDay",
       "matchNight",
       "matchTile",
-      "matchTop",
       "matchTop"
     ],
     "pixelArt": false
@@ -451,14 +449,23 @@ export const assetLists = {
       "CloudTop",
       "Recap",
       "ResultGlow",
+      "body",
       "breathWheel",
       "bubble",
       "bubbleEffect",
       "bubbleNourish",
+      "builderDecklist",
+      "builderHeader",
+      "builderLeftCorner",
+      "builderRightCorner",
+      "builderVertical",
+      "divider",
+      "header",
       "nameplate",
       "stackCount",
       "sundial",
-      "wins"
+      "tabSelector",
+      "thumbnailNameplate"
     ],
     "pixelArt": false
   },

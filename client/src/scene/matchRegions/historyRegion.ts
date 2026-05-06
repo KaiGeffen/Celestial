@@ -17,7 +17,7 @@ export default class HistoryRegion extends Region {
     this.container = scene.add.container(0, 0)
 
     scene.plugins.get('rexAnchor')['add'](this.container, {
-      x: '100%-225',
+      x: '100%-200',
       y: '30%',
     })
 
@@ -28,7 +28,8 @@ export default class HistoryRegion extends Region {
   }
 
   displayState(state: GameModel): void {
-    if (!state.isRecap) {
+    const canReplay = !state.isRecap && state.roundCount >= 1
+    if (canReplay) {
       this.btnRecap.enable()
       this.btnRecap.setVisible(true)
       this.chromeRecap.setVisible(true)

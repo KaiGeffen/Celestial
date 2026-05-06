@@ -23,39 +23,15 @@ export class UserSettings {
       canBeSpectated: true,
 
       // Whether hotkeys are enabled
-      hotkeys: false,
+      hotkeys: true,
 
       // Settings tied to user's account
       decks: [
         {
-          name: 'A Simple Dream',
-          cards: [0, 9, 61, 12, 12, 7, 7, 7, 7, 4, 4, 4, 4, 4, 4],
+          name: 'The Pathless Path',
+          cards: [50, 27, 27, 27, 27, 25, 88, 88, 31, 39, 11, 13, 91, 45, 45],
           cosmeticSet: {
-            avatar: 0,
-            border: 0,
-          },
-        },
-        {
-          name: 'Path of Ambition',
-          cards: [21, 20, 20, 17, 17, 14, 14, 6, 3, 3, 3, 3, 3, 0, 0],
-          cosmeticSet: {
-            avatar: 1,
-            border: 0,
-          },
-        },
-        {
-          name: 'Lost in Shadow',
-          cards: [1, 1, 1, 1, 1, 1, 35, 35, 13, 20, 19, 19, 19, 19, 23],
-          cosmeticSet: {
-            avatar: 2,
-            border: 0,
-          },
-        },
-        {
-          name: 'Lovesick Cats',
-          cards: [0, 0, 4, 4, 4, 33, 33, 33, 33, 34, 34, 11, 11, 11, 71],
-          cosmeticSet: {
-            avatar: 3,
+            avatar: 5,
             border: 0,
           },
         },
@@ -68,10 +44,34 @@ export class UserSettings {
           },
         },
         {
-          name: 'The Pathless Path',
-          cards: [50, 27, 27, 27, 27, 25, 88, 88, 31, 39, 11, 13, 91, 45, 45],
+          name: 'Lovesick Cats',
+          cards: [0, 0, 4, 4, 4, 33, 33, 33, 33, 34, 34, 11, 11, 11, 71],
           cosmeticSet: {
-            avatar: 5,
+            avatar: 3,
+            border: 0,
+          },
+        },
+        {
+          name: 'Lost in Shadow',
+          cards: [1, 1, 1, 1, 1, 1, 35, 35, 13, 20, 19, 19, 19, 19, 23],
+          cosmeticSet: {
+            avatar: 2,
+            border: 0,
+          },
+        },
+        {
+          name: 'Path of Ambition',
+          cards: [21, 20, 20, 17, 17, 14, 14, 6, 3, 3, 3, 3, 3, 0, 0],
+          cosmeticSet: {
+            avatar: 1,
+            border: 0,
+          },
+        },
+        {
+          name: 'A Simple Dream',
+          cards: [0, 9, 61, 12, 12, 7, 7, 7, 7, 4, 4, 4, 4, 4, 4],
+          cosmeticSet: {
+            avatar: 0,
             border: 0,
           },
         },
@@ -79,7 +79,7 @@ export class UserSettings {
       // List to use when playing with in development content
       devDecks: [],
       // Index of the currently equipped deck (for play menu)
-      equippedDeckIndex: 0,
+      equippedDeckIndex: 5,
 
       // For journey mode, for each card, whether or not that card has been unlocked
       inventory: getStartingInventory(),
@@ -101,12 +101,18 @@ export class UserSettings {
 
       // A list of all new user tooltips that have been seen
       tooltipsSeen: [],
+
+      // Ending choices for each character's journey (0=unchosen, 1=option A, 2=option B)
+      journeyChoices: [null, null, null, null, null, null],
     }
 
     for (var key in defaultSettings) {
       // If this value isn't set in local storage, set it to its default
       if (localStorage.getItem(key) === null) {
-        UserSettings._set(key, defaultSettings[key])
+        UserSettings._set(
+          key,
+          (defaultSettings as Record<string, unknown>)[key],
+        )
       }
     }
   }

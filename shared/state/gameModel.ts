@@ -38,12 +38,9 @@ export default class GameModel {
   mulligansComplete: boolean[] = [false, false]
   roundCount: number = 0
 
-  // How many ms each player has left
-  timers: [number, number] = [
-    MechanicsSettings.TIMER_START,
-    MechanicsSettings.TIMER_START,
-  ]
-  lastTime: number = Date.now()
+  // How many ms each player has left (PvP only; null for PvE/tutorial)
+  timers: [number, number] | null = null
+  lastTime: number | null = null
 
   // Effects
   sound: SoundEffect | null = null
@@ -102,6 +99,9 @@ export default class GameModel {
 
     // Starting priority is random
     this.priority = Math.floor(Math.random() * 2)
+    // Priority defaults to the same random player as starting priority
+    this.lastPlayerWhoPlayed = this.priority
+
     this.status = [new Statuses(), new Statuses()]
 
     // Draw starting hand
@@ -118,7 +118,7 @@ export default class GameModel {
   // Get how many ms the active player has left
   getPlayerTimeLeft(player: number): number {
     const elapsed = Date.now() - this.lastTime
-    return this.timers[player] - elapsed
+    return Math.max(0, this.timers[player] - elapsed)
   }
 
   switchPriority() {
@@ -185,7 +185,8 @@ export default class GameModel {
     // copy.avatars = [...this.avatars]
     // copy.elos = [...this.elos]
     copy.roundCount = this.roundCount
-    copy.timers = [...this.timers]
+    copy.timers = this.timers ? [...this.timers] : null
+    copy.lastTime = this.lastTime
     return copy
   }
 
@@ -382,8 +383,9 @@ export default class GameModel {
     card: Card,
     i?: number,
     from: Zone = Zone.Gone,
+    revealed = false,
   ) {
-    this.story.addAct(card, player, i)
+    this.story.addAct(card, player, i, revealed)
     const storySlot = i === undefined ? this.story.acts.length - 1 : i
     // Any existing Zone.Story animations targeting positions >= storySlot get shifted right
     // because this insertion displaces them (e.g. Immolant onDiscard followed by createInStory at 0).

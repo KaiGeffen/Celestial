@@ -12,7 +12,9 @@ export interface DeckEditorSearchToken {
   rangeMax: number | null
 }
 
-export function parseDeckEditorSearchQuery(query: string): DeckEditorSearchToken[] {
+export function parseDeckEditorSearchQuery(
+  query: string,
+): DeckEditorSearchToken[] {
   const tokens: DeckEditorSearchToken[] = []
   let current = ''
   let inQuotes = false
@@ -47,7 +49,10 @@ export function parseDeckEditorSearchQuery(query: string): DeckEditorSearchToken
   return tokens
 }
 
-function createSearchToken(text: string, isPhrase: boolean): DeckEditorSearchToken {
+function createSearchToken(
+  text: string,
+  isPhrase: boolean,
+): DeckEditorSearchToken {
   const token: DeckEditorSearchToken = {
     text,
     isPhrase,
@@ -61,7 +66,7 @@ function createSearchToken(text: string, isPhrase: boolean): DeckEditorSearchTok
     text = text.substring(1)
     token.text = text
   }
-  const fieldMatch = text.match(/^(cost|points|name|text|deck):(.+)$/i)
+  const fieldMatch = text.match(/^(cost|points|name|text):(.+)$/i)
   if (fieldMatch) {
     token.field = fieldMatch[1].toLowerCase()
     const value = fieldMatch[2]
@@ -107,7 +112,7 @@ function matchesToken(card: Card, token: DeckEditorSearchToken): boolean {
 }
 
 function searchEverywhere(card: Card, query: string): boolean {
-  let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points}`
+  let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points} ${card.beta ? 'beta' : ''}`
   for (const [keyword] of Catalog.getReferencedKeywords(card)) {
     searchableText += ` ${keyword.text}`
   }
@@ -118,27 +123,21 @@ function searchEverywhere(card: Card, query: string): boolean {
   return searchableText.toLowerCase().includes(query.toLowerCase())
 }
 
-/** Combined cost chips + search text predicate for the catalog grid. */
+/** Combined cost chips + pre-parsed search token predicate for the catalog grid. */
 export function cardPassesDeckEditorFilters(
   card: Card,
-  searchText: string,
+  tokens: DeckEditorSearchToken[],
   filterCostAry: boolean[],
 ): boolean {
-  const costOk = (() => {
-    if (!filterCostAry.includes(true)) return true
-    return filterCostAry[Math.min(card.cost, DECK_EDITOR_MAX_COST_FILTER)]
-  })()
-
-  const searchOk = (() => {
-    if (!searchText.trim()) return true
-    const tokens = parseDeckEditorSearchQuery(searchText).filter(
-      (token) => token.field !== 'deck',
-    )
-    for (const token of tokens) {
-      if (!matchesToken(card, token)) return false
+  if (filterCostAry.includes(true)) {
+    if (!filterCostAry[Math.min(card.cost, DECK_EDITOR_MAX_COST_FILTER)]) {
+      return false
     }
-    return true
-  })()
+  }
 
-  return costOk && searchOk
+  for (const token of tokens) {
+    if (!matchesToken(card, token)) return false
+  }
+
+  return true
 }

@@ -9,10 +9,13 @@ import { Flags } from '../../settings/flags'
 import { LEADERBOARD_PORT } from '../../../../shared/network/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
+import {
+  ensureRowAlphaGradientTexture,
+  MENU_ROW_HIGHLIGHT_GRADIENT_KEY,
+} from '../../lib/rowAlphaGradientTexture'
 
 const height = (Space.windowHeight * 2) / 3
 const width = 1000
-const RESULTS_PER_PAGE = 10
 
 interface LeaderboardEntry {
   rank: number
@@ -34,6 +37,14 @@ export default class LeaderboardMenu extends Menu {
     // Sizer has no pad between lines
     this.sizer.space.line = 0
     this.sizer.space.bottom = 0
+
+    ensureRowAlphaGradientTexture(
+      scene,
+      MENU_ROW_HIGHLIGHT_GRADIENT_KEY,
+      Color.gold,
+      0.5,
+      0,
+    )
 
     this.createHeader('Leaderboard')
     this.fetchLeaderboardData()
@@ -66,24 +77,33 @@ export default class LeaderboardMenu extends Menu {
     let headerSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
       width: width,
+      space: {
+        top: Space.padSmall,
+        bottom: Space.padSmall,
+      },
     })
 
-    let rankText = this.scene.add.text(0, 0, '\tRank', Style.basic)
-    const avatarText = this.scene.add.text(0, 0, '', Style.basic)
-    let usernameText = this.scene.add.text(0, 0, 'Username', Style.basic)
-    let winsText = this.scene.add.text(0, 0, 'Wins', Style.basic)
-    let lossesText = this.scene.add.text(0, 0, 'Losses', Style.basic)
-    let eloText = this.scene.add.text(0, 0, 'Elo', Style.basic)
+    const blankText = this.scene.add.text(0, 0, '', Style.basicStylized)
+    let rankText = this.scene.add.text(0, 0, '\tRank', Style.basicStylized)
+    const avatarText = this.scene.add.text(0, 0, '', Style.basicStylized)
+    let usernameText = this.scene.add.text(
+      0,
+      0,
+      'Username',
+      Style.basicStylized,
+    )
+    let winsText = this.scene.add.text(0, 0, 'Wins', Style.basicStylized)
+    let lossesText = this.scene.add.text(0, 0, 'Losses', Style.basicStylized)
+    let eloText = this.scene.add.text(0, 0, 'ELO', Style.basicStylized)
 
     headerSizer
+      .add(blankText, { proportion: 0.2 })
       .add(rankText, { proportion: 0.5 })
       .add(avatarText, { proportion: 1.5 })
       .add(usernameText, { proportion: 2 })
       .add(winsText, { proportion: 1 })
       .add(lossesText, { proportion: 1 })
       .add(eloText, { proportion: 1 })
-
-    const line = this.scene.add.line(0, 0, 0, 0, width, 0, Color.line)
 
     // Create scrollable panel for all player rows
     this.scrollablePanel = this.scene.rexUI.add.scrollablePanel({
@@ -99,7 +119,7 @@ export default class LeaderboardMenu extends Menu {
       },
     })
 
-    this.sizer.add(headerSizer).add(line).add(this.scrollablePanel)
+    this.sizer.add(headerSizer).add(this.scrollablePanel)
 
     // After layout, scroll to user's position if they're in the list
     this.scrollablePanel.layout()
@@ -150,10 +170,12 @@ export default class LeaderboardMenu extends Menu {
       },
     })
 
-    // If the row is our account, highlight it
+    // If the row is our account, highlight it (gold; same L→R alpha gradient as match history)
     if (entry.username === Server.getUserData().username) {
       rowSizer.addBackground(
-        this.scene.add.rectangle(0, 0, 1, 1, Color.rowHighlight),
+        this.scene.add
+          .image(0, 0, MENU_ROW_HIGHLIGHT_GRADIENT_KEY)
+          .setOrigin(0, 0),
       )
     }
 
@@ -173,19 +195,41 @@ export default class LeaderboardMenu extends Menu {
     })
 
     // Add each text object
-    let rankText = this.scene.add.text(0, 0, `\t${entry.rank}`, Style.basic)
-    let usernameText = this.scene.add.text(0, 0, entry.username, Style.basic)
-    let winsText = this.scene.add.text(0, 0, entry.wins.toString(), Style.basic)
+    const blankText = this.scene.add.text(0, 0, '', Style.basicStylized)
+    let rankText = this.scene.add.text(
+      0,
+      0,
+      `\t${entry.rank}`,
+      Style.basicStylized,
+    )
+    let usernameText = this.scene.add.text(
+      0,
+      0,
+      entry.username,
+      Style.basicStylized,
+    )
+    let winsText = this.scene.add.text(
+      0,
+      0,
+      entry.wins.toString(),
+      Style.basicStylized,
+    )
     let lossesText = this.scene.add.text(
       0,
       0,
       entry.losses.toString(),
-      Style.basic,
+      Style.basicStylized,
     )
-    let eloText = this.scene.add.text(0, 0, entry.elo.toString(), Style.basic)
+    let eloText = this.scene.add.text(
+      0,
+      0,
+      entry.elo.toString(),
+      Style.basicStylized,
+    )
 
     // Add each text with the right proportion
     rowSizer
+      .add(blankText, { proportion: 0.2 })
       .add(rankText, { proportion: 0.5 })
       .add(avatarContainer, { proportion: 1.5 })
       .add(usernameText, { proportion: 2 })

@@ -28,6 +28,11 @@ export default class DeckEditorScene extends BaseScene {
   // Name of the deck
   private deckName: string
 
+  // Snapshot of the deck state at scene open, for change detection
+  private originalCards: number[]
+  private originalName: string
+  private originalCosmeticSet: CosmeticSet
+
   // Regions
   private catalogRegion: DeckEditorCatalog
   private deckRegion: DeckEditorDeck
@@ -56,6 +61,11 @@ export default class DeckEditorScene extends BaseScene {
     this.deckName = deck.name
     this.cosmeticSet = deck.cosmeticSet
 
+    // Snapshot for change detection
+    this.originalCards = [...(deck.cards ?? [])]
+    this.originalName = deck.name
+    this.originalCosmeticSet = { ...deck.cosmeticSet }
+
     // Create the elements of the scene
     this.createElements(deck)
     this.sizer.layout()
@@ -67,6 +77,7 @@ export default class DeckEditorScene extends BaseScene {
     // Catalog region
     this.catalogRegion = new DeckEditorCatalog(this, {
       onCardPick: (card) => this.addCardToDeck(card),
+      onBack: () => this.handleBack(),
     })
 
     // Deck region
@@ -93,7 +104,7 @@ export default class DeckEditorScene extends BaseScene {
     // Make the main sizer
     this.sizer = this.rexUI.add.sizer()
     this.sizer.add(this.catalogRegion.columnSizer)
-    this.sizer.add(this.deckRegion.columnSizer)
+    this.sizer.add(this.deckRegion.scrollPanel)
 
     // Anchor this to take up full screen
     this.plugins.get('rexAnchor')['add'](this.sizer, {
@@ -105,7 +116,10 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   private createBackground(): void {
-    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
+    const background = this.add
+      .image(0, 0, 'background-Light')
+      .setOrigin(0)
+      .setDepth(-2)
     ;(this.plugins.get('rexAnchor') as any).add(background, {
       width: '100%',
       height: '100%',
@@ -142,12 +156,12 @@ export default class DeckEditorScene extends BaseScene {
       menu: 'editDeck',
       // When confirming, set the values for this scene with the new selected values
       callback: (
-        name: string,
+        _name: string,
         cosmeticSet: CosmeticSet,
         deckCode: number[],
       ) => {
         this.cosmeticSet = cosmeticSet
-        this.deckName = name
+        // Don't set this.deckName — cosmetics menu doesn't edit it; echoed name would revert unsaved renames.
 
         // TODO If copy/paste is removed, this is no longer needed
         if (deckCode && deckCode.length > 0) {
@@ -158,7 +172,7 @@ export default class DeckEditorScene extends BaseScene {
         // Ensure the thumbnail is updated
         this.syncDeckThumbnail()
       },
-      deckName: deck.name,
+      deckName: this.deckName,
       cosmeticSet: this.cosmeticSet,
       // TODO If copy/paste is removed, this is no longer needed
       deckCode: this.getDeckCode(),
@@ -209,19 +223,61 @@ export default class DeckEditorScene extends BaseScene {
     UserSettings._setIndex('decks', this.deckIndex, updated)
   }
 
+  private handleBack(): void {
+    if (!this.hasChanges()) {
+      // Menu isn't opening, so play the click sound
+      this.playSound('click')
+      this.scene.start('DeckSelectorScene')
+      return
+    }
+
+    // Open confirmation menu to confirm changes
+    this.scene.launch('MenuScene', {
+      menu: 'confirm',
+      text: 'Discard your changes and return to deck selection screen?',
+      callback: () => this.scene.start('DeckSelectorScene'),
+    })
+  }
+
+  private hasChanges(): boolean {
+    if (this.deckName !== this.originalName) return true
+
+    const cs = this.cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 }
+    const ocs = this.originalCosmeticSet ?? {
+      avatar: 0,
+      border: 0,
+      cardback: 0,
+    }
+    if (
+      cs.avatar !== ocs.avatar ||
+      cs.border !== ocs.border ||
+      cs.cardback !== ocs.cardback
+    )
+      return true
+
+    const current = [...this.getDeckCode()].sort((a, b) => a - b)
+    const original = [...this.originalCards].sort((a, b) => a - b)
+    if (current.length !== original.length) return true
+    for (let i = 0; i < current.length; i++) {
+      if (current[i] !== original[i]) return true
+    }
+
+    return false
+  }
+
   /** Utility */
   private getDeckCode(): number[] {
     return this.deckRegion.decklist.getDeckCode()
   }
 
   private syncDeckThumbnail(): void {
-    const isValid = this.getDeckCode().length === MechanicsSettings.DECK_SIZE
-
-    // Update the thumbnail
+    const cardCount = this.getDeckCode().length
+    const isValid = cardCount === MechanicsSettings.DECK_SIZE
     this.deckRegion.syncThumbnail({
       name: this.deckName,
       cosmeticSet: this.cosmeticSet,
       isValid,
+      cardCount,
     })
   }
 
@@ -230,7 +286,6 @@ export default class DeckEditorScene extends BaseScene {
       cards,
       Flags.devCardsEnabled ? false : true,
     )
-
     // Scroll to the top of the decklist
     this.deckRegion.scrollDecklistToTop()
   }
@@ -253,13 +308,7 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   onWindowResize(): void {
-    if (!this.sizer || !this.catalogRegion || !this.deckRegion) return
-
-    // Resize both regions
-    this.catalogRegion.onWindowResize()
-    this.deckRegion.onWindowResize()
-
-    this.sizer.layout()
+    this.sizer?.layout()
   }
 
   // TODO Removed? Is this used at all?

@@ -24,9 +24,13 @@ export default class Region {
     position: [number, number] = [0, 0],
     cardback: number = 0,
   ): CardImage {
-    return new CardImage(card, this.container, true, true, cardback).setPosition(
-      position,
-    )
+    return new CardImage(
+      card,
+      this.container,
+      true,
+      true,
+      cardback,
+    ).setPosition(position)
   }
 
   // Display parts of the given state relevant to this region
@@ -69,7 +73,7 @@ export default class Region {
         // .setOrigin(0)
         // .setInteractive()
         // .on('pointerdown', () => {foo.destroy()}),
-        text: this.scene.add.text(0, 0, text, Style.tutorial),
+        text: this.scene.add.text(0, 0, text),
       })
       .layout()
 

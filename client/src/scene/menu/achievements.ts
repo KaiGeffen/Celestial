@@ -1,5 +1,9 @@
 import 'phaser'
 import { Style, Space, Color } from '../../settings/settings'
+import {
+  ensureRowAlphaGradientTexture,
+  MENU_ROW_HIGHLIGHT_GRADIENT_KEY,
+} from '../../lib/rowAlphaGradientTexture'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import Server from '../../server'
@@ -11,6 +15,8 @@ import {
 const width = 900
 const height = 600
 
+// TODO Change to Quests
+
 export default class AchievementsMenu extends Menu {
   constructor(scene: MenuScene, params) {
     super(scene, width, params)
@@ -18,7 +24,15 @@ export default class AchievementsMenu extends Menu {
     // Base sizer has no pad between lines
     this.sizer.space.line = 0
 
-    this.createHeader('Achievements')
+    ensureRowAlphaGradientTexture(
+      scene,
+      MENU_ROW_HIGHLIGHT_GRADIENT_KEY,
+      Color.gold,
+      0.5,
+      0,
+    )
+
+    this.createHeader('Quests')
     this.createContent()
 
     // Set achievements as seen on server
@@ -49,7 +63,9 @@ export default class AchievementsMenu extends Menu {
       const id = Number(idStr)
       const meta = achievementsMeta[id]
       const userAch = userAchievements[id]
-      const isUnlocked = userAch && (typeof meta.progress !== 'number' || userAch.progress >= meta.progress)
+      const isUnlocked =
+        userAch &&
+        (typeof meta.progress !== 'number' || userAch.progress >= meta.progress)
       if (meta.hideIfLocked && !isUnlocked) {
         return
       }
@@ -81,17 +97,20 @@ export default class AchievementsMenu extends Menu {
       space: {
         left: Space.padSmall,
         right: Space.padSmall,
+        top: Space.padSmall,
+        bottom: Space.padSmall,
       },
     })
     headerSizer
-      .add(this.scene.add.text(0, 0, 'Title', Style.basic), { proportion: 2 })
-      .add(this.scene.add.text(0, 0, 'Description', Style.basic), {
+      .add(this.scene.add.text(0, 0, 'Title', Style.basicStylized), {
+        proportion: 2,
+      })
+      .add(this.scene.add.text(0, 0, 'Description', Style.basicStylized), {
         proportion: 5,
       })
-      .add(this.scene.add.text(0, 0, 'Reward', Style.basic), { proportion: 1 })
-
-    // Add line beneath header
-    const line = this.scene.add.line(0, 0, 0, 0, width, 0, Color.line)
+      .add(this.scene.add.text(0, 0, 'Reward', Style.basicStylized), {
+        proportion: 1,
+      })
 
     // Rows
     const rowsSizer = this.scene.rexUI.add.sizer({
@@ -129,10 +148,16 @@ export default class AchievementsMenu extends Menu {
         },
       })
 
-      // Add background to the row
-      if (backgroundColor) {
+      // Highlight (unseen unlocked): same gold L→R gradient as leaderboard / online players
+      if (backgroundColor === Color.gold) {
         singleRowSizer.addBackground(
-          this.scene.add.rectangle(0, 0, 1, 1, backgroundColor),
+          this.scene.add
+            .image(0, 0, MENU_ROW_HIGHLIGHT_GRADIENT_KEY)
+            .setOrigin(0, 0),
+        )
+      } else if (backgroundColor) {
+        singleRowSizer.addBackground(
+          this.scene.add.rectangle(0, 0, 1, 1, backgroundColor, 0.4),
         )
       }
 
@@ -148,7 +173,7 @@ export default class AchievementsMenu extends Menu {
       // Add gold reward if it exists (above image if both exist)
       if (meta.goldReward) {
         const goldText = this.scene.add
-          .text(0, 0, `${meta.goldReward}💰`, Style.basic)
+          .text(0, 0, `${meta.goldReward}💰`, Style.basicStylized)
           .setOrigin(0.5)
         rewardSizer.add(goldText)
       }
@@ -160,12 +185,12 @@ export default class AchievementsMenu extends Menu {
       }
 
       singleRowSizer
-        .add(this.scene.add.text(0, 0, meta.title, Style.basic), {
+        .add(this.scene.add.text(0, 0, meta.title, Style.basicStylized), {
           proportion: 2,
         })
         .add(
           this.scene.add
-            .text(0, 0, description, Style.basic)
+            .text(0, 0, description, Style.basicStylized)
             .setWordWrapWidth(width * 0.5)
             .setFixedSize(width * 0.5, 0),
           {
@@ -197,6 +222,6 @@ export default class AchievementsMenu extends Menu {
       mouseWheelScroller: { speed: 0.5 },
     })
 
-    this.sizer.add(headerSizer).add(line).add(scrollablePanel)
+    this.sizer.add(headerSizer).add(scrollablePanel)
   }
 }

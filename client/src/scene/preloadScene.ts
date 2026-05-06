@@ -76,12 +76,7 @@ export class SigninScene extends Phaser.Scene {
 
     // Text describing anything going on
     this.txt = this.add
-      .text(
-        Space.windowWidth / 2,
-        Space.windowHeight / 2,
-        '',
-        Style.announcement,
-      )
+      .text(Space.windowWidth / 2, Space.windowHeight / 2, '', Style.header)
       .setOrigin(0.5)
       .setDepth(10)
   }
@@ -96,7 +91,9 @@ export class SigninScene extends Phaser.Scene {
       !server.isOpen() &&
       Date.now() - this.timeSceneStart > GRACE_PERIOD_TO_CONNECT
     ) {
-      this.txt.setText(Messages.disconnectError)
+      // NOTE Removed because it would flicker on when first registering
+      // this.txt.setText(Messages.disconnectError)
+      this.txt.setText('')
     } else if (Server.pendingReconnect) {
       this.txt.setText('Reconnecting to match...')
     } else {
@@ -119,13 +116,14 @@ export class SigninScene extends Phaser.Scene {
 
         this.scene.launch('MenuScene', {
           menu: 'confirm',
-          text: 'Playing as Guest:\nYour progress is saved on this device only and is not tied to an account.\n\nSign in with Google to save progress across devices and access additional features.',
+          text: 'Guest accounts have limited features. Sign in with Google to access additional features.',
           hint: 'Play as Guest',
           callback: () => {
             Server.loginGuest(this.game, () => this.onOptionClick())
           },
         })
       },
+      muteClick: true,
       depth: -1,
     })
     // Hide the guest button if user is already signed in
@@ -230,24 +228,14 @@ export class SigninScene extends Phaser.Scene {
       return
     }
 
-    // If the last tutorial isn't complete, start the next tutorial
+    // If tutorials aren't all finished, show the opening cinematic
     const missions = UserSettings._get('completedMissions')
     if (!missions[TUTORIAL_LENGTH - 1]) {
-      for (let i = 0; i < TUTORIAL_LENGTH; i++) {
-        // If this tutorial mission hasn't been completed, jump to that mission
-        if (!missions[i]) {
-          this.scene.start('TutorialMatchScene', {
-            isTutorial: false, // TODO This is old, remove
-            deck: undefined,
-            mmCode: `ai:t${i}`,
-            missionID: i,
-          })
-          return
-        }
-      }
-    } else {
-      this.scene.start('HomeScene')
+      this.scene.start('OpeningScene')
+      return
     }
+
+    this.scene.start('HomeScene')
   }
 }
 

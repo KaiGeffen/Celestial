@@ -39,6 +39,8 @@ interface WaitingPlayer {
   id: string
   deck: Deck
   activeGame: ActiveGame
+  queuedAt: number
+  notifiedDiscord: boolean
 }
 
 const CARD_COST = 1000
@@ -152,6 +154,29 @@ export default function createWebSocketServer() {
             .set({ avatar_experience: experience })
             .where(eq(players.id, id))
         })
+        .on('sendJourneyChoice', async ({ characterIndex, choice }) => {
+          if (!id) return
+          if (characterIndex < 0 || characterIndex > 5) return
+          if (choice !== 0 && choice !== 1) return
+
+          const row = await db
+            .select({ journey_choices: players.journey_choices })
+            .from(players)
+            .where(eq(players.id, id))
+            .limit(1)
+
+          const raw = row[0]?.journey_choices
+          const next: (number | null)[] =
+            raw && Array.isArray(raw) ? [...raw] : Array(6).fill(null)
+          while (next.length < 6) next.push(null)
+          next.length = 6
+          next[characterIndex] = choice
+
+          await db
+            .update(players)
+            .set({ journey_choices: next })
+            .where(eq(players.id, id))
+        })
         .on(
           'sendInitialUserData',
           async ({ username, decks, inventory, missions, ref }) => {
@@ -189,6 +214,7 @@ export default function createWebSocketServer() {
               completedmissions: missions,
               missiongoldclaimed: '',
               avatar_experience: [0, 0, 0, 0, 0, 0],
+              journey_choices: [null, null, null, null, null, null],
               card_inventory: getStartingInventoryBitString(),
               lastactive: new Date().toISOString(),
               garden: [],
@@ -487,6 +513,8 @@ export default function createWebSocketServer() {
               id: data.uuid,
               deck: data.deck,
               activeGame: activeGame,
+              queuedAt: Date.now(),
+              notifiedDiscord: false,
             }
             searchingPlayers[data.password] = waitingPlayer
           }
@@ -722,6 +750,34 @@ export default function createWebSocketServer() {
           })
         }
       })
+
+      // Notify Discord when a player has been searching for 2+ minutes
+      const webhookUrl = process.env.DISCORD_WEBHOOK_URL
+      if (webhookUrl) {
+        const now = Date.now()
+        const toNotify = Object.values(searchingPlayers).filter(
+          (p) => !p.notifiedDiscord && now - p.queuedAt >= 2 * 60 * 1000,
+        )
+        if (toNotify.length > 0) {
+          const ids = toNotify.map((p) => p.id)
+          const rows = await db
+            .select({ id: players.id, username: players.username })
+            .from(players)
+            .where(inArray(players.id, ids))
+          for (const player of toNotify) {
+            player.notifiedDiscord = true
+            const username =
+              rows.find((r) => r.id === player.id)?.username ?? 'A player'
+            fetch(webhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                content: `${username} is searching for an opponent.`,
+              }),
+            }).catch((e) => console.error('Discord webhook error:', e))
+          }
+        }
+      }
     } catch (e) {
       console.error('Error broadcasting online players:', e)
     }

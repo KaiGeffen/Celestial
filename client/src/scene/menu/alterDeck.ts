@@ -2,7 +2,7 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
-import { Color, Space, Flags } from '../../settings/settings'
+import { Color, Space, Flags, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import {
@@ -17,7 +17,6 @@ import {
   getUnlockedBorders,
   getUnlockedCardbacks,
 } from '../../utils/cosmetics'
-import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import cardbackNames from '../../data/cardbackNames'
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 
@@ -114,9 +113,6 @@ class AlterDeckMenu extends Menu {
         right: Space.pad,
       },
     })
-    this.cosmeticChoicesSizer.addBackground(
-      this.scene.add.rectangle(0, 0, 1, 1, Color.backgroundLight, 0.4),
-    )
 
     // Create initial content
     this.updateCosmeticGrid()
@@ -340,9 +336,7 @@ class AlterDeckMenu extends Menu {
         align: 'center',
         placeholder: 'Import deck-code',
         tooltip: 'Import a deck from clipboard.',
-        fontFamily: 'Mulish',
-        fontSize: '24px',
-        color: Color.textboxText,
+        ...Style.inputText,
         maxLength: MechanicsSettings.DECK_SIZE * 4,
         selectAll: true,
         id: 'search-field',
@@ -428,7 +422,6 @@ class AlterDeckMenu extends Menu {
         // Close this scene
         this.scene.scene.stop()
       },
-      muteClick: true,
       returnHotkey: true,
     })
 

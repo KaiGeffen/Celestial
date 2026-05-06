@@ -7,13 +7,8 @@ import BaseScene from './baseScene'
 import Decklist from '../lib/decklist'
 import Buttons from '../lib/buttons/buttons'
 import DeckThumbnail from '../lib/deckThumbnail'
-import {
-  Color,
-  Space,
-  Style,
-  UserSettings,
-  deckFilterBarHeight,
-} from '../settings/settings'
+import { Color, Space, Style, UserSettings } from '../settings/settings'
+import Server from '../server'
 import newScrollablePanel from '../lib/scrollablePanel'
 import { MechanicsSettings } from '../../../shared/settings'
 import { Deck } from '../../../shared/types/deck'
@@ -50,8 +45,9 @@ export default class DeckSelectorScene extends BaseScene {
     this.savedDeckIndex = undefined
 
     this.createBackground()
+    this.createChrome()
 
-    const bodyScrollHeight = Space.windowHeight - deckFilterBarHeight()
+    const bodyScrollHeight = Space.windowHeight - Space.filterBarHeight
 
     // Right column: deck preview + footer buttons (center Decklist cutouts in column)
     this.decklist = new Decklist(this, () => () => {}) // no-op cutout callback
@@ -72,7 +68,7 @@ export default class DeckSelectorScene extends BaseScene {
     this.rosterPanel = newScrollablePanel(this, {
       width: ROSTER_WIDTH,
       height: bodyScrollHeight,
-      background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
+      background: this.add.image(0, 0, 'chrome-builderDecklist'),
       panel: { child: rosterDeckSizer },
       footer: this.createRightPanel(),
       scrollMode: 'y',
@@ -128,7 +124,7 @@ export default class DeckSelectorScene extends BaseScene {
     if (!this.mainSizer) return
     // Like `CatalogRegion.resize`: scroll panels get an explicit `setMinSize` on every resize so
     // they shrink when the window narrows (root `layout()` alone mostly grows proportion slots).
-    const bodyH = Math.max(1, Space.windowHeight - deckFilterBarHeight())
+    const bodyH = Math.max(1, Space.windowHeight - Space.filterBarHeight)
     const centerW = Math.max(1, Space.windowWidth - ROSTER_WIDTH)
     if (this.centerPanel) {
       const ratio = this.centerPanel.t
@@ -150,13 +146,59 @@ export default class DeckSelectorScene extends BaseScene {
     })
   }
 
+  /** All chrome that isn't background for a region */
+  private createChrome(): void {
+    const y = Space.filterBarHeight - 3.5
+    const y2 = y - 1
+
+    // Top left corner
+    const LeftVertical = this.add
+      .image(-3.5, y, 'chrome-builderVertical')
+      .setOrigin(0, 0)
+      .setDepth(1)
+    this.plugins.get('rexAnchor')['add'](LeftVertical, {
+      height: '100%',
+    })
+    const topLeftCorner = this.add
+      .image(0, y, 'chrome-builderLeftCorner')
+      .setOrigin(0, 0)
+      .setDepth(1)
+
+    // Top right corner
+    const dx = ROSTER_WIDTH - 5
+    const rightVertical = this.add
+      .image(0, y2, 'chrome-builderVertical')
+      .setOrigin(1, 0)
+      .setDepth(1)
+    this.plugins.get('rexAnchor')['add'](rightVertical, {
+      x: `100%-${dx}`,
+      height: '100%',
+    })
+    const topRightCorner = this.add
+      .image(0, y2, 'chrome-builderRightCorner')
+      .setOrigin(1, 0)
+      .setDepth(1)
+    this.plugins.get('rexAnchor')['add'](topRightCorner, {
+      x: `100%-${dx}`,
+    })
+
+    // Central sizer background (With deck thumbnails)
+    const centralSizerBackground = this.add
+      .image(0, Space.filterBarHeight, 'chrome-body')
+      .setOrigin(1, 0)
+      .setAlpha(0.7)
+    this.plugins.get('rexAnchor')['add'](centralSizerBackground, {
+      x: `100%-${ROSTER_WIDTH}`,
+      width: `100%-${ROSTER_WIDTH}`,
+      height: '100%',
+    })
+  }
+
   /** Full-width header — same layout/padding as `DeckEditorScene` `createFilterHeader`. */
   private createMainHeader(): any {
-    const barH = deckFilterBarHeight()
     const background = this.add
-      .rectangle(0, 0, 1, 1, Color.backgroundDark)
+      .image(0, 0, 'chrome-builderHeader')
       .setInteractive()
-    this.addShadow(background, -90)
 
     const backContainer = new ContainerLite(
       this,
@@ -179,27 +221,31 @@ export default class DeckSelectorScene extends BaseScene {
       Space.buttonHeight,
     )
 
-    const title = this.add
-      .text(0, 0, 'MY DECKS', Style.announcement)
-      .setOrigin(0.5)
+    const title = this.add.text(0, 0, '', Style.header).setOrigin(0.5, 0.8)
+    const titleContainer = new ContainerLite(
+      this,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    titleContainer.add(title)
 
     const sizer = this.rexUI.add
       .sizer({
-        height: barH,
+        height: Space.filterBarHeight,
         orientation: 0,
         space: {
           left: Space.pad,
-          right: Space.pad,
           top: Space.padSmall,
           bottom: Space.padSmall,
-          item: Space.pad,
         },
-      } as any)
+      })
       .addBackground(background)
 
     sizer
-      .add(backContainer, { align: 'center' })
-      .add(title, { align: 'center', proportion: 1, expand: true })
+      .add(backContainer, { align: 'top' })
+      .add(titleContainer, { align: 'top', proportion: 1, expand: true })
       .add(balanceContainer, { align: 'center' })
     return sizer
   }
@@ -219,7 +265,6 @@ export default class DeckSelectorScene extends BaseScene {
     const scrollable = newScrollablePanel(this, {
       width: centerColumnWidth,
       height: bodyScrollHeight,
-      background: this.add.rectangle(0, 0, 1, 1, Color.backgroundLight),
       panel: { child: panel },
     }).setOrigin(0)
 
@@ -232,12 +277,11 @@ export default class DeckSelectorScene extends BaseScene {
     panel.removeAll(true)
     this.deckThumbnails = []
 
-    const defaultCosmetics: CosmeticSet = { avatar: 0, border: 0, cardback: 0 }
     const newDeckThumb = new DeckThumbnail({
       scene: this,
-      name: 'New Deck',
-      cosmeticSet: defaultCosmetics,
-      isValid: true,
+      name: 'New Deck+',
+      cosmeticSet: Server.getUserData().cosmeticSet,
+      isNewDeckButton: true,
       onClick: () => this.onNewDeckClick(),
     })
     panel.add(newDeckThumb.container)
@@ -258,6 +302,7 @@ export default class DeckSelectorScene extends BaseScene {
         name,
         cosmeticSet,
         isValid,
+        cardCount: deck.cards?.length || 0,
         onClick: () => this.onDeckClick(i),
       })
 
@@ -272,7 +317,11 @@ export default class DeckSelectorScene extends BaseScene {
     UserSettings._push('decks', {
       name: `Deck ${(UserSettings._get('decks') || []).length + 1}`,
       cards: [],
-      cosmeticSet: { avatar: 0, border: 0, cardback: 0 },
+      cosmeticSet: Server.getUserData().cosmeticSet ?? {
+        avatar: 0,
+        border: 0,
+        cardback: 0,
+      },
     })
     const newIndex = (UserSettings._get('decks') || []).length - 1
     UserSettings._set('equippedDeckIndex', newIndex)
@@ -300,22 +349,15 @@ export default class DeckSelectorScene extends BaseScene {
   }
 
   private createRightPanel(): any {
-    const background = this.add
-      .rectangle(0, 0, ROSTER_WIDTH, 1, Color.backgroundLight)
-      .setInteractive()
-    const sizer = this.rexUI.add
-      .sizer({
-        width: ROSTER_WIDTH,
-        orientation: 1,
-        space: {
-          left: Space.pad,
-          right: Space.pad,
-          top: Space.pad,
-          bottom: Space.pad,
-          item: Space.padSmall,
-        },
-      } as any)
-      .addBackground(background)
+    const sizer = this.rexUI.add.sizer({
+      width: ROSTER_WIDTH,
+      orientation: 1,
+      space: {
+        top: Space.pad,
+        bottom: Space.pad,
+        item: Space.padSmall,
+      },
+    })
 
     const makeBtn = (text: string, f: () => void, muteClick = false) => {
       const container = new ContainerLite(
@@ -350,12 +392,15 @@ export default class DeckSelectorScene extends BaseScene {
       muteClick: true,
     })
 
-    const rowSizer = this.rexUI.add.sizer({
-      orientation: 0,
-      space: { item: Space.padSmall },
-    } as any)
-    rowSizer.add(colSizer)
-    rowSizer.add(playContainer)
+    const rowSizer = this.rexUI.add
+      .sizer({
+        orientation: 0,
+        space: { item: Space.padSmall },
+      } as any)
+      .add(colSizer)
+      .add(playContainer)
+
+    // Add the row sizer to the sizer
     sizer.add(rowSizer)
 
     return sizer

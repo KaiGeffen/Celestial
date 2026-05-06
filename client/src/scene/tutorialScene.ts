@@ -9,7 +9,6 @@ import {
   BBStyle,
   Time,
   Depth,
-  Flags,
   UserSettings,
 } from '../settings/settings'
 import Button from '../lib/buttons/button'
@@ -17,11 +16,16 @@ import Buttons from '../lib/buttons/buttons'
 import { CardImage } from '../lib/cardImage'
 import Catalog from '../../../shared/state/catalog'
 import { ResultsRegionTutorial } from './matchRegions/matchResults'
-import { SearchingRegionTutorial } from './matchRegions/searchingRegion'
+import RoundResultRegion from './matchRegions/roundResultRegion'
 import { Animation } from '../../../shared/animation'
 import { Zone } from '../../../shared/state/zone'
 import GameModel from '../../../shared/state/gameModel'
 import Loader from '../loader/loader'
+
+/** Hint text starts this many px left of its laid-out position and slides in with the fade. */
+const HINT_TWEEN_X_DELTA = -10
+const TUTORIAL_FINAL_LOSS_MESSAGE =
+  "Oh... I didn't think we'd lose.\n\nAurora, can we have a win, just this one time?"
 
 export default class TutorialMatchScene extends MatchScene {
   // How far into the tutorial (How many lines of text you have seen)
@@ -33,9 +37,6 @@ export default class TutorialMatchScene extends MatchScene {
   // Text button to continue the hint text
   btnNext: Button
 
-  // Pointer for showing area of interest to user
-  pointer: Phaser.GameObjects.Image
-
   // A card that is being shown
   card: CardImage
 
@@ -43,6 +44,45 @@ export default class TutorialMatchScene extends MatchScene {
 
   constructor(args = { key: 'TutorialMatchScene', lastScene: 'JourneyScene' }) {
     super(args)
+  }
+
+  init(...args: Parameters<MatchScene['init']>): void {
+    super.init(...args)
+    const params = args[0]
+    this.applyTutorialMissionInitialRegions(params.missionID ?? 0)
+  }
+
+  /** Regions hidden at tutorial start depend on which mission is running. */
+  private applyTutorialMissionInitialRegions(missionID: number): void {
+    this.view.searching.hide()
+    this.view.mulligan.hide()
+
+    switch (missionID) {
+      case 0:
+        this.view.pass.tutorialSimplifyPass(true)
+        this.view.pass.hide()
+        this.view.ourAvatar.hide()
+        this.view.theirAvatar.hide()
+        this.view.theirBoard.hide()
+        this.view.ourStacks.hide()
+        this.view.theirStacks.hide()
+        this.view.historyRegion.hide()
+        this.view.ourBoard.tutorialSetHandVisibility(false)
+        break
+
+      case 1:
+        this.view.pass.tutorialSimplifyPass(true)
+        this.view.ourStacks.hide()
+        this.view.theirStacks.hide()
+        this.view.historyRegion.hide()
+        break
+
+      case 2:
+        break
+
+      default:
+        break
+    }
   }
 
   preload(): void {
@@ -56,13 +96,6 @@ export default class TutorialMatchScene extends MatchScene {
     this.view.results = new ResultsRegionTutorial().create(this)
     this.view.results['missionID'] = this.params.missionID + 1
 
-    // Replace the searching screen with still frames
-    this.view.searching.hide()
-    this.view.searching = new SearchingRegionTutorial().create(
-      this,
-      this.params.missionID,
-    )
-
     // Must reset progress
     this.progress = -1
 
@@ -72,10 +105,11 @@ export default class TutorialMatchScene extends MatchScene {
         Space.windowWidth / 2,
         Space.windowHeight / 2,
         '',
-        BBStyle.basic,
+        BBStyle.basicStylized,
       )
-      .setOrigin(0.5, Flags.mobile ? 0 : 0.5)
+      .setOrigin(0.5, 1)
       .setDepth(Depth.tutorial)
+      .setInteractive()
 
     // Add a background and outline
     this.txt
@@ -103,11 +137,6 @@ export default class TutorialMatchScene extends MatchScene {
       },
       returnHotkey: true,
     })
-
-    // Pointer for showing area of interest to user
-    this.pointer = this.add
-      .image(0, 0, 'icon-Pointer')
-      .setAlpha(Flags.mobile ? 0.0001 : 1)
   }
 
   protected displayState(state: GameModel): boolean {
@@ -151,9 +180,11 @@ export default class TutorialMatchScene extends MatchScene {
       this.progress += 1
     }
 
+    // Preserve any pause the parent set (e.g. end-of-round recap pause)
+    const parentPaused = this.paused
+
     switch (this.params.missionID) {
       case 0:
-        // this.view.ourStacks.tutorialHide()
         this.displayHints1()
         break
 
@@ -166,18 +197,56 @@ export default class TutorialMatchScene extends MatchScene {
         break
     }
 
+    // At the end of the night, show a hint after the round result animation finishes
+    if (parentPaused) {
+      this.paused = true
+      const round = state.roundCount - 1
+      const mission = this.params.missionID
+
+      // Do this after animations finish
+      ;(this.view.scores as RoundResultRegion).onAnimationComplete = () => {
+        // If the player lost the tutorial, show a final loss hint
+        if (state.winner === 1) {
+          this.displayFinalLossHint()
+        } else {
+          this.displayNightHint(mission, round)
+        }
+      }
+    }
+
     return result
+  }
+
+  // Display a night hint (end-of-round pause) for the given mission and round
+  private displayNightHint(mission: number, round: number): void {
+    const datum = data[mission].night[round]
+    if (!datum) return
+
+    const s = `[b]${datum.bold}[/b]`
+    this.txt.setAlpha(0)
+    this.txt.setText(s).setVisible(true)
+
+    this.align(datum)
+
+    this.playHintEntranceTween()
+  }
+
+  private displayFinalLossHint(): void {
+    this.txt.setAlpha(0)
+    this.txt.setText(TUTORIAL_FINAL_LOSS_MESSAGE).setVisible(true)
+    this.btnNext.setVisible(false)
+    this.align({ align: 'center' })
+    this.playHintEntranceTween()
   }
 
   // Display the current hint for the given mission id
   private displayHint(i: number): void {
-    const datum = data[i][this.progress]
+    const datum = data[i].hints[this.progress]
 
     if (datum === undefined || datum === null) {
       // Hide all elements
       this.txt.setVisible(false)
       this.btnNext.setVisible(false)
-      this.pointer.setVisible(false)
 
       // Ensure that scene is not paused
       this.paused = false
@@ -186,49 +255,53 @@ export default class TutorialMatchScene extends MatchScene {
     }
 
     // Set the appropriate text
-    let s = `[i]${datum.italic}[/i]`
-    if (datum.italic) s += '\n\n'
-    if (Flags.mobile && datum.mobile) s += `[b]${datum.mobile}[/b]`
-    else s += `[b]${datum.bold}[/b]`
+    const s = `[b]${datum.bold}[/b]`
 
+    this.txt.setAlpha(0)
     this.txt.setText(s).setVisible(s !== '')
-
-    // Fade that text in
-    this.tweens.add({
-      targets: this.txt,
-      alpha: 1,
-      duration: Time.match.hintFade,
-      onStart: () => {
-        this.txt.alpha = 0
-      },
-    })
 
     // If this is the final hint before the player must do something, hide the button
     this.btnNext.setVisible(!datum.final)
-    this.pointer.setVisible(!datum.final)
 
     // Align the elements based on the type of hint
     this.align(datum)
 
+    if (s !== '') {
+      this.playHintEntranceTween()
+    }
+
     // If next button is visible, pause match until it's clicked
     this.paused = this.btnNext.isVisible()
+  }
+
+  /** After `align`, slide from `HINT_TWEEN_X_DELTA` and fade in in one tween. */
+  private playHintEntranceTween(): void {
+    const endX = this.txt.x
+    this.txt.x = endX + HINT_TWEEN_X_DELTA
+    this.tweens.add({
+      targets: this.txt,
+      x: endX,
+      alpha: 1,
+      duration: Time.match.hintFade,
+    })
   }
 
   // Display hints for the first tutorial
   private displayHints1(): void {
     this.displayHint(0)
 
+    // Have glows only for the first two hints
+    this.view.wins.stopTutorialGlow()
+    this.view.breathRegion.stopTutorialGlow()
+
+    if (this.progress === 0) {
+      this.view.wins.startTutorialGlow()
+    } else if (this.progress === 1) {
+      this.view.breathRegion.startTutorialGlow()
+    }
+
     // Hide different elements on the screen based on progress
     switch (this.progress) {
-      case 0:
-        this.view.pass.hide()
-        this.view.ourAvatar.hide()
-        this.view.theirAvatar.hide()
-        this.view.theirBoard.hide()
-        // Hide cards in hand until later
-        this.view.ourBoard.tutorialSetHandVisibility(false)
-        break
-
       case 1:
         break
 
@@ -241,15 +314,23 @@ export default class TutorialMatchScene extends MatchScene {
         break
 
       case 5:
-        this.addCard('Mercy')
+        this.card.destroy()
+        // Show night time
+        this.view.backgroundRegion.tweenTintForRecap(true)
         break
 
       case 6:
-        this.card.destroy()
-        this.view.ourBoard.tutorialSetHandVisibility(true)
+        this.addCard('Mercy')
         break
 
       case 7:
+        this.card.destroy()
+        this.view.ourBoard.tutorialSetHandVisibility(true)
+        // Show day time
+        this.view.backgroundRegion.tweenTintForRecap(false)
+        break
+
+      case 8:
         this.view.theirBoard.show()
 
         // User can't pass during first tutorial
@@ -264,23 +345,20 @@ export default class TutorialMatchScene extends MatchScene {
   private displayHints2(): void {
     this.displayHint(1)
 
-    // Hide pass until a point
-    if (this.progress === 0) {
-      this.view.pass.tutorialSimplifyPass(true)
-    } else if (this.progress === 7) {
+    if (this.progress === 7) {
       this.view.pass.tutorialSimplifyPass(false)
     }
 
     // Hide different elements on the screen based on progress
     switch (this.progress) {
-      case 5:
+      case 6:
         this.view.ourBoard.cards[1].setOnClick(() => {
           this.signalError('Try playing Mercy then passing...')
         })
         break
 
-      case 7:
-      case 9:
+      case 8:
+      case 10:
         this.view.ourBoard.cards[0].setOnClick(() => {
           this.signalError('Try passing instead...')
         })
@@ -291,153 +369,50 @@ export default class TutorialMatchScene extends MatchScene {
   // Display hints for the third tutorial
   private displayHints3(): void {
     this.displayHint(2)
-
-    // Hide stacks
-    // this.view.discardPiles.hide()
-    // this.view.commands.hide()
-    // this.view.ourHand['hideStacks']()
-    // this.view.theirHand['hideStacks']()
-
-    // // Hide pass until a point
-    // if (this.progress < 8) {
-    // 	this.view.pass.hide()
-    // } else {
-    // 	this.view.pass.show()
-    // }
   }
 
   // Align the elements based on the type of tutorial
   private align(datum): void {
-    // Reset flipping the pointer
-    this.pointer.resetFlip()
+    // Fixed anchor: text bottom and button are always at the same Y
+    const textBottomY = Space.windowHeight / 2 + Space.pad * 4
+    const btnY = textBottomY + Space.pad + Space.buttonHeight / 2
 
-    // On mobile, text always in top left
-    if (Flags.mobile) {
-      const x = Space.windowWidth / 2
-      this.txt.setPosition(x, Space.pad)
+    let textX = Space.windowWidth / 2
+    let btnX = Space.windowWidth / 2
 
-      // Button just below text
-      const y = this.txt.displayHeight + Space.pad * 2 + Space.buttonHeight / 2
-      this.btnNext.setPosition(x, y)
-      return
-    }
-
-    let x, y
     switch (datum.align) {
       case 'right':
-        this.pointer.setRotation(0)
-
-        x = Space.windowWidth - this.pointer.width / 2 - 72
-        y = Space.windowHeight - 168 - this.pointer.height
-        this.pointer.setPosition(x, y)
-
-        // Text to the left of pointer
-        x -= this.pointer.width / 2 + Space.pad + this.txt.displayWidth / 2
-        y -= this.pointer.height / 2
-        this.txt.setPosition(x, y)
-
-        // Move next button just below the text
-        y += this.txt.displayHeight / 2 + Space.pad + Space.buttonHeight / 2
-        this.btnNext.setPosition(x, y)
+        textX = Space.windowWidth - this.txt.displayWidth / 2 - Space.pad
+        btnX = textX
         break
 
       case 'left':
-        this.pointer.setRotation(0).setFlipX(true)
-
-        x = Space.pad + this.pointer.width / 2 + 50
-        y = Space.windowHeight - 200 - this.pointer.height
-        this.pointer.setPosition(x, y)
-
-        // Text to the right of pointer
-        x += this.pointer.width / 2 + Space.pad + this.txt.displayWidth / 2
-        y -= this.pointer.height / 2
-        this.txt.setPosition(x, y)
-
-        // Move next button just below the text
-        y += this.txt.displayHeight / 2 + Space.pad + Space.buttonHeight / 2
-        this.btnNext.setPosition(x, y)
+        textX = this.txt.displayWidth / 2 + Space.pad
+        btnX = textX
         break
 
       case 'card':
-        this.pointer.setRotation(Math.PI / 2)
-
-        x =
-          Space.windowWidth / 2 +
-          Space.cardWidth / 2 +
-          Space.pad +
-          this.pointer.width / 2 +
-          50
-        y = Space.windowHeight / 2 + this.pointer.height / 2
-        this.pointer.setPosition(x, y)
-
-        // Text above the pointer
-        x =
+        textX =
           Space.windowWidth / 2 +
           Space.cardWidth / 2 +
           Space.pad +
           this.txt.displayWidth / 2
-        y -= this.pointer.height / 2 + Space.pad + this.txt.displayHeight / 2
-        this.txt.setPosition(x, y)
-
-        // Move next button below and to the left of
-        x -= this.txt.displayWidth / 2 - Space.buttonWidth / 2 - Space.pad
-        y += this.txt.displayHeight / 2 + Space.pad + Space.buttonHeight / 2
-        this.btnNext.setPosition(x, y)
+        btnX =
+          textX - this.txt.displayWidth / 2 + Space.buttonWidth / 2 + Space.pad
         break
 
       case 'bottom':
-        this.pointer.setRotation(0).setFlipX(true)
-
-        x = Space.windowWidth / 2 - Space.cardWidth
-        y =
-          Space.windowHeight -
-          Space.handHeight -
-          this.pointer.displayHeight / 2 -
-          Space.pad * 2
-        this.pointer.setPosition(x, y)
-
-        // Text left of the pointer
-        // NOTE Get right instead of left because x is flipped
-        x =
-          this.pointer.getRightCenter().x +
-          this.txt.displayWidth / 2 +
-          Space.pad
-        y -= this.pointer.displayHeight / 2
-        this.txt.setPosition(x, y)
-
-        // Button just below text
-        y += this.txt.displayHeight / 2 + Space.pad + Space.buttonHeight / 2
-        this.btnNext.setPosition(x, y)
-
-        break
-
       case 'center':
-        this.pointer.setVisible(false)
-
-        x = Space.windowWidth / 2
-        y = Space.windowHeight / 2
-        this.txt.setPosition(x, y)
-
-        // Button just below text
-        y += this.txt.displayHeight / 2 + Space.pad + Space.buttonHeight / 2
-        this.btnNext.setPosition(x, y)
-
         break
 
       case 'story':
-        this.pointer.setVisible(false)
-
-        // Text to the right of center
-        x = Space.windowWidth / 2 + this.txt.displayWidth / 2 + Space.pad
-        y = Space.windowHeight / 2
-        this.txt.setPosition(x, y)
-
-        // Button just below text
-        y += this.txt.displayHeight / 2 + Space.pad + Space.buttonHeight / 2
-        this.btnNext.setPosition(x, y)
-
+        textX = Space.windowWidth / 2 + this.txt.displayWidth / 2 + Space.pad
+        btnX = textX
         break
     }
+
+    this.txt.setPosition(textX, textBottomY)
+    this.btnNext.setPosition(btnX, btnY)
   }
 
   private addCard(name: string): CardImage {
@@ -445,10 +420,8 @@ export default class TutorialMatchScene extends MatchScene {
       this.card.destroy()
     }
 
-    const x = Flags.mobile ? Space.cardWidth / 2 : Space.windowWidth / 2
-    const y = Flags.mobile
-      ? Space.windowHeight - Space.cardHeight / 2
-      : Space.windowHeight / 2
+    const x = Space.windowWidth / 2
+    const y = Space.windowHeight / 2
     this.card = new CardImage(Catalog.getCard(name), this.add.container(x, y))
 
     return this.card

@@ -4,7 +4,7 @@ import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
 import Cinematic from '../lib/cinematic'
-import { openDiscord } from '../utils/externalLinks'
+import { openDiscord, openSteamStore } from '../utils/externalLinks'
 import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -73,7 +73,7 @@ export default class HomeScene extends BaseScene {
 
     // Right panel: Title, image, and text - expand to fill remaining width
     const rightPanel = this.createRightPanel(leftHeight)
-    mainSizer.add(rightPanel, { align: 'top' })
+    mainSizer.add(rightPanel)
 
     // Anchor main sizer to fill entire screen (after layout so it positions correctly)
     this.plugins.get('rexAnchor')['add'](mainSizer, {
@@ -311,12 +311,10 @@ export default class HomeScene extends BaseScene {
 
     const usernameText = this.add
       .text(0, 0, username, Style.username)
-      .setOrigin(0, 0.5)
-      // Advanced wrapping helps even for "single long words" usernames
+      .setOrigin(0.5, 0.5)
       .setWordWrapWidth(maxTextWidth, true)
-      // Lock width in the layout (important when rexUI measures text)
-      .setFixedSize(maxTextWidth, usernameFontSize)
-    textSizer.add(usernameText, { align: 'left' })
+      .setFixedSize(maxTextWidth, usernameFontSize + 5)
+    textSizer.add(usernameText, { align: 'center' })
 
     // Line 2: Divider line (thin black line)
     const divider = this.add
@@ -326,19 +324,19 @@ export default class HomeScene extends BaseScene {
 
     // Line 3: ELO
     const eloText = this.add
-      .text(0, 0, `ELO: ${elo}`, Style.username)
+      .text(0, 0, `ELO: ${elo}`, Style.usernameInfo)
       .setOrigin(0, 0.5)
     textSizer.add(eloText, { align: 'left' })
 
     // Line 4: Gems
     const gemsText = this.add
-      .text(0, 0, `💎 ${amtGems.toLocaleString()}`, Style.username)
+      .text(0, 0, `💎 ${amtGems.toLocaleString()}`, Style.usernameInfo)
       .setOrigin(0, 0.5)
     textSizer.add(gemsText, { align: 'left' })
 
     // Line 5: Coins (gold)
     this.coinsDisplayText = this.add
-      .text(0, 0, `💰 ${amtCoins.toLocaleString()}`, Style.username)
+      .text(0, 0, `💰 ${amtCoins.toLocaleString()}`, Style.usernameInfo)
       .setOrigin(0, 0.5)
     textSizer.add(this.coinsDisplayText, { align: 'left' })
 
@@ -355,7 +353,6 @@ export default class HomeScene extends BaseScene {
   }
 
   private createRightPanel(height: number): any {
-    // Use vertical sizer to allow content to expand to fill height
     const panelSizer = this.rexUI.add.sizer({
       orientation: 'vertical',
       height,
@@ -368,7 +365,6 @@ export default class HomeScene extends BaseScene {
       },
     })
 
-    // Add background
     const background = this.add
       .rectangle(0, 0, 1, 1, Color.backgroundLight)
       .setAlpha(0.3)
@@ -381,91 +377,93 @@ export default class HomeScene extends BaseScene {
       .setOrigin(0.5, 0)
     panelSizer.add(title)
 
-    // Line below title (using a thin rectangle)
-    const line = this.add.rectangle(0, 0, 1, 3, 0x353f4e).setOrigin(0, 0)
+    const line = this.add.rectangle(0, 0, 1, 3, 0x353f4e)
     panelSizer.add(line, { expand: true })
 
-    // Create horizontal sizer for image and text side by side
+    // Horizontal: left = daily image + tip, right = announcement pairs
     const contentSizer = this.rexUI.add.sizer({
       orientation: 'horizontal',
-      space: {
-        item: Space.pad,
-      },
+      space: { item: Space.pad },
     })
 
-    // Container with an image + tip that rotates daily
+    // Left: rotating daily image + tip
     const dailyContainer = this.rexUI.add.sizer({
       orientation: 'vertical',
-      space: {
-        item: Space.padSmall,
-      },
+      space: { item: Space.padSmall },
     })
+    const dayOfWeek = new Date().getDay()
 
-    // Image - show CardUpdate (was: deterministic by day of week)
-    const dayOfWeek = new Date().getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    // Daily image
     const newsImages = [
-      'Birth', // Sunday (0)
-      'Goliath', // Monday (1)
-      'LayBare', // Tuesday (2)
-      'MeAndHer', // Wednesday (3)
-      'Nightmare', // Thursday (4)
-      'Possibilities', // Friday (5)
-      'Refresh', // Saturday (6)
+      'Birth',
+      'Goliath',
+      'LayBare',
+      'MeAndHer',
+      'Nightmare',
+      'Possibilities',
+      'Refresh',
     ]
-    const newsImageName = newsImages[dayOfWeek]
-    const image = this.add.image(0, 0, `news-${newsImageName}`).setOrigin(0, 0)
-
+    const image = this.add
+      .image(0, 0, `news-${newsImages[dayOfWeek]}`)
+      .setOrigin(0, 0)
     dailyContainer.add(image)
 
-    const tipText = this.rexUI.add
-      .BBCodeText(0, 0, getDailyHomeTip(), {
-        ...BBStyle.description,
-        wrap: {
-          mode: 'word',
-          width: image.displayWidth - Space.pad,
-        },
+    // Tip text
+    const tipText = this.rexUI.add.BBCodeText(
+      0,
+      0,
+      `[b]Daily Tip:[/b]\n${getDailyHomeTip()}`,
+      {
+        ...BBStyle.dailyHint,
+        wrap: { mode: 'word', width: image.displayWidth - Space.pad },
         fixedWidth: image.displayWidth,
-      })
-      .setOrigin(0, 0)
-    dailyContainer.add(tipText, { align: 'top' })
+      },
+    )
+    dailyContainer.add(tipText)
+    contentSizer.add(dailyContainer)
 
-    // Add the image container to contentSizer
-    contentSizer.add(dailyContainer, { align: 'top' })
-
-    // Make news content as BBCode to have hoverable card names and links
-    const text = this.rexUI.add
-      .BBCodeText(0, 0, NEWS_TEXT, BBStyle.description)
-      .setInteractive()
-      .on('areaover', (key: string) => {
-        if (key === '_link_register') {
-          // Show cursor as pointer for link
-          this.input.setDefaultCursor('pointer')
-        } else if (key === '_link_discord') {
-          // Show cursor as pointer for link
-          this.input.setDefaultCursor('pointer')
-        } else if (key[0] === '_') {
-          this.hint.showCard(key.slice(1))
-        }
+    // Right: subheader + body pairs
+    const announcementSizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: { item: Space.pad * 3 },
+    })
+    for (const pair of ANNOUNCEMENT_PAIRS) {
+      const blockSizer = this.rexUI.add.sizer({
+        orientation: 'vertical',
       })
-      .on('areaout', (key: string) => {
-        if (key === '_link_register') {
-          this.input.setDefaultCursor('default')
-        }
-        if (key === '_link_discord') {
-          this.input.setDefaultCursor('default')
-        }
-        this.hint.hide()
-      })
-      .on('areadown', (key: string) => {
-        if (key === '_link_register') {
-          window.open(URL, '_blank')
-        }
-        if (key === '_link_discord') {
-          openDiscord()
-        }
-      })
-      .setOrigin(0, 0)
-    contentSizer.add(text, { align: 'top' })
+      blockSizer.add(
+        this.add
+          .text(0, 0, pair.subheader, Style.announcementSubheader)
+          .setOrigin(0.5, 0),
+        { align: 'center' },
+      )
+      blockSizer.add(
+        this.add.image(0, 0, 'chrome-divider').setOrigin(0.5, 0).setScale(0.3),
+        { align: 'center' },
+      )
+      const bodyText = this.rexUI.add
+        .BBCodeText(0, 0, pair.body, BBStyle.announcementCopy)
+        .setInteractive()
+        .on('areaover', (key: string) => {
+          if (key === '_link_discord' || key === '_link_steam')
+            this.input.setDefaultCursor('pointer')
+          else if (key[0] === '_') this.hint.showCard(key.slice(1))
+        })
+        .on('areaout', (key: string) => {
+          if (key === '_link_discord' || key === '_link_steam')
+            this.input.setDefaultCursor('default')
+          this.hint.hide()
+        })
+        .on('areadown', (key: string) => {
+          if (key === '_link_discord') openDiscord()
+          else if (key === '_link_steam') openSteamStore()
+        })
+        .setOrigin(0, 0)
+      blockSizer.add(bodyText, { align: 'left' })
+      blockSizer.layout()
+      announcementSizer.add(blockSizer, { align: 'left' })
+    }
+    contentSizer.add(announcementSizer, { align: 'top' })
 
     panelSizer.add(contentSizer)
 
@@ -540,18 +538,21 @@ export default class HomeScene extends BaseScene {
   }
 }
 
-const URL = ''
-
-const NEWS_TEXT = `🕊️ [b]Thank you to our wonderful Celestial community![/b]
-Many changes this month as we ramp up to a [color=#4090DD]Steam demo release[/color], let us know your thoughts! 
-
-🏆 Congrats to Sherlock for reclaiming his tournament title! And to Redrame for getting #1 on ladder.
-With the launch of the demo, we plan to snapshot the top players as we transition to a more public release.
-
-🐚 Shell Mode
-On Saturdays we play a new [color=#4090DD]Shell Mode[/color], hop in to the [area=_link_discord][color=#FABD5D]Discord server[/color][/area] to learn more!
-
-🎴 Card Changes
-👇 Hero - Exhale point +3 > +2
-👇 Seen - Clear View sight 4 > 3
-👆 Phoenix - Points 3 > 4`
+const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
+  {
+    subheader: 'Celestial Decks on Steam',
+    body: `Our [area=_link_steam][stroke=${Color.goldS}]Steam page[/stroke][/area] is live! We'd love for you to wishlist it, and keep and eye out for the demo releasing soon.`,
+  },
+  // {
+  //   subheader: 'Congrats to Sherlock!',
+  //   body: 'Congrats to Sherlock for reclaiming his tournament title! And to Redrame for getting #1 on ladder.\nWith the launch of the demo, we plan to snapshot the top players as we transition to a more public release.',
+  // },
+  {
+    subheader: 'Shell Mode',
+    body: `Each Saturday in May, we'll be playing a new mode called Shell Mode. Hop in to the [area=_link_discord][stroke=${Color.goldS}]Discord server[/stroke][/area] to learn more!`,
+  },
+  {
+    subheader: 'Card Changes',
+    body: `🌱 [area=_Birdsong][stroke=${Color.goldS}]Birdsong[/stroke][/area] - New card released!\n👇 [area=_Hero][stroke=${Color.goldS}]Hero[/stroke][/area] - Exhale point +3 > +2\n👇 [area=_Clear View][stroke=${Color.goldS}]Clear View[/stroke][/area] - [area=_Seen][stroke=${Color.goldS}]Seen[/area][/stroke] sight 4 > 3\n👆 [area=_Phoenix][stroke=${Color.goldS}]Phoenix[/stroke][/area] - Points 3 > 4`,
+  },
+]

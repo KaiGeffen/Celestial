@@ -187,7 +187,7 @@ export default class ChoosePremade extends Menu {
     // Hint on which information is displayed
     let hint = new Hint(this.scene)
 
-    this.txtName = this.scene.add.text(0, 0, '', Style.announcement)
+    this.txtName = this.scene.add.text(0, 0, '', Style.header)
     this.txtSurname = this.scene.add.text(0, 0, '', Style.surname)
 
     const width = Math.min(
@@ -195,11 +195,11 @@ export default class ChoosePremade extends Menu {
       Space.windowWidth - this.avatarFull.displayWidth - Space.pad * 3,
     )
     this.txtDescription = this.scene.rexUI.add
-      .BBCodeText(0, 0, '', BBStyle.description)
+      .BBCodeText(0, 0, '', BBStyle.dailyHint)
       .setWrapWidth(
         width -
-          BBStyle.description.padding.left -
-          BBStyle.description.padding.right,
+          BBStyle.dailyHint.padding.left -
+          BBStyle.dailyHint.padding.right,
       )
       .setInteractive()
     if (!Flags.mobile) {

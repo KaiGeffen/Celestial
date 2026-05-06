@@ -16,6 +16,7 @@ import {
   getUnlockedCardbacks,
 } from '../../utils/cosmetics'
 import cardbackNames from '../../data/cardbackNames'
+import { fitTextToMaxWidth } from '../../utils/textFit'
 
 export default class UserProfileMenu extends Menu {
   // The avatar on the homeScene (optional, may be null if not displayed)
@@ -72,6 +73,7 @@ export default class UserProfileMenu extends Menu {
         1,
         10,
         Color.backgroundLight,
+        0.4,
       ),
     )
 
@@ -96,16 +98,14 @@ export default class UserProfileMenu extends Menu {
       0,
       0,
       userData.username || 'Guest',
-      Style.announcement,
+      Style.usernameLarge,
     )
-    // Ensure the username isn't too long
-    const safeWidth = Math.min(Space.buttonWidth, txtUsername.width)
-    txtUsername.setFixedSize(safeWidth, 0)
+    fitTextToMaxWidth(txtUsername, Space.buttonWidth)
     const txtElo = this.scene.add.text(
       0,
       0,
-      (userData.elo || 1000).toString(),
-      Style.basic,
+      `${userData.elo || 1000}`,
+      Style.basicStylized,
     )
     sizer.add(txtUsername)
     sizer.add(txtElo)
