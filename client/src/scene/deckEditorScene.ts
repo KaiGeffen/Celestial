@@ -116,7 +116,10 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   private createBackground(): void {
-    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
+    const background = this.add
+      .image(0, 0, 'background-Light')
+      .setOrigin(0)
+      .setDepth(-2)
     ;(this.plugins.get('rexAnchor') as any).add(background, {
       width: '100%',
       height: '100%',

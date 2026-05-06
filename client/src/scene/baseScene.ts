@@ -375,12 +375,7 @@ export class BaseSceneWithHeader extends BaseScene {
     }).setDepth(2)
 
     this.add
-      .text(
-        Space.windowWidth / 2,
-        this.headerHeight / 2,
-        title,
-        Style.header,
-      )
+      .text(Space.windowWidth / 2, this.headerHeight / 2, title, Style.header)
       .setOrigin(0.5)
       .setDepth(2)
   }

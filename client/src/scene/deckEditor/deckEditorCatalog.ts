@@ -102,6 +102,7 @@ export class DeckEditorCatalog {
       height: catalogBodyHeight,
       panel: { child: panel },
       slider: false,
+      background: scene.add.image(0, 0, 'chrome-body').setDepth(-1),
     }).setOrigin(0)
 
     this.scrollPanel.layout()
@@ -154,9 +155,7 @@ export class DeckEditorCatalog {
 
   private buildFilterHeaderRow(): any {
     const scene = this.scene
-    const background = scene.add
-      .rectangle(0, 0, 1, 1, Color.backgroundLight)
-      .setInteractive()
+    const background = scene.add.image(0, 0, 'chrome-header').setInteractive()
     scene.addShadow(background, -90)
 
     const ui = this.scene.rexUI
