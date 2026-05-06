@@ -373,7 +373,7 @@ export default class HomeScene extends BaseScene {
 
     // Title with line below
     const title = this.add
-      .text(0, 0, `New Update [${GAME_VERSION}]`, Style.announcement)
+      .text(0, 0, `New Update [${GAME_VERSION}]`, Style.header)
       .setOrigin(0.5, 0)
     panelSizer.add(title)
 
