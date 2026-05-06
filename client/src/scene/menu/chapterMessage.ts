@@ -117,7 +117,7 @@ export default class ChapterMessageMenu extends MessageMenu {
 
           Server.claimMissionGold(this.claimGoldMissionId)
           this.scene.game.events.emit('missionGoldClaimed')
-          this.claimGoldButton.setText('Gold Claimed').disable()
+          this.claimGoldButton.setText('Claimed').disable()
         }
       },
       muteClick: true,
@@ -135,7 +135,7 @@ export default class ChapterMessageMenu extends MessageMenu {
 
     this.sizer.add(buttonsSizer, padding)
     if (this.isMissionGoldClaimed()) {
-      this.claimGoldButton.setText('Gold Claimed').disable()
+      this.claimGoldButton.setText('Claimed').disable()
     } else if (!this.textScrollablePanel?.isOverflowY) {
       this.claimGoldButton.enable()
     } else {
