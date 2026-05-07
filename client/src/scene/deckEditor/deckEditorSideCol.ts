@@ -64,20 +64,20 @@ export class RightCol {
       },
     })
 
-    this.updateFooterState()
+    this.updateCardCounts()
   }
 
   layoutDecklist(): void {
     const panel = this.scrollPanel
     panel.t = Math.min(0.999999, panel.t)
     panel.layout()
-    this.updateFooterState()
+    this.updateCardCounts()
   }
 
   scrollDecklistToTop(): void {
     this.scrollPanel.t = 0
     this.scrollPanel.layout()
-    this.updateFooterState()
+    this.updateCardCounts()
   }
 
   // Overwritten in children where a thumbnail exists
@@ -98,7 +98,7 @@ export class RightCol {
   }
 
   // Overwritten in children that need dynamic footer state (e.g. Play enabled/disabled).
-  protected updateFooterState(): void {}
+  protected updateCardCounts(): void {}
 
   protected createFooter(): FixWidthSizer {
     const bg = this.scene.add
@@ -187,7 +187,7 @@ export class DeckEditorDeck extends RightCol {
       .fixWidthSizer({
         space: {
           top: Space.pad,
-          bottom: Space.padSmall,
+          bottom: Space.pad,
         },
         align: 'center',
       })
@@ -229,13 +229,14 @@ export class DeckEditorDeckJourney extends RightCol {
   }
 
   protected override createBody(): FixWidthSizer {
+    // Required cards
     const requiredCards = this.opts.requiredCards ?? []
     this.requiredDecklist = new Decklist(this.scene, () => () => {
       this.scene.signalError("Can't remove a required card")
     })
     this.requiredDecklist.setJourneyDeck(requiredCards)
 
-    // Keep the required list callback message exactly as requested.
+    // Cards in required decklist signal that they can't be removed
     this.requiredDecklist.cutouts.forEach((cutout) => {
       cutout.setOnClick(() => {
         this.scene.signalError("Can't remove a required card")
@@ -249,32 +250,38 @@ export class DeckEditorDeckJourney extends RightCol {
           top: Space.padSmall,
           left: Space.padSmall,
           right: Space.padSmall,
-          item: Space.padSmall,
+          line: Space.pad,
         },
       })
-      .add((this.requiredLabel = this.newJourneyHeader('Required Cards')))
+      .add((this.requiredLabel = this.createText('Required Cards')))
       .add(this.requiredDecklist.sizer)
-      .add((this.chosenLabel = this.newJourneyHeader('Chosen Cards')))
+      .add((this.chosenLabel = this.createText('Chosen Cards')))
       .add(this.decklist.sizer)
   }
 
-  protected override updateFooterState(): void {
+  // Update the displayed and relevant state based on card counts changing
+  protected override updateCardCounts(): void {
     const requiredCount = this.requiredDecklist?.getDeckCode().length ?? 0
     const chosenCount = this.decklist.getDeckCode().length
-    const chosenTarget = Math.max(0, MechanicsSettings.DECK_SIZE - requiredCount)
+    const chosenTarget = Math.max(
+      0,
+      MechanicsSettings.DECK_SIZE - requiredCount,
+    )
 
+    // Update the text
     this.requiredLabel?.setText(`Required Cards (${requiredCount})`)
     this.chosenLabel?.setText(`Chosen Cards (${chosenCount}/${chosenTarget})`)
 
+    // Update the play button
     if (!this.playBtn) return
     const valid = requiredCount + chosenCount === MechanicsSettings.DECK_SIZE
     if (valid) this.playBtn.enable()
     else this.playBtn.disable()
   }
 
-  private newJourneyHeader(text: string): Phaser.GameObjects.Text {
+  private createText(s: string): Phaser.GameObjects.Text {
     return this.scene.add
-      .text(0, 0, text, Style.journeyRequiredAndChosenHeader)
+      .text(0, 0, s, Style.journeyRequiredAndChosenHeader)
       .setOrigin(0.5)
   }
 

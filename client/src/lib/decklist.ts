@@ -28,7 +28,7 @@ export default class Decklist {
       width: Space.cutoutWidth + 10,
       // orientation: 'vertical',
       space: {
-        top: Space.padSmall,
+        // top: Space.padSmall,
         left: Space.padSmall,
         right: Space.padSmall,
       },

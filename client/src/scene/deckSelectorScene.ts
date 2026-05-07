@@ -66,6 +66,9 @@ export default class DeckSelectorScene extends BaseScene {
       })
       .addSpace(1)
     this.rosterPanel = newScrollablePanel(this, {
+      space: {
+        top: Space.padSmall,
+      },
       width: ROSTER_WIDTH,
       height: bodyScrollHeight,
       background: this.add.image(0, 0, 'chrome-builderDecklist'),
