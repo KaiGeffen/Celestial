@@ -526,16 +526,15 @@ export const assetLists = {
     "files": [
       "1",
       "2",
-      "2",
       "3",
-      "3",
+      "4",
       "4",
       "5",
       "6",
       "7",
       "8",
       "9",
-      "old 1"
+      "not 1"
     ],
     "pixelArt": false
   }

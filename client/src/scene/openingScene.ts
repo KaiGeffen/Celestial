@@ -85,11 +85,20 @@ export default class OpeningScene extends BaseScene {
   create(): void {
     super.create()
 
+    this.createBackground()
     this.createSlideImage()
     this.createChrome()
     this.createText()
 
     this.showSlide(0)
+  }
+
+  private createBackground(): void {
+    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
+    this.plugins.get('rexAnchor')['add'](background, {
+      width: '100%',
+      height: '100%',
+    })
   }
 
   private createSlideImage(): void {
@@ -184,28 +193,52 @@ export default class OpeningScene extends BaseScene {
       const frameHeight = Math.max(1, Space.windowHeight - BOTTOM_CHROME_HEIGHT)
       const frameWidth = Math.min(Space.windowWidth, frameHeight * slideRatio)
 
-      // Width-driven zoom: full width -> framed width, preserving ratio.
-      const startScale = Space.windowWidth / this.slideImage.width
-      const targetWidth = Math.max(1, frameWidth)
-      const endScale = targetWidth / this.slideImage.width
-
-      this.slideImage.setOrigin(0.5, 0).setPosition(this.imageW / 2, 0)
-      this.slideImage.setScale(startScale).setVisible(true)
-
       if (this.slideTween) {
         this.slideTween.stop()
         this.slideTween = null
       }
-      this.slideTween = this.tweens.add({
-        targets: this.slideImage,
-        scaleX: endScale,
-        scaleY: endScale,
-        duration: TWEEN_DURATION,
-        ease: 'Sine.Out',
-        onComplete: () => {
-          this.slideTween = null
-        },
-      })
+
+      this.slideImage.setOrigin(0.5, 0).setVisible(true)
+
+      if (i === 0) {
+        // First slide: pan left -> right at fixed framed scale.
+        const fixedScale = Math.max(
+          frameWidth / this.slideImage.width,
+          frameHeight / this.slideImage.height,
+        )
+        this.slideImage.setScale(fixedScale)
+
+        const visibleWidth = this.slideImage.width * fixedScale
+        const panRange = Math.max(0, (visibleWidth - frameWidth) / 2)
+        const centerX = this.imageW / 2
+        this.slideImage.setPosition(centerX + panRange, 0)
+
+        this.slideTween = this.tweens.add({
+          targets: this.slideImage,
+          x: centerX - panRange,
+          duration: TWEEN_DURATION * 2,
+          ease: 'Sine.InOut',
+          onComplete: () => {
+            this.slideTween = null
+          },
+        })
+      } else {
+        // Other slides: width-driven zoom to framed width.
+        const startScale = Space.windowWidth / this.slideImage.width
+        const endScale = Math.max(1, frameWidth) / this.slideImage.width
+        this.slideImage.setPosition(this.imageW / 2, 0).setScale(startScale)
+
+        this.slideTween = this.tweens.add({
+          targets: this.slideImage,
+          scaleX: endScale,
+          scaleY: endScale,
+          duration: TWEEN_DURATION,
+          ease: 'Sine.Out',
+          onComplete: () => {
+            this.slideTween = null
+          },
+        })
+      }
     } else {
       if (this.slideTween) {
         this.slideTween.stop()

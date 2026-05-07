@@ -122,6 +122,7 @@ export default class TutorialMatchScene extends MatchScene {
       within: this,
       text: 'Next',
       f: () => {
+        this.playSound('click')
         this.progress += 1
         switch (this.params.missionID) {
           case 0:
