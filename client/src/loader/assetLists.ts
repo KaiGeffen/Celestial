@@ -342,6 +342,7 @@ export const assetLists = {
       "DeckbuilderTab",
       "Discord",
       "InputText",
+      "InputText",
       "Inspire",
       "JourneyStar",
       "JourneyTab",
