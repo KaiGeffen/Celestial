@@ -9,7 +9,6 @@ import Card from '../../../shared/state/card'
 import { Deck } from '../../../shared/types/deck'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import { MechanicsSettings } from '../../../shared/settings'
-import { encodeShareableDeckCode } from '../../../shared/codec'
 
 import Server from '../server'
 import { DeckEditorCatalog } from './deckEditor/deckEditorCatalog'
@@ -22,11 +21,11 @@ export default class DeckEditorScene extends BaseScene {
   // Currently selected deck index
   deckIndex: number
 
-  // Equipped cosmetics
-  private cosmeticSet: CosmeticSet
-
   // Name of the deck
-  private deckName: string
+  protected deckName: string
+
+  // Equipped cosmetics
+  protected cosmeticSet: CosmeticSet
 
   // Snapshot of the deck state at scene open, for change detection
   private originalCards: number[]
@@ -39,10 +38,13 @@ export default class DeckEditorScene extends BaseScene {
 
   private sizer: RexUIPlugin.Sizer
 
-  constructor() {
+  constructor(
+    sceneKey: string = 'DeckEditorScene',
+    lastSceneKey: string = 'DeckSelectorScene',
+  ) {
     super({
-      key: 'DeckEditorScene',
-      lastScene: 'DeckSelectorScene',
+      key: sceneKey,
+      lastScene: lastSceneKey,
     })
   }
 
@@ -61,14 +63,41 @@ export default class DeckEditorScene extends BaseScene {
     this.deckName = deck.name
     this.cosmeticSet = deck.cosmeticSet
 
+    const cardIds = this.getInitialCardIds(deck)
+
     // Snapshot for change detection
-    this.originalCards = [...(deck.cards ?? [])]
+    this.originalCards = [...cardIds]
     this.originalName = deck.name
     this.originalCosmeticSet = { ...deck.cosmeticSet }
 
+    const editingDeck: Deck = {
+      ...deck,
+      cards: cardIds,
+    }
+
     // Create the elements of the scene
-    this.createElements(deck)
+    this.createElements(editingDeck)
     this.sizer.layout()
+  }
+
+  /** Override in subclasses (e.g. journey) to seed the list from mission data. */
+  protected getInitialCardIds(deck: Deck): number[] {
+    return [...(deck.cards ?? [])]
+  }
+
+  protected editorReturnScene(): string {
+    return 'DeckSelectorScene'
+  }
+
+  protected getDiscardBackMessage(): string {
+    return 'Discard your changes and return to deck selection screen?'
+  }
+
+  protected handlePlayClick(): void {
+    this.saveCurrentDeck()
+    // NOTE Necessary because play menu could change this, and if closed+reopened it be desync
+    UserSettings._set('equippedDeckIndex', this.deckIndex)
+    this.scene.launch('MenuScene', { menu: 'play', activeScene: this })
   }
 
   private createElements(deck: Deck): void {
@@ -90,15 +119,10 @@ export default class DeckEditorScene extends BaseScene {
       onDeckNameClick: () => this.openDeckNameMenu(),
       onSave: () => {
         this.saveCurrentDeck()
-        this.scene.start('DeckSelectorScene')
+        this.scene.start(this.editorReturnScene())
       },
       onCosmetics: () => this.openStylesMenu(),
-      onPlay: () => {
-        this.saveCurrentDeck()
-        // NOTE Necessary because play menu could change this, and if closed+reopened it be desync
-        UserSettings._set('equippedDeckIndex', this.deckIndex)
-        this.scene.launch('MenuScene', { menu: 'play', activeScene: this })
-      },
+      onPlay: () => this.handlePlayClick(),
     })
 
     // Make the main sizer
@@ -203,7 +227,7 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   // Persist current version of deck into UserSettings
-  private saveCurrentDeck(): void {
+  protected saveCurrentDeck(): void {
     this.ensureDeckAtIndex()
 
     // Get the deck
@@ -224,18 +248,20 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   private handleBack(): void {
+    const dest = this.editorReturnScene()
+
     if (!this.hasChanges()) {
       // Menu isn't opening, so play the click sound
       this.playSound('click')
-      this.scene.start('DeckSelectorScene')
+      this.scene.start(dest)
       return
     }
 
     // Open confirmation menu to confirm changes
     this.scene.launch('MenuScene', {
       menu: 'confirm',
-      text: 'Discard your changes and return to deck selection screen?',
-      callback: () => this.scene.start('DeckSelectorScene'),
+      text: this.getDiscardBackMessage(),
+      callback: () => this.scene.start(dest),
     })
   }
 
@@ -266,7 +292,7 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   /** Utility */
-  private getDeckCode(): number[] {
+  protected getDeckCode(): number[] {
     return this.deckRegion.decklist.getDeckCode()
   }
 

@@ -19,7 +19,7 @@ import {
   Style,
   UserSettings,
 } from '../../settings/settings'
-import { BuilderScene } from '../builderScene'
+import type { BuilderScene } from '../builderScene'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { Deck } from '../../../../shared/types/deck'

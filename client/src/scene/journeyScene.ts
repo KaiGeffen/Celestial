@@ -968,7 +968,9 @@ export default class JourneyScene extends BaseScene {
   private missionOnClick(mission: MissionDetails): () => void {
     return () => {
       if ('deck' in mission) {
-        this.scene.start('MapJourneyBuilderScene', mission)
+        // TODO Equipped deck doesnt need to be used
+        const deckIndex = UserSettings._get('equippedDeckIndex') ?? 0
+        this.scene.start('JourneyEditorScene', { deckIndex, mission })
       } else if ('tip' in mission) {
         // Tip node: mark complete and show tip popup
         UserSettings._setIndex('completedMissions', mission.id, true)

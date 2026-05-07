@@ -10,9 +10,9 @@ import {
 } from './scene/matchScene'
 import { SpectatorMatchScene } from './scene/spectatorMatchScene'
 import TutorialMatchScene from './scene/tutorialScene'
-import { BuilderScene, MapJourneyBuilderScene } from './scene/builderScene'
 import DeckSelectorScene from './scene/deckSelectorScene'
 import DeckEditorScene from './scene/deckEditorScene'
+import JourneyEditorScene from './scene/journeyEditorScene'
 import MatchHistoryScene from './scene/matchHistoryScene'
 
 import OpeningScene from './scene/openingScene'
@@ -58,16 +58,15 @@ const config: Phaser.Types.Core.GameConfig = {
     TutorialMatchScene,
     OpeningScene,
     PlaceholderScene,
-    BuilderScene,
     DeckSelectorScene,
     DeckEditorScene,
+    JourneyEditorScene,
     MapScene,
     MatchHistoryScene,
     StoreScene,
     // Allowing old map based journey mode
     JourneyScene,
     JourneyMatchScene,
-    MapJourneyBuilderScene,
     // Race mode
     RaceScene,
     RaceMatchScene,

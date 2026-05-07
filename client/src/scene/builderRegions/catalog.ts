@@ -10,7 +10,7 @@ import { UserSettings } from '../../settings/userSettings'
 
 // Region where all of the available cards can be scrolled through
 export default class CatalogRegion {
-  // Overwrite the 'scene' property of container to specifically be a BuilderScene
+  // Overwrite the 'scene' property of container to specifically be a BuilderBase scene
   scene: BuilderBase
 
   // The scrollable panel on which the catalog exists

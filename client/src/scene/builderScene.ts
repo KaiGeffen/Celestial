@@ -1,3 +1,7 @@
+/**
+ * Deprecated legacy builder UI — these scenes are intentionally not registered in `app.ts`.
+ * Use `DeckEditorScene` / `deckEditor/*` for deck editing. Kept only as a reference port.
+ */
 import 'phaser'
 import Card from '../../../shared/state/card'
 import BaseScene from './baseScene'
