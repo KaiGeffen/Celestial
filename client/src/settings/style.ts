@@ -271,8 +271,17 @@ const StyleJourney: StyleDict = {
   // Journey scene overlay header / navigation arrows
   journeyOverlay: {
     fontFamily: altFont,
-    fontSize: '30px',
-    color: '#f5f2eb',
+    fontSize: '36px',
+    color: Color.whiteS,
+    stroke: Color.goldS,
+    strokeThickness: 3,
+    shadow: {
+      offsetX: 2,
+      offsetY: 2,
+      color: 'rgba(0,0,0,0.5)',
+      blur: 4,
+      fill: true,
+    },
   },
   // Locked deck label in journey
   journeyLocked: {

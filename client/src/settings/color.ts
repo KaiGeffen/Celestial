@@ -55,6 +55,7 @@ export const Color: Record<string, any> = {
   darkBlue: CoreColors.darkBlue,
   darkBlueS: CoreColors.darkBlueS,
   grey: CoreColors.grey,
+  brown: CoreColors.brown,
 
   // GENERAL
   header: CoreColors.brown,

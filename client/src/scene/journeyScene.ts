@@ -33,7 +33,7 @@ import JOURNEY_CHOICES, {
 import Server from '../server'
 
 const OVERLAY_WIDTH = 575
-const OVERLAY_HEIGHT = 595
+const OVERLAY_HEIGHT = 603
 const OVERLAY_TOP = 80
 
 // TODO Remove 'message' menus, they are no longer used
@@ -139,15 +139,6 @@ export default class JourneyScene extends BaseScene {
     // Add buttons
     this.createBackButton()
 
-    // Add race button if dev mode is enabled
-    // if (Flags.devCardsEnabled) {
-    //   this.createRaceButton()
-    // }
-
-    if (params.stillframe !== undefined) {
-      this.createStillframe(params)
-    }
-
     // Make up pop-up for the card you just received, if there is one
     if (params.card) {
       this.createCardPopup(params)
@@ -217,9 +208,7 @@ export default class JourneyScene extends BaseScene {
       space: { item: 6 },
     })
 
-    const overlayBackground = this.add
-      .rectangle(0, 0, OVERLAY_WIDTH, OVERLAY_HEIGHT, Color.backgroundLight)
-      .setOrigin(0)
+    const overlayBackground = this.add.image(0, 0, 'background-Light')
 
     this.overlayPanel = newScrollablePanel(this, {
       x: Space.windowWidth - OVERLAY_WIDTH - 20,
@@ -333,29 +322,23 @@ export default class JourneyScene extends BaseScene {
   private createOverlayHeader(
     themes: ReturnType<typeof getMissionsByTheme>,
   ): Phaser.GameObjects.GameObject {
-    const headerBg = this.add
-      .rectangle(0, 0, 420, 420, 0x353f4e, 1)
-      .setOrigin(0)
-      .setInteractive()
+    // Background
+    const headerBg = this.add.image(0, 0, 'chrome-header').setInteractive()
     const headerSizer = this.rexUI.add
       .sizer({
         orientation: 'horizontal',
         width: OVERLAY_WIDTH,
-        space: { left: 12, right: 12, top: 14, bottom: 14 },
+        space: { left: 12, right: 12, top: 12, bottom: 12 },
       })
       .addBackground(headerBg)
 
+    // Header title text
     this.overlayHeaderText = this.add
       .text(0, 0, '', Style.journeyOverlay)
       .setOrigin(0.5, 0.5)
 
-    const leftArrowContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      TODO_ICON_SIZE,
-      TODO_ICON_SIZE,
-    )
+    // Arrows
+    const leftArrowContainer = new ContainerLite(this, 0, 0, 50, 50)
     new Buttons.Icon({
       within: leftArrowContainer,
       name: 'Left',
@@ -365,15 +348,8 @@ export default class JourneyScene extends BaseScene {
           (this.selectedThemeIndex - 1 + themes.length) % themes.length
         this.refreshOverlayContent()
       },
-      size: TODO_ICON_SIZE,
     })
-    const rightArrowContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      TODO_ICON_SIZE,
-      TODO_ICON_SIZE,
-    )
+    const rightArrowContainer = new ContainerLite(this, 0, 0, 50, 50)
     new Buttons.Icon({
       within: rightArrowContainer,
       name: 'Right',
@@ -382,9 +358,9 @@ export default class JourneyScene extends BaseScene {
         this.selectedThemeIndex = (this.selectedThemeIndex + 1) % themes.length
         this.refreshOverlayContent()
       },
-      size: TODO_ICON_SIZE,
     })
 
+    // Character writing icon
     this.overlayArtButtonContainer = new ContainerLite(
       this,
       0,
@@ -402,33 +378,14 @@ export default class JourneyScene extends BaseScene {
         }
       },
     })
-    overlayArtButton.icon.setTintFill(Color.backgroundLight)
+    overlayArtButton.icon.setTintFill(Color.white)
 
-    const sideControlsWidth = TODO_ICON_SIZE * 2 + Space.pad
-    const leftControls = this.rexUI.add.sizer({
-      orientation: 'horizontal',
-      width: sideControlsWidth,
-      space: { item: Space.pad },
-    })
-    leftControls
-      .add(leftArrowContainer, { align: 'center' })
-      .add(this.overlayArtButtonContainer, {
-        align: 'center',
-      })
-
-    const rightControls = this.rexUI.add.sizer({
-      orientation: 'horizontal',
-      width: sideControlsWidth,
-    })
-    rightControls.addSpace().add(rightArrowContainer, { align: 'center' })
-
+    // Add everything to the sizer
     headerSizer
-      .add(leftControls, { align: 'center' })
-      .addSpace()
-      .add(this.overlayHeaderText, { proportion: 1, align: 'center' })
-      .addSpace()
-      .add(rightControls, { align: 'center' })
-    headerSizer.layout()
+      .add(leftArrowContainer)
+      .add(this.overlayArtButtonContainer)
+      .add(this.overlayHeaderText, { proportion: 1 })
+      .add(rightArrowContainer)
     return headerSizer
   }
 
@@ -608,9 +565,6 @@ export default class JourneyScene extends BaseScene {
       width: rowWidth,
       space: { left: 4, right: 4, top: 4, bottom: 4, item: 8 },
     })
-
-    const rowBg = this.add.rectangle(0, 0, 1, 1, 0xf5f2eb).setOrigin(0)
-    row.addBackground(rowBg)
 
     const isCompleted = completed[mission.id]
     const isUnlocked = this.isMissionUnlocked(mission, completed)
@@ -792,30 +746,10 @@ export default class JourneyScene extends BaseScene {
     new Buttons.Basic({
       within: this,
       text: 'Back',
-      x: Space.pad + Space.buttonWidth / 2,
-      y: Space.buttonHeight / 2 + Space.pad,
+      x: Space.padSmall + Space.buttonWidth / 2,
+      y: Space.padSmall + Space.buttonHeight / 2,
       f: () => {
         this.scene.start('HomeScene')
-      },
-      depth: 10,
-    }).setNoScroll()
-  }
-
-  private createRaceButton(): void {
-    const x =
-      Space.windowWidth -
-      Space.buttonWidth / 2 -
-      (TODO_ICON_SIZE + Space.pad * 2) -
-      Space.buttonWidth * 2 -
-      Space.pad * 2
-    const y = Space.buttonHeight / 2 + Space.pad
-    new Buttons.Basic({
-      within: this,
-      text: 'Race',
-      x,
-      y,
-      f: () => {
-        this.scene.start('RaceScene', {})
       },
       depth: 10,
     }).setNoScroll()
@@ -846,113 +780,6 @@ export default class JourneyScene extends BaseScene {
     // Clear params
     params.txt = ''
     params.card = undefined
-  }
-
-  // Create a stillframe animation specified in params
-  private createStillframe(params): void {
-    // TODO Make dry with the searching tutorial class implementation
-
-    // Height of the tutorial text
-    const TEXT_HEIGHT = 225
-
-    let container = this.add.container().setDepth(11)
-
-    let img = this.add
-      .image(Space.windowWidth / 2, 0, `journey-Story 4`)
-      .setOrigin(0.5, 0)
-      .setInteractive()
-
-    // Ensure that image fits perfectly in window
-    const scale = Space.windowWidth / img.displayWidth
-    img.setScale(scale)
-
-    // Text background
-    let background = this.add
-      .rectangle(
-        0,
-        Space.windowHeight - TEXT_HEIGHT,
-        Space.windowWidth,
-        TEXT_HEIGHT,
-        Color.backgroundLight,
-      )
-      .setOrigin(0)
-    this.plugins.get('rexDropShadowPipeline')['add'](background, {
-      distance: 3,
-      shadowColor: 0x000000,
-    })
-
-    // Add text
-    let txt = this.add
-      .text(0, 0, '', Style.stillframe)
-      .setWordWrapWidth(Space.stillframeTextWidth)
-
-    const s =
-      "Impressive, all that life, all that wonder. You are welcomed in of course. But if I might share one thing that I've learned in my time here... It's that someday, everything blows away."
-
-    let textbox = this.rexUI.add
-      .textBox({
-        text: txt,
-        x: Space.pad,
-        y: background.y,
-        space: {
-          left: Space.pad,
-          right: Space.pad,
-          top: Space.pad,
-          bottom: Space.pad,
-        },
-        page: {
-          maxLines: 0, // 0 = unlimited lines
-        },
-      })
-      .start(s, JOURNEY_TEXTBOX_TYPE_MS)
-      .setOrigin(0)
-
-    container.add([img, background, txt, textbox])
-
-    // Add an okay button
-    let btn = new Buttons.Basic({
-      within: container,
-      text: 'Continue',
-      x: Space.windowWidth - Space.pad - Space.buttonWidth / 2,
-      y: Space.windowHeight - Space.pad - Space.buttonHeight / 2,
-      f: () => {
-        // If typing isn't complete, complete it
-        if (textbox.isTyping) {
-          textbox.stop(true)
-        }
-        // Otherwise move on to the next frame
-        else {
-          this.tweens.add({
-            targets: container,
-            alpha: 0,
-            duration: Time.general.journeyStillframeFadeMs,
-            onComplete: () => {
-              container.setVisible(false)
-              container.alpha = 1
-            },
-          })
-
-          this.scene.start('PlaceholderScene')
-        }
-      },
-    })
-
-    // Scroll the image going down
-    this.add.tween({
-      targets: img,
-      duration: Time.general.journeyStillframeScrollMs,
-      ease: Ease.stillframe,
-      y: Space.windowHeight - img.displayHeight,
-      onStart: () => {
-        img.y = 0
-      },
-    })
-
-    // Set the param to undefined so it doesn't persist
-    params.stillframe = undefined
-
-    const coords = UserSettings._get('journeyCoordinates')
-    container.setPosition(coords.x, coords.y)
   }
 
   private static rememberCoordinates(
