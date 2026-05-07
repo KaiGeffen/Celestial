@@ -451,8 +451,8 @@ export const BBStyle: Record<string, any> = {
     strokeThickness: 2,
   },
   missionName: {
-    fontFamily: sansFont,
-    fontSize: '18px',
+    fontFamily: secondaryFont,
+    fontSize: '20px',
     color: Color.basicText,
   },
   cardCost: {

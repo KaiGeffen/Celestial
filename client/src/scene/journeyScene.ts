@@ -569,7 +569,7 @@ export default class JourneyScene extends BaseScene {
     const row = this.rexUI.add.sizer({
       orientation: 'horizontal',
       width: rowWidth,
-      space: { left: 4, right: 4, top: 4, bottom: 4, item: 8 },
+      space: { left: 4, right: 4, top: 4, bottom: 4, item: Space.padSmall },
     })
 
     const isCompleted = completed[mission.id]
@@ -587,7 +587,7 @@ export default class JourneyScene extends BaseScene {
     if (isCompleted) {
       const hasClaimedMissionGold =
         Server.getUserData().missionGoldClaimed?.[mission.id] ?? false
-      new Buttons.Icon({
+      const btn = new Buttons.Icon({
         within: iconCell,
         name: 'Quest',
         muteClick: true,
@@ -612,14 +612,14 @@ export default class JourneyScene extends BaseScene {
                 )
                 this.scene.launch('MenuScene', {
                   menu: 'chapterMessage',
-                  title: `${avatarNames[avatarIndex]} — ${mission.name}`,
+                  title: mission.name,
                   s: resultText,
                   claimGoldMissionId: mission.id,
                 })
               } else {
                 this.scene.launch('MenuScene', {
                   menu: 'choiceChapterMessage',
-                  title: `${avatarNames[avatarIndex]} — ${mission.name}`,
+                  title: mission.name,
                   avatarIndex,
                   claimGoldMissionId: mission.id,
                 })
@@ -632,7 +632,7 @@ export default class JourneyScene extends BaseScene {
                   .trim()
               this.scene.launch('MenuScene', {
                 menu: 'chapterMessage',
-                title: `${avatarNames[avatarIndex]} — ${mission.name}`,
+                title: mission.name,
                 s: storyText,
                 claimGoldMissionId: mission.id,
               })
@@ -647,6 +647,9 @@ export default class JourneyScene extends BaseScene {
           }
         },
       })
+      btn.icon.setTintFill(Color.brown)
+
+      // Add a notification badge if the mission has not been claimed
       if (!hasClaimedMissionGold) {
         const badge = this.add.circle(
           TODO_ICON_SIZE / 2 - 5,
