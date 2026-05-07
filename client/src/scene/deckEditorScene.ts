@@ -12,10 +12,16 @@ import { MechanicsSettings } from '../../../shared/settings'
 
 import Server from '../server'
 import { DeckEditorCatalog } from './deckEditor/deckEditorCatalog'
-import { DeckEditorDeck } from './deckEditor/deckEditorDeck'
+import {
+  DeckEditorDeck,
+  DeckEditorDeckJourney,
+  type DeckEditorDeckOptions,
+  type RightCol,
+} from './deckEditor/deckEditorSideCol'
+import type { MissionDetails } from '../../../shared/journey/journey'
 
 export type { DeckEditorCatalogOptions } from './deckEditor/deckEditorCatalog'
-export type { DeckEditorDeckOptions } from './deckEditor/deckEditorDeck'
+export type { DeckEditorDeckOptions } from './deckEditor/deckEditorSideCol'
 
 export default class DeckEditorScene extends BaseScene {
   // Currently selected deck index
@@ -34,7 +40,7 @@ export default class DeckEditorScene extends BaseScene {
 
   // Regions
   private catalogRegion: DeckEditorCatalog
-  private deckRegion: DeckEditorDeck
+  private deckRegion: RightCol
 
   // Root sizer spanning the full window — catalog on the left, deck on the right
   private sizer: RexUIPlugin.Sizer
@@ -96,11 +102,19 @@ export default class DeckEditorScene extends BaseScene {
     return 'Discard your changes and return to deck selection screen?'
   }
 
+  protected shouldConfirmOnBack(): boolean {
+    return true
+  }
+
   protected handlePlayClick(): void {
     this.saveCurrentDeck()
     // NOTE Necessary because play menu could change this, and if closed+reopened it be desync
     UserSettings._set('equippedDeckIndex', this.deckIndex)
     this.scene.launch('MenuScene', { menu: 'play', activeScene: this })
+  }
+
+  protected createDeckRegion(opts: DeckEditorDeckOptions): RightCol {
+    return new DeckEditorDeck(this, opts)
   }
 
   private createElements(deck: Deck): void {
@@ -113,7 +127,7 @@ export default class DeckEditorScene extends BaseScene {
     })
 
     // Deck region
-    this.deckRegion = new DeckEditorDeck(this, {
+    this.deckRegion = this.createDeckRegion({
       deckName: this.deckName,
       cosmeticSet: this.cosmeticSet,
       deckCards: Catalog.getCardListByIds(deck.cards),
@@ -218,12 +232,9 @@ export default class DeckEditorScene extends BaseScene {
           this.addCardToDeck(cutout.card)
         } else {
           // Remove 1 of the card
-          const fullyRemoved = this.deckRegion.decklist.removeCard(cutout.card)
-
-          // If no more of the card exists, update the layout
-          if (fullyRemoved) {
-            this.deckRegion.layoutDecklist()
-          }
+          this.deckRegion.decklist.removeCard(cutout.card)
+          // Always refresh layout/footer state after a removal, even when the cutout remains.
+          this.deckRegion.layoutDecklist()
 
           // Update the thumbnail
           this.syncDeckThumbnail()
@@ -256,9 +267,9 @@ export default class DeckEditorScene extends BaseScene {
   private handleBack(): void {
     const dest = this.editorReturnScene()
 
-    // If there are no unsaved changes, navigate directly.
+    // If confirmation is disabled or there are no unsaved changes, navigate directly.
     // The confirm dialog plays its own click sound, so only play it on the direct path.
-    if (!this.hasChanges()) {
+    if (!this.shouldConfirmOnBack() || !this.hasChanges()) {
       // Menu isn't opening, so play the click sound
       this.playSound('click')
       this.scene.start(dest)
@@ -369,5 +380,84 @@ export default class DeckEditorScene extends BaseScene {
       this.cosmeticSet = cosmeticSet
     }
     this.syncDeckThumbnail()
+  }
+}
+
+export class DeckEditorJourneyScene extends DeckEditorScene {
+  private mission!: MissionDetails
+
+  constructor() {
+    super('DeckEditorJourneyScene', 'JourneyScene')
+  }
+
+  create(params: { deckIndex: number; mission?: MissionDetails }) {
+    this.mission = params.mission
+    if (!this.mission) {
+      this.showMessage('Mission data is missing.')
+      this.scene.start('JourneyScene')
+      return
+    }
+    // Journey editor does not depend on equipped deck selection.
+    super.create({ deckIndex: 0 })
+  }
+
+  protected createDeckRegion(opts: DeckEditorDeckOptions): RightCol {
+    return new DeckEditorDeckJourney(this, {
+      ...opts,
+      requiredCards: Catalog.getCardListByIds(this.mission.deck ?? []),
+    })
+  }
+
+  protected editorReturnScene(): string {
+    return 'JourneyScene'
+  }
+
+  protected getDiscardBackMessage(): string {
+    return 'Discard your changes and return to the journey map?'
+  }
+
+  protected shouldConfirmOnBack(): boolean {
+    return false
+  }
+
+  protected saveCurrentDeck(): void {}
+
+  protected handlePlayClick(): void {
+    const opponent = this.mission.opponent
+    if (!opponent?.length) {
+      this.showMessage('This mission is missing opponent data.')
+      return
+    }
+
+    const cosmeticSet =
+      this.cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 }
+
+    const playerDeck: Deck = {
+      name: this.deckName,
+      cards: this.getDeckCode(),
+      cosmeticSet,
+    }
+
+    const aiDeck: Deck = {
+      name: 'AI Deck',
+      cards: opponent,
+      cosmeticSet: {
+        avatar: 0,
+        border: 0,
+        cardback: 0,
+        relic: 0,
+      },
+    }
+
+    this.scene.start('JourneyMatchScene', {
+      deck: playerDeck,
+      aiDeck,
+      missionID: this.mission.id,
+      missionCards: this.mission.cards ?? [],
+    })
+  }
+
+  protected getInitialCardIds(deck: Deck): number[] {
+    return []
   }
 }

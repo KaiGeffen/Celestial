@@ -281,6 +281,12 @@ const StyleJourney: StyleDict = {
     color: '#555555',
     wordWrap: { width: Space.maxTextWidth },
   },
+  // Journey required/chosen cards headers
+  journeyRequiredAndChosenHeader: {
+    fontFamily: primaryFont,
+    fontSize: '24px',
+    color: Color.basicText,
+  },
 }
 
 // Styles that are no longer used in any in-use scenes

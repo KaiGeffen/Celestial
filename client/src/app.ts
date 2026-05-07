@@ -11,8 +11,7 @@ import {
 import { SpectatorMatchScene } from './scene/spectatorMatchScene'
 import TutorialMatchScene from './scene/tutorialScene'
 import DeckSelectorScene from './scene/deckSelectorScene'
-import DeckEditorScene from './scene/deckEditorScene'
-import JourneyEditorScene from './scene/journeyEditorScene'
+import DeckEditorScene, { DeckEditorJourneyScene } from './scene/deckEditorScene'
 import MatchHistoryScene from './scene/matchHistoryScene'
 
 import OpeningScene from './scene/openingScene'
@@ -60,7 +59,7 @@ const config: Phaser.Types.Core.GameConfig = {
     PlaceholderScene,
     DeckSelectorScene,
     DeckEditorScene,
-    JourneyEditorScene,
+    DeckEditorJourneyScene,
     MapScene,
     MatchHistoryScene,
     StoreScene,
