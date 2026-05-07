@@ -37,6 +37,11 @@ export default class Decklist {
 
   // Add a new card to the deck
   addCard(card: Card) {
+    if (this.countCards >= 99) {
+      this.scene.signalError('Too many cards!')
+      return
+    }
+
     // If card exists in deck with same ID AND version, increment it
     for (let i = 0; i < this.cutouts.length; i++) {
       const cutout = this.cutouts[i]
