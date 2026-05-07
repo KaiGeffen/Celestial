@@ -8,6 +8,9 @@ import { TUTORIAL_LENGTH } from '../../../shared/settings'
 const IMAGE_HEIGHT_RATIO = 0.72
 const TYPEWRITER_DELAY_MS = 30
 const TWEEN_DURATION = 5000
+const BOTTOM_CHROME_HEIGHT = 330
+const SLIDE_WIDTH = 1428
+const SLIDE_HEIGHT = 936
 
 interface Slide {
   imageKey: string
@@ -115,31 +118,35 @@ export default class OpeningScene extends BaseScene {
 
   private createChrome(): void {
     const chromeKey = 'chrome-builderHeader'
+    const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
+    const frameHeight = Math.max(1, Space.windowHeight - BOTTOM_CHROME_HEIGHT)
+    const frameWidth = Math.min(Space.windowWidth, frameHeight * slideRatio)
 
     // Left and rightpanel
+    const dx = Math.max(0, (Space.windowWidth - frameWidth) / 2)
     const leftChrome = this.add
-      .image(0, 0, chromeKey)
-      .setOrigin(1, 0.5)
+      .image(dx, 0, chromeKey)
+      .setOrigin(1, 1)
       .setAngle(-90)
 
     const rightChrome = this.add
       .image(0, 0, chromeKey)
-      .setOrigin(0, 0.5)
+      .setOrigin(0, 1)
       .setAngle(90)
     this.plugins.get('rexAnchor')['add'](rightChrome, {
-      x: '100%',
+      x: `100%-${dx}`,
     })
 
     // Bottom panel (Behind text)
     const bottomChrome = this.add
       .image(0, 0, chromeKey)
-      .setOrigin(0.5, 0)
+      .setOrigin(0.5, 1)
       .setAngle(180)
       .setInteractive()
       .on('pointerdown', () => this.onAdvance())
     this.plugins.get('rexAnchor')['add'](bottomChrome, {
       x: '50%',
-      y: '100%+40',
+      y: `100%-${BOTTOM_CHROME_HEIGHT}`,
     })
   }
 
