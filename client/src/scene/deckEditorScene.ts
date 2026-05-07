@@ -36,6 +36,7 @@ export default class DeckEditorScene extends BaseScene {
   private catalogRegion: DeckEditorCatalog
   private deckRegion: DeckEditorDeck
 
+  // Root sizer spanning the full window — catalog on the left, deck on the right
   private sizer: RexUIPlugin.Sizer
 
   constructor(
@@ -59,10 +60,11 @@ export default class DeckEditorScene extends BaseScene {
     const decks = UserSettings._get('decks')
     const deck: Deck = decks[this.deckIndex]
 
-    // Set this classes variables
+    // Initialize live state from the saved deck
     this.deckName = deck.name
     this.cosmeticSet = deck.cosmeticSet
 
+    // getInitialCardIds allows subclasses (e.g. journey editor) to seed a different starting list
     const cardIds = this.getInitialCardIds(deck)
 
     // Snapshot for change detection
@@ -70,6 +72,7 @@ export default class DeckEditorScene extends BaseScene {
     this.originalName = deck.name
     this.originalCosmeticSet = { ...deck.cosmeticSet }
 
+    // Working copy — cards may differ from deck.cards when a subclass overrides getInitialCardIds
     const editingDeck: Deck = {
       ...deck,
       cards: cardIds,
@@ -114,7 +117,7 @@ export default class DeckEditorScene extends BaseScene {
       deckName: this.deckName,
       cosmeticSet: this.cosmeticSet,
       deckCards: Catalog.getCardListByIds(deck.cards),
-      mustOwnCardsInList: Flags.devCardsEnabled ? false : true,
+      mustOwnCardsInList: !Flags.devCardsEnabled,
       createCutoutInteraction: () => this.onClickCutout(),
       onDeckNameClick: () => this.openDeckNameMenu(),
       onSave: () => {
@@ -125,7 +128,7 @@ export default class DeckEditorScene extends BaseScene {
       onPlay: () => this.handlePlayClick(),
     })
 
-    // Make the main sizer
+    // Root sizer: catalog column fills remaining width, deck column is fixed-width on the right
     this.sizer = this.rexUI.add.sizer()
     this.sizer.add(this.catalogRegion.columnSizer)
     this.sizer.add(this.deckRegion.scrollPanel)
@@ -204,6 +207,9 @@ export default class DeckEditorScene extends BaseScene {
     })
   }
 
+  // Returns a factory: DeckEditorDeck calls this once at construction to get a per-cutout
+  // click-handler factory. The outer call receives a Cutout; the inner closure is the
+  // actual click handler bound to that cutout's card.
   private onClickCutout(): (cutout: Cutout) => () => void {
     return (cutout: Cutout) => {
       return () => {
@@ -250,6 +256,8 @@ export default class DeckEditorScene extends BaseScene {
   private handleBack(): void {
     const dest = this.editorReturnScene()
 
+    // If there are no unsaved changes, navigate directly.
+    // The confirm dialog plays its own click sound, so only play it on the direct path.
     if (!this.hasChanges()) {
       // Menu isn't opening, so play the click sound
       this.playSound('click')
@@ -281,6 +289,7 @@ export default class DeckEditorScene extends BaseScene {
     )
       return true
 
+    // Sort both before comparing — card order within a deck doesn't matter
     const current = [...this.getDeckCode()].sort((a, b) => a - b)
     const original = [...this.originalCards].sort((a, b) => a - b)
     if (current.length !== original.length) return true
@@ -307,10 +316,11 @@ export default class DeckEditorScene extends BaseScene {
     })
   }
 
+  // Replaces the entire decklist at once (e.g. paste/import), unlike addCardToDeck which appends one card
   private setDeck(cards: Card[]): void {
     this.deckRegion.decklist.setDeck(
       cards,
-      Flags.devCardsEnabled ? false : true,
+      !Flags.devCardsEnabled,
     )
     // Scroll to the top of the decklist
     this.deckRegion.scrollDecklistToTop()
