@@ -347,7 +347,6 @@ export const assetLists = {
       "JourneyTab",
       "LeaderboardTab",
       "Left",
-      "Left",
       "MatchHistoryTab",
       "Moon",
       "Network",
@@ -359,7 +358,6 @@ export const assetLists = {
       "Quest",
       "QuestsTab",
       "Recap",
-      "Right",
       "Right",
       "Search",
       "Share",
@@ -482,6 +480,27 @@ export const assetLists = {
       "Refresh"
     ],
     "pixelArt": true
+  },
+  "tutorial": {
+    "files": [
+      "1",
+      "2",
+      "2",
+      "3",
+      "3",
+      "4",
+      "5",
+      "5",
+      "6",
+      "6",
+      "7",
+      "7",
+      "8",
+      "9",
+      "old 1",
+      "old 1"
+    ],
+    "pixelArt": false
   },
   "sfx": {
     "files": [

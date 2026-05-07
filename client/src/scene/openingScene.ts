@@ -84,7 +84,6 @@ export default class OpeningScene extends BaseScene {
 
     this.imageW = Space.windowWidth
     this.imageH = Math.round(Space.windowHeight * IMAGE_HEIGHT_RATIO)
-    const panelH = Space.windowHeight - this.imageH
 
     // Dark backing behind slide image
     this.add.rectangle(0, 0, this.imageW, this.imageH, 0x0d0d1a).setOrigin(0)
@@ -94,24 +93,7 @@ export default class OpeningScene extends BaseScene {
       .image(this.imageW / 2, this.imageH / 2, '__DEFAULT')
       .setVisible(false)
 
-    // Text panel — click anywhere to advance
-    this.add
-      .rectangle(
-        0,
-        this.imageH,
-        Space.windowWidth,
-        panelH,
-        Color.backgroundDark,
-      )
-      .setOrigin(0)
-      .setInteractive()
-      .on('pointerdown', () => this.onAdvance())
-
-    // Body text
-    this.bodyText = this.add.text(Space.pad * 2, this.imageH + Space.pad, '', {
-      ...Style.announcementOverBlack,
-      wordWrap: { width: Space.windowWidth - Space.pad * 4 },
-    })
+    this.createChrome()
 
     // Next button anchored to bottom-right
     const nextContainer = new ContainerLite(
@@ -132,6 +114,46 @@ export default class OpeningScene extends BaseScene {
     })
 
     this.showSlide(0)
+  }
+
+  private createChrome(): void {
+    const panelTop = this.imageH
+    const panelHeight = Space.windowHeight - panelTop
+    const panelCenterY = panelTop + panelHeight / 2
+    const chromeKey = 'chrome-builderHeader'
+
+    // Left and rightpanel
+    const leftChrome = this.add
+      .image(0, 0, chromeKey)
+      .setOrigin(1, 0.5)
+      .setAngle(-90)
+
+    const rightChrome = this.add
+      .image(0, 0, chromeKey)
+      .setOrigin(0, 0.5)
+      .setAngle(90)
+    this.plugins.get('rexAnchor')['add'](rightChrome, {
+      x: '100%',
+    })
+
+    // Bottom panel (Behind text)
+    const bottomChrome = this.add
+      .image(0, 0, chromeKey)
+      .setOrigin(0.5, 0)
+      .setAngle(180)
+      .setInteractive()
+      .on('pointerdown', () => this.onAdvance())
+    this.plugins.get('rexAnchor')['add'](bottomChrome, {
+      x: '50%',
+      y: '100%+40',
+      // width: '100%',
+    })
+
+    // Body text on top of chrome
+    this.bodyText = this.add.text(Space.pad * 2, panelTop + Space.pad, '', {
+      ...Style.announcementOverBlack,
+      wordWrap: { width: Space.windowWidth - Space.pad * 4 },
+    })
   }
 
   private showSlide(i: number): void {

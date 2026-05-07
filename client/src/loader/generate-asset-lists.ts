@@ -31,6 +31,7 @@ const DIRECTORIES = [
   'img/roundResult',
   'img/chrome',
   'img/news',
+  'img/tutorial',
   'sfx',
   'dialog',
 ]
@@ -51,6 +52,7 @@ const NON_PIXEL_ART_DIRS = [
   'chrome',
   'icon',
   'cardback',
+  'tutorial',
 ]
 
 function getDirectoryKey(dir: string): string {
