@@ -540,8 +540,8 @@ export default class HomeScene extends BaseScene {
 
 const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   {
-    subheader: 'Celestial Decks on Steam',
-    body: `Our [area=_link_steam][stroke=${Color.goldS}]Steam page[/stroke][/area] is live! We'd love for you to wishlist it, and keep and eye out for the demo releasing soon.`,
+    subheader: 'Steam',
+    body: `The [area=_link_steam][stroke=${Color.goldS}]Steam demo[/stroke][/area] is live! Check it out there, and wishlist the full game to keep up with updates.`,
   },
   // {
   //   subheader: 'Congrats to Sherlock!',
@@ -549,10 +549,10 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   // },
   {
     subheader: 'Shell Mode',
-    body: `Each Saturday in May, we'll be playing a new mode called Shell Mode. Hop in to the [area=_link_discord][stroke=${Color.goldS}]Discord server[/stroke][/area] to learn more!`,
+    body: `Each Saturday in May, we'll be playing a new mode called Shell Mode. Hop on the [area=_link_discord][stroke=${Color.goldS}]Discord server[/stroke][/area] to learn more!`,
   },
   {
     subheader: 'Card Changes',
-    body: `🌱 [area=_Birdsong][stroke=${Color.goldS}]Birdsong[/stroke][/area] - New card released!\n👇 [area=_Hero][stroke=${Color.goldS}]Hero[/stroke][/area] - Exhale point +3 > +2\n👇 [area=_Clear View][stroke=${Color.goldS}]Clear View[/stroke][/area] - [area=_Seen][stroke=${Color.goldS}]Seen[/area][/stroke] sight 4 > 3\n👆 [area=_Phoenix][stroke=${Color.goldS}]Phoenix[/stroke][/area] - Points 3 > 4`,
+    body: `🌱 [area=_Birdsong][stroke=${Color.goldS}]Birdsong[/stroke][/area] - New card released!\n🔻 [area=_Hero][stroke=${Color.goldS}]Hero[/stroke][/area] - Exhale point +3 > +2\n🔻 [area=_Clear View][stroke=${Color.goldS}]Clear View[/stroke][/area] - [area=_Seen][stroke=${Color.goldS}]Seen[/area][/stroke] sight 4 > 3\n🔺 [area=_Phoenix][stroke=${Color.goldS}]Phoenix[/stroke][/area] - Points 3 > 4`,
   },
 ]
