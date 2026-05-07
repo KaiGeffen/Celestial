@@ -179,9 +179,14 @@ export default class OpeningScene extends BaseScene {
     if (this.textures.exists(imageKey)) {
       this.slideImage.setTexture(imageKey)
 
-      // Width-driven zoom: full width -> width minus 360px, preserving ratio.
+      // Compute the same framed area used by the chrome layout.
+      const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
+      const frameHeight = Math.max(1, Space.windowHeight - BOTTOM_CHROME_HEIGHT)
+      const frameWidth = Math.min(Space.windowWidth, frameHeight * slideRatio)
+
+      // Width-driven zoom: full width -> framed width, preserving ratio.
       const startScale = Space.windowWidth / this.slideImage.width
-      const targetWidth = Math.max(1, Space.windowWidth - 360)
+      const targetWidth = Math.max(1, frameWidth)
       const endScale = targetWidth / this.slideImage.width
 
       this.slideImage.setOrigin(0.5, 0).setPosition(this.imageW / 2, 0)
@@ -237,14 +242,21 @@ export default class OpeningScene extends BaseScene {
   }
 
   private onAdvance(): void {
+    const texts = SLIDES[this.slideIndex].texts
+
     if (this.typewriterEvent) {
       this.typewriterEvent.remove()
       this.typewriterEvent = null
       this.bodyText.setText(this.fullText)
+      const isLastTextForSlide = this.textIndex + 1 >= texts.length
+      if (isLastTextForSlide && this.slideTween) {
+        this.slideTween.seek(TWEEN_DURATION)
+        this.slideTween.complete()
+        this.slideTween = null
+      }
       return
     }
 
-    const texts = SLIDES[this.slideIndex].texts
     if (this.textIndex + 1 < texts.length) {
       this.textIndex++
       this.startTypewriter(texts[this.textIndex])
