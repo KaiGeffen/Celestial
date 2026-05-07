@@ -179,18 +179,14 @@ export class DeckEditorCatalog {
         this.onCostChipClick(i),
       )
 
-      // If this is currently selected, toggle on
-      if (this.filterCostAry[i]) {
-        btn.toggle()
-      }
       this.costFilterBtns.push(btn)
     }
 
     // Populate sizer
     this.headerSizer.add(this.createBackButton())
-    this.headerSizer.add(sizerCostChips, { proportion: 1 })
+    this.headerSizer.add(sizerCostChips, { proportion: 7 / 13 })
     this.headerSizer.add(this.createSearchField(), {
-      proportion: 1,
+      proportion: 6 / 13,
     })
     this.headerSizer.add(this.createSortButton())
 
