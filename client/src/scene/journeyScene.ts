@@ -31,9 +31,10 @@ import JOURNEY_CHOICES, {
   formatJourneyFinaleChapterBody,
 } from '../data/journeyChoices'
 import Server from '../server'
+import Button from '../lib/buttons/button'
 
 const OVERLAY_WIDTH = 575
-const OVERLAY_HEIGHT = 603
+const OVERLAY_HEIGHT = 606
 const OVERLAY_TOP = 80
 
 // TODO Remove 'message' menus, they are no longer used
@@ -83,13 +84,15 @@ export default class JourneyScene extends BaseScene {
   private driftCenterX = 0
   private driftCenterY = 0
 
+  // Button that toggles writing about the character
+  private btnCharacterDescription: Button
+
   private isTweeningCamera = false
   private selectedThemeIndex = 0
   private previousThemeIndex = 0
   private showOverlayCharacterView = false
   private overlayHeaderText: Phaser.GameObjects.Text
   private overlayPanel: ScrollablePanel
-  private overlayArtButtonContainer: ContainerLite
   private missionTipContainer: Phaser.GameObjects.Container
   private missionTipBg: Phaser.GameObjects.Rectangle
   private missionTipTextBox: Phaser.GameObjects.GameObject & {
@@ -361,15 +364,15 @@ export default class JourneyScene extends BaseScene {
     })
 
     // Character writing icon
-    this.overlayArtButtonContainer = new ContainerLite(
+    const btnContainer = new ContainerLite(
       this,
       0,
       0,
       TODO_ICON_SIZE,
       TODO_ICON_SIZE,
     )
-    const overlayArtButton = new Buttons.Icon({
-      within: this.overlayArtButtonContainer,
+    this.btnCharacterDescription = new Buttons.Icon({
+      within: btnContainer,
       name: 'Quest',
       f: () => {
         if (this.selectedThemeIndex < avatarNames.length) {
@@ -378,12 +381,12 @@ export default class JourneyScene extends BaseScene {
         }
       },
     })
-    overlayArtButton.icon.setTintFill(Color.white)
+    this.btnCharacterDescription.icon.setTintFill(Color.white)
 
     // Add everything to the sizer
     headerSizer
       .add(leftArrowContainer)
-      .add(this.overlayArtButtonContainer)
+      .add(btnContainer)
       .add(this.overlayHeaderText, { proportion: 1 })
       .add(rightArrowContainer)
     return headerSizer
@@ -479,7 +482,10 @@ export default class JourneyScene extends BaseScene {
 
   private refreshOverlayCharacterArt(): void {
     const hasCharacterArt = this.selectedThemeIndex < avatarNames.length
-    this.overlayArtButtonContainer.setVisible(hasCharacterArt)
+
+    // Button is enabled/not based on if character has art
+    const invert = !hasCharacterArt
+    this.btnCharacterDescription.enable(invert)
 
     if (!hasCharacterArt) {
       this.overlayCharacterImage.setVisible(false)
