@@ -7,6 +7,7 @@ import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
 const IMAGE_HEIGHT_RATIO = 0.72
 const TYPEWRITER_DELAY_MS = 30
+const TWEEN_DURATION = 5000
 
 interface Slide {
   imageKey: string
@@ -171,18 +172,13 @@ export default class OpeningScene extends BaseScene {
     if (this.textures.exists(imageKey)) {
       this.slideImage.setTexture(imageKey)
 
-      // Start at full-screen cover, then tween down to the visible top-region cover.
-      const fullScreenScale = Math.max(
-        Space.windowWidth / this.slideImage.width,
-        Space.windowHeight / this.slideImage.height,
-      )
-      const visibleScale = Math.max(
-        this.imageW / this.slideImage.width,
-        this.imageH / this.slideImage.height,
-      )
+      // Width-driven zoom: full width -> width minus 360px, preserving ratio.
+      const startScale = Space.windowWidth / this.slideImage.width
+      const targetWidth = Math.max(1, Space.windowWidth - 360)
+      const endScale = targetWidth / this.slideImage.width
 
       this.slideImage.setOrigin(0.5, 0).setPosition(this.imageW / 2, 0)
-      this.slideImage.setScale(fullScreenScale).setVisible(true)
+      this.slideImage.setScale(startScale).setVisible(true)
 
       if (this.slideTween) {
         this.slideTween.stop()
@@ -190,9 +186,9 @@ export default class OpeningScene extends BaseScene {
       }
       this.slideTween = this.tweens.add({
         targets: this.slideImage,
-        scaleX: visibleScale,
-        scaleY: visibleScale,
-        duration: 500,
+        scaleX: endScale,
+        scaleY: endScale,
+        duration: TWEEN_DURATION,
         ease: 'Sine.Out',
         onComplete: () => {
           this.slideTween = null

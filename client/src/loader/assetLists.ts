@@ -521,5 +521,22 @@ export const assetLists = {
   },
   "dialog": {
     "files": []
+  },
+  "tutorial": {
+    "files": [
+      "1",
+      "2",
+      "2",
+      "3",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "old 1"
+    ],
+    "pixelArt": false
   }
 } as const;

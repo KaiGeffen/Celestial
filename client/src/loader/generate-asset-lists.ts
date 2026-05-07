@@ -33,6 +33,8 @@ const DIRECTORIES = [
   'img/news',
   'sfx',
   'dialog',
+  // TODO Remove - just doing this to convert to webp
+  'img/tutorial',
 ]
 
 // Directories that should not use pixel art
@@ -51,6 +53,7 @@ const NON_PIXEL_ART_DIRS = [
   'chrome',
   'icon',
   'cardback',
+  'tutorial',
 ]
 
 function getDirectoryKey(dir: string): string {
