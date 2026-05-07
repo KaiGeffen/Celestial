@@ -1,10 +1,7 @@
 import 'phaser'
-import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-
 import BaseScene from './baseScene'
-import Buttons from '../lib/buttons/buttons'
 import Loader from '../loader/loader'
-import { Color, Space, Style } from '../settings/settings'
+import { Space, Style } from '../settings/settings'
 import { UserSettings } from '../settings/userSettings'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
@@ -64,10 +61,12 @@ export default class OpeningScene extends BaseScene {
   private slideIndex = 0
   private textIndex = 0
   private slideImage: Phaser.GameObjects.Image
+  // TODO Remove
   private imageW: number
   private imageH: number
   private bodyText: Phaser.GameObjects.Text
   private typewriterEvent: Phaser.Time.TimerEvent | null = null
+  private slideTween: Phaser.Tweens.Tween | null = null
   private fullText = ''
   private charIndex = 0
 
@@ -82,44 +81,38 @@ export default class OpeningScene extends BaseScene {
   create(): void {
     super.create()
 
-    this.imageW = Space.windowWidth
-    this.imageH = Math.round(Space.windowHeight * IMAGE_HEIGHT_RATIO)
-
-    // Dark backing behind slide image
-    this.add.rectangle(0, 0, this.imageW, this.imageH, 0x0d0d1a).setOrigin(0)
-
-    // Slide image — cover-fit, centered; overflow goes off-screen
-    this.slideImage = this.add
-      .image(this.imageW / 2, this.imageH / 2, '__DEFAULT')
-      .setVisible(false)
-
+    this.createSlideImage()
     this.createChrome()
-
-    // Next button anchored to bottom-right
-    const nextContainer = new ContainerLite(
-      this,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: nextContainer,
-      text: 'Next',
-      f: () => this.onAdvance(),
-    })
-    ;(this.plugins.get('rexAnchor') as any).add(nextContainer, {
-      right: `right-${Space.pad}`,
-      bottom: `bottom-${Space.pad}`,
-    })
+    this.createText()
 
     this.showSlide(0)
   }
 
+  private createSlideImage(): void {
+    this.imageW = Space.windowWidth
+    this.imageH = Math.round(Space.windowHeight * IMAGE_HEIGHT_RATIO)
+
+    // Slide image — cover-fit, centered; overflow goes off-screen
+    this.slideImage = this.add.image(0, 0, 'tutorial-1').setOrigin(0.5, 0)
+
+    this.plugins.get('rexAnchor')['add'](this.slideImage, {
+      x: '50%',
+      onUpdateViewportCallback: (viewport) => {
+        const minWidth = Math.max(1, viewport.width - 360)
+        const minHeight = Math.max(1, viewport.height - 320)
+        const scale = Math.max(
+          minWidth / this.slideImage.width,
+          minHeight / this.slideImage.height,
+        )
+        this.slideImage.setDisplaySize(
+          this.slideImage.width * scale,
+          this.slideImage.height * scale,
+        )
+      },
+    })
+  }
+
   private createChrome(): void {
-    const panelTop = this.imageH
-    const panelHeight = Space.windowHeight - panelTop
-    const panelCenterY = panelTop + panelHeight / 2
     const chromeKey = 'chrome-builderHeader'
 
     // Left and rightpanel
@@ -146,13 +139,28 @@ export default class OpeningScene extends BaseScene {
     this.plugins.get('rexAnchor')['add'](bottomChrome, {
       x: '50%',
       y: '100%+40',
-      // width: '100%',
+    })
+  }
+
+  private createText(): void {
+    // Body text on top of chrome
+    this.bodyText = this.add
+      .text(Space.pad * 2, 0, '', Style.openingScene)
+      .setWordWrapWidth(Space.windowWidth - Space.pad * 4)
+    this.plugins.get('rexAnchor')['add'](this.bodyText, {
+      y: '100%-220',
+      onUpdateViewportCallback: (viewport) => {
+        this.bodyText.setWordWrapWidth(viewport.width - Space.pad * 4)
+      },
     })
 
-    // Body text on top of chrome
-    this.bodyText = this.add.text(Space.pad * 2, panelTop + Space.pad, '', {
-      ...Style.announcementOverBlack,
-      wordWrap: { width: Space.windowWidth - Space.pad * 4 },
+    // Reminder text
+    const reminderText = this.add
+      .text(0, 0, 'Click to continue', Style.openingReminder)
+      .setOrigin(1, 1)
+    this.plugins.get('rexAnchor')['add'](reminderText, {
+      x: `100%-${Space.padSmall}`,
+      y: `100%-${Space.padSmall}`,
     })
   }
 
@@ -162,17 +170,39 @@ export default class OpeningScene extends BaseScene {
 
     if (this.textures.exists(imageKey)) {
       this.slideImage.setTexture(imageKey)
-      const scale = Math.max(
+
+      // Start at full-screen cover, then tween down to the visible top-region cover.
+      const fullScreenScale = Math.max(
+        Space.windowWidth / this.slideImage.width,
+        Space.windowHeight / this.slideImage.height,
+      )
+      const visibleScale = Math.max(
         this.imageW / this.slideImage.width,
         this.imageH / this.slideImage.height,
       )
-      this.slideImage
-        .setDisplaySize(
-          this.slideImage.width * scale,
-          this.slideImage.height * scale,
-        )
-        .setVisible(true)
+
+      this.slideImage.setOrigin(0.5, 0).setPosition(this.imageW / 2, 0)
+      this.slideImage.setScale(fullScreenScale).setVisible(true)
+
+      if (this.slideTween) {
+        this.slideTween.stop()
+        this.slideTween = null
+      }
+      this.slideTween = this.tweens.add({
+        targets: this.slideImage,
+        scaleX: visibleScale,
+        scaleY: visibleScale,
+        duration: 500,
+        ease: 'Sine.Out',
+        onComplete: () => {
+          this.slideTween = null
+        },
+      })
     } else {
+      if (this.slideTween) {
+        this.slideTween.stop()
+        this.slideTween = null
+      }
       this.slideImage.setVisible(false)
     }
 

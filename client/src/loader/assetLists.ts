@@ -481,27 +481,6 @@ export const assetLists = {
     ],
     "pixelArt": true
   },
-  "tutorial": {
-    "files": [
-      "1",
-      "2",
-      "2",
-      "3",
-      "3",
-      "4",
-      "5",
-      "5",
-      "6",
-      "6",
-      "7",
-      "7",
-      "8",
-      "9",
-      "old 1",
-      "old 1"
-    ],
-    "pixelArt": false
-  },
   "sfx": {
     "files": [
       "click",

@@ -27,6 +27,7 @@ const CoreColors: Record<string, number | string> = {
 
   grey: 0x555555,
   greyA: 0x555555e0,
+  greyS: '#555555',
   lightGrey: 0x888888,
 
   backgroundDark: 0xcbc1a8,
@@ -55,6 +56,7 @@ export const Color: Record<string, any> = {
   darkBlue: CoreColors.darkBlue,
   darkBlueS: CoreColors.darkBlueS,
   grey: CoreColors.grey,
+  greyS: CoreColors.greyS,
   brown: CoreColors.brown,
 
   // GENERAL

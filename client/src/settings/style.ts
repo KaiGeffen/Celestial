@@ -296,6 +296,19 @@ const StyleJourney: StyleDict = {
     fontSize: '24px',
     color: Color.basicText,
   },
+  // The opening visuals that come before the tutorial
+  openingScene: {
+    fontFamily: secondaryFont,
+    fontSize: '60px',
+    color: Color.darkUmberS,
+    stroke: Color.whiteS,
+    strokeThickness: 2,
+  },
+  openingReminder: {
+    fontFamily: sansFont,
+    fontSize: '24px',
+    color: Color.greyS,
+  },
 }
 
 // Styles that are no longer used in any in-use scenes
