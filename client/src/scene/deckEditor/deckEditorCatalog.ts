@@ -24,6 +24,7 @@ import {
 export type DeckEditorCatalogOptions = {
   onCardPick: (card: Card) => void
   onBack: () => void
+  useJourneyInventory?: boolean
 }
 
 // The cost chip buttons
@@ -82,7 +83,9 @@ export class DeckEditorCatalog {
       pool = [...Catalog.collectibleCardsWithBetaCards]
     } else {
       pool = [...Catalog.collectibleCards]
-      const inventory = UserSettings._get('cardInventory') || []
+      const inventory = opts.useJourneyInventory
+        ? UserSettings._get('inventory') || []
+        : UserSettings._get('cardInventory') || []
       pool = pool.filter((c) => inventory[c.id] === true)
     }
 

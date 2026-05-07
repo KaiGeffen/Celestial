@@ -117,6 +117,10 @@ export default class DeckEditorScene extends BaseScene {
     return new DeckEditorDeck(this, opts)
   }
 
+  protected shouldUseJourneyUnlocksForCatalog(): boolean {
+    return false
+  }
+
   private createElements(deck: Deck): void {
     this.createBackground()
 
@@ -124,6 +128,7 @@ export default class DeckEditorScene extends BaseScene {
     this.catalogRegion = new DeckEditorCatalog(this, {
       onCardPick: (card) => this.addCardToDeck(card),
       onBack: () => this.handleBack(),
+      useJourneyInventory: this.shouldUseJourneyUnlocksForCatalog(),
     })
 
     // Deck region
@@ -421,6 +426,10 @@ export class DeckEditorJourneyScene extends DeckEditorScene {
   }
 
   protected saveCurrentDeck(): void {}
+
+  protected shouldUseJourneyUnlocksForCatalog(): boolean {
+    return true
+  }
 
   protected handlePlayClick(): void {
     const opponent = this.mission.opponent
