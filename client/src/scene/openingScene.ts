@@ -125,16 +125,25 @@ export default class OpeningScene extends BaseScene {
     })
   }
 
+  /**
+   * Side chrome is placed in the horizontal band [0, dx] / [W-dx, W]. If its
+   * axis-aligned bounds width is smaller than dx, scale up uniformly so it spans.
+   */
+  private stretchSideChromeToDx(img: Phaser.GameObjects.Image, dx: number): void {
+    if (dx <= 0) return
+    img.setScale(1)
+    const b = img.getBounds()
+    if (b.width > 0 && b.width < dx) {
+      const f = dx / b.width
+      img.setScale(f, f)
+    }
+  }
+
   private createChrome(): void {
     const chromeKey = 'chrome-builderHeader'
-    const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
-    const frameHeight = Math.max(1, Space.windowHeight - BOTTOM_CHROME_HEIGHT)
-    const frameWidth = Math.min(Space.windowWidth, frameHeight * slideRatio)
 
-    // Left and rightpanel
-    const dx = Math.max(0, (Space.windowWidth - frameWidth) / 2)
     const leftChrome = this.add
-      .image(dx, 0, chromeKey)
+      .image(0, 0, chromeKey)
       .setOrigin(1, 1)
       .setAngle(-90)
 
@@ -142,9 +151,28 @@ export default class OpeningScene extends BaseScene {
       .image(0, 0, chromeKey)
       .setOrigin(0, 1)
       .setAngle(90)
-    this.plugins.get('rexAnchor')['add'](rightChrome, {
-      x: `100%-${dx}`,
+
+    const layoutSides = (viewport: Phaser.Geom.Rectangle) => {
+      const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
+      const frameHeight = Math.max(1, viewport.height - BOTTOM_CHROME_HEIGHT)
+      const frameWidth = Math.min(viewport.width, frameHeight * slideRatio)
+      const dx = Math.max(0, (viewport.width - frameWidth) / 2)
+
+      leftChrome.x = dx
+      rightChrome.x = viewport.width - dx
+
+      this.stretchSideChromeToDx(leftChrome, dx)
+      this.stretchSideChromeToDx(rightChrome, dx)
+    }
+
+    // Side positions live at x = dx and x = W − dx; callback keeps both in sync on resize.
+    this.plugins.get('rexAnchor')['add'](leftChrome, {
+      onUpdateViewportCallback: layoutSides,
     })
+
+    layoutSides(
+      new Phaser.Geom.Rectangle(0, 0, this.scale.width, this.scale.height),
+    )
 
     // Bottom panel (Behind text)
     const bottomChrome = this.add
