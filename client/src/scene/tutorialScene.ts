@@ -255,7 +255,7 @@ export default class TutorialMatchScene extends MatchScene {
     }
 
     // Set the appropriate text
-    const s = `[b]${datum.bold}[/b]`
+    const s = `${datum.bold}`
 
     this.txt.setAlpha(0)
     this.txt.setText(s).setVisible(s !== '')
