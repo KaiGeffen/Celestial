@@ -58,9 +58,11 @@ class Enlightenment extends Card {
     for (let i = 0; i < game.story.acts.length; i++) {
       const act = game.story.acts[i]
       if (act.owner === (player ^ 1)) {
+        // If player has vision, act was revealed, or card is visible
         if (
           i + 1 <= game.status[player].vision ||
-          act.card.qualities.includes(Quality.VISIBLE)
+          act.card.qualities.includes(Quality.VISIBLE) ||
+          act.revealed
         ) {
           numSeenCards += 1
         }
@@ -101,7 +103,8 @@ class Conquer extends Card {
       } else {
         if (
           i + 1 <= game.status[player].vision ||
-          act.card.qualities.includes(Quality.VISIBLE)
+          act.card.qualities.includes(Quality.VISIBLE) ||
+          act.revealed
         ) {
           numSeenCards += 1
         }

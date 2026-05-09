@@ -207,11 +207,13 @@ class Defiance extends Card {
       if (act.owner === (player ^ 1)) {
         numSeenCards += 1
       } else {
+        // Can see from vision, visible, or revealed
         const canSeeWithVision = i + 1 <= game.status[player ^ 1].vision
         const canSeeBecauseVisible = act.card.qualities.includes(
           Quality.VISIBLE,
         )
-        if (canSeeWithVision || canSeeBecauseVisible) {
+        const canSeeBecauseRevealed = act.revealed
+        if (canSeeWithVision || canSeeBecauseVisible || canSeeBecauseRevealed) {
           numSeenCards += 1
         }
       }
