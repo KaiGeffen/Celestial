@@ -59,7 +59,7 @@ export default class StoreScene extends BaseSceneWithHeader {
   }
 
   private createBackground(): void {
-    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
+    const background = this.add.image(0, 0, 'chrome-bodyAlt').setOrigin(0)
 
     this.plugins.get('rexAnchor')['add'](background, {
       width: `100%`,

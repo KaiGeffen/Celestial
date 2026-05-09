@@ -115,7 +115,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
   }
 
   private createBackground(): void {
-    const bodyBg = this.add.image(0, 0, 'chrome-body').setOrigin(0, 0)
+    const bodyBg = this.add.image(0, 0, 'chrome-bodyAlt').setOrigin(0, 0)
 
     const anchor = {
       width: '100%',

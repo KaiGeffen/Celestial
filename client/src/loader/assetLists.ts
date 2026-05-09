@@ -450,6 +450,7 @@ export const assetLists = {
       "Recap",
       "ResultGlow",
       "body",
+      "bodyAlt",
       "breathWheel",
       "bubble",
       "bubbleEffect",
@@ -533,7 +534,6 @@ export const assetLists = {
       "6",
       "7",
       "8",
-      "9",
       "9"
     ],
     "pixelArt": false
