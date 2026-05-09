@@ -1,13 +1,12 @@
 import 'phaser'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
+import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 import {
-  BBStyle,
   Time,
   Space,
   Flags,
-  Color,
   Style,
   Messages,
   UserSettings,
@@ -30,7 +29,8 @@ class SharedBaseScene extends Phaser.Scene {
   rexGestures: GesturesPlugin
 
   // Message explaining to user what they did wrong
-  txtMessage: RexUIPlugin.BBCodeText
+  txtMessage: Phaser.GameObjects.Text
+  txtMessageContainer: ContainerLite
 
   // Timeout for displaying a message onscreen
   msgTimeout: NodeJS.Timeout
@@ -41,29 +41,31 @@ class SharedBaseScene extends Phaser.Scene {
   create(params = {}): void {
     this.hint = new Hint(this)
 
-    // Text for when user does something and gets a message
-    this.txtMessage = this.createMessageText()
+    // Error message, made visible in signalError()
+    this.createErrorMessage()
 
     // Load the journey material, in case it's not already loaded
     Loader.loadJourneyMapAndMission(this)
   }
 
-  private createMessageText(): RexUIPlugin.BBCodeText {
-    return this.rexUI.add
-      .BBCodeText(
-        Space.windowWidth / 2,
-        Space.windowHeight / 2,
-        '',
-        BBStyle.error,
-      )
-      .setOrigin(0.5)
-      .setDepth(50)
-      .setVisible(false)
+  private createErrorMessage(): void {
+    this.txtMessageContainer = new ContainerLite(this).setVisible(false)
+    this.plugins.get('rexAnchor')['add'](this.txtMessageContainer, {
+      x: '50%',
+      y: '50%',
+    })
+
+    const txtMessageBg = this.add.image(0, 0, 'chrome-error')
+    this.txtMessageContainer.add(txtMessageBg)
+
+    this.txtMessage = this.add.text(0, 0, '', Style.error)
+    this.txtMessageContainer.add(this.txtMessage)
   }
 
   // Show the user a message onscreen
   showMessage(msg = ''): void {
-    this.txtMessage.setText(`[stroke=black]${msg}[/stroke]`).setVisible(true)
+    this.txtMessageContainer.setVisible(true)
+    this.txtMessage.setText(msg)
 
     // Remove previous timeout, create a new one
     if (this.msgTimeout !== undefined) {
@@ -71,7 +73,8 @@ class SharedBaseScene extends Phaser.Scene {
     }
 
     this.msgTimeout = setTimeout(() => {
-      this.txtMessage.setText('').setVisible(false)
+      this.txtMessageContainer.setVisible(false)
+      this.txtMessage.setText('')
     }, Time.general.centerMessageLingerMs)
   }
 

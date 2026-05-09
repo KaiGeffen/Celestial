@@ -129,6 +129,13 @@ const StyleGeneral: StyleDict = {
     color: '#009900',
   },
 
+  // Error text that appears in the center of the screen
+  error: {
+    fontFamily: mainFont,
+    fontSize: FontSettings.huge.size,
+    color: Color.error,
+  },
+
   // Deck thumbnails: card count on invalid-deck badge (white on red bar)
   thumbnailInvalidCount: {
     fontFamily: sansFont,
@@ -393,27 +400,6 @@ export const BBStyle: Record<string, any> = {
       bottom: 20,
     },
     // lineSpacing: Space.cardHeight - Space.pad,
-  }, // Error text that appears in the center of the screen
-  error: {
-    fontFamily: mainFont,
-    fontSize: FontSettings.huge.size,
-    color: Color.error,
-    backgroundColor: Color.errorBackground,
-    backgroundStrokeColor: Color.errorStroke,
-    backgroundStrokeLineWidth: 4,
-    backgroundCornerRadius: 5,
-    backgroundHorizontalGradient: false,
-    padding: {
-      left: Space.pad,
-      right: Space.pad,
-      top: Space.pad,
-      bottom: Space.pad,
-    },
-    // strokeThickness: 4,
-    wrap: {
-      mode: 'word',
-      width: Space.windowWidth - Space.pad * 2,
-    },
   },
   // Daily Hint on home screen
   dailyHint: {

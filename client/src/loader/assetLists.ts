@@ -461,6 +461,7 @@ export const assetLists = {
       "builderRightCorner",
       "builderVertical",
       "divider",
+      "error",
       "header",
       "nameplate",
       "profile",
