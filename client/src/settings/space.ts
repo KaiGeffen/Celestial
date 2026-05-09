@@ -61,6 +61,7 @@ function getSpace() {
     buttonWidth: 150,
     buttonHeight: 51,
     bigButtonHeight: 130,
+    inputTextWidth: 320,
     textboxWidth: 310,
     textboxHeight: 70,
 

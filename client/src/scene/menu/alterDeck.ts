@@ -21,7 +21,6 @@ import cardbackNames from '../../data/cardbackNames'
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 
 const width = Space.avatarSize * 6 + Space.pad * 7
-const inputTextWidth = 200
 
 enum tab {
   ICON,
@@ -330,7 +329,7 @@ class AlterDeckMenu extends Menu {
 
     // Create the deck code input text
     this.deckCodeInputText = this.scene.add
-      .rexInputText(0, 0, inputTextWidth, 50, {
+      .rexInputText(0, 0, Space.inputTextWidth, 50, {
         type: 'text',
         text: '',
         align: 'center',
@@ -361,7 +360,7 @@ class AlterDeckMenu extends Menu {
       this.scene,
       0,
       0,
-      Space.textboxWidth,
+      Space.inputTextWidth,
       Space.textboxHeight,
       [this.deckCodeInputText, chrome],
     )

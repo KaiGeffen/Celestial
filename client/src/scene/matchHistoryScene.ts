@@ -192,7 +192,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
 
     // Add search box
     this.searchObj = this.add
-      .rexInputText(0, 0, Space.textboxWidth, Space.textboxHeight, {
+      .rexInputText(0, 0, Space.inputTextWidth, Space.textboxHeight, {
         type: 'text',
         text: this.searchText,
         align: 'center',

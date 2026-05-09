@@ -15,7 +15,6 @@ import {
 } from '../../../../shared/network/settings'
 
 const width = 700
-const inputTextWidth = 200
 
 export class RegisterUsernameMenu extends Menu {
   private username: string = ''
@@ -91,7 +90,7 @@ export class RegisterUsernameMenu extends Menu {
     let sizer = this.scene.rexUI.add.sizer()
 
     this.usernameInputText = this.scene.add
-      .rexInputText(0, 0, inputTextWidth, 40, {
+      .rexInputText(0, 0, Space.inputTextWidth, 40, {
         type: 'text',
         text: this.username,
         align: 'center',
@@ -114,7 +113,7 @@ export class RegisterUsernameMenu extends Menu {
       this.scene,
       0,
       0,
-      Space.textboxWidth,
+      Space.inputTextWidth,
       Space.textboxHeight,
       this.usernameInputText,
     )

@@ -7,7 +7,6 @@ import Menu from './menu'
 import MenuScene from '../menuScene'
 
 const width = 420
-const inputTextWidth = 320
 
 /** Simple dialog: one text field to rename a deck. */
 export default class EditDeckNameMenu extends Menu {
@@ -37,7 +36,7 @@ export default class EditDeckNameMenu extends Menu {
     this.nameInput = this.scene.add.rexInputText(
       0,
       0,
-      inputTextWidth,
+      Space.inputTextWidth,
       Space.textboxHeight,
       {
         type: 'text',
@@ -56,7 +55,7 @@ export default class EditDeckNameMenu extends Menu {
       this.scene,
       0,
       0,
-      inputTextWidth,
+      Space.inputTextWidth,
       Space.textboxHeight,
       [this.nameInput, chrome],
     )

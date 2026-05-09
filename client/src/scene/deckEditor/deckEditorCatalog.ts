@@ -202,11 +202,11 @@ export class DeckEditorCatalog {
       scene,
       0,
       0,
-      Space.textboxWidth,
+      Space.inputTextWidth,
       Space.textboxHeight,
     )
     this.searchObj = scene.add
-      .rexInputText(0, 0, Space.textboxWidth - 80, Space.textboxHeight, {
+      .rexInputText(0, 0, Space.inputTextWidth - 80, Space.textboxHeight, {
         type: 'text',
         text: this.searchText,
         align: 'center',

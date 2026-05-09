@@ -104,12 +104,12 @@ export default class FilterRegion {
       this.scene,
       0,
       0,
-      Space.textboxWidth,
+      Space.inputTextWidth,
       Space.textboxHeight,
     )
 
     this.searchObj = this.scene.add
-      .rexInputText(0, 0, Space.textboxWidth, Space.textboxHeight, {
+      .rexInputText(0, 0, Space.inputTextWidth, Space.textboxHeight, {
         type: 'text',
         text: this.searchText,
         align: 'center',
