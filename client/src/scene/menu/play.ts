@@ -439,6 +439,7 @@ export default class PlayMenu extends Menu {
     // Create a vertical sizer for the content (play options at top) with its own background
     const contentSizer = this.scene.rexUI.add.fixWidthSizer({
       width: playPanelWidth,
+      align: 'center',
       space: {
         bottom: Space.pad,
         item: Space.padSmall,
@@ -477,7 +478,7 @@ export default class PlayMenu extends Menu {
     // Versus Computer
     contentSizer
       .add(
-        this.createPlayOption('Versus Computer', 'Go', () => {
+        this.createPlayOption('Versus Computer', () => {
           if (!server || !server.isOpen()) {
             this.scene.signalError(Messages.disconnectError)
             return
@@ -510,7 +511,7 @@ export default class PlayMenu extends Menu {
     // Versus Human
     contentSizer
       .add(
-        this.createPlayOption('Versus Human', 'Go', () => {
+        this.createPlayOption('Versus Human', () => {
           if (!server || !server.isOpen()) {
             this.scene.signalError(Messages.disconnectError)
             return
@@ -531,31 +532,27 @@ export default class PlayMenu extends Menu {
       .addNewLine()
 
     // Password Match
-    const friendlyMatchOption = this.createPlayOption(
-      'Password Match',
-      'Go',
-      () => {
-        if (!server || !server.isOpen()) {
-          this.scene.signalError(Messages.disconnectError)
-          return
-        }
-        if (!this.password || this.password === '') {
-          this.scene.signalError('Please enter a password')
-          return
-        }
-        this.scene.scene.stop()
-        if (this.activeScene) {
-          this.activeScene.scene.stop()
-        }
-        this.scene.scene.start('StandardMatchScene', {
-          isPvp: true,
-          deck: this.deck,
-          password: this.password,
-          lastScene: this.getReturnSceneKey(),
-        })
-        logEvent('queue_pwd')
-      },
-    )
+    const friendlyMatchOption = this.createPlayOption('Password Match', () => {
+      if (!server || !server.isOpen()) {
+        this.scene.signalError(Messages.disconnectError)
+        return
+      }
+      if (!this.password || this.password === '') {
+        this.scene.signalError('Please enter a password')
+        return
+      }
+      this.scene.scene.stop()
+      if (this.activeScene) {
+        this.activeScene.scene.stop()
+      }
+      this.scene.scene.start('StandardMatchScene', {
+        isPvp: true,
+        deck: this.deck,
+        password: this.password,
+        lastScene: this.getReturnSceneKey(),
+      })
+      logEvent('queue_pwd')
+    })
     // Store reference to the PWD button
     this.pwdBtn = this.playOptionButtons[this.playOptionButtons.length - 1]
     // Initially disable since password field is empty (updatePwdButton will handle this)
@@ -565,7 +562,7 @@ export default class PlayMenu extends Menu {
 
     // Password entry for PWD
     this.inputText = this.scene.add
-      .rexInputText(0, 0, playPanelWidth - Space.pad * 2, 40, {
+      .rexInputText(0, 0, Space.inputTextWidth, 40, {
         type: 'text',
         text: '',
         align: 'center',
@@ -620,11 +617,7 @@ export default class PlayMenu extends Menu {
     return gardenSizer
   }
 
-  private createPlayOption(
-    text: string,
-    buttonText: string,
-    callback: () => void,
-  ): any {
+  private createPlayOption(text: string, callback: () => void): any {
     const sizer = this.scene.rexUI.add.sizer({
       width: playPanelWidth - Space.pad * 2,
       space: {
@@ -636,7 +629,7 @@ export default class PlayMenu extends Menu {
     const container = new ContainerLite(this.scene, 0, 0, Space.buttonWidth, 50)
     const button = new Buttons.Basic({
       within: container,
-      text: buttonText,
+      text: 'Go',
       f: () => {
         // Check deck validity before starting match
         if (!this.isDeckValid()) {
