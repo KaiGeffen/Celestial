@@ -86,7 +86,7 @@ class Nightmare extends Card {
         // Move THIS card from discard to story
         game.pile[player].splice(index, 1)
 
-        game.createInStory(player, this, undefined, Zone.Discard)
+        game.createInStory(player, this, undefined, Zone.Discard, true)
       }
       return true
     }
