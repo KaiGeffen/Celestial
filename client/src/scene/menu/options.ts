@@ -65,14 +65,18 @@ export default class OptionsMenu extends Menu {
 
     // After layout is complete, move the highlight to the selected tab button
     const x = (Space.windowWidth - this.width + Space.pad) / 2
-    const y = this.tabBtns[selectedTab].getGlobalPosition()[1] - 4
+    const y = this.tabBtns[selectedTab].getGlobalPosition()[1]
     this.tabSelector.setPosition(x, y)
   }
 
   private createContent(activeScene: BaseScene) {
+    // Replace the background
+    const background = this.scene.add.image(0, 0, 'chrome-bodyAlt')
+    this.sizer.addBackground(background)
+
     // Only add header if it fits
     if (Space.windowHeight >= 375) {
-      let header = this.createHeader('Options', this.width + Space.pad * 2)
+      const header = this.createHeader('Options', this.width + Space.pad * 2)
     }
 
     // Sizer with tabs on left, contents on right
@@ -593,7 +597,7 @@ export default class OptionsMenu extends Menu {
   private tweenTabSelector(y: number): void {
     this.scene.tweens.add({
       targets: this.tabSelector,
-      y: y - 4,
+      y: y,
       duration: Time.general.optionsTabSlideMs,
       ease: 'Sine.easeInOut',
     })

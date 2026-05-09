@@ -95,7 +95,7 @@ export default class HomeScene extends BaseScene {
 
     // Add background
     const background = this.add
-      .rexRoundRectangle(0, 0, 1, 1, 10, 0xffffff)
+      .rectangle(0, 0, 1, 1, 0xffffff)
       .setAlpha(0.3)
       .setInteractive()
     panelSizer.addBackground(background)
