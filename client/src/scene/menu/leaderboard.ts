@@ -34,6 +34,9 @@ export default class LeaderboardMenu extends Menu {
   constructor(scene: MenuScene, params) {
     super(scene, width, params)
 
+    // Sizer is invisible until leaderboard data is fetched
+    this.sizer.setVisible(false)
+
     // Sizer has no pad between lines
     this.sizer.space.line = 0
     this.sizer.space.bottom = 0
@@ -69,7 +72,7 @@ export default class LeaderboardMenu extends Menu {
       this.scene.signalError('Failed to load leaderboard data')
     }
 
-    this.sizer.layout()
+    this.sizer.setVisible(true).layout()
   }
 
   private createContent() {

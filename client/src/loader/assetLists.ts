@@ -528,6 +528,7 @@ export const assetLists = {
   "tutorial": {
     "files": [
       "1",
+      "1",
       "2",
       "3",
       "4",
