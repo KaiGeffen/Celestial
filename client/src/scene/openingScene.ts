@@ -325,6 +325,8 @@ export default class OpeningScene extends BaseScene {
   }
 
   private onAdvance(): void {
+    this.playSound('click')
+
     const texts = SLIDES[this.slideIndex].texts
 
     if (this.typewriterEvent) {
