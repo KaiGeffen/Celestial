@@ -29,36 +29,40 @@ const SLIDES: Slide[] = [
   },
   {
     imageKey: 'tutorial-4',
-    texts: [`Aurora: "The penumbra of my realm are struggling to find peace."`],
+    texts: [
+      `Aurora: The penumbra of my realm are struggling to find peace.`,
+      `Aurora: I can't let them all turn into umbra—even if your kind is adorable.`,
+    ],
   },
   {
     imageKey: 'tutorial-5',
     texts: [
-      `Aurora: "I can't let them all turn into umbra—even if your kind is adorable."`,
-      `Aurora: “Your story should have been settled here, under my guidance. But now you’re bound to this realm, as a shadow of your former self.”`,
-      `Aurora: “What am I doing wrong? What am I missing?”`,
+      `Aurora: Your story should have been settled here, under my guidance. But now you’re bound to this realm, as a shadow of your former self.`,
+      `Aurora: What am I doing wrong? What am I missing?`,
     ],
   },
   {
     imageKey: 'tutorial-6',
-    texts: [`Aurora: "You wish to help? Well… it wouldn't hurt to try."`],
+    texts: [`Aurora: You wish to help? Well… it wouldn't hurt to try.`],
   },
   {
     imageKey: 'tutorial-7',
     texts: [
-      `Aurora: “The penumbra Jules should be close to resolution, but they need a little nudge forward.”`,
-      `Aurora: “Go see if you can lend a hand.”`,
+      `Aurora: The penumbra Jules should be close to resolution, but they need a little nudge forward.`,
+      `Aurora: Go see if you can lend a hand.`,
     ],
   },
   {
     imageKey: 'tutorial-8',
     texts: [
-      'Jules: “Oh, hello there. Do you want to join me?”',
-      `Jules: “An umbra as my storytelling partner? That sounds like a welcome change.”`,
-      `Jules: “Let’s untangle this together, little one.”`,
+      'Jules: Oh, hello there. Do you want to join me?',
+      `Jules: An umbra as my storytelling partner? That sounds like a welcome change.`,
     ],
   },
-  { imageKey: 'tutorial-9', texts: [''] },
+  {
+    imageKey: 'tutorial-9',
+    texts: [`Jules: Let’s untangle this together, little one.`],
+  },
 ]
 
 export default class OpeningScene extends BaseScene {
@@ -129,7 +133,10 @@ export default class OpeningScene extends BaseScene {
    * Side chrome is placed in the horizontal band [0, dx] / [W-dx, W]. If its
    * axis-aligned bounds width is smaller than dx, scale up uniformly so it spans.
    */
-  private stretchSideChromeToDx(img: Phaser.GameObjects.Image, dx: number): void {
+  private stretchSideChromeToDx(
+    img: Phaser.GameObjects.Image,
+    dx: number,
+  ): void {
     if (dx <= 0) return
     img.setScale(1)
     const b = img.getBounds()
