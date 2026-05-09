@@ -302,6 +302,21 @@ export default class OpeningScene extends BaseScene {
     })
   }
 
+  /**
+   * Phaser `Tween.complete()` ends playback but does not advance properties to their
+   * final values — seek to the end of the timeline, then remove the tween.
+   */
+  private skipSlideTweenToEnd(): void {
+    const tw = this.slideTween
+    if (!tw) return
+    const endMs = tw.totalDuration
+    if (endMs > 0) {
+      tw.seek(endMs, 50, false)
+    }
+    tw.stop()
+    this.slideTween = null
+  }
+
   private onAdvance(): void {
     const texts = SLIDES[this.slideIndex].texts
 
@@ -309,18 +324,18 @@ export default class OpeningScene extends BaseScene {
       this.typewriterEvent.remove()
       this.typewriterEvent = null
       this.bodyText.setText(this.fullText)
-      const isLastTextForSlide = this.textIndex + 1 >= texts.length
-      if (isLastTextForSlide && this.slideTween) {
-        this.slideTween.seek(TWEEN_DURATION)
-        this.slideTween.complete()
-        this.slideTween = null
-      }
       return
     }
 
     if (this.textIndex + 1 < texts.length) {
       this.textIndex++
       this.startTypewriter(texts[this.textIndex])
+      return
+    }
+
+    // Last line is visible: jump slide motion to its final frame; next click advances.
+    if (this.slideTween) {
+      this.skipSlideTweenToEnd()
       return
     }
 

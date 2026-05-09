@@ -533,6 +533,7 @@ export const assetLists = {
       "6",
       "7",
       "8",
+      "9",
       "9"
     ],
     "pixelArt": false

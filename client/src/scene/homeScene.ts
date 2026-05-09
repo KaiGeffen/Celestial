@@ -288,6 +288,7 @@ export default class HomeScene extends BaseScene {
       orientation: 'vertical',
       space: {
         item: Space.padSmall * 0.75,
+        top: Space.padSmall,
       },
     })
 
@@ -299,7 +300,7 @@ export default class HomeScene extends BaseScene {
 
     // Calculate max width for text: button width minus avatar size and padding
     const maxTextWidth =
-      NAVIGATION_BUTTON_WIDTH - Space.avatarSize - Space.pad * 3
+      NAVIGATION_BUTTON_WIDTH - Space.avatarSize - Space.pad * 2.5
 
     // Line 1: Username (with word wrap to prevent overflow)
     const usernameFontSize =
