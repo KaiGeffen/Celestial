@@ -167,7 +167,10 @@ export const assetLists = {
       "Sensualist",
       "Shadow",
       "Sickness",
+      "Sky Burial",
       "Spark",
+      "Starfall",
+      "Starfall",
       "Starling",
       "Stars",
       "Storytime",
@@ -527,7 +530,6 @@ export const assetLists = {
   },
   "tutorial": {
     "files": [
-      "1",
       "1",
       "2",
       "3",
