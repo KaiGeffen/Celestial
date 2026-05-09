@@ -28,9 +28,9 @@ class SharedBaseScene extends Phaser.Scene {
   rexUI: RexUIPlugin
   rexGestures: GesturesPlugin
 
-  // Message explaining to user what they did wrong
-  txtMessage: Phaser.GameObjects.Text
-  txtMessageContainer: ContainerLite
+  // Error message components
+  errorMessageBg: Phaser.GameObjects.Image
+  txtErrorMessage: Phaser.GameObjects.Text
 
   // Timeout for displaying a message onscreen
   msgTimeout: NodeJS.Timeout
@@ -49,23 +49,33 @@ class SharedBaseScene extends Phaser.Scene {
   }
 
   private createErrorMessage(): void {
-    this.txtMessageContainer = new ContainerLite(this).setVisible(false)
-    this.plugins.get('rexAnchor')['add'](this.txtMessageContainer, {
+    // Background image
+    this.errorMessageBg = this.add
+      .image(0, 0, 'chrome-error')
+      .setVisible(false)
+      .setDepth(99)
+    this.plugins.get('rexAnchor')['add'](this.errorMessageBg, {
       x: '50%',
       y: '50%',
     })
 
-    const txtMessageBg = this.add.image(0, 0, 'chrome-error')
-    this.txtMessageContainer.add(txtMessageBg)
-
-    this.txtMessage = this.add.text(0, 0, '', Style.error)
-    this.txtMessageContainer.add(this.txtMessage)
+    // Text
+    this.txtErrorMessage = this.add
+      .text(0, 0, '', Style.error)
+      .setVisible(false)
+      .setOrigin(0.5, 0.5)
+      .setDepth(99)
+    this.plugins.get('rexAnchor')['add'](this.txtErrorMessage, {
+      x: '50%',
+      y: '50%',
+    })
   }
 
   // Show the user a message onscreen
   showMessage(msg = ''): void {
-    this.txtMessageContainer.setVisible(true)
-    this.txtMessage.setText(msg)
+    this.errorMessageBg.setVisible(true)
+    this.txtErrorMessage.setVisible(true)
+    this.txtErrorMessage.setText(msg)
 
     // Remove previous timeout, create a new one
     if (this.msgTimeout !== undefined) {
@@ -73,8 +83,9 @@ class SharedBaseScene extends Phaser.Scene {
     }
 
     this.msgTimeout = setTimeout(() => {
-      this.txtMessageContainer.setVisible(false)
-      this.txtMessage.setText('')
+      this.errorMessageBg.setVisible(false)
+      this.txtErrorMessage.setVisible(false)
+      this.txtErrorMessage.setText('')
     }, Time.general.centerMessageLingerMs)
   }
 
