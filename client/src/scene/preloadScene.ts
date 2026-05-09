@@ -57,7 +57,7 @@ export class SigninScene extends Phaser.Scene {
     this.createButtons()
 
     // Electron + Steam login path
-    if (this.isElectronBuild()) {
+    if (Flags.isElectronBuild()) {
       Server.loginSteam(this.game, () => this.onOptionClick()).catch((e) =>
         console.error('Steam login failed:', e),
       )
@@ -108,7 +108,7 @@ export class SigninScene extends Phaser.Scene {
 
   // Create buttons for each of the signin options (Guest, OAuth)
   private createButtons(): void {
-    if (this.isElectronBuild()) {
+    if (Flags.isElectronBuild()) {
       this.createSteamLoginButton()
       const quitButtonContainer = this.add.container()
       this.quitButton = new Buttons.Basic({
@@ -174,10 +174,6 @@ export class SigninScene extends Phaser.Scene {
       x: `50%`,
       y: `100%-${Space.pad + Space.buttonHeight / 2}`,
     })
-  }
-
-  private isElectronBuild(): boolean {
-    return typeof (window as any).electronAPI !== 'undefined'
   }
 
   private onOptionClick(): void {

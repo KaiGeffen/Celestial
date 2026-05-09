@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Color, Space } from '../../settings/settings'
+import { Style, Color, Space, Flags } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
@@ -168,7 +168,7 @@ export default class UserProfileMenu extends Menu {
       Space.buttonHeight,
     )
 
-    new Buttons.Basic({
+    const logoutButton = new Buttons.Basic({
       within: container,
       text: 'Logout',
       f: () => {
@@ -178,6 +178,10 @@ export default class UserProfileMenu extends Menu {
         this.close()
       },
     })
+
+    if (Flags.isElectronBuild()) {
+      logoutButton.disable()
+    }
 
     return container
   }

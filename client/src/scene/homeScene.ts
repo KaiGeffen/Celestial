@@ -552,6 +552,6 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   },
   {
     subheader: 'Card Changes',
-    body: `🌱 [area=_Birdsong][stroke=${Color.goldS}]Birdsong[/stroke][/area] - New card released!\n🔻 [area=_Hero][stroke=${Color.goldS}]Hero[/stroke][/area] - Exhale point +3 > +2\n🔻 [area=_Clear View][stroke=${Color.goldS}]Clear View[/stroke][/area] - [area=_Seen][stroke=${Color.goldS}]Seen[/area][/stroke] sight 4 > 3\n🔺 [area=_Phoenix][stroke=${Color.goldS}]Phoenix[/stroke][/area] - Points 3 > 4`,
+    body: `[area=_Birdsong][stroke=${Color.goldS}]Birdsong[/stroke][/area] - New card released!\n[area=_Hero][stroke=${Color.goldS}]Hero[/stroke][/area] - Exhale extra points +3 > +2\n[area=_Clear View][stroke=${Color.goldS}]Clear View[/stroke][/area] - Sight gained from [area=_Seen][stroke=${Color.goldS}]Seen[/area][/stroke] 4 > 3\n[area=_Phoenix][stroke=${Color.goldS}]Phoenix[/stroke][/area] - Points 3 > 4`,
   },
 ]

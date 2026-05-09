@@ -22,4 +22,7 @@ export const Flags = {
   networkToggle: new URLSearchParams(window.location.search).has(
     'networkToggle',
   ),
+
+  // Whether this client is running in the Electron build
+  isElectronBuild: () => typeof window.electronAPI !== 'undefined',
 }
