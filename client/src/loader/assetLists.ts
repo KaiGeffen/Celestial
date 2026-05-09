@@ -462,6 +462,7 @@ export const assetLists = {
       "divider",
       "header",
       "nameplate",
+      "profile",
       "stackCount",
       "sundial",
       "tabSelector",
@@ -528,13 +529,11 @@ export const assetLists = {
       "2",
       "3",
       "4",
-      "4",
       "5",
       "6",
       "7",
       "8",
-      "9",
-      "not 1"
+      "9"
     ],
     "pixelArt": false
   }

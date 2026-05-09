@@ -91,19 +91,11 @@ export default class HomeScene extends BaseScene {
     const width = 300
     const panelSizer = this.rexUI.add.fixWidthSizer({
       width,
-      space: {
-        top: Space.pad,
-        bottom: Space.pad,
-        left: Space.pad,
-        right: Space.pad,
-        item: Space.pad,
-        line: Space.pad,
-      },
     })
 
     // Add background
     const background = this.add
-      .rectangle(0, 0, 1, 1, 0xffffff)
+      .rexRoundRectangle(0, 0, 1, 1, 10, 0xffffff)
       .setAlpha(0.3)
       .setInteractive()
     panelSizer.addBackground(background)
@@ -128,6 +120,9 @@ export default class HomeScene extends BaseScene {
       width: NAVIGATION_BUTTON_WIDTH,
       space: {
         line: 5,
+        left: Space.pad,
+        right: Space.pad,
+        bottom: Space.pad,
       },
     })
 
@@ -242,24 +237,27 @@ export default class HomeScene extends BaseScene {
   }
 
   private createUserProfileSection(): any {
+    const leftPad = 45
+    const rightPad = -5
+    const yPad = 50
     // Main horizontal sizer for avatar on left, info on right
     const mainSizer = this.rexUI.add.fixWidthSizer({
-      width: NAVIGATION_BUTTON_WIDTH,
+      width: NAVIGATION_BUTTON_WIDTH + leftPad + rightPad,
       space: {
-        item: Space.pad,
-        top: Space.pad,
-        bottom: Space.pad,
-        left: Space.pad,
-        right: Space.pad,
+        item: Space.padSmall,
+        top: yPad,
+        bottom: yPad,
+        left: leftPad,
+        right: rightPad,
       },
     })
 
     // Add dark background
     const background = this.add
-      .rectangle(0, 0, 1, 1, Color.backgroundDark)
+      .image(0, 0, 'chrome-profile')
+      // .rectangle(0, 0, 1, 1, Color.backgroundDark)
       .setInteractive()
     mainSizer.addBackground(background)
-    this.addShadow(background)
 
     // Avatar container - fixed size
     const avatarContainer = new ContainerLite(
