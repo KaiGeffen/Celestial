@@ -358,19 +358,25 @@ import { MatchScene } from '../matchScene'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
-
-const JOURNEY_UNLOCK_CARD_SCALE = 0.55
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
+import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 /**
- * Journey missions: full-screen unlock strip (`missionCards`) before the normal
- * Victory / round breakdown (same pattern as {@link ResultsRegionTutorial} replacing results).
+ * Journey missions: cards-unlocked screen (`missionCards`) shown before the normal
+ * Victory / round breakdown. Vertical rexUI sizer (auto-sized to its contents):
+ * title → cards row → disclaimer → Continue button.
  */
 export class ResultsRegionJourney extends MatchResultsRegion {
   private unlockDismissed = false
   private unlockBuilt = false
   private lastGameState: GameModel | null = null
-  private unlockLayer!: Phaser.GameObjects.Container
-  private rowSizer!: any
+
+  // Full-screen dim behind the unlock panel; anchored to the viewport.
+  private unlockBackdrop: Phaser.GameObjects.Rectangle
+  // Vertical sizer (title / cards / disclaimer / button) — auto-sizes to contents.
+  private unlockSizer: FixWidthSizer
+  // Inner horizontal sizer for the row of card images.
+  private cardsRow: Sizer
 
   override create(scene: MatchScene): this {
     super.create(scene)
@@ -381,116 +387,150 @@ export class ResultsRegionJourney extends MatchResultsRegion {
   override displayState(state: GameModel): void {
     this.deleteTemp()
 
-    if (state.winner === null) {
-      this.unlockDismissed = false
-      this.unlockBuilt = false
-      this.unlockLayer?.setVisible(false)
-      this.hide()
-      return
-    }
-    if (state.isRecap) {
-      this.hide()
-      return
-    }
-    if (this.seen) {
+    // Don't show during pre-game, recap, or after results have been seen.
+    if (state.winner === null || state.isRecap || this.seen) {
       this.hide()
       return
     }
 
     const ids = (this.scene.params?.missionCards ?? []) as number[]
-    const needsUnlock =
+    const showUnlock =
       state.winner === 0 && ids.length > 0 && !this.unlockDismissed
 
-    if (needsUnlock) {
+    if (showUnlock) {
       this.lastGameState = state
-      this.ensureUnlockCards(ids)
-      this.unlockLayer.setVisible(true)
+      this.populateUnlockCards(ids)
+      // Hide the parent's standard results UI while the unlock panel is up.
+      this.container.setVisible(false)
       this.panel.setVisible(false)
-      this.txtResult.setVisible(false)
-      this.ourAvatar.setVisible(false)
-      this.theirAvatar.setVisible(false)
-      this.footerButtons?.setVisible(false)
-      this.show()
+      this.setUnlockVisible(true)
       return
     }
 
-    this.unlockLayer.setVisible(false)
+    // Normal results flow (unlock dismissed or none to unlock)
+    this.setUnlockVisible(false)
     this.populateResults(state)
-    this.footerButtons?.setVisible(true)
     this.show()
     this.seen = true
   }
 
+  override hide(): this {
+    this.setUnlockVisible(false)
+    return super.hide()
+  }
+
+  private setUnlockVisible(visible: boolean): void {
+    this.unlockBackdrop?.setVisible(visible)
+    this.unlockSizer?.setVisible(visible)
+  }
+
   private buildUnlockLayer(): void {
     const scene = this.scene
-    this.unlockLayer = scene.add.container(0, 0)
 
-    const backdrop = scene.add
-      .rectangle(0, 0, 1, 1, Color.darken, 0.88)
+    this.unlockBackdrop = scene.add
+      .rectangle(0, 0, 1, 1, Color.darken, 0.85)
       .setInteractive()
-    scene.plugins.get('rexAnchor')['add'](backdrop, {
+      .setDepth(Depth.results + 1)
+    scene.plugins.get('rexAnchor')['add'](this.unlockBackdrop, {
+      x: `50%`,
+      y: `50%`,
       width: `100%`,
       height: `100%`,
     })
-    this.unlockLayer.add(backdrop)
 
-    const title = scene.add
-      .text(0, 0, 'Cards unlocked!', Style.announcementOverBlack)
-      .setOrigin(0.5)
+    // Mulligan-style RoundRectangle background; sized by the sizer via addBackground.
+    const panelBg = this.scene.add.image(0, 0, 'chrome-bodyAlt')
 
-    this.rowSizer = scene.rexUI.add.fixWidthSizer({
-      space: { item: Space.pad, left: Space.pad, right: Space.pad },
-    })
+    const title = scene.add.text(0, 0, 'Cards unlocked!', Style.header)
 
-    const btnWrap = scene.add.container(0, 0)
+    this.cardsRow = scene.rexUI.add.sizer({
+      space: { item: Space.pad },
+    }) as Sizer
+
+    const disclaimer = scene.add.text(
+      0,
+      0,
+      'Unlocked in Journey mode only.',
+      Style.basicStylized,
+    )
+
+    // Buttons.Basic positions itself at (0, 0) inside its `within`; ContainerLite gives the sizer a proper slot.
+    const btnContainer = new ContainerLite(
+      scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
     new Buttons.Basic({
-      within: btnWrap,
+      within: btnContainer,
       text: 'Continue',
-      f: () => this.onUnlockContinue(),
-      muteClick: true,
+      f: () => this.onContinue(),
     })
 
-    const stack = scene.rexUI
-      .add.sizer({
-        orientation: 'y',
-        space: { item: Space.pad * 2 },
+    // The main sizer
+    const width = Space.cardWidth * 3 + Space.pad * 4
+    this.unlockSizer = scene.rexUI.add
+      .fixWidthSizer({
+        width,
+        align: 'center',
+        space: {
+          line: Space.pad,
+          left: Space.pad,
+          right: Space.pad,
+          top: Space.pad,
+          bottom: Space.padSmall,
+        },
       })
-      .add(title, { align: 'center' })
-      .add(this.rowSizer, { align: 'center' })
-      .add(btnWrap, { align: 'center' })
+      .addBackground(panelBg)
+      .add(title)
+      .addNewLine()
+      .add(this.cardsRow)
+      .addNewLine()
+      .add(disclaimer)
+      .addNewLine()
+      .add(btnContainer)
 
-    this.unlockLayer.add(stack as unknown as Phaser.GameObjects.GameObject)
-    stack.layout()
+    scene.plugins.get('rexAnchor')['add'](this.unlockSizer, {
+      x: `50%`,
+      y: `50%`,
+    })
+    this.unlockSizer.setDepth(Depth.results + 2).layout()
 
-    this.unlockLayer.setVisible(false)
-    this.container.add(this.unlockLayer)
-    this.unlockLayer.setDepth(Depth.results + 1)
+    this.setUnlockVisible(false)
   }
 
-  private ensureUnlockCards(ids: number[]): void {
+  private populateUnlockCards(ids: number[]): void {
     if (this.unlockBuilt) return
     this.unlockBuilt = true
+
     for (const id of ids) {
       const card = Catalog.getCardById(id)
-      const ci = new CardImage(card, this.rowSizer, false, true, 0)
-      ci.container.setScale(JOURNEY_UNLOCK_CARD_SCALE)
-      this.rowSizer.add(ci.container)
+      if (!card) continue
+      const cardContainer = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        Space.cardWidth,
+        Space.cardHeight,
+      )
+      new CardImage(card, cardContainer, false, true, 0)
+      this.cardsRow.add(cardContainer)
     }
-    this.rowSizer.layout()
+
+    // Re-flow now that cards are in, then re-apply depth so the late-added cards
+    // render above the sizer's background (rexUI's setDepth only walks current children).
+    this.unlockSizer.layout()
+    this.unlockSizer.setDepth(Depth.results + 2)
   }
 
-  private onUnlockContinue(): void {
+  private onContinue(): void {
     if (this.unlockDismissed) return
     this.unlockDismissed = true
-    this.unlockLayer.setVisible(false)
+    this.setUnlockVisible(false)
     if (this.lastGameState) {
       this.displayState(this.lastGameState)
     }
-  }
-
-  override hide(): this {
-    this.unlockLayer?.setVisible(false)
-    return super.hide()
   }
 }
 
