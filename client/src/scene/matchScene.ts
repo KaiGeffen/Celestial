@@ -701,13 +701,6 @@ export class StandardMatchScene extends MatchScene {
   }
 }
 
-// TODO Consider removing this if it's not adding anything
-export class JourneyMatchScene extends MatchScene {
-  constructor(args = { key: 'JourneyMatchScene', lastScene: 'JourneyScene' }) {
-    super(args)
-  }
-}
-
 export class RaceMatchScene extends MatchScene {
   constructor(args = { key: 'RaceMatchScene', lastScene: 'RaceScene' }) {
     super(args)

@@ -16,6 +16,8 @@ import avatarNames from '../../../../shared/data/avatarNames'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import logEvent from '../../utils/analytics'
 import { server } from '../../server'
+import { CardImage } from '../../lib/cardImage'
+import Catalog from '../../../../shared/state/catalog'
 
 export default class MatchResultsRegion extends Region {
   // Whether the results have been seen already
@@ -33,6 +35,9 @@ export default class MatchResultsRegion extends Region {
 
   // The panel that shows results of the match
   panel: ScrollablePanel
+
+  /** Footer row from {@link createButtons} (Hide / Play Again / Exit); optional when subclasses replace buttons. */
+  protected footerButtons?: Phaser.GameObjects.Container
 
   WIDTH = 300
   HEIGHT = Space.windowHeight - (Space.buttonHeight + Space.pad * 2) * 2
@@ -77,11 +82,23 @@ export default class MatchResultsRegion extends Region {
       return
     }
 
+    this.populateResults(state)
+
+    this.show()
+    this.seen = true
+  }
+
+  /** Victory/defeat header, avatars, and round breakdown (used by journey unlock flow after dismiss). */
+  protected populateResults(state: GameModel): void {
     // Avatars
     const av1 = avatarNames[state.cosmeticSets[0].avatar]
     const av2 = avatarNames[state.cosmeticSets[1].avatar]
     this.setFullAvatarTexture(this.ourAvatar, `avatar-${av1}Full`)
     this.setFullAvatarTexture(this.theirAvatar, `avatar-${av2}Full`)
+
+    this.txtResult.setVisible(true)
+    this.ourAvatar.setVisible(true)
+    this.theirAvatar.setVisible(true)
 
     // Text saying if you won or lost
     this.txtResult.setText(state.winner === 0 ? 'Victory' : 'Defeat')
@@ -91,9 +108,6 @@ export default class MatchResultsRegion extends Region {
 
     // Ensure panel layout
     this.panel.setVisible(true).layout()
-
-    this.show()
-    this.seen = true
   }
 
   hide(): this {
@@ -126,6 +140,7 @@ export default class MatchResultsRegion extends Region {
 
   protected createButtons() {
     const container = this.scene.add.container()
+    this.footerButtons = container
     this.container.add(container)
     this.scene.plugins.get('rexAnchor')['add'](container, {
       y: `50%-${Space.pad + Space.buttonHeight / 2}`,
@@ -343,6 +358,141 @@ import { MatchScene } from '../matchScene'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
+
+const JOURNEY_UNLOCK_CARD_SCALE = 0.55
+
+/**
+ * Journey missions: full-screen unlock strip (`missionCards`) before the normal
+ * Victory / round breakdown (same pattern as {@link ResultsRegionTutorial} replacing results).
+ */
+export class ResultsRegionJourney extends MatchResultsRegion {
+  private unlockDismissed = false
+  private unlockBuilt = false
+  private lastGameState: GameModel | null = null
+  private unlockLayer!: Phaser.GameObjects.Container
+  private rowSizer!: any
+
+  override create(scene: MatchScene): this {
+    super.create(scene)
+    this.buildUnlockLayer()
+    return this
+  }
+
+  override displayState(state: GameModel): void {
+    this.deleteTemp()
+
+    if (state.winner === null) {
+      this.unlockDismissed = false
+      this.unlockBuilt = false
+      this.unlockLayer?.setVisible(false)
+      this.hide()
+      return
+    }
+    if (state.isRecap) {
+      this.hide()
+      return
+    }
+    if (this.seen) {
+      this.hide()
+      return
+    }
+
+    const ids = (this.scene.params?.missionCards ?? []) as number[]
+    const needsUnlock =
+      state.winner === 0 && ids.length > 0 && !this.unlockDismissed
+
+    if (needsUnlock) {
+      this.lastGameState = state
+      this.ensureUnlockCards(ids)
+      this.unlockLayer.setVisible(true)
+      this.panel.setVisible(false)
+      this.txtResult.setVisible(false)
+      this.ourAvatar.setVisible(false)
+      this.theirAvatar.setVisible(false)
+      this.footerButtons?.setVisible(false)
+      this.show()
+      return
+    }
+
+    this.unlockLayer.setVisible(false)
+    this.populateResults(state)
+    this.footerButtons?.setVisible(true)
+    this.show()
+    this.seen = true
+  }
+
+  private buildUnlockLayer(): void {
+    const scene = this.scene
+    this.unlockLayer = scene.add.container(0, 0)
+
+    const backdrop = scene.add
+      .rectangle(0, 0, 1, 1, Color.darken, 0.88)
+      .setInteractive()
+    scene.plugins.get('rexAnchor')['add'](backdrop, {
+      width: `100%`,
+      height: `100%`,
+    })
+    this.unlockLayer.add(backdrop)
+
+    const title = scene.add
+      .text(0, 0, 'Cards unlocked!', Style.announcementOverBlack)
+      .setOrigin(0.5)
+
+    this.rowSizer = scene.rexUI.add.fixWidthSizer({
+      space: { item: Space.pad, left: Space.pad, right: Space.pad },
+    })
+
+    const btnWrap = scene.add.container(0, 0)
+    new Buttons.Basic({
+      within: btnWrap,
+      text: 'Continue',
+      f: () => this.onUnlockContinue(),
+      muteClick: true,
+    })
+
+    const stack = scene.rexUI
+      .add.sizer({
+        orientation: 'y',
+        space: { item: Space.pad * 2 },
+      })
+      .add(title, { align: 'center' })
+      .add(this.rowSizer, { align: 'center' })
+      .add(btnWrap, { align: 'center' })
+
+    this.unlockLayer.add(stack as unknown as Phaser.GameObjects.GameObject)
+    stack.layout()
+
+    this.unlockLayer.setVisible(false)
+    this.container.add(this.unlockLayer)
+    this.unlockLayer.setDepth(Depth.results + 1)
+  }
+
+  private ensureUnlockCards(ids: number[]): void {
+    if (this.unlockBuilt) return
+    this.unlockBuilt = true
+    for (const id of ids) {
+      const card = Catalog.getCardById(id)
+      const ci = new CardImage(card, this.rowSizer, false, true, 0)
+      ci.container.setScale(JOURNEY_UNLOCK_CARD_SCALE)
+      this.rowSizer.add(ci.container)
+    }
+    this.rowSizer.layout()
+  }
+
+  private onUnlockContinue(): void {
+    if (this.unlockDismissed) return
+    this.unlockDismissed = true
+    this.unlockLayer.setVisible(false)
+    if (this.lastGameState) {
+      this.displayState(this.lastGameState)
+    }
+  }
+
+  override hide(): this {
+    this.unlockLayer?.setVisible(false)
+    return super.hide()
+  }
+}
 
 export class ResultsRegionTutorial extends MatchResultsRegion {
   missionID: number

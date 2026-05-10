@@ -20,5 +20,8 @@ export const Depth: Record<string, number> = {
   searching: 9,
   roundResult: 9,
 
+  /** Journey mission card unlock overlay — below `results` when stacked; journey flow hides results until dismissed. */
+  journeyUnlock: 9,
+
   results: 10,
 }

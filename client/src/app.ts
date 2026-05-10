@@ -3,11 +3,8 @@ import 'phaser'
 import MenuScene from './scene/menuScene'
 import { PreloadScene, SigninScene } from './scene/preloadScene'
 import HomeScene from './scene/homeScene'
-import {
-  StandardMatchScene,
-  JourneyMatchScene,
-  RaceMatchScene,
-} from './scene/matchScene'
+import { StandardMatchScene, RaceMatchScene } from './scene/matchScene'
+import JourneyMatchScene from './scene/journeyMatchScene'
 import { SpectatorMatchScene } from './scene/spectatorMatchScene'
 import TutorialMatchScene from './scene/tutorialScene'
 import DeckSelectorScene from './scene/deckSelectorScene'
