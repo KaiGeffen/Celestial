@@ -102,6 +102,22 @@ export default class Loader {
         frames: scene.anims.generateFrameNumbers(name, { start: 0, end: 3 }),
       })
     })
+
+    // Umbra animations
+    let umbraKey = 'avatar-umbra1'
+    scene.anims.create({
+      key: `idle${1}`,
+      frames: scene.anims.generateFrameNumbers(umbraKey, { start: 0, end: 3 }),
+      frameRate: 8,
+      repeat: -1,
+    })
+    umbraKey = 'avatar-umbra2'
+    scene.anims.create({
+      key: `idle${2}`,
+      frames: scene.anims.generateFrameNumbers(umbraKey, { start: 0, end: 5 }),
+      frameRate: 8,
+      repeat: -1,
+    })
   }
 
   // Loads all SFX, dialog handled in HTMLAudioElement

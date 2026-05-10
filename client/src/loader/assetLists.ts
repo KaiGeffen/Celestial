@@ -2,6 +2,8 @@
 export const assetLists = {
   "avatar": {
     "files": [
+      "umbra1",
+      "umbra2",
       "Adonis",
       "Jules",
       "Kitz",
@@ -16,6 +18,14 @@ export const assetLists = {
       "RenataFull"
     ],
     "dimensions": {
+      "umbra1": {
+        "width": 128,
+        "height": 128
+      },
+      "umbra2": {
+        "width": 128,
+        "height": 128
+      },
       "Adonis": {
         "width": 130,
         "height": 130
@@ -169,7 +179,6 @@ export const assetLists = {
       "Sickness",
       "Sky Burial",
       "Spark",
-      "Starfall",
       "Starfall",
       "Starling",
       "Stars",

@@ -123,7 +123,7 @@ export default class DeckThumbnail {
         0,
       )
       .setOrigin(0.5, 1)
-      .setInteractive({ useHandCursor: true })
+      .setInteractive()
       .on('pointerdown', () => {
         if (!muteClick) {
           scene.sound.play('click')
