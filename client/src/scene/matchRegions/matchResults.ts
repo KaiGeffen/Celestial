@@ -11,6 +11,7 @@ import {
   Messages,
 } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
+import Button from '../../lib/buttons/button'
 import GameModel from '../../../../shared/state/gameModel'
 import avatarNames from '../../../../shared/data/avatarNames'
 import newScrollablePanel from '../../lib/scrollablePanel'
@@ -18,6 +19,7 @@ import logEvent from '../../utils/analytics'
 import { server } from '../../server'
 import { CardImage } from '../../lib/cardImage'
 import Catalog from '../../../../shared/state/catalog'
+import { animateCardReveal } from '../../lib/cardReveal'
 
 export default class MatchResultsRegion extends Region {
   // Whether the results have been seen already
@@ -377,6 +379,8 @@ export class ResultsRegionJourney extends MatchResultsRegion {
   private unlockSizer: FixWidthSizer
   // Inner horizontal sizer for the row of card images.
   private cardsRow: Sizer
+  // Disabled until every cardback has been clicked / flipped.
+  private btnContinue: Button
 
   override create(scene: MatchScene): this {
     super.create(scene)
@@ -462,7 +466,7 @@ export class ResultsRegionJourney extends MatchResultsRegion {
       Space.buttonWidth,
       Space.buttonHeight,
     )
-    new Buttons.Basic({
+    this.btnContinue = new Buttons.Basic({
       within: btnContainer,
       text: 'Continue',
       f: () => this.onContinue(),
@@ -504,9 +508,11 @@ export class ResultsRegionJourney extends MatchResultsRegion {
     if (this.unlockBuilt) return
     this.unlockBuilt = true
 
+    let unrevealedCount = 0
     for (const id of ids) {
       const card = Catalog.getCardById(id)
       if (!card) continue
+
       const cardContainer = new ContainerLite(
         this.scene,
         0,
@@ -514,14 +520,47 @@ export class ResultsRegionJourney extends MatchResultsRegion {
         Space.cardWidth,
         Space.cardHeight,
       )
-      new CardImage(card, cardContainer, false, true, 0)
+      // Real card sits hidden underneath; revealed by `animateCardReveal` on click.
+      // Constructed interactive so it has the standard hover/click behavior once
+      // shown — Phaser skips invisible objects in hit tests, so the cardback on
+      // top is the only thing that receives pointer events until then.
+      // Pre-apply the visible glow so it fades in along with the front during the flip.
+      const ci = new CardImage(card, cardContainer, true, true, 0)
+        .setVisibleGlow()
+        .hide()
+      // Clickable cardback overlay — pre-empts the helper's own cardback so the
+      // user clicks *this* one to trigger the flip.
+      const cardback = new CardImage(
+        Catalog.cardback,
+        cardContainer,
+        true,
+        true,
+        0,
+      )
+      cardback.setOnClick(() => {
+        cardback.destroy()
+        animateCardReveal(this.scene, ci, cardContainer)
+
+        unrevealedCount--
+        if (unrevealedCount === 0) {
+          this.btnContinue.enable()
+        }
+      })
+
       this.cardsRow.add(cardContainer)
+      unrevealedCount++
     }
 
     // Re-flow now that cards are in, then re-apply depth so the late-added cards
     // render above the sizer's background (rexUI's setDepth only walks current children).
     this.unlockSizer.layout()
     this.unlockSizer.setDepth(Depth.results + 2)
+
+    // Continue is gated on the player flipping every cardback (re-enabled in the
+    // click handler when `unrevealedCount` hits 0).
+    if (unrevealedCount > 0) {
+      this.btnContinue.disable()
+    }
   }
 
   private onContinue(): void {

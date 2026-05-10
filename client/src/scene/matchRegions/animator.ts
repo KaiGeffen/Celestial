@@ -17,6 +17,7 @@ import Catalog from '../../../../shared/state/catalog'
 import { View } from '../matchScene'
 import Card from '../../../../shared/state/card'
 import { SHRUNKEN_CARD_SCALE } from './matchRegionSettings'
+import { animateCardReveal } from '../../lib/cardReveal'
 
 export default class Animator {
   scene: MatchScene
@@ -463,48 +464,7 @@ export default class Animator {
 
   // Animate a card being revealed
   private animateReveal(card: CardImage, i: number): void {
-    const endScaleX = card.container.scaleX
-    const endScaleY = card.container.scaleY
-
-    // A scaling trick to make the card appear to flip over
-    const scaleTrick = 0.95
-
-    // Start the next reveal halfway through the current reveal
-    const stepDelay = i * (Time.match.cardReveal / 2)
-
-    // Animate the back of the card flipping
-    let hiddenCard = this.createCard(Catalog.cardback, [0, 0], card.cardback)
-      .show()
-      .copyLocation(card)
-    hiddenCard.container.setScale(endScaleX, endScaleY)
-
-    this.scene.tweens.add({
-      targets: hiddenCard.container,
-      scaleX: 0,
-      scaleY: endScaleY * scaleTrick,
-      delay: stepDelay,
-      duration: Time.match.cardReveal / 2,
-      ease: 'Sine.easeIn',
-      onComplete: () => {
-        hiddenCard.destroy()
-      },
-    })
-
-    // Animate the actual card flipping up
-    card.hide()
-    card.container.scaleY = endScaleY * scaleTrick
-    card.container.scaleX = 0
-    this.scene.tweens.add({
-      targets: card.container,
-      scaleX: endScaleX,
-      scaleY: endScaleY,
-      delay: stepDelay + Time.match.cardReveal / 2,
-      duration: Time.match.cardReveal / 2,
-      ease: 'Sine.easeOut',
-      onStart: function (tween: Phaser.Tweens.Tween, targets, _) {
-        card.show()
-      },
-    })
+    animateCardReveal(this.scene, card, card.container.parentContainer, i)
   }
 
   // Animate a card transforming into another card

@@ -114,6 +114,7 @@ export class CardImage {
 
     if (interactive) {
       this.imageSubject.setInteractive()
+      this.interactive = true
     }
   }
 
@@ -356,7 +357,11 @@ export class CardImage {
     this.artContainer.add(this.imageContainer)
 
     // Cardback
-    this.imageCardback = this.scene.add.image(0, 0, this.getCardbackTextureKey())
+    this.imageCardback = this.scene.add.image(
+      0,
+      0,
+      this.getCardbackTextureKey(),
+    )
     this.imageCardback.setDisplaySize(Space.cardWidth, Space.cardHeight)
     this.artContainer.add(this.imageCardback)
 
