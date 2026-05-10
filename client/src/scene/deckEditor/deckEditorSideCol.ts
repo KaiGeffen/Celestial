@@ -318,4 +318,11 @@ export class DeckEditorDeckJourney extends RightCol {
       .addBackground(bg)
       .add(playBtn)
   }
+
+  /** Full deck for starting a match: required mission cards plus chosen cards. */
+  getFullDeckCode(): number[] {
+    const required = this.requiredDecklist?.getDeckCode() ?? []
+    const chosen = this.decklist.getDeckCode()
+    return [...required, ...chosen]
+  }
 }

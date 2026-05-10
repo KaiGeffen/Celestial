@@ -40,7 +40,7 @@ export default class DeckEditorScene extends BaseScene {
 
   // Regions
   private catalogRegion: DeckEditorCatalog
-  private deckRegion: RightCol
+  protected deckRegion: RightCol
 
   // Root sizer spanning the full window — catalog on the left, deck on the right
   private sizer: RexUIPlugin.Sizer
@@ -443,7 +443,7 @@ export class DeckEditorJourneyScene extends DeckEditorScene {
 
     const playerDeck: Deck = {
       name: this.deckName,
-      cards: this.getDeckCode(),
+      cards: (this.deckRegion as DeckEditorDeckJourney).getFullDeckCode(),
       cosmeticSet,
     }
 
