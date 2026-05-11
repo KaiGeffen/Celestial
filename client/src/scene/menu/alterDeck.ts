@@ -360,7 +360,7 @@ class AlterDeckMenu extends Menu {
       this.scene,
       0,
       0,
-      Space.inputTextWidth,
+      Space.inputTextWidth + Space.pad * 3,
       Space.textboxHeight,
       [this.deckCodeInputText, chrome],
     )

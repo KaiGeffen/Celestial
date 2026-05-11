@@ -408,6 +408,38 @@ const abandoned = new Abandoned({
   beta: true,
 })
 
+class Mire extends Card {
+  onRoundEndIfThisResolved(player: number, game: GameModel) {
+    const copy = this.copy()
+    copy.points -= 1
+    game.createInStory(player, copy, undefined, Zone.Create, true)
+  }
+}
+const mire = new Mire({
+  name: 'Mire',
+  id: 3043,
+  cost: 5,
+  points: 4,
+  qualities: [Quality.FLEETING],
+  text: 'Fleeting\nAt the end of this round, create a Revealed copy of this with -1 point.',
+  beta: true,
+})
+
+class Broken extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    bonus -= game.amtCardsPlayedLastRound[player]
+    super.play(player, game, index, bonus)
+  }
+}
+const broken = new Broken({
+  name: 'Broken',
+  id: 3044,
+  cost: 4,
+  points: 6,
+  text: 'Worth -1 for each card you played last round.',
+  beta: true,
+})
+
 export {
   dagger,
   shadow,
@@ -427,4 +459,6 @@ export {
   // mutual,
   isolation,
   abandoned,
+  mire,
+  broken,
 }
