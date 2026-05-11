@@ -130,6 +130,8 @@ function hideHiddenOpponentAnimations(model: GameModel) {
   model.animations[1] = model.animations[1]
     // Hide mulligan choices
     .filter((animation) => animation.from !== Zone.Mulligan)
+    // Drop any animation the opponent isn't supposed to know occurred at all
+    .filter((animation) => animation.visibility !== Visibility.FullyUnknown)
     // Obfuscate the cards opponent is drawing
     .map((animation) => {
       if (animation.to === Zone.Hand || animation.to === Zone.Mulligan) {
@@ -145,12 +147,6 @@ function hideHiddenOpponentAnimations(model: GameModel) {
             // e.g., leave the card as is
             // (no action needed)
             break
-          case Visibility.FullyUnknown:
-            // Don't know the action occurred
-            // e.g., maybe remove or hide the animation
-            // (handle as needed, e.g., set to null or skip)
-            animation.card = null
-            break
           default:
             // Optional: handle unexpected values
             break
@@ -158,6 +154,4 @@ function hideHiddenOpponentAnimations(model: GameModel) {
       }
       return animation
     })
-    // Remove any animations that are now null
-    .filter((animation) => animation.card !== null)
 }

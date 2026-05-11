@@ -378,7 +378,8 @@ export class RefreshCard extends Card {
         }),
       )
 
-      game.draw(player, 1)
+      // Draw isn't known to opponent
+      game.draw(player, 1, false, Visibility.FullyUnknown)
     }
   }
 }

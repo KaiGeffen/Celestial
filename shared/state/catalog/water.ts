@@ -143,14 +143,6 @@ class Overflow extends RefreshCard {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus + game.hand[player].length)
   }
-
-  onPlay(player: number, game: GameModel): void {
-    if (game.hand[player].length > 0) {
-      const card = game.hand[player].shift()
-      game.deck[player].unshift(card)
-      game.draw(player, 1)
-    }
-  }
 }
 const overflow = new Overflow({
   name: 'Overflow',
@@ -187,14 +179,6 @@ class Cloud extends RefreshCard {
       game.draw(player, 1)
     }
     if (super.exhale(2, game, player)) {
-      game.draw(player, 1)
-    }
-  }
-
-  onPlay(player: number, game: GameModel): void {
-    if (game.hand[player].length > 0) {
-      const card = game.hand[player].shift()
-      game.deck[player].unshift(card)
       game.draw(player, 1)
     }
   }
@@ -300,7 +284,25 @@ const rime = new Rime({
   beta: true,
 })
 
-// TODO
+class Pool extends RefreshCard {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    if (super.exhale(1, game, player)) {
+      game.draw(player, 1)
+    }
+  }
+
+  onPlay(player: number, game: GameModel): void {
+    super.onPlay(player, game)
+    super.onPlay(player, game)
+  }
+}
+const pool = new Pool({
+  name: 'Pool',
+  id: 7037,
+  text: 'Refresh, Refresh\nExhale 1: Draw a card.',
+})
 
 export {
   mercy,
@@ -319,4 +321,5 @@ export {
   // NEW
   crabs,
   rime,
+  pool,
 }

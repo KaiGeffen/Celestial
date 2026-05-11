@@ -190,7 +190,12 @@ export default class GameModel {
     return copy
   }
 
-  draw(player: number, amt = 1, isSetup = false) {
+  draw(
+    player: number,
+    amt = 1,
+    isSetup = false,
+    visibility?: Visibility,
+  ) {
     let card: Card = null
     while (amt > 0 && this.hand[player].length < MechanicsSettings.HAND_CAP) {
       // If deck is empty, shuffled discard pile into deck
@@ -234,6 +239,7 @@ export default class GameModel {
             to: Zone.Hand,
             card: card,
             index2: this.hand[player].length - 1,
+            visibility,
           }),
         )
       }
