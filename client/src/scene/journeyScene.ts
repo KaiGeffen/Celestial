@@ -724,7 +724,6 @@ export default class JourneyScene extends BaseScene {
         within: btnContainer,
         text: 'Start',
         f: this.missionOnClick(mission),
-        muteClick: true,
       })
       startBtn.setOnHover(
         () => this.showMissionTip(this.getMissionTip(mission)),

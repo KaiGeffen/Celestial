@@ -397,7 +397,7 @@ export class ResultsRegionJourney extends MatchResultsRegion {
       return
     }
 
-    const ids = (this.scene.params?.missionCards ?? []) as number[]
+    const ids = this.scene.params?.missionCards ?? []
     const showUnlock =
       state.winner === 0 && ids.length > 0 && !this.unlockDismissed
 
@@ -445,12 +445,21 @@ export class ResultsRegionJourney extends MatchResultsRegion {
     // Mulligan-style RoundRectangle background; sized by the sizer via addBackground.
     const panelBg = this.scene.add.image(0, 0, 'chrome-bodyAlt')
 
-    const title = scene.add.text(0, 0, 'Cards unlocked!', Style.header)
+    // Title text
+    const countUnlockedCards = (scene.params?.missionCards ?? []).length
+    const title = scene.add.text(
+      0,
+      0,
+      countUnlockedCards === 1 ? 'Card unlocked!' : 'Cards unlocked!',
+      Style.header,
+    )
 
+    // Cards
     this.cardsRow = scene.rexUI.add.sizer({
       space: { item: Space.pad },
-    }) as Sizer
+    })
 
+    // Disclaimer text
     const disclaimer = scene.add.text(
       0,
       0,
@@ -458,7 +467,7 @@ export class ResultsRegionJourney extends MatchResultsRegion {
       Style.basicStylized,
     )
 
-    // Buttons.Basic positions itself at (0, 0) inside its `within`; ContainerLite gives the sizer a proper slot.
+    // Buttons
     const btnContainer = new ContainerLite(
       scene,
       0,
@@ -472,7 +481,7 @@ export class ResultsRegionJourney extends MatchResultsRegion {
       f: () => this.onContinue(),
     })
 
-    // The main sizer
+    // Main sizer
     const width = Space.cardWidth * 3 + Space.pad * 4
     this.unlockSizer = scene.rexUI.add
       .fixWidthSizer({
@@ -501,6 +510,7 @@ export class ResultsRegionJourney extends MatchResultsRegion {
     })
     this.unlockSizer.setDepth(Depth.results + 2).layout()
 
+    //
     this.setUnlockVisible(false)
   }
 
