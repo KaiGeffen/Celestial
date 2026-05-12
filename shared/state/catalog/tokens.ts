@@ -157,7 +157,6 @@ const ice = new Ice({
   points: 1,
   text: 'When drawn, add this to the story Revealed.',
   theme: 7,
-  beta: true,
 })
 
 class GreatWheel extends Card {
@@ -174,7 +173,6 @@ const greatWheel = new GreatWheel({
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nEnd the current round.',
   theme: 5,
-  beta: true,
 })
 
 export {

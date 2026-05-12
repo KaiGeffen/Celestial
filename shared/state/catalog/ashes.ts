@@ -441,7 +441,6 @@ const remnant = new Remnant({
   cost: 2,
   points: 2,
   text: 'Create an Ashes in your discard pile.\nMorning: Return this to hand. Discard a card.',
-  beta: true,
 })
 
 class DyingLight extends Card {
@@ -536,7 +535,7 @@ const suddenDraw = new Prometheus({
 class Zoomies extends Card {
   onBigResolve(player: number, game: GameModel, index: number) {
     // NOTE This is a hack to get this card speicifcally to work - should be generalized
-    
+
     // Count Zoomies at lower pile indices — they insert after us, pushing this card right
     let futureInsertions = 0
     for (let j = 0; j < index; j++) {
@@ -562,7 +561,6 @@ const zoomies = new Zoomies({
   cost: 1,
   points: 1,
   text: 'When you resolve a card that costs 7 or more, move this card from your discard pile to the story.',
-  beta: true,
 })
 
 export {

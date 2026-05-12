@@ -13,16 +13,26 @@ import * as specialCardsCatalog from './catalog/specialCards'
 import { Keyword, Keywords } from './keyword'
 
 // Apply the card's theme and sort by cost for building the full catalog
+// Also make cards with id 1000+ be beta
 function applyThemeAndSort(
   catalog: Record<string, Card>,
   themeId: number,
 ): Card[] {
-  return Object.values(catalog)
-    .map((c) => {
-      c.theme = themeId
-      return c
-    })
-    .sort((a, b) => a.cost - b.cost)
+  return (
+    Object.values(catalog)
+      .map((c) => {
+        c.theme = themeId
+        return c
+      })
+      // Id 1000+ cards are beta
+      .map((c) => {
+        if (c.id >= 1000) {
+          c.beta = true
+        }
+        return c
+      })
+      .sort((a, b) => a.cost - b.cost)
+  )
 }
 
 const fullCatalog = [

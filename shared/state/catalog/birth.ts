@@ -311,7 +311,6 @@ const genesis = new Genesis({
   cost: 5,
   points: 5,
   text: 'Set your points to 5, then Birth 1 for each point you lost.',
-  beta: true,
 })
 
 class BeginnersMind extends Card {

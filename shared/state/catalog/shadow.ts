@@ -218,7 +218,6 @@ const rupture = new Rupture({
   id: 72,
   cost: 1,
   text: "Create a Wound in your opponent's hand.",
-  beta: true,
 })
 
 class LostInShadow extends Card {
@@ -308,11 +307,10 @@ class Voices extends Card {
 }
 const voices = new Voices({
   name: 'Voices',
-  id: 483,
+  id: 3483,
   cost: 1,
   points: 1,
   text: 'Exhale 1: Your opponent adds a card from their hand to the story.\nExhale 2: You do the same after their card.',
-  beta: true,
 })
 
 class Isolation extends Card {
@@ -328,11 +326,10 @@ class Isolation extends Card {
 }
 const isolation = new Isolation({
   name: 'Isolation',
-  id: 484,
+  id: 3484,
   cost: 7,
   points: 7,
   text: 'Costs 0 if you won last round without playing any cards.',
-  beta: true,
 })
 
 class Spider extends Card {
@@ -350,7 +347,6 @@ const spider = new Spider({
   cost: 5,
   points: 5,
   text: "Return the next card in the story to its owner's hand.",
-  beta: true,
 })
 
 class Mutual extends Card {
@@ -374,7 +370,6 @@ const mutual = new Mutual({
   name: 'Mutual',
   id: 343,
   text: 'Exhale 1: If exactly one of the next 2 cards in the story is yours, discard both.',
-  beta: true,
 })
 
 class Abandoned extends Card {
@@ -405,7 +400,6 @@ const abandoned = new Abandoned({
   cost: 3,
   points: 3,
   text: 'When discarded, add this to the story Revealed and create a Wound in hand.',
-  beta: true,
 })
 
 class Mire extends Card {
@@ -422,7 +416,6 @@ const mire = new Mire({
   points: 4,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nAt the end of this round, create a Revealed copy of this with -1 point.',
-  beta: true,
 })
 
 class Broken extends Card {
@@ -437,7 +430,6 @@ const broken = new Broken({
   cost: 4,
   points: 6,
   text: 'Worth -1 for each card you played last round.',
-  beta: true,
 })
 
 export {

@@ -302,11 +302,10 @@ class Doll extends Card {
 }
 const doll = new Doll({
   name: 'Doll',
-  id: 482,
+  id: 4482,
   cost: 1,
   points: 1,
   text: 'Morning: Worth X permanently, where X is how many points you won the last round by.',
-  beta: true,
 })
 
 class Heart extends Card {
@@ -329,7 +328,6 @@ const heart = new Heart({
   cost: 3,
   points: 4,
   text: 'When a card is played while this is in the story, discard this and Nourish 3.',
-  beta: true,
 })
 
 export {

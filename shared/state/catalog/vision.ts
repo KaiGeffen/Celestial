@@ -265,7 +265,6 @@ const suddenInsight = new SuddenInsight({
   cost: 4,
   points: 4,
   text: 'When drawn, gain Sight 2.\nExhale 1: Inspire 1',
-  beta: true,
 })
 
 class Realms extends Card {
@@ -309,7 +308,6 @@ const path = new Path({
   id: 6102,
   cost: 2,
   text: 'Create a Great Wheel in your hand.',
-  beta: true,
 })
 
 class Switcheroo extends Card {

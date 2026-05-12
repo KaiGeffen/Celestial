@@ -263,7 +263,6 @@ const crabs = new Crabs({
   cost: 2,
   points: 3,
   text: 'When you win this round, discard a card.\nWhen you lose this round, draw a card.',
-  beta: true,
 })
 
 class Rime extends Card {
@@ -281,7 +280,6 @@ const rime = new Rime({
   cost: 4,
   points: 5,
   text: 'Create 2 copies of Ice on the bottom of your deck.',
-  beta: true,
 })
 
 class Pool extends RefreshCard {
@@ -302,7 +300,6 @@ const pool = new Pool({
   name: 'Pool',
   id: 7037,
   text: 'Refresh, Refresh\nExhale 1: Draw a card.',
-  beta: true,
 })
 
 export {

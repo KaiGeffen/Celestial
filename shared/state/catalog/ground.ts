@@ -28,7 +28,6 @@ const updraft = new Updraft({
   id: 9066,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nMove your next card in the story forward one spot.',
-  beta: true,
 })
 
 class Groundwork extends Card {
@@ -42,7 +41,6 @@ const groundwork = new Groundwork({
   id: 9002,
   cost: 1,
   text: 'Worth +2 for each of your cards in a row with this.',
-  beta: true,
 })
 
 export // updraft

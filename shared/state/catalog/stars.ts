@@ -294,7 +294,6 @@ const rocketship = new Rocketship({
   cost: 2,
   points: 2,
   text: 'Worth +1 for each card in your hand with base cost 6 or more. Put those cards on the bottom of your deck.',
-  beta: true,
 })
 
 class Fable extends Card {
@@ -331,7 +330,6 @@ const fable = new Fable({
   name: 'Fable',
   id: 8093,
   text: 'Exhale 5: Draw 3 cards.\nExhale 3: Create a Sickness in the story.\nExhale 1: Discard the 3 cheapest cards from your deck.',
-  beta: true,
 })
 
 const phi = new Card({
@@ -382,7 +380,6 @@ const starfall = new Starfall({
   cost: 6,
   points: 7,
   text: 'At the start of turn, if your hand has at least 5 cards including this, discard this to Inspired 1.',
-  beta: true,
 })
 
 class Boreas extends Card {
@@ -411,7 +408,6 @@ const heavens = new Heavens({
   cost: 9,
   points: 9,
   text: "Costs 2 less for each time you've triggered Exhale since the last story began.",
-  beta: true,
 })
 
 export {
