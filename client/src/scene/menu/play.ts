@@ -31,7 +31,6 @@ import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/Sc
 const menuWidth = 1000
 const deckPanelWidth = Space.cutoutWidth + Space.pad * 2
 const playPanelWidth = 527
-const PLANT_SIZER_HEIGHT = 244
 
 export default class PlayMenu extends Menu {
   password: string
@@ -181,6 +180,8 @@ export default class PlayMenu extends Menu {
   }
 
   private createContent() {
+    // Replace the background
+    this.sizer.removeAllBackgrounds(true)
     this.sizer.addBackground(this.scene.add.image(0, 0, 'chrome-bodyAlt'))
 
     this.createHeader('Play', this.width + Space.pad * 2)
@@ -198,11 +199,11 @@ export default class PlayMenu extends Menu {
     // Left column: play options on top, garden below
     const leftColumn = this.scene.rexUI.add.fixWidthSizer({
       width: playPanelWidth,
-      space: { line: Space.pad },
+      space: { top: 10, line: 60 },
     })
     leftColumn.add(this.createPlayPanel()).addNewLine()
     leftColumn.add(this.createGardenPanel())
-    mainSizer.add(leftColumn, { align: 'top' })
+    mainSizer.add(leftColumn)
 
     // Right column: deck panel (title+arrows then decklist)
     mainSizer.add(this.createDeckPanel(), { align: 'top' })
@@ -214,7 +215,7 @@ export default class PlayMenu extends Menu {
     const panelSizer = this.scene.rexUI.add.fixWidthSizer({
       width: deckPanelWidth,
       align: 'center',
-      space: { line: 40 },
+      space: { line: Space.padSmall },
     })
 
     // Title row: prev arrow, deck name, next arrow
@@ -287,13 +288,12 @@ export default class PlayMenu extends Menu {
     }
 
     this.scrollableDeck = newScrollablePanel(this.scene, {
-      width: Space.cutoutWidth + 10,
-      height: 420,
+      height: 500,
       panel: {
         child: this.decklist.sizer,
       },
       scrollMode: 'y',
-    })
+    }).layout()
 
     panelSizer.add(this.scrollableDeck)
 
@@ -301,68 +301,63 @@ export default class PlayMenu extends Menu {
   }
 
   private createPlayPanel(): any {
-    const sizer = this.scene.rexUI.add.fixWidthSizer({
+    const panel = this.scene.rexUI.add.sizer({
+      orientation: 'vertical',
       width: playPanelWidth,
-      align: 'center',
-      space: {
-        item: Space.padSmall,
-        line: Space.pad,
-      },
+      space: { item: Space.pad },
     })
 
-    sizer
-      .add(
-        this.createPlayOption('Versus Computer', () => {
-          if (!server || !server.isOpen()) {
-            this.scene.signalError(Messages.disconnectError)
-            return
-          }
-          // If a password has been provided which is a valid deck code, AI uses that deck instead of a random one
-          const aiDeckCode = decodeShareableDeckCode(this.password?.trim())
-          const aiDeck =
-            aiDeckCode?.length === MechanicsSettings.DECK_SIZE
-              ? {
-                  ...getRandomAiDeck(),
-                  name: 'Custom AI',
-                  cards: aiDeckCode,
-                }
-              : getRandomAiDeck()
-          this.scene.scene.stop()
-          if (this.activeScene) {
-            this.activeScene.scene.stop()
-          }
-          this.scene.scene.start('StandardMatchScene', {
-            isPvp: false,
-            deck: this.deck,
-            aiDeck,
-            lastScene: this.getReturnSceneKey(),
-          })
-          logEvent('queue_pve')
-        }),
-      )
-      .addNewLine()
+    panel.add(
+      this.createPlayOption('Versus Computer', () => {
+        if (!server || !server.isOpen()) {
+          this.scene.signalError(Messages.disconnectError)
+          return
+        }
+        // If a password has been provided which is a valid deck code, AI uses that deck instead of a random one
+        const aiDeckCode = decodeShareableDeckCode(this.password?.trim())
+        const aiDeck =
+          aiDeckCode?.length === MechanicsSettings.DECK_SIZE
+            ? {
+                ...getRandomAiDeck(),
+                name: 'Custom AI',
+                cards: aiDeckCode,
+              }
+            : getRandomAiDeck()
+        this.scene.scene.stop()
+        if (this.activeScene) {
+          this.activeScene.scene.stop()
+        }
+        this.scene.scene.start('StandardMatchScene', {
+          isPvp: false,
+          deck: this.deck,
+          aiDeck,
+          lastScene: this.getReturnSceneKey(),
+        })
+        logEvent('queue_pve')
+      }),
+      { expand: true },
+    )
 
-    sizer
-      .add(
-        this.createPlayOption('Versus Human', () => {
-          if (!server || !server.isOpen()) {
-            this.scene.signalError(Messages.disconnectError)
-            return
-          }
-          this.scene.scene.stop()
-          if (this.activeScene) {
-            this.activeScene.scene.stop()
-          }
-          this.scene.scene.start('StandardMatchScene', {
-            isPvp: true,
-            deck: this.deck,
-            password: '',
-            lastScene: this.getReturnSceneKey(),
-          })
-          logEvent('queue_pvp')
-        }),
-      )
-      .addNewLine()
+    panel.add(
+      this.createPlayOption('Versus Human', () => {
+        if (!server || !server.isOpen()) {
+          this.scene.signalError(Messages.disconnectError)
+          return
+        }
+        this.scene.scene.stop()
+        if (this.activeScene) {
+          this.activeScene.scene.stop()
+        }
+        this.scene.scene.start('StandardMatchScene', {
+          isPvp: true,
+          deck: this.deck,
+          password: '',
+          lastScene: this.getReturnSceneKey(),
+        })
+        logEvent('queue_pvp')
+      }),
+      { expand: true },
+    )
 
     const friendlyMatchOption = this.createPlayOption('Password Match', () => {
       if (!server || !server.isOpen()) {
@@ -388,7 +383,7 @@ export default class PlayMenu extends Menu {
     this.pwdBtn = this.playOptionButtons[this.playOptionButtons.length - 1]
     this.updatePwdButton()
 
-    sizer.add(friendlyMatchOption).addNewLine()
+    panel.add(friendlyMatchOption, { expand: true })
 
     this.inputText = this.scene.add
       .rexInputText(0, 0, Space.inputTextWidth, 40, {
@@ -406,9 +401,19 @@ export default class PlayMenu extends Menu {
         this.password = inputText.text
         this.updatePwdButton()
       })
-    sizer.add(this.inputText).addNewLine()
+
+    const inputRow = this.scene.rexUI.add.sizer({
+      orientation: 'horizontal',
+      width: playPanelWidth,
+    })
+    inputRow.addSpace(1).add(this.inputText).addSpace(1)
+    panel.add(inputRow, { expand: true })
 
     // Validation message - shown when the equipped deck is invalid
+    const validationRow = this.scene.rexUI.add.sizer({
+      orientation: 'horizontal',
+      width: playPanelWidth,
+    })
     this.txtDeckValidation = this.scene.add
       .text(0, 0, 'Invalid deck', {
         ...Style.basic,
@@ -416,9 +421,10 @@ export default class PlayMenu extends Menu {
       })
       .setOrigin(0.5, 0)
       .setVisible(!this.isDeckValid())
-    sizer.add(this.txtDeckValidation)
+    validationRow.addSpace(1).add(this.txtDeckValidation).addSpace(1)
+    panel.add(validationRow, { expand: true })
 
-    return sizer
+    return panel
   }
 
   private createGardenPanel(): any {
@@ -426,14 +432,13 @@ export default class PlayMenu extends Menu {
   }
 
   private createPlayOption(text: string, callback: () => void): any {
-    const sizer = this.scene.rexUI.add.sizer({
-      width: playPanelWidth - Space.pad * 2,
-      space: {
-        left: Space.pad,
-      },
+    const row = this.scene.rexUI.add.sizer({
+      orientation: 'horizontal',
+      width: playPanelWidth,
+      space: { left: Space.pad, right: Space.pad },
     })
 
-    const txt = this.scene.add.text(0, 0, text, Style.basic)
+    const txt = this.scene.add.text(0, 0, text, Style.basicStylized)
     const container = new ContainerLite(this.scene, 0, 0, Space.buttonWidth, 50)
     const button = new Buttons.Basic({
       within: container,
@@ -458,9 +463,11 @@ export default class PlayMenu extends Menu {
       button.disable()
     }
 
-    // Add text and button with space between them (text left, button right, full width)
-    sizer.add(txt).addSpace().add(container)
-    return sizer
+    row
+      .add(txt, { align: 'center' })
+      .addSpace(1)
+      .add(container, { align: 'center' })
+    return row
   }
 
   private isDeckValid(): boolean {
@@ -484,7 +491,7 @@ export default class PlayMenu extends Menu {
   private createGarden(): any {
     const gardenSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
-      width: playPanelWidth - Space.pad * 2,
+      width: playPanelWidth,
       space: { item: Space.pad },
     })
 
@@ -509,7 +516,6 @@ export default class PlayMenu extends Menu {
         orientation: 'vertical',
         space: { item: Space.padSmall },
       })
-      plantSizer.setMinSize(0, PLANT_SIZER_HEIGHT)
 
       // Check if there's a plant at this index
       if (i < serverGarden.length && serverGarden[i]) {
@@ -539,7 +545,7 @@ export default class PlayMenu extends Menu {
 
         // Create timer text below plant - will be updated in update loop
         const timer = this.scene.add
-          .text(0, 0, this.formatTimer(plantTime), Style.basic)
+          .text(0, 0, this.formatTimer(plantTime), Style.basicStylized)
           .setOrigin(0.5)
         this.gardenTimers[i] = timer
 
@@ -741,6 +747,6 @@ export default class PlayMenu extends Menu {
     const minutes = Math.floor((totalSeconds % 3600) / 60)
     const seconds = totalSeconds % 60
 
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+    return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
   }
 }
