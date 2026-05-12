@@ -29,10 +29,9 @@ body {
   min-width: 100vmin;
   min-height: 100vmin;
   display: flex;
-  flex-direction: row;
+  flex-direction: col;
   align-items: stretch;
   justify-content: flex-start;
-  gap: 0.75vmin;
   padding: 0.35vmin 0 0.35vmin clamp(14px, 6vmin, 64px);
   overflow: visible;
 }
@@ -76,7 +75,8 @@ body {
   justify-content: center;
   min-width: 0;
   overflow: visible;
-  padding-left: 100px;
+  padding-left: 80px;
+  padding-right: 10px;
 }
 
 .streamer-brand-stack {
@@ -89,20 +89,7 @@ body {
 }
 
 .streamer-logo-wrap {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  width: 100%;
-  line-height: 0;
-}
-
-.streamer-logo {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-width: 100%;
-  object-fit: contain;
-  object-position: center top;
+  width: 190%;
 }
 
 .streamer-count-label {
@@ -114,7 +101,8 @@ body {
   text-align: center;
   margin: 0;
   line-height: 1.2;
-  width: 100%;
+  padding-inline-start: 80px;
+  width: 140%;
 }
 
 .streamer-count {
@@ -126,5 +114,6 @@ body {
   flex-shrink: 0;
   text-align: center;
   margin: 0;
-  width: 100%;
+  padding-inline-start: 80px;
+  width: 140%;
 }
