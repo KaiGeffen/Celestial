@@ -56,6 +56,12 @@ export default class MenuScene extends BaseMenuScene {
     this.scene.bringToTop()
   }
 
+  update(time: number, delta: number): void {
+    if (this.menu) {
+      this.menu.update(time, delta)
+    }
+  }
+
   private addBackground() {
     // Invisible background rectangles, stops other containers from being clicked
     const invisBackground = this.add

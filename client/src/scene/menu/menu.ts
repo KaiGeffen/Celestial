@@ -46,6 +46,9 @@ export default class Menu {
     this.endScene()
   }
 
+  // Called every frame from MenuScene; override in subclasses
+  update(time: number, delta: number): void {}
+
   protected endScene(): void {
     // TODO Confusing that it returns a callback that has to be called
     this.scene.endScene()()

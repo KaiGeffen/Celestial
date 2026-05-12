@@ -130,7 +130,7 @@ function hideHiddenOpponentAnimations(model: GameModel) {
   model.animations[1] = model.animations[1]
     // Hide mulligan choices
     .filter((animation) => animation.from !== Zone.Mulligan)
-    // Drop any animation the opponent isn't supposed to know occurred at all
+    // Drop any animation the opponent doesn't know occurred at all
     .filter((animation) => animation.visibility !== Visibility.FullyUnknown)
     // Obfuscate the cards opponent is drawing
     .map((animation) => {

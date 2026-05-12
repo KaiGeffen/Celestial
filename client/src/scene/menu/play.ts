@@ -65,17 +65,6 @@ export default class PlayMenu extends Menu {
   constructor(scene: MenuScene, params) {
     super(scene, menuWidth)
 
-    // Add method to reskin input text like in mode.ts
-    this.reskinInputText = () => {
-      if (this.inputText) {
-        this.scene.add.image(
-          this.inputText.x,
-          this.inputText.y,
-          'icon-InputText',
-        )
-      }
-    }
-
     // Get the equipped deck from UserSettings
     this.activeScene = params.activeScene
     const decks = UserSettings._get('decks')
@@ -103,14 +92,6 @@ export default class PlayMenu extends Menu {
 
     // Reskin input text after layout
     this.reskinInputText()
-
-    // Set up timer update loop - update every second
-    this.scene.time.addEvent({
-      delay: 1000,
-      callback: this.updateTimers,
-      callbackScope: this,
-      loop: true,
-    })
 
     // Listen for garden harvest events
     this.scene.game.events.on('gardenHarvested', this.onGardenHarvested, this)
@@ -243,12 +224,6 @@ export default class PlayMenu extends Menu {
         line: Space.padSmall,
       },
     })
-
-    const background = this.scene.add
-      .rectangle(0, 0, deckPanelWidth, 1, Color.backgroundLight)
-      .setInteractive()
-    panelSizer.addBackground(background)
-    this.scene.addShadow(background, -90)
 
     // Deck name - centered using sizer alignment
     const deckNameBackground = this.scene.add
@@ -862,23 +837,8 @@ export default class PlayMenu extends Menu {
     return Math.max(GardenSettings.GROWTH_TIME_HOURS - hoursElapsed, 0)
   }
 
-  private formatTimer(plantedTime: Date): string {
-    const hoursRemaining = this.timeUntilFullyGrown(plantedTime)
-
-    if (hoursRemaining <= 0) {
-      return 'Ready'
-    }
-
-    const totalSeconds = Math.floor(hoursRemaining * 3600)
-    const hours = Math.floor(totalSeconds / 3600)
-    const minutes = Math.floor((totalSeconds % 3600) / 60)
-    const seconds = totalSeconds % 60
-
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-  }
-
-  private updateTimers(): void {
-    // Update garden timers every second
+  // Manage the garden timers and visuals
+  update(_time: number, _delta: number): void {
     if (this.gardenTimers && this.gardenTimes) {
       for (let i = 0; i < GardenSettings.MAX_PLANTS; i++) {
         if (
@@ -933,5 +893,21 @@ export default class PlayMenu extends Menu {
         }
       }
     }
+  }
+
+  // Utility method for timer
+  private formatTimer(plantedTime: Date): string {
+    const hoursRemaining = this.timeUntilFullyGrown(plantedTime)
+
+    if (hoursRemaining <= 0) {
+      return 'Ready'
+    }
+
+    const totalSeconds = Math.floor(hoursRemaining * 3600)
+    const hours = Math.floor(totalSeconds / 3600)
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+    const seconds = totalSeconds % 60
+
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
   }
 }
