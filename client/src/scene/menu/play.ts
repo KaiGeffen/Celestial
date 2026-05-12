@@ -2,7 +2,6 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
-import AvatarButton from '../../lib/buttons/avatar'
 import {
   Color,
   Messages,
@@ -22,7 +21,6 @@ import { server } from '../../server'
 import Decklist from '../../lib/decklist'
 import Catalog from '../../../../shared/state/catalog'
 import Card from '../../../../shared/state/card'
-import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import Server from '../../server'
 import { GardenSettings, MechanicsSettings } from '../../../../shared/settings'
 import { decodeShareableDeckCode } from '../../../../shared/codec'
@@ -30,7 +28,7 @@ import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
-const menuWidth = 975
+const menuWidth = 1000
 const deckPanelWidth = Space.cutoutWidth + Space.pad * 2
 const playPanelWidth = 527
 const PLANT_SIZER_HEIGHT = 244
@@ -48,7 +46,6 @@ export default class PlayMenu extends Menu {
   plantGlowTweens: (Phaser.Tweens.Tween | null)[] // Fixed-length array of glow tweens for each plant
   clickedHarvestIndex: number | null = null // Track which index was clicked for harvest
   txtDeckName: RexUIPlugin.BBCodeText
-  avatar: AvatarButton
   txtDeckValidation: Phaser.GameObjects.Text
   playOptionButtons: Button[] = []
   gardenSizer: any // Store reference to garden sizer for updates
@@ -123,12 +120,6 @@ export default class PlayMenu extends Menu {
     // Update deck name
     this.txtDeckName.setText(this.deck.name || '')
 
-    // Update avatar
-    if (this.avatar) {
-      this.avatar.setAvatar(this.deck.cosmeticSet?.avatar || 0)
-      this.avatar.setBorder(this.deck.cosmeticSet?.border || 0)
-    }
-
     // Update decklist
     const deckCards: Card[] = this.deck.cards
       .map((id) => {
@@ -190,58 +181,46 @@ export default class PlayMenu extends Menu {
   }
 
   private createContent() {
-    // Create main horizontal sizer for left (play options + garden) and right (deck) panels
+    this.createHeader('Play', this.width + Space.pad * 2)
+
+    // Main horizontal sizer holding the two columns
     const mainSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
-      width: menuWidth - Space.pad * 2,
       space: {
         item: Space.pad,
         top: Space.pad,
-        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
       },
     })
 
-    // Left panel: Play options with garden at bottom - align to top
-    const playPanel = this.createPlayPanel()
-    mainSizer.add(playPanel, { align: 'top' })
+    // Left column: play options on top, garden below
+    const leftColumn = this.scene.rexUI.add.fixWidthSizer({
+      width: playPanelWidth,
+      space: { line: Space.pad },
+    })
+    leftColumn.add(this.createPlayPanel()).addNewLine()
+    leftColumn.add(this.createGardenPanel())
+    mainSizer.add(leftColumn, { align: 'top' })
 
-    // Right panel: Deck
-    const deckPanel = this.createDeckPanel()
-    mainSizer.add(deckPanel, { align: 'top' })
+    // Right column: deck panel (title+arrows then decklist)
+    mainSizer.add(this.createDeckPanel(), { align: 'top' })
 
-    this.sizer.add(mainSizer).addNewLine()
+    this.sizer.add(mainSizer)
   }
 
   private createDeckPanel(): any {
     const panelSizer = this.scene.rexUI.add.fixWidthSizer({
       width: deckPanelWidth,
-      space: {
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        item: Space.padSmall,
-        line: Space.padSmall,
-      },
+      space: { line: Space.padSmall },
     })
 
-    // Deck name - centered using sizer alignment
-    const deckNameBackground = this.scene.add
-      .rectangle(0, 0, deckPanelWidth, 1, Color.backgroundDark)
-      .setInteractive()
-    this.scene.addShadow(deckNameBackground, -90)
-
+    // Title row: prev arrow, deck name, next arrow
     const deckNameSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
       width: deckPanelWidth,
-      space: {
-        top: Space.pad,
-        bottom: Space.pad,
-      },
     })
-    deckNameSizer.addBackground(deckNameBackground)
 
-    // Previous deck button
     const decks = UserSettings._get('decks')
     const hasMultipleDecks = decks && decks.length > 1
 
@@ -262,7 +241,6 @@ export default class PlayMenu extends Menu {
     }
     deckNameSizer.add(prevDeckContainer)
 
-    // Deck name
     this.txtDeckName = this.scene.rexUI.add
       .BBCodeText()
       .setStyle({ ...BBStyle.deckname, fixedWidth: deckPanelWidth - 25 })
@@ -270,7 +248,6 @@ export default class PlayMenu extends Menu {
       .setText(this.deck.name || '')
     deckNameSizer.add(this.txtDeckName, { expand: true })
 
-    // Next deck button
     const nextDeckContainer = new ContainerLite(
       this.scene,
       0,
@@ -290,84 +267,28 @@ export default class PlayMenu extends Menu {
 
     panelSizer.add(deckNameSizer).addNewLine()
 
-    // Change Deck button and Avatar side by side, centered
-    const buttonAvatarSizer = this.scene.rexUI.add.sizer({
-      orientation: 'horizontal',
-      width: deckPanelWidth - Space.pad * 2,
-      space: { item: Space.pad },
-    })
-    buttonAvatarSizer.addSpace() // Add space before to center
-
-    // Edit the deck button
-    const changeDeckContainer = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.bigButtonHeight,
-    )
-    new Buttons.Big({
-      within: changeDeckContainer,
-      text: 'Edit',
-      f: () => {
-        this.scene.scene.stop()
-        const activeScene = this.scene.scene.manager
-          .getScenes(true)
-          .find((s) => s.scene.key !== 'MenuScene' && s.scene.isActive())
-        if (activeScene) {
-          activeScene.scene.stop()
-        }
-        const deckIndex = UserSettings._get('equippedDeckIndex') || 0
-        this.scene.scene.start('DeckEditorScene', { deckIndex })
-        logEvent('change_deck_from_play_menu')
-      },
-    })
-    buttonAvatarSizer.add(changeDeckContainer)
-
-    // Avatar (non-clickable)
-    const avatarContainer = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.avatarSize + Space.pad,
-      Space.avatarSize,
-    )
-    this.avatar = new Buttons.Avatar({
-      within: avatarContainer,
-      avatarId: this.deck.cosmeticSet?.avatar || 0,
-      border: this.deck.cosmeticSet?.border || 0,
-      muteClick: true,
-    })
-    buttonAvatarSizer.add(avatarContainer)
-    buttonAvatarSizer.addSpace() // Add space after to center
-
-    panelSizer.add(buttonAvatarSizer).addNewLine()
-
-    // Deck validation message - centered
+    // Validation message - shown when deck is invalid
     const deckSize = this.deck.cards ? this.deck.cards.length : 0
     const isValid = deckSize === MechanicsSettings.DECK_SIZE
 
-    if (!isValid) {
-      const validationSizer = this.scene.rexUI.add.sizer({
-        width: deckPanelWidth - Space.pad * 2,
-        orientation: 'horizontal',
+    const validationSizer = this.scene.rexUI.add.sizer({
+      width: deckPanelWidth,
+      orientation: 'horizontal',
+    })
+    this.txtDeckValidation = this.scene.add
+      .text(0, 0, 'Invalid deck', {
+        ...Style.basic,
+        color: '#ff0000',
+        wordWrap: { width: deckPanelWidth - Space.pad * 2 },
       })
-      this.txtDeckValidation = this.scene.add
-        .text(0, 0, 'Invalid deck', {
-          ...Style.basic,
-          color: '#ff0000',
-          wordWrap: { width: deckPanelWidth - Space.pad * 2 },
-        })
-        .setOrigin(0.5, 0)
-      // Center by adding space before and after
-      validationSizer.addSpace().add(this.txtDeckValidation).addSpace()
-      panelSizer.add(validationSizer).addNewLine()
-    }
+      .setOrigin(0.5, 0)
+      .setVisible(!isValid)
+    validationSizer.addSpace().add(this.txtDeckValidation).addSpace()
+    panelSizer.add(validationSizer).addNewLine()
 
     // Decklist
     this.decklist = new Decklist(this.scene as any, () => () => {})
 
-    // Convert deck card IDs to Card objects, filtering out any invalid cards
     const deckCards: Card[] = this.deck.cards
       .map((id) => {
         try {
@@ -382,9 +303,8 @@ export default class PlayMenu extends Menu {
       this.decklist.setDeck(deckCards, false)
     }
 
-    // Create scrollable panel for the deck
     this.scrollableDeck = newScrollablePanel(this.scene, {
-      width: deckPanelWidth - Space.pad * 2,
+      width: deckPanelWidth,
       height: 420,
       panel: {
         child: this.decklist.sizer,
@@ -398,60 +318,16 @@ export default class PlayMenu extends Menu {
   }
 
   private createPlayPanel(): any {
-    // Create a vertical sizer to hold play options at top and garden at bottom
-    const panelSizer = this.scene.rexUI.add.fixWidthSizer({
-      width: playPanelWidth,
-      space: {
-        top: 0,
-        bottom: Space.pad,
-        left: 0,
-        right: 0,
-        item: Space.padSmall,
-        line: Space.padSmall,
-      },
-    })
-
-    // Create a vertical sizer for the content (play options at top) with its own background
-    const contentSizer = this.scene.rexUI.add.fixWidthSizer({
+    const sizer = this.scene.rexUI.add.fixWidthSizer({
       width: playPanelWidth,
       align: 'center',
       space: {
-        bottom: Space.pad,
         item: Space.padSmall,
         line: Space.pad,
       },
     })
 
-    const contentBackground = this.scene.add
-      .rectangle(0, 0, 1, 1, Color.backgroundLight)
-      .setInteractive()
-    contentSizer.addBackground(contentBackground)
-    this.scene.addShadow(contentBackground, -90)
-
-    // Player vs Player section - center the title
-    const titleBackground = this.scene.add
-      .rectangle(0, 0, playPanelWidth, 1, Color.backgroundDark)
-      .setInteractive()
-    this.scene.addShadow(titleBackground, -90)
-
-    const titleSizer = this.scene.rexUI.add.fixWidthSizer({
-      width: playPanelWidth,
-      align: 'center',
-      space: {
-        top: Space.pad,
-        bottom: Space.pad,
-      },
-    })
-    titleSizer.addBackground(titleBackground)
-
-    const txtTitle = this.scene.add
-      .text(0, 0, 'Game Mode', Style.header)
-      .setOrigin(0.5)
-    titleSizer.add(txtTitle)
-    contentSizer.add(titleSizer).addNewLine()
-
-    // Versus Computer
-    contentSizer
+    sizer
       .add(
         this.createPlayOption('Versus Computer', () => {
           if (!server || !server.isOpen()) {
@@ -483,8 +359,7 @@ export default class PlayMenu extends Menu {
       )
       .addNewLine()
 
-    // Versus Human
-    contentSizer
+    sizer
       .add(
         this.createPlayOption('Versus Human', () => {
           if (!server || !server.isOpen()) {
@@ -506,7 +381,6 @@ export default class PlayMenu extends Menu {
       )
       .addNewLine()
 
-    // Password Match
     const friendlyMatchOption = this.createPlayOption('Password Match', () => {
       if (!server || !server.isOpen()) {
         this.scene.signalError(Messages.disconnectError)
@@ -528,14 +402,11 @@ export default class PlayMenu extends Menu {
       })
       logEvent('queue_pwd')
     })
-    // Store reference to the PWD button
     this.pwdBtn = this.playOptionButtons[this.playOptionButtons.length - 1]
-    // Initially disable since password field is empty (updatePwdButton will handle this)
     this.updatePwdButton()
 
-    contentSizer.add(friendlyMatchOption).addNewLine()
+    sizer.add(friendlyMatchOption).addNewLine()
 
-    // Password entry for PWD
     this.inputText = this.scene.add
       .rexInputText(0, 0, Space.inputTextWidth, 40, {
         type: 'text',
@@ -550,46 +421,15 @@ export default class PlayMenu extends Menu {
       })
       .on('textchange', (inputText) => {
         this.password = inputText.text
-        // Enable/disable PWD button based on password and deck validity
         this.updatePwdButton()
       })
-    contentSizer.add(this.inputText).addNewLine()
+    sizer.add(this.inputText)
 
-    // Add content sizer to panel (game modes)
-    panelSizer.add(contentSizer).addNewLine()
-
-    // Add garden as separate panel with its own background
-    const gardenPanel = this.createGardenPanel()
-    panelSizer.add(gardenPanel)
-
-    return panelSizer
+    return sizer
   }
 
   private createGardenPanel(): any {
-    // Create a sizer for the garden with its own background
-    const gardenSizer = this.scene.rexUI.add.fixWidthSizer({
-      width: playPanelWidth,
-      space: {
-        top: Space.pad,
-        bottom: Space.pad,
-        left: Space.pad,
-        right: Space.pad,
-        item: Space.padSmall,
-        line: Space.padSmall,
-      },
-    })
-
-    const background = this.scene.add
-      .rectangle(0, 0, playPanelWidth, 1, Color.backgroundLight)
-      .setInteractive()
-    gardenSizer.addBackground(background)
-    this.scene.addShadow(background, -90)
-
-    // Create the garden content
-    const gardenContent = this.createGarden()
-    gardenSizer.add(gardenContent)
-
-    return gardenSizer
+    return this.createGarden()
   }
 
   private createPlayOption(text: string, callback: () => void): any {
