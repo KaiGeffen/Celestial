@@ -181,6 +181,8 @@ export default class PlayMenu extends Menu {
   }
 
   private createContent() {
+    this.sizer.addBackground(this.scene.add.image(0, 0, 'chrome-bodyAlt'))
+
     this.createHeader('Play', this.width + Space.pad * 2)
 
     // Main horizontal sizer holding the two columns
@@ -188,7 +190,6 @@ export default class PlayMenu extends Menu {
       orientation: 'horizontal',
       space: {
         item: Space.pad,
-        top: Space.pad,
         left: Space.pad,
         right: Space.pad,
       },
@@ -212,7 +213,8 @@ export default class PlayMenu extends Menu {
   private createDeckPanel(): any {
     const panelSizer = this.scene.rexUI.add.fixWidthSizer({
       width: deckPanelWidth,
-      space: { line: Space.padSmall },
+      align: 'center',
+      space: { line: 40 },
     })
 
     // Title row: prev arrow, deck name, next arrow
@@ -267,25 +269,6 @@ export default class PlayMenu extends Menu {
 
     panelSizer.add(deckNameSizer).addNewLine()
 
-    // Validation message - shown when deck is invalid
-    const deckSize = this.deck.cards ? this.deck.cards.length : 0
-    const isValid = deckSize === MechanicsSettings.DECK_SIZE
-
-    const validationSizer = this.scene.rexUI.add.sizer({
-      width: deckPanelWidth,
-      orientation: 'horizontal',
-    })
-    this.txtDeckValidation = this.scene.add
-      .text(0, 0, 'Invalid deck', {
-        ...Style.basic,
-        color: '#ff0000',
-        wordWrap: { width: deckPanelWidth - Space.pad * 2 },
-      })
-      .setOrigin(0.5, 0)
-      .setVisible(!isValid)
-    validationSizer.addSpace().add(this.txtDeckValidation).addSpace()
-    panelSizer.add(validationSizer).addNewLine()
-
     // Decklist
     this.decklist = new Decklist(this.scene as any, () => () => {})
 
@@ -304,7 +287,7 @@ export default class PlayMenu extends Menu {
     }
 
     this.scrollableDeck = newScrollablePanel(this.scene, {
-      width: deckPanelWidth,
+      width: Space.cutoutWidth + 10,
       height: 420,
       panel: {
         child: this.decklist.sizer,
@@ -423,7 +406,17 @@ export default class PlayMenu extends Menu {
         this.password = inputText.text
         this.updatePwdButton()
       })
-    sizer.add(this.inputText)
+    sizer.add(this.inputText).addNewLine()
+
+    // Validation message - shown when the equipped deck is invalid
+    this.txtDeckValidation = this.scene.add
+      .text(0, 0, 'Invalid deck', {
+        ...Style.basic,
+        color: '#ff0000',
+      })
+      .setOrigin(0.5, 0)
+      .setVisible(!this.isDeckValid())
+    sizer.add(this.txtDeckValidation)
 
     return sizer
   }

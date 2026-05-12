@@ -480,10 +480,9 @@ export const BBStyle: Record<string, any> = {
     strokeThickness: 1,
   },
   deckname: {
-    ...Style.header,
+    ...Style.deckThumbnail,
+    fontSize: FontSettings.large.size,
     halign: 'center',
     fixedHeight: 50,
-    stroke: Color.blackS,
-    strokeThickness: 4,
   },
 }
