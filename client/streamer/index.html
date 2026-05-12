@@ -11,15 +11,26 @@
   </head>
   <body>
     <div class="streamer-1x1">
-      <div class="streamer-logo-wrap">
+      <div class="streamer-col streamer-col--art">
         <img
-          src="../assets/logo.svg"
-          alt="CELESTIAL Decks"
-          class="streamer-logo"
+          src="umbra.webp"
+          alt=""
+          class="streamer-character"
         />
       </div>
-      <p class="streamer-count-label"></p>
-      <p id="ref-count" class="streamer-count"></p>
+      <div class="streamer-col streamer-col--content">
+        <div class="streamer-brand-stack">
+          <div class="streamer-logo-wrap">
+            <img
+              src="../assets/logo.svg"
+              alt="CELESTIAL Decks"
+              class="streamer-logo"
+            />
+          </div>
+          <p class="streamer-count-label"></p>
+          <p id="ref-count" class="streamer-count"></p>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -36,15 +47,23 @@
             ? 'http://localhost:' + REFERRAL_COUNT_PORT + '/ref-count'
             : 'https://celestialdecks.gg/ref-count'
 
+        function setLabelOneline(on) {
+          if (!labelEl) return
+          if (on) labelEl.classList.add('streamer-label-oneline')
+          else labelEl.classList.remove('streamer-label-oneline')
+        }
+
         // Set the count of sign ups for the given ref code
         function setCount(n) {
           if (labelEl) labelEl.textContent = '!celestial sign ups'
+          setLabelOneline(true)
           if (el)
             el.textContent = typeof n === 'number' ? n.toLocaleString() : n
         }
 
         // Show the message when no ref code is provided
         function showNoReferrer() {
+          setLabelOneline(false)
           if (labelEl)
             labelEl.textContent = 'Include ref code:   .../?ref=yourcode'
           if (el) el.textContent = ''
@@ -52,6 +71,7 @@
 
         // Show the message when the ref code is invalid
         function showReferrerInvalid() {
+          setLabelOneline(false)
           if (labelEl) labelEl.textContent = `Invalid ref code: "${referrer}"`
           if (el) el.textContent = ''
         }
@@ -74,6 +94,7 @@
               }
             })
             .catch(function () {
+              setLabelOneline(false)
               if (labelEl) labelEl.textContent = 'Error fetching count'
             })
         }

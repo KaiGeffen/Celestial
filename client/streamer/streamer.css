@@ -1,4 +1,4 @@
-/* Streamer overlay – 1:1 aspect ratio, logo + sign-up count */
+/* Streamer overlay – 1:1 aspect ratio; character left, logo + count right */
 
 :root {
   --color-navy: #353f4e;
@@ -19,7 +19,7 @@ body {
   margin: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background: url('../assets/img/background/Light.webp') center/cover no-repeat;
 }
 
@@ -29,37 +29,68 @@ body {
   min-width: 100vmin;
   min-height: 100vmin;
   display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0.75vmin;
+  padding: 0.35vmin 0 0.35vmin clamp(14px, 6vmin, 64px);
+  overflow: visible;
+}
+
+.streamer-col--art {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 0;
+}
+
+.streamer-character {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: min(62vmin, 78%);
+  object-fit: contain;
+  object-position: left center;
+}
+
+.streamer-col--content {
+  flex: 1 1 0;
+  display: flex;
   flex-direction: column;
   align-items: stretch;
   justify-content: center;
-  gap: 0.4vmin;
-  padding: 2%;
+  min-width: 0;
+  overflow: visible;
+  padding-right: 0;
+}
+
+.streamer-brand-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.45vmin;
+  width: 100%;
+  max-width: 100%;
 }
 
 .streamer-logo-wrap {
-  flex: 0 1 72%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  min-height: 0;
+  width: 100%;
+  line-height: 0;
 }
 
 .streamer-logo {
+  display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-width: 100%;
   object-fit: contain;
-  object-position: center;
-  animation: logoBreathe 4s ease-in-out infinite;
-}
-
-@keyframes logoBreathe {
-  0%,
-  100% {
-    transform: scale(1.38);
-  }
-  50% {
-    transform: scale(1.46);
-  }
+  object-position: center top;
 }
 
 .streamer-count-label {
@@ -71,6 +102,11 @@ body {
   text-align: center;
   margin: 0;
   line-height: 1.2;
+  width: 100%;
+}
+
+.streamer-count-label.streamer-label-oneline {
+  white-space: nowrap;
 }
 
 .streamer-count {
@@ -82,4 +118,5 @@ body {
   flex-shrink: 0;
   text-align: center;
   margin: 0;
+  width: 100%;
 }
