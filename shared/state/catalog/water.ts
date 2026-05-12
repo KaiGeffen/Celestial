@@ -302,6 +302,7 @@ const pool = new Pool({
   name: 'Pool',
   id: 7037,
   text: 'Refresh, Refresh\nExhale 1: Draw a card.',
+  beta: true,
 })
 
 export {
