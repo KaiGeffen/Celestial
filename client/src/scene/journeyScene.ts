@@ -232,20 +232,17 @@ export default class JourneyScene extends BaseScene {
   }
 
   private createOverlayCharacterArt(): void {
-    const topPad = Space.buttonHeight + Space.pad * 2
-    const availableHeight = Space.windowHeight - topPad * 2
-
+    const x = Space.windowWidth - OVERLAY_WIDTH - Space.pad
     this.overlayCharacterImage = this.add
-      .image(Space.pad, topPad, 'avatar-JulesFull')
-      .setOrigin(0, 0)
+      .image(x, OVERLAY_TOP, 'avatar-JulesFull')
+      .setOrigin(1, 0)
       .setScrollFactor(0)
       .setVisible(false)
-      .setDepth(100)
       .setScale(
-        availableHeight /
+        OVERLAY_HEIGHT /
           this.textures.get('avatar-JulesFull').getSourceImage().height,
       )
-    this.addShadow(this.overlayCharacterImage)
+    // this.addShadow(this.overlayCharacterImage)
   }
 
   private createMissionTipBox(): void {
