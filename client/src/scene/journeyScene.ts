@@ -328,7 +328,12 @@ export default class JourneyScene extends BaseScene {
       .sizer({
         orientation: 'horizontal',
         width: OVERLAY_WIDTH,
-        space: { left: 12, right: 12, top: 12, bottom: 12 },
+        space: {
+          left: Space.padSmall,
+          right: Space.padSmall,
+          top: Space.padSmall,
+          bottom: Space.padSmall,
+        },
       })
       .addBackground(headerBg)
 
@@ -422,7 +427,7 @@ export default class JourneyScene extends BaseScene {
   }
 
   private createOverlayCharacterText(): Phaser.GameObjects.GameObject {
-    const padding = Space.padSmall
+    const padding = Space.pad
     const text = this.add
       .text(0, 0, '', Style.chapterBody)
       .setWordWrapWidth(OVERLAY_WIDTH - padding * 2)
@@ -434,10 +439,10 @@ export default class JourneyScene extends BaseScene {
         x: 0,
         y: 0,
         space: {
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: 0,
+          left: padding,
+          right: padding,
+          top: padding,
+          bottom: padding,
         },
         page: {
           maxLines: 0,
@@ -448,19 +453,13 @@ export default class JourneyScene extends BaseScene {
     const bioText =
       '    ' +
       (avatarBios[this.selectedThemeIndex] ?? 'Bio coming soon.')
-        .replace(/\n/g, '\n    ')
+        .replace(/\n/g, '\n\n    ')
         .trim()
     textBox.start(bioText, JOURNEY_TEXTBOX_TYPE_MS)
 
     return this.rexUI.add
       .sizer({
         orientation: 'vertical',
-        space: {
-          left: padding,
-          right: padding,
-          top: padding,
-          bottom: padding,
-        },
       })
       .add(textBox)
   }
