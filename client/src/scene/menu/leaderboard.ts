@@ -22,27 +22,24 @@ interface LeaderboardEntry {
   rank: number
   username: string
   elo: number
-  eloPeak: number
-  winsLifetime: number
-  lossesLifetime: number
-  winsMonth: number
-  lossesMonth: number
+  wins: number
+  losses: number
   cosmeticSet: CosmeticSet
+}
+
+interface LeaderboardResponse {
+  month: LeaderboardEntry[]
+  allTime: LeaderboardEntry[]
 }
 
 type LeaderboardMode = 'current' | 'allTime'
 
 export default class LeaderboardMenu extends Menu {
-  private leaderboardData: LeaderboardEntry[] = []
+  private monthData: LeaderboardEntry[] = []
+  private allTimeData: LeaderboardEntry[] = []
   private scrollablePanel: ScrollablePanel
   private mode: LeaderboardMode = 'current'
   private modeToggleButton: Button
-
-  // Per-row wins/losses/elo text refs so we can re-render on mode toggle
-  // without rebuilding the scrollable panel.
-  private rowWinsTexts: Phaser.GameObjects.Text[] = []
-  private rowLossesTexts: Phaser.GameObjects.Text[] = []
-  private rowEloTexts: Phaser.GameObjects.Text[] = []
 
   constructor(scene: MenuScene, params) {
     super(scene, width, params)
@@ -77,7 +74,9 @@ export default class LeaderboardMenu extends Menu {
       if (!response.ok) {
         throw new Error('Failed to fetch leaderboard data')
       }
-      this.leaderboardData = await response.json()
+      const data: LeaderboardResponse = await response.json()
+      this.monthData = data.month ?? []
+      this.allTimeData = data.allTime ?? []
       this.createContent()
     } catch (error) {
       console.error('Error fetching leaderboard data:', error)
@@ -173,39 +172,33 @@ export default class LeaderboardMenu extends Menu {
     this.mode = this.mode === 'current' ? 'allTime' : 'current'
     this.modeToggleButton.setText(this.getModeToggleLabel())
 
-    // Rows are aligned 1:1 with leaderboardData order
-    this.leaderboardData.forEach((entry, i) => {
-      this.rowWinsTexts[i]?.setText(this.getWinsForEntry(entry).toString())
-      this.rowLossesTexts[i]?.setText(this.getLossesForEntry(entry).toString())
-      this.rowEloTexts[i]?.setText(this.getEloForEntry(entry).toString())
-    })
+    // Lists differ in membership AND order, so rebuild the panel's rows
+    const innerSizer = this.scrollablePanel.getElement('panel') as any
+    innerSizer.removeAll(true)
+    this.activeList().forEach((entry) => innerSizer.add(this.createRow(entry)))
+    this.scrollablePanel.layout()
+    this.scrollablePanel.t = 0
+    this.scrollToUserPosition()
   }
 
-  private getWinsForEntry(entry: LeaderboardEntry): number {
-    return this.mode === 'current' ? entry.winsMonth : entry.winsLifetime
-  }
-
-  private getLossesForEntry(entry: LeaderboardEntry): number {
-    return this.mode === 'current' ? entry.lossesMonth : entry.lossesLifetime
-  }
-
-  private getEloForEntry(entry: LeaderboardEntry): number {
-    return this.mode === 'current' ? entry.elo : entry.eloPeak
+  private activeList(): LeaderboardEntry[] {
+    return this.mode === 'current' ? this.monthData : this.allTimeData
   }
 
   private scrollToUserPosition() {
-    if (!this.scrollablePanel || this.leaderboardData.length === 0) {
+    const list = this.activeList()
+    if (!this.scrollablePanel || list.length === 0) {
       return
     }
 
     const userData = Server.getUserData()
-    const userIndex = this.leaderboardData.findIndex(
+    const userIndex = list.findIndex(
       (entry) => entry.username === userData.username,
     )
 
     // If user is found in the list, scroll to their position
     if (userIndex !== -1) {
-      const totalLength = this.leaderboardData.length
+      const totalLength = list.length
       const ratio = totalLength > 1 ? userIndex / (totalLength - 1) : 0
       // Clamp ratio to valid scroll range (0 to 0.999999)
       this.scrollablePanel.t = Math.min(0.999999, Math.max(0, ratio))
@@ -219,8 +212,7 @@ export default class LeaderboardMenu extends Menu {
       height: height,
     })
 
-    // Create individual rows for all entries
-    this.leaderboardData.forEach((entry) => {
+    this.activeList().forEach((entry) => {
       let rowSizer = this.createRow(entry)
       entriesSizer.add(rowSizer)
     })
@@ -278,24 +270,21 @@ export default class LeaderboardMenu extends Menu {
     let winsText = this.scene.add.text(
       0,
       0,
-      this.getWinsForEntry(entry).toString(),
+      entry.wins.toString(),
       Style.basicStylized,
     )
     let lossesText = this.scene.add.text(
       0,
       0,
-      this.getLossesForEntry(entry).toString(),
+      entry.losses.toString(),
       Style.basicStylized,
     )
-    this.rowWinsTexts.push(winsText)
-    this.rowLossesTexts.push(lossesText)
     let eloText = this.scene.add.text(
       0,
       0,
-      this.getEloForEntry(entry).toString(),
+      entry.elo.toString(),
       Style.basicStylized,
     )
-    this.rowEloTexts.push(eloText)
 
     // Add each text with the right proportion
     rowSizer
