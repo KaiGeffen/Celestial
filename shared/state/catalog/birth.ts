@@ -298,19 +298,22 @@ class Genesis extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    const amt = game.score[player] - 5
+    // Birth if points were lost
+    const amt = game.score[player] - 2
     if (amt > 0) {
-      game.score[player] = 5
       this.birth(amt, game, player)
     }
+
+    // Set points to 2 regardless
+    game.score[player] = 2
   }
 }
 const genesis = new Genesis({
   name: 'Genesis',
   id: 5023,
-  cost: 5,
-  points: 5,
-  text: 'Set your points to 5, then Birth 1 for each point you lost.',
+  cost: 2,
+  points: 2,
+  text: 'Set your points to 2, then Birth 1 for each point you lost.',
 })
 
 class BeginnersMind extends Card {

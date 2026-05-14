@@ -64,8 +64,6 @@ const ALT_MAP_FADE_DURATION = 400
 const MISSION_TIP_FADE_DURATION = 200
 /** Tip box width: from left pad to just left of the overlay panel (one extra pad) */
 const MISSION_TIP_BOX_WIDTH = Space.windowWidth - OVERLAY_WIDTH - Space.pad * 3
-const DEFAULT_MISSION_TIP =
-  'This mission will challenge your deck-building and strategy.\n\nComplete the required cards, then choose the rest to fill your deck.\n\nGood luck.'
 const ALT_MAP_SWAY_SPEED = 0.0004
 const ALT_MAP_SWAY_PHASE = 1.5
 const ALT_MAP_SWAY_RADIUS = 80
@@ -294,10 +292,6 @@ export default class JourneyScene extends BaseScene {
     ])
     this.missionTipContainer.setScrollFactor(0)
     this.missionTipContainer.setAlpha(0)
-  }
-
-  private getMissionTip(mission: MissionDetails): string {
-    return mission.tip ?? DEFAULT_MISSION_TIP
   }
 
   private showMissionTip(text: string): void {
@@ -722,7 +716,7 @@ export default class JourneyScene extends BaseScene {
         f: this.missionOnClick(mission),
       })
       startBtn.setOnHover(
-        () => this.showMissionTip(this.getMissionTip(mission)),
+        () => this.showMissionTip(mission.tip ?? ''),
         () => this.hideMissionTip(),
       )
       row.add(btnContainer, { align: 'center' })
