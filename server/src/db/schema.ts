@@ -47,10 +47,14 @@ export const players = pgTable(
       .notNull()
       .default(sql`now()`),
     lastactive: date('lastactive').notNull(),
-    wins: integer('wins').notNull(),
-    losses: integer('losses').notNull(),
     elo: integer('elo').notNull(),
     decks: varchar('decks', { length: 1000 }).array().notNull(),
+
+    // PVP Records
+    pvp_wins_lifetime: integer('pvp_wins_lifetime').notNull(),
+    pvp_losses_lifetime: integer('pvp_losses_lifetime').notNull(),
+    pvp_wins_month: integer('pvp_wins_month').notNull(),
+    pvp_losses_month: integer('pvp_losses_month').notNull(),
 
     // Single Player Records
     pve_wins: integer('pve_wins').notNull(),

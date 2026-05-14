@@ -65,11 +65,13 @@ export async function updateMatchResultPVP(
   const newLoserRating = elo.updateRating(expectedScoreLoser, 0, loserData.elo)
 
   // Update the database with new ELO for winner and loser
+  // Bump both lifetime and current-month PVP records
   await db
     .update(players)
     .set({
       elo: newWinnerRating,
-      wins: sql`${players.wins} + 1`,
+      pvp_wins_lifetime: sql`${players.pvp_wins_lifetime} + 1`,
+      pvp_wins_month: sql`${players.pvp_wins_month} + 1`,
     })
     .where(eq(players.id, winnerId))
 
@@ -77,7 +79,8 @@ export async function updateMatchResultPVP(
     .update(players)
     .set({
       elo: newLoserRating,
-      losses: sql`${players.losses} + 1`,
+      pvp_losses_lifetime: sql`${players.pvp_losses_lifetime} + 1`,
+      pvp_losses_month: sql`${players.pvp_losses_month} + 1`,
     })
     .where(eq(players.id, loserId))
 }

@@ -24,14 +24,14 @@ export default function createLeaderboardServer() {
       const leaderboardData = await db
         .select({
           username: players.username,
-          wins: players.wins,
-          losses: players.losses,
+          wins: players.pvp_wins_lifetime,
+          losses: players.pvp_losses_lifetime,
           elo: players.elo,
           cosmetic_set: players.cosmetic_set,
         })
         .from(players)
         .where(
-          sql`${players.username} != 'Guest' AND (${players.wins} + ${players.losses}) > 0`,
+          sql`${players.username} != 'Guest' AND (${players.pvp_wins_lifetime} + ${players.pvp_losses_lifetime}) > 0`,
         )
         .orderBy(desc(players.elo))
         .limit(1000)
