@@ -5,6 +5,7 @@ import MenuScene from '../menuScene'
 import Server from '../../server'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import Buttons from '../../lib/buttons/buttons'
+import Button from '../../lib/buttons/button'
 import { Flags } from '../../settings/flags'
 import { LEADERBOARD_PORT } from '../../../../shared/network/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -21,15 +22,25 @@ interface LeaderboardEntry {
   rank: number
   username: string
   elo: number
-  wins: number
-  losses: number
-  gamesPlayed: number
+  winsLifetime: number
+  lossesLifetime: number
+  winsMonth: number
+  lossesMonth: number
   cosmeticSet: CosmeticSet
 }
+
+type LeaderboardMode = 'current' | 'allTime'
 
 export default class LeaderboardMenu extends Menu {
   private leaderboardData: LeaderboardEntry[] = []
   private scrollablePanel: ScrollablePanel
+  private mode: LeaderboardMode = 'current'
+  private modeToggleButton: Button
+
+  // Per-row wins/losses text refs so we can re-render on mode toggle
+  // without rebuilding the scrollable panel.
+  private rowWinsTexts: Phaser.GameObjects.Text[] = []
+  private rowLossesTexts: Phaser.GameObjects.Text[] = []
 
   constructor(scene: MenuScene, params) {
     super(scene, width, params)
@@ -127,6 +138,52 @@ export default class LeaderboardMenu extends Menu {
     // After layout, scroll to user's position if they're in the list
     this.scrollablePanel.layout()
     this.scrollToUserPosition()
+
+    this.createModeToggle()
+  }
+
+  // Toggle between showing this month's and lifetime W/L numbers
+  private createModeToggle() {
+    const container = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    this.modeToggleButton = new Buttons.Basic({
+      within: container,
+      text: this.getModeToggleLabel(),
+      f: this.toggleMode,
+    })
+
+    this.scene.plugins.get('rexAnchor')['add'](container, {
+      x: `50%+${width / 2 - Space.buttonWidth / 2 - Space.pad}`,
+      y: `50%-${height / 2 + Space.buttonHeight / 2 - 5}`,
+    })
+  }
+
+  private getModeToggleLabel(): string {
+    return this.mode === 'current' ? 'Current' : 'All Time'
+  }
+
+  private toggleMode = () => {
+    this.mode = this.mode === 'current' ? 'allTime' : 'current'
+    this.modeToggleButton.setText(this.getModeToggleLabel())
+
+    // Rows are aligned 1:1 with leaderboardData order
+    this.leaderboardData.forEach((entry, i) => {
+      this.rowWinsTexts[i]?.setText(this.getWinsForEntry(entry).toString())
+      this.rowLossesTexts[i]?.setText(this.getLossesForEntry(entry).toString())
+    })
+  }
+
+  private getWinsForEntry(entry: LeaderboardEntry): number {
+    return this.mode === 'current' ? entry.winsMonth : entry.winsLifetime
+  }
+
+  private getLossesForEntry(entry: LeaderboardEntry): number {
+    return this.mode === 'current' ? entry.lossesMonth : entry.lossesLifetime
   }
 
   private scrollToUserPosition() {
@@ -214,15 +271,17 @@ export default class LeaderboardMenu extends Menu {
     let winsText = this.scene.add.text(
       0,
       0,
-      entry.wins.toString(),
+      this.getWinsForEntry(entry).toString(),
       Style.basicStylized,
     )
     let lossesText = this.scene.add.text(
       0,
       0,
-      entry.losses.toString(),
+      this.getLossesForEntry(entry).toString(),
       Style.basicStylized,
     )
+    this.rowWinsTexts.push(winsText)
+    this.rowLossesTexts.push(lossesText)
     let eloText = this.scene.add.text(
       0,
       0,

@@ -24,8 +24,10 @@ export default function createLeaderboardServer() {
       const leaderboardData = await db
         .select({
           username: players.username,
-          wins: players.pvp_wins_lifetime,
-          losses: players.pvp_losses_lifetime,
+          winsLifetime: players.pvp_wins_lifetime,
+          lossesLifetime: players.pvp_losses_lifetime,
+          winsMonth: players.pvp_wins_month,
+          lossesMonth: players.pvp_losses_month,
           elo: players.elo,
           cosmetic_set: players.cosmetic_set,
         })
@@ -46,8 +48,10 @@ export default function createLeaderboardServer() {
         }
         return {
           username: player.username,
-          wins: player.wins,
-          losses: player.losses,
+          winsLifetime: player.winsLifetime,
+          lossesLifetime: player.lossesLifetime,
+          winsMonth: player.winsMonth,
+          lossesMonth: player.lossesMonth,
           elo: player.elo,
           cosmeticSet,
           rank: index + 1,
