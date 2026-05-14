@@ -234,6 +234,7 @@ export default function createWebSocketServer() {
               pvp_wins_month: 0,
               pvp_losses_month: 0,
               elo: 1000,
+              elo_peak: 1000,
               decks: decks.map((deck) => JSON.stringify(deck)),
               pve_wins: 0,
               pve_losses: 0,

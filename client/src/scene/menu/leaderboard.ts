@@ -22,6 +22,7 @@ interface LeaderboardEntry {
   rank: number
   username: string
   elo: number
+  eloPeak: number
   winsLifetime: number
   lossesLifetime: number
   winsMonth: number
@@ -37,10 +38,11 @@ export default class LeaderboardMenu extends Menu {
   private mode: LeaderboardMode = 'current'
   private modeToggleButton: Button
 
-  // Per-row wins/losses text refs so we can re-render on mode toggle
+  // Per-row wins/losses/elo text refs so we can re-render on mode toggle
   // without rebuilding the scrollable panel.
   private rowWinsTexts: Phaser.GameObjects.Text[] = []
   private rowLossesTexts: Phaser.GameObjects.Text[] = []
+  private rowEloTexts: Phaser.GameObjects.Text[] = []
 
   constructor(scene: MenuScene, params) {
     super(scene, width, params)
@@ -175,6 +177,7 @@ export default class LeaderboardMenu extends Menu {
     this.leaderboardData.forEach((entry, i) => {
       this.rowWinsTexts[i]?.setText(this.getWinsForEntry(entry).toString())
       this.rowLossesTexts[i]?.setText(this.getLossesForEntry(entry).toString())
+      this.rowEloTexts[i]?.setText(this.getEloForEntry(entry).toString())
     })
   }
 
@@ -184,6 +187,10 @@ export default class LeaderboardMenu extends Menu {
 
   private getLossesForEntry(entry: LeaderboardEntry): number {
     return this.mode === 'current' ? entry.lossesMonth : entry.lossesLifetime
+  }
+
+  private getEloForEntry(entry: LeaderboardEntry): number {
+    return this.mode === 'current' ? entry.elo : entry.eloPeak
   }
 
   private scrollToUserPosition() {
@@ -285,9 +292,10 @@ export default class LeaderboardMenu extends Menu {
     let eloText = this.scene.add.text(
       0,
       0,
-      entry.elo.toString(),
+      this.getEloForEntry(entry).toString(),
       Style.basicStylized,
     )
+    this.rowEloTexts.push(eloText)
 
     // Add each text with the right proportion
     rowSizer

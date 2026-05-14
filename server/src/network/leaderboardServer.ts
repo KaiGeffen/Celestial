@@ -29,6 +29,7 @@ export default function createLeaderboardServer() {
           winsMonth: players.pvp_wins_month,
           lossesMonth: players.pvp_losses_month,
           elo: players.elo,
+          eloPeak: players.elo_peak,
           cosmetic_set: players.cosmetic_set,
         })
         .from(players)
@@ -53,6 +54,7 @@ export default function createLeaderboardServer() {
           winsMonth: player.winsMonth,
           lossesMonth: player.lossesMonth,
           elo: player.elo,
+          eloPeak: player.eloPeak,
           cosmeticSet,
           rank: index + 1,
         }
