@@ -109,7 +109,37 @@ export default class StatusRegion extends Region {
     return this
   }
 
+  /** All eight status buttons, in display order. */
+  private allButtons(): Button[] {
+    return [
+      this.btnOurInspire,
+      this.btnOurNourish,
+      this.btnOurSight,
+      this.btnOurPossibility,
+      this.btnTheirInspire,
+      this.btnTheirNourish,
+      this.btnTheirSight,
+      this.btnTheirPossibility,
+    ]
+  }
+
+  /**
+   * Status icons must never appear partially transparent.
+   * Kill any in-flight fade tween from a prior state and snap alpha back to 1
+   * before re-evaluating the new state. `hideStatusesUntilAnimationSlot` and
+   * `animateStatus` will rebuild whatever fade-in is needed for *this* state.
+   */
+  private resetFadeState(): void {
+    for (const btn of this.allButtons()) {
+      const targets = [btn.icon, btn.txt].filter(Boolean)
+      if (targets.length) this.scene.tweens.killTweensOf(targets)
+      btn.setAlpha(1)
+    }
+  }
+
   displayState(state: GameModel): void {
+    this.resetFadeState()
+
     this.btnOurInspire
       .setVisible(state.status[0].inspired !== 0)
       .setText(`${state.status[0].inspired}`)
