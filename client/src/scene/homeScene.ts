@@ -390,7 +390,10 @@ export default class HomeScene extends BaseScene {
       orientation: 'vertical',
       space: { item: Space.padSmall },
     })
-    const dayOfWeek = new Date().getDay()
+    const startOfYear = new Date(new Date().getFullYear(), 0, 0)
+    const dayOfYear = Math.floor(
+      (Date.now() - startOfYear.getTime()) / 86_400_000,
+    )
 
     // Daily image
     const newsImages = [
@@ -401,9 +404,16 @@ export default class HomeScene extends BaseScene {
       'Nightmare',
       'Possibilities',
       'Refresh',
+      'Conquer',
+      'Fates',
+      'LostInShadow',
+      'Overflow',
+      'Posterity',
+      'Rose',
+      'Spark',
     ]
     const image = this.add
-      .image(0, 0, `news-${newsImages[dayOfWeek]}`)
+      .image(0, 0, `news-${newsImages[dayOfYear % newsImages.length]}`)
       .setOrigin(0, 0)
     dailyContainer.add(image)
 

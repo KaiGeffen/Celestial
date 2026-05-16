@@ -487,12 +487,19 @@ export const assetLists = {
   "news": {
     "files": [
       "Birth",
+      "Conquer",
+      "Fates",
       "Goliath",
       "LayBare",
+      "LostInShadow",
       "MeAndHer",
       "Nightmare",
+      "Overflow",
       "Possibilities",
-      "Refresh"
+      "Posterity",
+      "Refresh",
+      "Rose",
+      "Spark"
     ],
     "pixelArt": true
   },
