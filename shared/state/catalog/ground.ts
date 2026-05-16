@@ -43,5 +43,44 @@ const groundwork = new Groundwork({
   text: 'Worth +2 for each of your cards in a row with this.',
 })
 
-export // updraft
- {}
+class Primal extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    for (let i = 0; i < game.story.acts.length; ) {
+      const act = game.story.acts[i]
+
+      // How many cards were added/removed from the story
+      let deltaStoryLength = 0
+
+      // Find a card in hand with the same cost
+      for (let j = 0; j < game.hand[player].length; j++) {
+        const card = game.hand[player][j]
+        if (card.cost === act.card.cost) {
+          // Discard card from story
+          const actReturned = game.removeAct(i)
+          deltaStoryLength += actReturned ? 0 : -1
+
+          // Discard card from hand, track if it added to story
+          const discardedCardReturned = game.discard(player, 1, j)
+          deltaStoryLength += discardedCardReturned ? 0 : 1
+
+          // Stop looking in hand for this story card
+          break
+        }
+      }
+
+      // Update the story index based on how many cards added/removed
+      i -= deltaStoryLength
+    }
+  }
+}
+const primal = new Primal({
+  name: 'Primal',
+  id: 9003,
+  // cost: 7,
+  points: 7,
+  text: 'For each card later in the story, discard it and a card from your hand that share a cost.',
+})
+
+export { primal }

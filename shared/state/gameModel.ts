@@ -190,12 +190,7 @@ export default class GameModel {
     return copy
   }
 
-  draw(
-    player: number,
-    amt = 1,
-    isSetup = false,
-    visibility?: Visibility,
-  ) {
+  draw(player: number, amt = 1, isSetup = false, visibility?: Visibility) {
     let card: Card = null
     while (amt > 0 && this.hand[player].length < MechanicsSettings.HAND_CAP) {
       // If deck is empty, shuffled discard pile into deck
@@ -250,7 +245,11 @@ export default class GameModel {
     return card
   }
 
-  discard(player: number, amt = 1, index = 0) {
+  // Return whether a card was returned to the story
+  discard(player: number, amt = 1, index = 0): boolean {
+    // TODO Take the full count instead of just binary yes/no
+    let cardReturnedToStory = false
+
     for (let i = 0; i < amt; i++) {
       if (this.hand[player].length > index) {
         const card = this.hand[player].splice(index, 1)[0]
@@ -268,9 +267,12 @@ export default class GameModel {
         )
 
         // Trigger its on discard effects
-        card.onDiscard(player, this)
+        const result = card.onDiscard(player, this)
+        cardReturnedToStory = cardReturnedToStory || result
       }
     }
+
+    return cardReturnedToStory
   }
 
   bottom(player: number, amt = 1, index = 0) {
