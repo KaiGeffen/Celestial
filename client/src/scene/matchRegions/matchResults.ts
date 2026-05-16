@@ -9,6 +9,7 @@ import {
   BBStyle,
   Depth,
   Messages,
+  Time,
 } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
@@ -549,7 +550,13 @@ export class ResultsRegionJourney extends MatchResultsRegion {
       )
       cardback.setOnClick(() => {
         cardback.destroy()
-        animateCardReveal(this.scene, ci, cardContainer)
+        animateCardReveal(
+          this.scene,
+          ci,
+          cardContainer,
+          0,
+          Time.match.matchResultsUnlockCardReveal,
+        )
 
         unrevealedCount--
         if (unrevealedCount === 0) {

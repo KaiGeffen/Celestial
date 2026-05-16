@@ -16,12 +16,14 @@ import { MatchScene } from '../scene/matchScene'
  *
  * @param i - reveal slot index; staggers each subsequent reveal by half its duration
  *            so the next card starts flipping as the previous finishes.
+ * @param durationMs - total flip duration (two halves); defaults to story {@link Time.match.cardReveal}.
  */
 export function animateCardReveal(
   scene: MatchScene,
   card: CardImage,
   parent: Phaser.GameObjects.Container | ContainerLite,
   i: number = 0,
+  durationMs: number = Time.match.cardReveal,
 ): void {
   const endScaleX = card.container.scaleX
   const endScaleY = card.container.scaleY
@@ -29,8 +31,10 @@ export function animateCardReveal(
   // A scaling trick to make the card appear to flip over
   const scaleTrick = 0.95
 
+  const halfDuration = durationMs / 2
+
   // Start the next reveal halfway through the current reveal
-  const stepDelay = i * (Time.match.cardReveal / 2)
+  const stepDelay = i * halfDuration
 
   // Animate the back of the card flipping
   const hiddenCard = new CardImage(
@@ -52,7 +56,7 @@ export function animateCardReveal(
     scaleX: 0,
     scaleY: endScaleY * scaleTrick,
     delay: stepDelay,
-    duration: Time.match.cardReveal / 2,
+    duration: halfDuration,
     ease: 'Sine.easeIn',
     onComplete: () => hiddenCard.destroy(),
   })
@@ -65,8 +69,8 @@ export function animateCardReveal(
     targets: card.container,
     scaleX: endScaleX,
     scaleY: endScaleY,
-    delay: stepDelay + Time.match.cardReveal / 2,
-    duration: Time.match.cardReveal / 2,
+    delay: stepDelay + halfDuration,
+    duration: halfDuration,
     ease: 'Sine.easeOut',
     onStart: () => card.show(),
   })
