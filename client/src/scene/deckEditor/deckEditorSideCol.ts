@@ -42,8 +42,6 @@ export class RightCol {
     this.scene = scene
     this.opts = opts
 
-    // Create background before decklist to be behind
-    const background = scene.add.image(0, 0, 'chrome-builderDecklist')
     this.decklist = new Decklist(scene, opts.createCutoutInteraction())
 
     // TODO MustOwnCardsInList
@@ -51,8 +49,6 @@ export class RightCol {
 
     // Create the scroll panel
     this.scrollPanel = newScrollablePanel(scene, {
-      background: background,
-
       // Components
       header: this.createHeader(),
       footer: this.createFooter(),

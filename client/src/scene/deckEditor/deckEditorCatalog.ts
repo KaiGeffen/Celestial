@@ -146,8 +146,10 @@ export class DeckEditorCatalog {
 
   private createFilterHeaderRow(): any {
     const scene = this.scene
-    const background = scene.add.image(0, 0, 'chrome-header').setInteractive()
-    scene.addShadow(background, -90)
+    const background = scene.add
+      .rectangle(0, 0, 1, 1, 0x000000, 0.01)
+      .setInteractive()
+    // scene.addShadow(background, -90)
 
     // Sizer
     this.headerSizer = this.scene.rexUI.add
@@ -155,8 +157,8 @@ export class DeckEditorCatalog {
         space: {
           left: Space.pad,
           right: Space.pad,
-          top: 1.5,
-          bottom: 1.5,
+          // top: 1.5,
+          bottom: 28,
         },
       })
       .addBackground(background)

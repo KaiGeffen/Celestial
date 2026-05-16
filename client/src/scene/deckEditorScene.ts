@@ -19,9 +19,11 @@ import {
   type RightCol,
 } from './deckEditor/deckEditorSideCol'
 import type { MissionDetails } from '../../../shared/journey/journey'
-
+import { Space } from '../settings/settings'
 export type { DeckEditorCatalogOptions } from './deckEditor/deckEditorCatalog'
 export type { DeckEditorDeckOptions } from './deckEditor/deckEditorSideCol'
+
+const ROSTER_WIDTH = Space.cutoutWidth + 20
 
 export default class DeckEditorScene extends BaseScene {
   // Currently selected deck index
@@ -123,6 +125,7 @@ export default class DeckEditorScene extends BaseScene {
 
   private createElements(deck: Deck): void {
     this.createBackground()
+    this.createChrome()
 
     // Catalog region
     this.catalogRegion = new DeckEditorCatalog(this, {
@@ -168,6 +171,39 @@ export default class DeckEditorScene extends BaseScene {
       .setDepth(-2)
     ;(this.plugins.get('rexAnchor') as any).add(background, {
       width: '100%',
+      height: '100%',
+    })
+  }
+
+  /** All chrome that isn't background for a region */
+  private createChrome(): void {
+    // Top bar
+    const topHeader = this.add
+      .image(0, 0, 'chrome-builderHeader')
+      .setOrigin(0, 0)
+    this.plugins.get('rexAnchor')['add'](topHeader, {
+      width: '100%',
+      height: `0%+${Space.filterBarHeight}`,
+    })
+
+    // Central sizer background (With deck thumbnails)
+    const centralSizerBackground = this.add
+      .image(0, Space.filterBarHeight, 'chrome-body')
+      .setOrigin(1, 0)
+      .setAlpha(0.7)
+    this.plugins.get('rexAnchor')['add'](centralSizerBackground, {
+      x: `100%-${ROSTER_WIDTH}`,
+      width: `100%-${ROSTER_WIDTH}`,
+      height: '100%',
+    })
+
+    // Right column background
+    const rightColumnBackground = this.add
+      .image(0, 0, 'chrome-builderDecklist')
+      .setOrigin(1, 0)
+    this.plugins.get('rexAnchor')['add'](rightColumnBackground, {
+      x: `100%`,
+      width: `0%+${ROSTER_WIDTH}`,
       height: '100%',
     })
   }
@@ -334,10 +370,7 @@ export default class DeckEditorScene extends BaseScene {
 
   // Replaces the entire decklist at once (e.g. paste/import), unlike addCardToDeck which appends one card
   private setDeck(cards: Card[]): void {
-    this.deckRegion.decklist.setDeck(
-      cards,
-      !Flags.devCardsEnabled,
-    )
+    this.deckRegion.decklist.setDeck(cards, !Flags.devCardsEnabled)
     // Scroll to the top of the decklist
     this.deckRegion.scrollDecklistToTop()
   }
@@ -438,8 +471,11 @@ export class DeckEditorJourneyScene extends DeckEditorScene {
       return
     }
 
-    const cosmeticSet =
-      this.cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 }
+    const cosmeticSet = this.cosmeticSet ?? {
+      avatar: 0,
+      border: 0,
+      cardback: 0,
+    }
 
     const playerDeck: Deck = {
       name: this.deckName,
