@@ -554,6 +554,7 @@ export class ResultsRegionJourney extends MatchResultsRegion {
         0,
       )
       cardback.setOnClick(() => {
+        this.scene.playSound('inspire')
         cardback.destroy()
         animateCardReveal(
           this.scene,
