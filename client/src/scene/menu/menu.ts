@@ -154,7 +154,6 @@ export default class Menu {
 }
 
 import OptionsMenu from './options'
-import ChoosePremade from './choosePremade'
 import CreditsMenu from './credits'
 import RulebookMenu from './rulebook'
 import { NewDeckMenu, EditDeckMenu } from './alterDeck'
@@ -178,8 +177,6 @@ import PlayMenu from './play'
 
 const menus = {
   options: OptionsMenu,
-  // TODO Remove
-  choosePremade: ChoosePremade,
   credits: CreditsMenu,
   rulebook: RulebookMenu,
   // TODO Rename since it's just alter deck

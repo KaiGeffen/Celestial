@@ -1,7 +1,4 @@
 import 'phaser'
-import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
-
-import RoundRectangle from 'phaser3-rex-plugins/plugins/roundrectangle.js'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 import Menu from './menu'

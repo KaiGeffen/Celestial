@@ -14,14 +14,11 @@ import {
 } from '../../settings/settings'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import { DecklistSettings } from '../../../../shared/settings'
-import avatarNames from '../../../../shared/data/avatarNames'
-import premadeDecklists from '../../data/premadeDecklists'
 import { Deck } from '../../../../shared/types/deck'
 import Catalog from '../../../../shared/state/catalog'
 import type { BuilderScene } from '../builderScene'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import Server from '../../server'
-import logEvent from '../../utils/analytics'
 
 const width = Space.decklistPanelWidth
 
@@ -34,9 +31,6 @@ export default class DecklistsRegion {
 
   // The index of the currently selected deck
   savedDeckIndex: number
-
-  // Button for user to select a premade deck
-  btnPremade: Button
 
   // List of buttons for user-defined decks
   decklistBtns: Button[]
@@ -164,23 +158,6 @@ export default class DecklistsRegion {
     }
   }
 
-  // Callback for when a premade avatar is clicked on
-  premadeCallback(): (id: number) => void {
-    return (id: number) => {
-      // Get premade deck details from scene
-      const name = `${avatarNames[id]} Premade`
-      const deck = premadeDecklists[id]
-      const cosmeticSet: CosmeticSet = {
-        avatar: id,
-        border: 0,
-        cardback: 0,
-      }
-
-      this.createDeck(name, cosmeticSet, deck)
-      // Note: createDeck already sets the equipped deck index
-    }
-  }
-
   // Create a new deck for the user, return success status
   createEmptyDeck(): boolean {
     // If user already has MAX decks, signal error instead
@@ -264,38 +241,6 @@ export default class DecklistsRegion {
       })
       .addBackground(background)
 
-    // Premade button
-    const containerPremade = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    this.btnPremade = new Buttons.Basic({
-      within: containerPremade,
-      text: 'Premade',
-      f: () => {
-        // Check if at max decks
-        if (UserSettings._get('decks').length >= DecklistSettings.MAX_DECKS) {
-          this.scene.signalError(
-            `Reached max number of decks (${DecklistSettings.MAX_DECKS}).`,
-          )
-        } else {
-          this.scene.setSearchVisible(false)
-          this.scene.scene.launch('MenuScene', {
-            menu: 'choosePremade',
-            callback: this.premadeCallback(),
-            exitCallback: () => this.scene.setSearchVisible(true),
-          })
-
-          logEvent('view_premade')
-        }
-      },
-      muteClick: true,
-    })
-    sizer.add(containerPremade)
-
     // Custom button
     const containerCustom = new ContainerLite(
       this.scene,
@@ -304,7 +249,7 @@ export default class DecklistsRegion {
       Space.buttonWidth,
       Space.buttonHeight,
     )
-    this.btnPremade = new Buttons.Basic({
+    new Buttons.Basic({
       within: containerCustom,
       text: 'Custom',
       f: this.newDeckCallback(),

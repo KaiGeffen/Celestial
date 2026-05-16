@@ -388,7 +388,7 @@ export default class HomeScene extends BaseScene {
     // Left: rotating daily image + tip
     const dailyContainer = this.rexUI.add.sizer({
       orientation: 'vertical',
-      space: { item: Space.padSmall },
+      space: { item: 150 },
     })
     const startOfYear = new Date(new Date().getFullYear(), 0, 0)
     const dayOfYear = Math.floor(
