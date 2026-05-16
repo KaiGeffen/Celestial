@@ -64,9 +64,8 @@ export default class OptionsMenu extends Menu {
     this.layout()
 
     // After layout is complete, move the highlight to the selected tab button
-    const x = (Space.windowWidth - this.width + Space.pad) / 2
     const y = this.tabBtns[selectedTab].getGlobalPosition()[1]
-    this.tabSelector.setPosition(x, y)
+    this.tabSelector.setY(y)
   }
 
   private createContent(activeScene: BaseScene) {
@@ -110,6 +109,9 @@ export default class OptionsMenu extends Menu {
       .image(0, 0, 'chrome-tabSelector')
       .setOrigin(0, 0.5)
       .setScale(0.3)
+    this.scene.plugins.get('rexAnchor')['add'](this.tabSelector, {
+      x: `50%-${(this.width - Space.pad) / 2}`,
+    })
 
     let tabsSizer = this.scene.rexUI.add.fixWidthSizer({
       space: {
