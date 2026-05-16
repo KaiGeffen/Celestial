@@ -18,6 +18,9 @@ export const MatchTiming = {
    */
   matchResultsUnlockCardReveal: 1200,
 
+  /** How long to scale in the card user has unlocked. */
+  matchResultsUnlockCardScaleInMs: 2400,
+
   /** How long for a card to sink in the water */
   cardSink: 800,
 

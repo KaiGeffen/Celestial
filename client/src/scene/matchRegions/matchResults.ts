@@ -364,6 +364,11 @@ import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWid
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
+/** Outer cell for an unlock card; holds the pair we tween after rex `layout()`. */
+type JourneyUnlockCardWrap = ContainerLite & {
+  journeyUnlockPair: { ci: CardImage; cardback: CardImage }
+}
+
 /**
  * Journey missions: cards-unlocked screen (`missionCards`) shown before the normal
  * Victory / round breakdown. Vertical rexUI sizer (auto-sized to its contents):
@@ -511,7 +516,6 @@ export class ResultsRegionJourney extends MatchResultsRegion {
     })
     this.unlockSizer.setDepth(Depth.results + 2).layout()
 
-    //
     this.setUnlockVisible(false)
   }
 
@@ -530,7 +534,7 @@ export class ResultsRegionJourney extends MatchResultsRegion {
         0,
         Space.cardWidth,
         Space.cardHeight,
-      )
+      ) as JourneyUnlockCardWrap
       // Real card sits hidden underneath; revealed by `animateCardReveal` on click.
       // Constructed interactive so it has the standard hover/click behavior once
       // shown — Phaser skips invisible objects in hit tests, so the cardback on
@@ -540,11 +544,12 @@ export class ResultsRegionJourney extends MatchResultsRegion {
         .setVisibleGlow()
         .hide()
       // Clickable cardback overlay — pre-empts the helper's own cardback so the
-      // user clicks *this* one to trigger the flip.
+      // user clicks *this* one to trigger the flip. Interaction enabled after
+      // post-layout scale-in (see below).
       const cardback = new CardImage(
         Catalog.cardback,
         cardContainer,
-        true,
+        false,
         true,
         0,
       )
@@ -564,6 +569,7 @@ export class ResultsRegionJourney extends MatchResultsRegion {
         }
       })
 
+      cardContainer.journeyUnlockPair = { ci, cardback }
       this.cardsRow.add(cardContainer)
       unrevealedCount++
     }
@@ -572,6 +578,37 @@ export class ResultsRegionJourney extends MatchResultsRegion {
     // render above the sizer's background (rexUI's setDepth only walks current children).
     this.unlockSizer.layout()
     this.unlockSizer.setDepth(Depth.results + 2)
+
+    const scaleInMs = Time.match.matchResultsUnlockCardScaleInMs
+    // Scale must be applied after `layout()` — rexUI positioning can reset child transforms.
+    const row = this.cardsRow as Sizer & {
+      sizerChildren: Phaser.GameObjects.GameObject[]
+    }
+    row.sizerChildren.forEach((child) => {
+      const wrap = child as JourneyUnlockCardWrap
+      const { ci, cardback } = wrap.journeyUnlockPair
+      ci.container.setScale(0)
+      cardback.container.setScale(0)
+
+      this.scene.tweens.add({
+        targets: ci.container,
+        scaleX: 1,
+        scaleY: 1,
+        duration: scaleInMs,
+        ease: 'Cubic.easeOut',
+      })
+      this.scene.tweens.add({
+        targets: cardback.container,
+        scaleX: 1,
+        scaleY: 1,
+        duration: scaleInMs,
+        ease: 'Cubic.easeOut',
+        onComplete: () => {
+          cardback.imageSubject.setInteractive()
+          cardback.interactive = true
+        },
+      })
+    })
 
     // Continue is gated on the player flipping every cardback (re-enabled in the
     // click handler when `unrevealedCount` hits 0).
