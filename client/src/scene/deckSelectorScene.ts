@@ -204,21 +204,12 @@ export default class DeckSelectorScene extends BaseScene {
       width: `0%+${ROSTER_WIDTH}`,
       height: '100%',
     })
-
-    // Top bar
-    const topHeader = this.add
-      .image(0, 0, 'chrome-builderHeader')
-      .setOrigin(0, 0)
-    this.plugins.get('rexAnchor')['add'](topHeader, {
-      width: '100%',
-      height: `0%+${Space.filterBarHeight}`,
-    })
   }
 
   /** Full-width header — same layout/padding as `DeckEditorScene` `createFilterHeader`. */
   private createMainHeader(): any {
     const background = this.add
-      .rectangle(0, 0, 1, 1, 0x000000, 0.01)
+      .image(0, 0, 'chrome-builderHeader')
       .setInteractive()
 
     const backContainer = new ContainerLite(
