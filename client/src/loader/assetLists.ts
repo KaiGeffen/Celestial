@@ -382,6 +382,8 @@ export const assetLists = {
       "StoreTab",
       "Sun",
       "ThumbHorizontal",
+      "ThumbTall copy",
+      "ThumbTall",
       "ThumbTall",
       "ThumbVertical",
       "TrackVertical",

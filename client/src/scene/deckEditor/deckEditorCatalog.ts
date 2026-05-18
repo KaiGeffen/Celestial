@@ -7,7 +7,7 @@ import BaseScene from '../baseScene'
 import Buttons from '../../lib/buttons/buttons'
 import UButton from '../../lib/buttons/underlined'
 import { CardImage } from '../../lib/cardImage'
-import { Color, Space, UserSettings, Flags } from '../../settings/settings'
+import { Space, UserSettings, Flags } from '../../settings/settings'
 import { Style } from '../../settings/style'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import Catalog from '../../../../shared/state/catalog'
@@ -102,12 +102,18 @@ export class DeckEditorCatalog {
       this.cardImages.push(cardImage)
     })
 
+    const thumb = scene.add.image(0, 0, 'icon-ThumbTall').setOrigin(1, 0.5)
     this.scrollPanel = newScrollablePanel(scene, {
       header: this.createFilterHeaderRow(),
-      // width: catalogWidth,
-      // height: catalogBodyHeight,
       panel: { child: this.gridSizer },
-      slider: false,
+      slider: {
+        track: scene.add.rectangle(0, 0, 41, 1, 0x000000, 0.01),
+        thumb,
+        input: 'click',
+      },
+      space: {
+        // top: Space.pad,
+      },
       background: scene.add.image(0, 0, 'chrome-body').setDepth(-1),
       anchor: {
         width: `100%-${DECK_EDITOR_DECK_WIDTH}`,
