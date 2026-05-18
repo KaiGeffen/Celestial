@@ -78,6 +78,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
 
     // Make the button
     this.matchTypeBtn = new Buttons.Basic({
+      x: Space.pad * 2 + (Space.buttonWidth * 3) / 2,
       y: Space.buttonHeight / 2 + Space.padSmall,
       within: container,
       text: this.matchTypeFilter.toUpperCase(),
@@ -87,12 +88,6 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         this.matchTypeBtn.setText(this.matchTypeFilter.toUpperCase())
         this.filterAndRefreshContent()
       },
-    })
-
-    // Anchor to left of icons in top-right
-    const dx = Space.iconSize * 2 + Space.buttonWidth / 2 + Space.padSmall * 1.5
-    this.plugins.get('rexAnchor')['add'](container, {
-      x: `100%-${dx}`,
     })
   }
 
