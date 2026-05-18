@@ -177,15 +177,6 @@ export default class DeckEditorScene extends BaseScene {
 
   /** All chrome that isn't background for a region */
   private createChrome(): void {
-    // Top bar
-    const topHeader = this.add
-      .image(0, 0, 'chrome-builderHeader')
-      .setOrigin(0, 0)
-    this.plugins.get('rexAnchor')['add'](topHeader, {
-      width: '100%',
-      height: `0%+${Space.filterBarHeight}`,
-    })
-
     // Central sizer background (With deck thumbnails)
     const centralSizerBackground = this.add
       .image(0, Space.filterBarHeight, 'chrome-body')
@@ -195,6 +186,35 @@ export default class DeckEditorScene extends BaseScene {
       x: `100%-${ROSTER_WIDTH}`,
       width: `100%-${ROSTER_WIDTH}`,
       height: '100%',
+    })
+
+    // Top bar
+    const topHeader = this.add
+      .image(0, 0, 'chrome-builderHeader')
+      .setOrigin(0, 0)
+    this.plugins.get('rexAnchor')['add'](topHeader, {
+      width: '100%',
+      height: `0%+${Space.filterBarHeight}`,
+    })
+    const topRightCorner = this.add
+      .image(0, -18, 'chrome-editorTopCorner')
+      .setOrigin(1, 0)
+      .setScale(0.5)
+    this.plugins.get('rexAnchor')['add'](topRightCorner, {
+      x: `100%-${ROSTER_WIDTH}`,
+    })
+    // The scalable scroll part, and its bottom
+    const scroll = this.add.image(0, 100, 'chrome-editorScroll').setOrigin(1, 0)
+    this.plugins.get('rexAnchor')['add'](scroll, {
+      x: `100%-${ROSTER_WIDTH}`,
+      height: '100%',
+    })
+    const scrollBottom = this.add
+      .image(0, 0, 'chrome-editorScrollBottom')
+      .setOrigin(1, 1)
+    this.plugins.get('rexAnchor')['add'](scrollBottom, {
+      x: `100%-${ROSTER_WIDTH}`,
+      y: `100%`,
     })
 
     // Right column background
