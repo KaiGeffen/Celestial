@@ -452,13 +452,7 @@ export class ResultsRegionJourney extends MatchResultsRegion {
     const panelBg = this.scene.add.image(0, 0, 'chrome-bodyAlt')
 
     // Title text
-    const countUnlockedCards = (scene.params?.missionCards ?? []).length
-    const title = scene.add.text(
-      0,
-      0,
-      countUnlockedCards === 1 ? 'Card unlocked!' : 'Cards unlocked!',
-      Style.header,
-    )
+    const title = scene.add.text(0, 0, 'Memories Unlocked!', Style.header)
 
     // Cards
     this.cardsRow = scene.rexUI.add.sizer({
@@ -466,10 +460,11 @@ export class ResultsRegionJourney extends MatchResultsRegion {
     })
 
     // Disclaimer text
+    const countUnlockedCards = (scene.params?.missionCards ?? []).length
     const disclaimer = scene.add.text(
       0,
       0,
-      'Unlocked in Journey mode only.',
+      `You may now use ${countUnlockedCards === 1 ? 'this card' : 'these cards'} in Journey mode.`,
       Style.basicStylized,
     )
 
