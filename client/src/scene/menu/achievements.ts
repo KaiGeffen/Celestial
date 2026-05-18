@@ -95,7 +95,7 @@ export default class AchievementsMenu extends Menu {
       orientation: 'horizontal',
       width: width,
       space: {
-        left: Space.padSmall,
+        left: Space.pad,
         right: Space.padSmall,
         top: Space.padSmall,
         bottom: Space.padSmall,
@@ -140,7 +140,7 @@ export default class AchievementsMenu extends Menu {
         orientation: 'horizontal',
         width: width,
         space: {
-          left: Space.padSmall,
+          left: Space.pad,
           right: Space.padSmall,
           top: Space.padSmall,
           bottom: Space.padSmall,
