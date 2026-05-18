@@ -93,14 +93,6 @@ export default class HomeScene extends BaseScene {
       width,
     })
 
-    // Add background
-    const background = this.add
-      .rectangle(0, 0, 1, 1, 0xffffff)
-      .setAlpha(0.3)
-      .setInteractive()
-    panelSizer.addBackground(background)
-    this.addShadow(background)
-
     // User profile section - same width as navigation buttons
     const userProfileSizer = this.createUserProfileSection()
     panelSizer.add(userProfileSizer)
@@ -364,21 +356,6 @@ export default class HomeScene extends BaseScene {
       },
     })
 
-    const background = this.add
-      .rectangle(0, 0, 1, 1, Color.backgroundLight)
-      .setAlpha(0.3)
-    panelSizer.addBackground(background)
-    this.addShadow(background)
-
-    // Title with line below
-    const title = this.add
-      .text(0, 0, `New Update [${GAME_VERSION}]`, Style.header)
-      .setOrigin(0.5, 0)
-    panelSizer.add(title)
-
-    const line = this.add.rectangle(0, 0, 1, 3, 0x353f4e)
-    panelSizer.add(line, { expand: true })
-
     // Horizontal: left = daily image + tip, right = announcement pairs
     const contentSizer = this.rexUI.add.sizer({
       orientation: 'horizontal',
@@ -388,7 +365,15 @@ export default class HomeScene extends BaseScene {
     // Left: rotating daily image + tip
     const dailyContainer = this.rexUI.add.sizer({
       orientation: 'vertical',
-      space: { item: 150 },
+    })
+    const title = this.add
+      .text(0, 0, `New Update [${GAME_VERSION}]`, Style.header)
+      .setOrigin(0.5, 0)
+    dailyContainer.add(title, { align: 'center' })
+
+    const dailyImageTipSizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: { item: 190 },
     })
     const startOfYear = new Date(new Date().getFullYear(), 0, 0)
     const dayOfYear = Math.floor(
@@ -415,7 +400,7 @@ export default class HomeScene extends BaseScene {
     const image = this.add
       .image(0, 0, `news-${newsImages[dayOfYear % newsImages.length]}`)
       .setOrigin(0, 0)
-    dailyContainer.add(image)
+    dailyImageTipSizer.add(image)
 
     // Tip text
     const tipText = this.rexUI.add.BBCodeText(
@@ -428,13 +413,14 @@ export default class HomeScene extends BaseScene {
         fixedWidth: image.displayWidth,
       },
     )
-    dailyContainer.add(tipText)
+    dailyImageTipSizer.add(tipText)
+    dailyContainer.add(dailyImageTipSizer)
     contentSizer.add(dailyContainer)
 
     // Right: subheader + body pairs
     const announcementSizer = this.rexUI.add.sizer({
       orientation: 'vertical',
-      space: { item: Space.pad * 3 },
+      space: { top: 65, item: Space.pad * 3 },
     })
     for (const pair of ANNOUNCEMENT_PAIRS) {
       const blockSizer = this.rexUI.add.sizer({

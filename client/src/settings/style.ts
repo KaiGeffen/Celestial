@@ -49,16 +49,9 @@ const StyleGeneral: StyleDict = {
   header: {
     fontFamily: primaryFont,
     fontSize: '40px',
-    color: Color.goldS,
+    color: Color.header,
     stroke: Color.blackS,
-    strokeThickness: 4,
-    shadow: {
-      offsetX: 2,
-      offsetY: 2,
-      color: 'rgba(0,0,0,0.5)',
-      blur: 4,
-      fill: true,
-    },
+    strokeThickness: 1,
   },
 
   // Text on basic buttons

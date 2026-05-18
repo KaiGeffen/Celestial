@@ -58,9 +58,10 @@ export const Color: Record<string, any> = {
   grey: CoreColors.grey,
   greyS: CoreColors.greyS,
   brown: CoreColors.brown,
+  brownS: CoreColors.brownS,
 
   // GENERAL
-  header: CoreColors.brown,
+  header: CoreColors.darkUmberS,
   basicText: CoreColors.brownS,
   border: CoreColors.brown,
   outline: CoreColors.gold,
