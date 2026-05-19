@@ -548,6 +548,6 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   },
   {
     subheader: 'Card Changes',
-    body: `[area=_Mine][stroke=${Color.goldS}]Mine[/stroke][/area] - Draws a card.\n[area=_Phoenix][stroke=${Color.goldS}]Phoenix[/stroke][/area] - Points 4 > 3`,
+    body: `[area=_Mine][stroke=${Color.goldS}]Mine[/stroke][/area] - Updated ability.\n[area=_Phoenix][stroke=${Color.goldS}]Phoenix[/stroke][/area] - Points 4 > 3`,
   },
 ]
