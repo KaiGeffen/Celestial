@@ -182,7 +182,9 @@ export default class PlayMenu extends Menu {
   private createContent() {
     // Replace the background
     this.sizer.removeAllBackgrounds(true)
-    this.sizer.addBackground(this.scene.add.image(0, 0, 'chrome-bodyAlt'))
+    this.sizer
+      .addBackground(this.scene.add.image(0, 0, 'chrome-bodyAlt'))
+      .setInteractive()
 
     this.createHeader('Play', this.width + Space.pad * 2)
 
