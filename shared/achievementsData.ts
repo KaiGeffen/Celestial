@@ -127,7 +127,7 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
   // Manually unlocked
   1001: {
     title: 'Secret Garden',
-    description: 'A prize held by tournament winners.',
+    description: `A prize for those who've won a monthly tournament.`,
     image: 'border-Grape',
     borderUnlock: 2,
   },
@@ -174,7 +174,8 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
   },
   1009: {
     title: 'Stars Border',
-    description: 'Earned by helping out with feedback.',
+    description:
+      'Earned by participating in the Discord focus group discussions.',
     image: 'border-Stars',
     borderUnlock: 9,
   },
@@ -182,6 +183,7 @@ export const achievementsMeta: Record<number, AchievementMeta> = {
     title: 'Referred',
     description: 'You joined via a referral link.',
     goldReward: 1000,
+    // Can give 10 gems?
     hideIfLocked: true,
   },
 }

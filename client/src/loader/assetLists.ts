@@ -57,6 +57,7 @@ export const assetLists = {
     "files": [
       "Astrology",
       "Blossom",
+      "Default",
       "Default"
     ],
     "pixelArt": false
@@ -382,8 +383,6 @@ export const assetLists = {
       "StoreTab",
       "Sun",
       "ThumbHorizontal",
-      "ThumbTall copy",
-      "ThumbTall",
       "ThumbTall",
       "ThumbVertical",
       "TrackVertical",
