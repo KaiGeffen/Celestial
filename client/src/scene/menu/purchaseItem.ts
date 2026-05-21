@@ -78,7 +78,7 @@ export default class PurchaseItemMenu extends Menu {
       this.sizer.add(cardImageContainer)
     } else if (this.purchaseable) {
       // Add cosmetic image above the buttons
-      const isBorder = this.purchaseable.name.startsWith('border-')
+      const isBorder = this.purchaseable.type === 'border'
       const width = isBorder ? Space.avatarSize : Space.cardWidth
       const height = isBorder ? Space.avatarSize : Space.cardHeight
 

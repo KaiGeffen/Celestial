@@ -190,7 +190,7 @@ export default class StoreScene extends BaseSceneWithHeader {
   private createCosmeticItem(
     item: Purchaseable,
   ): Phaser.GameObjects.GameObject {
-    const isBorder = borders.some((b) => b.id === item.id)
+    const isBorder = item.type === 'border'
     const width = isBorder ? Space.avatarSize : Space.cardWidth
     const height = isBorder ? Space.avatarSize : Space.cardHeight
 
