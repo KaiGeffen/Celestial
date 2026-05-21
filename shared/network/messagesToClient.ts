@@ -33,6 +33,7 @@ export default interface messagesToClient {
     newGarden?: Date[]
     reward?: number
     goldReward?: number
+    gemReward?: number
   }
   promptReconnect: {
     state: GameModel

@@ -604,8 +604,8 @@ export default class PlayMenu extends Menu {
   private onGardenHarvested(data: {
     success: boolean
     newGarden?: Date[]
-    reward?: number
     goldReward?: number
+    gemReward?: number
   }): void {
     if (!data.success || this.clickedHarvestIndex === null) {
       this.clickedHarvestIndex = null
@@ -644,7 +644,7 @@ export default class PlayMenu extends Menu {
       .text(
         rewardPosition.x,
         rewardPosition.y + 40,
-        `+${data.goldReward}💰`,
+        `+${data.goldReward}💰\n+${data.gemReward}💎`,
         Style.reward,
       )
       .setOrigin(0.5, 1)

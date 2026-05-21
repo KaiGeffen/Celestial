@@ -61,6 +61,7 @@ export default class Garden {
     newGarden?: Date[]
     reward?: number
     goldReward?: number
+    gemReward?: number
   }> {
     // Get the player's garden
     const player = await db
@@ -97,27 +98,33 @@ export default class Garden {
     // Remove the plant at the specified plot
     gardenState.splice(plotNumber, 1)
 
-    // Randomly select a reward from the distribution
-    const reward = Math.floor(100 * Math.random())
-
+    // Get random gold and gem rewards
     const goldReward =
       Math.floor(Math.random() * REWARD_AMOUNTS.harvestVariance) +
       REWARD_AMOUNTS.harvestConstant
 
-    // Update the database with new garden state and add gold reward to coins
+    let gemReward = 0
+    if (Math.random() < REWARD_AMOUNTS.gemChance) {
+      gemReward =
+        Math.floor(Math.random() * REWARD_AMOUNTS.gemVariance) +
+        REWARD_AMOUNTS.gemAmount
+    }
+
+    // Update the database with new garden state and add currency amounts
     await db
       .update(players)
       .set({
         garden: gardenState,
         coins: sql`${players.coins} + ${goldReward}`,
+        gems: sql`${players.gems} + ${gemReward}`,
       })
       .where(eq(players.id, playerId))
 
     return {
       success: true,
       newGarden: gardenState,
-      reward: reward,
       goldReward: goldReward,
+      gemReward: gemReward,
     }
   }
 }

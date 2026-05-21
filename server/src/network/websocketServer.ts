@@ -298,8 +298,8 @@ export default function createWebSocketServer() {
             type: 'harvestGardenResult',
             success: harvestResult.success,
             newGarden: harvestResult.newGarden,
-            reward: harvestResult.reward,
             goldReward: harvestResult.goldReward,
+            gemReward: harvestResult.gemReward,
           })
         })
         .on('claimMissionGold', async ({ missionId }) => {

@@ -156,18 +156,18 @@ export default class Server {
           this.promptForUsernameRegistration(game)
         },
         onInvalidToken: () => {
-        console.log(
-          'Server has indicated that sent token is invalid. Logging out.',
-        )
+          console.log(
+            'Server has indicated that sent token is invalid. Logging out.',
+          )
 
-        game.scene.getScenes(true).forEach((scene) => {
-          if (scene instanceof BaseScene) {
-            scene.signalError('Invalid login token.')
-          }
-        })
+          game.scene.getScenes(true).forEach((scene) => {
+            if (scene instanceof BaseScene) {
+              scene.signalError('Invalid login token.')
+            }
+          })
 
-        if (server) server.close(code)
-        server = undefined
+          if (server) server.close(code)
+          server = undefined
         },
       },
     )
@@ -267,23 +267,22 @@ export default class Server {
       })
       .on(
         'harvestGardenResult',
-        ({ success, newGarden, reward, goldReward }) => {
+        ({ success, newGarden, goldReward, gemReward }) => {
           // Only update the stored garden if the harvest was successful
           if (success) {
             this.userData.garden = newGarden.map((dateStr) => new Date(dateStr))
 
-            // Update coins
-            if (goldReward !== undefined) {
-              this.userData.coins = (this.userData.coins || 0) + goldReward
-            }
+            // Update currencies
+            this.userData.coins = (this.userData.coins || 0) + (goldReward || 0)
+            this.userData.gems = (this.userData.gems || 0) + (gemReward || 0)
           }
 
           // Emit global event that HomeScene can listen to regardless of success
           game.events.emit('gardenHarvested', {
             success: success,
             newGarden: this.userData.garden,
-            reward: reward,
             goldReward: goldReward,
+            gemReward: gemReward,
           })
         },
       )
@@ -563,7 +562,10 @@ export default class Server {
       ),
     )
     sessionStorage.setItem('decks', JSON.stringify(data.decks))
-    sessionStorage.setItem('journeyChoices', JSON.stringify(data.journeyChoices))
+    sessionStorage.setItem(
+      'journeyChoices',
+      JSON.stringify(data.journeyChoices),
+    )
     sessionStorage.setItem(
       'avatar_experience',
       JSON.stringify(data.avatar_experience),
@@ -591,14 +593,19 @@ export default class Server {
         const uuid = uuidv5(payload.sub, UUID_NAMESPACE)
         const jti = payload.jti
 
-        this.connectAndAuthenticate(uuid, game, () => {}, () => {
-          server.send({
-            type: 'signIn',
-            email,
-            uuid,
-            jti,
-          })
-        })
+        this.connectAndAuthenticate(
+          uuid,
+          game,
+          () => {},
+          () => {
+            server.send({
+              type: 'signIn',
+              email,
+              uuid,
+              jti,
+            })
+          },
+        )
       } catch (e) {
         console.error('Failed to decode token during reconnect:', e)
       }
@@ -614,15 +621,23 @@ export default class Server {
               if (!session?.ticket) return
 
               // Attempt login with the ticket
-              this.connectAndAuthenticate(steamUuid, game, () => {}, () => {
-                server.send({
-                  type: 'loginSteam',
-                  ticket: session.ticket,
-                })
-              })
+              this.connectAndAuthenticate(
+                steamUuid,
+                game,
+                () => {},
+                () => {
+                  server.send({
+                    type: 'loginSteam',
+                    ticket: session.ticket,
+                  })
+                },
+              )
             })
             .catch((e) =>
-              console.error('Failed to acquire Steam auth during reconnect:', e),
+              console.error(
+                'Failed to acquire Steam auth during reconnect:',
+                e,
+              ),
             )
           return
         }
@@ -631,12 +646,17 @@ export default class Server {
       // User signed in as guest - get guest UUID and send signIn
       const guestUuid = localStorage.getItem('guest_uuid')
       if (guestUuid) {
-        this.connectAndAuthenticate(guestUuid, game, () => {}, () => {
-          server.send({
-            type: 'signIn',
-            uuid: guestUuid,
-          })
-        })
+        this.connectAndAuthenticate(
+          guestUuid,
+          game,
+          () => {},
+          () => {
+            server.send({
+              type: 'signIn',
+              uuid: guestUuid,
+            })
+          },
+        )
       }
     }
   }
