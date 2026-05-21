@@ -1,6 +1,10 @@
 import Server from '../server'
 import { achievementsMeta } from '../../../shared/achievementsData'
-import { borders, cardbacks, Purchaseable } from '../../../shared/purchaseables/index'
+import {
+  borders,
+  cardbacks,
+  Purchaseable,
+} from '../../../shared/purchaseables/index'
 import borderNames from '../data/borderNames'
 import cardbackNames from '../data/cardbackNames'
 
@@ -46,14 +50,6 @@ export function getUnlockedAvatars(): number[] {
 export function getUnlockedBorders(): number[] {
   const userData = Server.getUserData()
   const unlockedBorders = new Set<number>()
-
-  // I get all borders heehee
-  if (userData.username === 'Kai') {
-    for (let i = 0; i <= 9; i++) {
-      unlockedBorders.add(i)
-    }
-    return Array.from(unlockedBorders).sort((a, b) => a - b)
-  }
 
   // Default border (0)
   unlockedBorders.add(0)

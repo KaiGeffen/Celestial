@@ -543,11 +543,15 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   //   body: 'Congrats to Sherlock for reclaiming his tournament title! And to Redrame for getting #1 on ladder.\nWith the launch of the demo, we plan to snapshot the top players as we transition to a more public release.',
   // },
   {
+    subheader: 'Gems arrive',
+    body: `The cosmetic store is now live! Purchase borders and cardbacks with gems. Through June, each PvP match grants 1 gem, and each plant reward will have a small chance to give 3-5.`,
+  },
+  {
     subheader: 'Shell Mode',
     body: `Each Saturday in May, we'll be playing a new mode called Shell Mode. Hop on the [area=_link_discord][stroke=${Color.goldS}]Discord server[/stroke][/area] to learn more!`,
   },
   {
     subheader: 'Card Changes',
-    body: `[area=_Mine][stroke=${Color.goldS}]Mine[/stroke][/area] - Updated ability.\n[area=_Phoenix][stroke=${Color.goldS}]Phoenix[/stroke][/area] - Points 4 > 3`,
+    body: `[area=_Mine][stroke=${Color.goldS}]Mine[/stroke][/area] - Ability updated.\n[area=_Phoenix][stroke=${Color.goldS}]Phoenix[/stroke][/area] - Points 4 > 3`,
   },
 ]
