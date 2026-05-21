@@ -644,7 +644,7 @@ export default class PlayMenu extends Menu {
       .text(
         rewardPosition.x,
         rewardPosition.y + 40,
-        `+${data.goldReward}💰\n+${data.gemReward}💎`,
+        `+${data.goldReward}💰`,
         Style.reward,
       )
       .setOrigin(0.5, 1)
@@ -657,6 +657,30 @@ export default class PlayMenu extends Menu {
       ease: Ease.basic,
       onComplete: () => goldText.destroy(),
     })
+
+    // Tween the gem rewards if present
+    if (data.gemReward > 0) {
+      const gemText = this.scene.add
+        .text(
+          rewardPosition.x,
+          rewardPosition.y + 40,
+          `+${data.gemReward}💎`,
+          Style.reward,
+        )
+        .setOrigin(0.5, 1)
+        .setVisible(false)
+
+      this.scene.tweens.add({
+        targets: gemText,
+        y: rewardPosition.y,
+        alpha: 0,
+        delay: Time.general.rewardFloatMs,
+        duration: Time.general.rewardFloatMs,
+        ease: Ease.basic,
+        onStart: () => gemText.setVisible(true),
+        onComplete: () => gemText.destroy(),
+      })
+    }
   }
 
   private getGrowthStage(plantedTime: Date): number {
