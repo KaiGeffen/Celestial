@@ -46,7 +46,7 @@ export default interface messagesToServer {
   harvestGarden: {
     index: number
   }
-  claimMissionGold: {
+  claimMissionRewards: {
     missionId: number
   }
   // Queueing events

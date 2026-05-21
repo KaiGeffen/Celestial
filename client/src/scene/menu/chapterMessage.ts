@@ -115,7 +115,7 @@ export default class ChapterMessageMenu extends MessageMenu {
             onComplete: () => rewardText.destroy(),
           })
 
-          Server.claimMissionGold(this.claimGoldMissionId)
+          Server.claimMissionRewards(this.claimGoldMissionId)
           this.scene.game.events.emit('missionGoldClaimed')
           this.claimGoldButton.setText('Claimed').disable()
         }

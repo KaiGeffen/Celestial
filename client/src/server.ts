@@ -403,9 +403,9 @@ export default class Server {
     })
   }
 
-  static claimMissionGold(missionId: number): void {
+  static claimMissionRewards(missionId: number): void {
     if (!server || !server.isOpen()) {
-      console.error('Claiming mission gold when server ws doesnt exist.')
+      console.error('Claiming mission rewards when server ws doesnt exist.')
       return
     }
     if (this.userData) {
@@ -413,7 +413,7 @@ export default class Server {
       this.userData.missionGoldClaimed[missionId] = true
     }
     server.send({
-      type: 'claimMissionGold',
+      type: 'claimMissionRewards',
       missionId,
     })
   }

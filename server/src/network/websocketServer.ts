@@ -302,7 +302,7 @@ export default function createWebSocketServer() {
             gemReward: harvestResult.gemReward,
           })
         })
-        .on('claimMissionGold', async ({ missionId }) => {
+        .on('claimMissionRewards', async ({ missionId }) => {
           if (!id) return
 
           const missionExists = journeyData.some(
