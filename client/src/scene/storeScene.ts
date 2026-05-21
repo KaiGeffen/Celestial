@@ -10,6 +10,10 @@ import newScrollablePanel from '../lib/scrollablePanel'
 import Card from '../../../shared/state/card'
 import { UserSettings } from '../settings/userSettings'
 import Button from '../lib/buttons/button'
+import allPurchaseables, {
+  borders,
+  Purchaseable,
+} from '../../../shared/purchaseables/index'
 
 export default class StoreScene extends BaseSceneWithHeader {
   private scrollablePanel: any = null
@@ -114,19 +118,30 @@ export default class StoreScene extends BaseSceneWithHeader {
     })
 
     if (this.currentTab === 'cosmetics') {
-      const messageSizer = this.rexUI.add.sizer({
-        orientation: 'vertical',
-        width: Space.windowWidth,
-        height: Space.windowHeight - this.headerHeight,
-      })
-      const messageText = this.add
-        .text(0, 0, 'All Cosmetics owned', Style.header)
-        .setOrigin(0.5)
-      messageSizer.addSpace()
-      messageSizer.add(messageText)
-      messageSizer.addSpace()
-      messageSizer.layout()
-      sizer.add(messageSizer)
+      const ownedItems = new Set(Server.getUserData().ownedItems ?? [])
+      const unowned = allPurchaseables.filter(
+        (item) => !ownedItems.has(item.id),
+      )
+
+      if (unowned.length === 0) {
+        // Write the "all Owned" message
+        const messageSizer = this.rexUI.add.sizer({
+          orientation: 'vertical',
+          width: Space.windowWidth,
+          height: Space.windowHeight - this.headerHeight,
+        })
+        const messageText = this.add
+          .text(0, 0, 'All Cosmetics owned', Style.header)
+          .setOrigin(0.5)
+        messageSizer.addSpace()
+        messageSizer.add(messageText)
+        messageSizer.addSpace()
+        sizer.add(messageSizer)
+      } else {
+        unowned.forEach((item) => {
+          sizer.add(this.createCosmeticItem(item))
+        })
+      }
     } else {
       // Get card inventory (owned cards)
       const cardInventory = UserSettings._get('cardInventory') || []
@@ -150,7 +165,6 @@ export default class StoreScene extends BaseSceneWithHeader {
         messageSizer.addSpace()
         messageSizer.add(messageText)
         messageSizer.addSpace()
-        messageSizer.layout()
         sizer.add(messageSizer)
       } else {
         // Create store items for each card
@@ -171,6 +185,39 @@ export default class StoreScene extends BaseSceneWithHeader {
         height: `100%-${this.headerHeight}`,
       },
     })
+  }
+
+  private createCosmeticItem(
+    item: Purchaseable,
+  ): Phaser.GameObjects.GameObject {
+    const isBorder = borders.some((b) => b.id === item.id)
+    const width = isBorder ? Space.avatarSize : Space.cardWidth
+    const height = isBorder ? Space.avatarSize : Space.cardHeight
+
+    const image = this.add
+      .image(0, 0, item.name)
+      .setDisplaySize(width, height)
+      .setInteractive({ cursor: 'pointer' })
+      .on('pointerdown', () => {
+        this.scene.launch('MenuScene', {
+          menu: 'purchaseItem',
+          purchaseable: item,
+        })
+      })
+
+    const costText = this.add
+      .text(0, 0, `💎 ${item.cost.toLocaleString()}`, Style.basic)
+      .setOrigin(0.5)
+
+    const sizer = this.rexUI.add
+      .sizer({
+        orientation: 'vertical',
+        space: { item: Space.padSmall },
+      })
+      .add(image)
+      .add(costText)
+
+    return sizer
   }
 
   private createCardItem(card: Card): Phaser.GameObjects.GameObject {
