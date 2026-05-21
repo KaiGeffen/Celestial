@@ -1,5 +1,5 @@
 import EloRank from 'elo-rank'
-import { eq, sql, lt } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { db } from './db'
 import { matchHistory, missionStats, players } from './schema'
 import { Deck } from '../../../shared/types/deck'
@@ -74,6 +74,7 @@ export async function updateMatchResultPVP(
       elo_peak: sql`GREATEST(${players.elo_peak}, ${newWinnerRating})`,
       pvp_wins_lifetime: sql`${players.pvp_wins_lifetime} + 1`,
       pvp_wins_month: sql`${players.pvp_wins_month} + 1`,
+      gems: sql`${players.gems} + 1`,
     })
     .where(eq(players.id, winnerId))
 
@@ -83,6 +84,7 @@ export async function updateMatchResultPVP(
       elo: newLoserRating,
       pvp_losses_lifetime: sql`${players.pvp_losses_lifetime} + 1`,
       pvp_losses_month: sql`${players.pvp_losses_month} + 1`,
+      gems: sql`${players.gems} + 1`,
     })
     .where(eq(players.id, loserId))
 }
