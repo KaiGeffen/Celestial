@@ -14,9 +14,6 @@ const WIDTH = 600
 export default class PurchaseItemMenu extends Menu {
   private card: Card
   private cost: number
-  private isOwned: boolean
-  // Price text is broader store scene, set to `owned` if we buy it
-  private priceText: Phaser.GameObjects.Text
 
   constructor(
     scene: MenuScene,
@@ -49,7 +46,7 @@ export default class PurchaseItemMenu extends Menu {
   }
 
   private createContent(): void {
-    this.createHeader('Purchase (1,000)')
+    this.createHeader(`Purchase 💰${COST.toLocaleString()}`)
 
     // Add card image on the left
     const cardImageContainer = new ContainerLite(

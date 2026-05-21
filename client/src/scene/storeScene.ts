@@ -9,10 +9,13 @@ import Catalog from '../../../shared/state/catalog'
 import newScrollablePanel from '../lib/scrollablePanel'
 import Card from '../../../shared/state/card'
 import { UserSettings } from '../settings/userSettings'
+import Button from '../lib/buttons/button'
 
 export default class StoreScene extends BaseSceneWithHeader {
   private scrollablePanel: any = null
   private userStatsDisplay: Phaser.GameObjects.Text
+  private currentTab: 'cards' | 'cosmetics' = 'cards'
+  private btnTab: Button
 
   constructor() {
     super({ key: 'StoreScene' })
@@ -21,6 +24,7 @@ export default class StoreScene extends BaseSceneWithHeader {
   create(): void {
     this.createBackground()
     super.create({ title: 'Store' })
+    this.createTabButton()
     this.createUserStatsDisplay()
     this.createStoreItems()
 
@@ -58,6 +62,23 @@ export default class StoreScene extends BaseSceneWithHeader {
     )
   }
 
+  private createTabButton(): void {
+    const x = Space.pad * 2 + Space.buttonWidth + Space.buttonWidth / 2
+    const y = Space.padSmall + Space.buttonHeight / 2
+
+    this.btnTab = new Buttons.Basic({
+      within: this,
+      text: this.currentTab === 'cards' ? 'Cosmetics' : 'Cards',
+      x,
+      y,
+      f: () => {
+        this.currentTab = this.currentTab === 'cards' ? 'cosmetics' : 'cards'
+        this.btnTab.setText(this.currentTab === 'cards' ? 'Cosmetics' : 'Cards')
+        this.createStoreItems()
+      },
+    })
+  }
+
   private createBackground(): void {
     const background = this.add.image(0, 0, 'chrome-bodyAlt').setOrigin(0)
 
@@ -92,25 +113,14 @@ export default class StoreScene extends BaseSceneWithHeader {
       },
     })
 
-    // Get card inventory (owned cards)
-    const cardInventory = UserSettings._get('cardInventory') || []
-
-    // Get all collectible cards that are NOT owned
-    const cards = Catalog.collectibleCards.filter((card) => {
-      // Check if card is owned (indexed by card ID)
-      return !cardInventory[card.id]
-    })
-
-    // If all cards are owned, show a message instead
-    if (cards.length === 0) {
-      // Use a vertical sizer to center the message
+    if (this.currentTab === 'cosmetics') {
       const messageSizer = this.rexUI.add.sizer({
         orientation: 'vertical',
         width: Space.windowWidth,
         height: Space.windowHeight - this.headerHeight,
       })
       const messageText = this.add
-        .text(0, 0, 'All cards owned', Style.header)
+        .text(0, 0, 'All Cosmetics owned', Style.header)
         .setOrigin(0.5)
       messageSizer.addSpace()
       messageSizer.add(messageText)
@@ -118,10 +128,36 @@ export default class StoreScene extends BaseSceneWithHeader {
       messageSizer.layout()
       sizer.add(messageSizer)
     } else {
-      // Create store items for each card
-      cards.forEach((card) => {
-        sizer.add(this.createCardItem(card))
+      // Get card inventory (owned cards)
+      const cardInventory = UserSettings._get('cardInventory') || []
+
+      // Get all collectible cards that are NOT owned
+      const cards = Catalog.collectibleCards.filter((card) => {
+        // Check if card is owned (indexed by card ID)
+        return !cardInventory[card.id]
       })
+
+      // If all cards are owned, show a message instead
+      if (cards.length === 0) {
+        const messageSizer = this.rexUI.add.sizer({
+          orientation: 'vertical',
+          width: Space.windowWidth,
+          height: Space.windowHeight - this.headerHeight,
+        })
+        const messageText = this.add
+          .text(0, 0, 'All cards owned', Style.header)
+          .setOrigin(0.5)
+        messageSizer.addSpace()
+        messageSizer.add(messageText)
+        messageSizer.addSpace()
+        messageSizer.layout()
+        sizer.add(messageSizer)
+      } else {
+        // Create store items for each card
+        cards.forEach((card) => {
+          sizer.add(this.createCardItem(card))
+        })
+      }
     }
 
     // Create scrollable panel
