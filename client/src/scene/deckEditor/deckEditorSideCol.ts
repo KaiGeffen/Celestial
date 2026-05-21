@@ -90,7 +90,9 @@ export class RightCol {
   }
 
   protected createBody(): FixWidthSizer {
-    return this.scene.rexUI.add.fixWidthSizer().add(this.decklist.sizer)
+    return this.scene.rexUI.add
+      .fixWidthSizer({ width: Space.cutoutWidth + Space.padSmall * 2 })
+      .add(this.decklist.sizer)
   }
 
   // Overwritten in children that need dynamic footer state (e.g. Play enabled/disabled).

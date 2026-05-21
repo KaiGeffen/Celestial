@@ -51,7 +51,7 @@ export function getUnlockedBorders(): number[] {
   const userData = Server.getUserData()
   const unlockedBorders = new Set<number>()
 
-  // Default border (0)
+  // Default border
   unlockedBorders.add(0)
 
   // Add borders unlocked through achievements
