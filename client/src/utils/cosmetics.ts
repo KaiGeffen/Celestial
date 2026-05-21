@@ -1,5 +1,16 @@
 import Server from '../server'
 import { achievementsMeta } from '../../../shared/achievementsData'
+import { borders, cardbacks, Purchaseable } from '../../../shared/purchaseables/index'
+import borderNames from '../data/borderNames'
+import cardbackNames from '../data/cardbackNames'
+
+export function getCosmeticImageKey(item: Purchaseable): string {
+  if (item.type === 'border') {
+    return `border-${borderNames[item.itemId]}`
+  } else {
+    return `cardback-${cardbackNames[item.itemId]}`
+  }
+}
 
 export function getUnlockedAvatars(): number[] {
   const userData = Server.getUserData()
@@ -61,10 +72,31 @@ export function getUnlockedBorders(): number[] {
     }
   })
 
+  // Add borders unlocked through purchases
+  const ownedItemIds = new Set(userData.ownedItems ?? [])
+  borders.forEach((border) => {
+    if (ownedItemIds.has(border.id)) {
+      unlockedBorders.add(border.itemId)
+    }
+  })
+
   // Sort and return
   return Array.from(unlockedBorders).sort((a, b) => a - b)
 }
 
 export function getUnlockedCardbacks(): number[] {
-  return [0, 1, 2]
+  const ownedItemIds = new Set(Server.getUserData().ownedItems ?? [])
+  const unlockedCardbacks = new Set<number>()
+
+  // Default cardback (0)
+  unlockedCardbacks.add(0)
+
+  // Add cardbacks unlocked through purchases
+  cardbacks.forEach((cardback) => {
+    if (ownedItemIds.has(cardback.id)) {
+      unlockedCardbacks.add(cardback.itemId)
+    }
+  })
+
+  return Array.from(unlockedCardbacks).sort((a, b) => a - b)
 }

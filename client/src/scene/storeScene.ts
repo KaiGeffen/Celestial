@@ -11,9 +11,9 @@ import Card from '../../../shared/state/card'
 import { UserSettings } from '../settings/userSettings'
 import Button from '../lib/buttons/button'
 import allPurchaseables, {
-  borders,
   Purchaseable,
 } from '../../../shared/purchaseables/index'
+import { getCosmeticImageKey } from '../utils/cosmetics'
 
 export default class StoreScene extends BaseSceneWithHeader {
   private scrollablePanel: any = null
@@ -195,7 +195,7 @@ export default class StoreScene extends BaseSceneWithHeader {
     const height = isBorder ? Space.avatarSize : Space.cardHeight
 
     const image = this.add
-      .image(0, 0, item.name)
+      .image(0, 0, getCosmeticImageKey(item))
       .setDisplaySize(width, height)
       .setInteractive({ cursor: 'pointer' })
       .on('pointerdown', () => {

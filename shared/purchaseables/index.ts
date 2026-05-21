@@ -6,7 +6,8 @@ export type PurchaseableType = 'border' | 'cardback'
 export interface Purchaseable {
   id: number
   cost: number
-  name: string
+  // Index into the type's names list (e.g. borderNames or cardbackNames)
+  itemId: number
   type?: PurchaseableType
 }
 

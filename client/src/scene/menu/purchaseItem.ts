@@ -8,6 +8,7 @@ import Server from '../../server'
 import { CardImage } from '../../lib/cardImage'
 import Card from '../../../../shared/state/card'
 import { Purchaseable } from '../../../../shared/purchaseables/index'
+import { getCosmeticImageKey } from '../../utils/cosmetics'
 
 const CARD_COST = 1000
 const WIDTH = 600
@@ -86,7 +87,7 @@ export default class PurchaseItemMenu extends Menu {
       const height = isBorder ? Space.avatarSize : Space.cardHeight
 
       const image = this.scene.add
-        .image(0, 0, this.purchaseable.name)
+        .image(0, 0, getCosmeticImageKey(this.purchaseable))
         .setDisplaySize(width, height)
       this.sizer.add(image).addNewLine()
     }

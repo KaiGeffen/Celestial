@@ -4,12 +4,12 @@ const cardbacks: Purchaseable[] = [
   {
     id: 2001,
     cost: 100,
-    name: 'cardback-Astrology',
+    itemId: 1,
   },
   {
     id: 2002,
     cost: 100,
-    name: 'cardback-Blossom',
+    itemId: 2,
   },
 ]
 

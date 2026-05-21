@@ -4,22 +4,22 @@ const borders: Purchaseable[] = [
   {
     id: 1001,
     cost: 50,
-    name: 'border-Birds',
+    itemId: 4,
   },
   {
     id: 1002,
     cost: 50,
-    name: 'border-Ashes',
+    itemId: 5,
   },
   {
     id: 1003,
     cost: 50,
-    name: 'border-Shadow',
+    itemId: 3,
   },
   {
     id: 1004,
     cost: 50,
-    name: 'border-Birth',
+    itemId: 6,
   },
 ]
 
