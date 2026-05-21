@@ -7,59 +7,86 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Server from '../../server'
 import { CardImage } from '../../lib/cardImage'
 import Card from '../../../../shared/state/card'
+import { Purchaseable } from '../../../../shared/purchaseables/index'
 
-const COST = 1000
+const CARD_COST = 1000
 const WIDTH = 600
 
 export default class PurchaseItemMenu extends Menu {
-  private card: Card
-  private cost: number
+  private card: Card | null
+  private purchaseable: Purchaseable | null
 
   constructor(
     scene: MenuScene,
     params: {
-      card: Card
+      card?: Card
+      purchaseable?: Purchaseable
     },
   ) {
-    super(scene, WIDTH) // Wider menu to accommodate the image and description
+    super(scene, WIDTH)
 
     // Set properties before creating content
-    this.card = params.card
+    this.card = params.card ?? null
+    this.purchaseable = params.purchaseable ?? null
 
     // Now create content with properties set
     this.createContent()
     this.layout()
   }
 
+  private get cost(): number {
+    return this.purchaseable ? this.purchaseable.cost : CARD_COST
+  }
+
   private handlePurchase(): void {
     const balance = Server.getUserData().coins
 
-    if (balance < COST) {
+    if (balance < this.cost) {
       this.scene.signalError('Insufficient coins to make this purchase.')
       return
     }
 
-    // Send purchase request to server - it will update user data via sendUserData response
-    Server.purchaseItem(this.card.id)
+    if (this.card) {
+      Server.purchaseItem(this.card.id)
+    } else if (this.purchaseable) {
+      Server.purchaseItem(this.purchaseable.id)
+    }
 
     this.close()
   }
 
+  private get currencyEmoji(): string {
+    return this.purchaseable ? '💎' : '💰'
+  }
+
   private createContent(): void {
-    this.createHeader(`Purchase 💰${COST.toLocaleString()}`)
-
-    // Add card image on the left
-    const cardImageContainer = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.cardWidth,
-      Space.cardHeight,
+    this.createHeader(
+      `Purchase ${this.currencyEmoji}${this.cost.toLocaleString()}`,
     )
-    const cardImage = new CardImage(this.card, cardImageContainer, false, false)
 
-    // Add the content sizer to the menu
-    this.sizer.add(cardImageContainer)
+    if (this.card) {
+      const cardImageContainer = new ContainerLite(
+        this.scene,
+        0,
+        0,
+        Space.cardWidth,
+        Space.cardHeight,
+      )
+      new CardImage(this.card, cardImageContainer, false, false)
+
+      // Add the content sizer to the menu
+      this.sizer.add(cardImageContainer)
+    } else if (this.purchaseable) {
+      // Add cosmetic image above the buttons
+      const isBorder = this.purchaseable.name.startsWith('border-')
+      const width = isBorder ? Space.avatarSize : Space.cardWidth
+      const height = isBorder ? Space.avatarSize : Space.cardHeight
+
+      const image = this.scene.add
+        .image(0, 0, this.purchaseable.name)
+        .setDisplaySize(width, height)
+      this.sizer.add(image).addNewLine()
+    }
 
     // Create bottom buttons sizer
     const buttonsSizer = this.scene.rexUI.add.sizer({
