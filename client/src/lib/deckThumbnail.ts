@@ -80,7 +80,6 @@ export default class DeckThumbnail {
       within: this.container,
       avatarId: cosmeticSet.avatar ?? 0,
       border: cosmeticSet.border ?? 0,
-      muteClick: true,
       x: Space.avatarSize / 4,
       y: -10,
     })

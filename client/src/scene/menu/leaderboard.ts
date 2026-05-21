@@ -250,7 +250,6 @@ export default class LeaderboardMenu extends Menu {
       within: avatarContainer,
       avatarId: entry.cosmeticSet.avatar,
       border: entry.cosmeticSet.border,
-      muteClick: true,
     })
 
     // Add each text object

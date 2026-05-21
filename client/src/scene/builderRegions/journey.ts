@@ -166,7 +166,6 @@ export default class DeckRegion {
     this.btnAvatar = new Buttons.Avatar({
       within: containerAvatar,
       avatarId: avatarID,
-      emotive: true,
     })
 
     sizer.add(containerAvatar)

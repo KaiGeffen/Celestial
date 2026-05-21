@@ -138,7 +138,6 @@ export default class DeckRegion {
     this.avatar = new Buttons.Avatar({
       within: containerAvatar,
       f: this.openEditMenu(),
-      muteClick: true,
     })
     sizer.add(containerAvatar)
 

@@ -26,7 +26,6 @@ export default abstract class AvatarRegionBase extends Region {
       within: this.container,
       x: AVATAR_REGION_WIDTH / 2,
       y: this.avatarCenterY(),
-      emotive: this.avatarEmotive(),
     })
   }
 

@@ -246,7 +246,6 @@ export default class OnlinePlayersMenu extends Menu {
       within: avatarContainer,
       avatarId: player.cosmeticSet.avatar,
       border: player.cosmeticSet.border,
-      muteClick: true,
     })
 
     // Add each text object

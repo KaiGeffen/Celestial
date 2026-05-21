@@ -32,7 +32,6 @@ export default class AvatarButton extends Button {
     x = 0,
     y = 0,
     f = noOp,
-    emotive = false,
     origin = [0.5, 0.5],
     muteClick = false,
   }) {
@@ -43,14 +42,13 @@ export default class AvatarButton extends Button {
     super(within, x, y, {
       icon: {
         name: `avatar-${name}`,
-        interactive: true,
-        noGlow: f === noOp && !emotive,
+        interactive: f !== noOp,
       },
       callbacks: {
         click: f,
       },
       sound: {
-        mute: emotive || muteClick,
+        mute: muteClick,
       },
     })
 
@@ -61,11 +59,6 @@ export default class AvatarButton extends Button {
     within.add(this.border)
 
     this.setOrigin(...origin)
-
-    // Set it so the avatar emotes briefly when clicked
-    if (emotive) {
-      this.onClick = () => this.doEmote()
-    }
   }
 
   setOnClick(f, once = false, overwrite = true): Button {
