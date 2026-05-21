@@ -39,17 +39,20 @@ export default class PurchaseItemMenu extends Menu {
   }
 
   private handlePurchase(): void {
-    const balance = Server.getUserData().coins
-
-    if (balance < this.cost) {
-      this.scene.signalError('Insufficient coins to make this purchase.')
-      return
-    }
-
-    if (this.card) {
-      Server.purchaseItem(this.card.id)
-    } else if (this.purchaseable) {
+    if (this.purchaseable) {
+      const gems = Server.getUserData().gems ?? 0
+      if (gems < this.cost) {
+        this.scene.signalError('Not enough gems.')
+        return
+      }
       Server.purchaseItem(this.purchaseable.id)
+    } else if (this.card) {
+      const coins = Server.getUserData().coins ?? 0
+      if (coins < this.cost) {
+        this.scene.signalError('Not enough coins.')
+        return
+      }
+      Server.purchaseItem(this.card.id)
     }
 
     this.close()

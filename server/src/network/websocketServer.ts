@@ -8,13 +8,14 @@ import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 import { verifySteamTicket } from './steamAuth'
 
 import { db } from '../db/db'
-import { players, approvedRefs } from '../db/schema'
+import { players, approvedRefs, cosmeticsTransactions } from '../db/schema'
 import { eq, sql, inArray } from 'drizzle-orm'
 import { ServerWS } from '../../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../../shared/types/deck'
 import { AchievementManager } from '../achievementManager'
 import Garden from '../db/garden'
 import Catalog from '../../../shared/state/catalog'
+import allPurchaseables from '../../../shared/purchaseables/index'
 
 import PveMatch from './match/pveMatch'
 import PveMatchMission from './match/pveMatchMission'
@@ -350,54 +351,99 @@ export default function createWebSocketServer() {
         .on('purchaseItem', async ({ id: itemId }) => {
           if (!id) return
 
-          // Check if this is a valid card
-          if (!Catalog.getCardById(itemId)) return
+          const cosmeticItem = allPurchaseables.find((p) => p.id === itemId)
+          const isCosmetic = cosmeticItem !== undefined
+          const isCard = !isCosmetic && !!Catalog.getCardById(itemId)
 
-          // Get current user data
-          const userData = await db
-            .select({
-              coins: players.coins,
-              card_inventory: players.card_inventory,
-            })
-            .from(players)
-            .where(eq(players.id, id))
-            .limit(1)
+          if (!isCosmetic && !isCard) return
 
-          // Check if user has enough coins
-          const currentBalance = userData[0].coins
-          if (currentBalance < CARD_COST) {
-            ws.send({ type: 'signalError' })
-            return
-          }
-
-          // Convert inventory bit string to array
-          const inventoryArray = userData[0].card_inventory
-            .split('')
-            .map((char) => char === '1')
-
-          // Check if already owned
-          if (inventoryArray[itemId] === true) {
-            ws.send({ type: 'signalError' })
-            return
-          }
-
-          // Update inventory to mark card as owned
-          inventoryArray[itemId] = true
-          const newInventoryBitString = inventoryArray
-            .map((value) => (value ? '1' : '0'))
-            .join('')
-
-          // Start a transaction
-          await db.transaction(async (tx) => {
-            // Update coins and inventory
-            await tx
-              .update(players)
-              .set({
-                coins: currentBalance - CARD_COST,
-                card_inventory: newInventoryBitString,
-              })
+          if (isCosmetic) {
+            // Get current gems and existing owned items
+            const userData = await db
+              .select({ gems: players.gems })
+              .from(players)
               .where(eq(players.id, id))
-          })
+              .limit(1)
+
+            const currentGems = userData[0].gems
+
+            // Check if user has enough gems
+            if (currentGems < cosmeticItem.cost) {
+              ws.send({ type: 'signalError' })
+              return
+            }
+
+            // Check if already owned
+            const existing = await db
+              .select({ id: cosmeticsTransactions.id })
+              .from(cosmeticsTransactions)
+              .where(eq(cosmeticsTransactions.player_id, id))
+
+            if (existing.some((t) => t.id === itemId)) {
+              ws.send({ type: 'signalError' })
+              return
+            }
+
+            // Deduct gems and insert transaction
+            await db.transaction(async (tx) => {
+              await tx
+                .update(players)
+                .set({ gems: currentGems - cosmeticItem.cost })
+                .where(eq(players.id, id))
+
+              await tx.insert(cosmeticsTransactions).values({
+                player_id: id,
+                item_id: itemId,
+                transaction_type: 'purchase',
+              })
+            })
+          } else {
+            // Card purchase — pay with coins
+            const userData = await db
+              .select({
+                coins: players.coins,
+                card_inventory: players.card_inventory,
+              })
+              .from(players)
+              .where(eq(players.id, id))
+              .limit(1)
+
+            // Check if user has enough coins
+            const currentBalance = userData[0].coins
+            if (currentBalance < CARD_COST) {
+              ws.send({ type: 'signalError' })
+              return
+            }
+
+            // Convert inventory bit string to array
+            const inventoryArray = userData[0].card_inventory
+              .split('')
+              .map((char) => char === '1')
+
+            // Check if already owned
+            if (inventoryArray[itemId] === true) {
+              ws.send({ type: 'signalError' })
+              return
+            }
+
+            // Update inventory to mark card as owned
+            inventoryArray[itemId] = true
+            const newInventoryBitString = inventoryArray
+              .map((value) => (value ? '1' : '0'))
+              .join('')
+
+            // Start a transaction
+            await db.transaction(async (tx) => {
+              // Update coins and inventory
+              await tx
+                .update(players)
+                .set({
+                  coins: currentBalance - CARD_COST,
+                  card_inventory: newInventoryBitString,
+                })
+                .where(eq(players.id, id))
+            })
+          }
 
           // Send updated user data
           await sendUserData(ws, id)
