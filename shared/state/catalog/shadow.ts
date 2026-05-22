@@ -433,6 +433,24 @@ const ink = new Ink({
   text: 'Worth +1 for each time you passed this round.',
 })
 
+class Sharpness extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    for (let i = 0; i < game.story.acts.length; i++) {
+      if (game.story.acts[i].card.cost === game.breath[player]) {
+        game.removeAct(i)
+        break
+      }
+    }
+  }
+}
+const sharpness = new Sharpness({
+  name: 'Sharpness',
+  id: 3038,
+  text: 'Discard the next card in the story with base cost equal to your remaining breath.',
+})
+
 export {
   dagger,
   shadow,
@@ -454,4 +472,5 @@ export {
   abandoned,
   mire,
   ink,
+  sharpness,
 }
