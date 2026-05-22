@@ -395,6 +395,7 @@ export default class GameModel {
   ) {
     this.story.addAct(card, player, i, revealed)
     const storySlot = i === undefined ? this.story.acts.length - 1 : i
+
     // Any existing Zone.Story animations targeting positions >= storySlot get shifted right
     // because this insertion displaces them (e.g. Immolant onDiscard followed by createInStory at 0).
     for (const ownerAnims of this.animations) {
@@ -412,22 +413,6 @@ export default class GameModel {
         index2: storySlot,
       }),
     )
-  }
-
-  dig(player: number, amt: number) {
-    for (let i = 0; i < amt; i++) {
-      if (this.pile[player].length > 0) {
-        const card = this.pile[player].pop()
-        this.animations[player].push(
-          new Animation({
-            from: Zone.Discard,
-            to: Zone.Gone,
-            card: card,
-          }),
-        )
-        this.expended[player].push(card)
-      }
-    }
   }
 
   mill(player: number, amt: number) {

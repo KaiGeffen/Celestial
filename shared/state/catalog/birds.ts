@@ -308,7 +308,21 @@ class LetGo extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    game.dig(player, 4)
+    // Remove the top four cards of the discard pile
+    const amt = 4
+    for (let i = 0; i < amt; i++) {
+      if (game.pile[player].length > 0) {
+        const card = game.pile[player].pop()
+        game.animations[player].push(
+          new Animation({
+            from: Zone.Discard,
+            to: Zone.Gone,
+            card: card,
+          }),
+        )
+        game.expended[player].push(card)
+      }
+    }
   }
 }
 const letGo = new LetGo({
