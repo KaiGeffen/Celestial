@@ -139,6 +139,7 @@ export default class JourneyScene extends BaseScene {
 
     // Add buttons
     this.createBackButton()
+    this.createOpeningButton()
 
     // Make up pop-up for the card you just received, if there is one
     if (params.card) {
@@ -744,12 +745,24 @@ export default class JourneyScene extends BaseScene {
     new Buttons.Basic({
       within: this,
       text: 'Back',
-      x: Space.padSmall + Space.buttonWidth / 2,
+      x: Space.pad + Space.buttonWidth / 2,
       y: Space.padSmall + Space.buttonHeight / 2,
       f: () => {
         this.scene.start('HomeScene')
       },
       depth: 10,
+    }).setNoScroll()
+  }
+
+  private createOpeningButton(): void {
+    new Buttons.Basic({
+      within: this,
+      text: 'Movie',
+      x: (Space.buttonWidth * 3) / 2 + Space.pad * 2,
+      y: Space.padSmall + Space.buttonHeight / 2,
+      f: () => {
+        this.scene.start('OpeningScene')
+      },
     }).setNoScroll()
   }
 
