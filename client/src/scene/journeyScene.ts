@@ -757,7 +757,7 @@ export default class JourneyScene extends BaseScene {
   private createOpeningButton(): void {
     new Buttons.Basic({
       within: this,
-      text: 'Movie',
+      text: 'Intro',
       x: (Space.buttonWidth * 3) / 2 + Space.pad * 2,
       y: Space.padSmall + Space.buttonHeight / 2,
       f: () => {

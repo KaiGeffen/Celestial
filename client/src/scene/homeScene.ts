@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Color, Space, BBStyle, Flags } from '../settings/settings'
+import { Style, Color, Space, BBStyle } from '../settings/settings'
 import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
@@ -244,11 +244,36 @@ export default class HomeScene extends BaseScene {
       },
     })
 
-    // Add dark background
+    // Add background, make it clickable
     const background = this.add
       .image(0, 0, 'chrome-profile')
-      // .rectangle(0, 0, 1, 1, Color.backgroundDark)
       .setInteractive()
+      .on('pointerdown', () => {
+        this.scene.launch('MenuScene', {
+          menu: 'userProfile',
+          activeScene: this,
+        })
+      })
+
+    const outlineFx = this.plugins.get('rexOutlinePipeline')['add'](background, {
+      thickness: 3,
+      outlineColor: Color.outline,
+      quality: 0.3,
+    })
+    outlineFx.active = false
+
+    background
+      .on('pointerover', () => {
+        outlineFx.active = true
+      })
+      .on('pointerout', () => {
+        outlineFx.active = false
+      })
+
+    this.scene.get('MenuScene').events.on('start', () => {
+      outlineFx.active = false
+    })
+
     mainSizer.addBackground(background)
 
     // Avatar container - fixed size
@@ -263,15 +288,6 @@ export default class HomeScene extends BaseScene {
       within: avatarContainer,
       avatarId: Server.getUserData().cosmeticSet.avatar,
       border: Server.getUserData().cosmeticSet.border,
-      f: () => {
-        this.scene.launch('MenuScene', {
-          menu: 'userProfile',
-          activeScene: this,
-          outerAvatar: avatar,
-        })
-        logEvent('view_user_profile')
-      },
-      muteClick: true,
     })
     mainSizer.add(avatarContainer)
 
