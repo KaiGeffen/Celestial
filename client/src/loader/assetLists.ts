@@ -57,7 +57,6 @@ export const assetLists = {
     "files": [
       "Astrology",
       "Blossom",
-      "Default",
       "Default"
     ],
     "pixelArt": false
@@ -177,9 +176,12 @@ export const assetLists = {
       "Seen",
       "Sensualist",
       "Shadow",
+      "Shooting Stars",
       "Sickness",
       "Sky Burial",
+      "Sky Burial",
       "Spark",
+      "Starfall",
       "Starfall",
       "Starling",
       "Stars",
