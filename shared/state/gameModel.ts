@@ -4,6 +4,7 @@ import { Avatar } from './avatar'
 
 import { Animation, Visibility } from '../animation'
 import { Zone } from './zone'
+import { Quality } from './quality'
 import { Statuses } from './status'
 import { MechanicsSettings } from '../settings'
 import { SoundEffect } from './soundEffect'
@@ -321,6 +322,21 @@ export default class GameModel {
       }
     }
     return null
+  }
+
+  /**
+   * Returns whether the act at story index `i` is visible to `player`.
+   * Visible if the act is within the player's Sight, the card has the
+   * VISIBLE quality, or the act is Revealed.
+   */
+  isActVisibleToPlayer(player: number, i: number): boolean {
+    const act = this.story.acts[i]
+    if (!act) return false
+    return (
+      i + 1 <= this.status[player].vision ||
+      act.card.qualities.includes(Quality.VISIBLE) ||
+      act.revealed
+    )
   }
 
   /**

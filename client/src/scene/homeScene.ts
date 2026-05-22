@@ -543,7 +543,7 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   //   body: 'Congrats to Sherlock for reclaiming his tournament title! And to Redrame for getting #1 on ladder.\nWith the launch of the demo, we plan to snapshot the top players as we transition to a more public release.',
   // },
   {
-    subheader: 'Gems arrive',
+    subheader: 'Gems',
     body: `The cosmetic store is now live! Purchase borders and cardbacks with gems. Through June, each PvP match grants 1 gem, and each plant reward will have a small chance to give 3-5.`,
   },
   {

@@ -58,15 +58,11 @@ class Enlightenment extends Card {
     let numSeenCards = 0
     for (let i = 0; i < game.story.acts.length; i++) {
       const act = game.story.acts[i]
-      if (act.owner === (player ^ 1)) {
-        // If player has vision, act was revealed, or card is visible
-        if (
-          i + 1 <= game.status[player].vision ||
-          act.card.qualities.includes(Quality.VISIBLE) ||
-          act.revealed
-        ) {
-          numSeenCards += 1
-        }
+      if (
+        act.owner === (player ^ 1) &&
+        game.isActVisibleToPlayer(player, i)
+      ) {
+        numSeenCards += 1
       }
     }
     return numSeenCards >= 3 ? 0 : this.cost
@@ -99,16 +95,11 @@ class Conquer extends Card {
     let numSeenCards = 0
     for (let i = 0; i < game.story.acts.length; i++) {
       const act = game.story.acts[i]
-      if (act.owner === player) {
+      if (
+        act.owner === player ||
+        game.isActVisibleToPlayer(player, i)
+      ) {
         numSeenCards += 1
-      } else {
-        if (
-          i + 1 <= game.status[player].vision ||
-          act.card.qualities.includes(Quality.VISIBLE) ||
-          act.revealed
-        ) {
-          numSeenCards += 1
-        }
       }
     }
     return Math.max(0, this.cost - numSeenCards)
@@ -326,6 +317,27 @@ const switcheroo = new Switcheroo({
   text: 'Turn your Sight into Nourish.',
 })
 
+class Incense extends Card {
+  onPlay(player: number, game: GameModel) {
+    for (let i = game.story.acts.length - 1; i >= 0; i--) {
+      const act = game.story.acts[i]
+      if (
+        act.owner === (player ^ 1) &&
+        game.isActVisibleToPlayer(player, i)
+      ) {
+        game.moveBetweenZones(Zone.Story, Zone.Hand, player ^ 1, i)
+        break
+      }
+    }
+  }
+}
+const incense = new Incense({
+  name: 'Incense',
+  id: 8095,
+  cost: 3,
+  text: `When played, return your opponent's last card in the story which you can see to their hand.`,
+})
+
 export {
   dawn,
   nectar,
@@ -343,6 +355,7 @@ export {
   // NEW CARDS
   suddenInsight,
   // realms,
-  path as greatWheel,
+  path,
   // switcheroo,
+  incense,
 }
