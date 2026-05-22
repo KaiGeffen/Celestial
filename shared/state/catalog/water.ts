@@ -100,7 +100,7 @@ const iceberg = new Iceberg({
 
 class Dew extends Card {
   onMorning(player: number, game: GameModel, index: number) {
-    game.create(player, dew)
+    game.create(Zone.Hand, player, dew)
     return true
   }
 }
@@ -270,7 +270,7 @@ class Rime extends Card {
     super.play(player, game, index, bonus)
 
     for (let i = 0; i < 2; i++) {
-      game.createOnDeckBottom(player, ice)
+      game.create(Zone.Deck, player, ice, { index: 0 })
     }
   }
 }

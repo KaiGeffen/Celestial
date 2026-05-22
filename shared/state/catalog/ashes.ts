@@ -16,7 +16,7 @@ class Dash extends Card {
     if (this.upgradeVersion === 2) {
       // Create an Ashes for each card before this
       for (let i = 0; i < index; i++) {
-        game.createInPile(player, ashes)
+        game.create(Zone.Discard, player, ashes)
       }
     }
   }
@@ -46,14 +46,14 @@ class Impulse extends Card {
     super.play(player, game, index, bonus)
 
     if (this.upgradeVersion === 2) {
-      game.createOnDeck(player ^ 1, ashes)
+      game.create(Zone.Deck, player ^ 1, ashes)
     }
 
     for (let i = 0; i < 2; i++) {
       if (this.upgradeVersion !== 2) {
-        game.createInPile(player, ashes)
+        game.create(Zone.Discard, player, ashes)
       } else {
-        game.createOnDeck(player ^ 1, ashes)
+        game.create(Zone.Deck, player ^ 1, ashes)
       }
     }
   }
@@ -76,9 +76,9 @@ class Mine extends Card {
     this.inspire(1, game, player)
 
     // Top, hand, discard pile
-    game.createOnDeck(player, ashes)
-    game.create(player, ashes)
-    game.createInPile(player, ashes)
+    game.create(Zone.Deck, player, ashes)
+    game.create(Zone.Hand, player, ashes)
+    game.create(Zone.Discard, player, ashes)
   }
 }
 const mine = new Mine({
@@ -94,7 +94,7 @@ class Arsonist extends Card {
     super.play(player, game, index, bonus)
 
     for (let i = 0; i < 3; i++) {
-      game.createInPile(player, ashes)
+      game.create(Zone.Discard, player, ashes)
     }
   }
 
@@ -413,7 +413,7 @@ class Wildfire extends Card {
 
     if (super.exhale(1, game, player) && game.hand[player].length > 0) {
       game.discard(player)
-      game.createInStory(player, wildfire, 0)
+      game.create(Zone.Story, player, wildfire, { index: 0 })
     }
   }
 }
@@ -429,7 +429,7 @@ class Remnant extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    game.createInPile(player, ashes)
+    game.create(Zone.Discard, player, ashes)
   }
 
   onMorning(player: number, game: GameModel, index: number): boolean {
@@ -488,7 +488,7 @@ class Finale extends Card {
     super.play(player, game, index, bonus)
 
     for (let i = 0; i < 6; i++) {
-      game.createOnDeck(player, ashes)
+      game.create(Zone.Deck, player, ashes)
     }
     game.draw(player, 6)
   }
@@ -506,7 +506,7 @@ class Prometheus extends Card {
     super.play(player, game, index, bonus)
 
     game.maxBreath[player] += 1
-    game.createInPile(player, condemnation)
+    game.create(Zone.Discard, player, condemnation)
   }
 }
 const prometheus = new Prometheus({

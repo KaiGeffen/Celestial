@@ -250,7 +250,10 @@ class Pride extends Card {
   onMorning(player: number, game: GameModel, index: number) {
     if (super.exhale(1, game, player)) {
       game.pile[player].splice(index, 1)
-      game.createInStory(player, this, undefined, Zone.Discard, true)
+      game.create(Zone.Story, player, this, {
+        from: Zone.Discard,
+        revealed: true,
+      })
       const prideAnimIdx = game.animations[player].length - 1
       game.discard(player)
       // Discard may trigger cards (e.g. Abandoned) that insert before Pride in story.acts,
@@ -302,7 +305,7 @@ class Fable extends Card {
 
     // Characters
     if (super.exhale(1, game, player)) {
-      game.createInStory(player, dove)
+      game.create(Zone.Story, player, dove)
     }
 
     // Conflict

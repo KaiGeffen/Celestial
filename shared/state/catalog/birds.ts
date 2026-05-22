@@ -180,7 +180,7 @@ const fledgling = new Fledgling({
 
 class Nest extends Card {
   onMorning(player: number, game: GameModel, index: number) {
-    game.createInStory(player, dove, undefined, Zone.Discard)
+    game.create(Zone.Story, player, dove, { from: Zone.Discard })
     return true
   }
 }
@@ -336,7 +336,7 @@ const letGo = new LetGo({
 class Birdsong extends Card {
   onPass(playerWhoPassed: number, owner: number, game: GameModel): void {
     if (playerWhoPassed === owner) {
-      game.createInStory(owner, dove)
+      game.create(Zone.Story, owner, dove)
     }
   }
 }
@@ -377,7 +377,7 @@ const sudden = new Sudden({
 class SkyBurial extends Card {
   onPlay(player: number, game: GameModel) {
     const i = game.story.acts.length
-    game.createInStory(player ^ 1, vulture, i - 1)
+    game.create(Zone.Story, player ^ 1, vulture, { index: i - 1 })
   }
 }
 const skyBurial = new SkyBurial({

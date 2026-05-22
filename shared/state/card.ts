@@ -134,7 +134,7 @@ export default class Card {
         qualities: [Quality.FLEETING],
         theme: 4,
       })
-      game.create(player, card)
+      game.create(Zone.Hand, player, card)
     }
 
     // Increase the points of each Child in hand by amt

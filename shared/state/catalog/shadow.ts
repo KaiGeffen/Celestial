@@ -81,12 +81,15 @@ class Nightmare extends Card {
     if (game.hand[player ^ 1].length < game.hand[player].length) {
       // Upgrade 1: Create a shadow
       if (this.upgradeVersion === 1) {
-        game.createInStory(player, shadow, undefined, Zone.Create)
+        game.create(Zone.Story, player, shadow)
       } else {
         // Move THIS card from discard to story
         game.pile[player].splice(index, 1)
 
-        game.createInStory(player, this, undefined, Zone.Discard, true)
+        game.create(Zone.Story, player, this, {
+          from: Zone.Discard,
+          revealed: true,
+        })
       }
       return true
     }
@@ -180,7 +183,7 @@ class Sickness extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
     this.starve(4, game, player ^ 1)
-    game.create(player ^ 1, sickness)
+    game.create(Zone.Hand, player ^ 1, sickness)
   }
 }
 const sickness = new Sickness({
@@ -210,7 +213,7 @@ const victim = new Victim({
 class Rupture extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
-    game.create(player ^ 1, wound)
+    game.create(Zone.Hand, player ^ 1, wound)
   }
 }
 const rupture = new Rupture({
@@ -389,7 +392,7 @@ class Abandoned extends Card {
     game.story.addAct(this, player, 0, true)
 
     // Create a Wound in hand
-    game.create(player, wound)
+    game.create(Zone.Hand, player, wound)
 
     return true
   }
@@ -406,7 +409,7 @@ class Mire extends Card {
   onRoundEndIfThisResolved(player: number, game: GameModel) {
     const copy = this.copy()
     copy.points -= 1
-    game.createInStory(player, copy, undefined, Zone.Create, true)
+    game.create(Zone.Story, player, copy, { revealed: true })
   }
 }
 const mire = new Mire({

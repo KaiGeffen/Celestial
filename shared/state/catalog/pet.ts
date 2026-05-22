@@ -105,7 +105,7 @@ class HoldTight extends Card {
 
     // Create a copy of this in hand
     if (this.upgradeVersion === 1) {
-      game.create(player, this)
+      game.create(Zone.Hand, player, this)
     }
   }
 }

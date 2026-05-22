@@ -2,6 +2,7 @@ import Card from '../card'
 import { child, heirloom } from './tokens'
 import { Quality } from '../quality'
 import { Keywords } from '../keyword'
+import { Zone } from '../zone'
 import GameModel from '../gameModel'
 
 class Nascence extends Card {
@@ -148,7 +149,7 @@ class Storytime extends Card {
     // Create a copy in hand of each card later in the 	story that costs 0.
     for (const act of game.story.acts) {
       if (act.card.cost === 0) {
-        game.create(player, act.card)
+        game.create(Zone.Hand, player, act.card)
       }
     }
   }
@@ -166,7 +167,7 @@ class Pregnant extends Card {
     super.play(player, game, index, bonus)
 
     const card = child.copy()
-    game.createOnDeck(player, card)
+    game.create(Zone.Deck, player, card)
   }
 }
 const pregnant = new Pregnant({
@@ -181,7 +182,7 @@ class PassOn extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    game.create(player, heirloom)
+    game.create(Zone.Hand, player, heirloom)
   }
 }
 const passOn = new PassOn({
@@ -203,7 +204,7 @@ class JustLikeDad extends Card {
       } else {
         card = this
       }
-      game.create(player, card)
+      game.create(Zone.Hand, player, card)
     }
   }
 }

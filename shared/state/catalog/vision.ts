@@ -3,6 +3,7 @@ import { SightCard } from '../card'
 import { seen, predator, greatWheel } from './tokens'
 import { Quality } from '../quality'
 import { Keywords } from '../keyword'
+import { Zone } from '../zone'
 import GameModel from '../gameModel'
 import Act from '../act'
 
@@ -34,7 +35,7 @@ const nectar = new Nectar(3, {
 class ClearView extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
-    game.create(player ^ 1, seen)
+    game.create(Zone.Hand, player ^ 1, seen)
   }
 }
 const clearView = new ClearView({
@@ -82,7 +83,7 @@ const enlightenment = new Enlightenment({
 class Prey extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
-    game.create(player ^ 1, predator)
+    game.create(Zone.Hand, player ^ 1, predator)
   }
 }
 const prey = new Prey({
@@ -299,7 +300,7 @@ class Path extends Card {
     super.play(player, game, index, bonus)
 
     if (exhaled) {
-      game.create(player, greatWheel)
+      game.create(Zone.Hand, player, greatWheel)
     }
   }
 }

@@ -322,97 +322,106 @@ export default class GameModel {
     return null
   }
 
-  create(player: number, card: Card, known = true) {
-    if (this.hand[player].length < MechanicsSettings.HAND_CAP) {
-      this.hand[player].push(card)
-      this.animations[player].push(
-        new Animation({
-          from: Zone.Gone,
-          to: Zone.Hand,
-          card: card,
-          index2: this.hand[player].length - 1,
-          visibility: known
-            ? Visibility.KnowAllDetails
-            : Visibility.KnowItOccurred,
-        }),
-      )
-      return card
-    }
-    return null
-  }
-
-  createInPile(player: number, card: Card) {
-    this.animations[player].push(
-      new Animation({
-        from: Zone.Gone,
-        to: Zone.Discard,
-        card: card,
-        index2: this.pile[player].length,
-      }),
-    )
-    this.pile[player].push(card)
-  }
-
-  createOnDeck(player: number, card: Card) {
-    this.animations[player].push(
-      new Animation({
-        from: Zone.Gone,
-        to: Zone.Deck,
-        card: card,
-        index2: 0,
-      }),
-    )
-
-    // Add the card at the top of the deck
-    this.deck[player].push(card)
-  }
-
-  createOnDeckBottom(player: number, card: Card) {
-    this.animations[player].push(
-      new Animation({
-        from: Zone.Gone,
-        to: Zone.Deck,
-        card: card,
-        index2: 0,
-      }),
-    )
-
-    // Add the card at the bottom of the deck
-    this.deck[player].unshift(card)
-  }
-
   /**
-   * Add a card to the story and enqueue the recap animation. `from` defaults to
-   * Gone (created/token); use another zone when the card visibly moves from
-   * deck/discard/etc.
+   * Create a card in the given zone for the given player.
+   *
+   * Hand creates are silently dropped if the hand is at HAND_CAP.
+   *
+   * Options:
+   * - `index`: position to insert at within the target zone's array
+   *   (default = append). For Zone.Deck, 0 = bottom of deck. For
+   *   Zone.Story, this is the story slot.
+   * - `from`: visible source zone for the recap animation
+   *   (default Zone.Create).
+   * - `revealed` (Zone.Story only): reveal the act.
    */
-  createInStory(
+  create(
+    zone: Zone,
     player: number,
     card: Card,
-    i?: number,
-    from: Zone = Zone.Gone,
-    revealed = false,
-  ) {
-    this.story.addAct(card, player, i, revealed)
-    const storySlot = i === undefined ? this.story.acts.length - 1 : i
-
-    // Any existing Zone.Story animations targeting positions >= storySlot get shifted right
-    // because this insertion displaces them (e.g. Immolant onDiscard followed by createInStory at 0).
-    for (const ownerAnims of this.animations) {
-      for (const anim of ownerAnims) {
-        if (anim.to === Zone.Story && (anim.index2 ?? 0) >= storySlot) {
-          anim.index2 = (anim.index2 ?? 0) + 1
+    {
+      index,
+      from = Zone.Create,
+      revealed = false,
+    }: {
+      index?: number
+      from?: Zone
+      revealed?: boolean
+    } = {},
+  ): void {
+    switch (zone) {
+      case Zone.Hand: {
+        if (this.hand[player].length >= MechanicsSettings.HAND_CAP) {
+          return
         }
+        this.hand[player].push(card)
+        this.animations[player].push(
+          new Animation({
+            from,
+            to: Zone.Hand,
+            card,
+            index2: this.hand[player].length - 1,
+            visibility: Visibility.KnowAllDetails,
+          }),
+        )
+        return
+      }
+
+      case Zone.Discard: {
+        this.animations[player].push(
+          new Animation({
+            from,
+            to: Zone.Discard,
+            card,
+            index2: this.pile[player].length,
+          }),
+        )
+        this.pile[player].push(card)
+        return
+      }
+
+      case Zone.Deck: {
+        this.animations[player].push(
+          new Animation({
+            from,
+            to: Zone.Deck,
+            card,
+            index2: 0,
+          }),
+        )
+        if (index === undefined) {
+          this.deck[player].push(card)
+        } else {
+          this.deck[player].splice(index, 0, card)
+        }
+        return
+      }
+
+      case Zone.Story: {
+        this.story.addAct(card, player, index, revealed)
+        const storySlot =
+          index === undefined ? this.story.acts.length - 1 : index
+
+        // Any existing Zone.Story animations targeting positions >= storySlot get shifted right
+        // because this insertion displaces them (e.g. Immolant onDiscard followed by create-in-story at 0).
+        for (const ownerAnims of this.animations) {
+          for (const anim of ownerAnims) {
+            if (anim.to === Zone.Story && (anim.index2 ?? 0) >= storySlot) {
+              anim.index2 = (anim.index2 ?? 0) + 1
+            }
+          }
+        }
+        this.animations[player].push(
+          new Animation({
+            from,
+            to: Zone.Story,
+            card,
+            index2: storySlot,
+          }),
+        )
+        return
       }
     }
-    this.animations[player].push(
-      new Animation({
-        from,
-        to: Zone.Story,
-        card,
-        index2: storySlot,
-      }),
-    )
   }
 
   mill(player: number, amt: number) {
@@ -519,7 +528,7 @@ export default class GameModel {
 
   returnActToHand(i: number) {
     const act = this.story.removeAct(i)
-    this.create(act.owner, act.card)
+    this.create(Zone.Hand, act.owner, act.card)
 
     this.animations[act.owner].push(
       new Animation({
