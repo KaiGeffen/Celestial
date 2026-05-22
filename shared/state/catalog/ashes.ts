@@ -537,25 +537,9 @@ const suddenDraw = new Prometheus({
 
 class Zoomies extends Card {
   onBigResolve(player: number, game: GameModel, index: number) {
-    // NOTE This is a hack to get this card speicifcally to work - should be generalized
-
-    // Count Zoomies at lower pile indices — they insert after us, pushing this card right
-    let futureInsertions = 0
-    for (let j = 0; j < index; j++) {
-      if (game.pile[player][j] instanceof Zoomies) futureInsertions++
-    }
-
-    game.animations[player].push(
-      new Animation({
-        from: Zone.Discard,
-        to: Zone.Story,
-        card: this,
-        index2: futureInsertions,
-      }),
-    )
-
-    game.pile[player].splice(index, 1)
-    game.story.addAct(this, player, 0)
+    game.moveBetweenZones(Zone.Discard, Zone.Story, player, index, {
+      toIndex: 0,
+    })
   }
 }
 const zoomies = new Zoomies({

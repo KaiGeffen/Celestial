@@ -1,5 +1,4 @@
 import Card from '../card'
-import { Animation } from '../../animation'
 import { Zone } from '../zone'
 import { MAX_STORY_ACTS } from '../../settings'
 import GameModel from '../gameModel'
@@ -22,21 +21,9 @@ class Paramountcy extends Card {
         if (card.id === this.id) {
           paramountcyCount++
         } else {
-          // Remove the card from the discard pile
-          game.pile[player].splice(targetIndex, 1)
-
-          // Add it to the story
-          game.story.addAct(card, player, i - paramountcyCount)
-
-          // Animate the move
-          game.animations[player].push(
-            new Animation({
-              from: Zone.Discard,
-              to: Zone.Story,
-              card,
-              index2: i,
-            }),
-          )
+          game.moveBetweenZones(Zone.Discard, Zone.Story, player, targetIndex, {
+            toIndex: i - paramountcyCount,
+          })
         }
       }
     }
@@ -44,7 +31,7 @@ class Paramountcy extends Card {
 }
 const paramountcy = new Paramountcy({
   name: 'Paramountcy',
-  cost: 9,
+  // cost: 9,
   id: 62,
   text: 'Add the top four cards of your discard pile to the story after this.\n(Besides Paramountcy)',
   theme: 8,

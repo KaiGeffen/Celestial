@@ -448,25 +448,39 @@ export default class GameModel {
    *
    * Currently supported pairs:
    * - Zone.Discard → Zone.Hand
+   * - Zone.Discard → Zone.Story
    * - Zone.Story → Zone.Hand (caller must pass the act's owner as `player`)
    *
-   * Out-of-bounds indices are silently ignored.
+   * Out-of-bounds source indices are silently ignored.
+   *
+   * Options (Zone.Story destination only):
+   * - `toIndex`: story slot to insert at (default = append).
+   * - `revealed`: reveal the act.
    */
-  moveBetweenZones(from: Zone, to: Zone, player: number, index: number): void {
+  moveBetweenZones(
+    from: Zone,
+    to: Zone,
+    player: number,
+    fromIndex: number,
+    {
+      toIndex,
+      revealed = false,
+    }: { toIndex?: number; revealed?: boolean } = {},
+  ): void {
     let card: Card
     switch (from) {
       case Zone.Discard: {
-        if (index < 0 || index >= this.pile[player].length) {
+        if (fromIndex < 0 || fromIndex >= this.pile[player].length) {
           return
         }
-        card = this.pile[player].splice(index, 1)[0]
+        card = this.pile[player].splice(fromIndex, 1)[0]
         break
       }
       case Zone.Story: {
-        if (index < 0 || index >= this.story.acts.length) {
+        if (fromIndex < 0 || fromIndex >= this.story.acts.length) {
           return
         }
-        card = this.story.removeAct(index).card
+        card = this.story.removeAct(fromIndex).card
         break
       }
       // Currently no other zones supported
@@ -483,9 +497,33 @@ export default class GameModel {
             from,
             to,
             card,
-            index,
+            index: fromIndex,
             index2: this.hand[player].length - 1,
             visibility: Visibility.KnowAllDetails,
+          }),
+        )
+        return
+      }
+      case Zone.Story: {
+        this.story.addAct(card, player, toIndex, revealed)
+        const storySlot =
+          toIndex === undefined ? this.story.acts.length - 1 : toIndex
+
+        // Shift any existing Zone.Story animations targeting slots >= storySlot
+        // because this insertion displaces them.
+        for (const ownerAnims of this.animations) {
+          for (const anim of ownerAnims) {
+            if (anim.to === Zone.Story && (anim.index2 ?? 0) >= storySlot) {
+              anim.index2 = (anim.index2 ?? 0) + 1
+            }
+          }
+        }
+        this.animations[player].push(
+          new Animation({
+            from,
+            to,
+            card,
+            index2: storySlot,
           }),
         )
         return

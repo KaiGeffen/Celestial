@@ -84,10 +84,7 @@ class Nightmare extends Card {
         game.create(Zone.Story, player, shadow)
       } else {
         // Move THIS card from discard to story
-        game.pile[player].splice(index, 1)
-
-        game.create(Zone.Story, player, this, {
-          from: Zone.Discard,
+        game.moveBetweenZones(Zone.Discard, Zone.Story, player, index, {
           revealed: true,
         })
       }
