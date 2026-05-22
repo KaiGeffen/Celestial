@@ -340,7 +340,8 @@ class Spider extends Card {
     super.play(player, game, index, bonus)
 
     if (game.story.acts.length > 0) {
-      game.returnActToHand(0)
+      const owner = game.story.acts[0].owner
+      game.moveBetweenZones(Zone.Story, Zone.Hand, owner, 0)
     }
   }
 }

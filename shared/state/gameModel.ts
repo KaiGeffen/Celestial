@@ -443,28 +443,56 @@ export default class GameModel {
     }
   }
 
-  returnFromDiscardToHand(player: number, index: number = undefined) {
-    // Default to returning card from top of discard pile
-    if (index === undefined) {
-      index = this.pile[player].length - 1
+  /**
+   * Move a card from one zone to another for the given player.
+   *
+   * Currently supported pairs:
+   * - Zone.Discard → Zone.Hand
+   * - Zone.Story → Zone.Hand (caller must pass the act's owner as `player`)
+   *
+   * Out-of-bounds indices are silently ignored.
+   */
+  moveBetweenZones(from: Zone, to: Zone, player: number, index: number): void {
+    let card: Card
+    switch (from) {
+      case Zone.Discard: {
+        if (index < 0 || index >= this.pile[player].length) {
+          return
+        }
+        card = this.pile[player].splice(index, 1)[0]
+        break
+      }
+      case Zone.Story: {
+        if (index < 0 || index >= this.story.acts.length) {
+          return
+        }
+        card = this.story.removeAct(index).card
+        break
+      }
+      // Currently no other zones supported
+      default:
+        console.log(`moveBetweenZones: Unsupported zone: ${from} -> ${to}`)
+        return
     }
 
-    if (index < 0 || index >= this.pile[player].length) {
-      return
+    switch (to) {
+      case Zone.Hand: {
+        this.hand[player].push(card)
+        this.animations[player].push(
+          new Animation({
+            from,
+            to,
+            card,
+            index,
+            index2: this.hand[player].length - 1,
+            visibility: Visibility.KnowAllDetails,
+          }),
+        )
+        return
+      }
+      default:
+        console.log(`moveBetweenZones: Unsupported zone: ${from} -> ${to}`)
     }
-
-    const card = this.pile[player].splice(index, 1)[0]
-    this.hand[player].push(card)
-
-    this.animations[player].push(
-      new Animation({
-        from: Zone.Discard,
-        to: Zone.Hand,
-        card,
-        index,
-        index2: this.hand[player].length - 1,
-      }),
-    )
   }
 
   /**
@@ -524,22 +552,6 @@ export default class GameModel {
     // Add it to the discard and trigger its on discard effects
     this.pile[act.owner].push(act.card)
     return act.card.onDiscard(act.owner, this)
-  }
-
-  returnActToHand(i: number) {
-    const act = this.story.removeAct(i)
-    this.create(Zone.Hand, act.owner, act.card)
-
-    this.animations[act.owner].push(
-      new Animation({
-        from: Zone.Story,
-        to: Zone.Hand,
-        card: act.card,
-        index: i,
-        index2: this.hand[act.owner].length - 1,
-        visibility: Visibility.KnowAllDetails,
-      }),
-    )
   }
 
   // Return whether the given player won the previous round

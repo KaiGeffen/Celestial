@@ -433,7 +433,7 @@ class Remnant extends Card {
   }
 
   onMorning(player: number, game: GameModel, index: number): boolean {
-    game.returnFromDiscardToHand(player, index)
+    game.moveBetweenZones(Zone.Discard, Zone.Hand, player, index)
     game.discard(player)
     return true
   }

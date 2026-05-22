@@ -9,7 +9,7 @@ import Act from '../act'
 
 class Dawn extends SightCard {
   onMorning(player: number, game: GameModel, index: number): boolean {
-    game.returnFromDiscardToHand(player, index)
+    game.moveBetweenZones(Zone.Discard, Zone.Hand, player, index)
     return true
   }
 }
@@ -132,7 +132,7 @@ class Timid extends SightCard {
       while (i < game.story.acts.length) {
         const act = game.story.acts[i]
         if (act.owner === player) {
-          game.returnActToHand(i)
+          game.moveBetweenZones(Zone.Story, Zone.Hand, player, i)
         } else {
           i++
         }

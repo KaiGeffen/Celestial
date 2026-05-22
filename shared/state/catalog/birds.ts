@@ -389,22 +389,22 @@ const skyBurial = new SkyBurial({
   text: 'Visible\nWhen played, create a Vulture before this in the story for your opponent.',
 })
 
-class Emerge extends Card {
+class Becoming extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    if (super.exhale(2, game, player)) {
-      bonus += 2
-    }
     if (super.exhale(1, game, player)) {
       bonus += 1
+    }
+    if (super.exhale(2, game, player)) {
+      bonus += 2
     }
     super.play(player, game, index, bonus)
   }
 }
-const emerge = new Emerge({
-  name: 'Emerge',
+const becoming = new Becoming({
+  name: 'Becoming',
   id: 1071,
   qualities: [Quality.VISIBLE],
-  text: 'Visible\nExhale 2: Worth +2.\nExhale 1: Worth +1.',
+  text: 'Visible\nExhale 1: Worth +1.\nExhale 2: Worth +2.',
 })
 
 export {
@@ -424,5 +424,5 @@ export {
   // NEW
   skyBurial,
   birdsong,
-  emerge,
+  becoming,
 }
