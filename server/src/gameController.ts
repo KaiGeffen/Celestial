@@ -226,6 +226,8 @@ class ServerController {
     this.model.amtCardsPlayedLastRound = this.model.amtCardsPlayedThisRound
     this.model.amtCardsPlayedThisRound = [0, 0]
 
+    this.model.replacementCreateCardThisRound = undefined
+
     // Determine order of player triggers
     const players = this.model.priority === 0 ? [0, 1] : [1, 0]
 

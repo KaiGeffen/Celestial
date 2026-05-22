@@ -66,6 +66,7 @@ export default class GameModel {
   amtDrawn: number[] = [0, 0]
   amtCardsPlayedLastRound: [number, number] = [0, 0]
   amtCardsPlayedThisRound: [number, number] = [0, 0]
+  replacementCreateCardThisRound: Card
 
   // The cosmetics and such TODO Change to 2 cosmsets
   cosmeticSets: CosmeticSet[]
@@ -349,6 +350,11 @@ export default class GameModel {
       revealed?: boolean
     } = {},
   ): void {
+    // If this round there is a replacement card to be created, use that instead of the given card
+    if (this.replacementCreateCardThisRound) {
+      card = this.replacementCreateCardThisRound
+    }
+
     switch (zone) {
       case Zone.Hand: {
         if (this.hand[player].length >= MechanicsSettings.HAND_CAP) {

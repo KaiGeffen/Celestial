@@ -333,21 +333,19 @@ const beginnersMind = new BeginnersMind({
   text: 'When this is shuffled, move it to the top of your deck.',
 })
 
-class GrowingUp extends Card {
-  onPlay(player: number, game: GameModel): void {
-    const handHasChild = game.hand[player].some(
-      (card) => card.name === child.name,
-    )
-    if (handHasChild) {
-      super.birth(1, game, player)
-    }
+class Interbeing extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    game.replacementCreateCardThisRound = interbeing
   }
 }
-const growingUp = new GrowingUp({
-  name: 'Growing Up',
+const interbeing = new Interbeing({
+  name: 'Interbeing',
   id: 7046,
-  cost: 1,
-  text: 'When played, Birth 1 if you have a Child in your hand.',
+  cost: 2,
+  points: 2,
+  qualities: [Quality.FLEETING],
+  text: 'Fleeting\nIf a card would be created this round, create an Interbeing instead.',
 })
 
 export {
@@ -367,5 +365,5 @@ export {
   // NEW
   genesis,
   beginnersMind,
-  // growingUp,
+  interbeing,
 }
