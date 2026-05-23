@@ -471,13 +471,15 @@ export default class GameModel {
    * Currently supported pairs:
    * - Zone.Discard → Zone.Hand
    * - Zone.Discard → Zone.Story
+   * - Zone.Discard → Zone.Deck
    * - Zone.Story → Zone.Hand (caller must pass the act's owner as `player`)
    *
    * Out-of-bounds source indices are silently ignored.
    *
-   * Options (Zone.Story destination only):
-   * - `toIndex`: story slot to insert at (default = append).
-   * - `revealed`: reveal the act.
+   * Options:
+   * - `toIndex`: destination slot (Story insert position, or Deck array
+   *   index; default = append/top of deck).
+   * - `revealed` (Zone.Story only): reveal the act.
    */
   moveBetweenZones(
     from: Zone,
@@ -522,6 +524,23 @@ export default class GameModel {
             index: fromIndex,
             index2: this.hand[player].length - 1,
             visibility: Visibility.KnowAllDetails,
+          }),
+        )
+        return
+      }
+      case Zone.Deck: {
+        if (toIndex === undefined) {
+          this.deck[player].push(card)
+        } else {
+          this.deck[player].splice(toIndex, 0, card)
+        }
+        this.animations[player].push(
+          new Animation({
+            from,
+            to,
+            card,
+            index: fromIndex,
+            index2: 0,
           }),
         )
         return

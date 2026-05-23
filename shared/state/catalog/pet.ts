@@ -5,6 +5,7 @@ import { Animation } from '../../animation'
 import { Zone } from '../zone'
 import GameModel from '../gameModel'
 import Act from '../act'
+import { ashes } from './tokens'
 
 class Fruit extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -330,6 +331,28 @@ const heart = new Heart({
   text: 'When a card is played while this is in the story, discard this and Nourish 3.',
 })
 
+class Companion extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    if (game.roundResults[player][game.roundResults[player].length - 1] >= 7) {
+      bonus += 1
+    }
+
+    super.play(player, game, index, bonus)
+  }
+
+  onMorning(player: number, game: GameModel, index: number): boolean {
+    game.moveBetweenZones(Zone.Discard, Zone.Deck, player, index)
+    return true
+  }
+}
+const companion = new Companion({
+  name: 'Companion',
+  id: 4095,
+  cost: 3,
+  points: 3,
+  text: 'Worth +1 if you had at least 7 points last round.\nMorning: Put this on top of your deck.',
+})
+
 export {
   fruit,
   oak,
@@ -347,4 +370,5 @@ export {
   // NEW
   doll,
   heart,
+  companion,
 }
