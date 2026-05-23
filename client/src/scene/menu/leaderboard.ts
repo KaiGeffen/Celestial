@@ -159,7 +159,7 @@ export default class LeaderboardMenu extends Menu {
     })
 
     this.scene.plugins.get('rexAnchor')['add'](container, {
-      x: `50%+${width / 2 - Space.buttonWidth / 2 - Space.pad}`,
+      x: `50%-${width / 2 - Space.buttonWidth / 2 - Space.pad}`,
       y: `50%-${height / 2 + Space.buttonHeight / 2 - 5}`,
     })
   }
