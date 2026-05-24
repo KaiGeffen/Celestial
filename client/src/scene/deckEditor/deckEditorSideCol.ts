@@ -246,8 +246,6 @@ export class DeckEditorDeckJourney extends RightCol {
         align: 'center',
         space: {
           top: Space.padSmall,
-          left: Space.padSmall,
-          right: Space.padSmall,
           line: Space.pad,
         },
       })
