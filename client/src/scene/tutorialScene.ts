@@ -22,6 +22,13 @@ import { Zone } from '../../../shared/state/zone'
 import GameModel from '../../../shared/state/gameModel'
 import Loader from '../loader/loader'
 
+/** Card IDs unlocked when each tutorial mission is won (shown on the unlock screen). */
+const TUTORIAL_MISSION_CARDS: number[][] = [
+  [4, 6, 12], // Dove, Dash, Mercy
+  [0, 18], // Stars,  Uprising
+  [9, 11, 13], // Fruit, cosmos, hurricane
+]
+
 /** Hint text starts this many px left of its laid-out position and slides in with the fade. */
 const HINT_TWEEN_X_DELTA = -10
 const TUTORIAL_FINAL_LOSS_MESSAGE =
@@ -91,6 +98,9 @@ export default class TutorialMatchScene extends MatchScene {
 
   create(): void {
     super.create()
+
+    this.params.missionCards =
+      TUTORIAL_MISSION_CARDS[this.params.missionID ?? 0] ?? []
 
     // Replace the results screen with tutorial results
     this.view.results = new ResultsRegionTutorial().create(this)

@@ -623,7 +623,7 @@ export class ResultsRegionJourney extends MatchResultsRegion {
   }
 }
 
-export class ResultsRegionTutorial extends MatchResultsRegion {
+export class ResultsRegionTutorial extends ResultsRegionJourney {
   missionID: number
 
   protected createButtons() {
