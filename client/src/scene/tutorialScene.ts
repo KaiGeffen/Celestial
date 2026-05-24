@@ -291,47 +291,44 @@ export default class TutorialMatchScene extends MatchScene {
   private displayHints1(): void {
     this.displayHint(0)
 
-    // Have glows only for the first two hints
+    // Have glows only for the wins and breath hints
     this.view.wins.stopTutorialGlow()
     this.view.breathRegion.stopTutorialGlow()
 
-    if (this.progress === 0) {
+    if (this.progress === 1) {
       this.view.wins.startTutorialGlow()
-    } else if (this.progress === 1) {
+    } else if (this.progress === 2) {
       this.view.breathRegion.startTutorialGlow()
     }
 
     // Hide different elements on the screen based on progress
     switch (this.progress) {
-      case 1:
-        break
-
-      case 2:
+      case 3:
         this.addCard('Dove')
         break
 
-      case 4:
+      case 5:
         this.addCard('Dash')
         break
 
-      case 5:
+      case 6:
         this.card.destroy()
         // Show night time
         this.view.backgroundRegion.tweenTintForRecap(true)
         break
 
-      case 6:
+      case 7:
         this.addCard('Mercy')
         break
 
-      case 7:
+      case 8:
         this.card.destroy()
         this.view.ourBoard.tutorialSetHandVisibility(true)
         // Show day time
         this.view.backgroundRegion.tweenTintForRecap(false)
         break
 
-      case 8:
+      case 9:
         this.view.theirBoard.show()
 
         // User can't pass during first tutorial

@@ -2,6 +2,10 @@
   {
     "hints": [
       {
+        "bold": "The tutorial is highly recommended, but can be skipped from the options menu (Top right of screen, or esc key).",
+        "align": "center"
+      },
+      {
         "bold": "Win 5 rounds to win the match.\n\nIn the tutorial, you start with 2 wins.",
         "align": "center"
       },

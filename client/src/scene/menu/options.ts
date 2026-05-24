@@ -492,7 +492,7 @@ export default class OptionsMenu extends Menu {
     let action: () => void
 
     if (!tutorialsCompleted) {
-      s = 'Skip Tutorial'
+      s = 'Skip Tut'
       action = () => {
         // Complete all tutorial missions in one write.
         // Also mirror to localStorage so a quick reload can't race account sync.
