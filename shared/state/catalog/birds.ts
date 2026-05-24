@@ -375,7 +375,7 @@ class SkyBurial extends Card {
 }
 const skyBurial = new SkyBurial({
   name: 'Sky Burial',
-  id: 1070,
+  id: 108,
   cost: 2,
   points: 7,
   qualities: [Quality.VISIBLE],

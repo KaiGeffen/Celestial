@@ -372,10 +372,10 @@ class Starfall extends Card {
 }
 const starfall = new Starfall({
   name: 'Starfall',
-  id: 8006,
+  id: 107,
   cost: 6,
   points: 7,
-  text: 'At the start of turn, if your hand has at least 5 cards including this, discard this to Inspired 1.',
+  text: 'At the start of each round, if your hand has at least 5 cards including this, discard this to Inspired 1.',
 })
 
 class Boreas extends Card {
