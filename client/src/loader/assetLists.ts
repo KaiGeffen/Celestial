@@ -460,7 +460,6 @@ export const assetLists = {
     "files": [
       "CloudBottom",
       "CloudTop",
-      "Profile",
       "Recap",
       "ResultGlow",
       "body",
@@ -481,6 +480,7 @@ export const assetLists = {
       "error",
       "header",
       "nameplate",
+      "profile",
       "profile",
       "stackCount",
       "sundial",
