@@ -1,6 +1,6 @@
 {
   "name": "ts-celestial",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "The client-side of Celestial",
   "main": "dist/index.js",
   "scripts": {

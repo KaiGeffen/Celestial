@@ -255,11 +255,13 @@ export default class HomeScene extends BaseScene {
         })
       })
 
-    const outlineFx = this.plugins.get('rexOutlinePipeline')['add'](background, {
-      thickness: 3,
-      outlineColor: Color.outline,
-      quality: 0.3,
-    })
+    const outlineFx = this.plugins
+      .get('rexOutlinePipeline')
+      ['add'](background, {
+        thickness: 3,
+        outlineColor: Color.outline,
+        quality: 0.3,
+      })
     outlineFx.active = false
 
     background
@@ -568,6 +570,6 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   },
   {
     subheader: 'Card Changes',
-    body: `[area=_Mine][stroke=${Color.goldS}]Mine[/stroke][/area] - Ability updated.\n[area=_Phoenix][stroke=${Color.goldS}]Phoenix[/stroke][/area] - Points 4 > 3`,
+    body: `[area=_Sky Burial][stroke=${Color.goldS}]Sky Burial[/stroke][/area] - New card!\n[area=_Starfall][stroke=${Color.goldS}]Starfall[/stroke][/area] - New card!`,
   },
 ]
