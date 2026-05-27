@@ -74,11 +74,13 @@ class Story {
         }
       }
 
-      index++
-      addRecentModels(game)
-
+      // Record resolution snapshots before deep-copying, so skipped recap states
+      // include the correct scoreAtResolution for every act (including the last one).
       act.scoreAtResolution = [game.score[0], game.score[1]]
       act.nourishAtResolution = [game.status[0].nourish, game.status[1].nourish]
+
+      index++
+      addRecentModels(game)
     }
 
     // Do all round end effects
