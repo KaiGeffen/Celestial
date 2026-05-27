@@ -43,46 +43,6 @@ const groundwork = new Groundwork({
   text: 'Worth +2 for each of your cards in a row with this.',
 })
 
-class Primal extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
-
-    for (let i = 0; i < game.story.acts.length; ) {
-      const act = game.story.acts[i]
-
-      // How many cards were added/removed from the story
-      let deltaStoryLength = 0
-
-      // Find a card in hand with the same cost
-      for (let j = 0; j < game.hand[player].length; j++) {
-        const card = game.hand[player][j]
-        if (card.cost === act.card.cost) {
-          // Discard card from story
-          const actReturned = game.removeAct(i)
-          deltaStoryLength += actReturned ? 0 : -1
-
-          // Discard card from hand, track if it added to story
-          const discardedCardReturned = game.discard(player, 1, j)
-          deltaStoryLength += discardedCardReturned ? 0 : 1
-
-          // Stop looking in hand for this story card
-          break
-        }
-      }
-
-      // Update the story index based on how many cards added/removed
-      i -= deltaStoryLength
-    }
-  }
-}
-const primal = new Primal({
-  name: 'Primal',
-  id: 9003,
-  // cost: 7,
-  points: 7,
-  text: 'For each card later in the story, discard it and a card from your hand that share a cost.',
-})
-
 class Retain extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
@@ -97,4 +57,104 @@ const retain = new Retain({
   text: 'Retain 1',
 })
 
-export { primal, retain }
+class Cliff extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    this.retain(1, game, player)
+
+    if (super.exhale(3, game, player)) {
+      game.removeAct(game.story.acts.length - 1)
+    }
+  }
+}
+const cliff = new Cliff({
+  name: 'Cliff',
+  id: 9005,
+  cost: 2,
+  points: 2,
+  text: 'Retain 1\nExhale 3: Discard the last card in the story.',
+})
+
+class Chant extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    this.retain(1, game, player)
+  }
+
+  getCost(player: number, game: GameModel) {
+    return Math.max(0, this.cost - game.amtPasses[player])
+  }
+}
+const chant = new Chant({
+  name: 'Chant',
+  id: 9006,
+  cost: 4,
+  points: 3,
+  text: 'Retain 1\nCosts 1 less for each time you’ve passed this round.',
+})
+
+class March extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    // Count before
+    for (let i = game.story.resolvedActs.length - 1; i >= 0; i--) {
+      const act = game.story.resolvedActs[i]
+      if (act.owner === player) {
+        bonus += 1
+      } else {
+        break
+      }
+    }
+
+    // Count after
+    for (let i = 0; i < game.story.acts.length; i++) {
+      const act = game.story.acts[i]
+      if (act.owner === player) {
+        bonus += 1
+      } else {
+        break
+      }
+    }
+
+    super.play(player, game, index, bonus)
+  }
+}
+const march = new March({
+  name: 'March',
+  id: 9007,
+  cost: 2,
+  points: 1,
+  text: 'Worth +1 for each of your cards immediately before or after this.',
+})
+
+class Salvage extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    bonus += game.endingBreath[player]
+    super.play(player, game, index, bonus)
+
+    super.retain(1, game, player)
+  }
+}
+const salvage = new Salvage({
+  name: 'Salvage',
+  id: 9008,
+  cost: 1,
+  text: 'Retain 1\nWorth +1 for each breath you ended the last round with.',
+})
+
+class RollingStone extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    if (super.exhale(1, game, player)) {
+      bonus += game.endingBreath[player]
+    }
+
+    super.play(player, game, index, bonus)
+  }
+}
+const rollingStone = new RollingStone({
+  name: 'Rolling Stone',
+  id: 9009,
+  qualities: [Quality.FLEETING],
+  text: 'Fleeting\nWhen played with Retain, reveal this and create a copy in hand.\nExhale 1: Worth +1.',
+})
+
+export { retain, cliff, chant, march, salvage, rollingStone }
