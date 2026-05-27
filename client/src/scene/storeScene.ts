@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, BBStyle, Space } from '../settings/settings'
+import { Style, BBStyle, Space, Color } from '../settings/settings'
 import { BaseSceneWithHeader } from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
@@ -45,13 +45,27 @@ export default class StoreScene extends BaseSceneWithHeader {
   }
 
   private createUserStatsDisplay(): void {
+    const bg = this.add
+      .rectangle(
+        0,
+        this.headerHeight / 2,
+        120,
+        55,
+        Color.currencyBackground,
+        0.3,
+      )
+      .setOrigin(1, 0.5)
     this.userStatsDisplay = this.add
       .rexBBCodeText(0, this.headerHeight / 2, '', BBStyle.currency)
       .setOrigin(1, 0.5)
+      .setPadding(Space.padSmall)
 
     // Anchor the user stats display to the right
     this.plugins.get('rexAnchor')['add'](this.userStatsDisplay, {
       right: `100%-${Space.padSmall * 3 + Space.iconSize * 2}`,
+    })
+    this.plugins.get('rexAnchor')['add'](bg, {
+      right: `100%-${Space.padSmall * 2 + Space.iconSize * 2}`,
     })
 
     this.updateUserStatsDisplay()
@@ -61,7 +75,7 @@ export default class StoreScene extends BaseSceneWithHeader {
     const gems = Server.getUserData().gems ?? 0
     const coins = Server.getUserData().coins ?? 0
 
-    this.userStatsDisplay.setText(
+    const color = this.userStatsDisplay.setText(
       `[img=coin] ${coins.toLocaleString()}\n[img=gem] ${gems.toLocaleString()}`,
     )
   }
@@ -206,7 +220,12 @@ export default class StoreScene extends BaseSceneWithHeader {
       })
 
     const costText = this.add
-      .rexBBCodeText(0, 0, `[img=gem] ${item.cost.toLocaleString()}`, BBStyle.currency)
+      .rexBBCodeText(
+        0,
+        0,
+        `[img=gem] ${item.cost.toLocaleString()}`,
+        BBStyle.currency,
+      )
       .setOrigin(0.5)
 
     const sizer = this.rexUI.add

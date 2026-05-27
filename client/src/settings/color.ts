@@ -99,6 +99,9 @@ export const Color: Record<string, any> = {
   hintFill: CoreColors.white,
   hintBackground: CoreColors.greyA,
 
+  // Store
+  currencyBackground: CoreColors.backgroundLight,
+
   // TODO Refactor dynamic card displays, remove the background color
   // Card Image
   cardGreyed: CoreColors.lightGrey,
