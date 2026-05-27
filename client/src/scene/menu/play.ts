@@ -641,11 +641,11 @@ export default class PlayMenu extends Menu {
     plantSizer.removeAll(true)
 
     const goldText = this.scene.add
-      .text(
+      .rexBBCodeText(
         rewardPosition.x,
         rewardPosition.y + 40,
-        `+${data.goldReward}💰`,
-        Style.reward,
+        `[stroke]+${data.goldReward}[/stroke][img=coin]`,
+        BBStyle.reward,
       )
       .setOrigin(0.5, 1)
 
@@ -661,11 +661,11 @@ export default class PlayMenu extends Menu {
     // Tween the gem rewards if present
     if (data.gemReward > 0) {
       const gemText = this.scene.add
-        .text(
+        .rexBBCodeText(
           rewardPosition.x,
           rewardPosition.y + 40,
-          `+${data.gemReward}💎`,
-          Style.reward,
+          `[stroke]+${data.gemReward}[/stroke][img=gem]`,
+          BBStyle.reward,
         )
         .setOrigin(0.5, 1)
         .setVisible(false)

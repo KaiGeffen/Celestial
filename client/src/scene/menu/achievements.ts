@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Space, Color } from '../../settings/settings'
+import { Style, BBStyle, Space, Color } from '../../settings/settings'
 import {
   ensureRowAlphaGradientTexture,
   MENU_ROW_HIGHLIGHT_GRADIENT_KEY,
@@ -173,7 +173,7 @@ export default class AchievementsMenu extends Menu {
       // Add gold reward if it exists (above image if both exist)
       if (meta.goldReward) {
         const goldText = this.scene.add
-          .text(0, 0, `${meta.goldReward}💰`, Style.basicStylized)
+          .rexBBCodeText(0, 0, `[img=coin] ${meta.goldReward}`, BBStyle.currency)
           .setOrigin(0.5)
         rewardSizer.add(goldText)
       }

@@ -6,7 +6,7 @@ import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
 import Server from '../../server'
-import { Ease, Space, Style, Time } from '../../settings/settings'
+import { BBStyle, Ease, Space, Style, Time } from '../../settings/settings'
 import REWARD_AMOUNTS from '../../../../shared/config/rewardAmounts'
 import newScrollablePanel from '../../lib/scrollablePanel'
 
@@ -103,7 +103,12 @@ export default class ChapterMessageMenu extends MessageMenu {
           let [x, y] = this.claimGoldButton.getGlobalPosition()
           y -= Space.buttonHeight / 4
           const rewardText = this.scene.add
-            .text(x, y, `+${REWARD_AMOUNTS.missionComplete}💰`, Style.reward)
+            .rexBBCodeText(
+              x,
+              y,
+              `[stroke]+${REWARD_AMOUNTS.missionComplete}[/stroke][img=coin]`,
+              BBStyle.reward,
+            )
             .setOrigin(0.5, 1)
 
           this.scene.tweens.add({

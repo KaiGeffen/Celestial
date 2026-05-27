@@ -106,13 +106,13 @@ const StyleGeneral: StyleDict = {
     strokeThickness: 2,
   },
 
-  // Reward text for gold gain
-  reward: {
-    fontFamily: primaryFont,
-    fontSize: '40px',
-    color: Color.goldS,
-    stroke: Color.blackS,
-    strokeThickness: 3,
+  // Subtitle row in all places
+  subtitle: {
+    fontFamily: sansFont,
+    fontSize: '18px',
+    color: Color.whiteS,
+    stroke: Color.darkUmberS,
+    strokeThickness: 1,
   },
 
   // FPS counter in debug mode
@@ -204,13 +204,6 @@ const StyleMatch: StyleDict = {
     stroke: Color.darkUmberS,
     strokeThickness: 2,
   },
-  matchSubtitle: {
-    fontFamily: sansFont,
-    fontSize: '18px',
-    color: Color.whiteS,
-    stroke: Color.darkUmberS,
-    strokeThickness: 1,
-  },
   matchTime: {
     fontFamily: sansFont,
     fontSize: '16px',
@@ -224,7 +217,7 @@ const StyleHome: StyleDict = {
   username: {
     fontFamily: primaryFont,
     fontStyle: 'Bold',
-    fontSize: '18px',
+    fontSize: '20px',
     color: Color.whiteS,
     stroke: Color.darkUmberS,
     strokeThickness: 3,
@@ -238,11 +231,6 @@ const StyleHome: StyleDict = {
     stroke: Color.darkUmberS,
     strokeThickness: 3,
     align: 'center',
-  },
-  usernameInfo: {
-    fontFamily: sansFont,
-    fontSize: '14px',
-    color: Color.darkUmberS,
   },
   // Subheader (Copy in BBStyle)
   announcementSubheader: {
@@ -394,6 +382,18 @@ export const BBStyle: Record<string, any> = {
     },
     // lineSpacing: Space.cardHeight - Space.pad,
   },
+  // Menu header chrome bar
+  header: {
+    fontFamily: primaryFont,
+    fontSize: '40px',
+    color: Color.header,
+    stroke: Color.blackS,
+    strokeThickness: 1,
+    images: {
+      coin: { key: 'icon-coin', height: 40 },
+      gem: { key: 'icon-gem', height: 40 },
+    },
+  },
   // Daily Hint on home screen
   dailyHint: {
     fontFamily: secondaryFont,
@@ -477,5 +477,27 @@ export const BBStyle: Record<string, any> = {
     fontSize: FontSettings.large.size,
     halign: 'center',
     fixedHeight: 50,
+  },
+  // Floating reward text (gold/gem gain animations)
+  reward: {
+    fontFamily: primaryFont,
+    fontSize: '40px',
+    color: Color.goldS,
+    stroke: Color.blackS,
+    strokeThickness: 3,
+    images: {
+      coin: { key: 'icon-coin', height: 40 },
+      gem: { key: 'icon-gem', height: 40 },
+    },
+  },
+  // Basic display that includes currency
+  currency: {
+    fontFamily: secondaryFont,
+    fontSize: '24px',
+    color: Color.basicText,
+    images: {
+      coin: { key: 'icon-coin', height: 24 },
+      gem: { key: 'icon-gem', height: 24 },
+    },
   },
 }

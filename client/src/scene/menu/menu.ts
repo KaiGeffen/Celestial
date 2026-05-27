@@ -2,7 +2,7 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
-import { Style, Space } from '../../settings/settings'
+import { Style, BBStyle, Space } from '../../settings/settings'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
 
@@ -62,7 +62,7 @@ export default class Menu {
   protected createHeader(
     s: string,
     width: number = this.width,
-    style = Style.header,
+    style: BBCodeText.TextStyle = BBStyle.header,
   ): any {
     const background = this.scene.add.image(0, 0, 'chrome-header')
 
@@ -77,7 +77,12 @@ export default class Menu {
       })
       .addBackground(background)
 
-    const txt = this.scene.add.text(0, 0, s, style)
+    const txt = this.scene.add.rexBBCodeText(
+      0,
+      0,
+      `[stroke]${s}[/stroke]`,
+      style,
+    )
     sizer.addSpace().add(txt).addSpace()
 
     // TODO Rasterize shadow
@@ -174,6 +179,7 @@ import RaceDeckSelectionMenu from './raceDeckSelection'
 import RaceCardUpgradeMenu from './raceCardUpgrade'
 import RaceSpecialModesMenu from './raceSpecialModes'
 import PlayMenu from './play'
+import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 
 const menus = {
   options: OptionsMenu,

@@ -1,4 +1,5 @@
 import 'phaser'
+import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 import { Style, Color, Space, BBStyle } from '../settings/settings'
 import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
@@ -16,7 +17,7 @@ const NAVIGATION_BUTTON_WIDTH = 278
 const GAME_VERSION = packageJson.version
 
 export default class HomeScene extends BaseScene {
-  private coinsDisplayText: Phaser.GameObjects.Text
+  private coinsDisplayText: BBCodeText
 
   constructor() {
     super({
@@ -296,10 +297,7 @@ export default class HomeScene extends BaseScene {
     // Right side: vertical sizer for text content
     const textSizer = this.rexUI.add.sizer({
       orientation: 'vertical',
-      space: {
-        item: Space.padSmall * 0.75,
-        top: Space.padSmall,
-      },
+      space: { top: 5 },
     })
 
     const userData = Server.getUserData()
@@ -312,7 +310,7 @@ export default class HomeScene extends BaseScene {
     const maxTextWidth =
       NAVIGATION_BUTTON_WIDTH - Space.avatarSize - Space.pad * 2.5
 
-    // Line 1: Username (with word wrap to prevent overflow)
+    // Username (with word wrap to prevent overflow)
     const usernameFontSize =
       typeof Style.username.fontSize === 'string'
         ? parseInt(Style.username.fontSize, 10)
@@ -325,27 +323,31 @@ export default class HomeScene extends BaseScene {
       .setFixedSize(maxTextWidth, usernameFontSize + 5)
     textSizer.add(usernameText, { align: 'center' })
 
-    // Line 2: Divider line (thin black line)
-    const divider = this.add
-      .rectangle(0, 0, maxTextWidth, 2, 0x000000)
-      .setOrigin(0, 0.5)
-    textSizer.add(divider, { align: 'left' })
-
-    // Line 3: ELO
+    // ELO
     const eloText = this.add
-      .text(0, 0, `ELO: ${elo}`, Style.usernameInfo)
+      .text(0, 0, `${elo}`, Style.subtitle)
       .setOrigin(0, 0.5)
-    textSizer.add(eloText, { align: 'left' })
+    textSizer.add(eloText, { align: 'center', padding: { bottom: 25 } })
 
-    // Line 4: Gems
+    // Gems
     const gemsText = this.add
-      .text(0, 0, `💎 ${amtGems.toLocaleString()}`, Style.usernameInfo)
+      .rexBBCodeText(
+        0,
+        0,
+        `[img=gem] ${amtGems.toLocaleString()}`,
+        BBStyle.currency,
+      )
       .setOrigin(0, 0.5)
     textSizer.add(gemsText, { align: 'left' })
 
-    // Line 5: Coins (gold)
+    // Coins (gold)
     this.coinsDisplayText = this.add
-      .text(0, 0, `💰 ${amtCoins.toLocaleString()}`, Style.usernameInfo)
+      .rexBBCodeText(
+        0,
+        0,
+        `[img=coin] ${amtCoins.toLocaleString()}`,
+        BBStyle.currency,
+      )
       .setOrigin(0, 0.5)
     textSizer.add(this.coinsDisplayText, { align: 'left' })
 
@@ -538,7 +540,7 @@ export default class HomeScene extends BaseScene {
     this.checkAndShowUnseenAchievements()
 
     const coins = Server.getUserData().coins ?? 0
-    const coinsStr = `💰 ${coins.toLocaleString()}`
+    const coinsStr = `[img=coin] ${coins.toLocaleString()}`
     if (this.coinsDisplayText && this.coinsDisplayText.text !== coinsStr) {
       this.coinsDisplayText.setText(coinsStr)
     }

@@ -60,7 +60,7 @@ export default abstract class AvatarRegionBase extends Region {
       .setOrigin(0.5)
 
     this.txtSubtitle = this.scene.add
-      .text(x, subtitleY, '', Style.matchSubtitle)
+      .text(x, subtitleY, '', Style.subtitle)
       .setOrigin(0.5)
 
     this.txtTime = this.scene.add

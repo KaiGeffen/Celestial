@@ -59,13 +59,13 @@ export default class PurchaseItemMenu extends Menu {
     this.close()
   }
 
-  private get currencyEmoji(): string {
-    return this.purchaseable ? '💎' : '💰'
+  private get currencyIcon(): string {
+    return this.purchaseable ? '[img=gem]' : '[img=coin]'
   }
 
   private createContent(): void {
     this.createHeader(
-      `Purchase ${this.currencyEmoji}${this.cost.toLocaleString()}`,
+      `Purchase ${this.currencyIcon}${this.cost.toLocaleString()}`,
     )
 
     if (this.card) {

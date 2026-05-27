@@ -75,7 +75,7 @@ export const AppUiTiming = {
   /** On the searching scene when a match is found, how long for text to fade in/out */
   searchingMatchFoundPulseMs: 500,
   /** Floating reward text rise/fade */
-  rewardFloatMs: 800,
+  rewardFloatMs: 1200,
   /** Ready-to-harvest garden pulse cycle */
   gardenReadyPulseMs: 800,
 } as const

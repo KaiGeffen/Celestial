@@ -1,5 +1,5 @@
 import 'phaser'
-import { Color, Style, Space } from '../settings/settings'
+import { Style, BBStyle, Space } from '../settings/settings'
 import { BaseSceneWithHeader } from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
@@ -14,10 +14,11 @@ import allPurchaseables, {
   Purchaseable,
 } from '../../../shared/purchaseables/index'
 import { getCosmeticImageKey } from '../utils/cosmetics'
+import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 
 export default class StoreScene extends BaseSceneWithHeader {
   private scrollablePanel: any = null
-  private userStatsDisplay: Phaser.GameObjects.Text
+  private userStatsDisplay: BBCodeText
   private currentTab: 'cards' | 'cosmetics' = 'cards'
   private btnTab: Button
 
@@ -45,13 +46,12 @@ export default class StoreScene extends BaseSceneWithHeader {
 
   private createUserStatsDisplay(): void {
     this.userStatsDisplay = this.add
-      .text(0, this.headerHeight / 2, '', Style.basicStylized)
+      .rexBBCodeText(0, this.headerHeight / 2, '', BBStyle.currency)
       .setOrigin(1, 0.5)
-      .setDepth(2)
 
     // Anchor the user stats display to the right
     this.plugins.get('rexAnchor')['add'](this.userStatsDisplay, {
-      right: `100%-${Space.pad * 1.5 + Space.iconSize * 2}`,
+      right: `100%-${Space.padSmall * 3 + Space.iconSize * 2}`,
     })
 
     this.updateUserStatsDisplay()
@@ -62,7 +62,7 @@ export default class StoreScene extends BaseSceneWithHeader {
     const coins = Server.getUserData().coins ?? 0
 
     this.userStatsDisplay.setText(
-      `💰 ${coins.toLocaleString()}\n💎 ${gems.toLocaleString()}`,
+      `[img=coin] ${coins.toLocaleString()}\n[img=gem] ${gems.toLocaleString()}`,
     )
   }
 
@@ -206,7 +206,7 @@ export default class StoreScene extends BaseSceneWithHeader {
       })
 
     const costText = this.add
-      .text(0, 0, `💎 ${item.cost.toLocaleString()}`, Style.basic)
+      .rexBBCodeText(0, 0, `[img=gem] ${item.cost.toLocaleString()}`, BBStyle.currency)
       .setOrigin(0.5)
 
     const sizer = this.rexUI.add
