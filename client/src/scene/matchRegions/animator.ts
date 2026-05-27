@@ -52,9 +52,15 @@ export default class Animator {
 
     // Total Zone.Story insertions across both owners — used to correctly compute the
     // pre-insertion story length so animateStoryInsertShift applies the full shift once.
-    const totalStoryInsertions = state.animations[0]
+    // Cards played directly from hand (e.g. Sky Burial) have no animation entry, so we
+    // also compare story size against the previous state to catch unaminated insertions.
+    const animatedStoryInsertions = state.animations[0]
       .concat(state.animations[1])
       .filter((a) => a.to === Zone.Story && a.from !== Zone.Story).length
+    const storyCountDelta = !state.isRecap
+      ? state.story.acts.length - this.lastHiddenCards.length
+      : 0
+    const totalStoryInsertions = Math.max(animatedStoryInsertions, storyCountDelta)
     let storyInsertShiftDone = false
 
     for (let owner = 0; owner < 2; owner++) {
@@ -558,14 +564,18 @@ export default class Animator {
     const oldDx = this.computeStoryDx(oldTotalLength)
     const newDx = this.computeStoryDx(newTotalLength)
 
-    // Cards being newly inserted this state should not be shifted — only pre-existing ones
+    // Cards being newly inserted this state should not be shifted — only pre-existing ones.
+    // Use a contiguous range from insertionActiveIndex covering all totalInsertions slots.
+    // This handles cards that entered the story without an animation (e.g. Sky Burial played
+    // directly from hand gets displaced to insertionActiveIndex+1 when Vulture is created
+    // before it, but has no animation entry of its own to appear in a per-animation set).
     const newlyInsertedActiveIndices = new Set<number>()
-    for (const ownerAnims of [state.animations[0], state.animations[1]]) {
-      for (const anim of ownerAnims) {
-        if (anim.to === Zone.Story && anim.from !== Zone.Story) {
-          newlyInsertedActiveIndices.add(anim.index2 ?? 0)
-        }
-      }
+    for (
+      let pos = insertionActiveIndex;
+      pos < insertionActiveIndex + totalInsertions;
+      pos++
+    ) {
+      newlyInsertedActiveIndices.add(pos)
     }
 
     for (
