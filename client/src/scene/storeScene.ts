@@ -57,6 +57,7 @@ export default class StoreScene extends BaseSceneWithHeader {
       .setOrigin(1, 0.5)
     this.userStatsDisplay = this.add
       .rexBBCodeText(0, this.headerHeight / 2, '', BBStyle.currency)
+      .setAlign('right')
       .setOrigin(1, 0.5)
       .setPadding(Space.padSmall)
 
@@ -75,8 +76,8 @@ export default class StoreScene extends BaseSceneWithHeader {
     const gems = Server.getUserData().gems ?? 0
     const coins = Server.getUserData().coins ?? 0
 
-    const color = this.userStatsDisplay.setText(
-      `[img=coin] ${coins.toLocaleString()}\n[img=gem] ${gems.toLocaleString()}`,
+    this.userStatsDisplay.setText(
+      `${coins.toLocaleString()} [img=coin]\n${gems.toLocaleString()} [img=gem]`,
     )
   }
 
@@ -223,10 +224,11 @@ export default class StoreScene extends BaseSceneWithHeader {
       .rexBBCodeText(
         0,
         0,
-        `[img=gem] ${item.cost.toLocaleString()}`,
+        `${item.cost.toLocaleString()} [img=gem]`,
         BBStyle.currency,
       )
       .setOrigin(0.5)
+      .setBackgroundColor()
 
     const sizer = this.rexUI.add
       .sizer({

@@ -325,7 +325,7 @@ export default class HomeScene extends BaseScene {
 
     // ELO
     const eloText = this.add
-      .text(0, 0, `${elo}`, Style.subtitle)
+      .text(0, 0, `${elo}`, Style.basicStylized)
       .setOrigin(0, 0.5)
     textSizer.add(eloText, { align: 'center', padding: { bottom: 25 } })
 
@@ -334,22 +334,22 @@ export default class HomeScene extends BaseScene {
       .rexBBCodeText(
         0,
         0,
-        `[img=gem] ${amtGems.toLocaleString()}`,
+        `${amtGems.toLocaleString()} [img=gem]`,
         BBStyle.currency,
       )
       .setOrigin(0, 0.5)
-    textSizer.add(gemsText, { align: 'left' })
+    textSizer.add(gemsText, { align: 'right' })
 
     // Coins (gold)
     this.coinsDisplayText = this.add
       .rexBBCodeText(
         0,
         0,
-        `[img=coin] ${amtCoins.toLocaleString()}`,
+        `${amtCoins.toLocaleString()} [img=coin]`,
         BBStyle.currency,
       )
       .setOrigin(0, 0.5)
-    textSizer.add(this.coinsDisplayText, { align: 'left' })
+    textSizer.add(this.coinsDisplayText, { align: 'right' })
 
     // Layout text sizer
     textSizer.layout()
@@ -540,7 +540,7 @@ export default class HomeScene extends BaseScene {
     this.checkAndShowUnseenAchievements()
 
     const coins = Server.getUserData().coins ?? 0
-    const coinsStr = `[img=coin] ${coins.toLocaleString()}`
+    const coinsStr = `${coins.toLocaleString()} [img=coin]`
     if (this.coinsDisplayText && this.coinsDisplayText.text !== coinsStr) {
       this.coinsDisplayText.setText(coinsStr)
     }
