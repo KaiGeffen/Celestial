@@ -9,6 +9,7 @@ import {
   NourishButton,
   SightButton,
   PossibilityButton,
+  RetainButton,
 } from './statuses'
 import HomeSceneButton from './homeSceneButton'
 import Icon from './icon'
@@ -31,6 +32,7 @@ export default class Buttons {
     Nourish: NourishButton,
     Sight: SightButton,
     Possibility: PossibilityButton,
+    Retain: RetainButton,
   }
   static Mission = MissionButton
   static HomeScene = HomeSceneButton

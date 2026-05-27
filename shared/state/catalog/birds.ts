@@ -254,7 +254,7 @@ const layBare = new LayBare({
 
 class Vulture extends Card {
   onPlay(player: number, game: GameModel): void {
-    this.starve(2, game, player)
+    this.nourish(-2, game, player)
   }
 }
 const vulture = new Vulture({

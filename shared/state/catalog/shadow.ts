@@ -125,7 +125,7 @@ const boa = new Boa({
 class HungryGhost extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
-    this.starve(4, game, player)
+    this.nourish(-4, game, player)
   }
 
   rateDelay(world) {
@@ -179,7 +179,7 @@ const wingClipping = new WingClipping({
 class Sickness extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
-    this.starve(4, game, player ^ 1)
+    this.nourish(-4, game, player ^ 1)
     game.create(Zone.Hand, player ^ 1, sickness)
   }
 }

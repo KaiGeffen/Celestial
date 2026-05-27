@@ -87,9 +87,18 @@ class ServerController {
       if (this.attemptPlay(player, choice)) {
         this.model.passes = 0
         this.model.lastPlayerWhoPlayed = player
-        this.model.switchPriority()
+
+        // Normally switch priority, or spend Retain status
+        if (this.model.status[player].retain > 0) {
+          this.model.status[player].retain -= 1
+        } else {
+          this.model.switchPriority()
+        }
+
+        // Input was successful
         return true
       } else {
+        // Input was unsuccessful
         return false
       }
     }

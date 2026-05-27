@@ -238,3 +238,43 @@ export class PossibilityButton extends KeywordButton {
     return super.makeHintable(s)
   }
 }
+
+export class RetainButton extends KeywordButton {
+  constructor(
+    within: Phaser.GameObjects.Container,
+    x: number,
+    y: number,
+    text: string = '',
+    f: () => void = function () {},
+    opponentPerspective: boolean = false,
+  ) {
+    super(
+      within,
+      x,
+      y,
+      {
+        text: {
+          text: text,
+          interactive: false,
+          style: Style.statusKeywordValue,
+          offsetX: 15,
+        },
+        icon: {
+          name: `Sight`,
+          interactive: true,
+        },
+        callbacks: {
+          click: f,
+        },
+      },
+      opponentPerspective,
+    )
+    this.applyStatusTextColor(STATUS_TEXT_SIGHT)
+  }
+
+  makeHintable(): Button {
+    const s = getHint(this, 'Retain', this.opponentPerspective)
+
+    return super.makeHintable(s)
+  }
+}

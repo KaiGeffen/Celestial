@@ -58,10 +58,7 @@ class Enlightenment extends Card {
     let numSeenCards = 0
     for (let i = 0; i < game.story.acts.length; i++) {
       const act = game.story.acts[i]
-      if (
-        act.owner === (player ^ 1) &&
-        game.isActVisibleToPlayer(player, i)
-      ) {
+      if (act.owner === (player ^ 1) && game.isActVisibleToPlayer(player, i)) {
         numSeenCards += 1
       }
     }
@@ -95,10 +92,7 @@ class Conquer extends Card {
     let numSeenCards = 0
     for (let i = 0; i < game.story.acts.length; i++) {
       const act = game.story.acts[i]
-      if (
-        act.owner === player ||
-        game.isActVisibleToPlayer(player, i)
-      ) {
+      if (act.owner === player || game.isActVisibleToPlayer(player, i)) {
         numSeenCards += 1
       }
     }
@@ -321,10 +315,7 @@ class Incense extends Card {
   onPlay(player: number, game: GameModel) {
     for (let i = game.story.acts.length - 1; i >= 0; i--) {
       const act = game.story.acts[i]
-      if (
-        act.owner === (player ^ 1) &&
-        game.isActVisibleToPlayer(player, i)
-      ) {
+      if (act.owner === (player ^ 1) && game.isActVisibleToPlayer(player, i)) {
         game.moveBetweenZones(Zone.Story, Zone.Hand, player ^ 1, i)
         break
       }
@@ -335,7 +326,8 @@ const incense = new Incense({
   name: 'Incense',
   id: 8095,
   cost: 3,
-  text: `When played, return your opponent's last card in the story which you can see to their hand.`,
+  qualities: [Quality.VISIBLE],
+  text: `Visible\nWhen played, return your opponent's last card in the story which you can see to their hand.`,
 })
 
 export {

@@ -83,4 +83,18 @@ const primal = new Primal({
   text: 'For each card later in the story, discard it and a card from your hand that share a cost.',
 })
 
-export { primal }
+class Retain extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    this.retain(1, game, player)
+  }
+}
+const retain = new Retain({
+  name: 'Retain',
+  id: 9004,
+  cost: 1,
+  points: 1,
+  text: 'Retain 1',
+})
+
+export { primal, retain }

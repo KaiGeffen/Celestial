@@ -9,7 +9,7 @@ import { Depth, Time } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
-/** Distance between adjacent icon centers: Inspire–Nourish–Sight are evenly spaced with Nourish at 0; Possibility sits one more step to the right of Sight. */
+/** Distance between adjacent icon centers: Inspire–Nourish–Sight are evenly spaced with Nourish at 0; Possibility and Retain sit further right. */
 const ICON_SPREAD = 90
 
 /** Pixels below top / above bottom edge (matches “0%+100” / “100%-100” roughly). */
@@ -18,7 +18,7 @@ const BOTTOM_OFFSET = 205
 
 /**
  * Status row: Inspire, Nourish, Sight evenly spaced with Nourish on the horizontal center;
- * Possibility is one step further right (same step as between the trio). Anchored top/bottom.
+ * Possibility and Retain are one step further right each. Anchored top/bottom.
  */
 export default class StatusRegion extends Region {
   private ourRow: Phaser.GameObjects.Container
@@ -28,10 +28,12 @@ export default class StatusRegion extends Region {
   private btnOurNourish: Button
   private btnOurSight: Button
   private btnOurPossibility: Button
+  private btnOurRetain: Button
   private btnTheirInspire: Button
   private btnTheirNourish: Button
   private btnTheirSight: Button
   private btnTheirPossibility: Button
+  private btnTheirRetain: Button
 
   /** Base timings shared with recap animation slots. */
   private static readonly SLOT_MS =
@@ -75,6 +77,11 @@ export default class StatusRegion extends Region {
       2 * ICON_SPREAD,
       0,
     ).setVisible(false)
+    this.btnOurRetain = new Buttons.Keywords.Retain(
+      this.ourRow,
+      3 * ICON_SPREAD,
+      0,
+    ).setVisible(false)
 
     this.btnTheirInspire = new Buttons.Keywords.Inspire(
       this.theirRow,
@@ -105,21 +112,31 @@ export default class StatusRegion extends Region {
       () => {},
       true,
     ).setVisible(false)
+    this.btnTheirRetain = new Buttons.Keywords.Retain(
+      this.theirRow,
+      3 * ICON_SPREAD,
+      0,
+      '',
+      () => {},
+      true,
+    ).setVisible(false)
 
     return this
   }
 
-  /** All eight status buttons, in display order. */
+  /** All status buttons, in display order. */
   private allButtons(): Button[] {
     return [
       this.btnOurInspire,
       this.btnOurNourish,
       this.btnOurSight,
       this.btnOurPossibility,
+      this.btnOurRetain,
       this.btnTheirInspire,
       this.btnTheirNourish,
       this.btnTheirSight,
       this.btnTheirPossibility,
+      this.btnTheirRetain,
     ]
   }
 
@@ -152,6 +169,9 @@ export default class StatusRegion extends Region {
     this.btnOurPossibility
       .setVisible(state.status[0].possibility !== 0)
       .setText(`${state.status[0].possibility}`)
+    this.btnOurRetain
+      .setVisible(state.status[0].retain !== 0)
+      .setText(`${state.status[0].retain}`)
 
     this.btnTheirInspire
       .setVisible(state.status[1].inspired !== 0)
@@ -165,6 +185,9 @@ export default class StatusRegion extends Region {
     this.btnTheirPossibility
       .setVisible(state.status[1].possibility !== 0)
       .setText(`${state.status[1].possibility}`)
+    this.btnTheirRetain
+      .setVisible(state.status[1].retain !== 0)
+      .setText(`${state.status[1].retain}`)
 
     this.hideStatusesUntilAnimationSlot(state)
   }
@@ -179,7 +202,8 @@ export default class StatusRegion extends Region {
         if (
           animation.index !== 0 &&
           animation.index !== 1 &&
-          animation.index !== 3
+          animation.index !== 3 &&
+          animation.index !== 4
         )
           continue
 
@@ -202,6 +226,7 @@ export default class StatusRegion extends Region {
       if (index === 1 || index === -1) return this.btnOurNourish
       if (index === 2) return this.btnOurSight
       if (index === 3) return this.btnOurPossibility
+      if (index === 4) return this.btnOurRetain
       return undefined
     }
 
@@ -209,6 +234,7 @@ export default class StatusRegion extends Region {
     if (index === 1 || index === -1) return this.btnTheirNourish
     if (index === 2) return this.btnTheirSight
     if (index === 3) return this.btnTheirPossibility
+    if (index === 4) return this.btnTheirRetain
     return undefined
   }
 
@@ -224,7 +250,8 @@ export default class StatusRegion extends Region {
     if (
       animation.index === 0 ||
       animation.index === 1 ||
-      animation.index === 3
+      animation.index === 3 ||
+      animation.index === 4
     ) {
       this.scene.tweens.add({
         targets: [btn.icon, btn.txt].filter(Boolean),

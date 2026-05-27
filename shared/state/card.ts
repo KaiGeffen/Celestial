@@ -274,14 +274,14 @@ export default class Card {
     game.status[player].nourish += amt
   }
 
-  starve(amt: number, game: GameModel, player: number) {
+  retain(amt: number, game: GameModel, player: number) {
     game.animations[player].push(
       new Animation({
         from: Zone.Status,
-        index: -1,
+        index: 4,
       }),
     )
-    game.status[player].nourish -= amt
+    game.status[player].retain += amt
   }
 
   /* AI heuristics */

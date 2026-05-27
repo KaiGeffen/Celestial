@@ -20,6 +20,7 @@ export class Keywords {
       Keywords.inspire,
       Keywords.inspired,
       Keywords.possibility,
+      Keywords.retain,
       Keywords.nourish,
       Keywords.birth,
       Keywords.exhale,
@@ -77,6 +78,11 @@ export class Keywords {
   static possibility = new Keyword(
     'Possibility',
     '[color=#FABD5D]Possibility X[/color]: At the start of each round, you gain X extra breath.',
+    true,
+  )
+  static retain = new Keyword(
+    'Retain',
+    '[color=#FABD5D]Retain X[/color]: The next X times you play a card, keep priority.',
     true,
   )
   static nourish = new Keyword(
