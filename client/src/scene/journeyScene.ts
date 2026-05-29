@@ -318,7 +318,9 @@ export default class JourneyScene extends BaseScene {
     themes: ReturnType<typeof getMissionsByTheme>,
   ): Phaser.GameObjects.GameObject {
     // Background
-    const headerBg = this.add.image(0, 0, 'chrome-header').setInteractive()
+    const headerBg = this.add
+      .image(0, 0, 'chrome-journeyHeader')
+      .setInteractive()
     const headerSizer = this.rexUI.add
       .sizer({
         orientation: 'horizontal',
@@ -370,7 +372,7 @@ export default class JourneyScene extends BaseScene {
     )
     this.btnCharacterDescription = new Buttons.Icon({
       within: btnContainer,
-      name: 'Quest',
+      name: 'scroll',
       f: () => {
         if (this.selectedThemeIndex < avatarNames.length) {
           this.showOverlayCharacterView = !this.showOverlayCharacterView
@@ -378,7 +380,6 @@ export default class JourneyScene extends BaseScene {
         }
       },
     })
-    this.btnCharacterDescription.icon.setTintFill(Color.white)
 
     // Add everything to the sizer
     headerSizer
@@ -580,7 +581,7 @@ export default class JourneyScene extends BaseScene {
         Server.getUserData().missionGoldClaimed?.[mission.id] ?? false
       const btn = new Buttons.Icon({
         within: iconCell,
-        name: 'Quest',
+        name: 'scrollDark',
         muteClick: true,
         f: () => {
           if (mission.id < 700) {
@@ -638,16 +639,12 @@ export default class JourneyScene extends BaseScene {
           }
         },
       })
-      btn.icon.setTintFill(Color.brown)
 
       // Add a notification badge if the mission has not been claimed
       if (!hasClaimedMissionGold) {
-        const badge = this.add.circle(
-          TODO_ICON_SIZE / 2 - 5,
-          -TODO_ICON_SIZE / 2 + 5,
-          5,
-          0xd64045,
-        )
+        const badge = this.add
+          .circle(TODO_ICON_SIZE / 2 - 5, -TODO_ICON_SIZE / 2 + 5, 5, 0xd64045)
+          .setStrokeStyle(1, Color.brown)
         iconCell.add(badge)
       }
     }
