@@ -242,15 +242,15 @@ export default class DeckEditorScene extends BaseScene {
 
     // Open the styles menu
     this.scene.launch('MenuScene', {
-      menu: 'editDeck',
+      menu: 'alterDeckCosmetics',
       // When confirming, set the values for this scene with the new selected values
       callback: (
-        _name: string,
+        name: string,
         cosmeticSet: CosmeticSet,
         deckCode: number[],
       ) => {
+        this.deckName = name
         this.cosmeticSet = cosmeticSet
-        // Don't set this.deckName — cosmetics menu doesn't edit it; echoed name would revert unsaved renames.
 
         // TODO If copy/paste is removed, this is no longer needed
         if (deckCode && deckCode.length > 0) {

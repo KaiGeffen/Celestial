@@ -314,7 +314,7 @@ export default class DeckRegion {
   private openEditMenu(): () => void {
     return () => {
       this.scene.scene.launch('MenuScene', {
-        menu: 'editDeck',
+        menu: 'alterDeckCosmetics',
         callback: this.editCallback,
         deckName: this.txtDeckName.text,
         cosmeticSet: this.cosmeticSet,

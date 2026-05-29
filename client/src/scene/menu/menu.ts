@@ -161,7 +161,7 @@ export default class Menu {
 import OptionsMenu from './options'
 import CreditsMenu from './credits'
 import RulebookMenu from './rulebook'
-import { NewDeckMenu, EditDeckMenu } from './alterDeckCosmetics'
+import AlterDeckCosmeticsMenu from './alterDeckCosmetics'
 import ConfirmMenu from './confirm'
 import MessageMenu from './message'
 import ChapterMessageMenu from './chapterMessage'
@@ -184,13 +184,10 @@ const menus = {
   options: OptionsMenu,
   credits: CreditsMenu,
   rulebook: RulebookMenu,
-  // TODO Rename since it's just alter deck
-  newDeck: NewDeckMenu,
   play: PlayMenu,
 
   // TODO Move the copy/paste deck code somewhere.
-  // TODO Rename to be about cosmetics if that's what it is
-  editDeck: EditDeckMenu,
+  alterDeckCosmetics: AlterDeckCosmeticsMenu,
 
   confirm: ConfirmMenu,
   message: MessageMenu,

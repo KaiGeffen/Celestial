@@ -18,7 +18,7 @@ import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
 
 const width = 760
 
-class AlterDeckCosmeticsMenu extends Menu {
+export default class AlterDeckCosmeticsMenu extends Menu {
   name: string
   selectedAvatar: number
   selectedBorder: number
@@ -33,12 +33,7 @@ class AlterDeckCosmeticsMenu extends Menu {
   private gridContainer: any
   private nameInput: any
 
-  constructor(
-    scene: MenuScene,
-    params,
-    titleString: string,
-    confirmString: string,
-  ) {
+  constructor(scene: MenuScene, params) {
     super(scene, width)
 
     this.name = params.deckName ?? ''
@@ -52,7 +47,7 @@ class AlterDeckCosmeticsMenu extends Menu {
       0
     this.deckCode = params.deckCode ?? []
 
-    this.createContent(params.callback, titleString, confirmString)
+    this.createContent(params.callback)
     this.layout()
     this.createNameInput()
   }
@@ -63,11 +58,9 @@ class AlterDeckCosmeticsMenu extends Menu {
       cosmeticSet: CosmeticSet,
       deckCode: number[],
     ) => void,
-    titleString: string,
-    confirmString: string,
   ) {
-    this.createHeader(titleString)
-    this.createLeftColumn(callback, confirmString)
+    this.createHeader('Cosmetics')
+    this.createLeftColumn(callback)
     this.createRightColumn()
   }
 
@@ -77,7 +70,6 @@ class AlterDeckCosmeticsMenu extends Menu {
       cosmeticSet: CosmeticSet,
       deckCode: number[],
     ) => void,
-    confirmString: string,
   ) {
     const sizer = this.scene.rexUI.add.sizer({
       orientation: 'vertical',
@@ -107,6 +99,7 @@ class AlterDeckCosmeticsMenu extends Menu {
       scene: this.scene as any,
       onClick: () => {},
       muteClick: true,
+      noHover: true,
       name: '',
       cosmeticSet: {
         avatar: this.selectedAvatar,
@@ -170,7 +163,7 @@ class AlterDeckCosmeticsMenu extends Menu {
     )
     this.btnConfirm = new Buttons.Basic({
       within: confirmContainer,
-      text: confirmString,
+      text: 'Update',
       f: () => {
         const cosmeticSet: CosmeticSet = {
           avatar: this.selectedAvatar,
@@ -311,14 +304,13 @@ class AlterDeckCosmeticsMenu extends Menu {
         ...Style.inputText,
         maxLength: 40,
         id: 'alter-deck-name',
+
+        selectAll: true,
       },
     )
 
     this.nameInput.on('textchange', () => {
-      const raw = String(this.nameInput.text ?? '').trim()
-      if (raw.length > 0) {
-        this.name = raw
-      }
+      this.name = this.nameInput.text.trim()
     })
 
     this.scene.plugins.get('rexAnchor')['add'](this.nameInput, {
@@ -363,17 +355,5 @@ class AlterDeckCosmeticsMenu extends Menu {
 
       this.gridSizer.add(container, index % 2, Math.floor(index / 2))
     })
-  }
-}
-
-export class NewDeckMenu extends AlterDeckCosmeticsMenu {
-  constructor(scene: MenuScene, params) {
-    super(scene, params, 'Cosmetics', 'Create')
-  }
-}
-
-export class EditDeckMenu extends AlterDeckCosmeticsMenu {
-  constructor(scene: MenuScene, params) {
-    super(scene, params, 'Cosmetics', 'Update')
   }
 }

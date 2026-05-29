@@ -30,6 +30,7 @@ export default class DeckThumbnail {
     scene: BaseScene
     onClick: () => void
     muteClick?: boolean
+    noHover?: boolean
     name?: string
     cosmeticSet?: CosmeticSet
     isValid?: boolean
@@ -38,6 +39,7 @@ export default class DeckThumbnail {
   }) {
     const { scene, onClick } = opts
     const muteClick = opts.muteClick ?? false
+    const noHover = opts.noHover ?? false
     const name = opts.name ?? ''
     const userDefaultCosmeticSet: Partial<CosmeticSet> =
       Server.getUserData().cosmeticSet ?? {}
@@ -130,10 +132,12 @@ export default class DeckThumbnail {
         onClick()
       })
       .on('pointerover', () => {
+        if (noHover) return
         this.hovered = true
         this.updateNameBackgroundStyle()
       })
       .on('pointerout', () => {
+        if (noHover) return
         this.hovered = false
         this.updateNameBackgroundStyle()
       })

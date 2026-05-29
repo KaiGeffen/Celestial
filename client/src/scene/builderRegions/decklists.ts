@@ -439,7 +439,8 @@ export default class DecklistsRegion {
         )
       } else {
         this.scene.scene.launch('MenuScene', {
-          menu: 'newDeck',
+          menu: 'alterDeckCosmetics',
+          confirmText: 'Create',
           activeScene: this.scene,
           callback: this.createCallback(),
         })
