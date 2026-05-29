@@ -574,7 +574,7 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
     subheader: 'Ranked Seasons',
     body: `June 1st - 30th marks the start of our first official ranked season!
     
-    At the end of the season, the #1 player will get to pick the theme for the next cardback and co-design it. Once it's ready, each player in the top 10 will get a free copy.`,
+    As the season begins, each player's ELO will be reset. Once the season ends, the #1 player will get to pick the theme for the next cardback and co-design it. Once it's ready, each player in the top 10 will get a free copy.`,
   },
   {
     subheader: 'New Cards',
