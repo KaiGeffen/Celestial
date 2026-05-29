@@ -83,6 +83,7 @@ export default function createWebSocketServer() {
       // Remember the user once they've signed in
       let id: string = null
       let potentialEmail: string = null
+      let connectionTime: number | null = null
       let activeGame: ActiveGame = {
         match: null, // Match if user is in one
         playerNumber: null, // 0 or 1 for current match
@@ -116,6 +117,7 @@ export default function createWebSocketServer() {
 
         // Add to active users
         activePlayers[uuid] = ws
+        connectionTime = Date.now()
 
         // Handle initial achievement
         await AchievementManager.onConnection(id)
@@ -261,6 +263,7 @@ export default function createWebSocketServer() {
 
             // Add to active users
             activePlayers[id] = ws
+            connectionTime = Date.now()
 
             // Handle initial achievement
             await AchievementManager.onConnection(id)
@@ -712,6 +715,18 @@ export default function createWebSocketServer() {
 
       // Handle disconnect logic
       ws.onClose(() => {
+        // Accumulate playtime
+        if (id && connectionTime !== null) {
+          const elapsed = Math.floor((Date.now() - connectionTime) / 1000)
+          connectionTime = null
+          if (elapsed > 0) {
+            db.update(players)
+              .set({ playtime: sql`${players.playtime} + ${elapsed}` })
+              .where(eq(players.id, id))
+              .catch((e) => console.error('Error updating playtime:', e))
+          }
+        }
+
         // TODO Maybe this check is unnecessary, should delete in all cases
         // Remove them from active players
         if (activePlayers[id] === ws) {

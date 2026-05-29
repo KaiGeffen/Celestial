@@ -80,6 +80,9 @@ export const players = pgTable(
     gems: integer('gems').notNull(),
     coins: integer('coins').notNull(),
 
+    // Playtime
+    playtime: integer('playtime').notNull().default(0),
+
     // Cosmetic set
     cosmetic_set: varchar('cosmetic_set', { length: 1000 }).notNull(),
 
