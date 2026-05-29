@@ -13,6 +13,11 @@ export function openSteamStore() {
   logEvent('opened_steam_store')
 }
 
+export function openNextFest() {
+  window.open(Url.nextfest, '_blank')
+  logEvent('opened_nextfest')
+}
+
 export function openPrivacyPolicy() {
   window.open(Url.privacyPolicy, '_blank')
   logEvent('opened_privacy_policy')

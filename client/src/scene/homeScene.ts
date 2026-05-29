@@ -5,7 +5,11 @@ import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
 import Cinematic from '../lib/cinematic'
-import { openDiscord, openSteamStore } from '../utils/externalLinks'
+import {
+  openDiscord,
+  openNextFest,
+  openSteamStore,
+} from '../utils/externalLinks'
 import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
@@ -15,6 +19,7 @@ import packageJson from '../../package.json'
 const NAVIGATION_BUTTON_WIDTH = 278
 
 const GAME_VERSION = packageJson.version
+const LINK_AREA_KEYS = ['_link_discord', '_link_steam', '_link_nextfest']
 
 export default class HomeScene extends BaseScene {
   private coinsDisplayText: BBCodeText
@@ -440,7 +445,7 @@ export default class HomeScene extends BaseScene {
     // Right: subheader + body pairs
     const announcementSizer = this.rexUI.add.sizer({
       orientation: 'vertical',
-      space: { top: 65, item: Space.pad * 3 },
+      space: { top: 40, item: Space.pad * 3 },
     })
     for (const pair of ANNOUNCEMENT_PAIRS) {
       const blockSizer = this.rexUI.add.sizer({
@@ -460,18 +465,19 @@ export default class HomeScene extends BaseScene {
         .BBCodeText(0, 0, pair.body, BBStyle.announcementCopy)
         .setInteractive()
         .on('areaover', (key: string) => {
-          if (key === '_link_discord' || key === '_link_steam')
+          if (LINK_AREA_KEYS.includes(key))
             this.input.setDefaultCursor('pointer')
           else if (key[0] === '_') this.hint.showCard(key.slice(1))
         })
         .on('areaout', (key: string) => {
-          if (key === '_link_discord' || key === '_link_steam')
+          if (LINK_AREA_KEYS.includes(key))
             this.input.setDefaultCursor('default')
           this.hint.hide()
         })
         .on('areadown', (key: string) => {
           if (key === '_link_discord') openDiscord()
           else if (key === '_link_steam') openSteamStore()
+          else if (key === '_link_nextfest') openNextFest()
         })
         .setOrigin(0, 0)
       blockSizer.add(bodyText, { align: 'left' })
@@ -556,22 +562,22 @@ export default class HomeScene extends BaseScene {
 const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   {
     subheader: 'Steam',
-    body: `The [area=_link_steam][stroke=${Color.goldS}]Steam demo[/stroke][/area] is live! Check it out there, and wishlist the full game to keep up with updates.`,
-  },
-  // {
-  //   subheader: 'Congrats to Sherlock!',
-  //   body: 'Congrats to Sherlock for reclaiming his tournament title! And to Redrame for getting #1 on ladder.\nWith the launch of the demo, we plan to snapshot the top players as we transition to a more public release.',
-  // },
-  {
-    subheader: 'Gems',
-    body: `The cosmetic store is now live! Purchase borders and cardbacks with gems. Through June, each PvP match grants 1 gem, and each plant reward will have a small chance to give 3-5.`,
+    body: `Our [area=_link_steam][stroke=${Color.goldS}]Steam page[/stroke][/area] is up! We'd love if you could wishlist, and look forward to the demo release at [area=_link_nextfest][stroke=${Color.goldS}]Steam NextFest[/stroke][/area] in October.`,
   },
   {
-    subheader: 'Shell Mode',
-    body: `Each Saturday in May, we'll be playing a new mode called Shell Mode. Hop on the [area=_link_discord][stroke=${Color.goldS}]Discord server[/stroke][/area] to learn more!`,
+    subheader: 'Currencies & Cosmetics',
+    body: `Gems have arrived in the Celestial realm!
+    
+    Earn 1[img=gem] for each PvP match played, plus a small chance to get 3-5[img=gem] from each plant in your garden. These shiny rewards can be traded for new cosmetic items in the Store under the Cosmetics tab.`,
   },
   {
-    subheader: 'Card Changes',
-    body: `[area=_Sky Burial][stroke=${Color.goldS}]Sky Burial[/stroke][/area] - New card!\n[area=_Starfall][stroke=${Color.goldS}]Starfall[/stroke][/area] - New card!`,
+    subheader: 'Ranked Seasons',
+    body: `June 1st - 30th marks the start of our first official ranked season!
+    
+    At the end of the season, the #1 player will get to pick the theme for the next cardback and co-design it. Once it's ready, each player in the top 10 will get a free copy.`,
+  },
+  {
+    subheader: 'New Cards',
+    body: `[area=_Sky Burial][stroke=${Color.goldS}]Sky Burial[/stroke][/area] and [area=_Starfall][stroke=${Color.goldS}]Starfall[/stroke][/area] are now available in the Store!`,
   },
 ]

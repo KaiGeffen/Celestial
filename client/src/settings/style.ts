@@ -441,6 +441,10 @@ export const BBStyle: Record<string, any> = {
       width: ANNOUNCEMENT_WIDTH,
     },
     strokeThickness: 2,
+    images: {
+      coin: { key: 'icon-coin', height: 24 },
+      gem: { key: 'icon-gem', height: 24 },
+    },
   },
   missionName: {
     fontFamily: secondaryFont,
