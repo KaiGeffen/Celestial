@@ -3,6 +3,7 @@ import { Quality } from '../quality'
 import GameModel from '../gameModel'
 import { Zone } from '../zone'
 import { Animation } from '../../animation'
+import { child } from './tokens'
 
 class Updraft extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -144,17 +145,74 @@ const salvage = new Salvage({
 class RollingStone extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     if (super.exhale(1, game, player)) {
-      bonus += game.endingBreath[player]
+      bonus += 1
     }
 
     super.play(player, game, index, bonus)
+  }
+
+  onPlay(player: number, game: GameModel) {
+    if (game.status[player].retain > 0) {
+      // Make the new card
+      const s =
+        'Fleeting\nWhen played with Retain, Reveal this to create a copy in hand.\nExhale 1: Worth +1.'
+      const card = this.copy()
+      card.qualities = [Quality.FLEETING]
+      card.text = s
+
+      // Create in hand
+      game.create(Zone.Hand, player, card)
+
+      // Reveal this act
+      game.story.acts[game.story.acts.length - 1].revealed = true
+    }
   }
 }
 const rollingStone = new RollingStone({
   name: 'Rolling Stone',
   id: 9009,
-  qualities: [Quality.FLEETING],
-  text: 'Fleeting\nWhen played with Retain, reveal this and create a copy in hand.\nExhale 1: Worth +1.',
+  text: 'When played with Retain, Reveal this to create Fleeting copy in hand.\nExhale 1: Worth +1.',
 })
 
-export { retain, cliff, chant, march, salvage, rollingStone }
+class Solidarity extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    if (game.story.acts.length > 0 && game.story.acts[0].owner === player) {
+      this.transform(0, solidarity, game)
+    }
+  }
+}
+const solidarity = new Solidarity({
+  name: 'Solidarity',
+  id: 9010,
+  cost: 2,
+  points: 2,
+  text: 'If the next card in the story is yours, tranform it into Solidarity.',
+})
+
+class Earthsong extends Card {
+  onPass(playerWhoPassed: number, owner: number, game: GameModel): void {
+    if (playerWhoPassed === owner) {
+      game.breath[playerWhoPassed] += 1
+    }
+  }
+}
+const earthsong = new Earthsong({
+  name: 'Earthsong',
+  id: 9011,
+  cost: 3,
+  points: 3,
+  text: 'When you pass while this is in the story, gain 1 breath.',
+})
+
+export {
+  retain,
+  cliff,
+  chant,
+  march,
+  salvage,
+  rollingStone,
+  solidarity,
+  earthsong,
+}
