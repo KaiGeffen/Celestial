@@ -44,7 +44,8 @@ export default class ShareDeckCodeMenu extends Menu {
         align: 'center',
         placeholder: 'Deck code',
         ...Style.inputText,
-        maxLength: MechanicsSettings.DECK_SIZE * 4,
+        // Double to allow for 30 card overfull decks
+        maxLength: MechanicsSettings.DECK_SIZE * 4 * 2,
         selectAll: true,
       },
     )
