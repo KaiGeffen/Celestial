@@ -212,7 +212,7 @@ export default class StoreScene extends BaseSceneWithHeader {
     const image = this.add
       .image(0, 0, getCosmeticImageKey(item))
       .setDisplaySize(width, height)
-      .setInteractive({ cursor: 'pointer' })
+      .setInteractive()
       .on('pointerdown', () => {
         this.scene.launch('MenuScene', {
           menu: 'purchaseItem',

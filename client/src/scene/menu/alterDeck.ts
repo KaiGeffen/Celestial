@@ -2,14 +2,9 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
-import { Color, Space, Flags, Style } from '../../settings/settings'
+import { Color, Space } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
-import {
-  encodeShareableDeckCode,
-  decodeShareableDeckCode,
-} from '../../../../shared/codec'
-import { MechanicsSettings } from '../../../../shared/settings'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import Server from '../../server'
 import {
@@ -18,53 +13,34 @@ import {
   getUnlockedCardbacks,
 } from '../../utils/cosmetics'
 import cardbackNames from '../../data/cardbackNames'
-import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
+import DeckThumbnail from '../../lib/deckThumbnail'
+import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
 
-const width = Space.avatarSize * 6 + Space.pad * 7
-
-enum tab {
-  ICON,
-  BORDER,
-  CARDBACK,
-}
+const width = 760
 
 class AlterDeckMenu extends Menu {
-  // TODO Make some private
-
-  // The user inputted name for the deck
   name: string
-
-  // The user selected avatar number and border
   selectedAvatar: number
   selectedBorder: number
   selectedCardback: number
-
-  // The deck code for this deck, if any
   deckCode: number[] = []
-  encodedDeckCode: string = ''
-  deckCodeInputText
-
-  // The names for different elements, which differ in different menus
-  titleString: string
-  confirmString: string
-
-  // Current tab for cosmetic selection
-  currentTab: tab = tab.ICON
-
-  private cosmeticChoicesSizer: FixWidthSizer
 
   btnConfirm: Button
+
+  private currentTab: string = 'Icon'
+  private deckThumbnail: DeckThumbnail
+  private gridSizer: GridSizer
+  private gridContainer: any
 
   constructor(
     scene: MenuScene,
     params,
-    titleString,
-    confirmString,
-    deckName = '',
+    titleString: string,
+    confirmString: string,
   ) {
     super(scene, width)
 
-    this.name = params.deckName
+    this.name = params.deckName ?? ''
     this.selectedAvatar =
       params.cosmeticSet?.avatar ?? Server.getUserData().cosmeticSet?.avatar
     this.selectedBorder =
@@ -73,369 +49,255 @@ class AlterDeckMenu extends Menu {
       params.cosmeticSet?.cardback ??
       Server.getUserData().cosmeticSet?.cardback ??
       0
-    this.titleString = titleString
-    this.confirmString = confirmString
     this.deckCode = params.deckCode ?? []
 
-    this.createContent(params.callback)
-
+    this.createContent(params.callback, titleString, confirmString)
     this.layout()
   }
 
   private createContent(
-    createCallback: (
-      name: string,
-      cosmeticSet: CosmeticSet,
-      deckCode: number[],
-    ) => void,
+    callback: (name: string, cosmeticSet: CosmeticSet, deckCode: number[]) => void,
+    titleString: string,
+    confirmString: string,
   ) {
-    this.createHeader(this.titleString, width)
-
-    this.sizer
-      .add(this.createNameWithTabs())
-      .addNewLine()
-      .add(this.createCosmeticOptions())
-      .addNewLine()
-      .add(this.createFooter(createCallback))
+    this.createHeader(titleString)
+    this.createLeftColumn(callback, confirmString)
+    this.createRightColumn()
   }
 
-  private createCosmeticOptions() {
-    // Create the sizer for avatars/borders
-    this.cosmeticChoicesSizer = this.scene.rexUI.add.fixWidthSizer({
-      width,
-      height: Space.cardHeight,
-
+  private createLeftColumn(
+    callback: (name: string, cosmeticSet: CosmeticSet, deckCode: number[]) => void,
+    confirmString: string,
+  ) {
+    const sizer = this.scene.rexUI.add.sizer({
+      orientation: 'vertical',
       space: {
         item: Space.pad,
-        line: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
         left: Space.pad,
         right: Space.pad,
       },
     })
 
-    // Create initial content
-    this.updateCosmeticGrid()
-
-    return this.cosmeticChoicesSizer
-  }
-
-  private updateCosmeticGrid() {
-    // Clear the sizer
-    this.cosmeticChoicesSizer.removeAll(true)
-
-    let items = []
-
-    if (this.currentTab === tab.ICON) {
-      // Create avatar sizer
-      const unlockedAvatars = getUnlockedAvatars()
-
-      unlockedAvatars.forEach((avatarId) => {
-        const container = new ContainerLite(
-          this.scene,
-          0,
-          0,
-          Space.avatarSize,
-          Space.avatarSize,
-        )
-        let avatar = new Buttons.Avatar({
-          within: container,
-          avatarId: avatarId,
-          border: this.selectedBorder,
-          f: () => {
-            items.forEach((a) => a.deselect())
-            avatar.select()
-            this.selectedAvatar = avatarId
-          },
-        })
-        this.cosmeticChoicesSizer.add(container)
-        items.push(avatar)
-
-        if (avatarId === this.selectedAvatar) {
-          avatar.select()
-        } else {
-          avatar.deselect()
-        }
-      })
-    } else if (this.currentTab === tab.BORDER) {
-      // Create border sizer
-      const unlockedBorders = getUnlockedBorders()
-
-      unlockedBorders.forEach((borderId) => {
-        const container = new ContainerLite(
-          this.scene,
-          0,
-          0,
-          Space.avatarSize,
-          Space.avatarSize,
-        )
-        let avatar = new Buttons.Avatar({
-          within: container,
-          avatarId: this.selectedAvatar,
-          border: borderId,
-          f: () => {
-            items.forEach((a) => a.deselect())
-            avatar.select()
-            this.selectedBorder = borderId
-          },
-        })
-        this.cosmeticChoicesSizer.add(container)
-        items.push(avatar)
-
-        if (borderId === this.selectedBorder) {
-          avatar.select()
-        } else {
-          avatar.deselect()
-        }
-      })
-    } else {
-      const unlockedCardbacks = getUnlockedCardbacks()
-      const borders: Phaser.GameObjects.Rectangle[] = []
-
-      unlockedCardbacks.forEach((cardbackId) => {
-        const cardWidth = Space.cardWidth
-        const cardHeight = Space.cardHeight
-        const cardbackContainer = new ContainerLite(
-          this.scene,
-          0,
-          0,
-          cardWidth,
-          cardHeight,
-        )
-        const image = this.scene.add
-          .image(0, 0, `cardback-${cardbackNames[cardbackId]}`)
-          .setDisplaySize(cardWidth, cardHeight)
-          .setInteractive({ useHandCursor: true })
-          .on('pointerdown', () => {
-            this.scene.sound.play('click')
-            borders.forEach((border) => border.setAlpha(0.1))
-            border.setAlpha(1)
-            this.selectedCardback = cardbackId
-          })
-
-        const border = this.scene.add
-          .rectangle(0, 0, cardWidth, cardHeight)
-          .setFillStyle(0x000000, 0)
-          .setStrokeStyle(5, Color.outline)
-          .setAlpha(cardbackId === this.selectedCardback ? 1 : 0.1)
-
-        cardbackContainer.add([image, border])
-        this.cosmeticChoicesSizer.add(cardbackContainer)
-        borders.push(border)
-      })
-    }
-
-    // Update the layout
-    this.cosmeticChoicesSizer.layout()
-  }
-
-  private createNameWithTabs() {
-    let sizer = this.scene.rexUI.add.sizer({
-      width: width - Space.pad * 2,
-    })
-
-    // Create Icon button
-    const iconContainer = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
+    sizer.addBackground(
+      this.scene.rexUI.add.roundRectangle(0, 0, 1, 1, 10, Color.backgroundLight, 0.4),
     )
-    new Buttons.Basic({
-      within: iconContainer,
-      text: 'Icon',
-      f: () => {
-        this.currentTab = tab.ICON
-        this.updateCosmeticGrid()
+
+    // Live deck preview
+    this.deckThumbnail = new DeckThumbnail({
+      scene: this.scene as any,
+      onClick: () => {},
+      muteClick: true,
+      name: this.name,
+      cosmeticSet: {
+        avatar: this.selectedAvatar,
+        border: this.selectedBorder,
+        cardback: this.selectedCardback,
       },
+      isValid: true,
+      cardCount: this.deckCode.length,
     })
+    sizer.add(this.deckThumbnail.container)
 
-    const cardbackContainer = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
+    // Divider
+    sizer.add(
+      this.scene.add.rectangle(0, 0, Space.buttonWidth, 3, Color.backgroundDark),
     )
-    new Buttons.Basic({
-      within: cardbackContainer,
-      text: 'Cardback',
-      f: () => {
-        this.currentTab = tab.CARDBACK
-        this.updateCosmeticGrid()
-      },
-    })
 
-    // Create Border button
-    const borderContainer = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    new Buttons.Basic({
-      within: borderContainer,
-      text: 'Border',
-      f: () => {
-        this.currentTab = tab.BORDER
-        this.updateCosmeticGrid()
-      },
-    })
-
-    // Add Icon button, Cardback button, and Border button to sizer
-    sizer
-      .add(iconContainer)
-      .addSpace()
-      .add(cardbackContainer)
-      .addSpace()
-      .add(borderContainer)
-
-    return sizer
-  }
-
-  private createDeckCodeCopyAndPaste() {
-    // Create a sizer for the deck code section
-    let deckCodeSizer = this.scene.rexUI.add.sizer()
-
-    // Create share button container
-    let containerShare = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth / 3,
-      Space.avatarSize / 2,
-    )
-    new Buttons.Icon({
-      name: 'Share',
-      within: containerShare,
-      x: 0,
-      y: 0,
-      f: () => {
-        // Copy the deck's code to clipboard
-        let encodedDeck = encodeShareableDeckCode(this.deckCode)
-        navigator.clipboard.writeText(encodedDeck)
-
-        // On local, copy the deck code as an array
-        if (Flags.local) {
-          navigator.clipboard.writeText(this.deckCode.toString())
-        }
-
-        // Inform user deck code was copied
-        this.scene.showMessage('Deck code copied to clipboard.')
-      },
-      hint: 'Export deck-code',
-    })
-
-    // Create the deck code input text
-    this.deckCodeInputText = this.scene.add
-      .rexInputText(0, 0, Space.inputTextWidth, 50, {
-        type: 'text',
-        text: '',
-        align: 'center',
-        placeholder: 'Import deck-code',
-        tooltip: 'Import a deck from clipboard.',
-        ...Style.inputText,
-        maxLength: MechanicsSettings.DECK_SIZE * 4,
-        selectAll: true,
-        id: 'search-field',
+    // Tab buttons
+    ;['Icon', 'Border', 'Cardback'].forEach((tab) => {
+      const container = new ContainerLite(
+        this.scene, 0, 0, Space.buttonWidth, Space.buttonHeight,
+      )
+      new Buttons.Basic({
+        within: container,
+        text: tab,
+        f: () => {
+          this.currentTab = tab
+          this.updateGridContent()
+        },
       })
-      .on('textchange', (inputText) => {
-        const trimmedCode = inputText.text.trim()
-        const deckCode: number[] = decodeShareableDeckCode(trimmedCode)
-
-        if (deckCode === undefined) {
-          this.scene.signalError('Invalid deck code.')
-          this.encodedDeckCode = ''
-        } else {
-          this.deckCode = deckCode
-        }
-      })
-
-    // Chrome for the input text
-    const chrome = this.scene.add.image(0, 0, 'icon-InputText')
-
-    // Container with textbox and chrome
-    let inputContainer = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.inputTextWidth + Space.pad * 3,
-      Space.textboxHeight,
-      [this.deckCodeInputText, chrome],
-    )
-
-    // Add both elements to the sizer
-    deckCodeSizer.add(containerShare).add(inputContainer)
-
-    return deckCodeSizer
-  }
-
-  private createFooter(
-    createCallback: (
-      name: string,
-      cosmeticSet: CosmeticSet,
-      deckCode: number[],
-    ) => void,
-  ) {
-    let sizer = this.scene.rexUI.add.sizer({
-      width: width - Space.pad * 2,
+      sizer.add(container)
     })
 
-    sizer
-      .add(this.createCancelButton())
-      .addSpace()
-      .add(this.createDeckCodeCopyAndPaste())
-      .addSpace()
-      .add(this.createConfirm(createCallback))
-
-    return sizer
-  }
-
-  private createConfirm(
-    createCallback: (
-      name: string,
-      cosmeticSet: CosmeticSet,
-      deckCode: number[],
-    ) => void,
-  ) {
-    let container = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
+    // Divider
+    sizer.add(
+      this.scene.add.rectangle(0, 0, Space.buttonWidth, 3, Color.backgroundDark),
     )
 
+    // Confirm button
+    const confirmContainer = new ContainerLite(
+      this.scene, 0, 0, Space.buttonWidth, Space.buttonHeight,
+    )
     this.btnConfirm = new Buttons.Basic({
-      within: container,
-      text: this.confirmString,
+      within: confirmContainer,
+      text: confirmString,
       f: () => {
         const cosmeticSet: CosmeticSet = {
           avatar: this.selectedAvatar,
           border: this.selectedBorder,
           cardback: this.selectedCardback,
         }
-        createCallback(this.name, cosmeticSet, this.deckCode)
-
-        // Close this scene
+        callback(this.name, cosmeticSet, this.deckCode)
         this.scene.scene.stop()
       },
       returnHotkey: true,
     })
+    sizer.add(confirmContainer)
 
-    return container
+    this.sizer.add(sizer)
+  }
+
+  private createRightColumn() {
+    this.gridContainer = this.scene.rexUI.add.sizer({
+      width: Space.avatarSize * 3 + Space.pad * 4,
+      height: 600,
+    })
+
+    this.updateGridContent()
+    this.sizer.add(this.gridContainer)
+  }
+
+  private updateGridContent() {
+    if (this.gridSizer) {
+      this.gridContainer.remove(this.gridSizer, true)
+      this.gridSizer = null
+    }
+
+    let rows = 2
+    if (this.currentTab === 'Icon') {
+      rows = Math.max(2, Math.ceil(getUnlockedAvatars().length / 3))
+    } else if (this.currentTab === 'Border') {
+      rows = Math.max(2, Math.ceil(getUnlockedBorders().length / 3))
+    } else {
+      rows = Math.max(2, Math.ceil(getUnlockedCardbacks().length / 3))
+    }
+
+    this.gridSizer = this.scene.rexUI.add.gridSizer({
+      column: 3,
+      row: rows,
+      width: Space.avatarSize * 3 + Space.pad * 4,
+      height: 600,
+      space: {
+        column: Space.pad,
+        row: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+        left: Space.pad,
+        right: Space.pad,
+      },
+    })
+
+    this.gridContainer.add(this.gridSizer)
+    this.gridContainer.layout()
+
+    if (this.currentTab === 'Icon') {
+      this.createIconGrid()
+    } else if (this.currentTab === 'Border') {
+      this.createBorderGrid()
+    } else {
+      this.createCardbackGrid()
+    }
+
+    this.gridSizer.layout()
+  }
+
+  private createIconGrid() {
+    getUnlockedAvatars().forEach((avatarId, index) => {
+      const container = new ContainerLite(
+        this.scene, 0, 0, Space.avatarSize, Space.avatarSize,
+      )
+      new Buttons.Avatar({
+        within: container,
+        avatarId,
+        border: this.selectedBorder,
+        f: () => {
+          this.selectedAvatar = avatarId
+          this.deckThumbnail.updateDisplay({
+            cosmeticSet: {
+              avatar: this.selectedAvatar,
+              border: this.selectedBorder,
+              cardback: this.selectedCardback,
+            },
+          })
+        },
+      })
+      this.gridSizer.add(container, index % 3, Math.floor(index / 3))
+    })
+  }
+
+  private createBorderGrid() {
+    getUnlockedBorders().forEach((borderId, index) => {
+      const container = new ContainerLite(
+        this.scene, 0, 0, Space.avatarSize, Space.avatarSize,
+      )
+      new Buttons.Avatar({
+        within: container,
+        avatarId: this.selectedAvatar,
+        border: borderId,
+        f: () => {
+          this.selectedBorder = borderId
+          this.deckThumbnail.updateDisplay({
+            cosmeticSet: {
+              avatar: this.selectedAvatar,
+              border: this.selectedBorder,
+              cardback: this.selectedCardback,
+            },
+          })
+        },
+      })
+      this.gridSizer.add(container, index % 3, Math.floor(index / 3))
+    })
+  }
+
+  private createCardbackGrid() {
+    const cbWidth = Space.cardWidth * 0.85
+    const cbHeight = Space.cardHeight * 0.85
+
+    getUnlockedCardbacks().forEach((cardbackId, index) => {
+      const container = new ContainerLite(this.scene, 0, 0, cbWidth, cbHeight)
+
+      const image = this.scene.add
+        .image(0, 0, `cardback-${cardbackNames[cardbackId]}`)
+        .setDisplaySize(cbWidth, cbHeight)
+        .setInteractive()
+        .on('pointerdown', () => {
+          this.scene.sound.play('click')
+          this.selectedCardback = cardbackId
+          this.deckThumbnail.updateDisplay({
+            cosmeticSet: {
+              avatar: this.selectedAvatar,
+              border: this.selectedBorder,
+              cardback: this.selectedCardback,
+            },
+          })
+          this.updateGridContent()
+        })
+      container.add(image)
+
+      if (this.selectedCardback === cardbackId) {
+        container.add(
+          this.scene.add
+            .rectangle(0, 0, cbWidth, cbHeight)
+            .setFillStyle(0x000000, 0)
+            .setStrokeStyle(5, Color.outline),
+        )
+      }
+
+      this.gridSizer.add(container, index % 2, Math.floor(index / 2))
+    })
   }
 }
 
 export class NewDeckMenu extends AlterDeckMenu {
   constructor(scene: MenuScene, params) {
-    super(scene, params, 'New Deck', 'Create')
+    super(scene, params, 'Cosmetics', 'Create')
   }
 }
 
 export class EditDeckMenu extends AlterDeckMenu {
   constructor(scene: MenuScene, params) {
-    super(scene, params, 'Deck Cosmetics', 'Update')
+    super(scene, params, 'Cosmetics', 'Update')
   }
 }

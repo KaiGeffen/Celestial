@@ -15,6 +15,7 @@ import newScrollablePanel from '../../lib/scrollablePanel'
 import Card from '../../../../shared/state/card'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
 import { MechanicsSettings } from '../../../../shared/settings'
+import { encodeShareableDeckCode } from '../../../../shared/codec'
 
 /** Props for the deck editor right column — initial list + thumbnails + actions by callback. */
 export type DeckEditorDeckOptions = {
@@ -24,7 +25,6 @@ export type DeckEditorDeckOptions = {
   requiredCards?: Card[]
   mustOwnCardsInList: boolean
   createCutoutInteraction: () => (cutout: Cutout) => () => void
-  onDeckNameClick: () => void
   onSave: () => void
   onCosmetics: () => void
   onPlay: () => void
@@ -123,7 +123,12 @@ export class RightCol {
       space: { top: 9, item: Space.padSmall },
     })
     leftCol.add(smallBtn('Save', () => this.opts.onSave()))
-    leftCol.add(smallBtn('Cosmetics', () => this.opts.onCosmetics(), true))
+    leftCol.add(smallBtn('Copy', () => {
+      navigator.clipboard.writeText(
+        encodeShareableDeckCode(this.decklist.getDeckCode()),
+      )
+      this.scene.showMessage('Deck code copied to clipboard.')
+    }))
 
     // Play button
     const rightCol = new ContainerLite(
@@ -176,7 +181,7 @@ export class DeckEditorDeck extends RightCol {
     // Create the thumbnail
     this.deckThumbnail = new DeckThumbnail({
       scene: this.scene,
-      onClick: () => this.opts.onDeckNameClick(),
+      onClick: () => this.opts.onCosmetics(),
       muteClick: true,
     })
 

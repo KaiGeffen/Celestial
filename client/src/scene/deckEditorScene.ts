@@ -141,7 +141,6 @@ export default class DeckEditorScene extends BaseScene {
       deckCards: Catalog.getCardListByIds(deck.cards),
       mustOwnCardsInList: !Flags.devCardsEnabled,
       createCutoutInteraction: () => this.onClickCutout(),
-      onDeckNameClick: () => this.openDeckNameMenu(),
       onSave: () => {
         this.saveCurrentDeck()
         this.scene.start(this.editorReturnScene())
