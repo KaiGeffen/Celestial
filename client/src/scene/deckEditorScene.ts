@@ -234,18 +234,6 @@ export default class DeckEditorScene extends BaseScene {
     this.syncDeckThumbnail()
   }
 
-  private openDeckNameMenu(): void {
-    this.scene.launch('MenuScene', {
-      menu: 'editDeckName',
-      deckName: this.deckName,
-      callback: (name: string) => {
-        this.deckName = name
-        this.syncDeckThumbnail()
-      },
-      activeScene: this,
-    })
-  }
-
   private openStylesMenu(): void {
     // Get the deck
     this.ensureDeckAtIndex()

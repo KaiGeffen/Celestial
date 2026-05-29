@@ -2,7 +2,7 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
-import { Color, Space } from '../../settings/settings'
+import { Color, Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
@@ -31,6 +31,7 @@ class AlterDeckCosmeticsMenu extends Menu {
   private deckThumbnail: DeckThumbnail
   private gridSizer: GridSizer
   private gridContainer: any
+  private nameInput: any
 
   constructor(
     scene: MenuScene,
@@ -53,10 +54,15 @@ class AlterDeckCosmeticsMenu extends Menu {
 
     this.createContent(params.callback, titleString, confirmString)
     this.layout()
+    this.createNameInput()
   }
 
   private createContent(
-    callback: (name: string, cosmeticSet: CosmeticSet, deckCode: number[]) => void,
+    callback: (
+      name: string,
+      cosmeticSet: CosmeticSet,
+      deckCode: number[],
+    ) => void,
     titleString: string,
     confirmString: string,
   ) {
@@ -66,7 +72,11 @@ class AlterDeckCosmeticsMenu extends Menu {
   }
 
   private createLeftColumn(
-    callback: (name: string, cosmeticSet: CosmeticSet, deckCode: number[]) => void,
+    callback: (
+      name: string,
+      cosmeticSet: CosmeticSet,
+      deckCode: number[],
+    ) => void,
     confirmString: string,
   ) {
     const sizer = this.scene.rexUI.add.sizer({
@@ -81,15 +91,23 @@ class AlterDeckCosmeticsMenu extends Menu {
     })
 
     sizer.addBackground(
-      this.scene.rexUI.add.roundRectangle(0, 0, 1, 1, 10, Color.backgroundLight, 0.4),
+      this.scene.rexUI.add.roundRectangle(
+        0,
+        0,
+        1,
+        1,
+        10,
+        Color.backgroundLight,
+        0.4,
+      ),
     )
 
-    // Live deck preview
+    // Deck preview — name is shown in the input above, not on the thumbnail itself
     this.deckThumbnail = new DeckThumbnail({
       scene: this.scene as any,
       onClick: () => {},
       muteClick: true,
-      name: this.name,
+      name: '',
       cosmeticSet: {
         avatar: this.selectedAvatar,
         border: this.selectedBorder,
@@ -102,13 +120,23 @@ class AlterDeckCosmeticsMenu extends Menu {
 
     // Divider
     sizer.add(
-      this.scene.add.rectangle(0, 0, Space.buttonWidth, 3, Color.backgroundDark),
+      this.scene.add.rectangle(
+        0,
+        0,
+        Space.buttonWidth,
+        3,
+        Color.backgroundDark,
+      ),
     )
 
     // Tab buttons
     ;['Icon', 'Border', 'Cardback'].forEach((tab) => {
       const container = new ContainerLite(
-        this.scene, 0, 0, Space.buttonWidth, Space.buttonHeight,
+        this.scene,
+        0,
+        0,
+        Space.buttonWidth,
+        Space.buttonHeight,
       )
       new Buttons.Basic({
         within: container,
@@ -123,12 +151,22 @@ class AlterDeckCosmeticsMenu extends Menu {
 
     // Divider
     sizer.add(
-      this.scene.add.rectangle(0, 0, Space.buttonWidth, 3, Color.backgroundDark),
+      this.scene.add.rectangle(
+        0,
+        0,
+        Space.buttonWidth,
+        3,
+        Color.backgroundDark,
+      ),
     )
 
     // Confirm button
     const confirmContainer = new ContainerLite(
-      this.scene, 0, 0, Space.buttonWidth, Space.buttonHeight,
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
     )
     this.btnConfirm = new Buttons.Basic({
       within: confirmContainer,
@@ -206,7 +244,11 @@ class AlterDeckCosmeticsMenu extends Menu {
   private createIconGrid() {
     getUnlockedAvatars().forEach((avatarId, index) => {
       const container = new ContainerLite(
-        this.scene, 0, 0, Space.avatarSize, Space.avatarSize,
+        this.scene,
+        0,
+        0,
+        Space.avatarSize,
+        Space.avatarSize,
       )
       new Buttons.Avatar({
         within: container,
@@ -230,7 +272,11 @@ class AlterDeckCosmeticsMenu extends Menu {
   private createBorderGrid() {
     getUnlockedBorders().forEach((borderId, index) => {
       const container = new ContainerLite(
-        this.scene, 0, 0, Space.avatarSize, Space.avatarSize,
+        this.scene,
+        0,
+        0,
+        Space.avatarSize,
+        Space.avatarSize,
       )
       new Buttons.Avatar({
         within: container,
@@ -248,6 +294,36 @@ class AlterDeckCosmeticsMenu extends Menu {
         },
       })
       this.gridSizer.add(container, index % 3, Math.floor(index / 3))
+    })
+  }
+
+  private createNameInput() {
+    this.nameInput = this.scene.add.rexInputText(
+      0,
+      0,
+      Space.buttonWidth,
+      Space.textboxHeight,
+      {
+        type: 'text',
+        text: this.name,
+        align: 'center',
+        placeholder: 'Deck name',
+        ...Style.inputText,
+        maxLength: 40,
+        id: 'alter-deck-name',
+      },
+    )
+
+    this.nameInput.on('textchange', () => {
+      const raw = String(this.nameInput.text ?? '').trim()
+      if (raw.length > 0) {
+        this.name = raw
+      }
+    })
+
+    this.scene.plugins.get('rexAnchor')['add'](this.nameInput, {
+      x: '50%-235',
+      y: '50%-75',
     })
   }
 

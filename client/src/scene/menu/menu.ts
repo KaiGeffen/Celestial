@@ -162,7 +162,6 @@ import OptionsMenu from './options'
 import CreditsMenu from './credits'
 import RulebookMenu from './rulebook'
 import { NewDeckMenu, EditDeckMenu } from './alterDeckCosmetics'
-import EditDeckNameMenu from './editDeckName'
 import ConfirmMenu from './confirm'
 import MessageMenu from './message'
 import ChapterMessageMenu from './chapterMessage'
@@ -193,8 +192,6 @@ const menus = {
   // TODO Rename to be about cosmetics if that's what it is
   editDeck: EditDeckMenu,
 
-  // TODO Higher min height
-  editDeckName: EditDeckNameMenu,
   confirm: ConfirmMenu,
   message: MessageMenu,
 
