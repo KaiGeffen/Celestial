@@ -162,6 +162,7 @@ import OptionsMenu from './options'
 import CreditsMenu from './credits'
 import RulebookMenu from './rulebook'
 import AlterDeckCosmeticsMenu from './alterDeckCosmetics'
+import ShareDeckCodeMenu from './shareDeckCode'
 import ConfirmMenu from './confirm'
 import MessageMenu from './message'
 import ChapterMessageMenu from './chapterMessage'
@@ -186,8 +187,8 @@ const menus = {
   rulebook: RulebookMenu,
   play: PlayMenu,
 
-  // TODO Move the copy/paste deck code somewhere.
   alterDeckCosmetics: AlterDeckCosmeticsMenu,
+  shareDeckCode: ShareDeckCodeMenu,
 
   confirm: ConfirmMenu,
   message: MessageMenu,

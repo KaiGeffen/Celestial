@@ -27,6 +27,7 @@ export type DeckEditorDeckOptions = {
   createCutoutInteraction: () => (cutout: Cutout) => () => void
   onSave: () => void
   onCosmetics: () => void
+  onShare: () => void
   onPlay: () => void
 }
 
@@ -123,12 +124,7 @@ export class RightCol {
       space: { top: 9, item: Space.padSmall },
     })
     leftCol.add(smallBtn('Save', () => this.opts.onSave()))
-    leftCol.add(smallBtn('Copy', () => {
-      navigator.clipboard.writeText(
-        encodeShareableDeckCode(this.decklist.getDeckCode()),
-      )
-      this.scene.showMessage('Deck code copied to clipboard.')
-    }))
+    leftCol.add(smallBtn('Share', () => this.opts.onShare(), true))
 
     // Play button
     const rightCol = new ContainerLite(

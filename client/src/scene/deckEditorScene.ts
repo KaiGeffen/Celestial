@@ -11,6 +11,7 @@ import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import { MechanicsSettings } from '../../../shared/settings'
 
 import Server from '../server'
+import { encodeShareableDeckCode } from '../../../shared/codec'
 import { DeckEditorCatalog } from './deckEditor/deckEditorCatalog'
 import {
   DeckEditorDeck,
@@ -89,6 +90,7 @@ export default class DeckEditorScene extends BaseScene {
     // Create the elements of the scene
     this.createElements(editingDeck)
     this.sizer.layout()
+
   }
 
   /** Override in subclasses (e.g. journey) to seed the list from mission data. */
@@ -146,6 +148,16 @@ export default class DeckEditorScene extends BaseScene {
         this.scene.start(this.editorReturnScene())
       },
       onCosmetics: () => this.openStylesMenu(),
+      onShare: () => {
+        this.scene.launch('MenuScene', {
+          menu: 'shareDeckCode',
+          deckCode: encodeShareableDeckCode(this.getDeckCode()),
+          callback: (decoded: number[]) => {
+            this.setDeck(Catalog.getCardListByIds(decoded))
+          },
+          activeScene: this,
+        })
+      },
       onPlay: () => this.handlePlayClick(),
     })
 
