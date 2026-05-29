@@ -161,7 +161,7 @@ export default class Menu {
 import OptionsMenu from './options'
 import CreditsMenu from './credits'
 import RulebookMenu from './rulebook'
-import { NewDeckMenu, EditDeckMenu } from './alterDeck'
+import { NewDeckMenu, EditDeckMenu } from './alterDeckCosmetics'
 import EditDeckNameMenu from './editDeckName'
 import ConfirmMenu from './confirm'
 import MessageMenu from './message'

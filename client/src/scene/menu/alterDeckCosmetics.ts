@@ -18,7 +18,7 @@ import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
 
 const width = 760
 
-class AlterDeckMenu extends Menu {
+class AlterDeckCosmeticsMenu extends Menu {
   name: string
   selectedAvatar: number
   selectedBorder: number
@@ -290,13 +290,13 @@ class AlterDeckMenu extends Menu {
   }
 }
 
-export class NewDeckMenu extends AlterDeckMenu {
+export class NewDeckMenu extends AlterDeckCosmeticsMenu {
   constructor(scene: MenuScene, params) {
     super(scene, params, 'Cosmetics', 'Create')
   }
 }
 
-export class EditDeckMenu extends AlterDeckMenu {
+export class EditDeckMenu extends AlterDeckCosmeticsMenu {
   constructor(scene: MenuScene, params) {
     super(scene, params, 'Cosmetics', 'Update')
   }
