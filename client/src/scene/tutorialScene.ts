@@ -92,10 +92,6 @@ export default class TutorialMatchScene extends MatchScene {
     }
   }
 
-  preload(): void {
-    Loader.loadTutorialCutscenes(this)
-  }
-
   create(): void {
     super.create()
 

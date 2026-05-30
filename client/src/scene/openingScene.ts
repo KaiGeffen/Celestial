@@ -89,6 +89,14 @@ export default class OpeningScene extends BaseScene {
   create(): void {
     super.create()
 
+    // Reset all state — Phaser recycles the scene object; the constructor does not re-run.
+    this.slideIndex = 0
+    this.textIndex = 0
+    this.typewriterEvent = null
+    this.slideTween = null
+    this.fullText = ''
+    this.charIndex = 0
+
     this.createBackground()
     this.createSlideImage()
     this.createChrome()
