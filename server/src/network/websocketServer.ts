@@ -261,6 +261,11 @@ export default function createWebSocketServer() {
             }
             await db.insert(players).values(data)
 
+            // Log about it
+            console.log(
+              `New account registered: ${username} ${ref ? `, ref: ${ref}` : ''}`,
+            )
+
             // Add to active users
             activePlayers[id] = ws
             connectionTime = Date.now()

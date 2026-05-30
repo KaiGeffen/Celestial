@@ -562,7 +562,7 @@ export default class HomeScene extends BaseScene {
 const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   {
     subheader: 'Steam',
-    body: `Our [area=_link_steam][stroke=${Color.goldS}]Steam page[/stroke][/area] is up! We'd love if you could wishlist, and look forward to the demo release at [area=_link_nextfest][stroke=${Color.goldS}]Steam NextFest[/stroke][/area] in October.`,
+    body: `Our [area=_link_steam][stroke=${Color.goldS}]Steam page[/stroke][/area] is up! We'd love if you could wishlist, and look forward to the demo release at [area=_link_nextfest][stroke=${Color.goldS}]Steam Next Fest[/stroke][/area] in October.`,
   },
   {
     subheader: 'Currencies & Cosmetics',
