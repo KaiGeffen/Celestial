@@ -98,7 +98,11 @@ export default class OpeningScene extends BaseScene {
   }
 
   private createBackground(): void {
-    const background = this.add.image(0, 0, 'background-Light').setOrigin(0)
+    const background = this.add
+      .image(0, 0, 'background-Light')
+      .setOrigin(0)
+      .setInteractive()
+      .on('pointerdown', () => this.onAdvance())
     this.plugins.get('rexAnchor')['add'](background, {
       width: '100%',
       height: '100%',
@@ -186,8 +190,6 @@ export default class OpeningScene extends BaseScene {
       .image(0, 0, chromeKey)
       .setOrigin(0.5, 1)
       .setAngle(180)
-      .setInteractive()
-      .on('pointerdown', () => this.onAdvance())
     this.plugins.get('rexAnchor')['add'](bottomChrome, {
       x: '50%',
       y: `100%-${BOTTOM_CHROME_HEIGHT}`,

@@ -273,7 +273,6 @@ export class PreloadScene extends SigninScene {
 
     // Load the assets used in this scene
     Loader.preload(this)
-
   }
 
   create() {
