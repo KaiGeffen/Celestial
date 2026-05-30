@@ -652,13 +652,13 @@ export default class JourneyScene extends BaseScene {
 
     // 1) Mission name + card emojis
     let nameBBCode = this.getMissionDisplayName(mission)
-    if ('deck' in mission && mission.cards?.length) {
-      for (const cardId of mission.cards) {
-        if (Catalog.getCardById(cardId)) {
-          nameBBCode += ` [area=card_${cardId}]🎴[/area]`
-        }
-      }
-    }
+    // if ('deck' in mission && mission.cards?.length) {
+    //   for (const cardId of mission.cards) {
+    //     if (Catalog.getCardById(cardId)) {
+    //       nameBBCode += ` [area=card_${cardId}][img=card][/area]`
+    //     }
+    //   }
+    // }
     const nameText = this.rexUI.add
       .BBCodeText(0, 0, nameBBCode, BBStyle.missionName)
       .setInteractive()

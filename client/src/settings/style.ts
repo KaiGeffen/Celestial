@@ -448,8 +448,12 @@ export const BBStyle: Record<string, any> = {
   },
   missionName: {
     fontFamily: secondaryFont,
-    fontSize: '20px',
+    fontSize: '24px',
     color: Color.basicText,
+    fixedHeight: 40,
+    images: {
+      card: { key: 'icon-cardIcon', height: 40 },
+    },
   },
   cardCost: {
     fontFamily: altFont,

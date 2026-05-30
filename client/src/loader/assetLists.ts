@@ -388,6 +388,8 @@ export const assetLists = {
       "TrackVertical",
       "Underline",
       "XOut",
+      "cardIcon",
+      "cardIcon",
       "coin",
       "gem",
       "scroll",
