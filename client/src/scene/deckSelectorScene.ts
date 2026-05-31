@@ -17,6 +17,9 @@ import Catalog from '../../../shared/state/catalog'
 
 const ROSTER_WIDTH = Space.cutoutWidth + 20
 
+/** Minimum pointer travel (px) before a press becomes a drag. */
+const DRAG_THRESHOLD_PX = 15
+
 export default class DeckSelectorScene extends BaseScene {
   savedDeckIndex: number | undefined
 
@@ -27,6 +30,17 @@ export default class DeckSelectorScene extends BaseScene {
   private background: Phaser.GameObjects.Image | null
   /** Root layout; `windowResizeManager` calls `onWindowResize` so this relayouts after `Space` updates. */
   private mainSizer: any = null
+
+  // Drag-to-reorder state
+  private dragState: {
+    thumb: DeckThumbnail
+    deckIndex: number
+    startPointerX: number
+    startPointerY: number
+    isDragging: boolean
+  } | null = null
+  private dropTargetIndex: number | null = null
+  private dropHighlight: Phaser.GameObjects.Rectangle | null = null
 
   constructor() {
     super({
@@ -43,6 +57,11 @@ export default class DeckSelectorScene extends BaseScene {
 
     // TODO This ai code has issues, more thoroughly fix
     this.savedDeckIndex = undefined
+
+    // Reset drag state (scene object is recycled; constructor doesn't re-run)
+    this.dragState = null
+    this.dropTargetIndex = null
+    this.dropHighlight = null
 
     this.createBackground()
     this.createChrome()
@@ -66,9 +85,6 @@ export default class DeckSelectorScene extends BaseScene {
       })
       .addSpace(1)
     this.rosterPanel = newScrollablePanel(this, {
-      space: {
-        top: Space.padSmall,
-      },
       width: ROSTER_WIDTH,
       height: bodyScrollHeight,
       panel: { child: rosterDeckSizer },
@@ -316,6 +332,15 @@ export default class DeckSelectorScene extends BaseScene {
         isValid,
         cardCount: deck.cards?.length || 0,
         onClick: () => this.onDeckClick(i),
+        onPointerDown: (pointer) => {
+          this.dragState = {
+            thumb,
+            deckIndex: i,
+            startPointerX: pointer.x,
+            startPointerY: pointer.y,
+            isDragging: false,
+          }
+        },
       })
 
       this.deckThumbnails.push(thumb)
@@ -323,7 +348,154 @@ export default class DeckSelectorScene extends BaseScene {
     for (let i = this.deckThumbnails.length - 1; i >= 0; i--) {
       panel.add(this.deckThumbnails[i].container)
     }
+
+    this.cleanupDrag()
+    this.setupDrag()
   }
+
+  // ── Drag-to-reorder ─────────────────────────────────────────────────────────
+
+  /** Remove scene-level pointer listeners and reset any in-progress drag. */
+  private cleanupDrag(): void {
+    this.input.off('pointermove', this.onDragPointerMove, this)
+    this.input.off('pointerup', this.onDragPointerUp, this)
+    if (this.dragState?.isDragging) {
+      this.dragState.thumb.container.setDepth(0)
+    }
+    this.dragState = null
+    this.dropTargetIndex = null
+    if (this.dropHighlight) {
+      this.dropHighlight.setVisible(false)
+    }
+  }
+
+  /** Register scene-level pointer listeners for drag tracking. */
+  private setupDrag(): void {
+    // Lazy-create the drop insertion line (thin vertical bar to the left of the target)
+    if (!this.dropHighlight) {
+      this.dropHighlight = this.add
+        .rectangle(0, 0, 4, 220, Color.gold, 1)
+        .setVisible(false)
+        .setDepth(8)
+    }
+
+    this.input.on('pointermove', this.onDragPointerMove, this)
+    this.input.on('pointerup', this.onDragPointerUp, this)
+  }
+
+  private onDragPointerMove(pointer: Phaser.Input.Pointer): void {
+    if (!this.dragState || !pointer.isDown) return
+
+    const dx = pointer.x - this.dragState.startPointerX
+    const dy = pointer.y - this.dragState.startPointerY
+
+    if (!this.dragState.isDragging) {
+      if (Math.sqrt(dx * dx + dy * dy) < DRAG_THRESHOLD_PX) return
+      // Crossed threshold — enter drag mode
+      this.dragState.isDragging = true
+      this.dragState.thumb.container.setDepth(10)
+    }
+
+    // Move the thumbnail with the pointer
+    this.dragState.thumb.container.setPosition(pointer.x, pointer.y)
+
+    // Update drop-target highlight
+    const newTarget = this.getDeckIndexAtPoint(pointer.x, pointer.y)
+    if (newTarget !== this.dropTargetIndex) {
+      this.dropTargetIndex = newTarget
+      if (newTarget !== null && this.dropHighlight) {
+        const c = this.deckThumbnails[newTarget].container
+        // Thumbnails render in reverse data order, so a higher toIndex is visually
+        // left/above the source — put the line on whichever side the item is moving towards.
+        const onLeft = newTarget > this.dragState.deckIndex
+        const lineX = onLeft
+          ? c.x - c.width / 2 - Space.pad
+          : c.x + c.width / 2 + Space.pad
+        this.dropHighlight.setPosition(lineX, c.y).setVisible(true)
+      } else if (this.dropHighlight) {
+        this.dropHighlight.setVisible(false)
+      }
+    }
+  }
+
+  private onDragPointerUp(_pointer: Phaser.Input.Pointer): void {
+    if (!this.dragState) return
+
+    const wasDragging = this.dragState.isDragging
+    const fromIndex = this.dragState.deckIndex
+    const toIndex = this.dropTargetIndex
+
+    // Clear highlight & drag state before any refresh
+    if (this.dropHighlight) this.dropHighlight.setVisible(false)
+    this.dragState = null
+    this.dropTargetIndex = null
+
+    if (!wasDragging) return
+
+    const panel = this.centerPanel.getElement('panel') as FixWidthSizer
+    if (toIndex !== null && toIndex !== fromIndex) {
+      this.reorderDecks(fromIndex, toIndex)
+    } else {
+      // Dropped in place or outside any thumbnail — restore positions
+      this.refreshDeckList(panel)
+      this.centerPanel.layout()
+    }
+  }
+
+  /**
+   * Return the `deckThumbnails` index whose container bounds contain (x, y),
+   * excluding the currently-dragged thumbnail.
+   */
+  private getDeckIndexAtPoint(x: number, y: number): number | null {
+    const dragIdx = this.dragState?.deckIndex ?? -1
+    for (let i = 0; i < this.deckThumbnails.length; i++) {
+      if (i === dragIdx) continue
+      const c = this.deckThumbnails[i].container
+      const hw = c.width / 2
+      const hh = c.height / 2
+      if (x >= c.x - hw && x <= c.x + hw && y >= c.y - hh && y <= c.y + hh) {
+        return i
+      }
+    }
+    return null
+  }
+
+  /**
+   * Move deck at `fromIndex` to `toIndex` in UserSettings, update the
+   * equipped-deck pointer, and refresh the panel.
+   *
+   * Both indices are data indices (0 = first deck in the saved array).
+   */
+  private reorderDecks(fromIndex: number, toIndex: number): void {
+    const decks: Deck[] = [...(UserSettings._get('decks') || [])]
+    const [moved] = decks.splice(fromIndex, 1)
+    decks.splice(toIndex, 0, moved)
+    UserSettings._set('decks', decks)
+
+    // Remap the equipped-deck pointer to follow the moved deck
+    const eq: number | undefined = UserSettings._get('equippedDeckIndex')
+    let newEq = eq
+    if (newEq !== undefined) {
+      if (eq === fromIndex) {
+        newEq = toIndex
+      } else if (fromIndex < toIndex) {
+        if (newEq > fromIndex && newEq <= toIndex) newEq--
+      } else {
+        if (newEq >= toIndex && newEq < fromIndex) newEq++
+      }
+      UserSettings._set('equippedDeckIndex', newEq)
+    }
+
+    const panel = this.centerPanel.getElement('panel') as FixWidthSizer
+    this.refreshDeckList(panel)
+    this.centerPanel.layout()
+
+    if (newEq !== undefined && newEq < decks.length) {
+      this.selectDeck(newEq)
+    }
+  }
+
+  // ────────────────────────────────────────────────────────────────────────────
 
   private onNewDeckClick(): void {
     UserSettings._push('decks', {

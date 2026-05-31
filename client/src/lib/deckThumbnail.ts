@@ -29,6 +29,7 @@ export default class DeckThumbnail {
   constructor(opts: {
     scene: BaseScene
     onClick: () => void
+    onPointerDown?: (pointer: Phaser.Input.Pointer) => void
     muteClick?: boolean
     noHover?: boolean
     name?: string
@@ -125,11 +126,12 @@ export default class DeckThumbnail {
       )
       .setOrigin(0.5, 1)
       .setInteractive()
-      .on('pointerdown', () => {
+      .on('pointerdown', (pointer: Phaser.Input.Pointer) => {
         if (!muteClick) {
           scene.sound.play('click')
         }
         onClick()
+        opts.onPointerDown?.(pointer)
       })
       .on('pointerover', () => {
         if (noHover) return
