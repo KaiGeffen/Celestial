@@ -128,7 +128,20 @@ export default class ChapterMessageMenu extends MessageMenu {
       muteClick: true,
     })
 
-    buttonsSizer.addSpace().add(claimContainer).addSpace()
+    const leftCorner = this.scene.add
+      .image(0, 0, 'chrome-corner')
+      .setAngle(180)
+      .setScale(0.6)
+    const rightCorner = this.scene.add
+      .image(0, 0, 'chrome-corner')
+      .setAngle(90)
+      .setScale(0.6)
+    buttonsSizer
+      .addSpace()
+      .add(leftCorner)
+      .add(claimContainer)
+      .add(rightCorner)
+      .addSpace()
 
     const padding = {
       padding: {

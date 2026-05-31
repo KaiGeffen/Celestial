@@ -228,7 +228,7 @@ export default class JourneyScene extends BaseScene {
 
     const strokeBg = this.add
       .rectangle(0, 0, 1, 1)
-      .setStrokeStyle(3, Color.brown)
+      .setStrokeStyle(3, Color.backgroundStroke)
     this.overlayPanel.addBackground(strokeBg)
 
     this.createMissionTipBox()
@@ -258,7 +258,7 @@ export default class JourneyScene extends BaseScene {
         0,
       )
       .setOrigin(1, 0)
-      .setStrokeStyle(3, Color.brown)
+      .setStrokeStyle(3, Color.backgroundStroke)
       .setScrollFactor(0)
     // .setVisible(false)
   }

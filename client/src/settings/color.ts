@@ -71,6 +71,8 @@ export const Color: Record<string, any> = {
   backgroundDark: CoreColors.backgroundDark,
   backgroundLight: CoreColors.backgroundLight,
   backgroundLightS: CoreColors.backgroundLightS,
+  backgroundStroke: CoreColors.darkUmber,
+
   // Error messages
   error: CoreColors.whiteS,
   errorBackground: CoreColors.blackS,
