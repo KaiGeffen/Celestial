@@ -33,7 +33,7 @@ import JOURNEY_CHOICES, {
 import Server from '../server'
 import Button from '../lib/buttons/button'
 
-const OVERLAY_WIDTH = 575
+const OVERLAY_WIDTH = 680
 const OVERLAY_HEIGHT = 606
 const OVERLAY_TOP = 80
 
@@ -77,6 +77,7 @@ export default class JourneyScene extends BaseScene {
 
   // The character art
   private overlayCharacterImage: Phaser.GameObjects.Image
+  private overlayCharacterStroke: Phaser.GameObjects.Rectangle
 
   /** Center point the camera drifts around (theme position) */
   private driftCenterX = 0
@@ -225,6 +226,11 @@ export default class JourneyScene extends BaseScene {
     })
     this.overlayPanel.setScrollFactor(0)
 
+    const strokeBg = this.add
+      .rectangle(0, 0, 1, 1)
+      .setStrokeStyle(3, Color.brown)
+    this.overlayPanel.addBackground(strokeBg)
+
     this.createMissionTipBox()
 
     this.refreshOverlayContent(false) // already at theme position; no tween on open
@@ -241,7 +247,20 @@ export default class JourneyScene extends BaseScene {
         OVERLAY_HEIGHT /
           this.textures.get('avatar-JulesFull').getSourceImage().height,
       )
-    // this.addShadow(this.overlayCharacterImage)
+
+    this.overlayCharacterStroke = this.add
+      .rectangle(
+        x,
+        OVERLAY_TOP,
+        this.overlayCharacterImage.displayWidth,
+        OVERLAY_HEIGHT,
+        0x000000,
+        0,
+      )
+      .setOrigin(1, 0)
+      .setStrokeStyle(3, Color.brown)
+      .setScrollFactor(0)
+    // .setVisible(false)
   }
 
   private createMissionTipBox(): void {
@@ -481,12 +500,14 @@ export default class JourneyScene extends BaseScene {
 
     if (!hasCharacterArt) {
       this.overlayCharacterImage.setVisible(false)
+      this.overlayCharacterStroke.setVisible(false)
       return
     }
 
     const avatarName = avatarNames[this.selectedThemeIndex]
     this.overlayCharacterImage.setTexture(`avatar-${avatarName}Full`)
     this.overlayCharacterImage.setVisible(this.showOverlayCharacterView)
+    this.overlayCharacterStroke.setVisible(this.showOverlayCharacterView)
   }
 
   private onMissionGoldClaimed(): void {
