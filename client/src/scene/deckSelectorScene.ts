@@ -331,8 +331,13 @@ export default class DeckSelectorScene extends BaseScene {
         cosmeticSet,
         isValid,
         cardCount: deck.cards?.length || 0,
-        onClick: () => this.onDeckClick(i),
-        onPointerDown: (pointer) => {
+        onClick: (pointer) => {
+          if (pointer.button === 2) {
+            this.onDeckClick(i)
+            this.scene.start('DeckEditorScene', { deckIndex: i })
+            return
+          }
+          this.onDeckClick(i)
           this.dragState = {
             thumb,
             deckIndex: i,
