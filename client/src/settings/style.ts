@@ -451,6 +451,7 @@ export const BBStyle: Record<string, any> = {
     fontSize: '24px',
     color: Color.basicText,
     fixedHeight: 40,
+    valign: 'center',
     images: {
       card: { key: 'icon-cardIcon', height: 40 },
     },

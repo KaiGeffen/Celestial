@@ -34,7 +34,7 @@ import Server from '../server'
 import Button from '../lib/buttons/button'
 
 const OVERLAY_WIDTH = 680
-const OVERLAY_HEIGHT = 606
+const OVERLAY_HEIGHT = 620
 const OVERLAY_TOP = 80
 
 // TODO Remove 'message' menus, they are no longer used
@@ -56,8 +56,6 @@ const DRIFT_RADIUS_Y = 80
 const DRIFT_SPEED = 0.0003
 const DRIFT_PHASE = 1.3
 const THEME_CAMERA_TWEEN_DURATION = 400
-
-const TODO_ICON_SIZE = 32
 
 const STARS_THEME_INDEX = THEME_KEYS.indexOf('stars')
 const ALT_MAP_FADE_DURATION = 400
@@ -260,7 +258,6 @@ export default class JourneyScene extends BaseScene {
       .setOrigin(1, 0)
       .setStrokeStyle(3, Color.backgroundStroke)
       .setScrollFactor(0)
-    // .setVisible(false)
   }
 
   private createMissionTipBox(): void {
@@ -386,8 +383,8 @@ export default class JourneyScene extends BaseScene {
       this,
       0,
       0,
-      TODO_ICON_SIZE,
-      TODO_ICON_SIZE,
+      Space.iconSize,
+      Space.iconSize,
     )
     this.btnCharacterDescription = new Buttons.Icon({
       within: btnContainer,
@@ -582,7 +579,13 @@ export default class JourneyScene extends BaseScene {
     const row = this.rexUI.add.sizer({
       orientation: 'horizontal',
       width: rowWidth,
-      space: { left: 4, right: 4, top: 4, bottom: 4, item: Space.padSmall },
+      space: {
+        left: Space.padSmall,
+        right: Space.padSmall,
+        top: Space.padSmall / 2,
+        bottom: Space.padSmall / 2,
+        item: Space.padSmall,
+      },
     })
 
     const isCompleted = completed[mission.id]
@@ -594,8 +597,8 @@ export default class JourneyScene extends BaseScene {
       this,
       0,
       0,
-      TODO_ICON_SIZE,
-      TODO_ICON_SIZE,
+      Space.iconSize,
+      Space.iconSize,
     )
     if (isCompleted) {
       const hasClaimedMissionGold =
@@ -664,7 +667,7 @@ export default class JourneyScene extends BaseScene {
       // Add a notification badge if the mission has not been claimed
       if (!hasClaimedMissionGold) {
         const badge = this.add
-          .circle(TODO_ICON_SIZE / 2 - 5, -TODO_ICON_SIZE / 2 + 5, 5, 0xd64045)
+          .circle(Space.iconSize / 2 - 5, -Space.iconSize / 2 + 5, 5, 0xd64045)
           .setStrokeStyle(1, Color.brown)
         iconCell.add(badge)
       }

@@ -147,7 +147,6 @@ export default class ChapterMessageMenu extends MessageMenu {
       padding: {
         left: Space.pad,
         right: Space.pad,
-        top: Space.pad,
       },
     }
 
