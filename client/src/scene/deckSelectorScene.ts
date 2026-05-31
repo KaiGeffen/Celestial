@@ -444,6 +444,10 @@ export default class DeckSelectorScene extends BaseScene {
       // Dropped in place or outside any thumbnail — restore positions
       this.refreshDeckList(panel)
       this.centerPanel.layout()
+      // refreshDeckList recreates thumbnails with selected=false; re-apply selection
+      if (this.savedDeckIndex !== undefined) {
+        this.deckThumbnails[this.savedDeckIndex]?.setSelected(true)
+      }
     }
   }
 
