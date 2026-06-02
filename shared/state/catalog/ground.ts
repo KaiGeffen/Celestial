@@ -206,6 +206,51 @@ const earthsong = new Earthsong({
   text: 'When you pass while this is in the story, gain 1 breath.',
 })
 
+// TODO Has bugs
+class Temple extends Card {
+  onPlay(player: number, game: GameModel) {
+    for (let i = 0; i < game.story.acts.length; i++) {
+      const act = game.story.acts[i]
+      if (act.owner === player) {
+        game.removeAct(i)
+      }
+    }
+
+    // Keep a count in case of infinite loop
+    const maxCount = 99
+    for (
+      let i = 0, count = 0;
+      i < game.story.acts.length - 1 || count > maxCount;
+      count++
+    ) {
+      const act = game.story.acts[i]
+      if (act.owner === player) {
+        const actReturnedToStory = game.removeAct(i)
+
+        // If act stayed in story, move on to next act. Otherwise, the story has shrunk by 1 anyways
+        if (actReturnedToStory) {
+          i++
+        }
+      } else {
+        // If this is opponent's card, don't discard and move on to next act
+        i++
+      }
+    }
+  }
+
+  getCost(player: number, game: GameModel): number {
+    const amt = game.story.acts.filter((act) => act.owner === player).length
+    return Math.max(0, this.cost - amt)
+  }
+}
+const temple = new Temple({
+  name: 'Temple',
+  id: 9012,
+  cost: 5,
+  points: 5,
+  text: 'Costs 1 less for each of your cards in the story.\nWhen played, discarded your other cards from the story.',
+})
+
 export {
   retain,
   cliff,
@@ -215,4 +260,5 @@ export {
   rollingStone,
   solidarity,
   earthsong,
+  temple,
 }
