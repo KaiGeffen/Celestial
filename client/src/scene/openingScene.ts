@@ -1,6 +1,7 @@
 import 'phaser'
 import BaseScene from './baseScene'
 import Loader from '../loader/loader'
+import Buttons from '../lib/buttons/buttons'
 import { Space, Style } from '../settings/settings'
 import { UserSettings } from '../settings/userSettings'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
@@ -101,8 +102,25 @@ export default class OpeningScene extends BaseScene {
     this.createSlideImage()
     this.createChrome()
     this.createText()
+    this.createSkipButton()
 
     this.showSlide(0)
+  }
+
+  private createSkipButton(): void {
+    new Buttons.Basic({
+      within: this,
+      text: 'Skip',
+      x: Space.pad + Space.buttonWidth / 2,
+      y: Space.padSmall + Space.buttonHeight / 2,
+      f: () => {
+        this.scene.launch('MenuScene', {
+          menu: 'confirm',
+          text: 'Are you sure you want to skip the opening cutscene?',
+          callback: () => this.finish(),
+        })
+      },
+    })
   }
 
   private createBackground(): void {
