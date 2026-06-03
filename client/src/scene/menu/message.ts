@@ -86,39 +86,6 @@ export default class ConfirmMenu extends Menu {
     this.sizer.add(sizer, padding).addNewLine()
   }
 
-  protected createText(s: string, style = Style.basic): void {
-    const width = this.width - Space.pad * 2
-    const maxTextHeight = Space.windowHeight - 300
-
-    // Create scrollable text panel
-    const textPanel = this.scene.rexUI.add.sizer({
-      width: width,
-    })
-
-    const text = this.scene.add.text(0, 0, s, style).setWordWrapWidth(width)
-    textPanel.add(text)
-    const scrollableText = newScrollablePanel(this.scene, {
-      width: width,
-      height: Math.min(text.height, maxTextHeight),
-      panel: {
-        child: textPanel,
-      },
-      scrollMode: 'y',
-      slider: false,
-    })
-    this.textScrollablePanel = scrollableText
-
-    // Add this new sizer to the main sizer
-    const padding = {
-      padding: {
-        left: Space.pad,
-        right: Space.pad,
-      },
-    }
-
-    this.sizer.add(scrollableText, padding).addNewLine()
-  }
-
   private createTextAndDeck(
     deck: number[],
     s: string,

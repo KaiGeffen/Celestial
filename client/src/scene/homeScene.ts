@@ -530,7 +530,7 @@ export default class HomeScene extends BaseScene {
       // Show confirm menu prompting user to join Discord
       this.scene.launch('MenuScene', {
         menu: 'confirm',
-        text: 'Join the Discord server for updates, and to earn a 7,500 coin reward!',
+        text: 'Join the Discord server for updates, and to earn a 7,500[img=coin] reward!',
         hint: 'Join the Discord',
         callback: () => {
           openDiscord()

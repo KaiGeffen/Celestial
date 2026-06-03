@@ -335,9 +335,13 @@ export const BBStyle: Record<string, any> = {
       offset: 7,
     },
     halign: 'center',
-    wrap: {
-      mode: 'word',
-      width: Space.maxTextWidth,
+    // wrap: {
+    //   mode: 'word',
+    //   width: Space.maxTextWidth,
+    // },
+    images: {
+      coin: { key: 'icon-coin', height: 24 },
+      gem: { key: 'icon-gem', height: 24 },
     },
   },
   // The textbox for the card

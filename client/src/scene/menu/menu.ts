@@ -2,7 +2,7 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
-import { Style, BBStyle, Space, Color } from '../../settings/settings'
+import { BBStyle, Space, Color } from '../../settings/settings'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
 
@@ -112,7 +112,9 @@ export default class Menu {
     const bodyBg = this.scene.add.image(0, 0, 'chrome-body').setInteractive()
     this.sizer.addBackground(bodyBg)
 
-    const strokeBg = this.scene.add.rectangle(0, 0, 1, 1).setStrokeStyle(3, Color.backgroundStroke)
+    const strokeBg = this.scene.add
+      .rectangle(0, 0, 1, 1)
+      .setStrokeStyle(3, Color.backgroundStroke)
     this.sizer.addBackground(strokeBg)
 
     // Anchor in center of screen
@@ -139,25 +141,14 @@ export default class Menu {
   }
 
   // Add the given string as text to the sizer
-  protected createText(s: string): any {
+  protected createText(s: string): void {
     const width = this.width - Space.pad * 2
-    let sizer = this.scene.rexUI.add.sizer({ width: width })
 
-    let txt = this.scene.add.text(0, 0, s, Style.basic).setWordWrapWidth(width)
-
-    sizer.addSpace().add(txt).addSpace()
-
-    // Add this new sizer to the main sizer
-    const padding = {
-      padding: {
-        left: Space.pad,
-        right: Space.pad,
-      },
-    }
-
-    this.sizer.add(sizer, padding).addNewLine()
-
-    return sizer
+    const txt = this.scene.add.rexBBCodeText(0, 0, s, {
+      ...BBStyle.basicStylized,
+      wordWrap: { width },
+    })
+    this.sizer.add(txt)
   }
 }
 
