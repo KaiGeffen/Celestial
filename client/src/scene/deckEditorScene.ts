@@ -90,7 +90,6 @@ export default class DeckEditorScene extends BaseScene {
     // Create the elements of the scene
     this.createElements(editingDeck)
     this.sizer.layout()
-
   }
 
   /** Override in subclasses (e.g. journey) to seed the list from mission data. */
@@ -490,10 +489,15 @@ export class DeckEditorJourneyScene extends DeckEditorScene {
       return
     }
 
-    const cosmeticSet = this.cosmeticSet ?? {
-      avatar: 0,
-      border: 0,
-      cardback: 0,
+    // Get the cosmetic set (Get the correct avatar for the mission)
+    const cardback = UserSettings._get('cosmeticSet')?.cardback ?? 0
+    const border = UserSettings._get('cosmeticSet')?.border ?? 0
+    const avatar =
+      this.mission.id < 700 ? Math.floor(this.mission.id / 100) - 1 : 0
+    const cosmeticSet: CosmeticSet = {
+      avatar,
+      border,
+      cardback,
     }
 
     const playerDeck: Deck = {
