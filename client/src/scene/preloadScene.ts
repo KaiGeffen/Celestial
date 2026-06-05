@@ -58,24 +58,33 @@ export class SigninScene extends Phaser.Scene {
 
     // Electron + Steam login path
     if (Flags.isElectronBuild()) {
-      Server.loginSteam(this.game, () => this.onOptionClick()).catch((e) =>
-        console.error('Steam login failed:', e),
-      )
+      Server.loginSteam(this.game, () => this.onOptionClick()).catch((e) => {
+        // If login fails, tell the user
+        const loadingEl = document.getElementById('loading-text')
+        if (loadingEl) loadingEl.textContent = 'Steam login failed'
+
+        console.error('Steam login failed:', e)
+      })
     } else {
       const storedToken = localStorage.getItem(Url.gsi_token)
+
+      // If user has a gsi token, try signing in
       if (storedToken !== null) {
         const payload = jwt_decode<GoogleJwtPayload>(storedToken)
         Server.login(payload, this.game, () => this.onOptionClick())
 
-        // Show the guest button when menu closes
+        // Show the guest button when menu closes (If user is in registering username step of the account registration flow)
         this.events.on('showGuestButton', () => {
           this.guestButton?.setVisible(true)
         })
 
-        // TODO If this fails because the token is invalid or the server is offline, show options or say network offline
+        // TODO If this fails because the token is invalid or the server is offline, show standard options
       } else {
-        // Sign in is visible on this page, hidden on all other pages
+        // Show the GSI button
         document.getElementById('signin').hidden = false
+
+        // Hide the loading text
+        this.removeLoadingText()
       }
     }
 
@@ -220,6 +229,8 @@ export class SigninScene extends Phaser.Scene {
 
   // Navigate to the first scene user sees (Home, tutorial, or reconnect to a match)
   protected startFirstScene(): void {
+    this.removeLoadingText()
+
     // Check if there's a pending reconnect - if so, start the match scene
     const reconnect = Server.pendingReconnect
     if (reconnect) {
@@ -251,6 +262,11 @@ export class SigninScene extends Phaser.Scene {
     }
 
     this.scene.start('HomeScene')
+  }
+
+  private removeLoadingText(): void {
+    const loadingEl = document.getElementById('loading-text')
+    if (loadingEl) loadingEl.style.display = 'none'
   }
 }
 

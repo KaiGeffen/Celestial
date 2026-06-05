@@ -62,6 +62,25 @@
 
   <link rel="stylesheet" href="style.css">
 
+  <style>
+    @font-face {
+      font-family: 'Typey McTypeface';
+      src: url('assets/font/Typey.otf') format('opentype');
+    }
+    #loading-text {
+      position: fixed;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Typey McTypeface', sans-serif;
+      font-size: 48px;
+      color: #321a0f;
+      pointer-events: none;
+      z-index: 1;
+      /* animation: loading-pulse 4s ease-in-out infinite; */
+    }
+  </style>
+
   <!-- Optimize Google Analytics loading -->
   <script>
     // Initialize dataLayer and gtag stub immediately
@@ -96,6 +115,7 @@
 <body>
   <!-- Splash Screen - Shows immediately for fast FCP -->
   <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: url('assets/animation/stillframe.webp'); background-size: cover; background-position: center;"></div>
+  <div id="loading-text">Loading</div>
 
   <!-- Animation -->
   <video class="animation" id="animation" loop autoplay playsinline muted style="display: none;">
