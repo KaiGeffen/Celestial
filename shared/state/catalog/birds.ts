@@ -378,8 +378,8 @@ const skyBurial = new SkyBurial({
   id: 108,
   cost: 2,
   points: 7,
-  qualities: [Quality.VISIBLE],
-  text: 'Visible\nWhen played, create a Vulture before this in the story for your opponent.',
+  qualities: [Quality.VISIBLE, Quality.FLEETING],
+  text: 'Fleeting\nVisible\nWhen played, create a Vulture before this for your opponent.',
 })
 
 class Becoming extends Card {

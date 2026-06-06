@@ -171,7 +171,7 @@ class RollingStone extends Card {
 const rollingStone = new RollingStone({
   name: 'Rolling Stone',
   id: 9009,
-  text: 'When played with Retain, Reveal this to create Fleeting copy in hand.\nExhale 1: Worth +1.',
+  text: 'When played with Retain, Reveal this to create a Fleeting copy in hand.\nExhale 1: Worth +1.',
 })
 
 class Solidarity extends Card {
