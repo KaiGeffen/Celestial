@@ -28,9 +28,9 @@ function isAnimationReady(): boolean {
 
 export default function initializeSplashScreen(): void {
   // Listen for page load event
-  window.addEventListener('load', function () {
+  window.addEventListener('load', () => {
     // Check if animation is visible and ready to play
-    const checkGameReady = setInterval(function () {
+    const checkGameReady = setInterval(() => {
       if (isAnimationReady()) {
         clearInterval(checkGameReady)
         const splash = document.getElementById('splash-screen')
@@ -41,7 +41,7 @@ export default function initializeSplashScreen(): void {
     }, 100)
 
     // Fallback: transition after 5 seconds regardless
-    setTimeout(function () {
+    setTimeout(() => {
       const splash = document.getElementById('splash-screen')
       if (splash) {
         splash.style.display = 'none'

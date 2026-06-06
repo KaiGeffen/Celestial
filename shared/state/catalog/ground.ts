@@ -209,17 +209,11 @@ const earthsong = new Earthsong({
 // TODO Has bugs
 class Temple extends Card {
   onPlay(player: number, game: GameModel) {
-    for (let i = 0; i < game.story.acts.length; i++) {
-      const act = game.story.acts[i]
-      if (act.owner === player) {
-        game.removeAct(i)
-      }
-    }
-
     // Keep a count in case of infinite loop
     const maxCount = 99
     for (
       let i = 0, count = 0;
+      // NOTE -1 because this card is now in the story and shouldn't be considered
       i < game.story.acts.length - 1 || count > maxCount;
       count++
     ) {
@@ -230,6 +224,8 @@ class Temple extends Card {
         // If act stayed in story, move on to next act. Otherwise, the story has shrunk by 1 anyways
         if (actReturnedToStory) {
           i++
+        } else {
+          // Story has shrunk, no need to do anything
         }
       } else {
         // If this is opponent's card, don't discard and move on to next act
