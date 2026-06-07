@@ -391,6 +391,8 @@ export default class DeckEditorScene extends BaseScene {
     this.deckRegion.decklist.setDeck(cards, !Flags.devCardsEnabled)
     // Scroll to the top of the decklist
     this.deckRegion.scrollDecklistToTop()
+    // Sync thumbnail so card count and valid/invalid state reflect the new deck
+    this.syncDeckThumbnail()
   }
 
   // Ensure there is a deck at this index in users account (Fill with default cosmetics if not)
