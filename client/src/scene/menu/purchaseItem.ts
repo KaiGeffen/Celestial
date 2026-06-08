@@ -14,8 +14,8 @@ const CARD_COST = 1000
 const WIDTH = 600
 
 export default class PurchaseItemMenu extends Menu {
-  private card: Card | null
-  private purchaseable: Purchaseable | null
+  private card: Card
+  private purchaseable: Purchaseable
 
   constructor(
     scene: MenuScene,
@@ -27,8 +27,11 @@ export default class PurchaseItemMenu extends Menu {
     super(scene, WIDTH)
 
     // Set properties before creating content
-    this.card = params.card ?? null
-    this.purchaseable = params.purchaseable ?? null
+    this.card = params.card
+    this.purchaseable = params.purchaseable
+    if (this.card === undefined && this.purchaseable === undefined) {
+      throw new Error('Either card or purchaseable must be provided.')
+    }
 
     // Now create content with properties set
     this.createContent()
@@ -40,6 +43,7 @@ export default class PurchaseItemMenu extends Menu {
   }
 
   private handlePurchase(): void {
+    // If it's a cosmetic
     if (this.purchaseable) {
       const gems = Server.getUserData().gems ?? 0
       if (gems < this.cost) {
@@ -47,7 +51,9 @@ export default class PurchaseItemMenu extends Menu {
         return
       }
       Server.purchaseItem(this.purchaseable.id)
-    } else if (this.card) {
+    }
+    // If it's a card
+    else if (this.card) {
       const coins = Server.getUserData().coins ?? 0
       if (coins < this.cost) {
         this.scene.signalError('Not enough coins.')
@@ -56,6 +62,7 @@ export default class PurchaseItemMenu extends Menu {
       Server.purchaseItem(this.card.id)
     }
 
+    // Close the menu if purchase was successful
     this.close()
   }
 

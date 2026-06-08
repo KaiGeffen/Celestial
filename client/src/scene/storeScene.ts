@@ -15,9 +15,10 @@ import allPurchaseables, {
 } from '../../../shared/purchaseables/index'
 import { getCosmeticImageKey } from '../utils/cosmetics'
 import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
+import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
 export default class StoreScene extends BaseSceneWithHeader {
-  private scrollablePanel: any = null
+  private scrollablePanel: ScrollablePanel
   private userStatsDisplay: BBCodeText
   private currentTab: 'cards' | 'cosmetics' = 'cards'
   private btnTab: Button
@@ -116,9 +117,8 @@ export default class StoreScene extends BaseSceneWithHeader {
       this.input.off('wheel')
     }
 
-    // Create a sizer for the cards
+    // Create a sizer for the purchaseable items
     const sizer = this.rexUI.add.fixWidthSizer({
-      width: Space.windowWidth,
       space: {
         item: Space.pad,
         line: Space.pad,
@@ -177,9 +177,8 @@ export default class StoreScene extends BaseSceneWithHeader {
         const messageText = this.add
           .text(0, 0, 'All cards owned', Style.header)
           .setOrigin(0.5)
-        messageSizer.addSpace()
-        messageSizer.add(messageText)
-        messageSizer.addSpace()
+
+        messageSizer.addSpace().add(messageText).addSpace()
         sizer.add(messageSizer)
       } else {
         // Create store items for each card

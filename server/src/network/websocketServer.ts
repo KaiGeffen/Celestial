@@ -450,6 +450,13 @@ export default function createWebSocketServer() {
                   card_inventory: newInventoryBitString,
                 })
                 .where(eq(players.id, id))
+
+              // NOTE This is included just to keep track of purchases, but isn't really needed since the inventory is updated above
+              await tx.insert(cosmeticsTransactions).values({
+                player_id: id,
+                item_id: itemId,
+                transaction_type: 'purchase',
+              })
             })
           }
 
