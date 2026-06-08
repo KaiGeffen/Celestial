@@ -640,6 +640,7 @@ export default class JourneyScene extends BaseScene {
                   menu: 'choiceChapterMessage',
                   title: mission.name,
                   avatarIndex,
+                  cardName,
                   claimGoldMissionId: mission.id,
                 })
               }

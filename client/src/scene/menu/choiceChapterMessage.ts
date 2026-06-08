@@ -25,6 +25,7 @@ export default class ChoiceChapterMessageMenu extends MessageMenu {
   protected createContent(params): void {
     const avatarIndex: number = params.avatarIndex
     const claimGoldMissionId: number | undefined = params.claimGoldMissionId
+    const cardName: string | undefined = params.cardName
     const choiceData = JOURNEY_CHOICES[avatarIndex]
     const contentWidth = this.width - 100
     const sidePad = { padding: { left: 50, right: 50 } }
@@ -116,6 +117,7 @@ export default class ChoiceChapterMessageMenu extends MessageMenu {
             idx as 0 | 1,
             claimGoldMissionId,
             params.title,
+            cardName,
           ),
         muteClick: true,
       })
@@ -139,6 +141,7 @@ export default class ChoiceChapterMessageMenu extends MessageMenu {
     choiceIndex: 0 | 1,
     claimGoldMissionId: number | undefined,
     title: string,
+    cardName: string | undefined,
   ): void {
     UserSettings._setIndex('journeyChoices', avatarIndex, choiceIndex)
     Server.sendJourneyChoice(avatarIndex, choiceIndex)
@@ -150,6 +153,7 @@ export default class ChoiceChapterMessageMenu extends MessageMenu {
       menu: 'chapterMessage',
       title,
       s: resultText,
+      cardName,
       claimGoldMissionId,
     })
   }
