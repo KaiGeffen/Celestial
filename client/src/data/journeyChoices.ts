@@ -104,7 +104,7 @@ export function formatJourneyFinaleChapterBody(
 ): string {
   const choiceData = JOURNEY_CHOICES[avatarIndex]
   const intro = choiceData?.intro ?? ''
-  const chosenLine = '> ' + (choiceData?.options[choiceIndex]?.text ?? '')
+  const chosenLine = '"' + (choiceData?.options[choiceIndex]?.text ?? '') + '"'
   const outcome = choiceData?.options[choiceIndex]?.result ?? 'Coming soon.'
   const combined = [intro, chosenLine, outcome].filter(Boolean).join('\n\n')
   return '      ' + combined.replace(/\n/g, '\n      ').trim()

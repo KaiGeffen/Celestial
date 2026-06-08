@@ -43,6 +43,11 @@ class Story {
     while (this.acts.length > 0 && !this.roundEndedForced) {
       const act = this.acts.shift()!
 
+      // Keep track of how many points each player at the start to tell the delta
+      const pointsAtStart = game.score[act.owner]
+      const nourishAtStart = game.status[act.owner].nourish
+
+      // Set sound effect back to the default (Resolution may change this)
       game.sound = SoundEffect.Resolve
 
       // If a card changes as a result of playing, update the card (Pet is the only one)
@@ -74,10 +79,10 @@ class Story {
         }
       }
 
-      // Record resolution snapshots before deep-copying, so skipped recap states
-      // include the correct scoreAtResolution for every act (including the last one).
-      act.scoreAtResolution = [game.score[0], game.score[1]]
-      act.nourishAtResolution = [game.status[0].nourish, game.status[1].nourish]
+      // Record the points gained from effects and nourish
+      const deltaPoints = game.score[act.owner] - pointsAtStart
+      act.pointsFromEffects = deltaPoints - act.card.points - nourishAtStart
+      act.pointsFromNourish = nourishAtStart
 
       index++
       addRecentModels(game)

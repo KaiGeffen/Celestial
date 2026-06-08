@@ -60,7 +60,10 @@ export default class Animator {
     const storyCountDelta = !state.isRecap
       ? state.story.acts.length - this.lastHiddenCards.length
       : 0
-    const totalStoryInsertions = Math.max(animatedStoryInsertions, storyCountDelta)
+    const totalStoryInsertions = Math.max(
+      animatedStoryInsertions,
+      storyCountDelta,
+    )
     let storyInsertShiftDone = false
 
     for (let owner = 0; owner < 2; owner++) {
@@ -641,33 +644,35 @@ export default class Animator {
 class StoryResolveBubbles {
   private static readonly STAT_STROKE = '#000000'
 
+  // Names for each image
   private static readonly BUBBLE_TEXTURE_POINTS = 'chrome-bubble'
   private static readonly BUBBLE_TEXTURE_NOURISH = 'chrome-bubbleNourish'
   private static readonly BUBBLE_TEXTURE_EFFECT = 'chrome-bubbleEffect'
 
-  private static readonly POINTS_RESOLVE_CIRCLE_RADIUS = 18
-  private static readonly POINTS_RESOLVE_FONT_SMALL_PX = 24
-  private static readonly POINTS_RESOLVE_FONT_SCALE = 2.5
-  private static readonly POINTS_RESOLVE_FONT_LARGE_PX = Math.round(
-    StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX *
-      StoryResolveBubbles.POINTS_RESOLVE_FONT_SCALE,
-  )
-  private static readonly POINTS_RESOLVE_CIRCLE_RADIUS_LARGE =
-    StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS *
-    StoryResolveBubbles.POINTS_RESOLVE_FONT_SCALE
+  // How much the components scale up by
+  private static readonly DELTA_SCALE = 2.5
 
-  /** Large size for secondary bubbles (half of the main points bubble at full scale). */
-  private static readonly NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE =
-    StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE / 2
-  private static readonly NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX = Math.round(
-    StoryResolveBubbles.POINTS_RESOLVE_FONT_LARGE_PX / 2,
+  // Size the bubbles start / end (Main bubble is large, others small)
+  private static readonly RADIUS_START = 18
+  private static readonly RADIUS_END_LARGE =
+    StoryResolveBubbles.RADIUS_START * StoryResolveBubbles.DELTA_SCALE
+  private static readonly RADIUS_END_SMALL =
+    StoryResolveBubbles.RADIUS_END_LARGE / 2
+
+  // Font start / end pixels
+  private static readonly FONT_PX_START = 24
+  private static readonly FONT_PX_END_LARGE = Math.round(
+    StoryResolveBubbles.FONT_PX_START * StoryResolveBubbles.DELTA_SCALE,
+  )
+  private static readonly FONT_PX_END_SMALL = Math.round(
+    StoryResolveBubbles.FONT_PX_END_LARGE / 2,
   )
 
   /** Local offset from card center for nourish (bottom-right) vs effect (bottom-left) bubbles. */
   private static secondaryBubbleRestAtMainCorner(
     corner: 'bottomRight' | 'bottomLeft',
   ): { x: number; y: number } {
-    const R = StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE
+    const R = StoryResolveBubbles.RADIUS_END_LARGE
     const d = R / Math.SQRT2
     return corner === 'bottomRight' ? { x: d, y: d } : { x: -d, y: d }
   }
@@ -806,20 +811,12 @@ class StoryResolveBubbles {
       const printedPoints = act.card.points
       const effectAmt = pointsEarned - printedPoints - nourishAmt
 
-      // The card Pet is special
-      const showEffectsBubble = act.card.name !== 'Pet'
-      const mainBubblePts =
-        act.card.name === 'Pet'
-          ? pointsEarned - nourishAmt
-          : (card.points ?? card.card.points)
+      const mainBubblePts = card.points ?? card.card.points
 
       const tweenNourishFromStatus =
         oneNewResolvedAct && resolvedI === resolvedCount - 1 && nourishAmt !== 0
       const tweenEffectsFromStatus =
-        oneNewResolvedAct &&
-        resolvedI === resolvedCount - 1 &&
-        effectAmt !== 0 &&
-        showEffectsBubble
+        oneNewResolvedAct && resolvedI === resolvedCount - 1 && effectAmt !== 0
 
       const shouldStagger = oneNewResolvedAct && resolvedI === resolvedCount - 1
 
@@ -851,7 +848,7 @@ class StoryResolveBubbles {
           })
           delay += r
         }
-        if (effectAmt !== 0 && showEffectsBubble && !isResetState) {
+        if (effectAmt !== 0 && !isResetState) {
           pushBubbleStep(delay, () => {
             this.addEffectsResolveCircle(
               card,
@@ -868,7 +865,7 @@ class StoryResolveBubbles {
           nourishAmt,
           act.owner,
         )
-        if (effectAmt !== 0 && showEffectsBubble) {
+        if (effectAmt !== 0) {
           this.addEffectsResolveCircle(card, tweenEffectsFromStatus, effectAmt)
         }
       }
@@ -893,12 +890,11 @@ class StoryResolveBubbles {
     const pointsEarned = state.score[owner] - this.snapshotScore[owner]
     const printedPoints = act.card.points
     const effectAmt = pointsEarned - printedPoints - nourishAmt
-    const showEffectsBubble = act.card.name !== 'Pet'
 
     let n = 0
     n++
     if (nourishAmt !== 0) n++
-    if (effectAmt !== 0 && showEffectsBubble) n++
+    if (effectAmt !== 0) n++
     return n
   }
 
@@ -921,25 +917,11 @@ class StoryResolveBubbles {
           state.score[owner] - this.snapshotScore[owner],
         )
       } else {
-        const prevScore: [number, number] = [this.snapshotScore[0], this.snapshotScore[1]]
-        const prevNourish: [number, number] = [this.snapshotStatusNourish[0], this.snapshotStatusNourish[1]]
         const firstNewIdx = resolvedCount - delta
         for (let k = firstNewIdx; k < resolvedCount; k++) {
           const act = state.story.resolvedActs[k]
-          const owner = act.owner
-          const pointsEarned = act.scoreAtResolution
-            ? act.scoreAtResolution[owner] - prevScore[owner]
-            : 0
-          this.resolvedNourishByActIndex.push(prevNourish[owner])
-          this.resolvedPointsEarnedByActIndex.push(pointsEarned)
-          if (act.scoreAtResolution) {
-            prevScore[0] = act.scoreAtResolution[0]
-            prevScore[1] = act.scoreAtResolution[1]
-          }
-          if (act.nourishAtResolution) {
-            prevNourish[0] = act.nourishAtResolution[0]
-            prevNourish[1] = act.nourishAtResolution[1]
-          }
+          this.resolvedNourishByActIndex.push(act.pointsFromNourish)
+          this.resolvedPointsEarnedByActIndex.push(act.pointsFromEffects)
         }
       }
     }
@@ -985,8 +967,9 @@ class StoryResolveBubbles {
     radius: number,
   ): Phaser.GameObjects.Image {
     const img = scene.add.image(0, 0, textureKey)
+
     StoryResolveBubbles.setBubbleDisplaySize(img, radius)
-    img.setOrigin(0.5)
+
     return img
   }
 
@@ -1006,12 +989,12 @@ class StoryResolveBubbles {
     const bubbleImg = StoryResolveBubbles.createBubbleImage(
       this.scene,
       StoryResolveBubbles.BUBBLE_TEXTURE_POINTS,
-      StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS,
+      StoryResolveBubbles.RADIUS_START,
     )
     if (!tweenFromStat) {
       StoryResolveBubbles.setBubbleDisplaySize(
         bubbleImg,
-        StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE,
+        StoryResolveBubbles.RADIUS_END_LARGE,
       )
     }
 
@@ -1022,8 +1005,8 @@ class StoryResolveBubbles {
         `[stroke=${StoryResolveBubbles.STAT_STROKE}]${pts}[/stroke]`,
         tweenFromStat
           ? BBStyle.storyResolveBubble
-          : StoryResolveBubbles.resolvePointsBubbleTextStyle(
-              StoryResolveBubbles.POINTS_RESOLVE_FONT_LARGE_PX,
+          : StoryResolveBubbles.resolveBubbleTextStyle(
+              StoryResolveBubbles.FONT_PX_END_LARGE,
             ),
       )
       .setOrigin(0.5)
@@ -1032,8 +1015,8 @@ class StoryResolveBubbles {
 
     if (tweenFromStat) {
       const grow = {
-        fontPx: StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX,
-        radius: StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS,
+        fontPx: StoryResolveBubbles.FONT_PX_START,
+        radius: StoryResolveBubbles.RADIUS_START,
       }
       this.scene.tweens.add({
         targets: bubble,
@@ -1044,14 +1027,14 @@ class StoryResolveBubbles {
       })
       this.scene.tweens.add({
         targets: grow,
-        fontPx: StoryResolveBubbles.POINTS_RESOLVE_FONT_LARGE_PX,
-        radius: StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS_LARGE,
+        fontPx: StoryResolveBubbles.FONT_PX_END_LARGE,
+        radius: StoryResolveBubbles.RADIUS_END_LARGE,
         duration: Time.match.recapTween,
         ease: 'Sine.easeInOut',
         onUpdate: () => {
           StoryResolveBubbles.setBubbleDisplaySize(bubbleImg, grow.radius)
           txtPts.setStyle(
-            StoryResolveBubbles.resolvePointsBubbleTextStyle(grow.fontPx),
+            StoryResolveBubbles.resolveBubbleTextStyle(grow.fontPx),
           )
         },
       })
@@ -1091,12 +1074,12 @@ class StoryResolveBubbles {
     const nourishBubbleImg = StoryResolveBubbles.createBubbleImage(
       this.scene,
       StoryResolveBubbles.BUBBLE_TEXTURE_NOURISH,
-      StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS,
+      StoryResolveBubbles.RADIUS_START,
     )
     if (!tweenFromStatus) {
       StoryResolveBubbles.setBubbleDisplaySize(
         nourishBubbleImg,
-        StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE,
+        StoryResolveBubbles.RADIUS_END_SMALL,
       )
     }
 
@@ -1108,8 +1091,9 @@ class StoryResolveBubbles {
         `[stroke=${StoryResolveBubbles.STAT_STROKE}]${label}[/stroke]`,
         tweenFromStatus
           ? BBStyle.storyResolveBubble
-          : StoryResolveBubbles.nourishResolveBubbleTextStyle(
-              StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
+          : StoryResolveBubbles.resolveBubbleTextStyle(
+              StoryResolveBubbles.FONT_PX_END_SMALL,
+              Color.whiteS,
             ),
       )
       .setOrigin(0.5)
@@ -1118,8 +1102,8 @@ class StoryResolveBubbles {
 
     if (tweenFromStatus) {
       const grow = {
-        fontPx: StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX,
-        radius: StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS,
+        fontPx: StoryResolveBubbles.FONT_PX_START,
+        radius: StoryResolveBubbles.RADIUS_START,
       }
       this.scene.tweens.add({
         targets: bubble,
@@ -1131,8 +1115,8 @@ class StoryResolveBubbles {
       })
       this.scene.tweens.add({
         targets: grow,
-        fontPx: StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
-        radius: StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE,
+        fontPx: StoryResolveBubbles.FONT_PX_END_SMALL,
+        radius: StoryResolveBubbles.RADIUS_END_SMALL,
         delay: moveDelayMs,
         duration: Time.match.recapTween,
         ease: 'Sine.easeInOut',
@@ -1142,7 +1126,10 @@ class StoryResolveBubbles {
             grow.radius,
           )
           txtNourish.setStyle(
-            StoryResolveBubbles.nourishResolveBubbleTextStyle(grow.fontPx),
+            StoryResolveBubbles.resolveBubbleTextStyle(
+              grow.fontPx,
+              Color.whiteS,
+            ),
           )
         },
       })
@@ -1182,12 +1169,12 @@ class StoryResolveBubbles {
     const effectsBubbleImg = StoryResolveBubbles.createBubbleImage(
       this.scene,
       StoryResolveBubbles.BUBBLE_TEXTURE_EFFECT,
-      StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS,
+      StoryResolveBubbles.RADIUS_START,
     )
     if (!tweenFromEffectText) {
       StoryResolveBubbles.setBubbleDisplaySize(
         effectsBubbleImg,
-        StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE,
+        StoryResolveBubbles.RADIUS_END_SMALL,
       )
     }
 
@@ -1199,8 +1186,9 @@ class StoryResolveBubbles {
         `[stroke=${StoryResolveBubbles.STAT_STROKE}]${label}[/stroke]`,
         tweenFromEffectText
           ? BBStyle.storyResolveBubble
-          : StoryResolveBubbles.effectsResolveBubbleTextStyle(
-              StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
+          : StoryResolveBubbles.resolveBubbleTextStyle(
+              StoryResolveBubbles.FONT_PX_END_SMALL,
+              Color.whiteS,
             ),
       )
       .setOrigin(0.5)
@@ -1209,8 +1197,8 @@ class StoryResolveBubbles {
 
     if (tweenFromEffectText) {
       const grow = {
-        fontPx: StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX,
-        radius: StoryResolveBubbles.POINTS_RESOLVE_CIRCLE_RADIUS,
+        fontPx: StoryResolveBubbles.FONT_PX_START,
+        radius: StoryResolveBubbles.RADIUS_START,
       }
       this.scene.tweens.add({
         targets: bubble,
@@ -1221,8 +1209,8 @@ class StoryResolveBubbles {
       })
       this.scene.tweens.add({
         targets: grow,
-        fontPx: StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_FONT_LARGE_PX,
-        radius: StoryResolveBubbles.NOURISH_EFFECT_RESOLVE_CIRCLE_RADIUS_LARGE,
+        fontPx: StoryResolveBubbles.FONT_PX_END_SMALL,
+        radius: StoryResolveBubbles.RADIUS_END_SMALL,
         duration: Time.match.recapTween,
         ease: 'Sine.easeInOut',
         onUpdate: () => {
@@ -1231,56 +1219,26 @@ class StoryResolveBubbles {
             grow.radius,
           )
           txtFx.setStyle(
-            StoryResolveBubbles.effectsResolveBubbleTextStyle(grow.fontPx),
+            StoryResolveBubbles.resolveBubbleTextStyle(
+              grow.fontPx,
+              Color.whiteS,
+            ),
           )
         },
       })
     }
   }
 
-  private static resolvePointsBubbleTextStyle(fontPx: number) {
+  private static resolveBubbleTextStyle(fontPx: number, color?: string) {
     const base = BBStyle.storyResolveBubble
     const t = base.strokeThickness ?? 1
     return {
       ...base,
       fontSize: `${Math.round(fontPx)}px`,
+      ...(color !== undefined && { color }),
       strokeThickness: Math.max(
         1,
-        Math.round(
-          t * (fontPx / StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX),
-        ),
-      ),
-    }
-  }
-
-  private static nourishResolveBubbleTextStyle(fontPx: number) {
-    const base = BBStyle.storyResolveBubble
-    const t = base.strokeThickness ?? 1
-    return {
-      ...base,
-      fontSize: `${Math.round(fontPx)}px`,
-      color: Color.whiteS,
-      strokeThickness: Math.max(
-        1,
-        Math.round(
-          t * (fontPx / StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX),
-        ),
-      ),
-    }
-  }
-
-  private static effectsResolveBubbleTextStyle(fontPx: number) {
-    const base = BBStyle.storyResolveBubble
-    const t = base.strokeThickness ?? 1
-    return {
-      ...base,
-      fontSize: `${Math.round(fontPx)}px`,
-      color: Color.whiteS,
-      strokeThickness: Math.max(
-        1,
-        Math.round(
-          t * (fontPx / StoryResolveBubbles.POINTS_RESOLVE_FONT_SMALL_PX),
-        ),
+        Math.round(t * (fontPx / StoryResolveBubbles.FONT_PX_START)),
       ),
     }
   }
