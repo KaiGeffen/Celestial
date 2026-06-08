@@ -17,7 +17,7 @@ export default class ChapterMessageMenu extends MessageMenu {
   private claimGoldButton: Button
 
   constructor(scene: MenuScene, params) {
-    super(scene, params, 700)
+    super(scene, params, 800)
   }
 
   protected createSizer(): void {
@@ -96,12 +96,13 @@ export default class ChapterMessageMenu extends MessageMenu {
       0,
       0,
       Space.cardWidth,
-      Space.cardWidth,
+      0,
     )
-    const imageKey = `card/subject-${params.cardName}`
+    const imageKey = `card/subject-${params.cardName ?? 'Dove'}`
     const img = this.scene.add
       .image(0, 0, imageKey)
       .setDisplaySize(Space.cardWidth, Space.cardHeight)
+      .setOrigin(0.5, 0)
     imageContainer.add(img)
     top.add(imageContainer, { align: 'top' })
 
@@ -117,8 +118,8 @@ export default class ChapterMessageMenu extends MessageMenu {
 
     // Put the first n lines in this text, the rest into the next one
     const lines = txtTop.getWrappedText(params.s)
-    txtTop.setText(lines.slice(0, 10).join('\n'))
-    txtBottom.setText(lines.slice(10).join(''))
+    txtTop.setText(lines.slice(0, 13).join('\n'))
+    txtBottom.setText(lines.slice(13).join(''))
 
     // Layout the whole thing, see how much text fits to the right of the image
     this.textScrollablePanel.layout()
