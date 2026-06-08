@@ -154,7 +154,6 @@ export default class Loader {
   static loadJourneyMapAndMission(scene: Phaser.Scene): void {
     scene.load.path = 'assets/'
     scene.load.image('journey-Map', 'img/journey/Map.webp')
-    scene.load.image('journey-Mission', 'img/journey/Mission.webp')
     scene.load.image('journey-AltMap', 'img/journey/AltMap.webp')
 
     scene.load.start()
