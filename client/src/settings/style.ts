@@ -13,11 +13,10 @@ const secondaryFont = 'Berylium'
 const sansFont = 'Mulish'
 
 // Font sizes
-const FontSettings: Record<string, Record<string, string>> = {
-  standard: { size: '24px' },
-  huge: { size: '50px' },
-  large: { size: '44px' },
-  title: { size: '128px' },
+const largeSize = 40
+const size: Record<string, string> = {
+  standard: '24px',
+  large: largeSize + 'px',
 }
 
 // Home screen announcement width
@@ -29,26 +28,26 @@ type StyleDict = Record<string, Phaser.Types.GameObjects.Text.TextStyle>
 const StyleGeneral: StyleDict = {
   basic: {
     fontFamily: sansFont,
-    fontSize: FontSettings.standard.size,
+    fontSize: size.standard,
     color: Color.basicText,
     wordWrap: { width: Space.maxTextWidth },
   },
   /** Status row value numbers — no `wordWrap` so measured width matches the glyph run (for scale-to-fit). */
   statusKeywordValue: {
     fontFamily: sansFont,
-    fontSize: FontSettings.standard.size,
+    fontSize: size.standard,
     color: Color.basicText,
   },
   basicStylized: {
     fontFamily: secondaryFont,
-    fontSize: FontSettings.standard.size,
+    fontSize: size.standard,
     color: Color.basicText,
     wordWrap: { width: Space.maxTextWidth },
   },
   // Header for menus, sizers, etc
   header: {
     fontFamily: primaryFont,
-    fontSize: '40px',
+    fontSize: size.large,
     color: Color.header,
     stroke: Color.blackS,
     strokeThickness: 1,
@@ -65,7 +64,7 @@ const StyleGeneral: StyleDict = {
   // Text for the buttons that are just text
   textButton: {
     fontFamily: sansFont,
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.textButton,
     stroke: Color.blackS,
     strokeThickness: 1,
@@ -74,14 +73,14 @@ const StyleGeneral: StyleDict = {
   // Input text fields
   inputText: {
     fontFamily: sansFont,
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.textboxText,
   },
 
   // Deck thumbnail nameplate
   deckThumbnail: {
     fontFamily: secondaryFont,
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.basicText,
     fontStyle: 'Bold',
     stroke: Color.whiteS,
@@ -91,7 +90,7 @@ const StyleGeneral: StyleDict = {
   // Count of a card in the deck
   cutoutCardCount: {
     fontFamily: sansFont,
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.cardCount,
     stroke: '#0009',
     strokeThickness: 3,
@@ -100,7 +99,7 @@ const StyleGeneral: StyleDict = {
   // Any place where header text appears over a dark background
   announcementOverBlack: {
     fontFamily: secondaryFont,
-    fontSize: FontSettings.huge.size,
+    fontSize: size.large,
     color: Color.whiteS,
     stroke: Color.blackS,
     strokeThickness: 2,
@@ -125,7 +124,7 @@ const StyleGeneral: StyleDict = {
   // Error text that appears in the center of the screen
   error: {
     fontFamily: mainFont,
-    fontSize: FontSettings.huge.size,
+    fontSize: size.large,
     color: Color.error,
   },
 
@@ -153,7 +152,7 @@ const StyleMatch: StyleDict = {
   stackCountButton: {
     fontFamily: primaryFont,
     fontStyle: 'Bold',
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.whiteS,
     stroke: Color.darkUmberS,
     strokeThickness: 4,
@@ -190,7 +189,7 @@ const StyleMatch: StyleDict = {
   },
   cloud: {
     fontFamily: secondaryFont,
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.passText,
     stroke: '#fff',
     strokeThickness: 2,
@@ -199,7 +198,7 @@ const StyleMatch: StyleDict = {
   // In-match avatar nameplate rows
   matchUsername: {
     fontFamily: primaryFont,
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.whiteS,
     stroke: Color.darkUmberS,
     strokeThickness: 2,
@@ -235,7 +234,7 @@ const StyleHome: StyleDict = {
   // Subheader (Copy in BBStyle)
   announcementSubheader: {
     fontFamily: primaryFont,
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.darkUmberS,
     wordWrap: { width: ANNOUNCEMENT_WIDTH },
     align: 'center',
@@ -247,7 +246,7 @@ const StyleJourney: StyleDict = {
   chapterHeader: {
     fontFamily: primaryFont,
     fontStyle: 'italic',
-    fontSize: '36px',
+    fontSize: size.large,
     color: Color.darkUmberS,
   },
   chapterBody: {
@@ -259,7 +258,7 @@ const StyleJourney: StyleDict = {
   // Journey scene overlay header / navigation arrows
   journeyOverlay: {
     fontFamily: altFont,
-    fontSize: '36px',
+    fontSize: size.large,
     color: Color.whiteS,
     stroke: Color.goldS,
     strokeThickness: 3,
@@ -275,13 +274,13 @@ const StyleJourney: StyleDict = {
   journeyLocked: {
     fontFamily: sansFont,
     fontSize: '16px',
-    color: '#555555',
+    color: Color.greyS,
     wordWrap: { width: Space.maxTextWidth },
   },
   // Journey required/chosen cards headers
   journeyRequiredAndChosenHeader: {
     fontFamily: primaryFont,
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.basicText,
   },
   // The opening visuals that come before the tutorial
@@ -294,7 +293,7 @@ const StyleJourney: StyleDict = {
   },
   openingReminder: {
     fontFamily: sansFont,
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.greyS,
   },
 }
@@ -310,7 +309,7 @@ const StyleDeprecated: StyleDict = {
   // Text that plays over the stillframes in journey
   stillframe: {
     fontFamily: altFont,
-    fontSize: FontSettings.huge.size,
+    fontSize: size.large,
     color: Color.blackS,
   },
 }
@@ -366,7 +365,7 @@ export const BBStyle: Record<string, any> = {
   // Hint text shown when something onscreen is hovered
   hint: {
     fontFamily: sansFont,
-    fontSize: FontSettings.standard.size,
+    fontSize: size.standard,
     color: Color.hintFill,
     backgroundColor: Color.hintBackground,
     backgroundStrokeColor: '#0005',
@@ -389,13 +388,13 @@ export const BBStyle: Record<string, any> = {
   // Menu header chrome bar
   header: {
     fontFamily: primaryFont,
-    fontSize: '40px',
+    fontSize: size.large,
     color: Color.header,
     stroke: Color.blackS,
     strokeThickness: 1,
     images: {
-      coin: { key: 'icon-coin', height: 40 },
-      gem: { key: 'icon-gem', height: 40 },
+      coin: { key: 'icon-coin', height: largeSize },
+      gem: { key: 'icon-gem', height: largeSize },
     },
   },
   // Daily Hint on home screen
@@ -452,24 +451,24 @@ export const BBStyle: Record<string, any> = {
   },
   missionName: {
     fontFamily: secondaryFont,
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.basicText,
-    fixedHeight: 40,
+    fixedHeight: largeSize,
     valign: 'center',
     images: {
-      card: { key: 'icon-cardIcon', height: 40 },
+      card: { key: 'icon-cardIcon', height: largeSize },
     },
   },
   cardCost: {
     fontFamily: altFont,
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.cardCost,
     stroke: '#000000',
     strokeThickness: 1,
   },
   cardPoints: {
     fontFamily: altFont,
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.cardPoints,
     stroke: '#000000',
     strokeThickness: 1,
@@ -480,33 +479,33 @@ export const BBStyle: Record<string, any> = {
   },
   storyResolveBubble: {
     fontFamily: altFont,
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.cardCost,
     stroke: '#ffffff',
     strokeThickness: 1,
   },
   deckname: {
     ...Style.deckThumbnail,
-    fontSize: FontSettings.large.size,
+    fontSize: size.large,
     halign: 'center',
     fixedHeight: 50,
   },
   // Floating reward text (gold/gem gain animations)
   reward: {
     fontFamily: primaryFont,
-    fontSize: '40px',
+    fontSize: size.large,
     color: Color.goldS,
     stroke: Color.blackS,
     strokeThickness: 3,
     images: {
-      coin: { key: 'icon-coin', height: 40 },
+      coin: { key: 'icon-coin', height: largeSize },
       gem: { key: 'icon-gem', height: 40 },
     },
   },
   // Basic display that includes currency
   currency: {
     fontFamily: secondaryFont,
-    fontSize: '24px',
+    fontSize: size.standard,
     color: Color.basicText,
     images: {
       coin: { key: 'icon-coin', height: 24 },
