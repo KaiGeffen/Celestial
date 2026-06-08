@@ -43,9 +43,10 @@ class Story {
     while (this.acts.length > 0 && !this.roundEndedForced) {
       const act = this.acts.shift()!
 
-      // Keep track of how many points each player at the start to tell the delta
+      // Keep track where points come from for client-side animating
+      act.pointsFromStartingPoints = act.card.points
+      act.pointsFromNourish = game.status[act.owner].nourish
       const pointsAtStart = game.score[act.owner]
-      const nourishAtStart = game.status[act.owner].nourish
 
       // Set sound effect back to the default (Resolution may change this)
       game.sound = SoundEffect.Resolve
@@ -79,10 +80,10 @@ class Story {
         }
       }
 
-      // Record the points gained from effects and nourish
+      // Record the points gained from effects
       const deltaPoints = game.score[act.owner] - pointsAtStart
-      act.pointsFromEffects = deltaPoints - act.card.points - nourishAtStart
-      act.pointsFromNourish = nourishAtStart
+      act.pointsFromEffects =
+        deltaPoints - act.pointsFromStartingPoints - act.pointsFromNourish
 
       index++
       addRecentModels(game)

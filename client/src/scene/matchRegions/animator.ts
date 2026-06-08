@@ -679,12 +679,8 @@ class StoryResolveBubbles {
 
   private readonly layer: Phaser.GameObjects.Container
   private staggerEvents: Phaser.Time.TimerEvent[] = []
-  private resolvedNourishByActIndex: number[] = []
-  private resolvedPointsEarnedByActIndex: number[] = []
-  /** End of previous `animate`; used for resolve deltas vs the incoming state. */
+  /** End of previous `animate`; used to detect a single new resolved act. */
   private snapshotResolvedActCount = 0
-  private snapshotScore: [number, number] = [0, 0]
-  private snapshotStatusNourish: [number, number] = [0, 0]
   /** Resolved act count at the time of the last reset; acts below this index skip bubble drawing. -1 = no reset. */
   private resetBeforeResolvedCount = -1
   /** When >= 0, any bubble added via makeBubbleRoot will be popped after this delay (ms). -1 = no pending pop. */
@@ -696,11 +692,6 @@ class StoryResolveBubbles {
 
   saveSnapshotFromState(state: GameModel): void {
     this.snapshotResolvedActCount = state.story.resolvedActs.length
-    this.snapshotScore = [state.score[0], state.score[1]]
-    this.snapshotStatusNourish = [
-      state.status[0].nourish,
-      state.status[1].nourish,
-    ]
   }
 
   clear(): void {
@@ -767,8 +758,6 @@ class StoryResolveBubbles {
     resolvedCards: CardImage[],
     isResetState = false,
   ): number {
-    this.syncBookkeeping(state)
-
     const resolvedCount = state.story.resolvedActs.length
 
     // If a new round started, clear the reset tracking
@@ -806,12 +795,10 @@ class StoryResolveBubbles {
       const tweenBubbleFromStat =
         oneNewResolvedAct && resolvedI === resolvedCount - 1
 
-      const nourishAmt = this.resolvedNourishByActIndex[resolvedI] ?? 0
-      const pointsEarned = this.resolvedPointsEarnedByActIndex[resolvedI] ?? 0
-      const printedPoints = act.card.points
-      const effectAmt = pointsEarned - printedPoints - nourishAmt
+      const nourishAmt = act.pointsFromNourish
+      const effectAmt = act.pointsFromEffects
 
-      const mainBubblePts = card.points ?? card.card.points
+      const mainBubblePts = act.pointsFromStartingPoints
 
       const tweenNourishFromStatus =
         oneNewResolvedAct && resolvedI === resolvedCount - 1 && nourishAmt !== 0
@@ -885,46 +872,10 @@ class StoryResolveBubbles {
     }
 
     const act = state.story.resolvedActs[resolvedCount - 1]
-    const owner = act.owner
-    const nourishAmt = this.snapshotStatusNourish[owner]
-    const pointsEarned = state.score[owner] - this.snapshotScore[owner]
-    const printedPoints = act.card.points
-    const effectAmt = pointsEarned - printedPoints - nourishAmt
-
-    let n = 0
-    n++
-    if (nourishAmt !== 0) n++
-    if (effectAmt !== 0) n++
+    let n = 1
+    if (act.pointsFromNourish !== 0) n++
+    if (act.pointsFromEffects !== 0) n++
     return n
-  }
-
-  private syncBookkeeping(state: GameModel): void {
-    const resolvedCount = state.story.resolvedActs.length
-    const oneNewResolvedAct =
-      resolvedCount === this.snapshotResolvedActCount + 1 && resolvedCount > 0
-
-    if (resolvedCount < this.resolvedNourishByActIndex.length) {
-      this.resolvedNourishByActIndex.length = resolvedCount
-      this.resolvedPointsEarnedByActIndex.length = resolvedCount
-    }
-    if (resolvedCount > this.resolvedNourishByActIndex.length) {
-      const delta = resolvedCount - this.resolvedNourishByActIndex.length
-      if (delta === 1 && oneNewResolvedAct) {
-        const act = state.story.resolvedActs[resolvedCount - 1]
-        const owner = act.owner
-        this.resolvedNourishByActIndex.push(this.snapshotStatusNourish[owner])
-        this.resolvedPointsEarnedByActIndex.push(
-          state.score[owner] - this.snapshotScore[owner],
-        )
-      } else {
-        const firstNewIdx = resolvedCount - delta
-        for (let k = firstNewIdx; k < resolvedCount; k++) {
-          const act = state.story.resolvedActs[k]
-          this.resolvedNourishByActIndex.push(act.pointsFromNourish)
-          this.resolvedPointsEarnedByActIndex.push(act.pointsFromEffects)
-        }
-      }
-    }
   }
 
   /** Creates a world-space bubble root and attaches it to the resolve layer. */
@@ -977,9 +928,9 @@ class StoryResolveBubbles {
   addPointsResolveCircle(
     card: CardImage,
     tweenFromStat: boolean,
-    mainBubblePts?: number,
+    mainBubblePts: number,
   ): void {
-    const pts = mainBubblePts ?? card.points ?? card.card.points
+    const pts = mainBubblePts
     const start = tweenFromStat
       ? this.localToWorld(card.container, card.txtPoints.x, card.txtPoints.y)
       : this.localToWorld(card.container, 0, 0)
