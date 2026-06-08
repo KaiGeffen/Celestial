@@ -124,9 +124,11 @@ export default class ChapterMessageMenu extends MessageMenu {
 
     // Get all the text after the lines from the top text
     const lastTopLine = lines[12]
-    const splitIndex = params.s.indexOf(lastTopLine) + lastTopLine.length
-    const remainingString = params.s.slice(splitIndex).trimStart()
-    txtBottom.setText(remainingString)
+    if (lastTopLine !== undefined) {
+      const splitIndex = params.s.indexOf(lastTopLine) + lastTopLine.length
+      const remainingString = params.s.slice(splitIndex).trimStart()
+      txtBottom.setText(remainingString)
+    }
 
     // Layout the whole thing, see how much text fits to the right of the image
     this.textScrollablePanel.layout()
