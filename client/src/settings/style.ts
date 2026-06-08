@@ -482,7 +482,7 @@ export const BBStyle: Record<string, any> = {
     fontFamily: altFont,
     fontSize: '24px',
     color: Color.cardCost,
-    stroke: '#000000',
+    stroke: '#ffffff',
     strokeThickness: 1,
   },
   deckname: {

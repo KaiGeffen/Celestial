@@ -11,7 +11,6 @@ import {
   Depth,
   Ease,
   BBStyle,
-  Color,
 } from '../../settings/settings'
 import Catalog from '../../../../shared/state/catalog'
 import { View } from '../matchScene'
@@ -1044,7 +1043,6 @@ class StoryResolveBubbles {
           ? BBStyle.storyResolveBubble
           : StoryResolveBubbles.resolveBubbleTextStyle(
               StoryResolveBubbles.FONT_PX_END_SMALL,
-              Color.whiteS,
             ),
       )
       .setOrigin(0.5)
@@ -1077,10 +1075,7 @@ class StoryResolveBubbles {
             grow.radius,
           )
           txtNourish.setStyle(
-            StoryResolveBubbles.resolveBubbleTextStyle(
-              grow.fontPx,
-              Color.whiteS,
-            ),
+            StoryResolveBubbles.resolveBubbleTextStyle(grow.fontPx),
           )
         },
       })
@@ -1139,7 +1134,6 @@ class StoryResolveBubbles {
           ? BBStyle.storyResolveBubble
           : StoryResolveBubbles.resolveBubbleTextStyle(
               StoryResolveBubbles.FONT_PX_END_SMALL,
-              Color.whiteS,
             ),
       )
       .setOrigin(0.5)
@@ -1170,23 +1164,19 @@ class StoryResolveBubbles {
             grow.radius,
           )
           txtFx.setStyle(
-            StoryResolveBubbles.resolveBubbleTextStyle(
-              grow.fontPx,
-              Color.whiteS,
-            ),
+            StoryResolveBubbles.resolveBubbleTextStyle(grow.fontPx),
           )
         },
       })
     }
   }
 
-  private static resolveBubbleTextStyle(fontPx: number, color?: string) {
+  private static resolveBubbleTextStyle(fontPx: number) {
     const base = BBStyle.storyResolveBubble
     const t = base.strokeThickness ?? 1
     return {
       ...base,
       fontSize: `${Math.round(fontPx)}px`,
-      ...(color !== undefined && { color }),
       strokeThickness: Math.max(
         1,
         Math.round(t * (fontPx / StoryResolveBubbles.FONT_PX_START)),
