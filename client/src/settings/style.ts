@@ -252,7 +252,7 @@ const StyleJourney: StyleDict = {
   },
   chapterBody: {
     fontFamily: secondaryFont,
-    fontStyle: 'italic',
+    // fontStyle: 'italic',
     fontSize: '22px',
     color: Color.darkUmberS,
   },
