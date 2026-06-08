@@ -72,7 +72,9 @@ export default class ChapterMessageMenu extends MessageMenu {
     const maxTextHeight = Space.windowHeight - 300
 
     // Sizer
-    const top = this.scene.rexUI.add.sizer()
+    const top = this.scene.rexUI.add.sizer({
+      width: this.width - PAD_LEFT_RIGHT * 2,
+    })
     const bottom = this.scene.rexUI.add.sizer()
     const contentPanel = this.scene.rexUI.add
       .sizer({
@@ -119,7 +121,12 @@ export default class ChapterMessageMenu extends MessageMenu {
     // Put the first n lines in this text, the rest into the next one
     const lines = txtTop.getWrappedText(params.s)
     txtTop.setText(lines.slice(0, 13).join('\n'))
-    txtBottom.setText(lines.slice(13).join(''))
+
+    // Get all the text after the lines from the top text
+    const lastTopLine = lines[12]
+    const splitIndex = params.s.indexOf(lastTopLine) + lastTopLine.length
+    const remainingString = params.s.slice(splitIndex).trimStart()
+    txtBottom.setText(remainingString)
 
     // Layout the whole thing, see how much text fits to the right of the image
     this.textScrollablePanel.layout()
