@@ -608,6 +608,8 @@ export default class JourneyScene extends BaseScene {
         name: 'scrollDark',
         muteClick: true,
         f: () => {
+          const cardName = Catalog.getCardById(mission.cards?.[0])?.name
+
           if (mission.id < 700) {
             const avatarIndex = Math.floor(mission.id / 100) - 1
             const chapterIndex = mission.id % 100
@@ -630,6 +632,7 @@ export default class JourneyScene extends BaseScene {
                   menu: 'chapterMessage',
                   title: mission.name,
                   s: resultText,
+                  cardName,
                   claimGoldMissionId: mission.id,
                 })
               } else {
@@ -650,6 +653,7 @@ export default class JourneyScene extends BaseScene {
                 menu: 'chapterMessage',
                 title: mission.name,
                 s: storyText,
+                cardName,
                 claimGoldMissionId: mission.id,
               })
             }
@@ -658,6 +662,7 @@ export default class JourneyScene extends BaseScene {
               menu: 'chapterMessage',
               title: mission.name,
               s: 'Writing coming soon.',
+              cardName,
               claimGoldMissionId: mission.id,
             })
           }

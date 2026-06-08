@@ -10,6 +10,8 @@ import { BBStyle, Ease, Space, Style, Time } from '../../settings/settings'
 import REWARD_AMOUNTS from '../../../../shared/config/rewardAmounts'
 import newScrollablePanel from '../../lib/scrollablePanel'
 
+const PAD_LEFT_RIGHT = 50
+
 export default class ChapterMessageMenu extends MessageMenu {
   private claimGoldMissionId: number | undefined
   private claimGoldButton: Button
@@ -26,13 +28,21 @@ export default class ChapterMessageMenu extends MessageMenu {
   protected createContent(params): void {
     this.claimGoldMissionId = params.claimGoldMissionId
 
-    const contentWidth = this.width - 100 // 50px gap on each side
-    const sidePad = { padding: { left: 50, right: 50 } }
+    const contentWidth = this.width - 100 // PAD_LEFT_RIGHTpx gap on each side
+    const sidePad = { padding: { left: PAD_LEFT_RIGHT, right: PAD_LEFT_RIGHT } }
 
-    // Header: title text centered, then chrome-divider below it
+    this.createChapterHeader(params)
+
+    this.createChapterBody(params)
+
+    this.createFooter()
+  }
+
+  private createChapterHeader(params): void {
+    // Title text centered, chrome-divider
     const headerSizer = this.scene.rexUI.add.sizer({
       orientation: 'vertical',
-      width: contentWidth,
+      width: this.width - PAD_LEFT_RIGHT * 2,
       space: { item: Space.padSmall },
     })
 
@@ -43,44 +53,88 @@ export default class ChapterMessageMenu extends MessageMenu {
 
     const divider = this.scene.add.image(0, 0, 'chrome-divider').setScale(0.35)
     const dH = divider.displayHeight
-    divider.setDisplaySize(contentWidth, dH)
+    divider.setDisplaySize(this.width - PAD_LEFT_RIGHT * 2, dH)
     headerSizer.add(divider, { align: 'center' })
 
     this.sizer
       .add(headerSizer, {
-        padding: { left: 50, right: 50, top: Space.padSmall, bottom: 0 },
+        padding: {
+          left: PAD_LEFT_RIGHT,
+          right: PAD_LEFT_RIGHT,
+          top: Space.padSmall,
+        },
       })
       .addNewLine()
+  }
 
-    // Body: scrollable text, no scrollbar
+  private createChapterBody(params): void {
+    // Scrollable content — image beside first paragraph, remaining paragraphs below
     const maxTextHeight = Space.windowHeight - 300
-    const textPanel = this.scene.rexUI.add.sizer({ width: contentWidth })
-    const bodyTxt = this.scene.add
-      .text(0, 0, params.s, Style.chapterBody)
-      .setWordWrapWidth(contentWidth)
-    textPanel.add(bodyTxt)
 
-    const scrollableText = newScrollablePanel(this.scene, {
-      width: contentWidth,
+    // Sizer
+    const top = this.scene.rexUI.add.sizer()
+    const bottom = this.scene.rexUI.add.sizer()
+    const contentPanel = this.scene.rexUI.add
+      .sizer({
+        orientation: 'vertical',
+        width: this.width - PAD_LEFT_RIGHT * 2,
+      })
+      .add(top)
+      .add(bottom)
+
+    this.textScrollablePanel = newScrollablePanel(this.scene, {
+      width: this.width - PAD_LEFT_RIGHT * 2,
       height: maxTextHeight,
-      panel: { child: textPanel },
+      panel: { child: contentPanel },
       scrollMode: 'y',
       slider: false,
     })
-    this.textScrollablePanel = scrollableText
 
-    this.sizer.add(scrollableText, sidePad).addNewLine()
+    // Create image
+    const imageContainer = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.cardWidth,
+      Space.cardWidth,
+    )
+    const imageKey = `card/subject-${params.cardName}`
+    const img = this.scene.add
+      .image(0, 0, imageKey)
+      .setDisplaySize(Space.cardWidth, Space.cardHeight)
+    imageContainer.add(img)
+    top.add(imageContainer, { align: 'top' })
 
-    this.addFooter()
+    // Text to the right of the image and below that
+    const txtTop = this.scene.add
+      .text(0, 0, '', Style.chapterBody)
+      .setWordWrapWidth(this.width - PAD_LEFT_RIGHT * 2 - Space.cardWidth)
+    const txtBottom = this.scene.add
+      .text(0, 0, '', Style.chapterBody)
+      .setWordWrapWidth(this.width - PAD_LEFT_RIGHT * 2)
+    top.add(txtTop, { align: 'top' })
+    bottom.add(txtBottom, { align: 'top' })
+
+    // Put the first n lines in this text, the rest into the next one
+    const lines = txtTop.getWrappedText(params.s)
+    txtTop.setText(lines.slice(0, 10).join('\n'))
+    txtBottom.setText(lines.slice(10).join(''))
+
+    // Layout the whole thing, see how much text fits to the right of the image
+    this.textScrollablePanel.layout()
+
+    // Add it all to parent sizer
+    this.sizer.add(this.textScrollablePanel).addNewLine()
   }
 
-  private addFooter(): void {
+  private createFooter(): void {
     if (this.claimGoldMissionId === undefined) return
     const buttonsSizer = this.scene.rexUI.add.sizer({
       width: this.width - Space.pad * 2,
       space: {
         left: Space.pad,
         right: Space.pad,
+        item: Space.pad,
       },
     })
 
@@ -89,7 +143,7 @@ export default class ChapterMessageMenu extends MessageMenu {
       0,
       0,
       Space.buttonWidth,
-      50,
+      PAD_LEFT_RIGHT,
     )
     this.claimGoldButton = new Buttons.Basic({
       within: claimContainer,
@@ -143,24 +197,24 @@ export default class ChapterMessageMenu extends MessageMenu {
       .add(rightCorner)
       .addSpace()
 
-    const padding = {
-      padding: {
-        left: Space.pad,
-        right: Space.pad,
-      },
-    }
+    this.sizer.add(buttonsSizer)
 
-    this.sizer.add(buttonsSizer, padding)
+    // Adjust button appropriately
     if (this.isMissionGoldClaimed()) {
       this.claimGoldButton.setText('Claimed').disable()
-    } else if (!this.textScrollablePanel?.isOverflowY) {
+    }
+    // If the panel isn't overflowing, button is always enabled
+    else if (!this.textScrollablePanel?.isOverflowY) {
       this.claimGoldButton.enable()
-    } else {
+    }
+    // If the panel is overflowing, button is disabled but can be unlocked by scrolling to the bottom
+    else {
       this.claimGoldButton.disable()
       this.attachUnlockCallback()
     }
   }
 
+  // Mission gold has been claimed
   private isMissionGoldClaimed(): boolean {
     return (
       (this.claimGoldMissionId !== undefined &&
@@ -171,10 +225,10 @@ export default class ChapterMessageMenu extends MessageMenu {
   }
 
   private isClaimButtonUnlocked(): boolean {
-    return (
-      !this.textScrollablePanel?.isOverflowY ||
-      this.textScrollablePanel?.t >= 0.999
-    )
+    const textIsWithinBounds = !this.textScrollablePanel?.isOverflowY
+    const userScrolledToBottom = this.textScrollablePanel?.t >= 0.999999
+
+    return textIsWithinBounds || userScrolledToBottom
   }
 
   private attachUnlockCallback(): void {
