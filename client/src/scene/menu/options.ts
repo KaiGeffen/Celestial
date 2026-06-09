@@ -583,7 +583,7 @@ export default class OptionsMenu extends Menu {
       height: 20,
       orientation: 'x',
 
-      track: this.scene.add.image(0, 0, 'icon-TrackVertical'),
+      track: this.scene.add.image(0, 0, 'icon-TrackHorizontal'),
       thumb: this.scene.add.image(0, 0, 'icon-ThumbHorizontal').setScale(0.5),
       input: 'click',
 

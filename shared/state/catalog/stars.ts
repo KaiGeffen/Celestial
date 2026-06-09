@@ -406,6 +406,25 @@ const heavens = new Heavens({
   text: "Costs 2 less for each time you've triggered Exhale since the last story began.",
 })
 
+class Arise extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    if (game.pile[player].length > 0) {
+      const i = game.pile[player].length - 1
+      game.pile[player][i].onMorning(player, game, i)
+    }
+  }
+}
+const arise = new Arise({
+  name: 'Arise',
+  id: 8020,
+  cost: 4,
+  points: 4,
+  qualities: [Quality.FLEETING],
+  text: 'Fleeting\nIf the top card of your discard pile has Morning, trigger its ability.',
+})
+
 export {
   stars,
   cosmos,
@@ -427,4 +446,5 @@ export {
   // boreas,
   heavens,
   // fable,
+  arise,
 }

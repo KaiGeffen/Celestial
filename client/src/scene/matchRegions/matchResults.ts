@@ -36,6 +36,10 @@ export default class MatchResultsRegion extends Region {
   ourAvatar: Phaser.GameObjects.Image
   theirAvatar: Phaser.GameObjects.Image
 
+  // Border strokes over the avatar images (matching journeyScene overlay style)
+  private ourAvatarBorder: Phaser.GameObjects.Rectangle
+  private theirAvatarBorder: Phaser.GameObjects.Rectangle
+
   // The panel that shows results of the match
   panel: ScrollablePanel
 
@@ -99,9 +103,14 @@ export default class MatchResultsRegion extends Region {
     this.setFullAvatarTexture(this.ourAvatar, `avatar-${av1}Full`)
     this.setFullAvatarTexture(this.theirAvatar, `avatar-${av2}Full`)
 
+    this.ourAvatarBorder.setSize(this.ourAvatar.displayWidth, this.HEIGHT)
+    this.theirAvatarBorder.setSize(this.theirAvatar.displayWidth, this.HEIGHT)
+
     this.txtResult.setVisible(true)
     this.ourAvatar.setVisible(true)
     this.theirAvatar.setVisible(true)
+    this.ourAvatarBorder.setVisible(true)
+    this.theirAvatarBorder.setVisible(true)
 
     // Text saying if you won or lost
     this.txtResult.setText(state.winner === 0 ? 'Victory' : 'Defeat')
@@ -196,13 +205,39 @@ export default class MatchResultsRegion extends Region {
       .setOrigin(0, 0.5)
     this.setFullAvatarTexture(this.theirAvatar, 'avatar-MiaFull')
 
+    // Border strokes over the avatar images
+    this.ourAvatarBorder = this.scene.add
+      .rectangle(
+        -this.WIDTH / 2,
+        0,
+        this.ourAvatar.displayWidth,
+        this.HEIGHT,
+        0x000000,
+        0,
+      )
+      .setOrigin(1, 0.5)
+      .setStrokeStyle(3, Color.backgroundStroke)
+    this.theirAvatarBorder = this.scene.add
+      .rectangle(
+        this.WIDTH / 2,
+        0,
+        this.theirAvatar.displayWidth,
+        this.HEIGHT,
+        0x000000,
+        0,
+      )
+      .setOrigin(0, 0.5)
+      .setStrokeStyle(3, Color.backgroundStroke)
+
     // Create the panel with more details about the results
     this.createResultsPanel()
 
     this.container.add([
       this.txtResult,
       this.ourAvatar,
+      this.ourAvatarBorder,
       this.theirAvatar,
+      this.theirAvatarBorder,
       // this.panel, NOTE Scrollable panel is bugged with containers
     ])
   }
