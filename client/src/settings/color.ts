@@ -75,8 +75,6 @@ export const Color: Record<string, any> = {
 
   // Error messages
   error: CoreColors.whiteS,
-  errorBackground: CoreColors.blackS,
-  errorStroke: CoreColors.gold,
 
   // Button
   button: CoreColors.whiteS,

@@ -120,6 +120,7 @@ export default class OpeningScene extends BaseScene {
           callback: () => this.finish(),
         })
       },
+      muteClick: true,
     })
   }
 

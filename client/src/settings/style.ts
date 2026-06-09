@@ -3,9 +3,7 @@ import 'phaser'
 import { Space, Color, Flags } from './settings'
 
 // TODO Deprecate
-const mainFont = 'Mulish'
-const altFont = 'Cinzel'
-const cardTextFont = 'Cinzel'
+const cardFont = 'Cinzel'
 
 // The only fonts used
 const primaryFont = 'Typey McTypeface'
@@ -123,7 +121,7 @@ const StyleGeneral: StyleDict = {
 
   // Error text that appears in the center of the screen
   error: {
-    fontFamily: mainFont,
+    fontFamily: primaryFont,
     fontSize: size.large,
     color: Color.error,
   },
@@ -139,7 +137,7 @@ const StyleGeneral: StyleDict = {
 // Used on cards
 const StyleCards: StyleDict = {
   cardTitle: {
-    fontFamily: altFont,
+    fontFamily: cardFont,
     fontSize: '20px',
     color: Color.cardText,
     stroke: '#000000',
@@ -257,7 +255,7 @@ const StyleJourney: StyleDict = {
   },
   // Journey scene overlay header / navigation arrows
   journeyOverlay: {
-    fontFamily: altFont,
+    fontFamily: cardFont,
     fontSize: size.large,
     color: Color.whiteS,
     stroke: Color.goldS,
@@ -298,25 +296,8 @@ const StyleJourney: StyleDict = {
   },
 }
 
-// Styles that are no longer used in any in-use scenes
-const StyleDeprecated: StyleDict = {
-  // Surname for characters in premade deck
-  surname: {
-    fontFamily: mainFont,
-    fontSize: '34px',
-    color: Color.basicText,
-  },
-  // Text that plays over the stillframes in journey
-  stillframe: {
-    fontFamily: altFont,
-    fontSize: size.large,
-    color: Color.blackS,
-  },
-}
-
 // Add further `StyleType` consts above, then spread them here.
 export const Style: StyleDict = {
-  ...StyleDeprecated,
   ...StyleCards,
   ...StyleGeneral,
   ...StyleMatch,
@@ -345,7 +326,7 @@ export const BBStyle: Record<string, any> = {
   },
   // The textbox for the card
   cardText: {
-    fontFamily: cardTextFont,
+    fontFamily: cardFont,
     fontSize: '16px',
     color: Color.whiteS,
     strokeThickness: 1,
@@ -460,14 +441,14 @@ export const BBStyle: Record<string, any> = {
     },
   },
   cardCost: {
-    fontFamily: altFont,
+    fontFamily: cardFont,
     fontSize: size.standard,
     color: Color.cardCost,
     stroke: '#000000',
     strokeThickness: 1,
   },
   cardPoints: {
-    fontFamily: altFont,
+    fontFamily: cardFont,
     fontSize: size.standard,
     color: Color.cardPoints,
     stroke: '#000000',
@@ -478,7 +459,7 @@ export const BBStyle: Record<string, any> = {
     halign: 'center',
   },
   storyResolveBubble: {
-    fontFamily: altFont,
+    fontFamily: cardFont,
     fontSize: size.standard,
     color: Color.cardCost,
     stroke: '#ffffff',
