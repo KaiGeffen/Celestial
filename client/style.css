@@ -1,73 +1,79 @@
 /* Drop font files (.ttf, .otf, .woff2) into assets/fonts/ and add an @font-face here */
 @font-face {
-    font-family: 'Berylium';
-    src: url('assets/fonts/Berylium.otf') format('opentype');
+  font-family: 'Berylium';
+  src: url('assets/fonts/Berylium.otf') format('opentype');
 }
 
 @font-face {
-    font-family: 'Berylium';
-    src: url('assets/fonts/Berylium Rg It.otf') format('opentype');
-    font-style: italic;
+  font-family: 'Berylium';
+  src: url('assets/fonts/Berylium Rg It.otf') format('opentype');
+  font-style: italic;
 }
 
 @font-face {
-    font-family: 'BeryliumItalic';
-    src: url('assets/fonts/Berylium Rg It.otf') format('opentype');
+  font-family: 'BeryliumItalic';
+  src: url('assets/fonts/Berylium Rg It.otf') format('opentype');
 }
 
 @font-face {
-    font-family: 'Berylium';
-    src: url('assets/fonts/Berylium-Bold.otf') format('opentype');
-    font-weight: bold;
+  font-family: 'Berylium';
+  src: url('assets/fonts/Berylium-Bold.otf') format('opentype');
+  font-weight: bold;
 }
 
 @font-face {
-    font-family: 'Berylium';
-    src: url('assets/fonts/Berylium Bd It.otf') format('opentype');
-    font-weight: bold;
-    font-style: italic;
+  font-family: 'Berylium';
+  src: url('assets/fonts/Berylium Bd It.otf') format('opentype');
+  font-weight: bold;
+  font-style: italic;
 }
 
 @font-face {
-    font-family: 'Killam';
-    src: url('assets/fonts/Killam-Bold.ttf') format('truetype');
-    font-weight: bold;
+  font-family: 'Killam';
+  src: url('assets/fonts/Killam-Bold.ttf') format('truetype');
+  font-weight: bold;
 }
 
 @font-face {
-    font-family: 'OptimusPrinceps';
-    src: url('assets/fonts/OptimusPrinceps.ttf') format('truetype');
+  font-family: 'OptimusPrinceps';
+  src: url('assets/fonts/OptimusPrinceps.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: 'Typey McTypeface';
-    src: url('assets/fonts/Typey.otf') format('opentype');
+  font-family: 'Typey McTypeface';
+  src: url('assets/fonts/Typey.otf') format('opentype');
 }
 
-body, html {
-    height: 100%;
-    margin: 0;
-    overflow: hidden; /* Hide scrollbars */
-    background-color: #F5F2EB;
+@font-face {
+  font-family: 'Mulish';
+  src: url('assets/fonts/Mulish.otf') format('opentype');
+}
+
+body,
+html {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* Hide scrollbars */
+  background-color: #f5f2eb;
 }
 
 .game {
-    /* z-index: 2; */
-    position: absolute;
-    align-items: center;
+  /* z-index: 2; */
+  position: absolute;
+  align-items: center;
 }
 
 .animation {
-    /* z-index: 1; */
+  /* z-index: 1; */
 
-    height: 100vh;
-    width: 100vw;
+  height: 100vh;
+  width: 100vw;
 
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    object-fit: cover;
-    
-    filter: opacity(100%);
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  object-fit: cover;
+
+  filter: opacity(100%);
 }
