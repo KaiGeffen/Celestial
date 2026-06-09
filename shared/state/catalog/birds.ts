@@ -329,7 +329,9 @@ const letGo = new LetGo({
 class Birdsong extends Card {
   onPass(playerWhoPassed: number, owner: number, game: GameModel): void {
     if (playerWhoPassed === owner) {
-      game.create(Zone.Story, owner, dove)
+      game.create(Zone.Story, owner, dove, {
+        index: game.story.acts.length,
+      })
     }
   }
 }

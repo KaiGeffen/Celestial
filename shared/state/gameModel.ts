@@ -420,15 +420,14 @@ export default class GameModel {
       }
 
       case Zone.Story: {
-        this.story.addAct(card, player, index, revealed)
-        const storySlot =
-          index === undefined ? this.story.acts.length - 1 : index
+        const storyIndex = index === undefined ? 0 : index
+        this.story.addAct(card, player, storyIndex, revealed)
 
-        // Any existing Zone.Story animations targeting positions >= storySlot get shifted right
+        // Any existing Zone.Story animations targeting positions >= storyIndex get shifted right
         // because this insertion displaces them (e.g. Immolant onDiscard followed by create-in-story at 0).
         for (const ownerAnims of this.animations) {
           for (const anim of ownerAnims) {
-            if (anim.to === Zone.Story && (anim.index2 ?? 0) >= storySlot) {
+            if (anim.to === Zone.Story && (anim.index2 ?? 0) >= storyIndex) {
               anim.index2 = (anim.index2 ?? 0) + 1
             }
           }
@@ -438,7 +437,7 @@ export default class GameModel {
             from,
             to: Zone.Story,
             card,
-            index2: storySlot,
+            index2: storyIndex,
           }),
         )
         return
