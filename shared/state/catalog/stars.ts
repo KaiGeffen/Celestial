@@ -5,7 +5,9 @@ import { Keywords } from '../keyword'
 import { Animation } from '../../animation'
 import { Zone } from '../zone'
 import GameModel from '../gameModel'
-import { dove } from './birds'
+import { dove, vulture } from './birds'
+import { sickness } from './shadow'
+import { ashes } from './tokens'
 
 class Stars extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -296,36 +298,34 @@ class Fable extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
+    const createdCards = []
     // Characters
-    if (super.exhale(1, game, player)) {
-      game.create(Zone.Story, player, dove)
+    if (super.exhale(6, game, player)) {
+      createdCards.push(dove)
+      createdCards.push(vulture)
     }
 
     // Conflict
     if (super.exhale(3, game, player)) {
-      // Get the base cost of all cards in the story
-      const baseCosts = [1] //game.pile[player].map((card) => card.cost)
-
-      for (let i = 0; i < game.story.acts.length; ) {
-        // Discard the card if it shares a cost, otherwise move to next card
-        if (game.story.acts[i].card.cost in baseCosts) {
-          game.removeAct(i)
-        } else {
-          i++
-        }
-      }
+      createdCards.push(sickness)
     }
 
     // Moral
     if (super.exhale(1, game, player)) {
-      game.draw(player, 1)
+      createdCards.push(ashes)
+    }
+
+    // Add each to the story in the right order
+    while (createdCards.length > 0) {
+      const card = createdCards.pop()
+      game.create(Zone.Story, player, card)
     }
   }
 }
 const fable = new Fable({
   name: 'Fable',
   id: 8093,
-  text: 'Exhale 5: Draw 3 cards.\nExhale 3: Create a Sickness in the story.\nExhale 1: Discard the 3 cheapest cards from your deck.',
+  text: 'Create these after this:\nExhale 6: Dove & Vulture.\nExhale 3: Sickness.\nExhale 1: Ashes.',
 })
 
 const phi = new Card({
@@ -445,6 +445,6 @@ export {
   starfall,
   // boreas,
   heavens,
-  // fable,
+  fable,
   arise,
 }
