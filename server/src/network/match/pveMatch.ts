@@ -102,9 +102,6 @@ class PveMatch extends Match {
     ).catch((error) => {
       console.error('Error updating match results:', error)
     })
-
-    // Update achievements
-    await AchievementManager.onGamePlayed(this.uuid1, this.game.model, false, 0)
   }
 
   protected async updateAchievements() {

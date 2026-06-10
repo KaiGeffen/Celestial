@@ -149,7 +149,7 @@ export default class DeckThumbnail {
     this.container.add(this.nameText)
 
     if (isNewDeckButton) {
-      this.nameText.setFontStyle('italic')
+      this.nameText.setStroke(undefined, 0)
     }
     this.updateNameBackgroundStyle()
   }
