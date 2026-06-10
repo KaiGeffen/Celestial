@@ -121,7 +121,7 @@ const StyleGeneral: StyleDict = {
 
   // Error text that appears in the center of the screen
   error: {
-    fontFamily: primaryFont,
+    fontFamily: sansFont,
     fontSize: size.large,
     color: Color.error,
   },
