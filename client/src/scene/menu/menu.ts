@@ -109,13 +109,13 @@ export default class Menu {
       },
     })
 
-    const bodyBg = this.scene.add.image(0, 0, 'chrome-body').setInteractive()
-    this.sizer.addBackground(bodyBg)
-
     const strokeBg = this.scene.add
       .rectangle(0, 0, 1, 1)
       .setStrokeStyle(3, Color.backgroundStroke)
     this.sizer.addBackground(strokeBg)
+
+    const bodyBg = this.scene.add.image(0, 0, 'chrome-body').setInteractive()
+    this.sizer.addBackground(bodyBg)
 
     // Anchor in center of screen
     this.scene.plugins.get('rexAnchor')['add'](this.sizer, {
