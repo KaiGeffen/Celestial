@@ -71,31 +71,14 @@
       font-size: 48px;
       color: #321a0f;
       pointer-events: none;
+      text-align: center;
+      white-space: nowrap;
       z-index: 1;
       /* animation: loading-pulse 4s ease-in-out infinite; */
     }
   </style>
 
-  <!-- Optimize Google Analytics loading -->
-  <script>
-    // Initialize dataLayer and gtag stub immediately
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function(){window.dataLayer.push(arguments);};
-    window.gtag('js', new Date());
-    window.gtag('config', 'G-7E0LP0X7Y9');
-
-    // Load the actual GA script
-    window.addEventListener('load', function() {
-      setTimeout(function() {
-        const script = document.createElement('script');
-        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-7E0LP0X7Y9';
-        script.async = true;
-        document.body.appendChild(script);
-      }, 2000); // Delay by 2 seconds after page load
-    });
-  </script>
-
-  <script>
+<script>
     // Detect if user is on a mobile device
     function isMobile() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -106,6 +89,7 @@
       window.location.href = "https://celestialdecks.gg/about/";
     }
   </script>
+
 </head>
 <body>
   <!-- Splash Screen - Shows immediately for fast FCP -->

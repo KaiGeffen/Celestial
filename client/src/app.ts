@@ -8,7 +8,9 @@ import JourneyMatchScene from './scene/journeyMatchScene'
 import { SpectatorMatchScene } from './scene/spectatorMatchScene'
 import TutorialMatchScene from './scene/tutorialScene'
 import DeckSelectorScene from './scene/deckSelectorScene'
-import DeckEditorScene, { DeckEditorJourneyScene } from './scene/deckEditorScene'
+import DeckEditorScene, {
+  DeckEditorJourneyScene,
+} from './scene/deckEditorScene'
 import MatchHistoryScene from './scene/matchHistoryScene'
 
 import OpeningScene from './scene/openingScene'
@@ -19,6 +21,8 @@ import RaceScene from './scene/raceScene'
 import { Space } from './settings/settings'
 import addResizeHandler from './loader/windowResizeManager'
 import initializeSplashScreen from './loader/splashLoader'
+import initializeErrorHandler from './loader/errorHandler'
+import initializeAnalytics from './loader/analyticsLoader'
 
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import RoundRectanglePlugin from 'phaser3-rex-plugins/plugins/roundrectangle-plugin.js'
@@ -130,7 +134,10 @@ export class CelestialGame extends Phaser.Game {
 }
 
 window.onload = () => {
-  // Initialize splash screen transition logic
+  // Do any HTML initialization here
+  initializeErrorHandler()
+  initializeAnalytics()
   initializeSplashScreen()
+
   var game = new CelestialGame(config)
 }
