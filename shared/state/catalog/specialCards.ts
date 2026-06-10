@@ -8,18 +8,23 @@ class Paramountcy extends Card {
   play(player, game: GameModel, index, bonus) {
     super.play(player, game, index, bonus)
 
-    const allowedActsRemaining = MAX_STORY_ACTS - game.story.acts.length - index
+    // Get the number of cards to add to the story (Don't go over 99 in total)
+    const totalActsInStory = game.story.acts.length + index
+    const allowedActsRemaining = MAX_STORY_ACTS - totalActsInStory
     let amt = Math.min(4, game.pile[player].length, allowedActsRemaining)
+
     // The number of copies of paramountcy that have been skipped in the discard
     let paramountcyCount = 0
     for (let i = 0; i < amt; i++) {
+      // Get the top card that is not paramountcy
       const targetIndex = game.pile[player].length - paramountcyCount - 1
-      if (game.pile[player].length > 0 && game.pile[player][targetIndex]) {
-        const card = game.pile[player][targetIndex]
+      const card = game.pile[player][targetIndex]
 
-        // Don't add copies of paramountcy
+      if (card) {
+        // Don't add copies of paramountcy, and don't count them
         if (card.id === this.id) {
           paramountcyCount++
+          amt--
         } else {
           game.moveBetweenZones(Zone.Discard, Zone.Story, player, targetIndex, {
             toIndex: i - paramountcyCount,

@@ -234,7 +234,7 @@ const beggingBowl = new BeggingBowl({
 
 class SuddenInsight extends Card {
   onDraw(player: number, game: GameModel): void {
-    game.status[player].vision += 2
+    game.status[player].vision += 3
   }
 
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -250,7 +250,7 @@ const suddenInsight = new SuddenInsight({
   id: 6001,
   cost: 4,
   points: 4,
-  text: 'When drawn, gain Sight 2.\nExhale 1: Inspire 1',
+  text: 'When drawn, gain Sight 3.\nExhale 1: Inspire 1',
 })
 
 class Realms extends Card {
