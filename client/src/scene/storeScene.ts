@@ -34,15 +34,19 @@ export default class StoreScene extends BaseSceneWithHeader {
     this.createUserStatsDisplay()
     this.createStoreItems()
 
-    // Refresh store when user data is updated (e.g., after purchase)
-    this.game.events.on('userDataUpdated', () => {
-      this.createStoreItems()
+    // Refresh store when user data is updated (e.g., after purchase).
+    // Named method so the listener can be cleanly removed on shutdown.
+    this.game.events.on('userDataUpdated', this.onUserDataUpdated, this)
+    this.events.once('shutdown', () => {
+      this.game.events.off('userDataUpdated', this.onUserDataUpdated, this)
     })
   }
 
-  update(time: number, delta: number): void {
-    super.update(time, delta)
+  // No update() override needed — stats are refreshed via the userDataUpdated event.
+
+  private onUserDataUpdated(): void {
     this.updateUserStatsDisplay()
+    this.createStoreItems()
   }
 
   private createUserStatsDisplay(): void {
@@ -112,9 +116,6 @@ export default class StoreScene extends BaseSceneWithHeader {
     // Remove existing scrollable panel if it exists
     if (this.scrollablePanel) {
       this.scrollablePanel.destroy()
-
-      // Remove previous panels wheel event
-      this.input.off('wheel')
     }
 
     // Create a sizer for the purchaseable items
@@ -139,56 +140,27 @@ export default class StoreScene extends BaseSceneWithHeader {
       )
 
       if (unowned.length === 0) {
-        // Write the "all Owned" message
-        const messageSizer = this.rexUI.add.sizer({
-          orientation: 'vertical',
-          width: Space.windowWidth,
-          height: Space.windowHeight - this.headerHeight,
-        })
-        const messageText = this.add
-          .text(0, 0, 'All Cosmetics owned', Style.header)
-          .setOrigin(0.5)
-        messageSizer.addSpace()
-        messageSizer.add(messageText)
-        messageSizer.addSpace()
-        sizer.add(messageSizer)
+        sizer.add(this.createEmptyMessage('All Cosmetics owned'))
       } else {
         unowned.forEach((item) => {
           sizer.add(this.createCosmeticItem(item))
         })
       }
     } else {
-      // Get card inventory (owned cards)
       const cardInventory = UserSettings._get('cardInventory') || []
+      const cards = Catalog.collectibleCards.filter(
+        (card) => !cardInventory[card.id],
+      )
 
-      // Get all collectible cards that are NOT owned
-      const cards = Catalog.collectibleCards.filter((card) => {
-        // Check if card is owned (indexed by card ID)
-        return !cardInventory[card.id]
-      })
-
-      // If all cards are owned, show a message instead
       if (cards.length === 0) {
-        const messageSizer = this.rexUI.add.sizer({
-          orientation: 'vertical',
-          width: Space.windowWidth,
-          height: Space.windowHeight - this.headerHeight,
-        })
-        const messageText = this.add
-          .text(0, 0, 'All cards owned', Style.header)
-          .setOrigin(0.5)
-
-        messageSizer.addSpace().add(messageText).addSpace()
-        sizer.add(messageSizer)
+        sizer.add(this.createEmptyMessage('All cards owned'))
       } else {
-        // Create store items for each card
         cards.forEach((card) => {
           sizer.add(this.createCardItem(card))
         })
       }
     }
 
-    // Create scrollable panel
     this.scrollablePanel = newScrollablePanel(this, {
       x: 0,
       y: this.headerHeight,
@@ -199,6 +171,17 @@ export default class StoreScene extends BaseSceneWithHeader {
         height: `100%-${this.headerHeight}`,
       },
     })
+  }
+
+  private createEmptyMessage(text: string): Phaser.GameObjects.GameObject {
+    const sizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      width: Space.windowWidth,
+      height: Space.windowHeight - this.headerHeight,
+    })
+    const messageText = this.add.text(0, 0, text, Style.header).setOrigin(0.5)
+    sizer.addSpace().add(messageText).addSpace()
+    return sizer
   }
 
   private createCosmeticItem(
@@ -241,7 +224,6 @@ export default class StoreScene extends BaseSceneWithHeader {
   }
 
   private createCardItem(card: Card): Phaser.GameObjects.GameObject {
-    // Use CardImage for the card
     const cardImageContainer = new ContainerLite(
       this,
       0,
@@ -249,16 +231,20 @@ export default class StoreScene extends BaseSceneWithHeader {
       Space.cardWidth,
       Space.cardHeight,
     )
-    const cardImage = new CardImage(card, cardImageContainer, true, false)
+    // Pass interactive=false so CardImage doesn't call setInteractive() on the subject image.
+    // We then manually set imageSubject as the sole hit area (exact card size, no overflow)
+    // and strip interactivity from the text elements, whose hit regions can extend beyond card
+    // bounds and intercept clicks intended for adjacent cards.
+    const cardImage = new CardImage(card, cardImageContainer, false, false)
 
-    // Set click handler on the card image
     cardImage.setOnClick(() => {
-      // Launch the purchase menu
-      this.scene.launch('MenuScene', {
-        menu: 'purchaseItem',
-        card,
-      })
+      this.scene.launch('MenuScene', { menu: 'purchaseItem', card })
     })
+
+    cardImage.imageSubject.setInteractive()
+    cardImage.txtCost.disableInteractive()
+    cardImage.txtPoints.disableInteractive()
+    cardImage.txtText.disableInteractive()
 
     return cardImageContainer
   }
