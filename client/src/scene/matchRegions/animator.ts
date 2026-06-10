@@ -5,13 +5,7 @@ import { Animation } from '../../../../shared/animation'
 import { Zone } from '../../../../shared/state/zone'
 import CardLocation from './cardLocation'
 import { CardImage } from '../../lib/cardImage'
-import {
-  Space,
-  Time,
-  Depth,
-  Ease,
-  BBStyle,
-} from '../../settings/settings'
+import { Space, Time, Depth, Ease, BBStyle } from '../../settings/settings'
 import Catalog from '../../../../shared/state/catalog'
 import { View } from '../matchScene'
 import Card from '../../../../shared/state/card'
@@ -40,52 +34,62 @@ export default class Animator {
 
     this.animateAllReveals(state)
 
-    const hasReset = state.animations.some((anims) =>
-      anims.some((a) => a.from === Zone.Reset),
-    )
     const bubbleSlots = this.resolveBubbles.playForResolvedActs(
       state,
       this.view.story.resolvedCards,
-      hasReset,
     )
 
     // Total Zone.Story insertions across both owners — used to correctly compute the
     // pre-insertion story length so animateStoryInsertShift applies the full shift once.
     // Cards played directly from hand (e.g. Sky Burial) have no animation entry, so we
     // also compare story size against the previous state to catch unaminated insertions.
-    const animatedStoryInsertions = state.animations[0]
-      .concat(state.animations[1])
-      .filter((a) => a.to === Zone.Story && a.from !== Zone.Story).length
-    const storyCountDelta = !state.isRecap
-      ? state.story.acts.length - this.lastHiddenCards.length
-      : 0
-    const totalStoryInsertions = Math.max(
-      animatedStoryInsertions,
-      storyCountDelta,
-    )
+
+    // How many cards entered the story from animations
+    let storyCountDelta = 0
+
+    // During the day, it's new length minus previous length
+    if (!state.isRecap) {
+      storyCountDelta = state.story.acts.length - this.lastHiddenCards.length
+    }
+    // During the night, it's the number of cards added minus removed
+    else {
+      const allAnimations = state.animations[0].concat(state.animations[1])
+
+      const cardsAdded = allAnimations.filter((a) => a.to === Zone.Story).length
+      const cardsRemoved = allAnimations.filter(
+        (a) => a.from === Zone.Story,
+      ).length
+
+      storyCountDelta = cardsAdded - cardsRemoved
+    }
+
+    // TODO what
     let storyInsertShiftDone = false
 
     for (let owner = 0; owner < 2; owner++) {
       for (let i = 0; i < state.animations[owner].length; i++) {
         let animation = state.animations[owner][i]
-        const slot = i + bubbleSlots
+        const timeslot = i + bubbleSlots
 
         if (animation.from === Zone.Mulligan) {
-          this.animateMulligan(animation, owner, slot, state)
+          this.animateMulligan(animation, owner, timeslot, state)
         }
         // Shuffle a player's deck
         else if (animation.from === Zone.Shuffle) {
-          this.animateShuffle(owner, slot, state)
+          this.animateShuffle(owner, timeslot, state)
         }
         // Transform a card
         else if (animation.from === Zone.Transform) {
-          this.animateTransform(animation, slot, owner)
+          this.animateTransform(animation, timeslot, owner)
         } else if (animation.from === Zone.Status) {
-          this.view.statusRegion.animateStatus(animation, owner, slot)
+          this.view.statusRegion.animateStatus(animation, owner, timeslot)
         } else if (animation.from === Zone.Reset) {
-          this.resolveBubbles.popBubbles(slot, state.story.resolvedActs.length)
+          this.resolveBubbles.popBubbles(
+            timeslot,
+            state.story.resolvedActs.length,
+          )
         }
-        // In all other cases, move it from start to end
+        // In all other cases, move it from start to end zone
         else {
           let start = this.getStart(animation, state, owner)
           let end = this.getEnd(animation, state, owner)
@@ -104,7 +108,7 @@ export default class Animator {
             this.animateCard(
               card,
               end,
-              slot,
+              timeslot,
               permanentCard,
               this.getSound(animation),
               animation.to === Zone.Story ? SHRUNKEN_CARD_SCALE : undefined,
@@ -117,8 +121,14 @@ export default class Animator {
             if (animation.from === Zone.Story) {
               card.container.setScale(SHRUNKEN_CARD_SCALE)
               card.show()
-              this.animateStoryShift(animation.index ?? 0, slot, state)
+              this.animateStoryRemoveShift(
+                animation.index ?? 0,
+                timeslot,
+                state,
+              )
             }
+
+            // TODO Review and refactor
 
             // Shift existing story cards right when a card is inserted mid-story.
             // Only run once per state — multiple simultaneous insertions (e.g. Zoomies) must
@@ -130,15 +140,15 @@ export default class Animator {
             ) {
               this.animateStoryInsertShift(
                 animation.index2 ?? 0,
-                slot,
+                timeslot,
                 state,
-                totalStoryInsertions,
+                storyCountDelta,
               )
               storyInsertShiftDone = true
             }
           } else {
             // Emphasize the card if it stayed in the same zone
-            this.animateEmphasis(card, slot)
+            this.animateEmphasis(card, timeslot)
           }
         }
       }
@@ -502,6 +512,7 @@ export default class Animator {
     })
   }
 
+  // Compute the dx between cards in the story
   private computeStoryDx(totalLength: number): number {
     let dx = Space.cardWidth * 0.8 - Space.storyXOverlap
     if (totalLength <= 1) return dx
@@ -515,26 +526,28 @@ export default class Animator {
     return dx
   }
 
-  private animateStoryShift(
+  // Animate the story shifting to accomodate a card being removed
+  private animateStoryRemoveShift(
     removalActiveIndex: number,
-    slot: number,
+    timeslot: number,
     state: GameModel,
   ): void {
     const resolvedCount = state.story.resolvedActs.length
-    const newTotalLength =
-      state.story.acts.length + (state.isRecap ? resolvedCount : 0)
-    const oldTotalLength = newTotalLength + 1
+    const lengthOld = resolvedCount + state.story.acts.length
+    const lengthNew = lengthOld - 1
 
-    const oldDx = this.computeStoryDx(oldTotalLength)
-    const newDx = this.computeStoryDx(newTotalLength)
+    const dxOld = this.computeStoryDx(lengthOld)
+    const dxNew = this.computeStoryDx(lengthNew)
 
+    // Starting from the where the card was removed, shift all to take up new space
     for (let k = removalActiveIndex; k < this.view.story.cards.length; k++) {
       const card = this.view.story.cards[k]
       if (!card) continue
 
+      // Where it was versus where it is now
       const fullIndexOld = resolvedCount + k + 1
       const fullIndexNew = resolvedCount + k
-      const shiftX = oldDx * fullIndexOld - newDx * fullIndexNew
+      const shiftX = dxOld * fullIndexOld - dxNew * fullIndexNew
 
       card.container.x += shiftX
 
@@ -542,7 +555,8 @@ export default class Animator {
         targets: card.container,
         x: card.container.x - shiftX,
         delay:
-          slot * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
+          timeslot *
+          (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
         duration: Time.match.recapTween,
         ease: Ease.card,
       })
@@ -752,11 +766,10 @@ class StoryResolveBubbles {
    * Draws resolve bubbles for each settled act (staggered when a single act just resolved).
    * Returns recap tween slots to align other recap animations with those bubble tweens.
    */
-  playForResolvedActs(
-    state: GameModel,
-    resolvedCards: CardImage[],
-    isResetState = false,
-  ): number {
+  playForResolvedActs(state: GameModel, resolvedCards: CardImage[]): number {
+    const isResetState = state.animations.some((anims) =>
+      anims.some((a) => a.from === Zone.Reset),
+    )
     const resolvedCount = state.story.resolvedActs.length
 
     // If a new round started, clear the reset tracking
