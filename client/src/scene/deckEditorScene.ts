@@ -148,6 +148,10 @@ export default class DeckEditorScene extends BaseScene {
       },
       onCosmetics: () => this.openStylesMenu(),
       onShare: () => {
+        if (Flags.local) {
+          const deckArray = this.getDeckCode()
+          navigator.clipboard.writeText(JSON.stringify(deckArray))
+        }
         this.scene.launch('MenuScene', {
           menu: 'shareDeckCode',
           deckCode: encodeShareableDeckCode(this.getDeckCode()),

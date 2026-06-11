@@ -5,7 +5,7 @@
     "prereq": [[]],
     "difficulty": 1,
     "deck": [0, 0, 4, 4, 4, 4, 6, 6, 7, 7, 12, 12, 13, 18, 18],
-    "opponent": [3, 3, 3, 3, 3, 3, 6, 6, 6, 11, 11, 11, 14, 14, 82],
+    "opponent": [0, 0, 0, 4, 4, 4, 4, 4, 9, 9, 9, 12, 12, 82, 82],
     "cards": [7],
     "tip": "Playing cheap cards with Fleeting means your deck will be better after you shuffle."
   },
