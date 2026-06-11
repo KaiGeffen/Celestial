@@ -120,24 +120,22 @@ export default class Server {
     })
   }
 
-  // Log in with the server for user with given OAuth token
-  static login(payload: GoogleJwtPayload, game: Phaser.Game, callback) {
+  // Log in with the server using a Google ID token (credential).
+  static login(credential: string, game: Phaser.Game, callback) {
     /*
-    Destructure the payload
-    Immediately send the payload information to server
-    Register a listener for the response of the user-data
-    Listen for a prompt for user to send initial values (Local storage information)
-    Listen for invalid_token and show an error message
-    Listen for close ? and resend the login information
+    Send the raw Google credential to the server, which verifies it and derives
+    the account id itself. We decode it here only to compute the uuid for local
+    bookkeeping — the server never trusts this client-side value.
+    Register a listener for the response of the user-data.
+    Listen for a prompt for user to send initial values (Local storage information).
+    Listen for invalid_token and show an error message.
 
     This websocket stays open, and when the user updates anything that info
-    gets sent to the server. The wsServer above does get set by this, and user
-    in the static methods below. 
+    gets sent to the server.
     */
 
-    const email = payload.email
+    const payload = jwt_decode<GoogleJwtPayload>(credential)
     const uuid = uuidv5(payload.sub, UUID_NAMESPACE)
-    const jti = payload.jti
 
     this.connectAndAuthenticate(
       uuid,
@@ -145,10 +143,8 @@ export default class Server {
       callback,
       () => {
         server.send({
-          type: 'signIn',
-          email,
-          uuid,
-          jti,
+          type: 'loginGoogle',
+          credential,
         })
       },
       {
@@ -586,12 +582,11 @@ export default class Server {
     const storedToken = localStorage.getItem(Url.gsi_token)
     if (storedToken !== null) {
       console.log('Reconnecting with stored token')
-      // User signed in with OAuth - decode token and send signIn
+      // User signed in with Google - resend the credential for server-side
+      // verification. We decode it only to compute the uuid for local use.
       try {
         const payload = jwt_decode<GoogleJwtPayload>(storedToken)
-        const email = payload.email
         const uuid = uuidv5(payload.sub, UUID_NAMESPACE)
-        const jti = payload.jti
 
         this.connectAndAuthenticate(
           uuid,
@@ -599,10 +594,8 @@ export default class Server {
           () => {},
           () => {
             server.send({
-              type: 'signIn',
-              email,
-              uuid,
-              jti,
+              type: 'loginGoogle',
+              credential: storedToken,
             })
           },
         )

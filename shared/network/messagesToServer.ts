@@ -3,11 +3,15 @@ import { CosmeticSet } from '../types/cosmeticSet'
 import { Mulligan } from '../settings'
 
 export default interface messagesToServer {
-  // TODO
+  // Guest sign-in only. UUID is a client-generated random id with no identity
+  // claim — provider-backed accounts (Google/Steam) must use their verified
+  // login messages below, never this path.
   signIn: {
-    email?: string
     uuid: string
-    jti?: string
+  }
+  loginGoogle: {
+    // Raw Google Identity Services ID token (credential), verified server-side.
+    credential: string
   }
   loginSteam: {
     ticket: string

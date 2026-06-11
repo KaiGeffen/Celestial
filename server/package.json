@@ -19,6 +19,7 @@
     "drizzle-kit": "^0.20.6",
     "drizzle-orm": "^0.41.0",
     "elo-rank": "^1.0.4",
+    "google-auth-library": "^10.7.0",
     "nodemon": "^3.1.9",
     "pg": "^8.11.3",
     "pg-native": "^3.3.0",

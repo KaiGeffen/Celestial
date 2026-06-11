@@ -1,8 +1,6 @@
 import 'phaser'
-import jwt_decode from 'jwt-decode'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import type { CredentialResponse } from 'google-one-tap'
-import type { GoogleJwtPayload } from '../types/google'
 import Loader from '../loader/loader'
 import Server from '../server'
 import { server } from '../server'
@@ -70,8 +68,7 @@ export class SigninScene extends Phaser.Scene {
 
       // If user has a gsi token, try signing in
       if (storedToken !== null) {
-        const payload = jwt_decode<GoogleJwtPayload>(storedToken)
-        Server.login(payload, this.game, () => this.onOptionClick())
+        Server.login(storedToken, this.game, () => this.onOptionClick())
 
         // Show the guest button when menu closes (If user is in registering username step of the account registration flow)
         this.events.on('showGuestButton', () => {
@@ -210,10 +207,8 @@ export class SigninScene extends Phaser.Scene {
         // Store the token for next time
         localStorage.setItem(Url.gsi_token, token.credential)
 
-        const payload = jwt_decode<GoogleJwtPayload>(token.credential)
-
-        // Send jti to confirm connection. After server responds, complete login
-        Server.login(payload, this.game, () => this.onOptionClick())
+        // Send the raw credential; the server verifies it and derives identity.
+        Server.login(token.credential, this.game, () => this.onOptionClick())
       },
     })
 

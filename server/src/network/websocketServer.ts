@@ -6,6 +6,7 @@ import {
 } from '../../../shared/network/settings'
 import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 import { verifySteamTicket } from './steamAuth'
+import { verifyGoogleCredential } from './googleAuth'
 
 import { db } from '../db/db'
 import { players, approvedRefs, cosmeticsTransactions } from '../db/schema'
@@ -89,8 +90,14 @@ export default function createWebSocketServer() {
         playerNumber: null, // 0 or 1 for current match
       }
 
-      const handleSignInForUuid = async (uuid: string, email?: string) => {
-        potentialEmail = email ?? null
+      const handleSignInForUuid = async (
+        uuid: string,
+        opts: {
+          provider: 'guest' | 'google' | 'steam'
+          email?: string | null
+        },
+      ) => {
+        potentialEmail = opts.email ?? null
         id = uuid
 
         // Check if user is already connected with a live websocket
@@ -105,13 +112,24 @@ export default function createWebSocketServer() {
 
         // Check if user exists in database
         const result = await db
-          .select({ id: players.id })
+          .select({ id: players.id, email: players.email })
           .from(players)
           .where(eq(players.id, uuid))
           .limit(1)
 
         if (result.length === 0) {
           ws.send({ type: 'promptUserInit' })
+          return
+        }
+
+        // Security gate: the guest path carries no identity proof, so it must
+        // never authenticate a provider-backed account. Google accounts always
+        // store a verified email; reject any attempt to claim one via signIn.
+        if (opts.provider === 'guest' && result[0].email) {
+          id = null
+          potentialEmail = null
+          ws.send({ type: 'invalidToken' })
+          ws.close(1008, 'Account requires provider sign-in')
           return
         }
 
@@ -141,10 +159,28 @@ export default function createWebSocketServer() {
         }
       }
 
-      ws.on('signIn', async ({ email, uuid, jti }) => {
-        // TODO If user has sent an email, check their jti
-        await handleSignInForUuid(uuid, email)
+      ws.on('signIn', async ({ uuid }) => {
+        // Guest sign-in: no identity proof, so this can only ever reach
+        // guest accounts (enforced inside handleSignInForUuid).
+        await handleSignInForUuid(uuid, { provider: 'guest' })
       })
+        .on('loginGoogle', async ({ credential }) => {
+          console.log('Login Google...')
+          const identity = await verifyGoogleCredential(credential)
+          if (!identity) {
+            ws.send({ type: 'invalidToken' })
+            ws.close(1008, 'Invalid Google credential')
+            return
+          }
+
+          // Derive the account id from the VERIFIED subject, never from
+          // anything the client asserted.
+          const googleUuid = uuidv5(identity.sub, UUID_NAMESPACE)
+          await handleSignInForUuid(googleUuid, {
+            provider: 'google',
+            email: identity.email,
+          })
+        })
         .on('loginSteam', async ({ ticket }) => {
           console.log('Login Steam...')
           const steamId = await verifySteamTicket(ticket)
@@ -155,7 +191,7 @@ export default function createWebSocketServer() {
           }
 
           const steamUuid = uuidv5(steamId, UUID_NAMESPACE)
-          await handleSignInForUuid(steamUuid)
+          await handleSignInForUuid(steamUuid, { provider: 'steam' })
         })
         .on('sendDecks', async ({ decks }) => {
           if (!id) return
