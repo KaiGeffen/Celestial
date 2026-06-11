@@ -169,6 +169,51 @@ export default class Server {
     )
   }
 
+  // Log in using a previously issued server session token. This is the normal
+  // reconnect/return path for Google users — it does not need a fresh (1-hour)
+  // Google token.
+  static loginWithSession(token: string, game: Phaser.Game, callback): void {
+    // The session token is a JWT; we decode it (no secret needed) only to read
+    // the uuid for local bookkeeping. The server re-verifies its signature.
+    let uuid: string
+    try {
+      uuid = jwt_decode<{ uuid: string }>(token).uuid
+    } catch (e) {
+      console.error('Failed to decode session token:', e)
+      localStorage.removeItem(Url.session_token)
+      return
+    }
+
+    this.connectAndAuthenticate(
+      uuid,
+      game,
+      callback,
+      () => {
+        server.send({
+          type: 'loginSession',
+          token,
+        })
+      },
+      {
+        onPromptUserInit: () => this.promptForUsernameRegistration(game),
+        onInvalidToken: () => {
+          // A normal outcome once the session expires — clear it and fall back
+          // to the sign-in UI rather than showing an error.
+          console.log('Session expired or invalid; showing sign-in.')
+          localStorage.removeItem(Url.session_token)
+          if (server) server.close(code)
+          server = undefined
+
+          const signinEl = document.getElementById('signin')
+          if (signinEl) signinEl.hidden = false
+          game.scene.getScenes(true).forEach((scene) => {
+            scene.events.emit('showGuestButton')
+          })
+        },
+      },
+    )
+  }
+
   // Log in with Steam (Electron builds only)
   static async loginSteam(game: Phaser.Game, callback): Promise<boolean> {
     const api = window.electronAPI
@@ -241,6 +286,10 @@ export default class Server {
     callback: () => void,
   ) {
     server
+      .on('sessionToken', ({ token }) => {
+        // Persist the server-issued session for future reconnects.
+        localStorage.setItem(Url.session_token, token)
+      })
       .on('sendUserData', (data: messagesToClient['sendUserData']) => {
         // Store the uuid and user data after successful login
         this.userData = {
@@ -305,8 +354,9 @@ export default class Server {
 
     console.log('Logging out')
 
-    // Clear the sign-in token
+    // Clear the sign-in tokens
     localStorage.removeItem(Url.gsi_token)
+    localStorage.removeItem(Url.session_token)
 
     if (server) server.close(code)
     server = undefined
@@ -579,30 +629,18 @@ export default class Server {
       server = undefined
     }
 
-    const storedToken = localStorage.getItem(Url.gsi_token)
-    if (storedToken !== null) {
-      console.log('Reconnecting with stored token')
-      // User signed in with Google - resend the credential for server-side
-      // verification. We decode it only to compute the uuid for local use.
-      try {
-        const payload = jwt_decode<GoogleJwtPayload>(storedToken)
-        const uuid = uuidv5(payload.sub, UUID_NAMESPACE)
+    // Prefer the long-lived session token; it survives Google token expiry.
+    const sessionToken = localStorage.getItem(Url.session_token)
+    if (sessionToken !== null) {
+      console.log('Reconnecting with session token')
+      this.loginWithSession(sessionToken, game, () => {})
+      return
+    }
 
-        this.connectAndAuthenticate(
-          uuid,
-          game,
-          () => {},
-          () => {
-            server.send({
-              type: 'loginGoogle',
-              credential: storedToken,
-            })
-          },
-        )
-      } catch (e) {
-        console.error('Failed to decode token during reconnect:', e)
-      }
-    } else {
+    // No durable session: Google users must re-auth through Google Identity
+    // Services (handled on page load), so we never replay a stored — and likely
+    // expired — Google credential here. Steam and guest can reconnect directly.
+    {
       const steamUuid = localStorage.getItem('steam_uuid')
       if (steamUuid) {
         const api = window.electronAPI

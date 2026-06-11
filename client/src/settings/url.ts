@@ -9,5 +9,6 @@ export const Url = {
   oauth:
     '574352055172-n1nqdc2nvu3172levk2kl5jf7pbkp4ig.apps.googleusercontent.com',
   gsi_token: 'gsi_token_v2',
+  session_token: 'session_token_v1',
   privacyPolicy: 'https://celestialdecks.gg/privacy/',
 }

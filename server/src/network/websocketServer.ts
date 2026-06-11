@@ -7,6 +7,7 @@ import {
 import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 import { verifySteamTicket } from './steamAuth'
 import { verifyGoogleCredential } from './googleAuth'
+import { issueSessionToken, verifySessionToken } from './sessionToken'
 
 import { db } from '../db/db'
 import { players, approvedRefs, cosmeticsTransactions } from '../db/schema'
@@ -176,9 +177,36 @@ export default function createWebSocketServer() {
           // Derive the account id from the VERIFIED subject, never from
           // anything the client asserted.
           const googleUuid = uuidv5(identity.sub, UUID_NAMESPACE)
+
+          // Hand the client a long-lived session token so future reconnects
+          // don't need a fresh (1-hour) Google token.
+          const sessionToken = issueSessionToken({
+            uuid: googleUuid,
+            provider: 'google',
+            email: identity.email,
+          })
+          if (sessionToken) ws.send({ type: 'sessionToken', token: sessionToken })
+
           await handleSignInForUuid(googleUuid, {
             provider: 'google',
             email: identity.email,
+          })
+        })
+        .on('loginSession', async ({ token }) => {
+          const claims = verifySessionToken(token)
+          if (!claims) {
+            ws.send({ type: 'invalidToken' })
+            ws.close(1008, 'Invalid or expired session')
+            return
+          }
+
+          // Rolling expiry: re-issue so active users stay signed in.
+          const refreshed = issueSessionToken(claims)
+          if (refreshed) ws.send({ type: 'sessionToken', token: refreshed })
+
+          await handleSignInForUuid(claims.uuid, {
+            provider: claims.provider,
+            email: claims.email,
           })
         })
         .on('loginSteam', async ({ ticket }) => {

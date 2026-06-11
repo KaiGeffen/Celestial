@@ -3,13 +3,17 @@ import { OAuth2Client } from 'google-auth-library'
 /**
  * Google OAuth client ID this server accepts tokens for. Must match the
  * `client_id` the browser uses with Google Identity Services. Configurable via
- * env; falls back to the (public) production client ID.
+ * env; falls back to the (public) production client ID. Read lazily so a value
+ * from dotenv (loaded when db/db.ts is imported) is not missed.
  */
-const GOOGLE_CLIENT_ID =
-  process.env.GOOGLE_CLIENT_ID?.trim() ||
-  '574352055172-n1nqdc2nvu3172levk2kl5jf7pbkp4ig.apps.googleusercontent.com'
+function getClientId(): string {
+  return (
+    process.env.GOOGLE_CLIENT_ID?.trim() ||
+    '574352055172-n1nqdc2nvu3172levk2kl5jf7pbkp4ig.apps.googleusercontent.com'
+  )
+}
 
-const client = new OAuth2Client(GOOGLE_CLIENT_ID)
+const client = new OAuth2Client()
 
 export interface GoogleIdentity {
   /** Google's stable subject identifier for the account. */
@@ -36,7 +40,7 @@ export async function verifyGoogleCredential(
   try {
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: GOOGLE_CLIENT_ID,
+      audience: getClientId(),
     })
     const payload = ticket.getPayload()
     if (!payload?.sub) return null

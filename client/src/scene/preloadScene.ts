@@ -64,18 +64,20 @@ export class SigninScene extends Phaser.Scene {
         console.error('Steam login failed:', e)
       })
     } else {
-      const storedToken = localStorage.getItem(Url.gsi_token)
+      const sessionToken = localStorage.getItem(Url.session_token)
 
-      // If user has a gsi token, try signing in
-      if (storedToken !== null) {
-        Server.login(storedToken, this.game, () => this.onOptionClick())
+      // Auto sign-in only from a durable session token. We never replay a
+      // stored Google credential — it expires after ~1 hour, and a fresh one is
+      // issued by Google Identity Services (auto-select) on page load.
+      if (sessionToken !== null) {
+        Server.loginWithSession(sessionToken, this.game, () =>
+          this.onOptionClick(),
+        )
 
         // Show the guest button when menu closes (If user is in registering username step of the account registration flow)
         this.events.on('showGuestButton', () => {
           this.guestButton?.setVisible(true)
         })
-
-        // TODO If this fails because the token is invalid or the server is offline, show standard options
       } else {
         // Show the GSI button
         document.getElementById('signin').hidden = false
@@ -150,7 +152,9 @@ export class SigninScene extends Phaser.Scene {
       muteClick: true,
       depth: -1,
     })
-    this.guestButton.setVisible(localStorage.getItem(Url.gsi_token) === null)
+    this.guestButton.setVisible(
+      localStorage.getItem(Url.session_token) === null,
+    )
 
     this.plugins.get('rexAnchor')['add'](guestButtonContainer, {
       x: `50%`,
@@ -204,10 +208,13 @@ export class SigninScene extends Phaser.Scene {
       ux_mode: 'popup',
       auto_select: true,
       callback: (token: CredentialResponse) => {
-        // Store the token for next time
-        localStorage.setItem(Url.gsi_token, token.credential)
+        // Auto-select may fire this even though a session login already
+        // connected us — don't open a redundant second connection.
+        if (this.signedInOrGuest) return
 
-        // Send the raw credential; the server verifies it and derives identity.
+        // Send the raw credential; the server verifies it and returns a durable
+        // session token (persisted by the sessionToken handler). The Google
+        // credential itself is ephemeral and intentionally not stored.
         Server.login(token.credential, this.game, () => this.onOptionClick())
       },
     })

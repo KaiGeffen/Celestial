@@ -13,6 +13,10 @@ export default interface messagesToServer {
     // Raw Google Identity Services ID token (credential), verified server-side.
     credential: string
   }
+  loginSession: {
+    // Server-issued session token from a previous verified provider login.
+    token: string
+  }
   loginSteam: {
     ticket: string
   }
