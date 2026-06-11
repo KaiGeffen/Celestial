@@ -56,16 +56,20 @@ export default class OptionsMenu extends Menu {
 
     // The non-menu scene which is active, used for changing scenes
     let activeScene = params.activeScene
-    this.createContent(activeScene)
+    this.createContent()
 
     this.layout()
+
+    // Anchor the cancel / go-home buttons below the menu (done after layout so
+    // the menu's height is known)
+    this.createActionButtons(activeScene)
 
     // After layout is complete, move the highlight to the selected tab button
     const y = this.tabBtns[selectedTab].getGlobalPosition()[1]
     this.tabSelector.setY(y)
   }
 
-  private createContent(activeScene: BaseScene) {
+  private createContent() {
     // Replace the background
     const background = this.scene.add.image(0, 0, 'chrome-bodyAlt')
     this.sizer.addBackground(background)
@@ -90,7 +94,7 @@ export default class OptionsMenu extends Menu {
     this.subsizer.add(tabs).addSpace()
 
     // Create a sizer for each of the tabs
-    this.subpanels['general'] = this.createGeneralPanel(activeScene)
+    this.subpanels['general'] = this.createGeneralPanel()
     this.subpanels['audio'] = this.createAudioPanel()
     this.subpanels['rulebook'] = this.createRulebookPanel()
     this.subpanels['credits'] = this.createCreditsPanel()
@@ -184,7 +188,7 @@ export default class OptionsMenu extends Menu {
     return tabsSizer
   }
 
-  private createGeneralPanel(activeScene: BaseScene) {
+  private createGeneralPanel() {
     let sizer = this.scene.rexUI.add
       .sizer({
         orientation: 'vertical',
@@ -206,8 +210,6 @@ export default class OptionsMenu extends Menu {
       .add(this.createCanBeSpectated(), { expand: true })
       .addSpace()
       .add(this.createHotkeys(), { expand: true })
-      .addSpace()
-      .add(this.createHome(activeScene), { expand: true })
 
     return sizer
   }
@@ -458,11 +460,15 @@ export default class OptionsMenu extends Menu {
     return sizer
   }
 
-  private createHome(activeScene: BaseScene) {
-    let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
+  // Build the cancel / go-home action buttons and anchor them below the menu,
+  // centered horizontally (x = 50%).
+  private createActionButtons(activeScene: BaseScene): void {
+    const sizer = this.scene.rexUI.add.sizer({
+      space: { item: Space.pad },
+    })
 
-    let container = new ContainerLite(this.scene, 0, 0, Space.buttonWidth, 50)
-    sizer.addSpace().add(this.createCancelButton()).addSpace()
+    // Cancel button
+    sizer.add(this.createCancelButton())
 
     // For Electron builds, add an exit game button
     if (typeof (window as any).electronAPI !== 'undefined') {
@@ -478,10 +484,11 @@ export default class OptionsMenu extends Menu {
         text: 'Exit Game',
         f: () => (window as any).electronAPI.quit(),
       })
-      sizer.add(exitContainer).addSpace()
+      sizer.add(exitContainer)
     }
 
-    sizer.add(container).addSpace()
+    // The go-home button (its text/behavior varies by context)
+    const container = new ContainerLite(this.scene, 0, 0, Space.buttonWidth, 50)
 
     // Check if tutorials have been completed
     const missions = UserSettings._get('completedMissions')
@@ -552,8 +559,16 @@ export default class OptionsMenu extends Menu {
       text: s,
       f: action,
     })
+    sizer.add(container)
 
-    return sizer
+    // Lay out to compute size, then anchor the row centered just below the
+    // menu, and lay out again to apply the new position.
+    sizer.layout()
+    this.scene.plugins.get('rexAnchor')['add'](sizer, {
+      x: `50%`,
+      y: `50%+${this.sizer.height / 2 + Space.pad + sizer.height / 2}`,
+    })
+    sizer.layout()
   }
 
   private createVolumeSection(
