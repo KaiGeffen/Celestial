@@ -28,12 +28,17 @@ export class SigninScene extends Phaser.Scene {
   // Allows for typing objects in RexUI library
   rexUI: RexUIPlugin
 
-  // True when user is signed or chose to be a guest
+  // True when user is signed in or chose to be a guest
   signedInOrGuest: boolean = false
   guestButton?: Button
+
+  // The login and quit buttons exist just on Steam build
   steamLoginButton?: Button
   quitButton?: Button
+
   private txt: Phaser.GameObjects.Text
+
+  // When the scene started
   private timeSceneStart: number
 
   constructor(args) {
@@ -88,10 +93,8 @@ export class SigninScene extends Phaser.Scene {
     }
 
     // Text describing anything going on
-    this.txt = this.add
-      .text(Space.windowWidth / 2, Space.windowHeight / 2, '', Style.header)
-      .setOrigin(0.5)
-      .setDepth(10)
+    this.txt = this.add.text(0, 0, '', Style.header).setOrigin(0.5)
+    this.plugins.get('rexAnchor')['add'](this.txt, { x: '50%', y: '50%' })
   }
 
   // Signal to user any disconnections or attempts to reconnect
@@ -116,6 +119,7 @@ export class SigninScene extends Phaser.Scene {
 
   // Create buttons for each of the signin options (Guest, OAuth)
   private createButtons(): void {
+    // Steam buttons
     if (Flags.isElectronBuild()) {
       this.createSteamLoginButton()
       const quitButtonContainer = this.add.container()
@@ -135,6 +139,7 @@ export class SigninScene extends Phaser.Scene {
       return
     }
 
+    // Normal button
     const guestButtonContainer = this.add.container()
     this.guestButton = new Buttons.Basic({
       within: guestButtonContainer,
@@ -152,6 +157,8 @@ export class SigninScene extends Phaser.Scene {
       muteClick: true,
       depth: -1,
     })
+
+    // If signing in with a session token, hide this
     this.guestButton.setVisible(
       localStorage.getItem(Url.session_token) === null,
     )
@@ -197,6 +204,7 @@ export class SigninScene extends Phaser.Scene {
     // Ensure that music is playing
     ensureMusic(this)
 
+    // If loading is already complete, start the first scene
     if (!this.load.isLoading()) {
       this.startFirstScene()
     }
@@ -256,13 +264,14 @@ export class SigninScene extends Phaser.Scene {
       return
     }
 
-    // If tutorials aren't all finished, show the opening cinematic
+    // If tutorials aren't all finished, go to the opening cinematic
     const missions = UserSettings._get('completedMissions')
     if (!missions[TUTORIAL_LENGTH - 1]) {
       this.scene.start('OpeningScene')
       return
     }
 
+    // Otherwise (Standard case), go to the home screen
     this.scene.start('HomeScene')
   }
 
@@ -281,7 +290,7 @@ export class PreloadScene extends SigninScene {
 
   // Load all assets used throughout the game
   preload(): void {
-    // Ensure that every user setting is either set, or set it to its default value
+    // Ensure that user settings are all set, or set them to their default value
     UserSettings._ensure()
 
     // Ensure that audio plays even when tab loses focus
@@ -301,7 +310,7 @@ export class PreloadScene extends SigninScene {
       }
     })
 
-    // NOTE This does not block and these assets won't be loaded in time for below code
+    // NOTE This does not block and these assets won't be loaded in time for the below code
     Loader.loadAll(this)
 
     super.create()
