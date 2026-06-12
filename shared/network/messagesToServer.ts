@@ -57,8 +57,7 @@ export default interface messagesToServer {
   claimMissionRewards: {
     missionId: number
   }
-  // Queueing events. The player's identity comes from their authenticated
-  // session on the server — never send a uuid here, it would not be trusted.
+  // Queueing events
   initPvp: {
     password: string
     deck: Deck

@@ -247,7 +247,6 @@ export default function createWebSocketServer() {
         await handleSignInForUuid(uuid, { provider: 'guest' })
       })
         .on('loginGoogle', async ({ credential }) => {
-          console.log('Login Google...')
           const identity = await verifyGoogleCredential(credential)
           if (!identity) {
             ws.send({ type: 'invalidToken' })
@@ -306,49 +305,67 @@ export default function createWebSocketServer() {
           potentialSteamId = steamId
           await handleSignInForUuid(accountId, { provider: 'steam' })
         })
-        .on('sendDecks', authed(async ({ decks }) => {
-          await db
-            .update(players)
-            .set({ decks: decks.map((deck) => JSON.stringify(deck)) })
-            .where(eq(players.id, id))
-        }))
-        .on('sendInventory', authed(async ({ inventory }) => {
-          await db.update(players).set({ inventory }).where(eq(players.id, id))
-        }))
-        .on('sendCompletedMissions', authed(async ({ missions }) => {
-          await db
-            .update(players)
-            .set({ completedmissions: missions })
-            .where(eq(players.id, id))
-        }))
-        .on('sendAvatarExperience', authed(async ({ experience }) => {
-          await db
-            .update(players)
-            .set({ avatar_experience: experience })
-            .where(eq(players.id, id))
-        }))
-        .on('sendJourneyChoice', authed(async ({ characterIndex, choice }) => {
-          if (characterIndex < 0 || characterIndex > 5) return
-          if (choice !== 0 && choice !== 1) return
+        .on(
+          'sendDecks',
+          authed(async ({ decks }) => {
+            await db
+              .update(players)
+              .set({ decks: decks.map((deck) => JSON.stringify(deck)) })
+              .where(eq(players.id, id))
+          }),
+        )
+        .on(
+          'sendInventory',
+          authed(async ({ inventory }) => {
+            await db
+              .update(players)
+              .set({ inventory })
+              .where(eq(players.id, id))
+          }),
+        )
+        .on(
+          'sendCompletedMissions',
+          authed(async ({ missions }) => {
+            await db
+              .update(players)
+              .set({ completedmissions: missions })
+              .where(eq(players.id, id))
+          }),
+        )
+        .on(
+          'sendAvatarExperience',
+          authed(async ({ experience }) => {
+            await db
+              .update(players)
+              .set({ avatar_experience: experience })
+              .where(eq(players.id, id))
+          }),
+        )
+        .on(
+          'sendJourneyChoice',
+          authed(async ({ characterIndex, choice }) => {
+            if (characterIndex < 0 || characterIndex > 5) return
+            if (choice !== 0 && choice !== 1) return
 
-          const row = await db
-            .select({ journey_choices: players.journey_choices })
-            .from(players)
-            .where(eq(players.id, id))
-            .limit(1)
+            const row = await db
+              .select({ journey_choices: players.journey_choices })
+              .from(players)
+              .where(eq(players.id, id))
+              .limit(1)
 
-          const raw = row[0]?.journey_choices
-          const next: (number | null)[] =
-            raw && Array.isArray(raw) ? [...raw] : Array(6).fill(null)
-          while (next.length < 6) next.push(null)
-          next.length = 6
-          next[characterIndex] = choice
+            const raw = row[0]?.journey_choices
+            const next: (number | null)[] =
+              raw && Array.isArray(raw) ? [...raw] : Array(6).fill(null)
+            while (next.length < 6) next.push(null)
+            next.length = 6
+            next[characterIndex] = choice
 
-          await db
-            .update(players)
-            .set({ journey_choices: next })
-            .where(eq(players.id, id))
-        }))
+            await db
+              .update(players)
+              .set({ journey_choices: next })
+              .where(eq(players.id, id))
+          }),
+        )
         .on(
           'sendInitialUserData',
           authed(async ({ username, decks, inventory, missions, ref }) => {
@@ -435,176 +452,194 @@ export default function createWebSocketServer() {
             await sendUserData(ws, id)
           }),
         )
-        .on('setAchievementsSeen', authed(async () => {
-          await AchievementManager.setAchievementsSeen(id)
-        }))
-        .on('accessDiscord', authed(async () => {
-          await AchievementManager.onDiscordAccess(id)
-          await sendUserData(ws, id)
-        }))
-        .on('harvestGarden', authed(async ({ index }) => {
-          const harvestResult = await Garden.harvest(id, index)
-          ws.send({
-            type: 'harvestGardenResult',
-            success: harvestResult.success,
-            newGarden: harvestResult.newGarden,
-            goldReward: harvestResult.goldReward,
-            gemReward: harvestResult.gemReward,
-          })
-        }))
-        .on('claimMissionRewards', authed(async ({ missionId }) => {
-          const missionExists = journeyData.some(
-            (mission) => mission.id === missionId,
-          )
-          if (!missionExists) {
-            ws.send({ type: 'signalError' })
-            return
-          }
-
-          await db.transaction(async (tx) => {
-            const [playerData] = await tx
-              .select({
-                missiongoldclaimed: players.missiongoldclaimed,
-              })
-              .from(players)
-              .where(eq(players.id, id))
-              .limit(1)
-
-            if (!playerData) return
-
-            let missiongoldclaimed = playerData.missiongoldclaimed ?? ''
-            // The mission gold has already been claimed
-            if (missiongoldclaimed?.[missionId] === '1') {
+        .on(
+          'setAchievementsSeen',
+          authed(async () => {
+            await AchievementManager.setAchievementsSeen(id)
+          }),
+        )
+        .on(
+          'accessDiscord',
+          authed(async () => {
+            await AchievementManager.onDiscordAccess(id)
+            await sendUserData(ws, id)
+          }),
+        )
+        .on(
+          'harvestGarden',
+          authed(async ({ index }) => {
+            const harvestResult = await Garden.harvest(id, index)
+            ws.send({
+              type: 'harvestGardenResult',
+              success: harvestResult.success,
+              newGarden: harvestResult.newGarden,
+              goldReward: harvestResult.goldReward,
+              gemReward: harvestResult.gemReward,
+            })
+          }),
+        )
+        .on(
+          'claimMissionRewards',
+          authed(async ({ missionId }) => {
+            const missionExists = journeyData.some(
+              (mission) => mission.id === missionId,
+            )
+            if (!missionExists) {
+              ws.send({ type: 'signalError' })
               return
             }
 
-            const claimArray = missiongoldclaimed.split('')
-            while (claimArray.length <= missionId) claimArray.push('0')
-            claimArray[missionId] = '1'
-            missiongoldclaimed = claimArray.join('')
-
-            await tx
-              .update(players)
-              .set({
-                missiongoldclaimed,
-                coins: sql`${players.coins} + ${REWARD_AMOUNTS.missionComplete}`,
-              })
-              .where(eq(players.id, id))
-          })
-
-          await sendUserData(ws, id)
-        }))
-        // Store
-        .on('purchaseItem', authed(async ({ id: itemId }) => {
-          const cosmeticItem = allPurchaseables.find((p) => p.id === itemId)
-          const isCosmetic = cosmeticItem !== undefined
-          const isCard = !isCosmetic && !!Catalog.getCardById(itemId)
-
-          if (!isCosmetic && !isCard) return
-
-          if (isCosmetic) {
-            // Do the check and deduct atomically: lock the player row so two
-            // rapid purchases can't both read the old balance and double-spend.
             await db.transaction(async (tx) => {
-              const [row] = await tx
-                .select({ gems: players.gems })
-                .from(players)
-                .where(eq(players.id, id))
-                .for('update')
-                .limit(1)
-              if (!row) return
-
-              // Check if user has enough gems
-              if (row.gems < cosmeticItem.cost) {
-                ws.send({ type: 'signalError' })
-                return
-              }
-
-              // Check if already owned (compare item_id, not the transaction id)
-              const existing = await tx
-                .select({ item_id: cosmeticsTransactions.item_id })
-                .from(cosmeticsTransactions)
-                .where(eq(cosmeticsTransactions.player_id, id))
-              if (existing.some((t) => t.item_id === itemId)) {
-                ws.send({ type: 'signalError' })
-                return
-              }
-
-              // Deduct relative to the locked value, and record the purchase
-              await tx
-                .update(players)
-                .set({ gems: sql`${players.gems} - ${cosmeticItem.cost}` })
-                .where(eq(players.id, id))
-
-              await tx.insert(cosmeticsTransactions).values({
-                player_id: id,
-                item_id: itemId,
-                transaction_type: 'purchase',
-              })
-            })
-          } else {
-            // Card purchase — pay with coins, same atomic locked pattern
-            await db.transaction(async (tx) => {
-              const [row] = await tx
+              const [playerData] = await tx
                 .select({
-                  coins: players.coins,
-                  card_inventory: players.card_inventory,
+                  missiongoldclaimed: players.missiongoldclaimed,
                 })
                 .from(players)
                 .where(eq(players.id, id))
-                .for('update')
                 .limit(1)
-              if (!row) return
 
-              // Check if user has enough coins
-              if (row.coins < CARD_COST) {
-                ws.send({ type: 'signalError' })
+              if (!playerData) return
+
+              let missiongoldclaimed = playerData.missiongoldclaimed ?? ''
+              // The mission gold has already been claimed
+              if (missiongoldclaimed?.[missionId] === '1') {
                 return
               }
 
-              // Convert inventory bit string to array
-              const inventoryArray = row.card_inventory
-                .split('')
-                .map((char) => char === '1')
-
-              // Check if already owned
-              if (inventoryArray[itemId] === true) {
-                ws.send({ type: 'signalError' })
-                return
-              }
-
-              // Update inventory to mark card as owned
-              inventoryArray[itemId] = true
-              const newInventoryBitString = inventoryArray
-                .map((value) => (value ? '1' : '0'))
-                .join('')
+              const claimArray = missiongoldclaimed.split('')
+              while (claimArray.length <= missionId) claimArray.push('0')
+              claimArray[missionId] = '1'
+              missiongoldclaimed = claimArray.join('')
 
               await tx
                 .update(players)
                 .set({
-                  coins: sql`${players.coins} - ${CARD_COST}`,
-                  card_inventory: newInventoryBitString,
+                  missiongoldclaimed,
+                  coins: sql`${players.coins} + ${REWARD_AMOUNTS.missionComplete}`,
                 })
                 .where(eq(players.id, id))
-
-              // NOTE This is included just to keep track of purchases, but isn't really needed since the inventory is updated above
-              await tx.insert(cosmeticsTransactions).values({
-                player_id: id,
-                item_id: itemId,
-                transaction_type: 'purchase',
-              })
             })
-          }
 
-          // Send updated user data
-          await sendUserData(ws, id)
-        }))
-        .on('setCosmeticSet', authed(async ({ value }) => {
-          await db
-            .update(players)
-            .set({ cosmetic_set: JSON.stringify(value) })
-            .where(eq(players.id, id))
-        }))
+            await sendUserData(ws, id)
+          }),
+        )
+        // Store
+        .on(
+          'purchaseItem',
+          authed(async ({ id: itemId }) => {
+            const cosmeticItem = allPurchaseables.find((p) => p.id === itemId)
+            const isCosmetic = cosmeticItem !== undefined
+            const isCard = !isCosmetic && !!Catalog.getCardById(itemId)
+
+            if (!isCosmetic && !isCard) return
+
+            if (isCosmetic) {
+              // Do the check and deduct atomically: lock the player row so two
+              // rapid purchases can't both read the old balance and double-spend.
+              await db.transaction(async (tx) => {
+                const [row] = await tx
+                  .select({ gems: players.gems })
+                  .from(players)
+                  .where(eq(players.id, id))
+                  .for('update')
+                  .limit(1)
+                if (!row) return
+
+                // Check if user has enough gems
+                if (row.gems < cosmeticItem.cost) {
+                  ws.send({ type: 'signalError' })
+                  return
+                }
+
+                // Check if already owned (compare item_id, not the transaction id)
+                const existing = await tx
+                  .select({ item_id: cosmeticsTransactions.item_id })
+                  .from(cosmeticsTransactions)
+                  .where(eq(cosmeticsTransactions.player_id, id))
+                if (existing.some((t) => t.item_id === itemId)) {
+                  ws.send({ type: 'signalError' })
+                  return
+                }
+
+                // Deduct relative to the locked value, and record the purchase
+                await tx
+                  .update(players)
+                  .set({ gems: sql`${players.gems} - ${cosmeticItem.cost}` })
+                  .where(eq(players.id, id))
+
+                await tx.insert(cosmeticsTransactions).values({
+                  player_id: id,
+                  item_id: itemId,
+                  transaction_type: 'purchase',
+                })
+              })
+            } else {
+              // Card purchase — pay with coins, same atomic locked pattern
+              await db.transaction(async (tx) => {
+                const [row] = await tx
+                  .select({
+                    coins: players.coins,
+                    card_inventory: players.card_inventory,
+                  })
+                  .from(players)
+                  .where(eq(players.id, id))
+                  .for('update')
+                  .limit(1)
+                if (!row) return
+
+                // Check if user has enough coins
+                if (row.coins < CARD_COST) {
+                  ws.send({ type: 'signalError' })
+                  return
+                }
+
+                // Convert inventory bit string to array
+                const inventoryArray = row.card_inventory
+                  .split('')
+                  .map((char) => char === '1')
+
+                // Check if already owned
+                if (inventoryArray[itemId] === true) {
+                  ws.send({ type: 'signalError' })
+                  return
+                }
+
+                // Update inventory to mark card as owned
+                inventoryArray[itemId] = true
+                const newInventoryBitString = inventoryArray
+                  .map((value) => (value ? '1' : '0'))
+                  .join('')
+
+                await tx
+                  .update(players)
+                  .set({
+                    coins: sql`${players.coins} - ${CARD_COST}`,
+                    card_inventory: newInventoryBitString,
+                  })
+                  .where(eq(players.id, id))
+
+                // NOTE This is included just to keep track of purchases, but isn't really needed since the inventory is updated above
+                await tx.insert(cosmeticsTransactions).values({
+                  player_id: id,
+                  item_id: itemId,
+                  transaction_type: 'purchase',
+                })
+              })
+            }
+
+            // Send updated user data
+            await sendUserData(ws, id)
+          }),
+        )
+        .on(
+          'setCosmeticSet',
+          authed(async ({ value }) => {
+            await db
+              .update(players)
+              .set({ cosmetic_set: JSON.stringify(value) })
+              .where(eq(players.id, id))
+          }),
+        )
         // Connect to match
         .on(
           'initMission',
@@ -771,70 +806,78 @@ export default function createWebSocketServer() {
             delete searchingPlayers[password]
           }),
         )
-        .on('setCanBeSpectated', authed(({ allowed }) => {
-          spectateAllowedByUserId[id] = allowed
+        .on(
+          'setCanBeSpectated',
+          authed(({ allowed }) => {
+            spectateAllowedByUserId[id] = allowed
 
-          // Host disabled spectating mid-match: drop everyone watching their perspective.
-          if (!allowed) {
-            const ag = userActiveGameMap[id]
-            if (ag?.match && !ag.match.isOver()) {
-              const perspective = (ag.playerNumber === 1 ? 1 : 0) as 0 | 1
-              const removed =
-                ag.match.removeAllSpectatorsForPerspective(perspective)
-              for (const sWs of removed) {
-                spectatorWsToMatch.delete(sWs)
-                const sid = Object.keys(activePlayers).find(
-                  (uid) => activePlayers[uid] === sWs,
-                )
-                if (sid) spectatingUserIds.delete(sid)
-                if (sWs.isOpen()) {
-                  sWs.send({ type: 'spectateEnded' })
+            // Host disabled spectating mid-match: drop everyone watching their perspective.
+            if (!allowed) {
+              const ag = userActiveGameMap[id]
+              if (ag?.match && !ag.match.isOver()) {
+                const perspective = (ag.playerNumber === 1 ? 1 : 0) as 0 | 1
+                const removed =
+                  ag.match.removeAllSpectatorsForPerspective(perspective)
+                for (const sWs of removed) {
+                  spectatorWsToMatch.delete(sWs)
+                  const sid = Object.keys(activePlayers).find(
+                    (uid) => activePlayers[uid] === sWs,
+                  )
+                  if (sid) spectatingUserIds.delete(sid)
+                  if (sWs.isOpen()) {
+                    sWs.send({ type: 'spectateEnded' })
+                  }
                 }
               }
             }
-          }
-        }))
+          }),
+        )
         // Spectator mode: watch another connected user's match (requires sign-in,
         // so the spectator is attached only after the auth gate)
-        .on('spectatePlayer', authed(async ({ targetUuid }) => {
-          const targetActive = userActiveGameMap[targetUuid]
-          if (!targetActive?.match || targetActive.match.isOver()) {
-            ws.send({ type: 'signalError' })
-            return
-          }
-          if (spectateAllowedByUserId[targetUuid] === false) {
-            ws.send({ type: 'signalError' })
-            return
-          }
+        .on(
+          'spectatePlayer',
+          authed(async ({ targetUuid }) => {
+            const targetActive = userActiveGameMap[targetUuid]
+            if (!targetActive?.match || targetActive.match.isOver()) {
+              ws.send({ type: 'signalError' })
+              return
+            }
+            if (spectateAllowedByUserId[targetUuid] === false) {
+              ws.send({ type: 'signalError' })
+              return
+            }
 
-          // Only one active spectate subscription per socket for now.
-          const prevMatch = spectatorWsToMatch.get(ws)
-          if (prevMatch) {
-            prevMatch.removeSpectator(ws)
-            spectatorWsToMatch.delete(ws)
-          }
+            // Only one active spectate subscription per socket for now.
+            const prevMatch = spectatorWsToMatch.get(ws)
+            if (prevMatch) {
+              prevMatch.removeSpectator(ws)
+              spectatorWsToMatch.delete(ws)
+            }
 
-          const perspective = targetActive.playerNumber === 1 ? 1 : 0
-          targetActive.match.addSpectator(ws, perspective)
-          spectatorWsToMatch.set(ws, targetActive.match)
-          spectatingUserIds.add(id)
+            const perspective = targetActive.playerNumber === 1 ? 1 : 0
+            targetActive.match.addSpectator(ws, perspective)
+            spectatorWsToMatch.set(ws, targetActive.match)
+            spectatingUserIds.add(id)
 
-          // Notify the watched player (not the opponent) that someone is spectating
-          const [watcher] = await db
-            .select({ username: players.username })
-            .from(players)
-            .where(eq(players.id, id))
-            .limit(1)
+            // Notify the watched player (not the opponent) that someone is spectating
+            const [watcher] = await db
+              .select({ username: players.username })
+              .from(players)
+              .where(eq(players.id, id))
+              .limit(1)
 
-          const watchedWs =
-            perspective === 0 ? targetActive.match.ws1 : targetActive.match.ws2
-          if (watchedWs?.isOpen()) {
-            watchedWs.send({
-              type: 'spectatorJoined',
-              username: watcher?.username ?? 'Someone',
-            })
-          }
-        }))
+            const watchedWs =
+              perspective === 0
+                ? targetActive.match.ws1
+                : targetActive.match.ws2
+            if (watchedWs?.isOpen()) {
+              watchedWs.send({
+                type: 'spectatorJoined',
+                username: watcher?.username ?? 'Someone',
+              })
+            }
+          }),
+        )
         .on('exitSpectating', () => {
           const m = spectatorWsToMatch.get(ws)
           if (m) {

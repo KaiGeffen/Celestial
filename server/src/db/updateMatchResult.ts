@@ -8,6 +8,9 @@ import Garden from './garden'
 const K_FACTOR = 32 // Standard K-factor used in chess
 const elo = new EloRank(K_FACTOR)
 
+// The transaction handle passed to db.transaction callbacks (same query API as db).
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0]
+
 async function getPlayerData(playerId: string) {
   const result = await db
     .select()
@@ -34,29 +37,9 @@ export async function updateMatchResultPVP(
   const winnerData = await getPlayerData(winnerId)
   const loserData = await getPlayerData(loserId)
 
-  // Remember the match
-  await insertMatchHistory(
-    winnerId,
-    loserId,
-    winnerData,
-    loserData,
-    winnerDeck,
-    loserDeck,
-    roundsWLT,
-  )
-
-  // Plant a seed for both players
-  if (matchQualifiesForRewards) {
-    await Garden.plantSeed(winnerId)
-    await Garden.plantSeed(loserId)
-  }
-
-  // Calculate new ELO
-  // Calculate expected scores
+  // Calculate new ELO (1 for win, 0 for loss)
   const expectedScoreWinner = elo.getExpected(winnerData.elo, loserData.elo)
   const expectedScoreLoser = elo.getExpected(loserData.elo, winnerData.elo)
-
-  // Update ratings (1 for win, 0 for loss)
   const newWinnerRating = elo.updateRating(
     expectedScoreWinner,
     1,
@@ -64,29 +47,54 @@ export async function updateMatchResultPVP(
   )
   const newLoserRating = elo.updateRating(expectedScoreLoser, 0, loserData.elo)
 
-  // Update the database with new ELO for winner and loser
-  // Bump both lifetime and current-month PVP records, and raise the
-  // winner's peak ELO if they just hit a new high.
-  await db
-    .update(players)
-    .set({
-      elo: newWinnerRating,
-      elo_peak: sql`GREATEST(${players.elo_peak}, ${newWinnerRating})`,
-      pvp_wins_lifetime: sql`${players.pvp_wins_lifetime} + 1`,
-      pvp_wins_month: sql`${players.pvp_wins_month} + 1`,
-      gems: sql`${players.gems} + 1`,
-    })
-    .where(eq(players.id, winnerId))
+  // Record the match and both players' updated stats atomically, so a failure
+  // can't leave one player's ELO/record updated without the other's.
+  await db.transaction(async (tx) => {
+    await insertMatchHistory(
+      tx,
+      winnerId,
+      loserId,
+      winnerData,
+      loserData,
+      winnerDeck,
+      loserDeck,
+      roundsWLT,
+    )
 
-  await db
-    .update(players)
-    .set({
-      elo: newLoserRating,
-      pvp_losses_lifetime: sql`${players.pvp_losses_lifetime} + 1`,
-      pvp_losses_month: sql`${players.pvp_losses_month} + 1`,
-      gems: sql`${players.gems} + 1`,
-    })
-    .where(eq(players.id, loserId))
+    // Bump lifetime and current-month PVP records, and raise the winner's peak
+    // ELO if they hit a new high. Gems are a reward, so they're only granted
+    // when the match qualifies — otherwise instant-surrender matches mint them.
+    await tx
+      .update(players)
+      .set({
+        elo: newWinnerRating,
+        elo_peak: sql`GREATEST(${players.elo_peak}, ${newWinnerRating})`,
+        pvp_wins_lifetime: sql`${players.pvp_wins_lifetime} + 1`,
+        pvp_wins_month: sql`${players.pvp_wins_month} + 1`,
+        ...(matchQualifiesForRewards
+          ? { gems: sql`${players.gems} + 1` }
+          : {}),
+      })
+      .where(eq(players.id, winnerId))
+
+    await tx
+      .update(players)
+      .set({
+        elo: newLoserRating,
+        pvp_losses_lifetime: sql`${players.pvp_losses_lifetime} + 1`,
+        pvp_losses_month: sql`${players.pvp_losses_month} + 1`,
+        ...(matchQualifiesForRewards
+          ? { gems: sql`${players.gems} + 1` }
+          : {}),
+      })
+      .where(eq(players.id, loserId))
+  })
+
+  // Plant a seed for both players (reward side-effect, gated)
+  if (matchQualifiesForRewards) {
+    await Garden.plantSeed(winnerId)
+    await Garden.plantSeed(loserId)
+  }
 }
 
 export async function updateMatchResultPVE(
@@ -111,37 +119,35 @@ export async function updateMatchResultPVE(
   const winnerDeck = wasPlayerWin ? playerDeck : aiDeck
   const loserDeck = wasPlayerWin ? aiDeck : playerDeck
 
-  // Remember the match
-  await insertMatchHistory(
-    winnerId,
-    loserId,
-    winnerData,
-    loserData,
-    winnerDeck,
-    loserDeck,
-    roundsWLT,
-  )
+  // Record the match and the player's updated win/loss count atomically.
+  await db.transaction(async (tx) => {
+    await insertMatchHistory(
+      tx,
+      winnerId,
+      loserId,
+      winnerData,
+      loserData,
+      winnerDeck,
+      loserDeck,
+      roundsWLT,
+    )
 
-  // Plant a seed
+    if (wasPlayerWin) {
+      await tx
+        .update(players)
+        .set({ pve_wins: sql`${players.pve_wins} + 1` })
+        .where(eq(players.id, playerId))
+    } else {
+      await tx
+        .update(players)
+        .set({ pve_losses: sql`${players.pve_losses} + 1` })
+        .where(eq(players.id, playerId))
+    }
+  })
+
+  // Plant a seed (reward side-effect)
   if (matchQualifiesForRewards || wasPlayerWin) {
     await Garden.plantSeed(playerId)
-  }
-
-  // Update the number of pve wins and losses
-  if (wasPlayerWin) {
-    await db
-      .update(players)
-      .set({
-        pve_wins: sql`${players.pve_wins} + 1`,
-      })
-      .where(eq(players.id, playerId))
-  } else {
-    await db
-      .update(players)
-      .set({
-        pve_losses: sql`${players.pve_losses} + 1`,
-      })
-      .where(eq(players.id, playerId))
   }
 }
 
@@ -204,8 +210,9 @@ export async function updateJourneyProgress(
     .where(eq(players.id, playerId))
 }
 
-// Insert this match into the match history table
+// Insert this match into the match history table (within the given transaction)
 async function insertMatchHistory(
+  tx: Tx,
   winnerId: string | null,
   loserId: string | null,
   winnerData,
@@ -214,19 +221,25 @@ async function insertMatchHistory(
   loserDeck: Deck,
   roundsWLT: [number, number, number],
 ) {
-  // Convert avatar to number before stringifying
-  winnerDeck.cosmeticSet.avatar = Number(winnerDeck.cosmeticSet.avatar)
-  loserDeck.cosmeticSet.avatar = Number(loserDeck.cosmeticSet.avatar)
+  // Serialize without mutating the caller's deck (normalize avatar to a number).
+  const serializeDeck = (deck: Deck) =>
+    JSON.stringify({
+      ...deck,
+      cosmeticSet: {
+        ...deck.cosmeticSet,
+        avatar: Number(deck.cosmeticSet.avatar),
+      },
+    })
 
-  await db.insert(matchHistory).values({
+  await tx.insert(matchHistory).values({
     player1_id: winnerId,
     player2_id: loserId,
     player1_username: winnerData.username,
     player2_username: loserData.username,
     player1_elo: winnerData.elo,
     player2_elo: loserData.elo,
-    player1_deck: JSON.stringify(winnerDeck),
-    player2_deck: JSON.stringify(loserDeck),
+    player1_deck: serializeDeck(winnerDeck),
+    player2_deck: serializeDeck(loserDeck),
     rounds_won: roundsWLT[0],
     rounds_lost: roundsWLT[1],
     rounds_tied: roundsWLT[2],
