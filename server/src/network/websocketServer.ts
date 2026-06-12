@@ -7,7 +7,11 @@ import {
 import { TypedWebSocket } from '../../../shared/network/typedWebSocket'
 import { verifySteamTicket } from './steamAuth'
 import { verifyGoogleCredential } from './googleAuth'
-import { issueSessionToken, verifySessionToken } from './sessionToken'
+import {
+  issueSessionToken,
+  verifySessionToken,
+  SessionClaims,
+} from './sessionToken'
 
 import { db } from '../db/db'
 import { players, approvedRefs, cosmeticsTransactions } from '../db/schema'
@@ -160,6 +164,23 @@ export default function createWebSocketServer() {
         }
       }
 
+      // Wrap a handler so it only runs once this socket has completed a verified
+      // sign-in. `id` is set exclusively by handleSignInForUuid, so its presence
+      // is the single source of truth for "authenticated". Centralizing the gate
+      // here means no handler can forget it.
+      const authed =
+        <T>(handler: (data: T) => unknown) =>
+        (data: T) => {
+          if (!id) return
+          return handler(data)
+        }
+
+      // Issue (when a secret is configured) and deliver a session token.
+      const sendSession = (claims: SessionClaims) => {
+        const token = issueSessionToken(claims)
+        if (token) ws.send({ type: 'sessionToken', token })
+      }
+
       ws.on('signIn', async ({ uuid }) => {
         // Guest sign-in: no identity proof, so this can only ever reach
         // guest accounts (enforced inside handleSignInForUuid).
@@ -180,12 +201,11 @@ export default function createWebSocketServer() {
 
           // Hand the client a long-lived session token so future reconnects
           // don't need a fresh (1-hour) Google token.
-          const sessionToken = issueSessionToken({
+          sendSession({
             uuid: googleUuid,
             provider: 'google',
             email: identity.email,
           })
-          if (sessionToken) ws.send({ type: 'sessionToken', token: sessionToken })
 
           await handleSignInForUuid(googleUuid, {
             provider: 'google',
@@ -201,8 +221,7 @@ export default function createWebSocketServer() {
           }
 
           // Rolling expiry: re-issue so active users stay signed in.
-          const refreshed = issueSessionToken(claims)
-          if (refreshed) ws.send({ type: 'sessionToken', token: refreshed })
+          sendSession(claims)
 
           await handleSignInForUuid(claims.uuid, {
             provider: claims.provider,
@@ -221,33 +240,28 @@ export default function createWebSocketServer() {
           const steamUuid = uuidv5(steamId, UUID_NAMESPACE)
           await handleSignInForUuid(steamUuid, { provider: 'steam' })
         })
-        .on('sendDecks', async ({ decks }) => {
-          if (!id) return
+        .on('sendDecks', authed(async ({ decks }) => {
           await db
             .update(players)
             .set({ decks: decks.map((deck) => JSON.stringify(deck)) })
             .where(eq(players.id, id))
-        })
-        .on('sendInventory', async ({ inventory }) => {
-          if (!id) return
+        }))
+        .on('sendInventory', authed(async ({ inventory }) => {
           await db.update(players).set({ inventory }).where(eq(players.id, id))
-        })
-        .on('sendCompletedMissions', async ({ missions }) => {
-          if (!id) return
+        }))
+        .on('sendCompletedMissions', authed(async ({ missions }) => {
           await db
             .update(players)
             .set({ completedmissions: missions })
             .where(eq(players.id, id))
-        })
-        .on('sendAvatarExperience', async ({ experience }) => {
-          if (!id) return
+        }))
+        .on('sendAvatarExperience', authed(async ({ experience }) => {
           await db
             .update(players)
             .set({ avatar_experience: experience })
             .where(eq(players.id, id))
-        })
-        .on('sendJourneyChoice', async ({ characterIndex, choice }) => {
-          if (!id) return
+        }))
+        .on('sendJourneyChoice', authed(async ({ characterIndex, choice }) => {
           if (characterIndex < 0 || characterIndex > 5) return
           if (choice !== 0 && choice !== 1) return
 
@@ -268,14 +282,10 @@ export default function createWebSocketServer() {
             .update(players)
             .set({ journey_choices: next })
             .where(eq(players.id, id))
-        })
+        }))
         .on(
           'sendInitialUserData',
-          async ({ username, decks, inventory, missions, ref }) => {
-            if (!id) {
-              throw new Error('User sent initial user data before signing in')
-            }
-
+          authed(async ({ username, decks, inventory, missions, ref }) => {
             // If username already exists, error (Currently client sees error on their side, so this shouldn't happen. But if it does, don't create the row)
             // Exception: Allow multiple "Guest" usernames
             if (username !== 'Guest') {
@@ -353,19 +363,16 @@ export default function createWebSocketServer() {
 
             // Send user their data
             await sendUserData(ws, id)
-          },
+          }),
         )
-        .on('setAchievementsSeen', async () => {
-          if (!id) return
+        .on('setAchievementsSeen', authed(async () => {
           await AchievementManager.setAchievementsSeen(id)
-        })
-        .on('accessDiscord', async () => {
-          if (!id) return
+        }))
+        .on('accessDiscord', authed(async () => {
           await AchievementManager.onDiscordAccess(id)
           await sendUserData(ws, id)
-        })
-        .on('harvestGarden', async ({ index }) => {
-          if (!id) return
+        }))
+        .on('harvestGarden', authed(async ({ index }) => {
           const harvestResult = await Garden.harvest(id, index)
           ws.send({
             type: 'harvestGardenResult',
@@ -374,10 +381,8 @@ export default function createWebSocketServer() {
             goldReward: harvestResult.goldReward,
             gemReward: harvestResult.gemReward,
           })
-        })
-        .on('claimMissionRewards', async ({ missionId }) => {
-          if (!id) return
-
+        }))
+        .on('claimMissionRewards', authed(async ({ missionId }) => {
           const missionExists = journeyData.some(
             (mission) => mission.id === missionId,
           )
@@ -418,11 +423,9 @@ export default function createWebSocketServer() {
           })
 
           await sendUserData(ws, id)
-        })
+        }))
         // Store
-        .on('purchaseItem', async ({ id: itemId }) => {
-          if (!id) return
-
+        .on('purchaseItem', authed(async ({ id: itemId }) => {
           const cosmeticItem = allPurchaseables.find((p) => p.id === itemId)
           const isCosmetic = cosmeticItem !== undefined
           const isCard = !isCosmetic && !!Catalog.getCardById(itemId)
@@ -526,167 +529,180 @@ export default function createWebSocketServer() {
 
           // Send updated user data
           await sendUserData(ws, id)
-        })
-        .on('setCosmeticSet', async ({ value }) => {
-          if (!id) return
+        }))
+        .on('setCosmeticSet', authed(async ({ value }) => {
           await db
             .update(players)
             .set({ cosmetic_set: JSON.stringify(value) })
             .where(eq(players.id, id))
-        })
+        }))
         // Connect to match
-        .on('initMission', async ({ uuid, deck, missionID }) => {
-          if (!id) return
-          console.log('Mission:', missionID)
+        .on(
+          'initMission',
+          authed(async ({ deck, missionID }) => {
+            console.log('Mission:', missionID)
 
-          // This might fail if the mission is invalid
-          try {
-            activeGame.match = new PveMatchMission(ws, uuid, deck, missionID)
-          } catch (e) {
-            console.error('initMission:', e)
-            return
-          }
-
-          // Just like in pve, we are player 1
-          activeGame.playerNumber = 0
-
-          logFunnelEvent(uuid, 'play_mode', 'journey')
-
-          // Start the match and let user know the starting state
-          await activeGame.match.startMatch()
-          await activeGame.match.notifyState()
-        })
-        .on('initPve', async ({ aiDeck, uuid, deck }) => {
-          if (!id) return
-          console.log(
-            'PvE:',
-            deck.cards
-              .map((cardId) => Catalog.getCardById(cardId).name)
-              .join(', '),
-          )
-
-          activeGame.match = new PveMatch(ws, uuid, deck, aiDeck)
-          await activeGame.match.startMatch()
-
-          // TODO Explain why to make us player 1
-          activeGame.playerNumber = 0
-
-          // Analytics
-          logFunnelEvent(uuid, 'play_mode', 'pve')
-
-          // Start the match
-          await activeGame.match.startMatch()
-          await activeGame.match.notifyState()
-        })
-        .on('initSpecialPve', async ({ aiDeck, uuid, deck, enabledModes }) => {
-          if (!id) return
-          console.log(
-            'Race:',
-            deck.cards
-              .map((cardId) => Catalog.getCardById(cardId).name)
-              .join(', '),
-          )
-
-          activeGame.match = new PveSpecialMatch(
-            ws,
-            uuid,
-            deck,
-            aiDeck,
-            enabledModes,
-          )
-          activeGame.playerNumber = 0
-
-          // Analytics
-          logFunnelEvent(uuid, 'play_mode', 'race')
-
-          // Start the match and let user know the starting state
-          await activeGame.match.startMatch()
-          await activeGame.match.notifyState()
-        })
-        .on('initPvp', async (data) => {
-          // Clean up stale entries first
-          Object.keys(searchingPlayers).forEach((password) => {
-            // Ensure we never queue into ourself
-            const isSelf = searchingPlayers[password].id === data.uuid
-
-            // Ensure we don't queue into closed connections
-            const isClosed = !searchingPlayers[password].ws.isOpen()
-
-            if (isClosed || isSelf) {
-              delete searchingPlayers[password]
+            // This might fail if the mission is invalid
+            try {
+              activeGame.match = new PveMatchMission(ws, id, deck, missionID)
+            } catch (e) {
+              console.error('initMission:', e)
+              return
             }
-          })
 
-          // Analytics
-          logFunnelEvent(data.uuid, 'play_mode', 'pvp_queued_up')
+            // Just like in pve, we are player 1
+            activeGame.playerNumber = 0
 
-          // Check if there is another player, and they are still ready
-          const otherPlayer: WaitingPlayer = searchingPlayers[data.password]
-          if (otherPlayer) {
+            logFunnelEvent(id, 'play_mode', 'journey')
+
+            // Start the match and let user know the starting state
+            await activeGame.match.startMatch()
+            await activeGame.match.notifyState()
+          }),
+        )
+        .on(
+          'initPve',
+          authed(async ({ aiDeck, deck }) => {
             console.log(
-              'PVP:',
-              data.deck.cards
-                .map((cardId) => Catalog.getCardById(cardId).name)
-                .join(', '),
-              '\n',
-              otherPlayer.deck.cards
+              'PvE:',
+              deck.cards
                 .map((cardId) => Catalog.getCardById(cardId).name)
                 .join(', '),
             )
 
-            // Analytics
-            logFunnelEvent(otherPlayer.id, 'play_mode', 'pvp_match_found')
+            activeGame.match = new PveMatch(ws, id, deck, aiDeck)
+            await activeGame.match.startMatch()
 
-            // Create a PvP match
-            activeGame.match = new PvpMatch(
+            // TODO Explain why to make us player 1
+            activeGame.playerNumber = 0
+
+            // Analytics
+            logFunnelEvent(id, 'play_mode', 'pve')
+
+            // Start the match
+            await activeGame.match.startMatch()
+            await activeGame.match.notifyState()
+          }),
+        )
+        .on(
+          'initSpecialPve',
+          authed(async ({ aiDeck, deck, enabledModes }) => {
+            console.log(
+              'Race:',
+              deck.cards
+                .map((cardId) => Catalog.getCardById(cardId).name)
+                .join(', '),
+            )
+
+            activeGame.match = new PveSpecialMatch(
               ws,
-              data.uuid,
-              data.deck,
-              otherPlayer.ws,
-              otherPlayer.id,
-              otherPlayer.deck,
+              id,
+              deck,
+              aiDeck,
+              enabledModes,
             )
             activeGame.playerNumber = 0
 
-            // Set the other player's game to be the same, but with opposite player number
-            otherPlayer.activeGame.match = activeGame.match
-            otherPlayer.activeGame.playerNumber = 1
+            // Analytics
+            logFunnelEvent(id, 'play_mode', 'race')
 
-            // TODO Maybe just delete the last one? Somehow don't lose to race conditions
-            delete searchingPlayers[data.password]
-
-            // Notify both players that they are connected
-            // Start the match and let both users know the starting state
+            // Start the match and let user know the starting state
             await activeGame.match.startMatch()
             await activeGame.match.notifyState()
-          } else {
-            // Queue the player with their information
-            const waitingPlayer = {
-              ws: ws,
-              id: data.uuid,
-              deck: data.deck,
-              activeGame: activeGame,
-              queuedAt: Date.now(),
-              notifiedDiscord: false,
+          }),
+        )
+        .on(
+          'initPvp',
+          authed(async (data) => {
+            // Clean up stale entries first
+            Object.keys(searchingPlayers).forEach((password) => {
+              // Ensure we never queue into ourself
+              const isSelf = searchingPlayers[password].id === id
+
+              // Ensure we don't queue into closed connections
+              const isClosed = !searchingPlayers[password].ws.isOpen()
+
+              if (isClosed || isSelf) {
+                delete searchingPlayers[password]
+              }
+            })
+
+            // Analytics
+            logFunnelEvent(id, 'play_mode', 'pvp_queued_up')
+
+            // Check if there is another player, and they are still ready
+            const otherPlayer: WaitingPlayer = searchingPlayers[data.password]
+            if (otherPlayer) {
+              console.log(
+                'PVP:',
+                data.deck.cards
+                  .map((cardId) => Catalog.getCardById(cardId).name)
+                  .join(', '),
+                '\n',
+                otherPlayer.deck.cards
+                  .map((cardId) => Catalog.getCardById(cardId).name)
+                  .join(', '),
+              )
+
+              // Analytics
+              logFunnelEvent(otherPlayer.id, 'play_mode', 'pvp_match_found')
+
+              // Create a PvP match
+              activeGame.match = new PvpMatch(
+                ws,
+                id,
+                data.deck,
+                otherPlayer.ws,
+                otherPlayer.id,
+                otherPlayer.deck,
+              )
+              activeGame.playerNumber = 0
+
+              // Set the other player's game to be the same, but with opposite player number
+              otherPlayer.activeGame.match = activeGame.match
+              otherPlayer.activeGame.playerNumber = 1
+
+              // TODO Maybe just delete the last one? Somehow don't lose to race conditions
+              delete searchingPlayers[data.password]
+
+              // Notify both players that they are connected
+              // Start the match and let both users know the starting state
+              await activeGame.match.startMatch()
+              await activeGame.match.notifyState()
+            } else {
+              // Queue the player with their information
+              const waitingPlayer = {
+                ws: ws,
+                id: id,
+                deck: data.deck,
+                activeGame: activeGame,
+                queuedAt: Date.now(),
+                notifiedDiscord: false,
+              }
+              searchingPlayers[data.password] = waitingPlayer
             }
-            searchingPlayers[data.password] = waitingPlayer
-          }
-        })
-        .on('initTutorial', async (data) => {
-          console.log('Tutorial: ', data.num, 'for uuid: ', data.uuid)
+          }),
+        )
+        .on(
+          'initTutorial',
+          authed(async (data) => {
+            console.log('Tutorial: ', data.num, 'for uuid: ', id)
 
-          activeGame.match = new TutorialMatch(ws, data.num, data.uuid)
-          activeGame.playerNumber = 0
+            activeGame.match = new TutorialMatch(ws, data.num, id)
+            activeGame.playerNumber = 0
 
-          // Start the match and let user know the starting state
-          await activeGame.match.startMatch()
-          await activeGame.match.notifyState()
-        })
-        .on('cancelQueue', ({ password }) => {
-          delete searchingPlayers[password]
-        })
-        .on('setCanBeSpectated', ({ allowed }) => {
-          if (!id) return
+            // Start the match and let user know the starting state
+            await activeGame.match.startMatch()
+            await activeGame.match.notifyState()
+          }),
+        )
+        .on(
+          'cancelQueue',
+          authed(({ password }) => {
+            delete searchingPlayers[password]
+          }),
+        )
+        .on('setCanBeSpectated', authed(({ allowed }) => {
           spectateAllowedByUserId[id] = allowed
 
           // Host disabled spectating mid-match: drop everyone watching their perspective.
@@ -708,9 +724,10 @@ export default function createWebSocketServer() {
               }
             }
           }
-        })
-        // Spectator mode: watch another connected user's match
-        .on('spectatePlayer', async ({ targetUuid }) => {
+        }))
+        // Spectator mode: watch another connected user's match (requires sign-in,
+        // so the spectator is attached only after the auth gate)
+        .on('spectatePlayer', authed(async ({ targetUuid }) => {
           const targetActive = userActiveGameMap[targetUuid]
           if (!targetActive?.match || targetActive.match.isOver()) {
             ws.send({ type: 'signalError' })
@@ -731,10 +748,9 @@ export default function createWebSocketServer() {
           const perspective = targetActive.playerNumber === 1 ? 1 : 0
           targetActive.match.addSpectator(ws, perspective)
           spectatorWsToMatch.set(ws, targetActive.match)
-          if (id) spectatingUserIds.add(id)
+          spectatingUserIds.add(id)
 
           // Notify the watched player (not the opponent) that someone is spectating
-          if (!id) return
           const [watcher] = await db
             .select({ username: players.username })
             .from(players)
@@ -749,7 +765,7 @@ export default function createWebSocketServer() {
               username: watcher?.username ?? 'Someone',
             })
           }
-        })
+        }))
         .on('exitSpectating', () => {
           const m = spectatorWsToMatch.get(ws)
           if (m) {

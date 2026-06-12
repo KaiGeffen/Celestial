@@ -10,7 +10,6 @@ import GameModel from '../../../shared/state/gameModel'
 import { SoundEffect } from '../../../shared/state/soundEffect'
 import PassRegion from './matchRegions/passRegion'
 import { Deck } from '../../../shared/types/deck'
-import Server from '../server'
 import TheirAvatarRegion from './matchRegions/theirAvatarRegion'
 import OurAvatarRegion from './matchRegions/ourAvatarRegion'
 import OurBoardRegion from './matchRegions/ourBoardRegion'
@@ -83,20 +82,17 @@ export class MatchScene extends BaseScene {
       server.send({
         type: 'initTutorial',
         num: params.missionID,
-        uuid: Server.getUserData().uuid,
       })
     } else if (params.isPvp) {
       server.send({
         type: 'initPvp',
         password: params.password,
-        uuid: Server.getUserData().uuid,
         deck: params.deck,
       })
     } else if (params.enabledModes) {
       server.send({
         type: 'initSpecialPve',
         aiDeck: params.aiDeck,
-        uuid: Server.getUserData().uuid,
         deck: params.deck,
         enabledModes: params.enabledModes,
       })
@@ -104,7 +100,6 @@ export class MatchScene extends BaseScene {
       if (params.missionID !== undefined) {
         server.send({
           type: 'initMission',
-          uuid: Server.getUserData().uuid,
           deck: params.deck,
           missionID: params.missionID,
         })
@@ -112,7 +107,6 @@ export class MatchScene extends BaseScene {
         server.send({
           type: 'initPve',
           aiDeck: params.aiDeck,
-          uuid: Server.getUserData().uuid,
           deck: params.deck,
         })
       }
