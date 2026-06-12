@@ -78,6 +78,53 @@ const spectatorWsToMatch = new WeakMap<ServerWS, Match>()
 // User ids currently spectating another player's match (for online status)
 const spectatingUserIds = new Set<string>()
 
+/**
+ * Resolve a verified provider identity (Google sub or Steam id) to an account
+ * id. Looks the account up by its provider column; if that misses, falls back to
+ * the legacy derived id and backfills the column, so accounts created before
+ * linking migrate themselves on their next login. For a brand-new account the
+ * returned id is derived from this first provider identity.
+ */
+async function resolveProviderAccount(
+  provider: 'google' | 'steam',
+  providerId: string,
+  email: string | null,
+): Promise<string> {
+  const column = provider === 'google' ? players.google_id : players.steam_id
+
+  const [byColumn] = await db
+    .select({ id: players.id })
+    .from(players)
+    .where(eq(column, providerId))
+    .limit(1)
+  if (byColumn) return byColumn.id
+
+  // Legacy account, created before linking and keyed by the derived id.
+  const legacyId = uuidv5(providerId, UUID_NAMESPACE)
+  const [byLegacy] = await db
+    .select({ id: players.id })
+    .from(players)
+    .where(eq(players.id, legacyId))
+    .limit(1)
+  if (byLegacy) {
+    if (provider === 'google') {
+      await db
+        .update(players)
+        .set({ google_id: providerId, email })
+        .where(eq(players.id, legacyId))
+    } else {
+      await db
+        .update(players)
+        .set({ steam_id: providerId })
+        .where(eq(players.id, legacyId))
+    }
+    return legacyId
+  }
+
+  // New account: id derived from this first provider identity.
+  return legacyId
+}
+
 // Create the websocket server
 export default function createWebSocketServer() {
   const wss = new WebSocketServer({ port: USER_DATA_PORT })
@@ -89,6 +136,10 @@ export default function createWebSocketServer() {
       // Remember the user once they've signed in
       let id: string = null
       let potentialEmail: string = null
+      // Verified provider identities for this connection, applied when a brand-
+      // new account is created via sendInitialUserData.
+      let potentialGoogleId: string | null = null
+      let potentialSteamId: string | null = null
       let connectionTime: number | null = null
       let activeGame: ActiveGame = {
         match: null, // Match if user is in one
@@ -117,7 +168,12 @@ export default function createWebSocketServer() {
 
         // Check if user exists in database
         const result = await db
-          .select({ id: players.id, email: players.email })
+          .select({
+            id: players.id,
+            email: players.email,
+            google_id: players.google_id,
+            steam_id: players.steam_id,
+          })
           .from(players)
           .where(eq(players.id, uuid))
           .limit(1)
@@ -128,9 +184,13 @@ export default function createWebSocketServer() {
         }
 
         // Security gate: the guest path carries no identity proof, so it must
-        // never authenticate a provider-backed account. Google accounts always
-        // store a verified email; reject any attempt to claim one via signIn.
-        if (opts.provider === 'guest' && result[0].email) {
+        // never authenticate a provider-linked account. Reject if the account
+        // has any verified provider identity (email covers legacy Google rows
+        // not yet backfilled into google_id).
+        if (
+          opts.provider === 'guest' &&
+          (result[0].google_id || result[0].steam_id || result[0].email)
+        ) {
           id = null
           potentialEmail = null
           ws.send({ type: 'invalidToken' })
@@ -195,19 +255,24 @@ export default function createWebSocketServer() {
             return
           }
 
-          // Derive the account id from the VERIFIED subject, never from
-          // anything the client asserted.
-          const googleUuid = uuidv5(identity.sub, UUID_NAMESPACE)
+          // Resolve to an account by the VERIFIED subject — looked up, never
+          // trusting anything the client asserted.
+          const accountId = await resolveProviderAccount(
+            'google',
+            identity.sub,
+            identity.email,
+          )
+          potentialGoogleId = identity.sub
 
           // Hand the client a long-lived session token so future reconnects
           // don't need a fresh (1-hour) Google token.
           sendSession({
-            uuid: googleUuid,
+            uuid: accountId,
             provider: 'google',
             email: identity.email,
           })
 
-          await handleSignInForUuid(googleUuid, {
+          await handleSignInForUuid(accountId, {
             provider: 'google',
             email: identity.email,
           })
@@ -237,8 +302,9 @@ export default function createWebSocketServer() {
             return
           }
 
-          const steamUuid = uuidv5(steamId, UUID_NAMESPACE)
-          await handleSignInForUuid(steamUuid, { provider: 'steam' })
+          const accountId = await resolveProviderAccount('steam', steamId, null)
+          potentialSteamId = steamId
+          await handleSignInForUuid(accountId, { provider: 'steam' })
         })
         .on('sendDecks', authed(async ({ decks }) => {
           await db
@@ -295,9 +361,11 @@ export default function createWebSocketServer() {
                 .where(sql`LOWER(${players.username}) = LOWER(${username})`)
                 .limit(1)
               if (result.length > 0) {
-                throw new Error(
-                  'Attemping to register a username that already exists',
-                )
+                // Client already guards against this, so it shouldn't happen —
+                // but signal rather than throw (which would become an unhandled
+                // rejection and leave the socket in a half-open state).
+                ws.send({ type: 'signalError' })
+                return
               }
             }
 
@@ -305,6 +373,8 @@ export default function createWebSocketServer() {
             const data = {
               id: id,
               email: potentialEmail,
+              google_id: potentialGoogleId,
+              steam_id: potentialSteamId,
               username: username,
               pvp_wins_lifetime: 0,
               pvp_losses_lifetime: 0,
@@ -433,37 +503,37 @@ export default function createWebSocketServer() {
           if (!isCosmetic && !isCard) return
 
           if (isCosmetic) {
-            // Get current gems and existing owned items
-            const userData = await db
-              .select({ gems: players.gems })
-              .from(players)
-              .where(eq(players.id, id))
-              .limit(1)
-
-            const currentGems = userData[0].gems
-
-            // Check if user has enough gems
-            if (currentGems < cosmeticItem.cost) {
-              ws.send({ type: 'signalError' })
-              return
-            }
-
-            // Check if already owned
-            const existing = await db
-              .select({ id: cosmeticsTransactions.id })
-              .from(cosmeticsTransactions)
-              .where(eq(cosmeticsTransactions.player_id, id))
-
-            if (existing.some((t) => t.id === itemId)) {
-              ws.send({ type: 'signalError' })
-              return
-            }
-
-            // Deduct gems and insert transaction
+            // Do the check and deduct atomically: lock the player row so two
+            // rapid purchases can't both read the old balance and double-spend.
             await db.transaction(async (tx) => {
+              const [row] = await tx
+                .select({ gems: players.gems })
+                .from(players)
+                .where(eq(players.id, id))
+                .for('update')
+                .limit(1)
+              if (!row) return
+
+              // Check if user has enough gems
+              if (row.gems < cosmeticItem.cost) {
+                ws.send({ type: 'signalError' })
+                return
+              }
+
+              // Check if already owned (compare item_id, not the transaction id)
+              const existing = await tx
+                .select({ item_id: cosmeticsTransactions.item_id })
+                .from(cosmeticsTransactions)
+                .where(eq(cosmeticsTransactions.player_id, id))
+              if (existing.some((t) => t.item_id === itemId)) {
+                ws.send({ type: 'signalError' })
+                return
+              }
+
+              // Deduct relative to the locked value, and record the purchase
               await tx
                 .update(players)
-                .set({ gems: currentGems - cosmeticItem.cost })
+                .set({ gems: sql`${players.gems} - ${cosmeticItem.cost}` })
                 .where(eq(players.id, id))
 
               await tx.insert(cosmeticsTransactions).values({
@@ -473,47 +543,46 @@ export default function createWebSocketServer() {
               })
             })
           } else {
-            // Card purchase — pay with coins
-            const userData = await db
-              .select({
-                coins: players.coins,
-                card_inventory: players.card_inventory,
-              })
-              .from(players)
-              .where(eq(players.id, id))
-              .limit(1)
-
-            // Check if user has enough coins
-            const currentBalance = userData[0].coins
-            if (currentBalance < CARD_COST) {
-              ws.send({ type: 'signalError' })
-              return
-            }
-
-            // Convert inventory bit string to array
-            const inventoryArray = userData[0].card_inventory
-              .split('')
-              .map((char) => char === '1')
-
-            // Check if already owned
-            if (inventoryArray[itemId] === true) {
-              ws.send({ type: 'signalError' })
-              return
-            }
-
-            // Update inventory to mark card as owned
-            inventoryArray[itemId] = true
-            const newInventoryBitString = inventoryArray
-              .map((value) => (value ? '1' : '0'))
-              .join('')
-
-            // Start a transaction
+            // Card purchase — pay with coins, same atomic locked pattern
             await db.transaction(async (tx) => {
-              // Update coins and inventory
+              const [row] = await tx
+                .select({
+                  coins: players.coins,
+                  card_inventory: players.card_inventory,
+                })
+                .from(players)
+                .where(eq(players.id, id))
+                .for('update')
+                .limit(1)
+              if (!row) return
+
+              // Check if user has enough coins
+              if (row.coins < CARD_COST) {
+                ws.send({ type: 'signalError' })
+                return
+              }
+
+              // Convert inventory bit string to array
+              const inventoryArray = row.card_inventory
+                .split('')
+                .map((char) => char === '1')
+
+              // Check if already owned
+              if (inventoryArray[itemId] === true) {
+                ws.send({ type: 'signalError' })
+                return
+              }
+
+              // Update inventory to mark card as owned
+              inventoryArray[itemId] = true
+              const newInventoryBitString = inventoryArray
+                .map((value) => (value ? '1' : '0'))
+                .join('')
+
               await tx
                 .update(players)
                 .set({
-                  coins: currentBalance - CARD_COST,
+                  coins: sql`${players.coins} - ${CARD_COST}`,
                   card_inventory: newInventoryBitString,
                 })
                 .where(eq(players.id, id))

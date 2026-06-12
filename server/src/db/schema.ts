@@ -42,6 +42,11 @@ export const players = pgTable(
   {
     id: uuid('id').primaryKey(),
     email: varchar('email', { length: 255 }),
+    // Linked provider identities. An account may have one or both; logins are
+    // resolved by looking these up, not by trusting/deriving the id client-side.
+    // Null = that provider is not linked. Guests have neither set.
+    google_id: varchar('google_id', { length: 255 }),
+    steam_id: varchar('steam_id', { length: 255 }),
     username: varchar('username', { length: 255 }).notNull(),
     createdate: date('createdate')
       .notNull()
@@ -91,6 +96,8 @@ export const players = pgTable(
   },
   (table) => ({
     emailIdx: uniqueIndex('email_idx').on(table.email),
+    googleIdIdx: uniqueIndex('google_id_idx').on(table.google_id),
+    steamIdIdx: uniqueIndex('steam_id_idx').on(table.steam_id),
   }),
 )
 
