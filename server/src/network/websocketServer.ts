@@ -51,6 +51,7 @@ interface WaitingPlayer {
   id: string
   deck: Deck
   activeGame: ActiveGame
+  // Time when they queued
   queuedAt: number
   notifiedDiscord: boolean
 }
@@ -142,7 +143,7 @@ export default function createWebSocketServer() {
       let potentialSteamId: string | null = null
       let connectionTime: number | null = null
       let activeGame: ActiveGame = {
-        match: null, // Match if user is in one
+        match: null, // The match user is in if any
         playerNumber: null, // 0 or 1 for current match
       }
 
