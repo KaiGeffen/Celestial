@@ -32,6 +32,7 @@ import JOURNEY_CHOICES, {
 } from '../data/journeyChoices'
 import Server from '../server'
 import Button from '../lib/buttons/button'
+import { CardImage } from '../lib/cardImage'
 
 const OVERLAY_WIDTH = 680
 const OVERLAY_HEIGHT = 620
@@ -96,6 +97,9 @@ export default class JourneyScene extends BaseScene {
     start: (s: string, speed: number) => void
     stop: (showAll: boolean) => void
   }
+  // First reward card of the hovered mission, shown next to the tip
+  private missionCardContainer: Phaser.GameObjects.Container
+  private missionCardImage: CardImage
 
   constructor() {
     super({
@@ -153,6 +157,7 @@ export default class JourneyScene extends BaseScene {
     // Mission list overlay on the right
     this.createOverlayCharacterArt()
     this.createJourneyOverlay()
+    this.createMissionCardImage()
 
     // If we started on stars, show alt map immediately (no fade-in delay)
     if (this.selectedThemeIndex === STARS_THEME_INDEX) {
@@ -324,6 +329,49 @@ export default class JourneyScene extends BaseScene {
   private hideMissionTip(): void {
     this.tweens.add({
       targets: this.missionTipContainer,
+      alpha: 0,
+      duration: MISSION_TIP_FADE_DURATION,
+      ease: 'Power2.In',
+    })
+  }
+
+  private createMissionCardImage(): void {
+    // Hidden (alpha 0) until a mission is hovered, mirroring the tip box.
+    const tipBoxHeight = Space.pad * 2 + 22 * 6
+    const tipBoxTop = Space.windowHeight - tipBoxHeight - Space.pad
+    const x = Space.pad + MISSION_TIP_BOX_WIDTH / 2
+    const y = tipBoxTop - Space.pad - Space.cardHeight / 2
+
+    this.missionCardContainer = this.add
+      .container(x, y)
+      .setScrollFactor(0)
+      .setAlpha(0)
+    this.missionCardImage = new CardImage(
+      Catalog.cardback,
+      this.missionCardContainer,
+      false,
+    )
+  }
+
+  private showMissionCard(cardId?: number): void {
+    const card = cardId !== undefined ? Catalog.getCardById(cardId) : null
+    // Missions without a reward card (e.g. tip nodes) show nothing
+    if (!card) {
+      this.hideMissionCard()
+      return
+    }
+    this.missionCardImage.setCard(card)
+    this.tweens.add({
+      targets: this.missionCardContainer,
+      alpha: 1,
+      duration: MISSION_TIP_FADE_DURATION,
+      ease: 'Power2.Out',
+    })
+  }
+
+  private hideMissionCard(): void {
+    this.tweens.add({
+      targets: this.missionCardContainer,
       alpha: 0,
       duration: MISSION_TIP_FADE_DURATION,
       ease: 'Power2.In',
@@ -744,8 +792,14 @@ export default class JourneyScene extends BaseScene {
         f: this.missionOnClick(mission),
       })
       startBtn.setOnHover(
-        () => this.showMissionTip(mission.tip ?? ''),
-        () => this.hideMissionTip(),
+        () => {
+          this.showMissionTip(mission.tip ?? '')
+          this.showMissionCard(mission.cards?.[0])
+        },
+        () => {
+          this.hideMissionTip()
+          this.hideMissionCard()
+        },
       )
       row.add(btnContainer, { align: 'center' })
     } else {
