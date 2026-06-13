@@ -2,7 +2,6 @@ import 'phaser'
 
 /// <reference path="./types/electron.d.ts" />
 
-import Card from '../../shared/state/card'
 import { Flags, Url, UserSettings } from './settings/settings'
 import BaseScene from './scene/baseScene'
 import { TypedWebSocket } from '../../shared/network/typedWebSocket'
@@ -20,12 +19,10 @@ import { Achievement } from '../../shared/types/achievement'
 import GameModel from '../../shared/state/gameModel'
 import { v5 as uuidv5 } from 'uuid'
 import messagesToClient from '../../shared/network/messagesToClient'
+import messagesToServer from '../../shared/network/messagesToServer'
 
-const ip = '127.0.0.1'
-const port = 5555
-// Custom code for closing websocket connection due to invalid token
+// WebSocket normal-closure code (1000), used whenever we close the connection.
 const code = 1000
-const STEAM_UUID_NAMESPACE = UUID_NAMESPACE
 
 interface SteamAuthResult {
   steamId: string
@@ -228,7 +225,7 @@ export default class Server {
     }
 
     // Cache the UUID in case of reconnect
-    const uuid = uuidv5(session.steamId, STEAM_UUID_NAMESPACE)
+    const uuid = uuidv5(session.steamId, UUID_NAMESPACE)
     localStorage.setItem('steam_uuid', uuid)
 
     this.connectAndAuthenticate(
@@ -360,7 +357,6 @@ export default class Server {
 
     if (server) server.close(code)
     server = undefined
-    Server.userData = null
 
     UserSettings.clearSessionStorage()
 
@@ -368,85 +364,71 @@ export default class Server {
     document.getElementById('signin').hidden = false
   }
 
-  // Send server an updated list of decks
-  static sendDecks(decks: Deck[]): void {
+  // Send a message to the server if the connection is open. Pass `context` to
+  // log when it isn't; omit it for fire-and-forget messages that may race a
+  // close and shouldn't spam the console.
+  private static send<T extends keyof messagesToServer>(
+    message: messagesToServer[T] & { type: T },
+    context?: string,
+  ): void {
     if (!server || !server.isOpen()) {
-      console.error('Sending decks when server ws doesnt exist.')
+      if (context) console.error(`${context} when server ws doesn't exist.`)
       return
     }
-    server.send({
-      type: 'sendDecks',
-      decks: decks,
-    })
+    server.send(message)
   }
 
+  // Send server an updated list of decks
+  static sendDecks(decks: Deck[]): void {
+    Server.send({ type: 'sendDecks', decks }, 'Sending decks')
+  }
+
+  // TODO Remove this, since the server determines the match results and updates the inventory
   // Send server user's inventory of unlocked cards
   static sendInventory(inventory: boolean[]): void {
-    if (!server || !server.isOpen()) {
-      console.error('Sending inventory when server ws doesnt exist.')
-      return
-    }
-    server.send({
-      type: 'sendInventory',
-      inventory: this.convertBoolArrayToBitString(inventory),
-    })
+    Server.send(
+      {
+        type: 'sendInventory',
+        inventory: this.convertBoolArrayToBitString(inventory),
+      },
+      'Sending inventory',
+    )
   }
 
   // Send server user's list of completed missions
   static sendCompletedMissions(missions: boolean[]): void {
-    if (!server || !server.isOpen()) {
-      console.error('Sending completed missions when server ws doesnt exist.')
-      return
-    }
-    server.send({
-      type: 'sendCompletedMissions',
-      missions: this.convertBoolArrayToBitString(missions),
-    })
+    Server.send(
+      {
+        type: 'sendCompletedMissions',
+        missions: this.convertBoolArrayToBitString(missions),
+      },
+      'Sending completed missions',
+    )
   }
 
-  // Send player's choice for the ending to a character's journey
+  // Send player's choice for the ending to a character's journey (silent: fired
+  // opportunistically, so a closed socket shouldn't log)
   static sendJourneyChoice(characterIndex: number, choice: 0 | 1): void {
-    if (!server || !server.isOpen()) return
-    server.send({
-      type: 'sendJourneyChoice',
-      characterIndex,
-      choice,
-    })
+    Server.send({ type: 'sendJourneyChoice', characterIndex, choice })
   }
 
+  // TODO Remove avatar exp
   // Send server user's experience with each avatar
   static sendAvatarExperience(experience: number[]): void {
-    if (!server || !server.isOpen()) {
-      console.error('Sending avatar experience when server ws doesnt exist.')
-      return
-    }
-    server.send({
-      type: 'sendAvatarExperience',
-      experience: experience,
-    })
+    Server.send(
+      { type: 'sendAvatarExperience', experience },
+      'Sending avatar experience',
+    )
   }
 
   /** Sync whether others may spectate this user's matches (see UserSettings.canBeSpectated). */
   static sendCanBeSpectatedPreference(): void {
-    if (!server || !server.isOpen()) {
-      return
-    }
     const allowed = UserSettings._get('canBeSpectated') !== false
-    server.send({
-      type: 'setCanBeSpectated',
-      allowed,
-    })
+    Server.send({ type: 'setCanBeSpectated', allowed })
   }
 
   static purchaseItem(id: number): void {
-    if (!server || !server.isOpen()) {
-      console.error('Purchasing item when server ws doesnt exist.')
-      return
-    }
-    server.send({
-      type: 'purchaseItem',
-      id,
-    })
+    Server.send({ type: 'purchaseItem', id }, 'Purchasing item')
   }
 
   static claimMissionRewards(missionId: number): void {
@@ -487,25 +469,21 @@ export default class Server {
 
   // Send all data necessary to initialize a user
   static sendInitialUserData(username: string): void {
-    if (!server || !server.isOpen()) {
-      console.error('Sending initial user data when server ws doesnt exist.')
-      return
-    }
-
-    const ref = this.getReferralCode()
-
-    server.send({
-      type: 'sendInitialUserData',
-      username: username,
-      decks: UserSettings._get('decks'),
-      inventory: this.convertBoolArrayToBitString(
-        UserSettings._get('inventory'),
-      ),
-      missions: this.convertBoolArrayToBitString(
-        UserSettings._get('completedMissions'),
-      ),
-      ref,
-    })
+    Server.send(
+      {
+        type: 'sendInitialUserData',
+        username,
+        decks: UserSettings._get('decks'),
+        inventory: this.convertBoolArrayToBitString(
+          UserSettings._get('inventory'),
+        ),
+        missions: this.convertBoolArrayToBitString(
+          UserSettings._get('completedMissions'),
+        ),
+        ref: this.getReferralCode(),
+      },
+      'Sending initial user data',
+    )
   }
 
   static getUserData(): UserData {
@@ -549,25 +527,14 @@ export default class Server {
   }
 
   static accessDiscord(): void {
-    if (!server || !server.isOpen()) {
-      console.error('Accessing Discord when server ws doesnt exist.')
-      return
-    }
-
-    server.send({
-      type: 'accessDiscord',
-    })
+    Server.send({ type: 'accessDiscord' }, 'Accessing Discord')
   }
 
   static harvestGarden(plotNumber: number): void {
-    if (!server || !server.isOpen()) {
-      console.error('Harvesting garden when server ws doesnt exist.')
-      return
-    }
-    server.send({
-      type: 'harvestGarden',
-      index: plotNumber,
-    })
+    Server.send(
+      { type: 'harvestGarden', index: plotNumber },
+      'Harvesting garden',
+    )
   }
 
   private static convertBoolArrayToBitString(array: boolean[]): string {
