@@ -6,6 +6,11 @@ import GameModel from '../state/gameModel'
 export default interface messagesToClient {
   promptUserInit: {}
   invalidToken: {}
+  // Long-lived session token issued after a verified provider login; the client
+  // stores it and reconnects with it instead of a short-lived Google token.
+  sessionToken: {
+    token: string
+  }
   sendUserData: {
     inventory: string
     completedMissions: string

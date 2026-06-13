@@ -3,6 +3,7 @@ import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 import { Style, Color, Space, BBStyle } from '../settings/settings'
 import BaseScene from './baseScene'
 import Buttons from '../lib/buttons/buttons'
+import AvatarButton from '../lib/buttons/avatar'
 import Server from '../server'
 import Cinematic from '../lib/cinematic'
 import {
@@ -23,6 +24,8 @@ const LINK_AREA_KEYS = ['_link_discord', '_link_steam', '_link_nextfest']
 
 export default class HomeScene extends BaseScene {
   private coinsDisplayText: BBCodeText
+  // The home avatar, passed to the profile menu so cosmetic changes show live
+  private avatar: AvatarButton
 
   constructor() {
     super({
@@ -258,6 +261,7 @@ export default class HomeScene extends BaseScene {
         this.scene.launch('MenuScene', {
           menu: 'userProfile',
           activeScene: this,
+          outerAvatar: this.avatar,
         })
       })
 
@@ -292,7 +296,7 @@ export default class HomeScene extends BaseScene {
       Space.avatarSize,
       Space.avatarSize,
     )
-    const avatar = new Buttons.Avatar({
+    this.avatar = new Buttons.Avatar({
       within: avatarContainer,
       avatarId: Server.getUserData().cosmeticSet.avatar,
       border: Server.getUserData().cosmeticSet.border,

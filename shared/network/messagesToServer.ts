@@ -3,11 +3,19 @@ import { CosmeticSet } from '../types/cosmeticSet'
 import { Mulligan } from '../settings'
 
 export default interface messagesToServer {
-  // TODO
+  // Guest sign-in only. UUID is a client-generated random id with no identity
+  // claim — provider-backed accounts (Google/Steam) must use their verified
+  // login messages below, never this path.
   signIn: {
-    email?: string
     uuid: string
-    jti?: string
+  }
+  loginGoogle: {
+    // Raw Google Identity Services ID token (credential), verified server-side.
+    credential: string
+  }
+  loginSession: {
+    // Server-issued session token from a previous verified provider login.
+    token: string
   }
   loginSteam: {
     ticket: string
@@ -52,26 +60,21 @@ export default interface messagesToServer {
   // Queueing events
   initPvp: {
     password: string
-    uuid: string
     deck: Deck
   }
   initPve: {
     aiDeck: Deck
-    uuid: string
     deck: Deck
   }
   initMission: {
-    uuid: string
     deck: Deck
     missionID: number
   }
   initTutorial: {
     num: number
-    uuid: string
   }
   initSpecialPve: {
     aiDeck: Deck
-    uuid: string
     deck: Deck
     enabledModes: number[]
   }
