@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken'
+import { createHmac, timingSafeEqual } from 'crypto'
 
 /**
  * Server-issued session tokens. After a provider login (Google/Steam) is
@@ -6,11 +6,15 @@ import jwt from 'jsonwebtoken'
  * lifetime below WITHOUT re-verifying a fresh provider token. This decouples
  * our sessions from Google ID tokens, which expire after ~1 hour.
  *
+ * These are standard HS256 JWTs, signed/verified here with Node's built-in
+ * crypto (no external dependency). The client only base64-decodes the payload
+ * to read the uuid; it never verifies the signature.
+ *
  * SECURITY: the signing secret must come from the environment and never be
  * hardcoded — anyone who knows it can forge a session for any account. If it is
  * unset we simply do not issue session tokens and fall back to provider login.
  */
-const SESSION_TTL = '30d'
+const SESSION_TTL_SECONDS = 30 * 24 * 60 * 60 // 30 days
 
 let warnedMissingSecret = false
 // Read lazily (not at module load): dotenv.config() runs when db/db.ts is
@@ -39,15 +43,31 @@ export interface SessionClaims {
   email?: string | null
 }
 
+const b64url = (input: Buffer | string): string =>
+  Buffer.from(input).toString('base64url')
+
+const JWT_HEADER = b64url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+
+const signHs256 = (signingInput: string, secret: string): string =>
+  b64url(createHmac('sha256', secret).update(signingInput).digest())
+
 /** Mint a signed session token, or null if no secret is configured. */
 export function issueSessionToken(claims: SessionClaims): string | null {
   const secret = getSecret()
   if (!secret) return null
-  return jwt.sign(
-    { uuid: claims.uuid, provider: claims.provider, email: claims.email ?? null },
-    secret,
-    { expiresIn: SESSION_TTL },
+
+  const now = Math.floor(Date.now() / 1000)
+  const payload = b64url(
+    JSON.stringify({
+      uuid: claims.uuid,
+      provider: claims.provider,
+      email: claims.email ?? null,
+      iat: now,
+      exp: now + SESSION_TTL_SECONDS,
+    }),
   )
+  const signingInput = `${JWT_HEADER}.${payload}`
+  return `${signingInput}.${signHs256(signingInput, secret)}`
 }
 
 /** Verify a session token's signature and expiry. Returns claims or null. */
@@ -56,11 +76,29 @@ export function verifySessionToken(token: string): SessionClaims | null {
   const t = token?.trim()
   if (!secret || !t) return null
 
+  const parts = t.split('.')
+  if (parts.length !== 3) return null
+  const [header, payload, signature] = parts
+
+  // Constant-time signature check
+  const expected = signHs256(`${header}.${payload}`, secret)
+  const sigBuf = Buffer.from(signature)
+  const expBuf = Buffer.from(expected)
+  if (sigBuf.length !== expBuf.length || !timingSafeEqual(sigBuf, expBuf)) {
+    return null
+  }
+
   try {
-    const decoded = jwt.verify(t, secret) as jwt.JwtPayload
-    const { uuid, provider, email } = decoded
+    const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString())
+    const { uuid, provider, email, exp } = decoded
+
+    // Expiry
+    if (typeof exp !== 'number' || Math.floor(Date.now() / 1000) >= exp) {
+      return null
+    }
     if (typeof uuid !== 'string') return null
     if (provider !== 'google' && provider !== 'steam') return null
+
     return {
       uuid,
       provider,
