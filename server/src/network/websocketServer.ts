@@ -136,6 +136,7 @@ export default function createWebSocketServer() {
 
       // Remember the user once they've signed in
       let id: string = null
+      let username: string = null
       let potentialEmail: string = null
       // Verified provider identities for this connection, applied when a brand-
       // new account is created via sendInitialUserData.
@@ -174,6 +175,7 @@ export default function createWebSocketServer() {
             email: players.email,
             google_id: players.google_id,
             steam_id: players.steam_id,
+            username: players.username,
           })
           .from(players)
           .where(eq(players.id, uuid))
@@ -202,6 +204,7 @@ export default function createWebSocketServer() {
         // Add to active users
         activePlayers[uuid] = ws
         connectionTime = Date.now()
+        username = result[0].username
 
         // Handle initial achievement
         await AchievementManager.onConnection(id)
@@ -422,6 +425,7 @@ export default function createWebSocketServer() {
               ref,
             }
             await db.insert(players).values(data)
+            username = username
 
             // Log about it
             console.log(
@@ -645,7 +649,7 @@ export default function createWebSocketServer() {
         .on(
           'initMission',
           authed(async ({ deck, missionID }) => {
-            console.log('Mission:', missionID)
+            console.log('Mission:', missionID, 'for player: ', username)
 
             // This might fail if the mission is invalid
             try {
@@ -670,6 +674,8 @@ export default function createWebSocketServer() {
           authed(async ({ aiDeck, deck }) => {
             console.log(
               'PvE:',
+              username,
+              ' ',
               deck.cards
                 .map((cardId) => Catalog.getCardById(cardId).name)
                 .join(', '),
@@ -694,6 +700,8 @@ export default function createWebSocketServer() {
           authed(async ({ aiDeck, deck, enabledModes }) => {
             console.log(
               'Race:',
+              username,
+              ' ',
               deck.cards
                 .map((cardId) => Catalog.getCardById(cardId).name)
                 .join(', '),
@@ -740,6 +748,8 @@ export default function createWebSocketServer() {
             if (otherPlayer) {
               console.log(
                 'PVP:',
+                username,
+                ' ',
                 data.deck.cards
                   .map((cardId) => Catalog.getCardById(cardId).name)
                   .join(', '),
@@ -791,7 +801,7 @@ export default function createWebSocketServer() {
         .on(
           'initTutorial',
           authed(async (data) => {
-            console.log('Tutorial: ', data.num, 'for uuid: ', id)
+            console.log('Tutorial: ', data.num, 'for player: ', username)
 
             activeGame.match = new TutorialMatch(ws, data.num, id)
             activeGame.playerNumber = 0
@@ -861,12 +871,6 @@ export default function createWebSocketServer() {
             spectatingUserIds.add(id)
 
             // Notify the watched player (not the opponent) that someone is spectating
-            const [watcher] = await db
-              .select({ username: players.username })
-              .from(players)
-              .where(eq(players.id, id))
-              .limit(1)
-
             const watchedWs =
               perspective === 0
                 ? targetActive.match.ws1
@@ -874,7 +878,7 @@ export default function createWebSocketServer() {
             if (watchedWs?.isOpen()) {
               watchedWs.send({
                 type: 'spectatorJoined',
-                username: watcher?.username ?? 'Someone',
+                username,
               })
             }
           }),
