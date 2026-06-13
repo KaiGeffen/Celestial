@@ -82,6 +82,45 @@ export default class AvatarButton extends Button {
     return this
   }
 
+  // Darken-tween state: 0 = bright, 1 = fully darkened
+  private darkenValue = 0
+  private darkenTarget = 0
+  private darkenTween: Phaser.Tweens.Tween
+
+  /** Fade the icon + border toward darkened or bright over `duration` ms. */
+  setDarkened(darkened: boolean, duration: number): this {
+    const target = darkened ? 1 : 0
+    // Already at / tweening to this state — don't restart the tween.
+    if (this.darkenTarget === target) return this
+    this.darkenTarget = target
+
+    this.darkenTween?.remove()
+
+    const dark = Color.avatarDeselected
+    const dr = (dark >> 16) & 0xff
+    const dg = (dark >> 8) & 0xff
+    const db = dark & 0xff
+
+    const proxy = { v: this.darkenValue }
+    this.darkenTween = this.scene.tweens.add({
+      targets: proxy,
+      v: target,
+      duration,
+      onUpdate: () => {
+        this.darkenValue = proxy.v
+        // Interpolate white -> grey by progress and tint both layers
+        const r = Math.round(255 + (dr - 255) * proxy.v)
+        const g = Math.round(255 + (dg - 255) * proxy.v)
+        const b = Math.round(255 + (db - 255) * proxy.v)
+        const tint = (r << 16) | (g << 8) | b
+        this.icon.setTint(tint)
+        this.border.setTint(tint)
+      },
+    })
+
+    return this
+  }
+
   setAvatar(i: number): this {
     this.name = avatarNames[i]
     this.setTexture(`avatar-${this.name}`)

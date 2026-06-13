@@ -2,7 +2,7 @@ import 'phaser'
 import GameModel from '../../../../shared/state/gameModel'
 import Buttons from '../../lib/buttons/buttons'
 import AvatarButton from '../../lib/buttons/avatar'
-import { Color, Space, Style } from '../../settings/settings'
+import { Color, Space, Style, Time } from '../../settings/settings'
 import Region from './baseRegion'
 
 const AVATAR_REGION_WIDTH = Space.avatarSize + Space.pad * 2
@@ -76,6 +76,11 @@ export default abstract class AvatarRegionBase extends Region {
     const i = this.playerIndex()
     this.avatar.setAvatar(state.cosmeticSets[i].avatar)
     this.avatar.setBorder(state.cosmeticSets[i].border)
+
+    // Fade the avatar of the player who doesn't currently have priority toward
+    // darkened. When no one has priority (e.g. game over), brighten both.
+    const hasPriority = state.priority === i || state.priority == null
+    this.avatar.setDarkened(!hasPriority, Time.match.recapTween)
 
     this.txtUsername.setText(state.usernames[i])
 
