@@ -10,6 +10,7 @@ import {
   openDiscord,
   openNextFest,
   openSteamStore,
+  openTournament,
 } from '../utils/externalLinks'
 import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
@@ -20,7 +21,12 @@ import packageJson from '../../package.json'
 const NAVIGATION_BUTTON_WIDTH = 278
 
 const GAME_VERSION = packageJson.version
-const LINK_AREA_KEYS = ['_link_discord', '_link_steam', '_link_nextfest']
+const LINK_AREA_KEYS = [
+  '_link_discord',
+  '_link_steam',
+  '_link_nextfest',
+  '_link_tournament',
+]
 
 export default class HomeScene extends BaseScene {
   private coinsDisplayText: BBCodeText
@@ -482,6 +488,7 @@ export default class HomeScene extends BaseScene {
           if (key === '_link_discord') openDiscord()
           else if (key === '_link_steam') openSteamStore()
           else if (key === '_link_nextfest') openNextFest()
+          else if (key === '_link_tournament') openTournament()
         })
         .setOrigin(0, 0)
       blockSizer.add(bodyText, { align: 'left' })
@@ -569,19 +576,28 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
     body: `Our [area=_link_steam][stroke=${Color.goldS}]Steam page[/stroke][/area] is up! We'd love if you could wishlist, and look forward to the demo release at [area=_link_nextfest][stroke=${Color.goldS}]Steam Next Fest[/stroke][/area] in October.`,
   },
   {
-    subheader: 'Currencies & Cosmetics',
-    body: `Gems have arrived in the Celestial realm!
+    subheader: 'Tournament',
+    body: `Our next tournament will be on June 27th at 1 PM EST.
+[area=_link_tournament][stroke=${Color.goldS}]Register here![/stroke][/area]
     
-    Earn 1[img=gem] for each PvP match played, plus a small chance to get 3-5[img=gem] from each plant in your garden. These shiny rewards can be traded for new cosmetic items in the Store under the Cosmetics tab.`,
+Prizes are as follows: $100 for 1st, $75 for 2nd, $50 for 3rd, and $25 consolation prize for a random non-placing participant. All attendees will receive a new cardback.
+
+We're partnering with Fate League, so expect a new crop of challengers for this tournament!`,
   },
+  // {
+  //   subheader: 'Currencies & Cosmetics',
+  //   body: `Gems have arrived in the Celestial realm!
+
+  //   Earn 1[img=gem] for each PvP match played, plus a small chance to get 3-5[img=gem] from each plant in your garden. These shiny rewards can be traded for new cosmetic items in the Store under the Cosmetics tab.`,
+  // },
   {
     subheader: 'Ranked Seasons',
     body: `June 1st - 30th marks our first official ranked season!
     
     As the season begins, each player's ELO will be reset. Once the season ends, the #1 player will get to pick the theme for the next cardback and co-design it. Once it's ready, each player in the top 10 will get a free copy.`,
   },
-  {
-    subheader: 'New Cards',
-    body: `[area=_Sky Burial][stroke=${Color.goldS}]Sky Burial[/stroke][/area] and [area=_Starfall][stroke=${Color.goldS}]Starfall[/stroke][/area] are now available in the Store!`,
-  },
+  // {
+  //   subheader: 'New Cards',
+  //   body: `[area=_Sky Burial][stroke=${Color.goldS}]Sky Burial[/stroke][/area] and [area=_Starfall][stroke=${Color.goldS}]Starfall[/stroke][/area] are now available in the Store!`,
+  // },
 ]

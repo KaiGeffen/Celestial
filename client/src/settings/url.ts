@@ -11,4 +11,5 @@ export const Url = {
   gsi_token: 'gsi_token_v2',
   session_token: 'session_token_v1',
   privacyPolicy: 'https://celestialdecks.gg/privacy/',
+  tournament: 'https://challonge.com/CelestialDecks',
 }

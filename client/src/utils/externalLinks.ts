@@ -27,3 +27,8 @@ export function openFeedbackForm() {
   window.open(Url.feedback, '_blank')
   logEvent('opened_feedback_form')
 }
+
+export function openTournament() {
+  window.open(Url.tournament, '_blank')
+  logEvent('opened_tournament')
+}
