@@ -17,6 +17,7 @@ import ensureMusic from '../loader/audioManager'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
 import { server } from '../server'
+import { userDataStore, UserData } from '../userDataStore'
 import Loader from '../loader/loader'
 
 // Whether the user has seen the disconnect error message since their last connection
@@ -46,6 +47,18 @@ class SharedBaseScene extends Phaser.Scene {
 
     // Load the journey material, in case it's not already loaded
     Loader.loadJourneyMapAndMission(this)
+  }
+
+  /**
+   * Subscribe to the signed-in user's data: fires immediately with the current
+   * value, then on every change, and auto-unsubscribes on scene shutdown. Use
+   * for UI that should stay in sync with account data.
+   */
+  protected bindUserData(callback: (data: UserData | null) => void): void {
+    callback(userDataStore.get())
+    const unsubscribe = userDataStore.subscribe(callback)
+    this.events.once('shutdown', unsubscribe)
+    this.events.once('destroy', unsubscribe)
   }
 
   private createErrorMessage(): void {

@@ -32,21 +32,15 @@ export default class StoreScene extends BaseSceneWithHeader {
     super.create({ title: 'Store' })
     this.createTabButton()
     this.createUserStatsDisplay()
-    this.createStoreItems()
 
-    // Refresh store when user data is updated (e.g., after purchase).
-    // Named method so the listener can be cleanly removed on shutdown.
-    this.game.events.on('userDataUpdated', this.onUserDataUpdated, this)
-    this.events.once('shutdown', () => {
-      this.game.events.off('userDataUpdated', this.onUserDataUpdated, this)
+    // Currency and item ownership reflect account data and refresh on any change
+    // (e.g. after a purchase). bindUserData fires immediately to populate them,
+    // then on every subsequent change, and unsubscribes on shutdown.
+    this.bindUserData((data) => {
+      if (!data) return
+      this.updateUserStatsDisplay()
+      this.createStoreItems()
     })
-  }
-
-  // No update() override needed — stats are refreshed via the userDataUpdated event.
-
-  private onUserDataUpdated(): void {
-    this.updateUserStatsDisplay()
-    this.createStoreItems()
   }
 
   private createUserStatsDisplay(): void {
@@ -73,8 +67,7 @@ export default class StoreScene extends BaseSceneWithHeader {
     this.plugins.get('rexAnchor')['add'](bg, {
       right: `100%-${Space.padSmall * 2 + Space.iconSize * 2}`,
     })
-
-    this.updateUserStatsDisplay()
+    // Text is populated by bindUserData (see create).
   }
 
   private updateUserStatsDisplay(): void {

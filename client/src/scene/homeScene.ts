@@ -30,7 +30,9 @@ const LINK_AREA_KEYS = [
 
 export default class HomeScene extends BaseScene {
   private coinsDisplayText: BBCodeText
-  // The home avatar, passed to the profile menu so cosmetic changes show live
+  private gemsText: BBCodeText
+  private usernameText: Phaser.GameObjects.Text
+  private eloText: Phaser.GameObjects.Text
   private avatar: AvatarButton
 
   constructor() {
@@ -56,6 +58,20 @@ export default class HomeScene extends BaseScene {
 
     // Create the new layout: left side (user details + navigation) and right side (content)
     this.createMainLayout()
+
+    // Keep the profile section (avatar, name, elo, currencies) in sync with
+    // account data — e.g. a cosmetic change in the profile menu or a reward.
+    this.bindUserData((data) => {
+      if (!data) return
+      this.avatar.setAvatar(data.cosmeticSet.avatar)
+      this.avatar.setBorder(data.cosmeticSet.border)
+      this.usernameText.setText(data.username || 'Guest')
+      this.eloText.setText(`${data.elo || 1000}`)
+      this.gemsText.setText(`${(data.gems || 0).toLocaleString()} [img=gem]`)
+      this.coinsDisplayText.setText(
+        `${(data.coins || 0).toLocaleString()} [img=coin]`,
+      )
+    })
 
     // Check if there are any unseen achievements and show achievements menu if so
     this.checkAndShowUnseenAchievements()
@@ -267,7 +283,6 @@ export default class HomeScene extends BaseScene {
         this.scene.launch('MenuScene', {
           menu: 'userProfile',
           activeScene: this,
-          outerAvatar: this.avatar,
         })
       })
 
@@ -331,21 +346,21 @@ export default class HomeScene extends BaseScene {
         ? parseInt(Style.username.fontSize, 10)
         : (Style.username.fontSize as number)
 
-    const usernameText = this.add
+    this.usernameText = this.add
       .text(0, 0, username, Style.username)
       .setOrigin(0.5, 0.5)
       .setWordWrapWidth(maxTextWidth, true)
       .setFixedSize(maxTextWidth, usernameFontSize + 5)
-    textSizer.add(usernameText, { align: 'center' })
+    textSizer.add(this.usernameText, { align: 'center' })
 
     // ELO
-    const eloText = this.add
+    this.eloText = this.add
       .text(0, 0, `${elo}`, Style.basicStylized)
       .setOrigin(0, 0.5)
-    textSizer.add(eloText, { align: 'center', padding: { bottom: 25 } })
+    textSizer.add(this.eloText, { align: 'center', padding: { bottom: 25 } })
 
     // Gems
-    const gemsText = this.add
+    this.gemsText = this.add
       .rexBBCodeText(
         0,
         0,
@@ -353,7 +368,7 @@ export default class HomeScene extends BaseScene {
         BBStyle.currency,
       )
       .setOrigin(0, 0.5)
-    textSizer.add(gemsText, { align: 'right' })
+    textSizer.add(this.gemsText, { align: 'right' })
 
     // Coins (gold)
     this.coinsDisplayText = this.add
@@ -555,12 +570,6 @@ export default class HomeScene extends BaseScene {
 
     // Show any unseen achievements
     this.checkAndShowUnseenAchievements()
-
-    const coins = Server.getUserData().coins ?? 0
-    const coinsStr = `${coins.toLocaleString()} [img=coin]`
-    if (this.coinsDisplayText && this.coinsDisplayText.text !== coinsStr) {
-      this.coinsDisplayText.setText(coinsStr)
-    }
   }
 
   beforeExit(): void {

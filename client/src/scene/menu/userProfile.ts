@@ -27,9 +27,6 @@ import cardbackNames from '../../data/cardbackNames'
 import { fitTextToMaxWidth } from '../../utils/textFit'
 
 export default class UserProfileMenu extends Menu {
-  // The avatar on the homeScene (optional, may be null if not displayed)
-  private outerAvatar: AvatarButton | null
-
   // TODO Refactor to remove this
   private currentTab: string = 'Icon'
   private currentAvatar: AvatarButton
@@ -39,13 +36,9 @@ export default class UserProfileMenu extends Menu {
   // The home scene, which is closed when logging out
   private activeScene: BaseScene
 
-  constructor(
-    scene: MenuScene,
-    params: { activeScene: BaseScene; outerAvatar: AvatarButton | null },
-  ) {
+  constructor(scene: MenuScene, params: { activeScene: BaseScene }) {
     super(scene, 700)
     this.activeScene = params.activeScene
-    this.outerAvatar = params.outerAvatar
 
     this.createContent()
     this.layout()
@@ -379,11 +372,6 @@ export default class UserProfileMenu extends Menu {
   private updateCosmeticSet(newSet: CosmeticSet) {
     this.currentAvatar.setAvatar(newSet.avatar)
     this.currentAvatar.setBorder(newSet.border)
-
-    if (this.outerAvatar) {
-      this.outerAvatar.setAvatar(newSet.avatar)
-      this.outerAvatar.setBorder(newSet.border)
-    }
 
     Server.setCosmeticSet(newSet)
   }
