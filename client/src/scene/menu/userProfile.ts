@@ -1,5 +1,13 @@
 import 'phaser'
-import { Style, Color, Space, Flags } from '../../settings/settings'
+import {
+  Style,
+  Color,
+  Space,
+  Flags,
+  BBStyle,
+  UserSettings,
+} from '../../settings/settings'
+import Catalog from '../../../../shared/state/catalog'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
@@ -101,14 +109,31 @@ export default class UserProfileMenu extends Menu {
       Style.usernameLarge,
     )
     fitTextToMaxWidth(txtUsername, Space.buttonWidth)
+
+    // ELO
     const txtElo = this.scene.add.text(
       0,
       0,
-      `${userData.elo || 1000}`,
+      `ELO: ${userData.elo || 1000}`,
       Style.basicStylized,
     )
+
+    // Card collection count (cards owned / total collectible)
+    const cardInventory = UserSettings._get('cardInventory') || []
+    const ownedCards = Catalog.collectibleCards.filter(
+      (card) => cardInventory[card.id],
+    ).length
+    const txtCards = this.scene.add
+      .rexBBCodeText(
+        0,
+        0,
+        `${ownedCards}/${Catalog.collectibleCards.length} [img=card]`,
+        BBStyle.basicStylized,
+      )
+      .setOrigin(0.5)
     sizer.add(txtUsername)
     sizer.add(txtElo)
+    sizer.add(txtCards)
 
     // Divider
     sizer.add(

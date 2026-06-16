@@ -322,6 +322,7 @@ export const BBStyle: Record<string, any> = {
     images: {
       coin: { key: 'icon-coin', height: 24 },
       gem: { key: 'icon-gem', height: 24 },
+      card: { key: 'icon-cardIcon', height: 24 },
     },
   },
   // The textbox for the card
@@ -436,9 +437,6 @@ export const BBStyle: Record<string, any> = {
     color: Color.basicText,
     fixedHeight: largeSize,
     valign: 'center',
-    images: {
-      card: { key: 'icon-cardIcon', height: largeSize },
-    },
   },
   cardCost: {
     fontFamily: cardFont,
