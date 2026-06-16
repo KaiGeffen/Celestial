@@ -400,7 +400,7 @@ export default class OptionsMenu extends Menu {
     sizer.addSpace()
 
     const s =
-      UserSettings._get('canBeSpectated') !== false ? 'Enabled' : 'Disabled'
+      Server.getUserData().canBeSpectated !== false ? 'Enabled' : 'Disabled'
     let container = new ContainerLite(
       this.scene,
       0,
@@ -412,14 +412,10 @@ export default class OptionsMenu extends Menu {
       within: container,
       text: s,
       f: () => {
-        if (UserSettings._get('canBeSpectated') !== false) {
-          btn.setText('Disabled')
-          UserSettings._set('canBeSpectated', false)
-        } else {
-          btn.setText('Enabled')
-          UserSettings._set('canBeSpectated', true)
-        }
-        Server.sendCanBeSpectatedPreference()
+        const enabled = Server.getUserData().canBeSpectated !== false
+        const next = !enabled
+        btn.setText(next ? 'Enabled' : 'Disabled')
+        Server.setCanBeSpectated(next)
       },
     })
     sizer.add(container)

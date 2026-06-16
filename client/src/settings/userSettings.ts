@@ -19,9 +19,6 @@ export class UserSettings {
       // Whether the player should pass automatically if there's nothing they can play
       autopass: true,
 
-      // Whether other players may spectate this user's matches (server-enforced)
-      canBeSpectated: true,
-
       // Whether hotkeys are enabled
       hotkeys: true,
 

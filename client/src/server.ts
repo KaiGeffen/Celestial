@@ -50,6 +50,7 @@ type UserData = null | {
   missionGoldClaimed: boolean[]
   cosmeticSet: CosmeticSet
   achievements: Achievement[]
+  canBeSpectated: boolean
 }
 
 export default class Server {
@@ -300,7 +301,6 @@ export default class Server {
         }
 
         this.loadUserData(data, game)
-        Server.sendCanBeSpectatedPreference()
         // TODO Bad smell, the callback should only happen once as it references a scene
         if (callback) {
           callback()
@@ -421,10 +421,13 @@ export default class Server {
     )
   }
 
-  /** Sync whether others may spectate this user's matches (see UserSettings.canBeSpectated). */
-  static sendCanBeSpectatedPreference(): void {
-    const allowed = UserSettings._get('canBeSpectated') !== false
-    Server.send({ type: 'setCanBeSpectated', allowed })
+  /** Set whether others may spectate this user's matches (per-account preference). */
+  static setCanBeSpectated(allowed: boolean): void {
+    if (this.userData) this.userData.canBeSpectated = allowed
+    Server.send(
+      { type: 'setCanBeSpectated', allowed },
+      'Setting spectate preference',
+    )
   }
 
   static purchaseItem(id: number): void {
@@ -505,6 +508,7 @@ export default class Server {
           relic: 0,
         },
         achievements: [],
+        canBeSpectated: true,
       }
     } else {
       return this.userData

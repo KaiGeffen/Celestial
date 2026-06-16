@@ -176,6 +176,7 @@ export default function createWebSocketServer() {
             google_id: players.google_id,
             steam_id: players.steam_id,
             username: players.username,
+            can_be_spectated: players.can_be_spectated,
           })
           .from(players)
           .where(eq(players.id, uuid))
@@ -205,6 +206,8 @@ export default function createWebSocketServer() {
         activePlayers[uuid] = ws
         connectionTime = Date.now()
         username = result[0].username
+        // Seed the spectate preference from the persisted per-account value
+        spectateAllowedByUserId[uuid] = result[0].can_be_spectated
 
         // Handle initial achievement
         await AchievementManager.onConnection(id)
@@ -821,6 +824,13 @@ export default function createWebSocketServer() {
           'setCanBeSpectated',
           authed(({ allowed }) => {
             spectateAllowedByUserId[id] = allowed
+            // Persist the per-account preference
+            db.update(players)
+              .set({ can_be_spectated: allowed })
+              .where(eq(players.id, id))
+              .catch((e) =>
+                console.error('Error persisting canBeSpectated:', e),
+              )
 
             // Host disabled spectating mid-match: drop everyone watching their perspective.
             if (!allowed) {

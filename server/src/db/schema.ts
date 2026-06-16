@@ -88,6 +88,9 @@ export const players = pgTable(
     // Playtime
     playtime: integer('playtime').notNull().default(0),
 
+    // Whether others may spectate this user's matches
+    can_be_spectated: boolean('can_be_spectated').notNull().default(true),
+
     // Cosmetic set
     cosmetic_set: varchar('cosmetic_set', { length: 1000 }).notNull(),
 

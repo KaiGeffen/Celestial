@@ -28,6 +28,7 @@ export default interface messagesToClient {
     cardInventory: string
     missionGoldClaimed: string
     journeyChoices: (number | null)[]
+    canBeSpectated: boolean
   }
   purchaseItemSuccess: {
     itemId: number
