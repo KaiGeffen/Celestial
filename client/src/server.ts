@@ -15,11 +15,11 @@ import jwt_decode from 'jwt-decode'
 import { ClientWS } from '../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../shared/types/deck'
 import { CosmeticSet } from '../../shared/types/cosmeticSet'
-import { Achievement } from '../../shared/types/achievement'
 import GameModel from '../../shared/state/gameModel'
 import { v5 as uuidv5 } from 'uuid'
 import messagesToClient from '../../shared/network/messagesToClient'
 import messagesToServer from '../../shared/network/messagesToServer'
+import { UserData, userDataStore } from './userDataStore'
 
 // WebSocket normal-closure code (1000), used whenever we close the connection.
 const code = 1000
@@ -37,24 +37,29 @@ interface AuthHandlers {
 // The websocket connetion to the server
 export var server: ClientWS = undefined
 
-// User data
-type UserData = null | {
-  uuid: string
-  username: string
-  elo: number
-  pveWins: number
-  garden: Date[]
-  gems: number
-  coins: number
-  ownedItems: number[]
-  missionGoldClaimed: boolean[]
-  cosmeticSet: CosmeticSet
-  achievements: Achievement[]
-  canBeSpectated: boolean
+// Crash-guard fallback returned by getUserData() when nothing is loaded. This
+// shouldn't be hit in the live app (see getUserData) — the store holds null.
+const LOGGED_OUT_USER_DATA: UserData = {
+  uuid: null,
+  username: null,
+  elo: null,
+  pveWins: 0,
+  garden: [],
+  gems: null,
+  coins: null,
+  ownedItems: [],
+  missionGoldClaimed: [],
+  cosmeticSet: {
+    avatar: 0,
+    border: 0,
+    cardback: 0,
+    relic: 0,
+  },
+  achievements: [],
+  canBeSpectated: true,
 }
 
 export default class Server {
-  private static userData: UserData = null
   static pendingReconnect: { state: GameModel } | null = null
   static activePlayers: {
     uuid: string
@@ -289,16 +294,8 @@ export default class Server {
         localStorage.setItem(Url.session_token, token)
       })
       .on('sendUserData', (data: messagesToClient['sendUserData']) => {
-        // Store the uuid and user data after successful login
-        this.userData = {
-          uuid,
-          ...data,
-          garden: data.garden.map((dateStr) => new Date(dateStr)),
-          missionGoldClaimed: data.missionGoldClaimed
-            .toString()
-            .split('')
-            .map((char) => char === '1'),
-        }
+        // Authoritative account snapshot from the server.
+        userDataStore.applyServerData(data, uuid)
 
         this.loadUserData(data, game)
         // TODO Bad smell, the callback should only happen once as it references a scene
@@ -310,21 +307,14 @@ export default class Server {
       .on(
         'harvestGardenResult',
         ({ success, newGarden, goldReward, gemReward }) => {
-          // Only update the stored garden if the harvest was successful
-          if (success) {
-            this.userData.garden = newGarden.map((dateStr) => new Date(dateStr))
-
-            // Update currencies
-            this.userData.coins = (this.userData.coins || 0) + (goldReward || 0)
-            this.userData.gems = (this.userData.gems || 0) + (gemReward || 0)
-          }
-
-          // Emit global event that HomeScene can listen to regardless of success
+          // The authoritative garden + balances arrive via sendUserData (pushed
+          // by the server after a harvest). Here we only relay the result to the
+          // garden UI for its reward animation.
           game.events.emit('gardenHarvested', {
-            success: success,
-            newGarden: this.userData.garden,
-            goldReward: goldReward,
-            gemReward: gemReward,
+            success,
+            newGarden: (newGarden ?? []).map((dateStr) => new Date(dateStr)),
+            goldReward,
+            gemReward,
           })
         },
       )
@@ -347,7 +337,7 @@ export default class Server {
 
   static logout(): void {
     // Clear user data after logging out
-    this.userData = null
+    userDataStore.clear()
 
     console.log('Logging out')
 
@@ -405,7 +395,8 @@ export default class Server {
 
   /** Set whether others may spectate this user's matches (per-account preference). */
   static setCanBeSpectated(allowed: boolean): void {
-    if (this.userData) this.userData.canBeSpectated = allowed
+    // Client-owned: update locally then sync.
+    userDataStore.setSpectatable(allowed)
     Server.send(
       { type: 'setCanBeSpectated', allowed },
       'Setting spectate preference',
@@ -417,33 +408,21 @@ export default class Server {
   }
 
   static claimMissionRewards(missionId: number): void {
-    if (!server || !server.isOpen()) {
-      console.error('Claiming mission rewards when server ws doesnt exist.')
-      return
-    }
-    if (this.userData) {
-      this.userData.missionGoldClaimed = this.userData.missionGoldClaimed || []
-      this.userData.missionGoldClaimed[missionId] = true
-    }
-    server.send({
-      type: 'claimMissionRewards',
-      missionId,
-    })
+    // missionGoldClaimed is server-authoritative: the server validates the claim
+    // and pushes a fresh snapshot, so we don't guess it locally.
+    Server.send(
+      { type: 'claimMissionRewards', missionId },
+      'Claiming mission rewards',
+    )
   }
 
   static setCosmeticSet(cosmeticSet: CosmeticSet): void {
-    if (!server || !server.isOpen()) {
-      console.error('Setting cosmetic set when server ws doesnt exist.')
-      return
-    }
-
-    // Change it locally
-    this.userData.cosmeticSet = cosmeticSet
-
-    server.send({
-      type: 'setCosmeticSet',
-      value: cosmeticSet,
-    })
+    // Client-owned: update locally (so the UI reflects it immediately) then sync.
+    userDataStore.setCosmeticSet(cosmeticSet)
+    Server.send(
+      { type: 'setCosmeticSet', value: cosmeticSet },
+      'Setting cosmetic set',
+    )
   }
 
   // Get the referral code
@@ -472,44 +451,21 @@ export default class Server {
   }
 
   static getUserData(): UserData {
-    if (this.userData === null) {
-      return {
-        uuid: null,
-        username: null,
-        elo: null,
-        pveWins: 0,
-        garden: [],
-        gems: null,
-        coins: null,
-        ownedItems: [],
-        missionGoldClaimed: [],
-        cosmeticSet: {
-          avatar: 0,
-          border: 0,
-          cardback: 0,
-          relic: 0,
-        },
-        achievements: [],
-        canBeSpectated: true,
-      }
-    } else {
-      return this.userData
+    const data = userDataStore.get()
+    if (data === null) {
+      // The user is always signed in once past SigninScene, so this signals an
+      // ordering bug (reading account data before it loaded). The default is
+      // only a crash guard.
+      // TODO Becomes unreachable once read sites subscribe via bindUserData.
+      console.error('getUserData() called with no signed-in user')
+      return LOGGED_OUT_USER_DATA
     }
+    return data
   }
 
   static setAchievementsSeen(): void {
-    if (!server || !server.isOpen()) {
-      console.error('Setting achievements seen when server ws doesnt exist.')
-      return
-    }
-
-    this.userData.achievements.forEach((achievement) => {
-      achievement.seen = true
-    })
-
-    server.send({
-      type: 'setAchievementsSeen',
-    })
+    userDataStore.markAchievementsSeen()
+    Server.send({ type: 'setAchievementsSeen' }, 'Setting achievements seen')
   }
 
   static accessDiscord(): void {

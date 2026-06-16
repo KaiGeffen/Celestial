@@ -482,6 +482,8 @@ export default function createWebSocketServer() {
               goldReward: harvestResult.goldReward,
               gemReward: harvestResult.gemReward,
             })
+            // Push updated values (Above is just used for animation)
+            if (harvestResult.success) await sendUserData(ws, id)
           }),
         )
         .on(

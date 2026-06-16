@@ -164,13 +164,18 @@ export default class JourneyScene extends BaseScene {
       this.altMap.alpha = 1
     }
 
+    // Refresh the overlay when claim/completion state changes. `userDataUpdated`
+    // fires when the server pushes a fresh snapshot (e.g. after a mission-gold
+    // claim, which is now server-authoritative).
     this.game.events.on('missionGoldClaimed', this.onMissionGoldClaimed, this)
+    this.game.events.on('userDataUpdated', this.onMissionGoldClaimed, this)
     this.events.once('shutdown', () => {
       this.game.events.off(
         'missionGoldClaimed',
         this.onMissionGoldClaimed,
         this,
       )
+      this.game.events.off('userDataUpdated', this.onMissionGoldClaimed, this)
     })
 
     showTooltip(this)
