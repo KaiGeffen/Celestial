@@ -2,6 +2,7 @@ import { MechanicsSettings } from '../../../../shared/settings'
 import { TutorialController } from '../../tutorialController'
 import PveMatch from './pveMatch'
 import { logTutorialProgress } from '../../db/analytics'
+import { markMissionsComplete } from '../../db/updateMatchResult'
 import { ServerWS } from '../../../../shared/network/celestialTypedWebsocket'
 
 class TutorialMatch extends PveMatch {
@@ -12,8 +13,16 @@ class TutorialMatch extends PveMatch {
     super(
       ws,
       uuid,
-      { name: '', cards: [], cosmeticSet: { avatar: 0, border: 0, cardback: 0 } },
-      { name: '', cards: [], cosmeticSet: { avatar: 0, border: 0, cardback: 0 } },
+      {
+        name: '',
+        cards: [],
+        cosmeticSet: { avatar: 0, border: 0, cardback: 0 },
+      },
+      {
+        name: '',
+        cards: [],
+        cosmeticSet: { avatar: 0, border: 0, cardback: 0 },
+      },
     )
 
     this.tutorialNum = num
@@ -48,8 +57,11 @@ class TutorialMatch extends PveMatch {
     )
   }
 
-  // Don't update the database for tutorial matches
-  protected async updateDatabases() {}
+  protected async updateDatabases() {
+    await markMissionsComplete(this.uuid1, [this.tutorialNum]).catch((e) =>
+      console.error('Error marking tutorial complete:', e),
+    )
+  }
 }
 
 export default TutorialMatch

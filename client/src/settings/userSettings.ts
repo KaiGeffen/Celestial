@@ -143,10 +143,6 @@ export class UserSettings {
 
       if (key === 'decks') {
         Server.sendDecks(value)
-      } else if (key === 'inventory') {
-        Server.sendInventory(value)
-      } else if (key === 'completedMissions') {
-        Server.sendCompletedMissions(value)
       } else if (key === 'avatar_experience') {
         Server.sendAvatarExperience(value)
       }

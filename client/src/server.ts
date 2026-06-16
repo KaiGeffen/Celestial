@@ -383,27 +383,9 @@ export default class Server {
     Server.send({ type: 'sendDecks', decks }, 'Sending decks')
   }
 
-  // TODO Remove this, since the server determines the match results and updates the inventory
-  // Send server user's inventory of unlocked cards
-  static sendInventory(inventory: boolean[]): void {
-    Server.send(
-      {
-        type: 'sendInventory',
-        inventory: this.convertBoolArrayToBitString(inventory),
-      },
-      'Sending inventory',
-    )
-  }
-
-  // Send server user's list of completed missions
-  static sendCompletedMissions(missions: boolean[]): void {
-    Server.send(
-      {
-        type: 'sendCompletedMissions',
-        missions: this.convertBoolArrayToBitString(missions),
-      },
-      'Sending completed missions',
-    )
+  // Tell server to skip the tutorials
+  static skipTutorials(): void {
+    Server.send({ type: 'skipTutorials' }, 'Skipping tutorials')
   }
 
   // Send player's choice for the ending to a character's journey (silent: fired

@@ -71,9 +71,7 @@ export async function updateMatchResultPVP(
         elo_peak: sql`GREATEST(${players.elo_peak}, ${newWinnerRating})`,
         pvp_wins_lifetime: sql`${players.pvp_wins_lifetime} + 1`,
         pvp_wins_month: sql`${players.pvp_wins_month} + 1`,
-        ...(matchQualifiesForRewards
-          ? { gems: sql`${players.gems} + 1` }
-          : {}),
+        ...(matchQualifiesForRewards ? { gems: sql`${players.gems} + 1` } : {}),
       })
       .where(eq(players.id, winnerId))
 
@@ -83,9 +81,7 @@ export async function updateMatchResultPVP(
         elo: newLoserRating,
         pvp_losses_lifetime: sql`${players.pvp_losses_lifetime} + 1`,
         pvp_losses_month: sql`${players.pvp_losses_month} + 1`,
-        ...(matchQualifiesForRewards
-          ? { gems: sql`${players.gems} + 1` }
-          : {}),
+        ...(matchQualifiesForRewards ? { gems: sql`${players.gems} + 1` } : {}),
       })
       .where(eq(players.id, loserId))
   })
@@ -157,6 +153,31 @@ function setBitInBitstring(bitstring: string, index: number): string {
   while (arr.length <= index) arr.push('0')
   arr[index] = '1'
   return arr.join('')
+}
+
+/**
+ * Mark one or more missions complete for a player
+ * Used by tutorial completion and the Skip-Tutorials action
+ */
+export async function markMissionsComplete(
+  playerId: string,
+  missionIDs: number[],
+): Promise<void> {
+  const [row] = await db
+    .select({ completedmissions: players.completedmissions })
+    .from(players)
+    .where(eq(players.id, playerId))
+    .limit(1)
+  if (row == null) return
+
+  let completedmissions = row.completedmissions ?? ''
+  for (const id of missionIDs) {
+    completedmissions = setBitInBitstring(completedmissions, id)
+  }
+  await db
+    .update(players)
+    .set({ completedmissions })
+    .where(eq(players.id, playerId))
 }
 
 /** Increment global win/loss counts for a mission (indexed by mission id). */

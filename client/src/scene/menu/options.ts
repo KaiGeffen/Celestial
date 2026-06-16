@@ -497,14 +497,8 @@ export default class OptionsMenu extends Menu {
     if (!tutorialsCompleted) {
       s = 'Skip Tut'
       action = () => {
-        // Complete all tutorial missions in one write.
-        // Also mirror to localStorage so a quick reload can't race account sync.
-        const completedMissions = Array(TUTORIAL_LENGTH).fill(true)
-        UserSettings._set('completedMissions', completedMissions)
-        localStorage.setItem(
-          'completedMissions',
-          JSON.stringify(completedMissions),
-        )
+        // Tell server to skip the tutorials
+        Server.skipTutorials()
 
         // Stop the other active scene
         activeScene.beforeExit()

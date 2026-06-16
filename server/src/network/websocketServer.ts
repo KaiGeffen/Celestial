@@ -27,7 +27,8 @@ import PveMatch from './match/pveMatch'
 import PveMatchMission from './match/pveMatchMission'
 import PvpMatch from './match/pvpMatch'
 import Match from './match/match'
-import { MechanicsSettings } from '../../../shared/settings'
+import { MechanicsSettings, TUTORIAL_LENGTH } from '../../../shared/settings'
+import { markMissionsComplete } from '../db/updateMatchResult'
 import { logFunnelEvent } from '../db/analytics'
 import TutorialMatch from './match/tutorialMatch'
 import sendUserData from './sendUserData'
@@ -322,21 +323,13 @@ export default function createWebSocketServer() {
           }),
         )
         .on(
-          'sendInventory',
-          authed(async ({ inventory }) => {
-            await db
-              .update(players)
-              .set({ inventory })
-              .where(eq(players.id, id))
-          }),
-        )
-        .on(
-          'sendCompletedMissions',
-          authed(async ({ missions }) => {
-            await db
-              .update(players)
-              .set({ completedmissions: missions })
-              .where(eq(players.id, id))
+          'skipTutorials',
+          authed(async () => {
+            await markMissionsComplete(
+              id,
+              Array.from({ length: TUTORIAL_LENGTH }, (_, i) => i),
+            )
+            await sendUserData(ws, id)
           }),
         )
         .on(
@@ -409,6 +402,11 @@ export default function createWebSocketServer() {
               decks: decks.map((deck) => JSON.stringify(deck)),
               pve_wins: 0,
               pve_losses: 0,
+              // TODO Server-authoritative: inventory + completedmissions are
+              // trusted from the client here (to migrate guest progress on
+              // registration). A crafted client could pre-load these at creation.
+              // Make these server-derived (or validate) once guest migration is
+              // handled properly.
               inventory: inventory,
               completedmissions: missions,
               missiongoldclaimed: '',

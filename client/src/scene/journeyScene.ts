@@ -789,7 +789,7 @@ export default class JourneyScene extends BaseScene {
       const startBtn = new Buttons.Basic({
         within: btnContainer,
         text: 'Start',
-        f: this.missionOnClick(mission),
+        f: () => this.scene.start('DeckEditorJourneyScene', { mission }),
       })
       startBtn.setOnHover(
         () => {
@@ -881,26 +881,5 @@ export default class JourneyScene extends BaseScene {
       x: camera.scrollX,
       y: camera.scrollY,
     })
-  }
-
-  // Return the function for what happens when the given mission node is clicked on (from overlay Start button)
-  private missionOnClick(mission: MissionDetails): () => void {
-    return () => {
-      if ('deck' in mission) {
-        this.scene.start('DeckEditorJourneyScene', { mission })
-      } else if ('tip' in mission) {
-        // Tip node: mark complete and show tip popup
-        UserSettings._setIndex('completedMissions', mission.id, true)
-        const onMenuClosed = () => {
-          this.refreshOverlayContent(false)
-        }
-        this.scene.launch('MenuScene', {
-          menu: 'message',
-          title: 'Tip',
-          s: mission.tip,
-        })
-        this.scene.get('MenuScene').events.once('shutdown', onMenuClosed)
-      }
-    }
   }
 }

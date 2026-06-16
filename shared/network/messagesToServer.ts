@@ -23,15 +23,11 @@ export default interface messagesToServer {
   sendDecks: {
     decks: Deck[]
   }
-  sendInventory: {
-    inventory: string
-  }
-  sendCompletedMissions: {
-    missions: string
-  }
   sendAvatarExperience: {
     experience: number[]
   }
+  // Mark all tutorial missions as complete
+  skipTutorials: {}
   sendJourneyChoice: {
     characterIndex: number
     choice: 0 | 1
