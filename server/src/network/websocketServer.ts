@@ -333,15 +333,6 @@ export default function createWebSocketServer() {
           }),
         )
         .on(
-          'sendAvatarExperience',
-          authed(async ({ experience }) => {
-            await db
-              .update(players)
-              .set({ avatar_experience: experience })
-              .where(eq(players.id, id))
-          }),
-        )
-        .on(
           'sendJourneyChoice',
           authed(async ({ characterIndex, choice }) => {
             if (characterIndex < 0 || characterIndex > 5) return
@@ -410,7 +401,6 @@ export default function createWebSocketServer() {
               inventory: inventory,
               completedmissions: missions,
               missiongoldclaimed: '',
-              avatar_experience: [0, 0, 0, 0, 0, 0],
               journey_choices: [null, null, null, null, null, null],
               card_inventory: getStartingInventoryBitString(),
               lastactive: new Date().toISOString(),
@@ -642,6 +632,9 @@ export default function createWebSocketServer() {
         .on(
           'setCosmeticSet',
           authed(async ({ value }) => {
+            // TODO Validate the selection is actually owned (cosmetics from
+            // cosmeticsTransactions, avatars/borders/cardbacks from unlock rules)
+            // before persisting. Currently trusts the client's chosen set.
             await db
               .update(players)
               .set({ cosmetic_set: JSON.stringify(value) })

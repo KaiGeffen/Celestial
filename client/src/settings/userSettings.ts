@@ -93,9 +93,6 @@ export class UserSettings {
         y: 700 - Space.windowHeight / 2,
       },
 
-      // The experience with each avatar
-      avatar_experience: [0, 0, 0, 0, 0, 0],
-
       // A list of all new user tooltips that have been seen
       tooltipsSeen: [],
 
@@ -143,9 +140,8 @@ export class UserSettings {
 
       if (key === 'decks') {
         Server.sendDecks(value)
-      } else if (key === 'avatar_experience') {
-        Server.sendAvatarExperience(value)
       }
+      // inventory / completedMissions are server-authoritative; not synced up
     } else {
       localStorage.setItem(key, JSON.stringify(value))
     }

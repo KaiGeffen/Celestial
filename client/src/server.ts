@@ -384,15 +384,6 @@ export default class Server {
     Server.send({ type: 'sendJourneyChoice', characterIndex, choice })
   }
 
-  // TODO Remove avatar exp
-  // Send server user's experience with each avatar
-  static sendAvatarExperience(experience: number[]): void {
-    Server.send(
-      { type: 'sendAvatarExperience', experience },
-      'Sending avatar experience',
-    )
-  }
-
   /** Set whether others may spectate this user's matches (per-account preference). */
   static setCanBeSpectated(allowed: boolean): void {
     // Client-owned: update locally then sync.
@@ -456,7 +447,8 @@ export default class Server {
       // The user is always signed in once past SigninScene, so this signals an
       // ordering bug (reading account data before it loaded). The default is
       // only a crash guard.
-      // TODO Becomes unreachable once read sites subscribe via bindUserData.
+      // TODO This whole fallback is deletable once getUserData() is fully
+      // replaced by the store (bindUserData / direct store reads everywhere).
       console.error('getUserData() called with no signed-in user')
       return LOGGED_OUT_USER_DATA
     }
@@ -520,10 +512,6 @@ export default class Server {
     sessionStorage.setItem(
       'journeyChoices',
       JSON.stringify(data.journeyChoices),
-    )
-    sessionStorage.setItem(
-      'avatar_experience',
-      JSON.stringify(data.avatar_experience),
     )
 
     // Emit event so scenes can refresh if needed

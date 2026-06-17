@@ -70,7 +70,6 @@ export const players = pgTable(
     missiongoldclaimed: varchar('missiongoldclaimed', {
       length: 1000,
     }).notNull(),
-    avatar_experience: integer('avatar_experience').array().notNull(),
 
     // Per avatar: null = not chosen, 0 = choice A, 1 = choice B
     journey_choices: integer('journey_choices').array().notNull(),

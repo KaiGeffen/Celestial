@@ -44,7 +44,6 @@ export default async function sendUserData(ws: ServerWS, id: string) {
     type: 'sendUserData',
     inventory: data.inventory,
     completedMissions: data.completedmissions,
-    avatar_experience: data.avatar_experience,
     decks,
     username: data.username,
     elo: data.elo,

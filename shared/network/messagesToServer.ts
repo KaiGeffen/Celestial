@@ -23,9 +23,6 @@ export default interface messagesToServer {
   sendDecks: {
     decks: Deck[]
   }
-  sendAvatarExperience: {
-    experience: number[]
-  }
   // Mark all tutorial missions as complete
   skipTutorials: {}
   sendJourneyChoice: {

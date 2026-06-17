@@ -14,7 +14,6 @@ export default interface messagesToClient {
   sendUserData: {
     inventory: string
     completedMissions: string
-    avatar_experience: number[]
     decks: Deck[]
     username: string
     elo: number
