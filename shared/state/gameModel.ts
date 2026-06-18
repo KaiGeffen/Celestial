@@ -506,6 +506,13 @@ export default class GameModel {
         card = this.story.removeAct(fromIndex).card
         break
       }
+      case Zone.Deck: {
+        if (fromIndex < 0 || fromIndex >= this.deck[player].length) {
+          return
+        }
+        card = this.deck[player].splice(fromIndex, 1)[0]
+        break
+      }
       // Currently no other zones supported
       default:
         console.log(`moveBetweenZones: Unsupported zone: ${from} -> ${to}`)

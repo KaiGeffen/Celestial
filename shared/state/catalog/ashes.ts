@@ -550,6 +550,26 @@ const zoomies = new Zoomies({
   text: 'When you resolve a card that costs 7 or more, move this card from your discard pile to the story.',
 })
 
+class Judgement extends Card {
+  onShuffle(player: number, game: GameModel, index: number) {
+    super.onShuffle(player, game, index)
+
+    const cost = Math.max(0, 17 - game.deck[player].length)
+    if (super.exhale(cost, game, player)) {
+      game.moveBetweenZones(Zone.Deck, Zone.Story, player, index, {
+        revealed: true,
+      })
+    }
+  }
+}
+const judgement = new Judgement({
+  name: 'Judgement',
+  id: 2086,
+  cost: 4,
+  points: 4,
+  text: 'When shuffled, Exhale 17: Add this to the story Revealed.\nReduce the cost by 1 for each card shuffled.',
+})
+
 export {
   dash,
   impulse,
@@ -574,4 +594,5 @@ export {
   // prometheus,
   // suddenDraw,
   zoomies,
+  judgement,
 }
