@@ -15,7 +15,7 @@ import {
 
 import { db } from '../db/db'
 import { players, approvedRefs, cosmeticsTransactions } from '../db/schema'
-import { eq, sql, inArray } from 'drizzle-orm'
+import { and, eq, sql, inArray } from 'drizzle-orm'
 import { ServerWS } from '../../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../../shared/types/deck'
 import { AchievementManager } from '../achievementManager'
@@ -34,7 +34,6 @@ import TutorialMatch from './match/tutorialMatch'
 import sendUserData from './sendUserData'
 import { getStartingInventoryBitString } from '../startingInventory'
 import PveSpecialMatch from './match/pveSpecialMatch'
-import getClientGameModel from '../../../shared/state/clientGameModel'
 import REWARD_AMOUNTS from '../../../shared/config/rewardAmounts'
 import { journeyData } from '../../../shared/journey/journey'
 import { v5 as uuidv5 } from 'uuid'
@@ -58,6 +57,7 @@ interface WaitingPlayer {
 }
 
 const CARD_COST = 1000
+const INVALID_CLOSE_CODE = 1008
 
 /** Discord @Active Player role — used to ping matchmaking helpers via webhook. */
 const DISCORD_ACTIVE_PLAYER_ROLE_ID = '1369233011681398857'
@@ -138,11 +138,12 @@ export default function createWebSocketServer() {
       // Remember the user once they've signed in
       let id: string = null
       let username: string = null
-      let potentialEmail: string = null
-      // Verified provider identities for this connection, applied when a brand-
-      // new account is created via sendInitialUserData.
-      let potentialGoogleId: string | null = null
-      let potentialSteamId: string | null = null
+      let email: string = null
+      // Used when a new account is created
+      let googleId: string | null = null
+      let steamId: string | null = null
+
+      // When the session started
       let connectionTime: number | null = null
       let activeGame: ActiveGame = {
         match: null, // The match user is in if any
@@ -156,14 +157,14 @@ export default function createWebSocketServer() {
           email?: string | null
         },
       ) => {
-        potentialEmail = opts.email ?? null
+        email = opts.email ?? null
         id = uuid
 
         // Check if user is already connected with a live websocket
         const existingWs = activePlayers[uuid]
         if (existingWs && existingWs.isOpen()) {
           // Close the old connection to allow the new one
-          existingWs.close(1000, 'Logged in from another device')
+          existingWs.close(INVALID_CLOSE_CODE, 'Logged in from another device')
 
           // Remove existing ws from active players immediately
           delete activePlayers[uuid]
@@ -197,9 +198,8 @@ export default function createWebSocketServer() {
           (result[0].google_id || result[0].steam_id || result[0].email)
         ) {
           id = null
-          potentialEmail = null
           ws.send({ type: 'invalidToken' })
-          ws.close(1008, 'Account requires provider sign-in')
+          ws.close(INVALID_CLOSE_CODE, 'Account requires provider sign-in')
           return
         }
 
@@ -207,7 +207,7 @@ export default function createWebSocketServer() {
         activePlayers[uuid] = ws
         connectionTime = Date.now()
         username = result[0].username
-        // Seed the spectate preference from the persisted per-account value
+        // User the can be spectated field from the user's database entry
         spectateAllowedByUserId[uuid] = result[0].can_be_spectated
 
         // Handle initial achievement
@@ -243,7 +243,7 @@ export default function createWebSocketServer() {
           return handler(data)
         }
 
-      // Issue (when a secret is configured) and deliver a session token.
+      // Issue and deliver a session token so user can stay signed in
       const sendSession = (claims: SessionClaims) => {
         const token = issueSessionToken(claims)
         if (token) ws.send({ type: 'sessionToken', token })
@@ -252,24 +252,28 @@ export default function createWebSocketServer() {
       ws.on('signIn', async ({ uuid }) => {
         // Guest sign-in: no identity proof, so this can only ever reach
         // guest accounts (enforced inside handleSignInForUuid).
+        // Clear any provider identities that may have been set by a prior
+        // failed sign-in attempt on this same connection.
+        email = null
+        googleId = null
+        steamId = null
         await handleSignInForUuid(uuid, { provider: 'guest' })
       })
         .on('loginGoogle', async ({ credential }) => {
           const identity = await verifyGoogleCredential(credential)
           if (!identity) {
             ws.send({ type: 'invalidToken' })
-            ws.close(1008, 'Invalid Google credential')
+            ws.close(INVALID_CLOSE_CODE, 'Invalid Google credential')
             return
           }
 
-          // Resolve to an account by the VERIFIED subject — looked up, never
-          // trusting anything the client asserted.
+          // Resolve to an account by the VERIFIED subject, not trusted from client
           const accountId = await resolveProviderAccount(
             'google',
             identity.sub,
             identity.email,
           )
-          potentialGoogleId = identity.sub
+          googleId = identity.sub
 
           // Hand the client a long-lived session token so future reconnects
           // don't need a fresh (1-hour) Google token.
@@ -288,7 +292,7 @@ export default function createWebSocketServer() {
           const claims = verifySessionToken(token)
           if (!claims) {
             ws.send({ type: 'invalidToken' })
-            ws.close(1008, 'Invalid or expired session')
+            ws.close(INVALID_CLOSE_CODE, 'Invalid or expired session')
             return
           }
 
@@ -302,17 +306,17 @@ export default function createWebSocketServer() {
         })
         .on('loginSteam', async ({ ticket }) => {
           console.log('Login Steam...')
-          const steamId = await verifySteamTicket(ticket)
+          steamId = await verifySteamTicket(ticket)
           if (!steamId) {
             ws.send({ type: 'invalidToken' })
-            ws.close(1008, 'Invalid Steam ticket')
+            ws.close(INVALID_CLOSE_CODE, 'Invalid Steam ticket')
             return
           }
 
           const accountId = await resolveProviderAccount('steam', steamId, null)
-          potentialSteamId = steamId
           await handleSignInForUuid(accountId, { provider: 'steam' })
         })
+        // User sends their decks to the server
         .on(
           'sendDecks',
           authed(async ({ decks }) => {
@@ -322,6 +326,7 @@ export default function createWebSocketServer() {
               .where(eq(players.id, id))
           }),
         )
+        // Skip the tutorials
         .on(
           'skipTutorials',
           authed(async () => {
@@ -332,10 +337,13 @@ export default function createWebSocketServer() {
             await sendUserData(ws, id)
           }),
         )
+        // Make a choice in the journey mode
         .on(
           'sendJourneyChoice',
           authed(async ({ characterIndex, choice }) => {
+            // TODO This is hardcoded to be the first 6 characters
             if (characterIndex < 0 || characterIndex > 5) return
+            // Choice must be 0 or 1
             if (choice !== 0 && choice !== 1) return
 
             const row = await db
@@ -344,6 +352,7 @@ export default function createWebSocketServer() {
               .where(eq(players.id, id))
               .limit(1)
 
+            // Update the journey choices array stored in the database
             const raw = row[0]?.journey_choices
             const next: (number | null)[] =
               raw && Array.isArray(raw) ? [...raw] : Array(6).fill(null)
@@ -369,9 +378,6 @@ export default function createWebSocketServer() {
                 .where(sql`LOWER(${players.username}) = LOWER(${username})`)
                 .limit(1)
               if (result.length > 0) {
-                // Client already guards against this, so it shouldn't happen —
-                // but signal rather than throw (which would become an unhandled
-                // rejection and leave the socket in a half-open state).
                 ws.send({ type: 'signalError' })
                 return
               }
@@ -380,9 +386,9 @@ export default function createWebSocketServer() {
             // Create new user entry in database
             const data = {
               id: id,
-              email: potentialEmail,
-              google_id: potentialGoogleId,
-              steam_id: potentialSteamId,
+              email: email,
+              google_id: googleId,
+              steam_id: steamId,
               username: username,
               pvp_wins_lifetime: 0,
               pvp_losses_lifetime: 0,
@@ -472,7 +478,7 @@ export default function createWebSocketServer() {
               goldReward: harvestResult.goldReward,
               gemReward: harvestResult.gemReward,
             })
-            // Push updated values (Above is just used for animation)
+            // Send user their updated values (Above is just used for animation)
             if (harvestResult.success) await sendUserData(ws, id)
           }),
         )
@@ -521,7 +527,7 @@ export default function createWebSocketServer() {
             await sendUserData(ws, id)
           }),
         )
-        // Store
+        // Buy an item from the store
         .on(
           'purchaseItem',
           authed(async ({ id: itemId }) => {
@@ -549,12 +555,17 @@ export default function createWebSocketServer() {
                   return
                 }
 
-                // Check if already owned (compare item_id, not the transaction id)
+                // Check if already owned
                 const existing = await tx
                   .select({ item_id: cosmeticsTransactions.item_id })
                   .from(cosmeticsTransactions)
-                  .where(eq(cosmeticsTransactions.player_id, id))
-                if (existing.some((t) => t.item_id === itemId)) {
+                  .where(
+                    and(
+                      eq(cosmeticsTransactions.player_id, id),
+                      eq(cosmeticsTransactions.item_id, itemId),
+                    ),
+                  )
+                if (existing.length > 0) {
                   ws.send({ type: 'signalError' })
                   return
                 }
