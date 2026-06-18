@@ -425,6 +425,29 @@ const arise = new Arise({
   text: 'Fleeting\nIf the top card of your discard pile has Morning, trigger its ability.',
 })
 
+class Realms extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    if (super.exhale(6, game, player)) {
+      bonus += 6
+    }
+
+    super.play(player, game, index, bonus)
+  }
+
+  onMorning(player: number, game: GameModel, index: number) {
+    game.moveBetweenZones(Zone.Discard, Zone.Story, player, index, {
+      revealed: true,
+    })
+
+    return true
+  }
+}
+const realms = new Realms({
+  name: 'Realms',
+  id: 8021,
+  text: 'Exhale 6: Worth +6.\nMorning: Add this to the story Revealed.',
+})
+
 export {
   stars,
   cosmos,
@@ -447,4 +470,5 @@ export {
   heavens,
   fable,
   arise,
+  realms,
 }
