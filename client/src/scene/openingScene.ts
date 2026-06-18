@@ -70,9 +70,7 @@ export default class OpeningScene extends BaseScene {
   private slideIndex = 0
   private textIndex = 0
   private slideImage: Phaser.GameObjects.Image
-  // TODO Remove
   private imageW: number
-  private imageH: number
   private bodyText: Phaser.GameObjects.Text
   private typewriterEvent: Phaser.Time.TimerEvent | null = null
   private slideTween: Phaser.Tweens.Tween | null = null
@@ -93,8 +91,12 @@ export default class OpeningScene extends BaseScene {
     // Reset all state — Phaser recycles the scene object; the constructor does not re-run.
     this.slideIndex = 0
     this.textIndex = 0
+    const oldEvent = this.typewriterEvent
     this.typewriterEvent = null
+    oldEvent?.remove()
+    const oldTween = this.slideTween
     this.slideTween = null
+    oldTween?.stop()
     this.fullText = ''
     this.charIndex = 0
 
@@ -138,7 +140,6 @@ export default class OpeningScene extends BaseScene {
 
   private createSlideImage(): void {
     this.imageW = Space.windowWidth
-    this.imageH = Math.round(Space.windowHeight * IMAGE_HEIGHT_RATIO)
 
     // Slide image — cover-fit, centered; overflow goes off-screen
     this.slideImage = this.add.image(0, 0, 'tutorial-1').setOrigin(0.5, 0)
@@ -331,8 +332,9 @@ export default class OpeningScene extends BaseScene {
         this.charIndex++
         this.bodyText.setText(this.fullText.substring(0, this.charIndex))
         if (this.charIndex >= this.fullText.length) {
-          this.typewriterEvent!.remove()
+          const ev = this.typewriterEvent
           this.typewriterEvent = null
+          ev?.remove()
         }
       },
     })
