@@ -6,7 +6,6 @@ import { Space, Style } from '../settings/settings'
 import { UserSettings } from '../settings/userSettings'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
-const IMAGE_HEIGHT_RATIO = 0.72
 const TYPEWRITER_DELAY_MS = 30
 const TWEEN_DURATION = 5000
 const BOTTOM_CHROME_HEIGHT = 330
@@ -67,15 +66,15 @@ const SLIDES: Slide[] = [
 ]
 
 export default class OpeningScene extends BaseScene {
-  private slideIndex = 0
-  private textIndex = 0
+  private slideIndex: number
+  private textIndex: number
   private slideImage: Phaser.GameObjects.Image
   private imageW: number
   private bodyText: Phaser.GameObjects.Text
   private typewriterEvent: Phaser.Time.TimerEvent | null = null
   private slideTween: Phaser.Tweens.Tween | null = null
-  private fullText = ''
-  private charIndex = 0
+  private fullText: string
+  private charIndex: number
 
   constructor() {
     super({ key: 'OpeningScene' })
@@ -88,24 +87,28 @@ export default class OpeningScene extends BaseScene {
   create(): void {
     super.create()
 
-    // Reset all state — Phaser recycles the scene object; the constructor does not re-run.
-    this.slideIndex = 0
-    this.textIndex = 0
+    // Remove the events that might linger from last run of this scene
     const oldEvent = this.typewriterEvent
     this.typewriterEvent = null
     oldEvent?.remove()
     const oldTween = this.slideTween
     this.slideTween = null
     oldTween?.stop()
+
+    // Refresh the fields
+    this.slideIndex = 0
+    this.textIndex = 0
     this.fullText = ''
     this.charIndex = 0
 
+    // Create the components
     this.createBackground()
     this.createSlideImage()
     this.createChrome()
     this.createText()
     this.createSkipButton()
 
+    // Start with the first slide
     this.showSlide(0)
   }
 
@@ -126,6 +129,7 @@ export default class OpeningScene extends BaseScene {
     })
   }
 
+  // Create the background that appears behind everything else (Not the chrome)
   private createBackground(): void {
     const background = this.add
       .image(0, 0, 'background-Light')
@@ -138,15 +142,16 @@ export default class OpeningScene extends BaseScene {
     })
   }
 
+  // The images that are shown one after another
   private createSlideImage(): void {
     this.imageW = Space.windowWidth
 
-    // Slide image — cover-fit, centered; overflow goes off-screen
     this.slideImage = this.add.image(0, 0, 'tutorial-1').setOrigin(0.5, 0)
 
     this.plugins.get('rexAnchor')['add'](this.slideImage, {
       x: '50%',
       onUpdateViewportCallback: (viewport) => {
+        // TODO These numbers are the width of the borders on side/bottom
         const minWidth = Math.max(1, viewport.width - 360)
         const minHeight = Math.max(1, viewport.height - 320)
         const scale = Math.max(
@@ -250,66 +255,58 @@ export default class OpeningScene extends BaseScene {
     const { imageKey, texts } = SLIDES[i]
     this.textIndex = 0
 
-    if (this.textures.exists(imageKey)) {
-      this.slideImage.setTexture(imageKey)
+    // Set appropriate slide image
+    this.slideImage.setTexture(imageKey)
 
-      // Compute the same framed area used by the chrome layout.
-      const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
-      const frameHeight = Math.max(1, Space.windowHeight - BOTTOM_CHROME_HEIGHT)
-      const frameWidth = Math.min(Space.windowWidth, frameHeight * slideRatio)
+    // Compute the same framed area used by the chrome layout
+    const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
+    const frameHeight = Math.max(1, Space.windowHeight - BOTTOM_CHROME_HEIGHT)
+    const frameWidth = Math.min(Space.windowWidth, frameHeight * slideRatio)
 
-      if (this.slideTween) {
-        this.slideTween.stop()
-        this.slideTween = null
-      }
+    // If this slide has been started, clicking should complete/stop it
+    if (this.slideTween) {
+      this.slideTween.stop()
+      this.slideTween = null
+    }
 
-      this.slideImage.setOrigin(0.5, 0).setVisible(true)
+    // First slide pans left to right
+    if (i === 0) {
+      const fixedScale = Math.max(
+        frameWidth / this.slideImage.width,
+        frameHeight / this.slideImage.height,
+      )
+      this.slideImage.setScale(fixedScale)
 
-      if (i === 0) {
-        // First slide: pan left -> right at fixed framed scale.
-        const fixedScale = Math.max(
-          frameWidth / this.slideImage.width,
-          frameHeight / this.slideImage.height,
-        )
-        this.slideImage.setScale(fixedScale)
+      const visibleWidth = this.slideImage.width * fixedScale
+      const panRange = Math.max(0, (visibleWidth - frameWidth) / 2)
+      const centerX = this.imageW / 2
+      this.slideImage.setPosition(centerX + panRange, 0)
 
-        const visibleWidth = this.slideImage.width * fixedScale
-        const panRange = Math.max(0, (visibleWidth - frameWidth) / 2)
-        const centerX = this.imageW / 2
-        this.slideImage.setPosition(centerX + panRange, 0)
-
-        this.slideTween = this.tweens.add({
-          targets: this.slideImage,
-          x: centerX - panRange,
-          duration: TWEEN_DURATION * 2,
-          ease: 'Sine.InOut',
-          onComplete: () => {
-            this.slideTween = null
-          },
-        })
-      } else {
-        // Other slides: width-driven zoom to framed width.
-        const startScale = Space.windowWidth / this.slideImage.width
-        const endScale = Math.max(1, frameWidth) / this.slideImage.width
-        this.slideImage.setPosition(this.imageW / 2, 0).setScale(startScale)
-
-        this.slideTween = this.tweens.add({
-          targets: this.slideImage,
-          scaleX: endScale,
-          scaleY: endScale,
-          duration: TWEEN_DURATION,
-          ease: 'Sine.Out',
-          onComplete: () => {
-            this.slideTween = null
-          },
-        })
-      }
+      this.slideTween = this.tweens.add({
+        targets: this.slideImage,
+        x: centerX - panRange,
+        duration: TWEEN_DURATION * 2,
+        ease: 'Sine.InOut',
+        onComplete: () => {
+          this.slideTween = null
+        },
+      })
     } else {
-      if (this.slideTween) {
-        this.slideTween.stop()
-        this.slideTween = null
-      }
-      this.slideImage.setVisible(false)
+      // Other slides scale down to fit in frame
+      const startScale = Space.windowWidth / this.slideImage.width
+      const endScale = Math.max(1, frameWidth) / this.slideImage.width
+      this.slideImage.setPosition(this.imageW / 2, 0).setScale(startScale)
+
+      this.slideTween = this.tweens.add({
+        targets: this.slideImage,
+        scaleX: endScale,
+        scaleY: endScale,
+        duration: TWEEN_DURATION,
+        ease: 'Sine.Out',
+        onComplete: () => {
+          this.slideTween = null
+        },
+      })
     }
 
     this.startTypewriter(texts[0])
