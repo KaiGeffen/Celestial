@@ -279,6 +279,13 @@ export default class TutorialMatchScene extends MatchScene {
 
     // If next button is visible, pause match until it's clicked
     this.paused = this.btnNext.isVisible()
+
+    // While waiting for Next, block card plays with an error
+    if (this.paused) {
+      this.view.ourBoard.cards.forEach((card) => {
+        card.setOnClick(() => this.signalError('Click Next to continue.'))
+      })
+    }
   }
 
   /** After `align`, slide from `HINT_TWEEN_X_DELTA` and fade in in one tween. */
