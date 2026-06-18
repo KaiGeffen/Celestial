@@ -42,7 +42,7 @@ import { v5 as uuidv5 } from 'uuid'
 class ActiveGame {
   match: Match
   // Whether this is player 0 or 1 in the match
-  playerNumber: number
+  playerNumber: 0 | 1
 }
 
 // A player waiting for a game and their associated data
@@ -666,7 +666,6 @@ export default function createWebSocketServer() {
               return
             }
 
-            // Just like in pve, we are player 1
             activeGame.playerNumber = 0
 
             logFunnelEvent(id, 'play_mode', 'journey')
@@ -691,7 +690,6 @@ export default function createWebSocketServer() {
             activeGame.match = new PveMatch(ws, id, deck, aiDeck)
             await activeGame.match.startMatch()
 
-            // TODO Explain why to make us player 1
             activeGame.playerNumber = 0
 
             // Analytics
@@ -702,6 +700,7 @@ export default function createWebSocketServer() {
             await activeGame.match.notifyState()
           }),
         )
+        // TODO Remove Race
         .on(
           'initSpecialPve',
           authed(async ({ aiDeck, deck, enabledModes }) => {
@@ -750,7 +749,7 @@ export default function createWebSocketServer() {
             // Analytics
             logFunnelEvent(id, 'play_mode', 'pvp_queued_up')
 
-            // Check if there is another player, and they are still ready
+            // Start the game with another player
             const otherPlayer: WaitingPlayer = searchingPlayers[data.password]
             if (otherPlayer) {
               console.log(
@@ -828,7 +827,7 @@ export default function createWebSocketServer() {
           'setCanBeSpectated',
           authed(({ allowed }) => {
             spectateAllowedByUserId[id] = allowed
-            // Persist the per-account preference
+            // Save the preference to the database
             db.update(players)
               .set({ can_be_spectated: allowed })
               .where(eq(players.id, id))
@@ -840,25 +839,27 @@ export default function createWebSocketServer() {
             if (!allowed) {
               const ag = userActiveGameMap[id]
               if (ag?.match && !ag.match.isOver()) {
-                const perspective = (ag.playerNumber === 1 ? 1 : 0) as 0 | 1
+                // Which side of the game has disabled spectating
+                const perspective = ag.playerNumber
+
                 const removed =
                   ag.match.removeAllSpectatorsForPerspective(perspective)
-                for (const sWs of removed) {
-                  spectatorWsToMatch.delete(sWs)
+                for (const spectatorWs of removed) {
+                  spectatorWsToMatch.delete(spectatorWs)
                   const sid = Object.keys(activePlayers).find(
-                    (uid) => activePlayers[uid] === sWs,
+                    (uid) => activePlayers[uid] === spectatorWs,
                   )
                   if (sid) spectatingUserIds.delete(sid)
-                  if (sWs.isOpen()) {
-                    sWs.send({ type: 'spectateEnded' })
+                  if (spectatorWs.isOpen()) {
+                    spectatorWs.send({ type: 'spectateEnded' })
                   }
                 }
               }
             }
           }),
         )
-        // Spectator mode: watch another connected user's match (requires sign-in,
-        // so the spectator is attached only after the auth gate)
+        // Spectator mode: watch another connected user's match
+        // Requires sign-in, so the spectator is attached only after the auth gate
         .on(
           'spectatePlayer',
           authed(async ({ targetUuid }) => {
@@ -872,14 +873,14 @@ export default function createWebSocketServer() {
               return
             }
 
-            // Only one active spectate subscription per socket for now.
+            // Can only spectate one game
             const prevMatch = spectatorWsToMatch.get(ws)
             if (prevMatch) {
               prevMatch.removeSpectator(ws)
               spectatorWsToMatch.delete(ws)
             }
 
-            const perspective = targetActive.playerNumber === 1 ? 1 : 0
+            const perspective = targetActive.playerNumber
             targetActive.match.addSpectator(ws, perspective)
             spectatorWsToMatch.set(ws, targetActive.match)
             spectatingUserIds.add(id)
@@ -897,6 +898,7 @@ export default function createWebSocketServer() {
             }
           }),
         )
+        // Given player initiating exitting spectator mode
         .on('exitSpectating', () => {
           const m = spectatorWsToMatch.get(ws)
           if (m) {
@@ -907,39 +909,35 @@ export default function createWebSocketServer() {
         })
         // In match events
         .on('playCard', (data) => {
-          if (!activeGame.match) return
-          activeGame.match.doAction(
+          activeGame?.match?.doAction(
             activeGame.playerNumber,
             data.cardNum,
             data.versionNo,
           )
         })
         .on('mulligan', (data) => {
-          if (!activeGame.match) return
-          activeGame.match.doMulligan(activeGame.playerNumber, data.mulligan)
+          activeGame?.match?.doMulligan(activeGame.playerNumber, data.mulligan)
         })
         .on('passTurn', (data) => {
-          if (!activeGame.match) return
-          activeGame.match.doAction(
+          activeGame?.match?.doAction(
             activeGame.playerNumber,
             MechanicsSettings.PASS,
             data.versionNo,
           )
         })
         .on('surrender', async () => {
-          if (!activeGame.match) return
-          await activeGame.match.doSurrender(ws)
+          await activeGame?.match?.doSurrender(ws)
           activeGame.match = null
         })
+        // TODO This is deprecated, remove if not using
         .on('emote', () => {
-          if (!activeGame.match) return
-          activeGame.match.signalEmote(activeGame.playerNumber, 0)
+          activeGame?.match?.signalEmote(activeGame.playerNumber, 0)
         })
 
       // Handle disconnect logic
       ws.onClose(() => {
         // Accumulate playtime
-        if (id && connectionTime !== null) {
+        if (id && connectionTime) {
           const elapsed = Math.floor((Date.now() - connectionTime) / 1000)
           connectionTime = null
           if (elapsed > 0) {
@@ -970,7 +968,7 @@ export default function createWebSocketServer() {
         if (activeGame.match && !activeGame.match.isOver()) {
           activeGame.match.doDisconnect(ws)
 
-          // If in a match besides a tutorial, retain the active game for when user reconnects
+          // Retain the active game for when user reconnects (Except tutorial)
           if (activeGame.match instanceof TutorialMatch) {
             delete userActiveGameMap[id]
           } else {
@@ -1097,15 +1095,4 @@ export default function createWebSocketServer() {
       console.error('Error broadcasting online players:', e)
     }
   }, 2000)
-
-  // Debug: Print active users every 2 seconds
-  // setInterval(() => {
-  //   const userIds = Object.keys(activePlayers)
-  //   console.log(`Active users (${userIds.length}):`, userIds)
-  //   const awaitingReconnectIds = Object.keys(usersAwaitingReconnect)
-  //   console.log(
-  //     `Awaiting reconnect (${awaitingReconnectIds.length}):`,
-  //     awaitingReconnectIds,
-  //   )
-  // }, 2000)
 }
