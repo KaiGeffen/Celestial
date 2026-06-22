@@ -386,11 +386,11 @@ const skyBurial = new SkyBurial({
 
 class Becoming extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    if (super.exhale(1, game, player)) {
-      bonus += 1
-    }
     if (super.exhale(2, game, player)) {
       bonus += 2
+    }
+    if (super.exhale(1, game, player)) {
+      bonus += 1
     }
     super.play(player, game, index, bonus)
   }
@@ -399,7 +399,7 @@ const becoming = new Becoming({
   name: 'Becoming',
   id: 1071,
   qualities: [Quality.VISIBLE],
-  text: 'Visible\nExhale 1: Worth +1.\nExhale 2: Worth +2.',
+  text: 'Visible\nExhale 2: Worth +2.\nExhale 1: Worth +1.',
 })
 
 export {
