@@ -6,7 +6,7 @@ import { MechanicsSettings } from '../../../../shared/settings'
 import { AchievementManager } from '../../achievementManager'
 
 // Whether to use the timer
-const TIMER_ENABLED = false
+const TIMER_ENABLED = true
 
 class PvpMatch extends Match {
   timerCheckInterval: NodeJS.Timeout | null = null

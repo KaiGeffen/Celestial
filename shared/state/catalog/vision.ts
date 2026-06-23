@@ -330,6 +330,28 @@ const incense = new Incense({
   text: `Visible\nWhen played, return your opponent's last card in the story which you can see to their hand.`,
 })
 
+class Hermit extends Card {
+  onCardPlayedAfter(
+    index: number,
+    owner: number,
+    playedCardOwner: number,
+    game: GameModel,
+  ): boolean {
+    // Discard this and nourish 3
+    game.removeAct(index)
+    this.nourish(3, game, owner)
+
+    return true
+  }
+}
+const hermit = new Hermit({
+  name: 'Hermit',
+  id: 4088,
+  cost: 2,
+  points: 2,
+  text: 'When played, gain 2 breath.\nWhen a card is played while this is in the story, discard this and gain 2 breath.',
+})
+
 export {
   dawn,
   nectar,
@@ -349,5 +371,5 @@ export {
   // realms,
   path,
   // switcheroo,
-  incense,
+  // incense,
 }

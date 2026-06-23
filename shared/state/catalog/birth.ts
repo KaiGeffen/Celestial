@@ -295,7 +295,7 @@ const naptime = new Naptime({
   text: "You can spend the points from a Child in hand as breath to play this.\nSet both players' points to 0.",
 })
 
-class Genesis extends Card {
+class LifeShared extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -309,8 +309,8 @@ class Genesis extends Card {
     game.score[player] = 2
   }
 }
-const genesis = new Genesis({
-  name: 'Genesis',
+const lifeShared = new LifeShared({
+  name: 'Life Shared',
   id: 5023,
   cost: 2,
   points: 2,
@@ -363,7 +363,7 @@ export {
   justLikeDad,
   hug,
   // NEW
-  genesis,
+  lifeShared,
   beginnersMind,
   interbeing,
 }
