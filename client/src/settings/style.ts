@@ -205,8 +205,8 @@ const StyleMatch: StyleDict = {
     fontFamily: sansFont,
     fontSize: '16px',
     color: Color.whiteS,
-    stroke: '#000000',
-    strokeThickness: 1.5,
+    stroke: Color.darkUmberS,
+    strokeThickness: 1,
   },
 }
 
