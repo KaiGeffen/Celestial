@@ -287,13 +287,19 @@ export default class OpeningScene extends BaseScene {
         layoutText(viewport.width, viewport.height),
     })
 
-    // Reminder text
+    // Reminder text, right-aligned just left of the right chrome
     const reminderText = this.add
       .text(0, 0, 'Click to continue', Style.openingReminder)
       .setOrigin(1, 1)
+    const layoutReminder = (width: number, height: number) => {
+      const { left, availableWidth } = this.getContentLayout(width, height)
+      reminderText.setX(left + availableWidth)
+    }
+    layoutReminder(Space.windowWidth, Space.windowHeight)
     this.plugins.get('rexAnchor')['add'](reminderText, {
-      x: `100%-${Space.padSmall}`,
       y: `100%-${Space.padSmall}`,
+      onUpdateViewportCallback: (viewport) =>
+        layoutReminder(viewport.width, viewport.height),
     })
   }
 

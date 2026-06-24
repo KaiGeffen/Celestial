@@ -287,7 +287,7 @@ const StyleJourney: StyleDict = {
     fontSize: size.large,
     color: Color.darkUmberS,
     stroke: Color.whiteS,
-    strokeThickness: 2,
+    strokeThickness: 1,
   },
   openingReminder: {
     fontFamily: sansFont,
