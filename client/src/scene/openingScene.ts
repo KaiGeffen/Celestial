@@ -8,7 +8,8 @@ import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
 const TYPEWRITER_DELAY_MS = 30
 const TWEEN_DURATION = 5000
-const BOTTOM_CHROME_HEIGHT = 330
+// Space reserved at the bottom for the body text (also its anchor offset)
+const BODY_TEXT_HEIGHT = 240
 const SLIDE_WIDTH = 1428
 const SLIDE_HEIGHT = 936
 
@@ -167,44 +168,79 @@ export default class OpeningScene extends BaseScene {
     this.updateSlideMask(Space.windowWidth, Space.windowHeight)
 
     this.plugins.get('rexAnchor')['add'](this.slideImage, {
-      x: '50%',
       onUpdateViewportCallback: (viewport) => {
         this.updateSlideMask(viewport.width, viewport.height)
-
-        // TODO These numbers are the width of the borders on side/bottom
-        const minWidth = Math.max(1, viewport.width - 360)
-        const minHeight = Math.max(1, viewport.height - 320)
-        const scale = Math.max(
-          minWidth / this.slideImage.width,
-          minHeight / this.slideImage.height,
-        )
-        this.slideImage.setDisplaySize(
-          this.slideImage.width * scale,
-          this.slideImage.height * scale,
-        )
+        this.fitSlideToWindow(viewport.width, viewport.height)
       },
     })
   }
 
-  // Size the mask window to the framed area: centered horizontally, top-aligned,
-  // matching the same frame the chrome/slide layout uses.
-  private updateSlideMask(width: number, height: number): void {
-    const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
-    const frameHeight = Math.max(1, height - BOTTOM_CHROME_HEIGHT)
-    const frameWidth = Math.min(width, frameHeight * slideRatio)
+  // The central content area between the variable-width side chrome. The slide
+  // window, its border box, and the body text all fill this width. Side widths
+  // come from the chrome textures' aspect ratio (they're scaled to full height).
+  private getContentLayout(width: number, height: number) {
+    const chromeWidth = (key: string): number => {
+      const src = this.textures.get(key).getSourceImage() as HTMLImageElement
+      return src && src.height > 0 ? height * (src.width / src.height) : 0
+    }
+    const leftWidth = chromeWidth('chrome-introLeft')
+    const rightWidth = chromeWidth('chrome-introRight')
+    const availableWidth = Math.max(
+      1,
+      width - leftWidth - rightWidth - Space.pad * 2,
+    )
+    const left = leftWidth + Space.pad
+    const centerX = left + availableWidth / 2
     const top = Space.pad * 2
 
-    this.slideMask.setPosition(width / 2, top)
-    this.slideMask.setSize(frameWidth, frameHeight)
+    // The slide window keeps the SLIDE_WIDTH:SLIDE_HEIGHT ratio, scaled as large
+    // as fits within the available width and the height left above the text.
+    const availableHeight = Math.max(1, height - BODY_TEXT_HEIGHT - top)
+    const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
+    let windowWidth = availableWidth
+    let windowHeight = windowWidth / slideRatio
+    if (windowHeight > availableHeight) {
+      windowHeight = availableHeight
+      windowWidth = windowHeight * slideRatio
+    }
 
-    // Frame the window with the border image, centered the same as the slide,
-    // extended a bit beyond the window on every side so the border sits around it.
-    const boxPad = 13
-    this.slideBox.setPosition(width / 2, top - boxPad)
-    this.slideBox.setDisplaySize(
-      frameWidth + boxPad * 2,
-      frameHeight + boxPad * 2,
+    return { availableWidth, left, centerX, top, windowWidth, windowHeight }
+  }
+
+  // Size the mask window (and its border box) to the content area.
+  private updateSlideMask(width: number, height: number): void {
+    const { windowWidth, centerX, top, windowHeight } = this.getContentLayout(
+      width,
+      height,
     )
+
+    this.slideMask.setPosition(centerX, top)
+    this.slideMask.setSize(windowWidth, windowHeight)
+
+    // Frame the window with the border image, sitting a bit beyond it on every side.
+    const boxPad = 13
+    this.slideBox.setPosition(centerX, top - boxPad)
+    this.slideBox.setDisplaySize(
+      windowWidth + boxPad * 2,
+      windowHeight + boxPad * 2,
+    )
+  }
+
+  // Cover the content window with the slide, centered (used on resize).
+  private fitSlideToWindow(width: number, height: number): void {
+    const { windowWidth, centerX, top, windowHeight } = this.getContentLayout(
+      width,
+      height,
+    )
+    const scale = Math.max(
+      windowWidth / this.slideImage.width,
+      windowHeight / this.slideImage.height,
+    )
+    this.slideImage.setDisplaySize(
+      this.slideImage.width * scale,
+      this.slideImage.height * scale,
+    )
+    this.slideImage.setPosition(centerX, top)
   }
 
   private createChrome(): void {
@@ -215,15 +251,10 @@ export default class OpeningScene extends BaseScene {
       .setOrigin(1, 0)
 
     const layoutSides = (viewport: Phaser.Geom.Rectangle) => {
-      const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
-      const frameHeight = Math.max(1, viewport.height - BOTTOM_CHROME_HEIGHT)
-      const frameWidth = Math.min(viewport.width, frameHeight * slideRatio)
-      const dx = Math.max(0, (viewport.width - frameWidth) / 2)
-
       // Ensure right chrome flush with right side of screen
       rightChrome.setPosition(viewport.width, 0)
 
-      // Set the scale correctly
+      // Scale both side images to full height, preserving their ratio
       const height = viewport.height
       if (height <= 0) return
       const ratio = leftChrome.width / leftChrome.height
@@ -242,15 +273,18 @@ export default class OpeningScene extends BaseScene {
   }
 
   private createText(): void {
-    // Body text on top of chrome
-    this.bodyText = this.add
-      .text(Space.pad * 2, 0, '', Style.openingScene)
-      .setWordWrapWidth(Space.windowWidth - Space.pad * 4)
+    // Body text fills the same content area as the slide window
+    this.bodyText = this.add.text(0, 0, '', Style.openingScene)
+    const layoutText = (width: number, height: number) => {
+      const { left, availableWidth } = this.getContentLayout(width, height)
+      this.bodyText.setX(left)
+      this.bodyText.setWordWrapWidth(availableWidth)
+    }
+    layoutText(Space.windowWidth, Space.windowHeight)
     this.plugins.get('rexAnchor')['add'](this.bodyText, {
-      y: '100%-220',
-      onUpdateViewportCallback: (viewport) => {
-        this.bodyText.setWordWrapWidth(viewport.width - Space.pad * 4)
-      },
+      y: `100%-${BODY_TEXT_HEIGHT - Space.pad * 2}`,
+      onUpdateViewportCallback: (viewport) =>
+        layoutText(viewport.width, viewport.height),
     })
 
     // Reminder text
@@ -270,10 +304,11 @@ export default class OpeningScene extends BaseScene {
     // Set appropriate slide image
     this.slideImage.setTexture(imageKey)
 
-    // Compute the same framed area used by the chrome layout
-    const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
-    const frameHeight = Math.max(1, Space.windowHeight - BOTTOM_CHROME_HEIGHT)
-    const frameWidth = Math.min(Space.windowWidth, frameHeight * slideRatio)
+    // Fill the content area between the (variable-width) side chrome
+    const { windowWidth, centerX, top, windowHeight } = this.getContentLayout(
+      Space.windowWidth,
+      Space.windowHeight,
+    )
 
     // If this slide has been started, clicking should complete/stop it
     if (this.slideTween) {
@@ -284,15 +319,14 @@ export default class OpeningScene extends BaseScene {
     // First slide pans left to right
     if (i === 0) {
       const fixedScale = Math.max(
-        frameWidth / this.slideImage.width,
-        frameHeight / this.slideImage.height,
+        windowWidth / this.slideImage.width,
+        windowHeight / this.slideImage.height,
       )
       this.slideImage.setScale(fixedScale)
 
       const visibleWidth = this.slideImage.width * fixedScale
-      const panRange = Math.max(0, (visibleWidth - frameWidth) / 2)
-      const centerX = this.imageW / 2
-      this.slideImage.setPosition(centerX + panRange, Space.pad * 2)
+      const panRange = Math.max(0, (visibleWidth - windowWidth) / 2)
+      this.slideImage.setPosition(centerX + panRange, top)
 
       this.slideTween = this.tweens.add({
         targets: this.slideImage,
@@ -304,12 +338,16 @@ export default class OpeningScene extends BaseScene {
         },
       })
     } else {
-      // Other slides scale down to fit in frame
-      const startScale = Space.windowWidth / this.slideImage.width
-      const endScale = Math.max(1, frameWidth) / this.slideImage.width
-      this.slideImage
-        .setPosition(this.imageW / 2, Space.pad * 2)
-        .setScale(startScale)
+      // Other slides scale down to cover the content area
+      const endScale = Math.max(
+        windowWidth / this.slideImage.width,
+        windowHeight / this.slideImage.height,
+      )
+      const startScale = Math.max(
+        Space.windowWidth / this.slideImage.width,
+        endScale,
+      )
+      this.slideImage.setPosition(centerX, top).setScale(startScale)
 
       this.slideTween = this.tweens.add({
         targets: this.slideImage,

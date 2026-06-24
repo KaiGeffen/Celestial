@@ -284,7 +284,7 @@ const StyleJourney: StyleDict = {
   // The opening visuals that come before the tutorial
   openingScene: {
     fontFamily: secondaryFont,
-    fontSize: '60px',
+    fontSize: size.large,
     color: Color.darkUmberS,
     stroke: Color.whiteS,
     strokeThickness: 2,
