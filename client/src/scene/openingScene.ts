@@ -69,6 +69,10 @@ export default class OpeningScene extends BaseScene {
   private slideIndex: number
   private textIndex: number
   private slideImage: Phaser.GameObjects.Image
+  // Constant window the slide is clipped to (geometry mask source)
+  private slideMask: Phaser.GameObjects.Rectangle
+  // Border image framing that window
+  private slideBox: Phaser.GameObjects.Image
   private imageW: number
   private bodyText: Phaser.GameObjects.Text
   private typewriterEvent: Phaser.Time.TimerEvent | null = null
@@ -148,9 +152,25 @@ export default class OpeningScene extends BaseScene {
 
     this.slideImage = this.add.image(0, 0, 'tutorial-1').setOrigin(0.5, 0)
 
+    // Border framing the window, drawn over the slide.
+    this.slideBox = this.add.image(0, 0, 'chrome-introBox').setOrigin(0.5, 0)
+
+    // Clip the slide to a fixed "window" (the framed area). A geometry mask means
+    // a zoomed/panned slide only shows the part inside the frame instead of
+    // spilling over the background and chrome. The rectangle is the mask source,
+    // so it isn't drawn itself.
+    this.slideMask = this.add
+      .rectangle(0, 0, 10, 10, 0xffffff)
+      .setOrigin(0.5, 0)
+      .setVisible(false)
+    this.slideImage.setMask(this.slideMask.createGeometryMask())
+    this.updateSlideMask(Space.windowWidth, Space.windowHeight)
+
     this.plugins.get('rexAnchor')['add'](this.slideImage, {
       x: '50%',
       onUpdateViewportCallback: (viewport) => {
+        this.updateSlideMask(viewport.width, viewport.height)
+
         // TODO These numbers are the width of the borders on side/bottom
         const minWidth = Math.max(1, viewport.width - 360)
         const minHeight = Math.max(1, viewport.height - 320)
@@ -164,6 +184,27 @@ export default class OpeningScene extends BaseScene {
         )
       },
     })
+  }
+
+  // Size the mask window to the framed area: centered horizontally, top-aligned,
+  // matching the same frame the chrome/slide layout uses.
+  private updateSlideMask(width: number, height: number): void {
+    const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
+    const frameHeight = Math.max(1, height - BOTTOM_CHROME_HEIGHT)
+    const frameWidth = Math.min(width, frameHeight * slideRatio)
+    const top = Space.pad * 2
+
+    this.slideMask.setPosition(width / 2, top)
+    this.slideMask.setSize(frameWidth, frameHeight)
+
+    // Frame the window with the border image, centered the same as the slide,
+    // extended a bit beyond the window on every side so the border sits around it.
+    const boxPad = 13
+    this.slideBox.setPosition(width / 2, top - boxPad)
+    this.slideBox.setDisplaySize(
+      frameWidth + boxPad * 2,
+      frameHeight + boxPad * 2,
+    )
   }
 
   private createChrome(): void {
@@ -251,7 +292,7 @@ export default class OpeningScene extends BaseScene {
       const visibleWidth = this.slideImage.width * fixedScale
       const panRange = Math.max(0, (visibleWidth - frameWidth) / 2)
       const centerX = this.imageW / 2
-      this.slideImage.setPosition(centerX + panRange, 0)
+      this.slideImage.setPosition(centerX + panRange, Space.pad * 2)
 
       this.slideTween = this.tweens.add({
         targets: this.slideImage,
@@ -266,7 +307,9 @@ export default class OpeningScene extends BaseScene {
       // Other slides scale down to fit in frame
       const startScale = Space.windowWidth / this.slideImage.width
       const endScale = Math.max(1, frameWidth) / this.slideImage.width
-      this.slideImage.setPosition(this.imageW / 2, 0).setScale(startScale)
+      this.slideImage
+        .setPosition(this.imageW / 2, Space.pad * 2)
+        .setScale(startScale)
 
       this.slideTween = this.tweens.add({
         targets: this.slideImage,
