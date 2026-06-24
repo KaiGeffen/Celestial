@@ -404,6 +404,7 @@ export const assetLists = {
   "background": {
     "files": [
       "Light",
+      "intro",
       "matchBottom",
       "matchDay",
       "matchNight",
@@ -485,6 +486,9 @@ export const assetLists = {
       "editorTopCorner",
       "error",
       "header",
+      "introBox",
+      "introLeft",
+      "introRight",
       "journeyHeader",
       "nameplate",
       "profile",

@@ -132,7 +132,7 @@ export default class OpeningScene extends BaseScene {
   // Create the background that appears behind everything else (Not the chrome)
   private createBackground(): void {
     const background = this.add
-      .image(0, 0, 'background-Light')
+      .image(0, 0, 'background-intro')
       .setOrigin(0)
       .setInteractive()
       .on('pointerdown', () => this.onAdvance())
@@ -166,35 +166,12 @@ export default class OpeningScene extends BaseScene {
     })
   }
 
-  /**
-   * Side chrome is placed in the horizontal band [0, dx] / [W-dx, W]. If its
-   * axis-aligned bounds width is smaller than dx, scale up uniformly so it spans.
-   */
-  private stretchSideChromeToDx(
-    img: Phaser.GameObjects.Image,
-    dx: number,
-  ): void {
-    if (dx <= 0) return
-    img.setScale(1)
-    const b = img.getBounds()
-    if (b.width > 0 && b.width < dx) {
-      const f = dx / b.width
-      img.setScale(f, f)
-    }
-  }
-
   private createChrome(): void {
-    const chromeKey = 'chrome-builderHeader'
-
-    const leftChrome = this.add
-      .image(0, 0, chromeKey)
-      .setOrigin(1, 1)
-      .setAngle(-90)
-
+    // Dedicated, pre-oriented side images (no rotation needed).
+    const leftChrome = this.add.image(0, 0, 'chrome-introLeft').setOrigin(0, 0)
     const rightChrome = this.add
-      .image(0, 0, chromeKey)
-      .setOrigin(0, 1)
-      .setAngle(90)
+      .image(0, 0, 'chrome-introRight')
+      .setOrigin(1, 0)
 
     const layoutSides = (viewport: Phaser.Geom.Rectangle) => {
       const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
@@ -202,11 +179,15 @@ export default class OpeningScene extends BaseScene {
       const frameWidth = Math.min(viewport.width, frameHeight * slideRatio)
       const dx = Math.max(0, (viewport.width - frameWidth) / 2)
 
-      leftChrome.x = dx
-      rightChrome.x = viewport.width - dx
+      // Ensure right chrome flush with right side of screen
+      rightChrome.setPosition(viewport.width, 0)
 
-      this.stretchSideChromeToDx(leftChrome, dx)
-      this.stretchSideChromeToDx(rightChrome, dx)
+      // Set the scale correctly
+      const height = viewport.height
+      if (height <= 0) return
+      const ratio = leftChrome.width / leftChrome.height
+      leftChrome.setDisplaySize(height * ratio, height)
+      rightChrome.setDisplaySize(height * ratio, height)
     }
 
     // Side positions live at x = dx and x = W − dx; callback keeps both in sync on resize.
@@ -217,16 +198,6 @@ export default class OpeningScene extends BaseScene {
     layoutSides(
       new Phaser.Geom.Rectangle(0, 0, this.scale.width, this.scale.height),
     )
-
-    // Bottom panel (Behind text)
-    const bottomChrome = this.add
-      .image(0, 0, chromeKey)
-      .setOrigin(0.5, 1)
-      .setAngle(180)
-    this.plugins.get('rexAnchor')['add'](bottomChrome, {
-      x: '50%',
-      y: `100%-${BOTTOM_CHROME_HEIGHT}`,
-    })
   }
 
   private createText(): void {
