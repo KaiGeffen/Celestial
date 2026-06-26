@@ -283,15 +283,13 @@ export default class OnlinePlayersMenu extends Menu {
         0,
         0,
         Space.buttonWidth,
-        0,
+        Space.buttonHeight,
       )
 
-      new Buttons.Text(
-        spectateBtnContainer,
-        0,
-        0,
-        'Spectate',
-        () => {
+      new Buttons.Basic({
+        within: spectateBtnContainer,
+        text: 'Spectate',
+        f: () => {
           if (!server || !server.isOpen()) return
 
           // Ensure the active scene stops
@@ -305,9 +303,7 @@ export default class OnlinePlayersMenu extends Menu {
             spectateTargetUuid: player.uuid,
           })
         },
-        Space.buttonWidth,
-        Space.buttonHeight,
-      ).setOrigin(0.5, 0)
+      })
     }
 
     if (spectateBtnContainer) {
