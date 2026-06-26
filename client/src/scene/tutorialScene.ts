@@ -280,11 +280,14 @@ export default class TutorialMatchScene extends MatchScene {
     // If next button is visible, pause match until it's clicked
     this.paused = this.btnNext.isVisible()
 
-    // While waiting for Next, block card plays with an error
     if (this.paused) {
+      // While waiting for Next, block card plays with an error
       this.view.ourBoard.cards.forEach((card) => {
         card.setOnClick(() => this.signalError('Click Next to continue.'))
       })
+    } else {
+      // Restore normal card click handlers now that the player can act
+      this.view.ourBoard.refreshCardClicks()
     }
   }
 
