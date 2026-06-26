@@ -42,6 +42,9 @@ export default class DeckSelectorScene extends BaseScene {
   private dropTargetIndex: number | null = null
   private dropHighlight: Phaser.GameObjects.Rectangle | null = null
 
+  // Last deck-search query, re-used to prefill the search menu when reopened
+  private deckSearchQuery = ''
+
   constructor() {
     super({
       key: 'DeckSelectorScene',
@@ -62,6 +65,7 @@ export default class DeckSelectorScene extends BaseScene {
     this.dragState = null
     this.dropTargetIndex = null
     this.dropHighlight = null
+    this.deckSearchQuery = ''
 
     this.createBackground()
     this.createChrome()
@@ -124,8 +128,15 @@ export default class DeckSelectorScene extends BaseScene {
     // Open the deck search menu when "\" is pressed
     this.input.keyboard.on('keydown-BACK_SLASH', () =>
       this.scene.launch('MenuScene', {
-        menu: 'deckSearch',
-        callback: (search: string) => this.filterDecks(search),
+        menu: 'textEntry',
+        title: 'Search Decks',
+        confirmLabel: 'Search',
+        text: this.deckSearchQuery,
+        placeholder: 'Deck or card name',
+        callback: (search: string) => {
+          this.deckSearchQuery = search
+          this.filterDecks(search)
+        },
       }),
     )
 

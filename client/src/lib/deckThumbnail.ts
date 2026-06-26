@@ -188,13 +188,15 @@ export default class DeckThumbnail {
 
   private updateNameBackgroundStyle(): void {
     const showInvalid = !this.isValid && !this.isNewDeckButton
+    // Toggle through the container so ContainerLite's stored child-visible state
+    // stays in sync; otherwise hiding/showing the tile (e.g. deck search filter)
+    // reverts these to their add-time visibility and drops the red label.
     if (this.invalidIndicator) {
-      this.invalidIndicator.setVisible(showInvalid)
+      this.container.setChildVisible(this.invalidIndicator, showInvalid)
     }
     if (this.invalidText) {
-      this.invalidText
-        .setText(`${this.cardCount}/${MechanicsSettings.DECK_SIZE}`)
-        .setVisible(showInvalid)
+      this.invalidText.setText(`${this.cardCount}/${MechanicsSettings.DECK_SIZE}`)
+      this.container.setChildVisible(this.invalidText, showInvalid)
     }
 
     if (this.isNewDeckButton) {

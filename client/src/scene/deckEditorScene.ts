@@ -11,7 +11,10 @@ import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import { MechanicsSettings } from '../../../shared/settings'
 
 import Server from '../server'
-import { encodeShareableDeckCode } from '../../../shared/codec'
+import {
+  encodeShareableDeckCode,
+  decodeShareableDeckCode,
+} from '../../../shared/codec'
 import { DeckEditorCatalog } from './deckEditor/deckEditorCatalog'
 import {
   DeckEditorDeck,
@@ -153,9 +156,17 @@ export default class DeckEditorScene extends BaseScene {
           navigator.clipboard.writeText(JSON.stringify(deckArray))
         }
         this.scene.launch('MenuScene', {
-          menu: 'shareDeckCode',
-          deckCode: encodeShareableDeckCode(this.getDeckCode()),
-          callback: (decoded: number[]) => {
+          menu: 'textEntry',
+          title: 'Deck Code',
+          confirmLabel: 'Import',
+          text: encodeShareableDeckCode(this.getDeckCode()),
+          placeholder: 'Deck code',
+          callback: (text: string) => {
+            const decoded = decodeShareableDeckCode(text.trim())
+            if (!decoded) {
+              this.signalError('Invalid deck code.')
+              return false
+            }
             this.setDeck(Catalog.getCardListByIds(decoded))
           },
           activeScene: this,
