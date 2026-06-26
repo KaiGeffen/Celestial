@@ -129,22 +129,13 @@ class PvpMatch extends Match {
       for (let player = 0; player < 2; player++) {
         const timeLeft = this.game.model.getPlayerTimeLeft(player)
         if (timeLeft <= 0) {
-          let isValid = false
-
           // Do default action for the current context
           if (!this.game.model.mulligansComplete[player]) {
-            isValid = true
             this.game.doMulligan(player, [false, false, false])
-          } else {
-            isValid = this.game.onPlayerInput(
-              player,
-              MechanicsSettings.PASS,
-              this.game.model.versionNo,
-            )
-          }
-
-          if (isValid) {
             await this.notifyState()
+          } else {
+            // Auto-pass; tracks the streak and auto-surrenders after too many
+            await this.doTimeoutPass(player)
           }
         }
       }
