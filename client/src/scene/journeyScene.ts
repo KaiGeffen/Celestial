@@ -845,6 +845,21 @@ export default class JourneyScene extends BaseScene {
         this.scene.start('OpeningScene')
       },
     }).setNoScroll()
+
+    new Buttons.Basic({
+      within: this,
+      text: 'Tutorial',
+      x: (Space.buttonWidth * 5) / 2 + Space.pad * 3,
+      y: Space.padSmall + Space.buttonHeight / 2,
+      f: () => {
+        this.scene.start('TutorialMatchScene', {
+          isTutorial: false,
+          deck: undefined,
+          mmCode: 'ai:t0',
+          missionID: 0,
+        })
+      },
+    }).setNoScroll()
   }
 
   // Create a popup for the card specified in params
