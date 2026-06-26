@@ -121,6 +121,14 @@ export default class DeckSelectorScene extends BaseScene {
     })
     this.mainSizer.layout()
 
+    // Open the deck search menu when "\" is pressed
+    this.input.keyboard.on('keydown-BACK_SLASH', () =>
+      this.scene.launch('MenuScene', {
+        menu: 'deckSearch',
+        callback: (search: string) => this.filterDecks(search),
+      }),
+    )
+
     // Restore selection
     const equippedDeckIndex = UserSettings._get('equippedDeckIndex')
     const decks = UserSettings._get('decks') || []
@@ -539,6 +547,36 @@ export default class DeckSelectorScene extends BaseScene {
   selectDeck(i: number): void {
     if (i < 0 || i >= (UserSettings._get('decks') || []).length) return
     this.onDeckClick(i)
+  }
+
+  // ── Deck search ─────────────────────────────────────────────────────────────
+  /**
+   * Show only the deck thumbnails whose name, or one of whose card names,
+   * contains `search` (case-insensitive partial match). Empty search shows all.
+   */
+  private filterDecks(search: string): void {
+    const panel = this.centerPanel.getElement('panel') as FixWidthSizer
+    const query = search.trim().toLowerCase()
+    const decks: Deck[] = UserSettings._get('decks') || []
+
+    this.deckThumbnails.forEach((thumb, i) => {
+      const visible = query === '' || this.deckMatchesSearch(decks[i], query)
+      if (visible) {
+        panel.show(thumb.container)
+      } else {
+        panel.hide(thumb.container)
+      }
+    })
+
+    this.centerPanel.layout()
+  }
+
+  private deckMatchesSearch(deck: Deck, query: string): boolean {
+    if (!deck) return false
+    if ((deck.name ?? '').toLowerCase().includes(query)) return true
+    return (deck.cards || []).some((id) =>
+      Catalog.getCardById(id)?.name?.toLowerCase().includes(query),
+    )
   }
 
   private createRightPanel(): any {

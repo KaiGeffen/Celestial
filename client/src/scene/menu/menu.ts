@@ -157,6 +157,7 @@ import CreditsMenu from './credits'
 import RulebookMenu from './rulebook'
 import AlterDeckCosmeticsMenu from './alterDeckCosmetics'
 import ShareDeckCodeMenu from './shareDeckCode'
+import DeckSearchMenu from './deckSearch'
 import ConfirmMenu from './confirm'
 import MessageMenu from './message'
 import ChapterMessageMenu from './chapterMessage'
@@ -183,6 +184,7 @@ const menus = {
 
   alterDeckCosmetics: AlterDeckCosmeticsMenu,
   shareDeckCode: ShareDeckCodeMenu,
+  deckSearch: DeckSearchMenu,
 
   confirm: ConfirmMenu,
   message: MessageMenu,
