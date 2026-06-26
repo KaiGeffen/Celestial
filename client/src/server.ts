@@ -293,10 +293,7 @@ export default class Server {
           uuid,
           ...data,
           garden: data.garden.map((dateStr) => new Date(dateStr)),
-          missionGoldClaimed: data.missionGoldClaimed
-            .toString()
-            .split('')
-            .map((char) => char === '1'),
+          missionGoldClaimed: data.missionGoldClaimed,
         }
 
         this.loadUserData(data, game)
