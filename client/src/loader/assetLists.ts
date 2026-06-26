@@ -57,7 +57,8 @@ export const assetLists = {
     "files": [
       "Astrology",
       "Blossom",
-      "Default"
+      "Default",
+      "Lotus"
     ],
     "pixelArt": false
   },

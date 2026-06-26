@@ -384,7 +384,7 @@ const skyBurial = new SkyBurial({
   text: 'Fleeting\nVisible\nWhen played, create a Vulture before this for your opponent.',
 })
 
-class Becoming extends Card {
+class Emergence extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     if (super.exhale(2, game, player)) {
       bonus += 2
@@ -395,8 +395,8 @@ class Becoming extends Card {
     super.play(player, game, index, bonus)
   }
 }
-const becoming = new Becoming({
-  name: 'Becoming',
+const emergence = new Emergence({
+  name: 'Emergence',
   id: 1071,
   qualities: [Quality.VISIBLE],
   text: 'Visible\nExhale 2: Worth +2.\nExhale 1: Worth +1.',
@@ -419,5 +419,5 @@ export {
   // NEW
   skyBurial,
   birdsong,
-  becoming,
+  emergence,
 }

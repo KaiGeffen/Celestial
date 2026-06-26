@@ -282,7 +282,7 @@ const rime = new Rime({
   text: 'Create 2 copies of Ice on the bottom of your deck.',
 })
 
-class Pool extends RefreshCard {
+class Liquidity extends RefreshCard {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -296,8 +296,8 @@ class Pool extends RefreshCard {
     super.onPlay(player, game)
   }
 }
-const pool = new Pool({
-  name: 'Pool',
+const liquidity = new Liquidity({
+  name: 'Liquidity',
   id: 7037,
   text: 'Refresh, Refresh\nExhale 1: Draw a card.',
 })
@@ -319,5 +319,5 @@ export {
   // NEW
   // crabs,
   rime,
-  pool,
+  liquidity,
 }
