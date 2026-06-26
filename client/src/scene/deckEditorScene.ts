@@ -164,10 +164,10 @@ export default class DeckEditorScene extends BaseScene {
           callback: (text: string) => {
             const decoded = decodeShareableDeckCode(text.trim())
             if (!decoded) {
-              this.signalError('Invalid deck code.')
-              return false
+              return 'Invalid deck code.'
             }
             this.setDeck(Catalog.getCardListByIds(decoded))
+            return ''
           },
           activeScene: this,
         })

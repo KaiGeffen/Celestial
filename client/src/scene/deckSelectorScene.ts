@@ -136,6 +136,7 @@ export default class DeckSelectorScene extends BaseScene {
         callback: (search: string) => {
           this.deckSearchQuery = search
           this.filterDecks(search)
+          return ''
         },
       }),
     )

@@ -20,9 +20,8 @@ export interface TextEntryParams {
   // Pre-filled / current value of the field
   text?: string
   placeholder?: string
-  // Handle the entered (trimmed) text. Return false to keep the menu open
-  // (e.g. on invalid input); any other return value closes it.
-  callback: (text: string) => boolean | void
+  // Callback for when main button is used. Returns a string if there was an error.
+  callback: (text: string) => string
   exitCallback?: () => void
 }
 
@@ -93,8 +92,13 @@ export default class TextEntryMenu extends Menu {
       text: params.confirmLabel,
       f: () => {
         const value = String(this.input.text ?? '').trim()
-        // A false return means the input was rejected — leave the menu open
-        if (params.callback(value) === false) return
+        const error = params.callback(value)
+        // Non-empty error: leave the menu open and show it here, on the menu
+        // scene, rather than on the scene behind it.
+        if (error) {
+          this.scene.signalError(error)
+          return
+        }
         this.close()
       },
       returnHotkey: true,
