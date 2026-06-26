@@ -27,6 +27,7 @@ export interface TextEntryParams {
 
 // Generic single-field prompt: header, one text input, Cancel + a confirm button.
 export default class TextEntryMenu extends Menu {
+  readonly menuType = 'textEntry'
   private input: any
 
   constructor(scene: MenuScene, params: TextEntryParams) {

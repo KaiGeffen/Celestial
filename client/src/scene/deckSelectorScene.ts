@@ -125,8 +125,17 @@ export default class DeckSelectorScene extends BaseScene {
     })
     this.mainSizer.layout()
 
-    // Open the deck search menu when "\" is pressed
-    this.input.keyboard.on('keydown-BACK_SLASH', () =>
+    // Toggle the deck search menu when "\" is pressed
+    this.input.keyboard.on('keydown-BACK_SLASH', () => {
+      // If the search menu is already open, "\" closes it again
+      if (this.scene.isActive('MenuScene')) {
+        const menuScene = this.scene.get('MenuScene') as any
+        if (menuScene.menu?.menuType === 'textEntry') {
+          menuScene.menu.close()
+          return
+        }
+      }
+
       this.scene.launch('MenuScene', {
         menu: 'textEntry',
         title: 'Search Decks',
@@ -138,8 +147,8 @@ export default class DeckSelectorScene extends BaseScene {
           this.filterDecks(search)
           return ''
         },
-      }),
-    )
+      })
+    })
 
     // Restore selection
     const equippedDeckIndex = UserSettings._get('equippedDeckIndex')
