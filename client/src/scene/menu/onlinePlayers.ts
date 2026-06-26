@@ -16,6 +16,7 @@ import {
 
 const height = (Space.windowHeight * 2) / 3
 const width = 600
+const MAX_USERNAME_WIDTH = 245
 
 interface OnlinePlayer {
   uuid: string
@@ -249,12 +250,9 @@ export default class OnlinePlayersMenu extends Menu {
     })
 
     // Add each text object
-    let usernameText = this.scene.add.text(
-      0,
-      0,
-      player.username,
-      Style.basicStylized,
-    )
+    let usernameText = this.scene.add
+      .text(0, 0, player.username, Style.basicStylized)
+      .setWordWrapWidth(MAX_USERNAME_WIDTH, true)
     const statusText = this.scene.add.text(
       0,
       0,
@@ -263,7 +261,7 @@ export default class OnlinePlayersMenu extends Menu {
     )
 
     // Right column: vertically center status, then put the Spectate button below it.
-    const rightColumnWidth = 220
+    const rightColumnWidth = Space.buttonWidth
     const rightStack = this.scene.rexUI.add.sizer({
       orientation: 'vertical',
       width: rightColumnWidth,

@@ -17,6 +17,7 @@ import {
 
 const height = (Space.windowHeight * 2) / 3
 const width = 1000
+const MAX_USERNAME_WIDTH = 250
 
 interface LeaderboardEntry {
   rank: number
@@ -260,12 +261,9 @@ export default class LeaderboardMenu extends Menu {
       `\t${entry.rank}`,
       Style.basicStylized,
     )
-    let usernameText = this.scene.add.text(
-      0,
-      0,
-      entry.username,
-      Style.basicStylized,
-    )
+    let usernameText = this.scene.add
+      .text(0, 0, entry.username, Style.basicStylized)
+      .setWordWrapWidth(MAX_USERNAME_WIDTH, true)
     let winsText = this.scene.add.text(
       0,
       0,
