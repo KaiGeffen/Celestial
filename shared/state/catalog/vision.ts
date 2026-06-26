@@ -233,8 +233,10 @@ const beggingBowl = new BeggingBowl({
 })
 
 class SuddenInsight extends Card {
-  onDraw(player: number, game: GameModel): void {
+  onDraw(player: number, game: GameModel): boolean {
     game.status[player].vision += 3
+
+    return true
   }
 
   play(player: number, game: GameModel, index: number, bonus: number) {

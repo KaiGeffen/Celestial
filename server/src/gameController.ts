@@ -198,7 +198,18 @@ class ServerController {
       this.model.hand[player].push(card)
 
       // Trigger on-draw effects
-      card.onDraw(player, this.model)
+      const onDrawTriggered = card.onDraw(player, this.model)
+      if (onDrawTriggered) {
+        this.model.animations[player].push(
+          new Animation({
+            from: Zone.Hand,
+            to: Zone.Hand,
+            card: card,
+            index: indexTo,
+            visibility: Visibility.FullyUnknown,
+          }),
+        )
+      }
     }
 
     this.model.draw(player, mulligans.filter(Boolean).length)

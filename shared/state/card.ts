@@ -203,7 +203,9 @@ export default class Card {
 
   onRoundEndIfThisResolved(player: number, game: GameModel): void {}
 
-  onDraw(player: number, game: GameModel): void {}
+  onDraw(player: number, game: GameModel): boolean {
+    return false
+  }
 
   onShuffle(player: number, game: GameModel, index: number): void {}
 
