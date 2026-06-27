@@ -161,7 +161,6 @@ export default class ChapterMessageMenu extends MessageMenu {
       f: () => {
         if (
           this.claimGoldMissionId !== undefined &&
-          this.isClaimButtonUnlocked() &&
           !this.isMissionGoldClaimed()
         ) {
           let [x, y] = this.claimGoldButton.getGlobalPosition()
@@ -209,81 +208,18 @@ export default class ChapterMessageMenu extends MessageMenu {
 
     this.sizer.add(buttonsSizer)
 
-    // Adjust button appropriately
     if (this.isMissionGoldClaimed()) {
       this.claimGoldButton.setText('Claimed').disable()
-    }
-    // If the panel isn't overflowing, button is always enabled
-    else if (!this.textScrollablePanel?.isOverflowY) {
+    } else {
       this.claimGoldButton.enable()
     }
-    // If the panel is overflowing, button is disabled but can be unlocked by scrolling to the bottom
-    else {
-      this.claimGoldButton.disable()
-      this.attachUnlockCallback()
-    }
   }
 
-  // Mission gold has been claimed
   private isMissionGoldClaimed(): boolean {
     return (
-      (this.claimGoldMissionId !== undefined &&
-        (Server.getUserData().missionGoldClaimed?.[this.claimGoldMissionId] ??
-          false)) ||
-      false
+      this.claimGoldMissionId !== undefined &&
+      (Server.getUserData().missionGoldClaimed?.[this.claimGoldMissionId] ??
+        false)
     )
-  }
-
-  private isClaimButtonUnlocked(): boolean {
-    const textIsWithinBounds = !this.textScrollablePanel?.isOverflowY
-    const userScrolledToBottom = this.textScrollablePanel?.t >= 0.999999
-
-    return textIsWithinBounds || userScrolledToBottom
-  }
-
-  private attachUnlockCallback(): void {
-    const panel = this.textScrollablePanel
-    if (!panel) return
-
-    const unlockIfReady = () => {
-      if (!this.isMissionGoldClaimed() && this.isClaimButtonUnlocked()) {
-        this.claimGoldButton.enable()
-      }
-    }
-
-    this.wrapScrollableProperty(panel, 't', unlockIfReady)
-    this.wrapScrollableProperty(panel, 'childOY', unlockIfReady)
-    unlockIfReady()
-  }
-
-  private wrapScrollableProperty(
-    panel: object,
-    property: 't' | 'childOY',
-    callback: () => void,
-  ): void {
-    const descriptor = this.getPropertyDescriptor(panel, property)
-    if (!descriptor?.get || !descriptor?.set) return
-
-    Object.defineProperty(panel, property, {
-      configurable: true,
-      enumerable: true,
-      get() {
-        return descriptor.get.call(this)
-      },
-      set(value) {
-        descriptor.set.call(this, value)
-        callback()
-      },
-    })
-  }
-
-  private getPropertyDescriptor(obj: object, property: string) {
-    let current = obj
-    while (current) {
-      const descriptor = Object.getOwnPropertyDescriptor(current, property)
-      if (descriptor) return descriptor
-      current = Object.getPrototypeOf(current)
-    }
-    return undefined
   }
 }

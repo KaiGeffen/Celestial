@@ -486,10 +486,18 @@ export default function createWebSocketServer() {
         .on(
           'claimMissionRewards',
           authed(async ({ missionId }) => {
+            // TODO Temporary to debug
+            console.log(`${username} is claiming gold for mission ${missionId}`)
+
             const missionExists = journeyData.some(
               (mission) => mission.id === missionId,
             )
             if (!missionExists) {
+              // TODO Temporary to debug
+              console.log(
+                'Trying to claim gold for a mission that does not exist:',
+                missionId,
+              )
               ws.send({ type: 'signalError' })
               return
             }
@@ -507,7 +515,7 @@ export default function createWebSocketServer() {
 
               let missiongoldclaimed = playerData.missiongoldclaimed ?? ''
               // The mission gold has already been claimed
-              if (missiongoldclaimed?.[missionId] === '1') {
+              if (missiongoldclaimed[missionId] === '1') {
                 return
               }
 
