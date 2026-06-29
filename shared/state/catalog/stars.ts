@@ -117,7 +117,7 @@ const moon = new Moon({
   name: 'Moon',
   id: 73,
   cost: 5,
-  points: 5,
+  points: 4,
   text: 'Morning: Trigger the morning abilities of the top 2 cards below this with morning.',
 })
 
@@ -148,7 +148,7 @@ class Fates extends Card {
     }
 
     // Lachesis the allotter
-    if (super.exhale(3, game, player)) {
+    if (super.exhale(2, game, player)) {
       super.nourish(2, game, player)
     }
 
@@ -161,7 +161,7 @@ class Fates extends Card {
 const fates = new Fates({
   name: 'Fates',
   id: 93,
-  text: "Exhale 5: Set both players' points to 0.\nExhale 3: Nourish 2\nExhale 1: Birth 1",
+  text: "Exhale 5: Set both players' points to 0.\nExhale 2: Nourish 2\nExhale 1: Birth 1",
 })
 
 class Hero extends Card {

@@ -28,6 +28,7 @@ const seen = new Seen({
   name: 'Seen',
   id: 1001,
   cost: 2,
+  points: 1,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nAt the start of each round, if this is in your hand, give your opponent Sight 3.',
   theme: 5,

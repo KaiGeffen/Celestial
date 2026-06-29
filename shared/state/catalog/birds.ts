@@ -153,8 +153,7 @@ class Heron extends Card {
 const heron = new Heron({
   name: 'Heron',
   id: 65,
-  cost: 1,
-  points: 0,
+  cost: 2,
   qualities: [Quality.VISIBLE],
   text: "Visible\nSet both players' points to 0.\nCosts 1 more for each card in your discard pile.",
   story:
