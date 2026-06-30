@@ -591,10 +591,12 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   //   Earn 1[img=gem] for each PvP match played, plus a small chance to get 3-5[img=gem] from each plant in your garden. These shiny rewards can be traded for new cosmetic items in the Store under the Cosmetics tab.`,
   // },
   {
-    subheader: 'Ranked Seasons',
-    body: `June 1st - 30th marks our first official ranked season!
-    
-    As the season begins, each player's ELO will be reset. Once the season ends, the #1 player will get to pick the theme for the next cardback and co-design it. Once it's ready, each player in the top 10 will get a free copy.`,
+    subheader: 'Ranked',
+    body: `July 1st - 31st is our second ranked season!
+
+Each player's ELO resets, and the #1 player at the end of the season picks the theme for the next cardback. Once it's ready, each player in the top 10 will get a free copy.
+
+Also stay tuned for a tournament announcement soon!`,
   },
   {
     subheader: 'Card Changes',
@@ -604,6 +606,7 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
 [area=_Moon][stroke=${Color.goldS}]Moon[/stroke][/area] points 5 > 4
 [area=_Sensualist][stroke=${Color.goldS}]Sensualist[/stroke][/area] cost and points 5 > 4
 [area=_Fates][stroke=${Color.goldS}]Fates[/stroke][/area] 2nd Exhale cost 3 > 2
+[area=_The Future][stroke=${Color.goldS}]The Future[/stroke][/area] points 4 > 5
 [area=_Abundance][stroke=${Color.goldS}]Abundance[/stroke][/area] conditions ordering buffed`,
   },
 ]
