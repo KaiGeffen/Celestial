@@ -378,6 +378,11 @@ export default class Server {
     Server.send({ type: 'skipTutorials' }, 'Skipping tutorials')
   }
 
+  // Report how long asset loading took (fire-and-forget; may race a close)
+  static reportLoadTime(ms: number): void {
+    Server.send({ type: 'reportLoadTime', ms })
+  }
+
   // Send player's choice for the ending to a character's journey (silent: fired
   // opportunistically, so a closed socket shouldn't log)
   static sendJourneyChoice(characterIndex: number, choice: 0 | 1): void {

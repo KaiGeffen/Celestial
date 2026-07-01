@@ -43,6 +43,10 @@ export default interface messagesToServer {
     value: CosmeticSet
   }
   setAchievementsSeen: {}
+  // Client-reported time (ms) to finish loading all game assets
+  reportLoadTime: {
+    ms: number
+  }
   accessDiscord: {}
   harvestGarden: {
     index: number

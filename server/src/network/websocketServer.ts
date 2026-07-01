@@ -317,6 +317,10 @@ export default function createWebSocketServer() {
           const accountId = await resolveProviderAccount('steam', steamId, null)
           await handleSignInForUuid(accountId, { provider: 'steam' })
         })
+        // Client reports how long it took to load all game assets
+        .on('reportLoadTime', ({ ms }) => {
+          console.log(`Asset load time: ${ms}ms`)
+        })
         // User sends their decks to the server
         .on(
           'sendDecks',

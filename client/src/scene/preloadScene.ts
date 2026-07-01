@@ -303,8 +303,15 @@ export class PreloadScene extends SigninScene {
   }
 
   create() {
+    // Timestamp the start of asset loading so we can report its duration.
+    const loadStart = performance.now()
+
     // When loading is complete, if user selected an option, start home screen
     this.load.on('complete', () => {
+      // Report how long loading all assets took (server console log)
+      const loadMs = Math.round(performance.now() - loadStart)
+      Server.reportLoadTime(loadMs)
+
       if (this.signedInOrGuest) {
         this.startFirstScene()
       }
