@@ -580,19 +580,19 @@ export default class HomeScene extends BaseScene {
 }
 
 const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
-  {
-    subheader: 'Steam',
-    body: `Our [area=_link_steam][stroke=${Color.goldS}]Steam page[/stroke][/area] is up! We'd love if you could wishlist, and look forward to the demo release at [area=_link_nextfest][stroke=${Color.goldS}]Steam Next Fest[/stroke][/area] in October.`,
-  },
-  {
-    subheader: 'Tournament',
-    body: `Our next tournament will be on June 27th at 1 PM EST.
-[area=_link_tournament][stroke=${Color.goldS}]Register here![/stroke][/area]
-    
-Prizes are as follows: $100 for 1st, $75 for 2nd, $50 for 3rd, and $25 consolation prize for a random non-placing participant. All attendees will receive a new cardback.
+  // {
+  //   subheader: 'Steam',
+  //   body: `Our [area=_link_steam][stroke=${Color.goldS}]Steam page[/stroke][/area] is up! We'd love if you could wishlist, and look forward to the demo release at [area=_link_nextfest][stroke=${Color.goldS}]Steam Next Fest[/stroke][/area] in October.`,
+  // },
+  //   {
+  //     subheader: 'Tournament',
+  //     body: `Our next tournament will be on June 27th at 1 PM EST.
+  // [area=_link_tournament][stroke=${Color.goldS}]Register here![/stroke][/area]
 
-We're partnering with Fate League, so expect a new crop of challengers for this tournament!`,
-  },
+  // Prizes are as follows: $100 for 1st, $75 for 2nd, $50 for 3rd, and $25 consolation prize for a random non-placing participant. All attendees will receive a new cardback.
+
+  // We're partnering with Fate League, so expect a new crop of challengers for this tournament!`,
+  //   },
   // {
   //   subheader: 'Currencies & Cosmetics',
   //   body: `Gems have arrived in the Celestial realm!
@@ -600,13 +600,22 @@ We're partnering with Fate League, so expect a new crop of challengers for this 
   //   Earn 1[img=gem] for each PvP match played, plus a small chance to get 3-5[img=gem] from each plant in your garden. These shiny rewards can be traded for new cosmetic items in the Store under the Cosmetics tab.`,
   // },
   {
-    subheader: 'Ranked Seasons',
-    body: `June 1st - 30th marks our first official ranked season!
-    
-    As the season begins, each player's ELO will be reset. Once the season ends, the #1 player will get to pick the theme for the next cardback and co-design it. Once it's ready, each player in the top 10 will get a free copy.`,
+    subheader: 'Ranked',
+    body: `July 1st - 31st marks our second ranked season!
+
+Each player's ELO has been reset, and the #1 player at the end of the season picks the theme for the next cardback. Once it's ready, each player in the top 10 will get a free copy.
+
+Also stay tuned for a tournament announcement soon!`,
   },
-  // {
-  //   subheader: 'New Cards',
-  //   body: `[area=_Sky Burial][stroke=${Color.goldS}]Sky Burial[/stroke][/area] and [area=_Starfall][stroke=${Color.goldS}]Starfall[/stroke][/area] are now available in the Store!`,
-  // },
+  {
+    subheader: 'Card Changes',
+    body: `[area=_Paramountcy][stroke=${Color.goldS}]Paramountcy[/stroke][/area] cards added 4 > 3
+[area=_Heron][stroke=${Color.goldS}]Heron[/stroke][/area] cost 1 > 2
+[area=_Clear View][stroke=${Color.goldS}]Clear View[/stroke][/area] the created [area=_Seen][stroke=${Color.goldS}]Seen[/stroke][/area] points 0 > 1
+[area=_Moon][stroke=${Color.goldS}]Moon[/stroke][/area] points 5 > 4
+[area=_Sensualist][stroke=${Color.goldS}]Sensualist[/stroke][/area] cost and points 5 > 4
+[area=_Fates][stroke=${Color.goldS}]Fates[/stroke][/area] 2nd Exhale cost 3 > 2
+[area=_The Future][stroke=${Color.goldS}]The Future[/stroke][/area] points 4 > 5
+[area=_Abundance][stroke=${Color.goldS}]Abundance[/stroke][/area] conditions ordering buffed`,
+  },
 ]

@@ -156,7 +156,7 @@ import OptionsMenu from './options'
 import CreditsMenu from './credits'
 import RulebookMenu from './rulebook'
 import AlterDeckCosmeticsMenu from './alterDeckCosmetics'
-import ShareDeckCodeMenu from './shareDeckCode'
+import TextEntryMenu from './textEntry'
 import ConfirmMenu from './confirm'
 import MessageMenu from './message'
 import ChapterMessageMenu from './chapterMessage'
@@ -182,7 +182,7 @@ const menus = {
   play: PlayMenu,
 
   alterDeckCosmetics: AlterDeckCosmeticsMenu,
-  shareDeckCode: ShareDeckCodeMenu,
+  textEntry: TextEntryMenu,
 
   confirm: ConfirmMenu,
   message: MessageMenu,

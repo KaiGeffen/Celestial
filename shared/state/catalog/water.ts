@@ -153,11 +153,13 @@ const overflow = new Overflow({
 })
 
 class Fish extends Card {
-  onDraw(player: number, game: GameModel): void {
+  onDraw(player: number, game: GameModel): boolean {
     const copy = this.copy()
     copy.points += 1
 
     game.hand[player][game.hand[player].length - 1] = copy
+
+    return true
   }
 }
 const fish = new Fish({
@@ -282,7 +284,7 @@ const rime = new Rime({
   text: 'Create 2 copies of Ice on the bottom of your deck.',
 })
 
-class Pool extends RefreshCard {
+class Liquidity extends RefreshCard {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -296,10 +298,36 @@ class Pool extends RefreshCard {
     super.onPlay(player, game)
   }
 }
-const pool = new Pool({
-  name: 'Pool',
+const liquidity = new Liquidity({
+  name: 'Liquidity',
   id: 7037,
   text: 'Refresh, Refresh\nExhale 1: Draw a card.',
+})
+
+class Leviathan extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    const newVersion = this.copy()
+    newVersion.points = 3
+
+    return newVersion
+  }
+  onDraw(player: number, game: GameModel): boolean {
+    const copy = this.copy()
+    copy.points *= 2
+
+    game.hand[player][game.hand[player].length - 1] = copy
+
+    return true
+  }
+}
+const leviathan = new Leviathan({
+  name: 'Leviathan',
+  id: 7038,
+  cost: 8,
+  points: 3,
+  text: "When drawn, double this card's points.\nSet this card's points to 4.",
 })
 
 export {
@@ -317,7 +345,8 @@ export {
   damBreaks,
   overflow,
   // NEW
-  crabs,
+  // crabs,
   rime,
-  pool,
+  liquidity,
+  leviathan,
 }

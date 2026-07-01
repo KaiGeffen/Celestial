@@ -425,7 +425,7 @@ const wildfire = new Wildfire({
   text: 'Inspire 1\nExhale 1, discard a card: Create a Wildfire in the story.',
 })
 
-class Remnant extends Card {
+class Moloch extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -438,8 +438,8 @@ class Remnant extends Card {
     return true
   }
 }
-const remnant = new Remnant({
-  name: 'Remnant',
+const moloch = new Moloch({
+  name: 'Moloch',
   id: 2050,
   cost: 2,
   points: 2,
@@ -535,19 +535,39 @@ const suddenDraw = new Prometheus({
   text: 'When played, draw 2 cards.\nDiscard 2 cards.',
 })
 
-class Zoomies extends Card {
+class Moth extends Card {
   onBigResolve(player: number, game: GameModel, index: number) {
     game.moveBetweenZones(Zone.Discard, Zone.Story, player, index, {
       toIndex: 0,
     })
   }
 }
-const zoomies = new Zoomies({
-  name: 'Zoomies',
+const moth = new Moth({
+  name: 'Moth',
   id: 2085,
   cost: 1,
   points: 1,
   text: 'When you resolve a card that costs 7 or more, move this card from your discard pile to the story.',
+})
+
+class Judgement extends Card {
+  onShuffle(player: number, game: GameModel, index: number) {
+    super.onShuffle(player, game, index)
+
+    const cost = Math.max(0, 17 - game.deck[player].length)
+    if (super.exhale(cost, game, player)) {
+      game.moveBetweenZones(Zone.Deck, Zone.Story, player, index, {
+        revealed: true,
+      })
+    }
+  }
+}
+const judgement = new Judgement({
+  name: 'Judgement',
+  id: 2086,
+  cost: 4,
+  points: 4,
+  text: 'When shuffled, Exhale 17: Add this to the story Revealed.\nReduce the cost by 1 for each card shuffled.',
 })
 
 export {
@@ -567,11 +587,12 @@ export {
   // NEW
   // initiative,
   // wildfire,
-  remnant,
+  moloch,
   // dyingLight,
   // momentum,
   // finale,
   // prometheus,
   // suddenDraw,
-  zoomies,
+  moth as zoomies,
+  // judgement,
 }

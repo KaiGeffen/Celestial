@@ -86,6 +86,14 @@ export default class OurBoardRegion extends Region {
     }
   }
 
+  /** Re-apply normal click handlers to all hand cards (e.g. after a tutorial pause ends). */
+  refreshCardClicks(): void {
+    if (!this.lastHandState) return
+    this.cards.forEach((card, i) =>
+      this.setCardOnClick(card, this.lastHandState, i),
+    )
+  }
+
   // Set the callback / error message for when card is clicked
   private setCardOnClick(card: CardImage, state: GameModel, i: number) {
     // Set whether card shows up as playable

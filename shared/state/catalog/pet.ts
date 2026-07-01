@@ -172,8 +172,8 @@ class Abundance extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
-    if (super.exhale(1, game, player)) {
-      if (game.score[player] >= 7) {
+    if (game.score[player] >= 7) {
+      if (super.exhale(1, game, player)) {
         this.nourish(3, game, player)
       }
     }
@@ -184,7 +184,7 @@ const abundance = new Abundance({
   id: 77,
   cost: 2,
   points: 2,
-  text: 'Exhale 1: If you have 7 or more points, Nourish 3.',
+  text: 'If you have 7 or more points, Exhale 1: Nourish 3.',
 })
 
 class Rose extends Card {
@@ -280,8 +280,8 @@ class Sensualist extends Card {
 const sensualist = new Sensualist({
   name: 'Sensualist',
   id: 81,
-  cost: 5,
-  points: 5,
+  cost: 4,
+  points: 4,
   text: 'Costs 1 less for each of the following statuses you have: Nourish, Inspired, Sight.',
 })
 
@@ -332,14 +332,6 @@ const heart = new Heart({
 })
 
 class Companion extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    if (game.roundResults[player][game.roundResults[player].length - 1] >= 7) {
-      bonus += 1
-    }
-
-    super.play(player, game, index, bonus)
-  }
-
   onMorning(player: number, game: GameModel, index: number): boolean {
     game.moveBetweenZones(Zone.Discard, Zone.Deck, player, index)
     return true
@@ -350,7 +342,7 @@ const companion = new Companion({
   id: 4095,
   cost: 3,
   points: 3,
-  text: 'Worth +1 if you had at least 7 points last round.\nMorning: Put this on top of your deck.',
+  text: 'Morning: Put this on top of your deck.',
 })
 
 export {

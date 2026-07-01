@@ -6,10 +6,10 @@ import { Space, Style } from '../settings/settings'
 import { UserSettings } from '../settings/userSettings'
 import { TUTORIAL_LENGTH } from '../../../shared/settings'
 
-const IMAGE_HEIGHT_RATIO = 0.72
 const TYPEWRITER_DELAY_MS = 30
 const TWEEN_DURATION = 5000
-const BOTTOM_CHROME_HEIGHT = 330
+// Space reserved at the bottom for the body text (also its anchor offset)
+const BODY_TEXT_HEIGHT = 240
 const SLIDE_WIDTH = 1428
 const SLIDE_HEIGHT = 936
 
@@ -67,17 +67,19 @@ const SLIDES: Slide[] = [
 ]
 
 export default class OpeningScene extends BaseScene {
-  private slideIndex = 0
-  private textIndex = 0
+  private slideIndex: number
+  private textIndex: number
   private slideImage: Phaser.GameObjects.Image
-  // TODO Remove
+  // Constant window the slide is clipped to (geometry mask source)
+  private slideMask: Phaser.GameObjects.Rectangle
+  // Border image framing that window
+  private slideBox: Phaser.GameObjects.Image
   private imageW: number
-  private imageH: number
   private bodyText: Phaser.GameObjects.Text
   private typewriterEvent: Phaser.Time.TimerEvent | null = null
   private slideTween: Phaser.Tweens.Tween | null = null
-  private fullText = ''
-  private charIndex = 0
+  private fullText: string
+  private charIndex: number
 
   constructor() {
     super({ key: 'OpeningScene' })
@@ -90,20 +92,28 @@ export default class OpeningScene extends BaseScene {
   create(): void {
     super.create()
 
-    // Reset all state — Phaser recycles the scene object; the constructor does not re-run.
+    // Remove the events that might linger from last run of this scene
+    const oldEvent = this.typewriterEvent
+    this.typewriterEvent = null
+    oldEvent?.remove()
+    const oldTween = this.slideTween
+    this.slideTween = null
+    oldTween?.stop()
+
+    // Refresh the fields
     this.slideIndex = 0
     this.textIndex = 0
-    this.typewriterEvent = null
-    this.slideTween = null
     this.fullText = ''
     this.charIndex = 0
 
+    // Create the components
     this.createBackground()
     this.createSlideImage()
     this.createChrome()
     this.createText()
     this.createSkipButton()
 
+    // Start with the first slide
     this.showSlide(0)
   }
 
@@ -124,9 +134,10 @@ export default class OpeningScene extends BaseScene {
     })
   }
 
+  // Create the background that appears behind everything else (Not the chrome)
   private createBackground(): void {
     const background = this.add
-      .image(0, 0, 'background-Light')
+      .image(0, 0, 'background-intro')
       .setOrigin(0)
       .setInteractive()
       .on('pointerdown', () => this.onAdvance())
@@ -136,71 +147,119 @@ export default class OpeningScene extends BaseScene {
     })
   }
 
+  // The images that are shown one after another
   private createSlideImage(): void {
     this.imageW = Space.windowWidth
-    this.imageH = Math.round(Space.windowHeight * IMAGE_HEIGHT_RATIO)
 
-    // Slide image — cover-fit, centered; overflow goes off-screen
     this.slideImage = this.add.image(0, 0, 'tutorial-1').setOrigin(0.5, 0)
 
+    // Border framing the window, drawn over the slide.
+    this.slideBox = this.add.image(0, 0, 'chrome-introBox').setOrigin(0.5, 0)
+
+    // Clip the slide to a fixed "window" (the framed area). A geometry mask means
+    // a zoomed/panned slide only shows the part inside the frame instead of
+    // spilling over the background and chrome. The rectangle is the mask source,
+    // so it isn't drawn itself.
+    this.slideMask = this.add
+      .rectangle(0, 0, 10, 10, 0xffffff)
+      .setOrigin(0.5, 0)
+      .setVisible(false)
+    this.slideImage.setMask(this.slideMask.createGeometryMask())
+    this.updateSlideMask(Space.windowWidth, Space.windowHeight)
+
     this.plugins.get('rexAnchor')['add'](this.slideImage, {
-      x: '50%',
       onUpdateViewportCallback: (viewport) => {
-        const minWidth = Math.max(1, viewport.width - 360)
-        const minHeight = Math.max(1, viewport.height - 320)
-        const scale = Math.max(
-          minWidth / this.slideImage.width,
-          minHeight / this.slideImage.height,
-        )
-        this.slideImage.setDisplaySize(
-          this.slideImage.width * scale,
-          this.slideImage.height * scale,
-        )
+        this.updateSlideMask(viewport.width, viewport.height)
+        this.fitSlideToWindow(viewport.width, viewport.height)
       },
     })
   }
 
-  /**
-   * Side chrome is placed in the horizontal band [0, dx] / [W-dx, W]. If its
-   * axis-aligned bounds width is smaller than dx, scale up uniformly so it spans.
-   */
-  private stretchSideChromeToDx(
-    img: Phaser.GameObjects.Image,
-    dx: number,
-  ): void {
-    if (dx <= 0) return
-    img.setScale(1)
-    const b = img.getBounds()
-    if (b.width > 0 && b.width < dx) {
-      const f = dx / b.width
-      img.setScale(f, f)
+  // The central content area between the variable-width side chrome. The slide
+  // window, its border box, and the body text all fill this width. Side widths
+  // come from the chrome textures' aspect ratio (they're scaled to full height).
+  private getContentLayout(width: number, height: number) {
+    const chromeWidth = (key: string): number => {
+      const src = this.textures.get(key).getSourceImage() as HTMLImageElement
+      return src && src.height > 0 ? height * (src.width / src.height) : 0
     }
+    const leftWidth = chromeWidth('chrome-introLeft')
+    const rightWidth = chromeWidth('chrome-introRight')
+    const availableWidth = Math.max(
+      1,
+      width - leftWidth - rightWidth - Space.pad * 2,
+    )
+    const left = leftWidth + Space.pad
+    const centerX = left + availableWidth / 2
+    const top = Space.pad * 2
+
+    // The slide window keeps the SLIDE_WIDTH:SLIDE_HEIGHT ratio, scaled as large
+    // as fits within the available width and the height left above the text.
+    const availableHeight = Math.max(1, height - BODY_TEXT_HEIGHT - top)
+    const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
+    let windowWidth = availableWidth
+    let windowHeight = windowWidth / slideRatio
+    if (windowHeight > availableHeight) {
+      windowHeight = availableHeight
+      windowWidth = windowHeight * slideRatio
+    }
+
+    return { availableWidth, left, centerX, top, windowWidth, windowHeight }
+  }
+
+  // Size the mask window (and its border box) to the content area.
+  private updateSlideMask(width: number, height: number): void {
+    const { windowWidth, centerX, top, windowHeight } = this.getContentLayout(
+      width,
+      height,
+    )
+
+    this.slideMask.setPosition(centerX, top)
+    this.slideMask.setSize(windowWidth, windowHeight)
+
+    // Frame the window with the border image, sitting a bit beyond it on every side.
+    const boxPad = 13
+    this.slideBox.setPosition(centerX, top - boxPad)
+    this.slideBox.setDisplaySize(
+      windowWidth + boxPad * 2,
+      windowHeight + boxPad * 2,
+    )
+  }
+
+  // Cover the content window with the slide, centered (used on resize).
+  private fitSlideToWindow(width: number, height: number): void {
+    const { windowWidth, centerX, top, windowHeight } = this.getContentLayout(
+      width,
+      height,
+    )
+    const scale = Math.max(
+      windowWidth / this.slideImage.width,
+      windowHeight / this.slideImage.height,
+    )
+    this.slideImage.setDisplaySize(
+      this.slideImage.width * scale,
+      this.slideImage.height * scale,
+    )
+    this.slideImage.setPosition(centerX, top)
   }
 
   private createChrome(): void {
-    const chromeKey = 'chrome-builderHeader'
-
-    const leftChrome = this.add
-      .image(0, 0, chromeKey)
-      .setOrigin(1, 1)
-      .setAngle(-90)
-
+    // Dedicated, pre-oriented side images (no rotation needed).
+    const leftChrome = this.add.image(0, 0, 'chrome-introLeft').setOrigin(0, 0)
     const rightChrome = this.add
-      .image(0, 0, chromeKey)
-      .setOrigin(0, 1)
-      .setAngle(90)
+      .image(0, 0, 'chrome-introRight')
+      .setOrigin(1, 0)
 
     const layoutSides = (viewport: Phaser.Geom.Rectangle) => {
-      const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
-      const frameHeight = Math.max(1, viewport.height - BOTTOM_CHROME_HEIGHT)
-      const frameWidth = Math.min(viewport.width, frameHeight * slideRatio)
-      const dx = Math.max(0, (viewport.width - frameWidth) / 2)
+      // Ensure right chrome flush with right side of screen
+      rightChrome.setPosition(viewport.width, 0)
 
-      leftChrome.x = dx
-      rightChrome.x = viewport.width - dx
-
-      this.stretchSideChromeToDx(leftChrome, dx)
-      this.stretchSideChromeToDx(rightChrome, dx)
+      // Scale both side images to full height, preserving their ratio
+      const height = viewport.height
+      if (height <= 0) return
+      const ratio = leftChrome.width / leftChrome.height
+      leftChrome.setDisplaySize(height * ratio, height)
+      rightChrome.setDisplaySize(height * ratio, height)
     }
 
     // Side positions live at x = dx and x = W − dx; callback keeps both in sync on resize.
@@ -211,37 +270,36 @@ export default class OpeningScene extends BaseScene {
     layoutSides(
       new Phaser.Geom.Rectangle(0, 0, this.scale.width, this.scale.height),
     )
-
-    // Bottom panel (Behind text)
-    const bottomChrome = this.add
-      .image(0, 0, chromeKey)
-      .setOrigin(0.5, 1)
-      .setAngle(180)
-    this.plugins.get('rexAnchor')['add'](bottomChrome, {
-      x: '50%',
-      y: `100%-${BOTTOM_CHROME_HEIGHT}`,
-    })
   }
 
   private createText(): void {
-    // Body text on top of chrome
-    this.bodyText = this.add
-      .text(Space.pad * 2, 0, '', Style.openingScene)
-      .setWordWrapWidth(Space.windowWidth - Space.pad * 4)
+    // Body text fills the same content area as the slide window
+    this.bodyText = this.add.text(0, 0, '', Style.openingScene)
+    const layoutText = (width: number, height: number) => {
+      const { left, availableWidth } = this.getContentLayout(width, height)
+      this.bodyText.setX(left)
+      this.bodyText.setWordWrapWidth(availableWidth)
+    }
+    layoutText(Space.windowWidth, Space.windowHeight)
     this.plugins.get('rexAnchor')['add'](this.bodyText, {
-      y: '100%-220',
-      onUpdateViewportCallback: (viewport) => {
-        this.bodyText.setWordWrapWidth(viewport.width - Space.pad * 4)
-      },
+      y: `100%-${BODY_TEXT_HEIGHT - Space.pad * 2}`,
+      onUpdateViewportCallback: (viewport) =>
+        layoutText(viewport.width, viewport.height),
     })
 
-    // Reminder text
+    // Reminder text, right-aligned just left of the right chrome
     const reminderText = this.add
       .text(0, 0, 'Click to continue', Style.openingReminder)
       .setOrigin(1, 1)
+    const layoutReminder = (width: number, height: number) => {
+      const { left, availableWidth } = this.getContentLayout(width, height)
+      reminderText.setX(left + availableWidth)
+    }
+    layoutReminder(Space.windowWidth, Space.windowHeight)
     this.plugins.get('rexAnchor')['add'](reminderText, {
-      x: `100%-${Space.padSmall}`,
       y: `100%-${Space.padSmall}`,
+      onUpdateViewportCallback: (viewport) =>
+        layoutReminder(viewport.width, viewport.height),
     })
   }
 
@@ -249,66 +307,64 @@ export default class OpeningScene extends BaseScene {
     const { imageKey, texts } = SLIDES[i]
     this.textIndex = 0
 
-    if (this.textures.exists(imageKey)) {
-      this.slideImage.setTexture(imageKey)
+    // Set appropriate slide image
+    this.slideImage.setTexture(imageKey)
 
-      // Compute the same framed area used by the chrome layout.
-      const slideRatio = SLIDE_WIDTH / SLIDE_HEIGHT
-      const frameHeight = Math.max(1, Space.windowHeight - BOTTOM_CHROME_HEIGHT)
-      const frameWidth = Math.min(Space.windowWidth, frameHeight * slideRatio)
+    // Fill the content area between the (variable-width) side chrome
+    const { windowWidth, centerX, top, windowHeight } = this.getContentLayout(
+      Space.windowWidth,
+      Space.windowHeight,
+    )
 
-      if (this.slideTween) {
-        this.slideTween.stop()
-        this.slideTween = null
-      }
+    // If this slide has been started, clicking should complete/stop it
+    if (this.slideTween) {
+      this.slideTween.stop()
+      this.slideTween = null
+    }
 
-      this.slideImage.setOrigin(0.5, 0).setVisible(true)
+    // First slide pans left to right
+    if (i === 0) {
+      const fixedScale = Math.max(
+        windowWidth / this.slideImage.width,
+        windowHeight / this.slideImage.height,
+      )
+      this.slideImage.setScale(fixedScale)
 
-      if (i === 0) {
-        // First slide: pan left -> right at fixed framed scale.
-        const fixedScale = Math.max(
-          frameWidth / this.slideImage.width,
-          frameHeight / this.slideImage.height,
-        )
-        this.slideImage.setScale(fixedScale)
+      const visibleWidth = this.slideImage.width * fixedScale
+      const panRange = Math.max(0, (visibleWidth - windowWidth) / 2)
+      this.slideImage.setPosition(centerX + panRange, top)
 
-        const visibleWidth = this.slideImage.width * fixedScale
-        const panRange = Math.max(0, (visibleWidth - frameWidth) / 2)
-        const centerX = this.imageW / 2
-        this.slideImage.setPosition(centerX + panRange, 0)
-
-        this.slideTween = this.tweens.add({
-          targets: this.slideImage,
-          x: centerX - panRange,
-          duration: TWEEN_DURATION * 2,
-          ease: 'Sine.InOut',
-          onComplete: () => {
-            this.slideTween = null
-          },
-        })
-      } else {
-        // Other slides: width-driven zoom to framed width.
-        const startScale = Space.windowWidth / this.slideImage.width
-        const endScale = Math.max(1, frameWidth) / this.slideImage.width
-        this.slideImage.setPosition(this.imageW / 2, 0).setScale(startScale)
-
-        this.slideTween = this.tweens.add({
-          targets: this.slideImage,
-          scaleX: endScale,
-          scaleY: endScale,
-          duration: TWEEN_DURATION,
-          ease: 'Sine.Out',
-          onComplete: () => {
-            this.slideTween = null
-          },
-        })
-      }
+      this.slideTween = this.tweens.add({
+        targets: this.slideImage,
+        x: centerX - panRange,
+        duration: TWEEN_DURATION * 2,
+        ease: 'Sine.InOut',
+        onComplete: () => {
+          this.slideTween = null
+        },
+      })
     } else {
-      if (this.slideTween) {
-        this.slideTween.stop()
-        this.slideTween = null
-      }
-      this.slideImage.setVisible(false)
+      // Other slides scale down to cover the content area
+      const endScale = Math.max(
+        windowWidth / this.slideImage.width,
+        windowHeight / this.slideImage.height,
+      )
+      const startScale = Math.max(
+        Space.windowWidth / this.slideImage.width,
+        endScale,
+      )
+      this.slideImage.setPosition(centerX, top).setScale(startScale)
+
+      this.slideTween = this.tweens.add({
+        targets: this.slideImage,
+        scaleX: endScale,
+        scaleY: endScale,
+        duration: TWEEN_DURATION,
+        ease: 'Sine.Out',
+        onComplete: () => {
+          this.slideTween = null
+        },
+      })
     }
 
     this.startTypewriter(texts[0])
@@ -331,8 +387,9 @@ export default class OpeningScene extends BaseScene {
         this.charIndex++
         this.bodyText.setText(this.fullText.substring(0, this.charIndex))
         if (this.charIndex >= this.fullText.length) {
-          this.typewriterEvent!.remove()
+          const ev = this.typewriterEvent
           this.typewriterEvent = null
+          ev?.remove()
         }
       },
     })

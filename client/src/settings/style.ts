@@ -205,8 +205,8 @@ const StyleMatch: StyleDict = {
     fontFamily: sansFont,
     fontSize: '16px',
     color: Color.whiteS,
-    stroke: '#000000',
-    strokeThickness: 1.5,
+    stroke: Color.darkUmberS,
+    strokeThickness: 1,
   },
 }
 
@@ -284,10 +284,10 @@ const StyleJourney: StyleDict = {
   // The opening visuals that come before the tutorial
   openingScene: {
     fontFamily: secondaryFont,
-    fontSize: '60px',
+    fontSize: size.large,
     color: Color.darkUmberS,
     stroke: Color.whiteS,
-    strokeThickness: 2,
+    strokeThickness: 1,
   },
   openingReminder: {
     fontFamily: sansFont,

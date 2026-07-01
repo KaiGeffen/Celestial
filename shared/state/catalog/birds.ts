@@ -153,8 +153,7 @@ class Heron extends Card {
 const heron = new Heron({
   name: 'Heron',
   id: 65,
-  cost: 1,
-  points: 0,
+  cost: 2,
   qualities: [Quality.VISIBLE],
   text: "Visible\nSet both players' points to 0.\nCosts 1 more for each card in your discard pile.",
   story:
@@ -384,22 +383,22 @@ const skyBurial = new SkyBurial({
   text: 'Fleeting\nVisible\nWhen played, create a Vulture before this for your opponent.',
 })
 
-class Becoming extends Card {
+class Emergence extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
-    if (super.exhale(1, game, player)) {
-      bonus += 1
-    }
     if (super.exhale(2, game, player)) {
       bonus += 2
+    }
+    if (super.exhale(1, game, player)) {
+      bonus += 1
     }
     super.play(player, game, index, bonus)
   }
 }
-const becoming = new Becoming({
-  name: 'Becoming',
+const emergence = new Emergence({
+  name: 'Emergence',
   id: 1071,
   qualities: [Quality.VISIBLE],
-  text: 'Visible\nExhale 1: Worth +1.\nExhale 2: Worth +2.',
+  text: 'Visible\nExhale 2: Worth +2.\nExhale 1: Worth +1.',
 })
 
 export {
@@ -419,5 +418,5 @@ export {
   // NEW
   skyBurial,
   birdsong,
-  becoming,
+  emergence,
 }

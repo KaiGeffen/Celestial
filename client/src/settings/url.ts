@@ -2,7 +2,9 @@ import { STEAM_STORE_URL } from '../../../shared/steam'
 
 // Settings relating to various urls
 export const Url = {
-  discord: 'https://discord.gg/UXWswspB8S',
+  // discord: 'https://discord.gg/UXWswspB8S',
+  // Links to the introductions channel
+  discord: 'https://discord.gg/HGhgTXEpKt',
   steamStore: STEAM_STORE_URL,
   nextfest: 'https://store.steampowered.com/sale/nextfest',
   feedback: 'https://forms.gle/xq9Dnx5mtbSkX6Zs9',

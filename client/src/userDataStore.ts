@@ -20,12 +20,6 @@ export interface UserData {
 
 type Listener = (data: UserData | null) => void
 
-const bitstringToBools = (s: string): boolean[] =>
-  s
-    .toString()
-    .split('')
-    .map((c) => c === '1')
-
 /**
  * Single reactive holder of the signed-in player's account data.
  *
@@ -67,7 +61,7 @@ class UserDataStore {
       gems: data.gems,
       coins: data.coins,
       ownedItems: data.ownedItems,
-      missionGoldClaimed: bitstringToBools(data.missionGoldClaimed),
+      missionGoldClaimed: data.missionGoldClaimed,
       cosmeticSet: data.cosmeticSet,
       achievements: data.achievements,
       canBeSpectated: data.canBeSpectated,

@@ -49,6 +49,7 @@ class ActiveGame {
 interface WaitingPlayer {
   ws: ServerWS
   id: string
+  username: string
   deck: Deck
   activeGame: ActiveGame
   // Time when they queued
@@ -485,10 +486,18 @@ export default function createWebSocketServer() {
         .on(
           'claimMissionRewards',
           authed(async ({ missionId }) => {
+            // TODO Temporary to debug
+            console.log(`${username} is claiming gold for mission ${missionId}`)
+
             const missionExists = journeyData.some(
               (mission) => mission.id === missionId,
             )
             if (!missionExists) {
+              // TODO Temporary to debug
+              console.log(
+                'Trying to claim gold for a mission that does not exist:',
+                missionId,
+              )
               ws.send({ type: 'signalError' })
               return
             }
@@ -506,7 +515,7 @@ export default function createWebSocketServer() {
 
               let missiongoldclaimed = playerData.missiongoldclaimed ?? ''
               // The mission gold has already been claimed
-              if (missiongoldclaimed?.[missionId] === '1') {
+              if (missiongoldclaimed[missionId] === '1') {
                 return
               }
 
@@ -786,6 +795,20 @@ export default function createWebSocketServer() {
               // TODO Maybe just delete the last one? Somehow don't lose to race conditions
               delete searchingPlayers[data.password]
 
+              // If Discord was notified that this player was searching, follow up that a match was found
+              if (otherPlayer.notifiedDiscord) {
+                const webhookUrl = process.env.DISCORD_WEBHOOK_URL
+                if (webhookUrl) {
+                  fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      content: `**${otherPlayer.username}** has found a match!`,
+                    }),
+                  }).catch((e) => console.error('Discord webhook error:', e))
+                }
+              }
+
               // Notify both players that they are connected
               // Start the match and let both users know the starting state
               await activeGame.match.startMatch()
@@ -795,6 +818,7 @@ export default function createWebSocketServer() {
               const waitingPlayer = {
                 ws: ws,
                 id: id,
+                username: username,
                 deck: data.deck,
                 activeGame: activeGame,
                 queuedAt: Date.now(),
@@ -1082,7 +1106,7 @@ export default function createWebSocketServer() {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                content: `${username} is searching for an opponent.\nAre any <@&${DISCORD_ACTIVE_PLAYER_ROLE_ID}> around to help them out?`,
+                content: `**${username}** is searching for an opponent.\nAre any <@&${DISCORD_ACTIVE_PLAYER_ROLE_ID}> around to help them out?`,
                 allowed_mentions: {
                   roles: [DISCORD_ACTIVE_PLAYER_ROLE_ID],
                 },

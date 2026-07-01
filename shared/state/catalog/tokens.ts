@@ -28,6 +28,7 @@ const seen = new Seen({
   name: 'Seen',
   id: 1001,
   cost: 2,
+  points: 1,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nAt the start of each round, if this is in your hand, give your opponent Sight 3.',
   theme: 5,
@@ -128,7 +129,7 @@ const condemnation = new Condemnation({
 })
 
 class Ice extends Card {
-  onDraw(player: number, game: GameModel): void {
+  onDraw(player: number, game: GameModel): boolean {
     // Remove from hand
     game.hand[player].splice(game.hand[player].length - 1, 1)
 
@@ -148,6 +149,9 @@ class Ice extends Card {
         index2,
       }),
     )
+
+    // Don't emphasize the card in hand, since it moves to story
+    return false
   }
 }
 const ice = new Ice({

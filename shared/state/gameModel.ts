@@ -209,8 +209,9 @@ export default class GameModel {
       this.hand[player].push(card)
 
       // Trigger its on draw effects, except during setup phase
+      let onDrawTriggered = false
       if (!isSetup) {
-        card.onDraw(player, this)
+        onDrawTriggered = card.onDraw(player, this)
 
         // Only increment draw counter for cards that are confirmed (After mulligan)
         this.amtDrawn[player] += 1
@@ -239,6 +240,19 @@ export default class GameModel {
             visibility,
           }),
         )
+
+        // If an on-draw effect trigger, add an additional animation
+        if (onDrawTriggered) {
+          this.animations[player].push(
+            new Animation({
+              from: Zone.Hand,
+              to: Zone.Hand,
+              card: card,
+              index: this.hand[player].length - 1,
+              visibility: Visibility.FullyUnknown,
+            }),
+          )
+        }
       }
 
       // Keep track of how many cards are left to draw
@@ -315,7 +329,18 @@ export default class GameModel {
           )
 
           // Trigger its on draw effects
-          card.onDraw(player, this)
+          const onDrawTriggered = card.onDraw(player, this)
+          if (onDrawTriggered) {
+            this.animations[player].push(
+              new Animation({
+                from: Zone.Deck,
+                to: Zone.Hand,
+                card: card,
+                index2: this.hand[player].length - 1,
+                visibility: Visibility.FullyUnknown,
+              }),
+            )
+          }
 
           return card
         }
@@ -504,6 +529,13 @@ export default class GameModel {
           return
         }
         card = this.story.removeAct(fromIndex).card
+        break
+      }
+      case Zone.Deck: {
+        if (fromIndex < 0 || fromIndex >= this.deck[player].length) {
+          return
+        }
+        card = this.deck[player].splice(fromIndex, 1)[0]
         break
       }
       // Currently no other zones supported

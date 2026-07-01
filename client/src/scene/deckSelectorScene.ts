@@ -42,6 +42,9 @@ export default class DeckSelectorScene extends BaseScene {
   private dropTargetIndex: number | null = null
   private dropHighlight: Phaser.GameObjects.Rectangle | null = null
 
+  // Last deck-search query, re-used to prefill the search menu when reopened
+  private deckSearchQuery = ''
+
   constructor() {
     super({
       key: 'DeckSelectorScene',
@@ -62,6 +65,7 @@ export default class DeckSelectorScene extends BaseScene {
     this.dragState = null
     this.dropTargetIndex = null
     this.dropHighlight = null
+    this.deckSearchQuery = ''
 
     this.createBackground()
     this.createChrome()
@@ -120,6 +124,31 @@ export default class DeckSelectorScene extends BaseScene {
       top: 'top',
     })
     this.mainSizer.layout()
+
+    // Toggle the deck search menu when "\" is pressed
+    this.input.keyboard.on('keydown-BACK_SLASH', () => {
+      // If the search menu is already open, "\" closes it again
+      if (this.scene.isActive('MenuScene')) {
+        const menuScene = this.scene.get('MenuScene') as any
+        if (menuScene.menu?.menuType === 'textEntry') {
+          menuScene.menu.close()
+          return
+        }
+      }
+
+      this.scene.launch('MenuScene', {
+        menu: 'textEntry',
+        title: 'Search Decks',
+        confirmLabel: 'Search',
+        text: this.deckSearchQuery,
+        placeholder: 'Deck or card name',
+        callback: (search: string) => {
+          this.deckSearchQuery = search
+          this.filterDecks(search)
+          return ''
+        },
+      })
+    })
 
     // Restore selection
     const equippedDeckIndex = UserSettings._get('equippedDeckIndex')
@@ -539,6 +568,36 @@ export default class DeckSelectorScene extends BaseScene {
   selectDeck(i: number): void {
     if (i < 0 || i >= (UserSettings._get('decks') || []).length) return
     this.onDeckClick(i)
+  }
+
+  // ── Deck search ─────────────────────────────────────────────────────────────
+  /**
+   * Show only the deck thumbnails whose name, or one of whose card names,
+   * contains `search` (case-insensitive partial match). Empty search shows all.
+   */
+  private filterDecks(search: string): void {
+    const panel = this.centerPanel.getElement('panel') as FixWidthSizer
+    const query = search.trim().toLowerCase()
+    const decks: Deck[] = UserSettings._get('decks') || []
+
+    this.deckThumbnails.forEach((thumb, i) => {
+      const visible = query === '' || this.deckMatchesSearch(decks[i], query)
+      if (visible) {
+        panel.show(thumb.container)
+      } else {
+        panel.hide(thumb.container)
+      }
+    })
+
+    this.centerPanel.layout()
+  }
+
+  private deckMatchesSearch(deck: Deck, query: string): boolean {
+    if (!deck) return false
+    if ((deck.name ?? '').toLowerCase().includes(query)) return true
+    return (deck.cards || []).some((id) =>
+      Catalog.getCardById(id)?.name?.toLowerCase().includes(query),
+    )
   }
 
   private createRightPanel(): any {

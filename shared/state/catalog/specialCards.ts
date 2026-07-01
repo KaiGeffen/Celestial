@@ -11,7 +11,7 @@ class Paramountcy extends Card {
     // Get the number of cards to add to the story (Don't go over 99 in total)
     const totalActsInStory = game.story.acts.length + index
     const allowedActsRemaining = MAX_STORY_ACTS - totalActsInStory
-    let amt = Math.min(4, game.pile[player].length, allowedActsRemaining)
+    let amt = Math.min(3, game.pile[player].length, allowedActsRemaining)
 
     // The number of copies of paramountcy that have been skipped in the discard
     let paramountcyCount = 0
@@ -38,7 +38,7 @@ const paramountcy = new Paramountcy({
   name: 'Paramountcy',
   cost: 9,
   id: 62,
-  text: 'Add the top four cards of your discard pile to the story after this.\n(Besides Paramountcy)',
+  text: 'Add the top three cards of your discard pile to the story after this.\n(Besides Paramountcy)',
   theme: 8,
 })
 

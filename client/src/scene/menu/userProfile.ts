@@ -120,7 +120,7 @@ export default class UserProfileMenu extends Menu {
       .rexBBCodeText(
         0,
         0,
-        `${ownedCards}/${Catalog.collectibleCards.length} [img=card]`,
+        `${ownedCards} / ${Catalog.collectibleCards.length} [img=card]`,
         BBStyle.basicStylized,
       )
       .setOrigin(0.5)

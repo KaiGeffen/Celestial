@@ -57,7 +57,8 @@ export const assetLists = {
     "files": [
       "Astrology",
       "Blossom",
-      "Default"
+      "Default",
+      "Lotus"
     ],
     "pixelArt": false
   },
@@ -404,6 +405,7 @@ export const assetLists = {
   "background": {
     "files": [
       "Light",
+      "intro",
       "matchBottom",
       "matchDay",
       "matchNight",
@@ -485,6 +487,9 @@ export const assetLists = {
       "editorTopCorner",
       "error",
       "header",
+      "introBox",
+      "introLeft",
+      "introRight",
       "journeyHeader",
       "nameplate",
       "profile",

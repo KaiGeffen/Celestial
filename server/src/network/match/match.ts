@@ -1,5 +1,5 @@
 import { ServerController } from '../../gameController'
-import { Mulligan } from '../../../../shared/settings'
+import { MechanicsSettings, Mulligan } from '../../../../shared/settings'
 import getClientGameModel from '../../../../shared/state/clientGameModel'
 import { ServerWS } from '../../../../shared/network/celestialTypedWebsocket'
 import { db } from '../../db/db'
@@ -46,6 +46,9 @@ class Match implements Match {
     new Set<ServerWS>(),
     new Set<ServerWS>(),
   ]
+
+  // How many times each player has timed out in a row
+  private countTimeouts: [number, number] = [0, 0]
 
   addSpectator(ws: ServerWS, playerPerspective: 0 | 1): void {
     this.spectators[playerPerspective].add(ws)
@@ -175,12 +178,43 @@ class Match implements Match {
     const valid = this.game.onPlayerInput(player, action, versionNo)
 
     if (valid) {
+      // Reset the timeouts
+      this.countTimeouts[player] = 0
       await this.notifyState()
     } else {
       const ws = player === 0 ? this.ws1 : this.ws2
       // TODO
       // await this.notifyError(ws)
     }
+  }
+
+  // Called when a player's timer expires after the mulligan: autopass for them and after enough timeouts, surrender them
+  async doTimeoutPass(player: number) {
+    const valid = this.game.onPlayerInput(
+      player,
+      MechanicsSettings.PASS,
+      this.game.model.versionNo,
+    )
+
+    if (!valid) return
+
+    this.countTimeouts[player]++
+
+    // Surrender if they've timed out too many times in a row
+    const shouldSurrender =
+      this.game.model.winner === null &&
+      this.countTimeouts[player] >=
+        MechanicsSettings.MAX_CONSECUTIVE_AUTO_PASSES
+
+    if (shouldSurrender) {
+      const ws = player === 0 ? this.ws1 : this.ws2
+      if (ws) {
+        await this.doSurrender(ws)
+        return
+      }
+    }
+
+    await this.notifyState()
   }
 
   // Whether the match is over
