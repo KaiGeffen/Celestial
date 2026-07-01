@@ -571,10 +571,10 @@ export default class HomeScene extends BaseScene {
 }
 
 const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
-  {
-    subheader: 'Steam',
-    body: `Our [area=_link_steam][stroke=${Color.goldS}]Steam page[/stroke][/area] is up! We'd love if you could wishlist, and look forward to the demo release at [area=_link_nextfest][stroke=${Color.goldS}]Steam Next Fest[/stroke][/area] in October.`,
-  },
+  // {
+  //   subheader: 'Steam',
+  //   body: `Our [area=_link_steam][stroke=${Color.goldS}]Steam page[/stroke][/area] is up! We'd love if you could wishlist, and look forward to the demo release at [area=_link_nextfest][stroke=${Color.goldS}]Steam Next Fest[/stroke][/area] in October.`,
+  // },
   //   {
   //     subheader: 'Tournament',
   //     body: `Our next tournament will be on June 27th at 1 PM EST.
@@ -592,9 +592,9 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   // },
   {
     subheader: 'Ranked',
-    body: `July 1st - 31st is our second ranked season!
+    body: `July 1st - 31st marks our second ranked season!
 
-Each player's ELO resets, and the #1 player at the end of the season picks the theme for the next cardback. Once it's ready, each player in the top 10 will get a free copy.
+Each player's ELO has been reset, and the #1 player at the end of the season picks the theme for the next cardback. Once it's ready, each player in the top 10 will get a free copy.
 
 Also stay tuned for a tournament announcement soon!`,
   },
