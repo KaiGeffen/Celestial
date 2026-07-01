@@ -188,7 +188,6 @@ export default class ChapterMessageMenu extends MessageMenu {
           this.claimGoldButton.setText('Claimed').disable()
         }
       },
-      muteClick: true,
     })
 
     const leftCorner = this.scene.add
