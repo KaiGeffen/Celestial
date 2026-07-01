@@ -219,6 +219,24 @@ export const analytics = pgTable(
   }),
 )
 
+/** Client-reported time (ms) to finish loading all game assets. */
+export const loadTimes = pgTable(
+  'load_times',
+  {
+    id: serial('id').primaryKey(),
+    // Null when reported before/without a signed-in account
+    player_id: uuid('player_id').references(() => players.id, {
+      onDelete: 'cascade',
+    }),
+    load_ms: integer('load_ms').notNull(),
+    time: timestamp('time').notNull().defaultNow(),
+  },
+  (table) => ({
+    timeIdx: index('load_times_time_idx').on(table.time),
+    playerIdx: index('load_times_player_idx').on(table.player_id),
+  }),
+)
+
 /** Aggregate PvE mission outcomes across all players (one row per mission id). */
 export const missionStats = pgTable('mission_stats', {
   mission_id: integer('mission_id').primaryKey(),

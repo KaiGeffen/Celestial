@@ -14,7 +14,12 @@ import {
 } from './sessionToken'
 
 import { db } from '../db/db'
-import { players, approvedRefs, cosmeticsTransactions } from '../db/schema'
+import {
+  players,
+  approvedRefs,
+  cosmeticsTransactions,
+  loadTimes,
+} from '../db/schema'
 import { and, eq, sql, inArray } from 'drizzle-orm'
 import { ServerWS } from '../../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../../shared/types/deck'
@@ -320,6 +325,9 @@ export default function createWebSocketServer() {
         // Client reports how long it took to load all game assets
         .on('reportLoadTime', ({ ms }) => {
           console.log(`Asset load time: ${ms}ms`)
+          db.insert(loadTimes)
+            .values({ player_id: id ?? null, load_ms: ms })
+            .catch((e) => console.error('Error persisting load time:', e))
         })
         // User sends their decks to the server
         .on(
