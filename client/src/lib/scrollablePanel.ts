@@ -46,21 +46,36 @@ function updateOnScroll(
   panel: ScrollablePanel,
   childPanel: FixWidthSizer,
 ): void {
-  panel.scene.input.on(
-    'wheel',
-    (pointer: Phaser.Input.Pointer, gameObject, dx, dy, dz, event) => {
-      // Return if the pointer is outside of the panel
-      if (!childPanel.getBounds().contains(pointer.x, pointer.y)) {
-        return
-      }
+  const scene = panel.scene
 
-      // Scroll panel down by amount wheel moved
-      panel.childOY -= dx + dy
+  const onWheel = (
+    pointer: Phaser.Input.Pointer,
+    gameObject,
+    dx,
+    dy,
+    dz,
+    event,
+  ) => {
+    // Return if the pointer is outside of the panel
+    if (!childPanel.getBounds().contains(pointer.x, pointer.y)) {
+      return
+    }
 
-      // Ensure that panel isn't out bounds (Below 0% or above 100% scroll)
-      panel.t = Math.min(0.999999, Math.max(0, panel.t))
-    },
-  )
+    // Scroll panel down by amount wheel moved
+    panel.childOY -= dx + dy
+
+    // Ensure that panel isn't out bounds (Below 0% or above 100% scroll)
+    panel.t = Math.min(0.999999, Math.max(0, panel.t))
+  }
+
+  scene.input.on('wheel', onWheel)
+
+  // Remove the listener when the panel is destroyed. It's registered on the
+  // scene's input, so otherwise it would outlive the panel and throw on the
+  // next wheel event, blocking scroll for any panels created after it.
+  panel.once('destroy', () => {
+    scene.input.off('wheel', onWheel)
+  })
 }
 
 // Allow clicks that hit children to scroll the panel
