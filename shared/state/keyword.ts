@@ -25,6 +25,7 @@ export class Keywords {
       Keywords.birth,
       Keywords.exhale,
       Keywords.refresh,
+      Keywords.becomes,
     ]
   }
 
@@ -99,5 +100,12 @@ export class Keywords {
     'Exhale',
     '[color=#FABD5D]Exhale X[/color]: If you can, spend X breath to trigger the following effect.',
     true,
+  )
+
+  // Abiliites with a card name TODO
+  static becomes = new Keyword(
+    'Becomes',
+    '[color=#FABD5D]Becomes[/color]: When you pass while this is in your hand, transform into TODO.',
+    false,
   )
 }

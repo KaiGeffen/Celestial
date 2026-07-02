@@ -11,6 +11,7 @@ import * as waterCatalog from './catalog/water'
 import * as tokensCatalog from './catalog/tokens'
 import * as specialCardsCatalog from './catalog/specialCards'
 import * as groundCatalog from './catalog/ground'
+import * as dualCatalog from './catalog/dual'
 import { Keyword, Keywords } from './keyword'
 
 // Apply the card's theme and sort by cost for building the full catalog
@@ -47,6 +48,7 @@ const fullCatalog = [
   ...applyThemeAndSort(waterCatalog, 7),
   ...applyThemeAndSort(specialCardsCatalog, 8),
   ...applyThemeAndSort(groundCatalog, 8), // Ground theme todo
+  ...Object.values(dualCatalog), // Dual cards
 ]
 const nonCollectibles = [...Object.values(tokensCatalog)]
 const allCards = [...fullCatalog, ...nonCollectibles]
