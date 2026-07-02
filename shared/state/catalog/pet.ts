@@ -288,13 +288,13 @@ const sensualist = new Sensualist({
 class Doll extends Card {
   onMorning(player: number, game: GameModel, index: number) {
     const length = game.roundResults[player].length
-    const previousRoundResults =
+    const magnitude =
       game.roundResults[player][length - 1] -
       game.roundResults[player ^ 1][length - 1]
 
     // Replace this with a copy with points equal to the previous round results
     const copy = this.copy()
-    copy.points = Math.max(0, previousRoundResults)
+    copy.points = Math.abs(magnitude)
     game.pile[player][index] = copy
 
     return true
@@ -305,7 +305,7 @@ const doll = new Doll({
   id: 109,
   cost: 1,
   points: 1,
-  text: 'Morning: Worth X permanently, where X is how many points you won the last round by.',
+  text: 'Morning: Worth X permanently, where X is how many points the previous round was won by.',
 })
 
 class Heart extends Card {
