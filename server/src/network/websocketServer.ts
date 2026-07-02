@@ -622,22 +622,17 @@ export default function createWebSocketServer() {
                   return
                 }
 
-                // Convert inventory bit string to array
-                const inventoryArray = row.card_inventory
-                  .split('')
-                  .map((char) => char === '1')
-
                 // Check if already owned
-                if (inventoryArray[itemId] === true) {
+                if (row.card_inventory[itemId] === '1') {
                   ws.send({ type: 'signalError' })
                   return
                 }
 
-                // Update inventory to mark card as owned
-                inventoryArray[itemId] = true
-                const newInventoryBitString = inventoryArray
-                  .map((value) => (value ? '1' : '0'))
-                  .join('')
+                // Mark the card as owned, padding with '0' in case the stored
+                // string is shorter than this card's id
+                const padded = row.card_inventory.padEnd(itemId + 1, '0')
+                const newInventoryBitString =
+                  padded.slice(0, itemId) + '1' + padded.slice(itemId + 1)
 
                 await tx
                   .update(players)
