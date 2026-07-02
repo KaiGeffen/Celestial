@@ -12,10 +12,19 @@ abstract class DualCard extends Card {
   onPassInHand(game: GameModel, owner: 0 | 1, index: number): void {
     super.onPassInHand(game, owner, index)
 
-    // TODO Animation
     const other = this.otherCard
     if (other) {
       game.hand[owner][index] = other
+
+      // Animation
+      game.animations[owner].push(
+        new Animation({
+          from: Zone.Transform,
+          to: Zone.Hand,
+          card: this,
+          index2: index,
+        }),
+      )
     }
   }
 }
@@ -46,7 +55,11 @@ class Ecstasy extends DualCard {
 
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
-    game.score[player] *= 2
+
+    // Double each player's points
+    ;[0, 1].forEach((p) => {
+      game.score[p] *= 2
+    })
   }
 }
 const ecstasy = new Ecstasy({
