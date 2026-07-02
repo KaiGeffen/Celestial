@@ -608,8 +608,10 @@ Each player's ELO has been reset, and the #1 player at the end of the season pic
 Also stay tuned for a tournament announcement soon!`,
   },
   {
-    subheader: 'Card Changes',
-    body: `[area=_Paramountcy][stroke=${Color.goldS}]Paramountcy[/stroke][/area] cards added 4 > 3
+    subheader: 'Cards',
+    body: `New cards: [area=_Liquidity][stroke=${Color.goldS}]Liquidity[/stroke][/area], [area=_Doll][stroke=${Color.goldS}]Doll[/stroke][/area], [area=_Heart][stroke=${Color.goldS}]Heart[/stroke][/area], [area=_Isolation][stroke=${Color.goldS}]Isolation[/stroke][/area]
+
+[area=_Paramountcy][stroke=${Color.goldS}]Paramountcy[/stroke][/area] cards added 4 > 3
 [area=_Heron][stroke=${Color.goldS}]Heron[/stroke][/area] cost 1 > 2
 [area=_Clear View][stroke=${Color.goldS}]Clear View[/stroke][/area] the created [area=_Seen][stroke=${Color.goldS}]Seen[/stroke][/area] points 0 > 1
 [area=_Moon][stroke=${Color.goldS}]Moon[/stroke][/area] points 5 > 4
