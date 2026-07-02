@@ -295,9 +295,10 @@ export default class Server {
       })
       .on('sendUserData', (data: messagesToClient['sendUserData']) => {
         // Authoritative account snapshot from the server.
+        this.loadUserData(data)
         userDataStore.applyServerData(data, uuid)
+        game.events.emit('userDataUpdated')
 
-        this.loadUserData(data, game)
         // TODO Bad smell, the callback should only happen once as it references a scene
         if (callback) {
           callback()
@@ -481,10 +482,7 @@ export default class Server {
   }
 
   // Load user data that was sent from server into session storage
-  private static loadUserData(
-    data: messagesToClient['sendUserData'],
-    game: Phaser.Game,
-  ): void {
+  private static loadUserData(data: messagesToClient['sendUserData']): void {
     // Map from binary string to bool array
     sessionStorage.setItem(
       'inventory',
@@ -518,9 +516,6 @@ export default class Server {
       'journeyChoices',
       JSON.stringify(data.journeyChoices),
     )
-
-    // Emit event so scenes can refresh if needed
-    game.events.emit('userDataUpdated')
   }
 
   // Attempt to reconnect by sending stored token or guest UUID
