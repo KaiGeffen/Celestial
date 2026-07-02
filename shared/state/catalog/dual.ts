@@ -17,6 +17,7 @@ const agony = new Agony({
   cost: 1,
   text: "Becomes Ecstasy\nCreate a Wound in your opponent's hand.",
   theme: 2,
+  beta: true,
 })
 
 class Ecstasy extends Card {
@@ -32,6 +33,7 @@ const ecstasy = new Ecstasy({
   points: 1,
   text: "Becomes Agony\nDouble each player's points.",
   theme: 3,
+  beta: true,
 })
 
 export { agony, ecstasy }

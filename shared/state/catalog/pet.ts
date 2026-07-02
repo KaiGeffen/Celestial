@@ -285,7 +285,6 @@ const sensualist = new Sensualist({
   text: 'Costs 1 less for each of the following statuses you have: Nourish, Inspired, Sight.',
 })
 
-// NEW CARDS
 class Doll extends Card {
   onMorning(player: number, game: GameModel, index: number) {
     const length = game.roundResults[player].length
@@ -303,7 +302,7 @@ class Doll extends Card {
 }
 const doll = new Doll({
   name: 'Doll',
-  id: 4482,
+  id: 109,
   cost: 1,
   points: 1,
   text: 'Morning: Worth X permanently, where X is how many points you won the last round by.',
@@ -325,12 +324,13 @@ class Heart extends Card {
 }
 const heart = new Heart({
   name: 'Heart',
-  id: 4088,
+  id: 110,
   cost: 3,
   points: 4,
   text: 'When a card is played while this is in the story, discard this and Nourish 3.',
 })
 
+// BETA
 class Companion extends Card {
   onMorning(player: number, game: GameModel, index: number): boolean {
     game.moveBetweenZones(Zone.Discard, Zone.Deck, player, index)
@@ -359,8 +359,8 @@ export {
   parade,
   meAndHer,
   sensualist,
-  // NEW
   doll,
   heart,
+  // NEW
   companion,
 }

@@ -256,6 +256,25 @@ const vampire = new Vampire({
   text: "Worth -X where X is your opponent's points.\nCosts 1 less for each card in the story.",
 })
 
+class Isolation extends Card {
+  getCost(player: number, game: GameModel): number {
+    const wonPreviousRound = game.checkPlayerWonPreviousRound(player)
+
+    if (wonPreviousRound && game.amtCardsPlayedLastRound[player] === 0) {
+      return 0
+    }
+
+    return this.cost
+  }
+}
+const isolation = new Isolation({
+  name: 'Isolation',
+  id: 112,
+  cost: 7,
+  points: 7,
+  text: 'Costs 0 if you won last round without playing any cards.',
+})
+
 // NEW CARDS
 class Voices extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -311,25 +330,6 @@ const voices = new Voices({
   cost: 1,
   points: 1,
   text: 'Exhale 1: Your opponent adds a card from their hand to the story.\nExhale 2: You do the same after their card.',
-})
-
-class Isolation extends Card {
-  getCost(player: number, game: GameModel): number {
-    const wonPreviousRound = game.checkPlayerWonPreviousRound(player)
-
-    if (wonPreviousRound && game.amtCardsPlayedLastRound[player] === 0) {
-      return 0
-    }
-
-    return this.cost
-  }
-}
-const isolation = new Isolation({
-  name: 'Isolation',
-  id: 3484,
-  cost: 7,
-  points: 7,
-  text: 'Costs 0 if you won last round without playing any cards.',
 })
 
 class Spider extends Card {
@@ -464,13 +464,10 @@ export {
   victim,
   lostInShadow,
   vampire,
-  // NEW CARDS
-  // rupture,
-  voices,
-  // mutual,
   isolation,
+  // NEW CARDS
+  voices,
   abandoned,
   mire,
   ink,
-  // sharpness,
 }
