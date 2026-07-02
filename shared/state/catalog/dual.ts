@@ -1,11 +1,30 @@
-import Card from '../card'
+import Card, { CardData } from '../card'
 import { Quality } from '../quality'
 import GameModel from '../gameModel'
 import { Zone } from '../zone'
 import { Animation } from '../../animation'
 import { wound } from './tokens'
 
-class Agony extends Card {
+// A card that switches back and forth when you pass while it's in hand
+abstract class DualCard extends Card {
+  abstract get otherCard(): Card
+
+  onPassInHand(game: GameModel, owner: 0 | 1, index: number): void {
+    super.onPassInHand(game, owner, index)
+
+    // TODO Animation
+    const other = this.otherCard
+    if (other) {
+      game.hand[owner][index] = other
+    }
+  }
+}
+
+class Agony extends DualCard {
+  get otherCard() {
+    return ecstasy
+  }
+
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
     game.create(Zone.Hand, player ^ 1, wound)
@@ -20,7 +39,11 @@ const agony = new Agony({
   beta: true,
 })
 
-class Ecstasy extends Card {
+class Ecstasy extends DualCard {
+  get otherCard() {
+    return agony
+  }
+
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
     game.score[player] *= 2

@@ -5,7 +5,7 @@ import { Animation, Visibility } from '../animation'
 import { Zone } from './zone'
 import { Keyword } from './keyword'
 
-interface CardData {
+export interface CardData {
   name?: string
   id?: number
   cost?: number
@@ -220,7 +220,13 @@ export default class Card {
   }
 
   // Trigger when you pass while this is in the story
-  onPass(playerWhoPassed: number, owner: number, game: GameModel): void {}
+  onPassInStory(
+    playerWhoPassed: number,
+    owner: number,
+    game: GameModel,
+  ): void {}
+
+  onPassInHand(game: GameModel, owner: 0 | 1, index: number): void {}
 
   // When given player resolves a card with base-cost 7 or more
   onBigResolve(player: number, game: GameModel, index: number): void {}

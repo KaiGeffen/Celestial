@@ -192,7 +192,7 @@ const solidarity = new Solidarity({
 })
 
 class Earthsong extends Card {
-  onPass(playerWhoPassed: number, owner: number, game: GameModel): void {
+  onPassInStory(playerWhoPassed: number, owner: number, game: GameModel): void {
     if (playerWhoPassed === owner) {
       game.breath[playerWhoPassed] += 1
     }

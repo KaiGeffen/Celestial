@@ -114,7 +114,12 @@ class ServerController {
     // Trigger on pass effects
     for (let i = 0; i < this.model.story.acts.length; i++) {
       const act = this.model.story.acts[i]
-      act.card.onPass(player, act.owner, this.model)
+      act.card.onPassInStory(player, act.owner, this.model)
+    }
+    for (let i = 0; i < this.model.hand[player].length; i++) {
+      // TODO Make player be 0 or 1 type everywhere
+      const p = player as 0 | 1
+      this.model.hand[p][i].onPassInHand(this.model, p, i)
     }
   }
 
