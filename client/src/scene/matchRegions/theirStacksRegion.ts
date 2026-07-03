@@ -39,4 +39,8 @@ export default class TheirStacksRegion extends StacksRegionBase {
   protected discardHotkeyLetter(): string {
     return 'S'
   }
+
+  protected removedHotkeyLetter(): string {
+    return 'D'
+  }
 }

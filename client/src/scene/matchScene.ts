@@ -303,6 +303,9 @@ export class MatchScene extends BaseScene {
       () => {
         this.view.showOverlay(this.view.ourDiscardOverlay)
       },
+      () => {
+        this.view.showOverlay(this.view.ourExpendedOverlay)
+      },
     )
 
     view.theirStacks.setOverlayCallbacks(
@@ -311,6 +314,9 @@ export class MatchScene extends BaseScene {
       },
       () => {
         this.view.showOverlay(this.view.theirDiscardOverlay)
+      },
+      () => {
+        this.view.showOverlay(this.view.theirExpendedOverlay)
       },
     )
 
@@ -584,26 +590,10 @@ export class View {
     // Overlays
     this.ourDeckOverlay = new Regions.OurDeck().create(scene)
     this.theirDeckOverlay = new Regions.TheirDeck().create(scene)
-    this.ourDiscardOverlay = new Regions.OurDiscard()
-      .create(scene)
-      .setSwitch(() => {
-        this.showOverlay(this.ourExpendedOverlay)
-      })
-    this.theirDiscardOverlay = new Regions.TheirDiscard()
-      .create(scene)
-      .setSwitch(() => {
-        this.showOverlay(this.theirExpendedOverlay)
-      })
-    this.ourExpendedOverlay = new Regions.OurExpended()
-      .create(scene)
-      .setSwitch(() => {
-        this.showOverlay(this.ourDiscardOverlay)
-      })
-    this.theirExpendedOverlay = new Regions.TheirExpended()
-      .create(scene)
-      .setSwitch(() => {
-        this.showOverlay(this.theirDiscardOverlay)
-      })
+    this.ourDiscardOverlay = new Regions.OurDiscard().create(scene)
+    this.theirDiscardOverlay = new Regions.TheirDiscard().create(scene)
+    this.ourExpendedOverlay = new Regions.OurExpended().create(scene)
+    this.theirExpendedOverlay = new Regions.TheirExpended().create(scene)
 
     // These regions are only visible during certain times
     this.mulligan = new Regions.Mulligan().create(scene)

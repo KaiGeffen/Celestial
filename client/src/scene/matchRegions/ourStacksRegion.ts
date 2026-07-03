@@ -40,6 +40,10 @@ export default class OurStacksRegion extends StacksRegionBase {
     return 'W'
   }
 
+  protected removedHotkeyLetter(): string {
+    return 'E'
+  }
+
   /** Used by tutorial flow to hide pile controls. */
   tutorialHide(): void {
     if (this.btnDeck) {
@@ -47,6 +51,9 @@ export default class OurStacksRegion extends StacksRegionBase {
     }
     if (this.btnDiscard) {
       this.btnDiscard.setVisible(false)
+    }
+    if (this.btnRemoved) {
+      this.btnRemoved.setVisible(false)
     }
   }
 }

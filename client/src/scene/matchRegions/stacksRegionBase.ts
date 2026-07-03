@@ -13,6 +13,10 @@ const STACK_ICON_EXTRA_Y = 12
 /** Extra horizontal nudge for stack count buttons (deck / discard). */
 const STACK_ICON_DECK_X_NUDGE = 25
 const STACK_ICON_DISCARD_X_NUDGE = -30
+/** Removed-from-game badge: pinned near the left screen edge, sitting past the
+ * stacks' badge row (toward screen center) by this much. */
+const STACK_ICON_REMOVED_FROM_LEFT_X = 25
+const STACK_ICON_REMOVED_EXTRA_Y = 120
 
 /**
  * Shared deck + discard pile rendering for one player, parented under the
@@ -35,6 +39,8 @@ export default abstract class StacksRegionBase {
 
   btnDeck!: Button
   btnDiscard!: Button
+  /** Count of cards removed from the game. */
+  btnRemoved?: Button
 
   private deckCallback: () => void
   private discardCallback: () => void
@@ -62,6 +68,9 @@ export default abstract class StacksRegionBase {
   /** Single-letter hotkey label (e.g. W / S) for discard overlay. */
   protected abstract discardHotkeyLetter(): string
 
+  /** Single-letter hotkey label (e.g. E / D) for removed-from-game overlay. */
+  protected abstract removedHotkeyLetter(): string
+
   /** Count icons sit above/below the card center depending on which edge of the table. */
   private stackIconYDeltaFromCardCenter(): number {
     return this.ownerIndex() === 0
@@ -85,6 +94,18 @@ export default abstract class StacksRegionBase {
       loc[0] + STACK_ICON_OUTWARD_X + STACK_ICON_DISCARD_X_NUDGE,
       loc[1] + dy,
     ]
+  }
+
+  /** Near the left screen edge, ~100 past the stack badges' y (mirrored like them). */
+  private stackIconRemovedPosition(loc: [number, number]): [number, number] {
+    const halfWidth = (this.btnRemoved?.icon.displayWidth ?? 0) / 2
+    const x = STACK_ICON_REMOVED_FROM_LEFT_X + halfWidth - this.layoutParent.x
+    const dy =
+      this.stackIconYDeltaFromCardCenter() +
+      (this.ownerIndex() === 0
+        ? -STACK_ICON_REMOVED_EXTRA_Y
+        : STACK_ICON_REMOVED_EXTRA_Y)
+    return [x, loc[1] + dy]
   }
 
   create(scene: MatchScene, layoutParent: Phaser.GameObjects.Container): this {
@@ -125,6 +146,21 @@ export default abstract class StacksRegionBase {
       'discard',
     )
 
+    // Removed-from-game count, positioned once created (its own width matters)
+    this.btnRemoved = new Buttons.Stacks.StackCount(
+      this.stackIconsContainer,
+      0,
+      0,
+      o,
+      'removed',
+    )
+    const removedPos = this.stackIconRemovedPosition(
+      this.discardLocation(this.layoutParent, 0),
+    )
+    this.btnRemoved.setPosition(removedPos[0], removedPos[1])
+    // Hidden until a state shows this player has removed cards
+    this.btnRemoved.setVisible(false)
+
     this.registerStackHotkeys()
 
     return this
@@ -144,11 +180,16 @@ export default abstract class StacksRegionBase {
     return this
   }
 
-  setOverlayCallbacks(fDeck: () => void, fDiscard: () => void): void {
+  setOverlayCallbacks(
+    fDeck: () => void,
+    fDiscard: () => void,
+    fRemoved: () => void,
+  ): void {
     this.deckCallback = fDeck
     this.discardCallback = fDiscard
     this.btnDeck.setOnClick(fDeck)
     this.btnDiscard.setOnClick(fDiscard)
+    this.btnRemoved.setOnClick(fRemoved)
   }
 
   private registerStackHotkeys(): void {
@@ -165,6 +206,15 @@ export default abstract class StacksRegionBase {
         this.btnDiscard.onClick()
       }
     })
+    this.scene.input.keyboard.on(
+      `keydown-${this.removedHotkeyLetter()}`,
+      () => {
+        // Only while the badge is shown (i.e. cards have been removed)
+        if (UserSettings._get('hotkeys') && this.btnRemoved?.isVisible()) {
+          this.btnRemoved.onClick()
+        }
+      },
+    )
   }
 
   private layoutStackIcons(): void {
@@ -176,6 +226,13 @@ export default abstract class StacksRegionBase {
     )
     this.btnDeck.setPosition(deckPos[0], deckPos[1])
     this.btnDiscard.setPosition(discardPos[0], discardPos[1])
+
+    if (this.btnRemoved) {
+      const removedPos = this.stackIconRemovedPosition(
+        this.discardLocation(this.layoutParent, 0),
+      )
+      this.btnRemoved.setPosition(removedPos[0], removedPos[1])
+    }
   }
 
   onWindowResize(): void {
@@ -277,6 +334,11 @@ export default abstract class StacksRegionBase {
 
     this.btnDeck.setText(`${state.deck[o]?.length ?? 0}`)
     this.btnDiscard.setText(`${pileRow.length}`)
+
+    // Removed badge only shows once this player has cards removed from the game
+    const removedCount = state.expended[o]?.length ?? 0
+    this.btnRemoved?.setText(`${removedCount}`).setVisible(removedCount > 0)
+
     this.layoutStackIcons()
   }
 }
