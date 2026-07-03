@@ -137,6 +137,11 @@ export class MatchScene extends BaseScene {
     const searching = this.view?.searching as SearchingRegion
     if (!searching?.isVisible() || searching.matchFound) return
 
+    // The reconnect opened a fresh socket: this scene's match hooks
+    // (transmitState etc.) were registered on the dead one, so without this
+    // the found match's states would arrive unhandled and never display
+    this.registerMatchServerHooks()
+
     server.send({
       type: 'initPvp',
       password: this.params.password,
