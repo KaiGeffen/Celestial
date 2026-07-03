@@ -881,7 +881,9 @@ export default function createWebSocketServer() {
         .on(
           'cancelQueue',
           authed(({ password }) => {
-            delete searchingPlayers[password]
+            if (searchingPlayers[password]?.ws === ws) {
+              delete searchingPlayers[password]
+            }
           }),
         )
         .on(
