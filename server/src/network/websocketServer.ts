@@ -729,14 +729,12 @@ export default function createWebSocketServer() {
             )
 
             activeGame.match = new PveMatch(ws, id, deck, aiDeck)
-            await activeGame.match.startMatch()
-
             activeGame.playerNumber = 0
 
             // Analytics
             logFunnelEvent(id, 'play_mode', 'pve')
 
-            // Start the match
+            // Start the match and let user know the starting state
             await activeGame.match.startMatch()
             await activeGame.match.notifyState()
           }),
