@@ -824,6 +824,10 @@ export default function createWebSocketServer() {
               // Set the other player's game to be the same, but with opposite player number
               otherPlayer.activeGame.match = activeGame.match
               otherPlayer.activeGame.playerNumber = 1
+              // Re-register the game in the map: if the other player dropped
+              // and their close handler deleted their entry, reconnecting
+              // could otherwise never find this match
+              userActiveGameMap[otherPlayer.id] = otherPlayer.activeGame
 
               // TODO Maybe just delete the last one? Somehow don't lose to race conditions
               delete searchingPlayers[data.password]
