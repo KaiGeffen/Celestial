@@ -24,6 +24,7 @@ import BackgroundRegion from './matchRegions/backgroundRegion'
 import BreathRegion from './matchRegions/breathRegion'
 import HistoryRegion from './matchRegions/historyRegion'
 import StatusRegion from './matchRegions/statusRegion'
+import SearchingRegion from './matchRegions/searchingRegion'
 
 // TODO Figure out
 import { server } from '../server'
@@ -122,6 +123,25 @@ export class MatchScene extends BaseScene {
     this.paused = false
 
     this.setCallbacks(this.view)
+
+    // If the player disconnects while on the searching screen, requeue for a match
+    this.game.events.on('userDataUpdated', this.requeueAfterReconnect, this)
+    this.events.once('shutdown', () => {
+      this.game.events.off('userDataUpdated', this.requeueAfterReconnect, this)
+    })
+  }
+
+  private requeueAfterReconnect(): void {
+    if (!this.params?.isPvp) return
+
+    const searching = this.view?.searching as SearchingRegion
+    if (!searching?.isVisible() || searching.matchFound) return
+
+    server.send({
+      type: 'initPvp',
+      password: this.params.password,
+      deck: this.params.deck,
+    })
   }
 
   restart(): void {
