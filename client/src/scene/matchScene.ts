@@ -614,7 +614,9 @@ export class View {
   }
 
   displayState(state: GameModel) {
-    this.searching.hide()
+    if (this.searching.isVisible()) {
+      this.searching.displayState(state)
+    }
 
     this.mulligan.displayState(state)
 

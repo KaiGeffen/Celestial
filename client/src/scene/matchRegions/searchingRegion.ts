@@ -1,4 +1,5 @@
 import 'phaser'
+import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import { Color, Space, Style, Depth, Ease, Time } from '../../settings/settings'
 import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
@@ -7,6 +8,11 @@ import Buttons from '../../lib/buttons/buttons'
 import avatarNames from '../../../../shared/data/avatarNames'
 import GameModel from '../../../../shared/state/gameModel'
 import { server } from '../../server'
+import {
+  notifyMatchFound,
+  requestMatchNotificationPermission,
+  shouldShowNotificationRequestButton,
+} from '../../utils/notifications'
 
 export default class SearchingRegion extends Region {
   playerAvatar: Phaser.GameObjects.Image
@@ -17,6 +23,7 @@ export default class SearchingRegion extends Region {
   txtTime: Phaser.GameObjects.Text
   matchFound: boolean
   cancelButton: Button
+  notifyButton: Button
   password: string
 
   create(scene: MatchScene, avatarId: number, password: string): Region {
@@ -88,11 +95,8 @@ export default class SearchingRegion extends Region {
       this.cancelButton.disable()
     }
 
-    // If player has been waiting trivial time, don't bother
-    if (parseInt(this.txtTime.text.replace(':', '')) <= 3) {
-      this.hide()
-      return
-    }
+    // Send an os notification
+    notifyMatchFound()
 
     // Change the text and have it flash, then hide this region
     this.txtTitle.setText('Opponent found')
@@ -205,13 +209,51 @@ export default class SearchingRegion extends Region {
   }
 
   private addButtons(scene: MatchScene): void {
-    this.cancelButton = new Buttons.Basic({
-      within: this.container,
-      text: 'Cancel',
+    const sizer = scene.rexUI.add.sizer({
+      orientation: 'horizontal',
       y: 100,
-      f: () => {
-        scene.doBack()
+      space: {
+        item: Space.pad,
       },
     })
+
+    this.cancelButton = this.addSizerButton(scene, sizer, 'Cancel', () => {
+      scene.doBack()
+    })
+
+    // Show notification button if valid
+    if (shouldShowNotificationRequestButton()) {
+      this.notifyButton = this.addSizerButton(scene, sizer, 'Notify', () => {
+        requestMatchNotificationPermission().then((permission) => {
+          if (permission === 'granted') {
+            this.notifyButton.setText('Allowed').disable()
+          } else if (permission === 'denied') {
+            this.notifyButton.setText('Denied').disable()
+          }
+        })
+      })
+    }
+
+    sizer.layout()
+    this.container.add(sizer)
+  }
+
+  /** Wrap a Basic button in a ContainerLite so the sizer can lay it out. */
+  private addSizerButton(
+    scene: MatchScene,
+    sizer: any,
+    text: string,
+    f: () => void,
+  ): Button {
+    const container = new ContainerLite(
+      scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    const button = new Buttons.Basic({ within: container, text, f })
+    sizer.add(container)
+    return button
   }
 }
