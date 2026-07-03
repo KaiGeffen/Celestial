@@ -246,11 +246,17 @@ class Match implements Match {
   async doDisconnect(disconnectingWs: ServerWS) {}
 
   async reconnectUser(ws: ServerWS, playerNumber: number) {
+    // Take the seat first, so all further match traffic reaches the live socket
     if (playerNumber === 0) {
       this.ws1 = ws
     } else {
       this.ws2 = ws
     }
+
+    // The match may still be starting (startMatch's db reads in flight): there
+    // is no state to replay yet, and reading it would throw. The starting
+    // state will reach this socket via notifyState once startMatch completes.
+    if (!this.game) return
 
     // Send user current state
     await ws.send({
