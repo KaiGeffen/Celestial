@@ -543,6 +543,8 @@ export default class Animator {
     for (let k = removalActiveIndex; k < this.view.story.cards.length; k++) {
       const card = this.view.story.cards[k]
       if (!card) continue
+      // Don't tween a card that is already tweening
+      if (this.scene.tweens.getTweensOf(card.container).length > 0) continue
 
       // Where it was versus where it is now
       const fullIndexOld = resolvedCount + k + 1
@@ -602,6 +604,9 @@ export default class Animator {
       if (newlyInsertedActiveIndices.has(k)) continue
       const card = this.view.story.cards[k]
       if (!card) continue
+      // A card already tweening (e.g. just played from a hand) is headed to its
+      // correct position — shifting it too would fight that tween.
+      if (this.scene.tweens.getTweensOf(card.container).length > 0) continue
 
       const fullIndexOld = resolvedCount + k - totalInsertions
       const fullIndexNew = resolvedCount + k
