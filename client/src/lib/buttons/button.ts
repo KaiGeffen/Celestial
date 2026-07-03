@@ -179,7 +179,7 @@ export default class Button {
           this.txt
             .on(
               'pointerover',
-              () => this.txt.setTint(Color.buttonHighlight),
+              () => this.txt.setTintFill(Color.buttonHighlight),
               this,
             )
             .on('pointerout', () => this.txt.clearTint(), this)
@@ -288,10 +288,8 @@ export default class Button {
   }
 
   select(): Button {
+    // TODO This gets overwritten and super is called, but the tint is never used?
     this.icon.setTint(Color.buttonSelected)
-    if (this.txt) {
-      this.txt.setColor(Color.buttonTxtSelected)
-    }
 
     this.selected = true
 

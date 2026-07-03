@@ -18,7 +18,6 @@ export default class UButton extends Button {
       text: {
         text: text,
         interactive: true,
-        style: Style.textButton,
         hitArea: [
           new Phaser.Geom.Rectangle(-10, -5, 35, 40),
           Phaser.Geom.Rectangle.Contains,

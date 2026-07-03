@@ -55,16 +55,8 @@ const StyleGeneral: StyleDict = {
   button: {
     fontFamily: secondaryFont,
     fontSize: '20px',
-    color: '#58291b',
+    color: Color.buttonFill,
     stroke: '#1e0502',
-    strokeThickness: 1,
-  },
-  // Text for the buttons that are just text
-  textButton: {
-    fontFamily: sansFont,
-    fontSize: size.standard,
-    color: Color.textButton,
-    stroke: Color.blackS,
     strokeThickness: 1,
   },
 
