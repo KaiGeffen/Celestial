@@ -1030,7 +1030,13 @@ export default function createWebSocketServer() {
 
         // Disconnect from active match if it hasn't ended
         if (activeGame.match && !activeGame.match.isOver()) {
-          activeGame.match.doDisconnect(ws)
+          // Only signal the match if this socket still holds a seat in it.
+          // After a reconnect the seats belong to the user's new socket, and
+          // this stale socket's late close must not tell the players that
+          // someone disconnected.
+          if (activeGame.match.ws1 === ws || activeGame.match.ws2 === ws) {
+            activeGame.match.doDisconnect(ws)
+          }
 
           // Retain the active game for when user reconnects (Except tutorial)
           if (activeGame.match instanceof TutorialMatch) {
