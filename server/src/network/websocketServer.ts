@@ -241,6 +241,9 @@ export default function createWebSocketServer() {
         username = result[0].username
         // User the can be spectated field from the user's database entry
         spectateAllowedByUserId[uuid] = result[0].can_be_spectated
+        // A fresh session starts out not spectating (clears any flag left by a
+        // kicked connection, whose late close doesn't touch user-keyed state)
+        spectatingUserIds.delete(uuid)
 
         // Handle initial achievement
         await AchievementManager.onConnection(id)
@@ -1004,14 +1007,10 @@ export default function createWebSocketServer() {
           }
         }
 
-        // TODO Maybe this check is unnecessary, should delete in all cases
-        // Remove them from active players
-        if (activePlayers[id] === ws) {
-          delete activePlayers[id]
-        }
-        if (id) {
-          delete spectateAllowedByUserId[id]
-        }
+        // Whether this socket is still the user's current connection. False
+        // for a socket that was kicked by a newer sign-in — its late close
+        // must not wipe the state the new connection has established.
+        const isCurrentSocket = id !== null && activePlayers[id] === ws
 
         // Remove them from the matchmaking queue, so no one matches into a
         // dead connection and loads into a match their opponent never joins
@@ -1021,32 +1020,36 @@ export default function createWebSocketServer() {
           }
         })
 
+        // If this socket was spectating, remove it from the watched match
         const spectating = spectatorWsToMatch.get(ws)
         if (spectating) {
           spectating.removeSpectator(ws)
           spectatorWsToMatch.delete(ws)
         }
-        if (id) spectatingUserIds.delete(id)
 
-        // Disconnect from active match if it hasn't ended
-        if (activeGame.match && !activeGame.match.isOver()) {
-          // Only signal the match if this socket still holds a seat in it.
-          // After a reconnect the seats belong to the user's new socket, and
-          // this stale socket's late close must not tell the players that
-          // someone disconnected.
-          if (activeGame.match.ws1 === ws || activeGame.match.ws2 === ws) {
-            activeGame.match.doDisconnect(ws)
-          }
+        // The user-keyed state belongs to the user's current connection only
+        if (isCurrentSocket) {
+          delete activePlayers[id]
+          delete spectateAllowedByUserId[id]
+          spectatingUserIds.delete(id)
 
-          // Retain the active game for when user reconnects (Except tutorial)
-          if (activeGame.match instanceof TutorialMatch) {
-            delete userActiveGameMap[id]
+          // Disconnect from active match if it hasn't ended
+          if (activeGame.match && !activeGame.match.isOver()) {
+            // Defensive: only signal the match if this socket holds a seat
+            if (activeGame.match.ws1 === ws || activeGame.match.ws2 === ws) {
+              activeGame.match.doDisconnect(ws)
+            }
+
+            // Retain the active game for when user reconnects (Except tutorial)
+            if (activeGame.match instanceof TutorialMatch) {
+              delete userActiveGameMap[id]
+            } else {
+              userActiveGameMap[id] = activeGame
+            }
           } else {
-            userActiveGameMap[id] = activeGame
+            // No match (or match already over) => nothing to reconnect to.
+            delete userActiveGameMap[id]
           }
-        } else {
-          // No match (or match already over) => nothing to reconnect to.
-          delete userActiveGameMap[id]
         }
       })
     } catch (e) {
