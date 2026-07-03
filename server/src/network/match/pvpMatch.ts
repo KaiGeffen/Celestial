@@ -1,12 +1,9 @@
-import Match from './match'
+import Match, { MATCH_TIMER_ENABLED } from './match'
 import { ServerWS } from '../../../../shared/network/celestialTypedWebsocket'
 import { updateMatchResultPVP } from '../../db/updateMatchResult'
 import { Deck } from '../../../../shared/types/deck'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { AchievementManager } from '../../achievementManager'
-
-// Whether to use the timer
-const TIMER_ENABLED = true
 
 class PvpMatch extends Match {
   timerCheckInterval: NodeJS.Timeout | null = null
@@ -27,7 +24,7 @@ class PvpMatch extends Match {
 
   async startMatch() {
     await super.startMatch()
-    if (TIMER_ENABLED) {
+    if (MATCH_TIMER_ENABLED) {
       this.startTimer()
     }
   }
