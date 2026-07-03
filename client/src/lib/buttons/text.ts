@@ -15,12 +15,8 @@ export default class TextButton extends Button {
   ) {
     super(within, x, y, {
       text: {
-        text: text,
+        text: text.toUpperCase(),
         interactive: true,
-        // hitArea: [
-        // 	new Phaser.Geom.Rectangle(0, 0, width, height),
-        // 	Phaser.Geom.Rectangle.Contains
-        // 	]
       },
       callbacks: {
         click: f,

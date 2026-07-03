@@ -111,7 +111,7 @@ export default class OptionsMenu extends Menu {
       .setOrigin(0, 0.5)
       .setScale(0.3)
     this.scene.plugins.get('rexAnchor')['add'](this.tabSelector, {
-      x: `50%-${(this.width - Space.pad) / 2}`,
+      x: `50%-${this.width / 2}`,
     })
 
     let tabsSizer = this.scene.rexUI.add.fixWidthSizer({
