@@ -987,6 +987,14 @@ export default function createWebSocketServer() {
           delete spectateAllowedByUserId[id]
         }
 
+        // Remove them from the matchmaking queue, so no one matches into a
+        // dead connection and loads into a match their opponent never joins
+        Object.keys(searchingPlayers).forEach((password) => {
+          if (searchingPlayers[password].ws === ws) {
+            delete searchingPlayers[password]
+          }
+        })
+
         const spectating = spectatorWsToMatch.get(ws)
         if (spectating) {
           spectating.removeSpectator(ws)
