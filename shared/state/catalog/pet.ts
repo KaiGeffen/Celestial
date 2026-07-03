@@ -287,14 +287,15 @@ const sensualist = new Sensualist({
 
 class Doll extends Card {
   onMorning(player: number, game: GameModel, index: number) {
+    // This guards against proccing R1, even though currently that's impossible
     const length = game.roundResults[player].length
-    const magnitude =
-      game.roundResults[player][length - 1] -
-      game.roundResults[player ^ 1][length - 1]
+    const score1 = game.roundResults[player][length - 1] ?? 0
+    const score2 = game.roundResults[player ^ 1][length - 1] ?? 0
+    const amt = Math.max(0, score1 - score2)
 
     // Replace this with a copy with points equal to the previous round results
     const copy = this.copy()
-    copy.points = Math.abs(magnitude)
+    copy.points = Math.abs(amt)
     game.pile[player][index] = copy
 
     return true
@@ -305,7 +306,7 @@ const doll = new Doll({
   id: 109,
   cost: 1,
   points: 1,
-  text: 'Morning: Worth X permanently, where X is how many points the previous round was won by.',
+  text: "Morning: Worth X permanently, where X is how many points you won the previous round by.\nIf you didn't win, X is 0.",
 })
 
 class Heart extends Card {
