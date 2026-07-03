@@ -86,14 +86,6 @@ export default class OurBoardRegion extends Region {
     }
   }
 
-  /** Re-apply normal click handlers to all hand cards (e.g. after a tutorial pause ends). */
-  refreshCardClicks(): void {
-    if (!this.lastHandState) return
-    this.cards.forEach((card, i) =>
-      this.setCardOnClick(card, this.lastHandState, i),
-    )
-  }
-
   // Set the callback / error message for when card is clicked
   private setCardOnClick(card: CardImage, state: GameModel, i: number) {
     // Set whether card shows up as playable
@@ -110,6 +102,8 @@ export default class OurBoardRegion extends Region {
         msg = 'Opponent still mulliganing.'
       } else if (state.isRecap) {
         msg = 'The story is resolving.'
+      } else if (this.scene.paused) {
+        msg = 'Click Next to continue.'
       } else if (state.priority === 1) {
         msg = "It's not your turn."
       } else if (state.cardCosts[i] > state.breath[0]) {
@@ -255,10 +249,6 @@ export default class OurBoardRegion extends Region {
 
     return () => {
       if (!this.callback(i)) return
-
-      if (this.scene['paused']) {
-        return
-      }
 
       this.applyOptimisticBreathPlayability(state, i, hand)
 

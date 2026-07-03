@@ -269,18 +269,9 @@ export default class TutorialMatchScene extends MatchScene {
       this.playHintEntranceTween()
     }
 
-    // If next button is visible, pause match until it's clicked
+    // If next button is visible, pause the match until it's clicked. Hand card
+    // clicks check `scene.paused` themselves and error out while it's true.
     this.paused = this.btnNext.isVisible()
-
-    if (this.paused) {
-      // While waiting for Next, block card plays with an error
-      this.view.ourBoard.cards.forEach((card) => {
-        card.setOnClick(() => this.signalError('Click Next to continue.'))
-      })
-    } else {
-      // Restore normal card click handlers now that the player can act
-      this.view.ourBoard.refreshCardClicks()
-    }
   }
 
   /** After `align`, slide from `HINT_TWEEN_X_DELTA` and fade in in one tween. */

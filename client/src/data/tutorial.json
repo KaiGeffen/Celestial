@@ -66,7 +66,7 @@
       {
         "bold": "You're on your own for the rest of this match, good luck!",
         "align": "center",
-        "final": true
+        "final": false
       }
     ],
     "night": [

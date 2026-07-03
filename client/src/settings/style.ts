@@ -460,7 +460,6 @@ export const BBStyle: Record<string, any> = {
     fontFamily: cardFont,
     fontSize: size.standard,
     color: Color.cardCost,
-    stroke: '#ffffff',
     strokeThickness: 1,
   },
   deckname: {
