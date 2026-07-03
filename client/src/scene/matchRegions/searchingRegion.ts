@@ -14,6 +14,10 @@ import {
   shouldShowNotificationRequestButton,
 } from '../../utils/notifications'
 
+// Matches found faster than this (e.g. pve is roughly immediate) skip the
+// found fanfare (flash tween + browser notification)
+const MATCH_FOUND_FANFARE_MIN_SEARCH_MS = 1000
+
 export default class SearchingRegion extends Region {
   playerAvatar: Phaser.GameObjects.Image
   mysteryAvatar: Phaser.GameObjects.Image
@@ -93,6 +97,14 @@ export default class SearchingRegion extends Region {
     // Once a match is found, prevent further cancel attempts
     if (this.cancelButton) {
       this.cancelButton.disable()
+    }
+
+    // A near-instant match found skips the fanfare entirely
+    const searchDuration =
+      this.startTime === undefined ? 0 : this.scene.time.now - this.startTime
+    if (searchDuration < MATCH_FOUND_FANFARE_MIN_SEARCH_MS) {
+      this.hide()
+      return
     }
 
     // Send an os notification
