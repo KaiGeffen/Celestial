@@ -65,6 +65,12 @@ interface WaitingPlayer {
 const CARD_COST = 1000
 const INVALID_CLOSE_CODE = 1008
 
+/** How often to ping each socket. A socket that hasn't ponged by the next ping
+ * is dead (e.g. wifi drop with no TCP close) and gets terminated, so stale
+ * connections can't sit in the queue / a match looking open. Browsers answer
+ * protocol pings automatically, so this needs no client support. */
+const HEARTBEAT_INTERVAL_MS = 15 * 1000
+
 /** Discord @Active Player role — used to ping matchmaking helpers via webhook. */
 const DISCORD_ACTIVE_PLAYER_ROLE_ID = '1369233011681398857'
 
@@ -137,9 +143,29 @@ async function resolveProviderAccount(
 export default function createWebSocketServer() {
   const wss = new WebSocketServer({ port: USER_DATA_PORT })
 
+  // Every connected socket, swept by the heartbeat below
+  const openSockets = new Set<ServerWS>()
+
+  const heartbeat = setInterval(() => {
+    openSockets.forEach((ws) => {
+      // Belt-and-braces: drop sockets that closed without their cleanup running
+      if (!ws.isOpen()) {
+        openSockets.delete(ws)
+        return
+      }
+      // No pong since the last ping: the connection is dead. Terminate fires
+      // 'close', so the normal disconnect cleanup (queue, match) runs.
+      if (!ws.heartbeat()) {
+        ws.terminate()
+      }
+    })
+  }, HEARTBEAT_INTERVAL_MS)
+  wss.on('close', () => clearInterval(heartbeat))
+
   wss.on('connection', async (socket: WebSocket) => {
     try {
       const ws: ServerWS = new TypedWebSocket(socket)
+      openSockets.add(ws)
 
       // Remember the user once they've signed in
       let id: string = null
@@ -966,6 +992,8 @@ export default function createWebSocketServer() {
 
       // Handle disconnect logic
       ws.onClose(() => {
+        openSockets.delete(ws)
+
         // Accumulate playtime
         if (id && connectionTime) {
           const elapsed = Math.floor((Date.now() - connectionTime) / 1000)
