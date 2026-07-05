@@ -45,7 +45,6 @@ const agony = new Agony({
   cost: 1,
   text: "Becomes Ecstasy\nCreate a Wound in your opponent's hand.",
   theme: 2,
-  beta: true,
 })
 
 class Ecstasy extends DualCard {
@@ -69,7 +68,6 @@ const ecstasy = new Ecstasy({
   points: 1,
   text: "Becomes Agony\nDouble each player's points.",
   theme: 3,
-  beta: true,
 })
 
 class Subject extends DualCard {
@@ -102,4 +100,12 @@ const witness = new Witness({
   theme: 5,
 })
 
+// Mark each card as beta and export
+function markBeta(cards: Card[]): void {
+  for (const card of cards) {
+    card.beta = true
+  }
+}
+
+markBeta([agony, ecstasy, subject, witness])
 export { agony, ecstasy, subject, witness }
