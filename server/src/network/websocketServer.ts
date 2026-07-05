@@ -390,6 +390,18 @@ export default function createWebSocketServer() {
         if (token) ws.send({ type: 'sessionToken', token })
       }
 
+      // Starting a new game while still seated in a live one surrenders the
+      // old one first, so an abandoned opponent gets their win immediately
+      // instead of facing an empty seat. Normal exits already surrendered, so
+      // this is a no-op for them.
+      const surrenderActiveMatch = async () => {
+        if (activeGame.match && !activeGame.match.isOver()) {
+          await activeGame.match.doSurrender(ws)
+        }
+        activeGame.match = null
+        activeGame.playerNumber = null
+      }
+
       ws.on('signIn', async ({ uuid }) => {
         // Guest sign-in: no identity proof, so this can only ever reach
         // guest accounts (enforced inside handleSignInForUuid).
@@ -819,6 +831,8 @@ export default function createWebSocketServer() {
           authed(async ({ deck, missionID }) => {
             console.log('Mission:', missionID, 'for player: ', username)
 
+            await surrenderActiveMatch()
+
             // This might fail if the mission is invalid
             try {
               activeGame.match = new PveMatchMission(ws, id, deck, missionID)
@@ -848,6 +862,8 @@ export default function createWebSocketServer() {
                 .join(', '),
             )
 
+            await surrenderActiveMatch()
+
             activeGame.match = new PveMatch(ws, id, deck, aiDeck)
             activeGame.playerNumber = 0
 
@@ -872,6 +888,8 @@ export default function createWebSocketServer() {
                 .join(', '),
             )
 
+            await surrenderActiveMatch()
+
             activeGame.match = new PveSpecialMatch(
               ws,
               id,
@@ -892,6 +910,8 @@ export default function createWebSocketServer() {
         .on(
           'initPvp',
           authed(async (data) => {
+            await surrenderActiveMatch()
+
             // Clean up stale entries first
             Object.keys(searchingPlayers).forEach((password) => {
               // Ensure we never queue into ourself
@@ -986,6 +1006,8 @@ export default function createWebSocketServer() {
           'initTutorial',
           authed(async (data) => {
             console.log('Tutorial: ', data.num, 'for player: ', username)
+
+            await surrenderActiveMatch()
 
             activeGame.match = new TutorialMatch(ws, data.num, id)
             activeGame.playerNumber = 0
