@@ -20,9 +20,10 @@ import {
   cosmeticsTransactions,
   loadTimes,
 } from '../db/schema'
-import { and, eq, sql, inArray } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 import { ServerWS } from '../../../shared/network/celestialTypedWebsocket'
 import { Deck } from '../../../shared/types/deck'
+import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import { AchievementManager } from '../achievementManager'
 import Garden from '../db/garden'
 import Catalog from '../../../shared/state/catalog'
@@ -71,6 +72,12 @@ const INVALID_CLOSE_CODE = 1008
  * protocol pings automatically, so this needs no client support. */
 const HEARTBEAT_INTERVAL_MS = 15 * 1000
 
+/** How often the server broadcasts the online players list to everyone. */
+const BROADCAST_INTERVAL_MS = 2000
+
+/** How long a player searches before matchmaking helpers are pinged on Discord. */
+const LONG_SEARCH_NOTIFY_MS = 2 * 60 * 1000
+
 /** Discord @Active Player role — used to ping matchmaking helpers via webhook. */
 const DISCORD_ACTIVE_PLAYER_ROLE_ID = '1369233011681398857'
 
@@ -85,6 +92,12 @@ let userActiveGameMap: { [key: string]: ActiveGame } = {}
 
 // Whether each connected user allows others to spectate their matches (default: allowed)
 let spectateAllowedByUserId: { [key: string]: boolean } = {}
+
+// Each signed-in user's display info, cached at sign-in and updated on change,
+// so the online-players broadcast never needs to query the database
+let onlinePlayerDisplay: {
+  [key: string]: { username: string; cosmeticSet: CosmeticSet }
+} = {}
 
 // Spectator connections -> match they're watching (for cleanup / bulk remove)
 const spectatorWsToMatch = new WeakMap<ServerWS, Match>()
@@ -146,7 +159,7 @@ export default function createWebSocketServer() {
   // Every connected socket, swept by the heartbeat below
   const openSockets = new Set<ServerWS>()
 
-  const heartbeat = setInterval(() => {
+  setInterval(() => {
     openSockets.forEach((ws) => {
       // Belt-and-braces: drop sockets that closed without their cleanup running
       if (!ws.isOpen()) {
@@ -160,7 +173,90 @@ export default function createWebSocketServer() {
       }
     })
   }, HEARTBEAT_INTERVAL_MS)
-  wss.on('close', () => clearInterval(heartbeat))
+
+  // Build the online players list once per tick from in-memory state, and send
+  // the same list to every connection
+  const broadcastOnlinePlayers = () => {
+    const activeUserIds = Object.keys(activePlayers).filter((userId) =>
+      activePlayers[userId]?.isOpen(),
+    )
+    if (activeUserIds.length === 0) return
+
+    // Status encoding:
+    // 0 = none, 1 = searching, 2 = inMatch, 3 = inJourney, 4 = spectating
+    const getStatusForUserId = (userId: string): number => {
+      if (spectatingUserIds.has(userId)) return 4
+
+      const isSearching = Object.values(searchingPlayers).some(
+        (p) => p?.id === userId && p?.ws?.isOpen(),
+      )
+      if (isSearching) return 1
+
+      const active = userActiveGameMap[userId]
+      if (active?.match && !active.match.isOver()) {
+        return active.match instanceof PveMatchMission ? 3 : 2
+      }
+
+      return 0
+    }
+
+    const playersList = activeUserIds
+      .filter((userId) => onlinePlayerDisplay[userId] !== undefined)
+      .map((userId) => ({
+        uuid: userId,
+        username: onlinePlayerDisplay[userId].username,
+        cosmeticSet: onlinePlayerDisplay[userId].cosmeticSet,
+        status: getStatusForUserId(userId),
+        canBeSpectated: spectateAllowedByUserId[userId] !== false,
+      }))
+
+    activeUserIds.forEach((userId) => {
+      const userWs = activePlayers[userId]
+      if (userWs?.isOpen()) {
+        userWs.send({
+          type: 'broadcastOnlinePlayersList',
+          players: playersList,
+        })
+      }
+    })
+  }
+
+  // Ping matchmaking helpers on Discord when someone has been searching a while
+  const notifyDiscordOfLongSearches = () => {
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL
+    if (!webhookUrl) return
+
+    const now = Date.now()
+    Object.values(searchingPlayers).forEach((player) => {
+      if (player.notifiedDiscord) return
+      if (now - player.queuedAt < LONG_SEARCH_NOTIFY_MS) return
+
+      player.notifiedDiscord = true
+      const username =
+        onlinePlayerDisplay[player.id]?.username ??
+        player.username ??
+        'A player'
+      fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: `**${username}** is searching for an opponent.\nAre any <@&${DISCORD_ACTIVE_PLAYER_ROLE_ID}> around to help them out?`,
+          allowed_mentions: {
+            roles: [DISCORD_ACTIVE_PLAYER_ROLE_ID],
+          },
+        }),
+      }).catch((e) => console.error('Discord webhook error:', e))
+    })
+  }
+
+  setInterval(() => {
+    try {
+      broadcastOnlinePlayers()
+      notifyDiscordOfLongSearches()
+    } catch (e) {
+      console.error('Error broadcasting online players:', e)
+    }
+  }, BROADCAST_INTERVAL_MS)
 
   wss.on('connection', async (socket: WebSocket) => {
     try {
@@ -211,6 +307,7 @@ export default function createWebSocketServer() {
             steam_id: players.steam_id,
             username: players.username,
             can_be_spectated: players.can_be_spectated,
+            cosmetic_set: players.cosmetic_set,
           })
           .from(players)
           .where(eq(players.id, uuid))
@@ -244,6 +341,15 @@ export default function createWebSocketServer() {
         // A fresh session starts out not spectating (clears any flag left by a
         // kicked connection, whose late close doesn't touch user-keyed state)
         spectatingUserIds.delete(uuid)
+
+        // Cache display info for the online-players broadcast
+        let cosmeticSet: CosmeticSet
+        try {
+          cosmeticSet = JSON.parse(result[0].cosmetic_set)
+        } catch (e) {
+          cosmeticSet = { avatar: 0, border: 0, relic: 0 } as CosmeticSet
+        }
+        onlinePlayerDisplay[uuid] = { username, cosmeticSet }
 
         // Handle initial achievement
         await AchievementManager.onConnection(id)
@@ -409,14 +515,14 @@ export default function createWebSocketServer() {
         )
         .on(
           'sendInitialUserData',
-          authed(async ({ username, decks, inventory, missions, ref }) => {
+          authed(async ({ username: newUsername, decks, inventory, missions, ref }) => {
             // If username already exists, error (Currently client sees error on their side, so this shouldn't happen. But if it does, don't create the row)
             // Exception: Allow multiple "Guest" usernames
-            if (username !== 'Guest') {
+            if (newUsername !== 'Guest') {
               const result = await db
                 .select()
                 .from(players)
-                .where(sql`LOWER(${players.username}) = LOWER(${username})`)
+                .where(sql`LOWER(${players.username}) = LOWER(${newUsername})`)
                 .limit(1)
               if (result.length > 0) {
                 ws.send({ type: 'signalError' })
@@ -430,7 +536,7 @@ export default function createWebSocketServer() {
               email: email,
               google_id: googleId,
               steam_id: steamId,
-              username: username,
+              username: newUsername,
               pvp_wins_lifetime: 0,
               pvp_losses_lifetime: 0,
               pvp_wins_month: 0,
@@ -463,7 +569,7 @@ export default function createWebSocketServer() {
               ref,
             }
             await db.insert(players).values(data)
-            username = username
+            username = newUsername
 
             // Log about it
             console.log(
@@ -473,6 +579,12 @@ export default function createWebSocketServer() {
             // Add to active users
             activePlayers[id] = ws
             connectionTime = Date.now()
+
+            // Cache display info for the online-players broadcast
+            onlinePlayerDisplay[id] = {
+              username: newUsername,
+              cosmeticSet: JSON.parse(data.cosmetic_set),
+            }
 
             // Handle initial achievement
             await AchievementManager.onConnection(id)
@@ -687,6 +799,11 @@ export default function createWebSocketServer() {
         .on(
           'setCosmeticSet',
           authed(async ({ value }) => {
+            // Keep the online-players broadcast cache in sync
+            if (onlinePlayerDisplay[id]) {
+              onlinePlayerDisplay[id].cosmeticSet = value
+            }
+
             // TODO Validate the selection is actually owned (cosmetics from
             // cosmeticsTransactions, avatars/borders/cardbacks from unlock rules)
             // before persisting. Currently trusts the client's chosen set.
@@ -1037,6 +1154,7 @@ export default function createWebSocketServer() {
         if (isCurrentSocket) {
           delete activePlayers[id]
           delete spectateAllowedByUserId[id]
+          delete onlinePlayerDisplay[id]
           spectatingUserIds.delete(id)
 
           // Disconnect from active match if it hasn't ended
@@ -1064,114 +1182,4 @@ export default function createWebSocketServer() {
   })
 
   console.log('User-data server is running on port: ', USER_DATA_PORT)
-
-  // TODO It's ineffecicient for each user to calculate this themself, instead the server should calculate it once and each thread uses it
-  // Broadcast online players list every 2 seconds
-  setInterval(async () => {
-    try {
-      const activeUserIds = Object.keys(activePlayers).filter(
-        (id) => activePlayers[id] && activePlayers[id].isOpen(),
-      )
-
-      let playersList: Array<{
-        uuid: string
-        username: string
-        cosmeticSet: any
-        status: number
-        canBeSpectated: boolean
-      }> = []
-
-      if (activeUserIds.length > 0) {
-        // Get player data from database
-        const playerData = await db
-          .select({
-            id: players.id,
-            username: players.username,
-            cosmetic_set: players.cosmetic_set,
-          })
-          .from(players)
-          .where(inArray(players.id, activeUserIds))
-
-        // Build the players list with username, cosmetics, and computed status.
-        // Status encoding:
-        // 0 = none, 1 = searching, 2 = inMatch, 3 = inJourney, 4 = spectating
-        const getStatusForUserId = (userId: string): number => {
-          if (spectatingUserIds.has(userId)) return 4
-
-          const isSearching = Object.values(searchingPlayers).some(
-            (p) => p?.id === userId && p?.ws?.isOpen(),
-          )
-          if (isSearching) return 1
-
-          const active = userActiveGameMap[userId]
-          if (active?.match && !active.match.isOver()) {
-            return active.match instanceof PveMatchMission ? 3 : 2
-          }
-
-          return 0
-        }
-
-        playersList = playerData.map((player) => {
-          let cosmeticSet
-          try {
-            cosmeticSet = JSON.parse(player.cosmetic_set)
-          } catch (e) {
-            cosmeticSet = { avatar: 0, border: 0, relic: 0 }
-          }
-
-          return {
-            uuid: player.id,
-            username: player.username,
-            cosmeticSet,
-            status: getStatusForUserId(player.id),
-            canBeSpectated: spectateAllowedByUserId[player.id] !== false,
-          }
-        })
-      }
-
-      // Send to all active websockets
-      activeUserIds.forEach((id) => {
-        const ws = activePlayers[id]
-        if (ws && ws.isOpen()) {
-          ws.send({
-            type: 'broadcastOnlinePlayersList',
-            players: playersList,
-          })
-        }
-      })
-
-      // Notify Discord when a player has been searching for 2+ minutes
-      const webhookUrl = process.env.DISCORD_WEBHOOK_URL
-      if (webhookUrl) {
-        const now = Date.now()
-        const toNotify = Object.values(searchingPlayers).filter(
-          (p) => !p.notifiedDiscord && now - p.queuedAt >= 2 * 60 * 1000,
-        )
-        if (toNotify.length > 0) {
-          const ids = toNotify.map((p) => p.id)
-          const rows = await db
-            .select({ id: players.id, username: players.username })
-            .from(players)
-            .where(inArray(players.id, ids))
-          for (const player of toNotify) {
-            player.notifiedDiscord = true
-            const username =
-              rows.find((r) => r.id === player.id)?.username ?? 'A player'
-            fetch(webhookUrl, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                content: `**${username}** is searching for an opponent.\nAre any <@&${DISCORD_ACTIVE_PLAYER_ROLE_ID}> around to help them out?`,
-                allowed_mentions: {
-                  roles: [DISCORD_ACTIVE_PLAYER_ROLE_ID],
-                },
-              }),
-            }).catch((e) => console.error('Discord webhook error:', e))
-          }
-        }
-      }
-    } catch (e) {
-      console.error('Error broadcasting online players:', e)
-    }
-  }, 2000)
 }
