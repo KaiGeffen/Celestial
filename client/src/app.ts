@@ -46,6 +46,9 @@ const config: Phaser.Types.Core.GameConfig = {
   // pixelArt: true,
   powerPreference: 'high-performance',
   transparent: true,
+  loader: {
+    maxParallelDownloads: 128,
+  },
   dom: {
     createContainer: true,
   },
