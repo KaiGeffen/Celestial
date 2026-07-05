@@ -1,5 +1,3 @@
-import { Flags } from './settings'
-
 export var Space = getSpace()
 
 export function refreshSpace() {
@@ -15,8 +13,8 @@ function getSpace() {
     windowWidth: width,
     windowHeight: height,
     cardSize: 100,
-    padSmall: Flags.mobile ? 7 : 10,
-    pad: Flags.mobile ? 14 : 20,
+    padSmall: 10,
+    pad: 20,
     rowsPerPage: 4,
     cardsPerPage: 8 * 4,
     stackOffset: 30,
@@ -29,19 +27,18 @@ function getSpace() {
     iconSeparation: 180,
     stackIconHeight: 60,
     // The maximum height that something can be and still fit within the standard 780 browser height
-    maxHeight: Flags.mobile ? 375 : 750,
+    maxHeight: 750,
     textAreaHeight: 60,
 
-    // These values are experimental and related to the 3/15 gui pass
-    cardWidth: Flags.mobile ? 196 * 0.7 : (336 * 7) / 10,
-    cardHeight: Flags.mobile ? 280 * 0.7 : 336,
-    fullCardWidth: (336 * 7) / 10,
-    fullCardHeight: 336,
+    // The dimensions of the cards. File size is 2x this
+    cardWidth: (336 * 7) / 10,
+    cardHeight: 336,
+
     storyXOverlap: 30,
     // If this is more than half of cardHeight, mistake
-    storyYOverlap: Flags.mobile ? 80 : 120,
+    storyYOverlap: 120,
     // Dimensions of the hand regions
-    handHeight: Flags.mobile ? 80 : 160,
+    handHeight: 160,
     // Standard corner width for rounded rectangles
     corner: 0,
     // For basic text
@@ -65,7 +62,7 @@ function getSpace() {
     textboxWidth: 310,
     textboxHeight: 70,
 
-    avatarSize: Flags.mobile ? 80 : 130,
+    avatarSize: 130,
     iconSize: 40,
 
     sliderWidth: 40,
