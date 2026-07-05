@@ -79,7 +79,7 @@ module.exports = (_, argv) => {
         ),
       }),
       new HtmlWebpackPlugin({
-        title: isProd ? 'Celestial' : 'LOCAL',
+        title: isProd ? 'Celestial Decks' : 'LOCAL',
         template: 'template.html',
         filename: '../index.html',
         scriptLoading: 'defer',
