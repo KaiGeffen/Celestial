@@ -72,4 +72,34 @@ const ecstasy = new Ecstasy({
   beta: true,
 })
 
-export { agony, ecstasy }
+class Subject extends DualCard {
+  get otherCard() {
+    return witness
+  }
+}
+const subject = new Subject({
+  name: 'Subject',
+  id: 1103,
+  cost: 2,
+  points: 2,
+  text: 'Becomes Witness',
+  theme: 4,
+})
+
+class Witness extends DualCard {
+  get otherCard() {
+    return subject
+  }
+
+  onPlay(player: number, game: GameModel): void {
+    game.status[player].vision += 4
+  }
+}
+const witness = new Witness({
+  name: 'Witness',
+  id: 1104,
+  text: 'Becomes Witness\nWhen played, gain Sight 4.',
+  theme: 5,
+})
+
+export { agony, ecstasy, subject, witness }
