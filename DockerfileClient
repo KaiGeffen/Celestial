@@ -4,19 +4,22 @@ RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 
 WORKDIR /home/node/app
 
-COPY --chown=node:node ./client ./client
-COPY --chown=node:node ./shared ./shared
-COPY --chown=node:node ./client/robots.txt ./client/dist/
-COPY --chown=node:node ./client/sitemap.xml ./client/dist/
-
+# Install dependencies first, so this layer is only rebuilt when the
+# package files change, not on every code change
+COPY --chown=node:node ./client/package.json ./client/package-lock.json ./client/
 USER node
-
 WORKDIR /home/node/app/client
-
 RUN npm install
-# Gets covered by start below
-# RUN npm run build:prod
+
+# robots.txt and sitemap.xml are served from the client root by prodServer
+COPY --chown=node:node ./client /home/node/app/client
+COPY --chown=node:node ./shared /home/node/app/shared
+
+# Build in the image, not at container start: the asset cache-busting version
+# is minted at build time, so building on start would bust every player's
+# cache on every container restart, not just on real deploys
+RUN npm run build:prod
 
 EXPOSE 8083
 
-CMD [ "npm", "run", "start" ]
+CMD [ "node", "prodServer.cjs" ]

@@ -1,0 +1,9 @@
+# Never ship host dependencies into images: they're installed inside the
+# image (and host builds are macOS-native, which breaks in the Linux container)
+**/node_modules
+
+# Build outputs are produced inside the image
+**/dist
+
+.git
+**/.DS_Store
