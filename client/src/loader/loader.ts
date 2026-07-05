@@ -4,6 +4,15 @@ import { assetLists } from './assetLists'
 
 const EXTENSION = 'webp'
 
+// Injected by webpack DefinePlugin; changes each production build
+declare const __BUILD_VERSION__: string
+
+/** Append the build version so immutably-cached assets refetch after a deploy */
+function versioned(filepath: string): string {
+  const v = typeof __BUILD_VERSION__ !== 'undefined' ? __BUILD_VERSION__ : 'dev'
+  return `${filepath}?v=${v}`
+}
+
 interface AssetInfo {
   files: string[]
   dimensions?: {
@@ -22,12 +31,12 @@ export default class Loader {
     scene.load.path = 'assets/'
 
     // Button appears immediately
-    scene.load.image(`icon-Button`, `img/Button.png`)
+    scene.load.image(`icon-Button`, versioned(`img/Button.png`))
 
     // Assets that appear in the menu to register username
-    scene.load.image(`chrome-header`, `img/chrome/header.${EXTENSION}`)
-    scene.load.image(`chrome-body`, `img/chrome/body.${EXTENSION}`)
-    scene.load.image(`icon-InputText`, `img/icon/InputText.${EXTENSION}`)
+    scene.load.image(`chrome-header`, versioned(`img/chrome/header.${EXTENSION}`))
+    scene.load.image(`chrome-body`, versioned(`img/chrome/body.${EXTENSION}`))
+    scene.load.image(`icon-InputText`, versioned(`img/icon/InputText.${EXTENSION}`))
   }
 
   // Load all assets
@@ -54,14 +63,14 @@ export default class Loader {
           if (dims) {
             // If file has dimensions, it's in a dimension directory
             const filepath = `img/${directory}/${dims.width}x${dims.height}/${file}.${EXTENSION}`
-            scene.load.spritesheet(key, filepath, {
+            scene.load.spritesheet(key, versioned(filepath), {
               frameWidth: dims.width,
               frameHeight: dims.height,
             })
           } else {
             // Regular image file
             const filepath = `img/${directory}/${file}.${EXTENSION}`
-            scene.load.image(key, filepath)
+            scene.load.image(key, versioned(filepath))
           }
         })
       },
@@ -127,7 +136,7 @@ export default class Loader {
 
     // Load SFX
     audioAssets.forEach((name) => {
-      scene.load.audio(name, `sfx/${name}.opus`)
+      scene.load.audio(name, versioned(`sfx/${name}.opus`))
     })
   }
 
@@ -139,22 +148,16 @@ export default class Loader {
   // Load tutorial cutscenes
   static loadTutorialCutscenes(scene: Phaser.Scene): void {
     scene.load.path = 'assets/'
-    scene.load.image('tutorial-1', 'img/tutorial/1.webp')
-    scene.load.image('tutorial-2', 'img/tutorial/2.webp')
-    scene.load.image('tutorial-3', 'img/tutorial/3.webp')
-    scene.load.image('tutorial-4', 'img/tutorial/4.webp')
-    scene.load.image('tutorial-5', 'img/tutorial/5.webp')
-    scene.load.image('tutorial-6', 'img/tutorial/6.webp')
-    scene.load.image('tutorial-7', 'img/tutorial/7.webp')
-    scene.load.image('tutorial-8', 'img/tutorial/8.webp')
-    scene.load.image('tutorial-9', 'img/tutorial/9.webp')
+    for (let i = 1; i <= 9; i++) {
+      scene.load.image(`tutorial-${i}`, versioned(`img/tutorial/${i}.webp`))
+    }
   }
 
   // Load journey map and mission images
   static loadJourneyMapAndMission(scene: Phaser.Scene): void {
     scene.load.path = 'assets/'
-    scene.load.image('journey-Map', 'img/journey/Map.webp')
-    scene.load.image('journey-AltMap', 'img/journey/AltMap.webp')
+    scene.load.image('journey-Map', versioned('img/journey/Map.webp'))
+    scene.load.image('journey-AltMap', versioned('img/journey/AltMap.webp'))
 
     scene.load.start()
   }

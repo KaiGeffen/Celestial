@@ -1,4 +1,5 @@
 const path = require('path')
+const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 
@@ -70,6 +71,13 @@ module.exports = (_, argv) => {
         }
       : {},
     plugins: [
+      // Asset cache-busting: assets are served with immutable cache headers,
+      // and requested with this version as a query so each build refetches them
+      new webpack.DefinePlugin({
+        __BUILD_VERSION__: JSON.stringify(
+          isProd ? Date.now().toString(36) : 'dev',
+        ),
+      }),
       new HtmlWebpackPlugin({
         title: isProd ? 'Celestial' : 'LOCAL',
         template: 'template.html',
