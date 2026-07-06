@@ -10,6 +10,7 @@ import {
   Depth,
   Messages,
   Time,
+  Ease,
 } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
@@ -93,6 +94,31 @@ export default class MatchResultsRegion extends Region {
 
     this.show()
     this.seen = true
+
+    // PVP rewards a gem for valid matches
+    if (this.scene.params?.isPvp && state.roundCount >= 3) {
+      this.showGemReward()
+    }
+  }
+
+  /** How gem reward for pvp */
+  private showGemReward(): void {
+    const x = Space.windowWidth / 2
+    const y = Space.windowHeight / 2
+    const gemText = this.scene.add
+      .rexBBCodeText(x, y, `[stroke]+1[/stroke][img=gem]`, BBStyle.reward)
+      .setOrigin(0.5, 1)
+    // NOTE Because the panel can't be in container (phaser bug) and this must be above, this can't be in container
+    gemText.setDepth(Depth.results + 1)
+
+    this.scene.tweens.add({
+      targets: gemText,
+      y: y - 40,
+      alpha: 0,
+      duration: Time.general.rewardFloatMs,
+      ease: Ease.basic,
+      onComplete: () => gemText.destroy(),
+    })
   }
 
   /** Victory/defeat header, avatars, and round breakdown (used by journey unlock flow after dismiss). */
