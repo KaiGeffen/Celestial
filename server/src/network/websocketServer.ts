@@ -527,97 +527,107 @@ export default function createWebSocketServer() {
         )
         .on(
           'sendInitialUserData',
-          authed(async ({ username: newUsername, decks, inventory, missions, ref }) => {
-            // If username already exists, error (Currently client sees error on their side, so this shouldn't happen. But if it does, don't create the row)
-            // Exception: Allow multiple "Guest" usernames
-            if (newUsername !== 'Guest') {
-              const result = await db
-                .select()
-                .from(players)
-                .where(sql`LOWER(${players.username}) = LOWER(${newUsername})`)
-                .limit(1)
-              if (result.length > 0) {
-                ws.send({ type: 'signalError' })
-                return
-              }
-            }
-
-            // Create new user entry in database
-            const data = {
-              id: id,
-              email: email,
-              google_id: googleId,
-              steam_id: steamId,
+          authed(
+            async ({
               username: newUsername,
-              pvp_wins_lifetime: 0,
-              pvp_losses_lifetime: 0,
-              pvp_wins_month: 0,
-              pvp_losses_month: 0,
-              elo: 1000,
-              elo_peak: 1000,
-              decks: decks.map((deck) => JSON.stringify(deck)),
-              pve_wins: 0,
-              pve_losses: 0,
-              // TODO Server-authoritative: inventory + completedmissions are
-              // trusted from the client here (to migrate guest progress on
-              // registration). A crafted client could pre-load these at creation.
-              // Make these server-derived (or validate) once guest migration is
-              // handled properly.
-              inventory: inventory,
-              completedmissions: missions,
-              missiongoldclaimed: '',
-              journey_choices: [null, null, null, null, null, null],
-              card_inventory: getStartingInventoryBitString(),
-              lastactive: new Date().toISOString(),
-              garden: [],
-              gems: 0,
-              coins: 0,
-              cosmetic_set: JSON.stringify({
-                avatar: 0,
-                border: 0,
-                cardback: 0,
-                relic: 0,
-              }),
+              decks,
+              inventory,
+              missions,
               ref,
-            }
-            await db.insert(players).values(data)
-            username = newUsername
+            }) => {
+              // If username already exists, error (Currently client sees error on their side, so this shouldn't happen. But if it does, don't create the row)
+              // Exception: Allow multiple "Guest" usernames
+              if (newUsername !== 'Guest') {
+                const result = await db
+                  .select()
+                  .from(players)
+                  .where(
+                    sql`LOWER(${players.username}) = LOWER(${newUsername})`,
+                  )
+                  .limit(1)
+                if (result.length > 0) {
+                  ws.send({ type: 'signalError' })
+                  return
+                }
+              }
 
-            // Log about it
-            console.log(
-              `New account registered: ${username} ${ref ? `, ref: ${ref}` : ''}`,
-            )
+              // Create new user entry in database
+              const data = {
+                id: id,
+                email: email,
+                google_id: googleId,
+                steam_id: steamId,
+                username: newUsername,
+                pvp_wins_lifetime: 0,
+                pvp_losses_lifetime: 0,
+                pvp_wins_month: 0,
+                pvp_losses_month: 0,
+                elo: 1000,
+                elo_peak: 1000,
+                decks: decks.map((deck) => JSON.stringify(deck)),
+                pve_wins: 0,
+                pve_losses: 0,
+                // TODO Server-authoritative: inventory + completedmissions are
+                // trusted from the client here (to migrate guest progress on
+                // registration). A crafted client could pre-load these at creation.
+                // Make these server-derived (or validate) once guest migration is
+                // handled properly.
+                inventory: inventory,
+                completedmissions: missions,
+                missiongoldclaimed: '',
+                journey_choices: [null, null, null, null, null, null],
+                card_inventory: getStartingInventoryBitString(),
+                lastactive: new Date().toISOString(),
+                garden: [],
+                gems: 0,
+                coins: 0,
+                cosmetic_set: JSON.stringify({
+                  avatar: 0,
+                  border: 0,
+                  cardback: 0,
+                  relic: 0,
+                }),
+                ref,
+              }
+              await db.insert(players).values(data)
+              username = newUsername
 
-            // Add to active users
-            activePlayers[id] = ws
-            connectionTime = Date.now()
+              // Log about it
+              console.log(
+                `New account registered: ${username} ${ref ? `, ref: ${ref}` : ''}`,
+              )
 
-            // Cache display info for the online-players broadcast
-            onlinePlayerDisplay[id] = {
-              username: newUsername,
-              cosmeticSet: JSON.parse(data.cosmetic_set),
-            }
+              // Add to active users
+              activePlayers[id] = ws
+              connectionTime = Date.now()
 
-            // Handle initial achievement
-            await AchievementManager.onConnection(id)
+              // Cache display info for the online-players broadcast
+              onlinePlayerDisplay[id] = {
+                username: newUsername,
+                cosmeticSet: JSON.parse(data.cosmetic_set),
+              }
 
-            // Award referral achievement if they used a valid ref
-            ref = ref ? ref.toLowerCase() : null
-            if (ref) {
-              const allowed = await db
-                .select({ code: approvedRefs.code })
-                .from(approvedRefs)
-                .where(sql`LOWER(${approvedRefs.code}) = LOWER(${ref})`)
-                .limit(1)
-              if (allowed.length === 0) ref = null
-            }
-            if (ref) {
-              await AchievementManager.onReferralSignup(id)
-            }
+              // Handle initial achievement
+              await AchievementManager.onConnection(id)
 
-            // Send user their data
-            await sendUserData(ws, id)
-          }),
+              // Award referral achievement if they used a valid ref
+              ref = ref ? ref.toLowerCase() : null
+              if (ref) {
+                const allowed = await db
+                  .select({ code: approvedRefs.code })
+                  .from(approvedRefs)
+                  .where(sql`LOWER(${approvedRefs.code}) = LOWER(${ref})`)
+                  .limit(1)
+                if (allowed.length === 0) ref = null
+              }
+              if (ref) {
+                await AchievementManager.onReferralSignup(id)
+              }
+
+              // Send user their data
+              await sendUserData(ws, id)
+            },
+          ),
         )
         .on(
           'setAchievementsSeen',
@@ -650,18 +660,10 @@ export default function createWebSocketServer() {
         .on(
           'claimMissionRewards',
           authed(async ({ missionId }) => {
-            // TODO Temporary to debug
-            console.log(`${username} is claiming gold for mission ${missionId}`)
-
             const missionExists = journeyData.some(
               (mission) => mission.id === missionId,
             )
             if (!missionExists) {
-              // TODO Temporary to debug
-              console.log(
-                'Trying to claim gold for a mission that does not exist:',
-                missionId,
-              )
               ws.send({ type: 'signalError' })
               return
             }
