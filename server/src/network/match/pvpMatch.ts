@@ -1,9 +1,11 @@
-import Match, { MATCH_TIMER_ENABLED } from './match'
+import Match from './match'
 import { ServerWS } from '../../../../shared/network/celestialTypedWebsocket'
 import { updateMatchResultPVP } from '../../db/updateMatchResult'
 import { Deck } from '../../../../shared/types/deck'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { AchievementManager } from '../../achievementManager'
+
+const MATCH_TIMER_ENABLED = false
 
 class PvpMatch extends Match {
   timerCheckInterval: NodeJS.Timeout | null = null

@@ -14,8 +14,6 @@ import { getCardWithVersion } from '../../../../shared/state/cardUpgrades'
 
 // TODO Timer logic for disconnects
 
-export const MATCH_TIMER_ENABLED = true
-
 interface Match {
   gameId: string
   ws1: ServerWS | null
