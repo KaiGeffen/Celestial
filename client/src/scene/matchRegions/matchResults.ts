@@ -27,8 +27,8 @@ export default class MatchResultsRegion extends Region {
   // Whether the results have been seen already
   seen: boolean
 
-  // Text saying if you won or lost
-  txtResult: Phaser.GameObjects.Text
+  // Text saying if you won or lost (panel header)
+  txtResult: BBCodeText
 
   // Scrollable panel containing details about the results of each round
   scrollablePanel: FixWidthSizer
@@ -48,7 +48,7 @@ export default class MatchResultsRegion extends Region {
   protected footerButtons?: Phaser.GameObjects.Container
 
   WIDTH = 300
-  HEIGHT = Space.windowHeight - (Space.buttonHeight + Space.pad * 2) * 2
+  HEIGHT = Space.windowHeight - (Space.buttonHeight + Space.pad * 3)
 
   create(scene: MatchScene): this {
     this.scene = scene
@@ -209,24 +209,22 @@ export default class MatchResultsRegion extends Region {
   }
 
   private createContent() {
-    // Win/Lose text
-    this.txtResult = this.scene.add
-      .text(
-        0,
-        -(this.HEIGHT / 2 + Space.pad),
-        'Victory',
-        Style.announcementOverBlack,
-      )
-      .setOrigin(0.5, 1)
-
     // Your avatar
     this.ourAvatar = this.scene.add
-      .image(-this.WIDTH / 2, 0, 'avatar-JulesFull')
+      .image(
+        -this.WIDTH / 2,
+        -(Space.buttonHeight + Space.pad) / 2,
+        'avatar-JulesFull',
+      )
       .setInteractive()
       .setOrigin(1, 0.5)
     this.setFullAvatarTexture(this.ourAvatar, 'avatar-JulesFull')
     this.theirAvatar = this.scene.add
-      .image(this.WIDTH / 2, 0, 'avatar-MiaFull')
+      .image(
+        this.WIDTH / 2,
+        -(Space.buttonHeight + Space.pad) / 2,
+        'avatar-MiaFull',
+      )
       .setInteractive()
       .setOrigin(0, 0.5)
     this.setFullAvatarTexture(this.theirAvatar, 'avatar-MiaFull')
@@ -235,7 +233,7 @@ export default class MatchResultsRegion extends Region {
     this.ourAvatarBorder = this.scene.add
       .rectangle(
         -this.WIDTH / 2,
-        0,
+        -(Space.buttonHeight + Space.pad) / 2,
         this.ourAvatar.displayWidth,
         this.HEIGHT,
         0x000000,
@@ -246,7 +244,7 @@ export default class MatchResultsRegion extends Region {
     this.theirAvatarBorder = this.scene.add
       .rectangle(
         this.WIDTH / 2,
-        0,
+        -(Space.buttonHeight + Space.pad) / 2,
         this.theirAvatar.displayWidth,
         this.HEIGHT,
         0x000000,
@@ -259,7 +257,6 @@ export default class MatchResultsRegion extends Region {
     this.createResultsPanel()
 
     this.container.add([
-      this.txtResult,
       this.ourAvatar,
       this.ourAvatarBorder,
       this.theirAvatar,
@@ -294,7 +291,7 @@ export default class MatchResultsRegion extends Region {
       },
       anchor: {
         x: `50%`,
-        y: `50%`,
+        y: `50%-${(Space.buttonHeight + Space.pad) / 2}`,
       },
     })
       .setDepth(Depth.results)
@@ -336,11 +333,11 @@ export default class MatchResultsRegion extends Region {
       .addBackground(background)
       .setDepth(Depth.results)
 
-    let txt = this.scene.add
-      .rexBBCodeText(0, 0, 'Results:', BBStyle.matchResultsHeader)
+    this.txtResult = this.scene.add
+      .rexBBCodeText(0, 0, 'Victory', BBStyle.matchResultsHeader)
       .setOrigin(0.5)
       .setDepth(Depth.results)
-    sizer.add(txt)
+    sizer.add(this.txtResult)
 
     return sizer
   }
@@ -424,6 +421,7 @@ import { TUTORIAL_LENGTH } from '../../../../shared/settings'
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
+import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 
 /** Outer cell for an unlock card; holds the pair we tween after rex `layout()`. */
 type JourneyUnlockCardWrap = ContainerLite & {
