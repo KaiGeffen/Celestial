@@ -56,10 +56,8 @@ export class SpectatorMatchScene extends MatchScene {
       this.signalError(m)
       return false
     })
-    this.view.ourBoard.setCardClickCallback(() => {
-      this.signalError(m)
-      return false
-    })
+    // Card clicks aren't wired to a stage callback here, so clicking one just
+    // animates it to the story locally and does nothing
     this.view.mulligan.setCallback(() => {
       this.signalError(m)
       return false

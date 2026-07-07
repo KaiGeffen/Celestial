@@ -30,6 +30,11 @@ export default class PassRegion extends Region {
   btnPass: Button
   btnMoon: Moon
 
+  // Most recent state, used to restore the pass button after leaving Play mode
+  private lastState: GameModel | null = null
+  // Whether the pass button is currently acting as a "Play" confirm button
+  private inPlayMode = false
+
   yourPass: Phaser.GameObjects.Container
   theirPass: Phaser.GameObjects.Container
 
@@ -106,7 +111,14 @@ export default class PassRegion extends Region {
       this.animatePass(this.theirPass, false)
     }
 
-    // Enable/disable button based on who has priority
+    // A new state supersedes any transient Play-confirm mode
+    this.lastState = state
+    this.inPlayMode = false
+    this.configurePassButton(state)
+  }
+
+  /** Normal pass button behaviour, driven by whose turn / recap / game-over it is. */
+  private configurePassButton(state: GameModel): void {
     if (state.winner !== null) {
       // Once the game is over, change the callback to instead show results of match
       this.btnPass
@@ -128,6 +140,27 @@ export default class PassRegion extends Region {
     } else {
       this.btnPass.disable()
     }
+  }
+
+  /** Turn the pass button into a "Play" button that confirms a staged card. */
+  enterPlayMode(onConfirm: () => void): void {
+    this.inPlayMode = true
+    this.btnPass
+      .enable()
+      .setText('Play')
+      .setOnClick(() => {
+        onConfirm()
+        // Disable until the confirmed state arrives, to avoid a double send
+        this.btnPass.disable()
+      })
+  }
+
+  /** Restore the normal pass button after a staged play is cancelled. */
+  exitPlayMode(): void {
+    if (!this.inPlayMode) return
+    this.inPlayMode = false
+    this.btnPass.setText('Pass')
+    if (this.lastState) this.configurePassButton(this.lastState)
   }
 
   // Set the callback for when user hits the Pass button

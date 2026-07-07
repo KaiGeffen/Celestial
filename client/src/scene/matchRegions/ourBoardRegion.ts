@@ -34,9 +34,15 @@ const OUR_HAND_REST_FAN_MAX_RAD = (4 * Math.PI) / 180
 const OUR_HAND_REST_ARC_LIFT_PX = 14
 
 export default class OurBoardRegion extends Region {
-  // Function called when elements in this region are interacted with
-  callback: (i: number) => boolean
   displayCostCallback: (cost: number) => void
+
+  // Index of the card the player has staged to play (animated to the story but
+  // not yet sent to the server), or null. Confirmed via the Play button.
+  stagedCardNum: number | null = null
+
+  // Notified with the staged index (or null when unstaged) so the scene can
+  // switch the Pass button to a Play button and back.
+  private onStageChanged?: (stagedCardNum: number | null) => void
 
   // Whether we have already clicked on a card to play it
   cardClicked: boolean
@@ -117,7 +123,18 @@ export default class OurBoardRegion extends Region {
         return
       }
 
-      // If no errors, play the card
+      // Two-step play: if a card is already staged, clicking it again cancels,
+      // and clicking a different card stages that one instead.
+      if (this.stagedCardNum !== null) {
+        if (this.stagedCardNum === i) {
+          this.cancelStagedPlay()
+        } else {
+          this.reselectStagedPlay(i)
+        }
+        return
+      }
+
+      // Stage the card: animates to the story; the Play button confirms it.
       this.onCardPlay(i, card, this.cards, state)()
 
       // Stop the card from doing a further on-click visual effect
@@ -248,7 +265,7 @@ export default class OurBoardRegion extends Region {
     )
 
     return () => {
-      if (!this.callback(i)) return
+      this.stagedCardNum = i
 
       this.applyOptimisticBreathPlayability(state, i, hand)
 
@@ -309,8 +326,6 @@ export default class OurBoardRegion extends Region {
                 ease: 'Sine.easeInOut',
               })
             }
-
-            this.callback(i)
           }, 10)
         },
         onComplete: () => {
@@ -318,12 +333,17 @@ export default class OurBoardRegion extends Region {
           card.container.parentContainer.sendToBack(card.container)
         },
       })
+
+      // Let the scene react (show the Play button, or immediately confirm)
+      this.onStageChanged?.(i)
     }
   }
 
   // Modify displayState to lower any raised card when state changes
   displayState(state: GameModel): void {
     this.cardTweeningToStory = null
+    // A new authoritative state supersedes any staged (unconfirmed) play
+    this.stagedCardNum = null
     this.deleteTemp()
 
     // Until we have mulliganed, hide (Delete) all the cards in our hand
@@ -469,10 +489,42 @@ export default class OurBoardRegion extends Region {
     }
   }
 
-  // Set the callback for when a card in this region is clicked on
-  setCardClickCallback(f: (x: number) => boolean): Region {
-    this.callback = f
-    return this
+  /** Notified with the staged card index, or null when nothing is staged. */
+  setStageChangeCallback(f: (stagedCardNum: number | null) => void): void {
+    this.onStageChanged = f
+  }
+
+  /** The card the player has staged to play, or null. */
+  getStagedCardNum(): number | null {
+    return this.stagedCardNum
+  }
+
+  /** Return the staged card to the hand without playing it. */
+  cancelStagedPlay(): void {
+    if (this.stagedCardNum === null || !this.lastHandState) return
+    const state = this.lastHandState
+    this.stagedCardNum = null
+    this.onStageChanged?.(null)
+    // Rebuild the hand next tick — not mid-click, which would destroy the card
+    // whose pointer event is still running — restoring the card to its slot.
+    this.scene.time.delayedCall(0, () => {
+      if (this.lastHandState === state) this.displayState(state)
+    })
+  }
+
+  /** Cancel the current staged play and stage a different card instead. */
+  private reselectStagedPlay(i: number): void {
+    if (!this.lastHandState) return
+    const state = this.lastHandState
+    this.scene.time.delayedCall(0, () => {
+      if (this.lastHandState !== state) return
+      // Rebuild the hand (returns the old card), then stage the new one
+      this.displayState(state)
+      const card = this.cards[i]
+      if (!card) return
+      this.onCardPlay(i, card, this.cards, state)()
+      card.doBurstEffect = false
+    })
   }
 
   // Set the callback for showing how much breath a card costs

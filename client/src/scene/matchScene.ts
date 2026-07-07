@@ -268,14 +268,21 @@ export class MatchScene extends BaseScene {
     // Callbacks in this and spectator modes
     this.setCommonCallbacks(view)
 
-    // Hand region
-    view.ourBoard.setCardClickCallback((i: number) => {
-      server.send({
-        type: 'playCard',
-        cardNum: i,
-        versionNo: this.currentVersion,
-      })
-      return true
+    // Hand region: clicking a card stages it (animates to the story) but does
+    // not send; the Play button confirms and sends it.
+    view.ourBoard.setStageChangeCallback((stagedCardNum: number | null) => {
+      if (stagedCardNum === null) {
+        this.view.pass.exitPlayMode()
+        return
+      }
+
+      // The tutorial's sun is often hidden, so keep its immediate-play behavior
+      if (this.isTutorial) {
+        this.confirmStagedPlay()
+        return
+      }
+
+      this.view.pass.enterPlayMode(() => this.confirmStagedPlay())
     })
     view.ourAvatar.setEmoteCallback(() => {
       server.send({
@@ -316,6 +323,21 @@ export class MatchScene extends BaseScene {
         type: 'mulligan',
         mulligan: choice,
       })
+    })
+  }
+
+  // Send the staged card play to the server (confirmed via the Play button)
+  private confirmStagedPlay(): void {
+    const i = this.view.ourBoard.getStagedCardNum()
+    if (i === null) return
+    if (!server.isOpen()) {
+      this.signalError(Messages.disconnectError)
+      return
+    }
+    server.send({
+      type: 'playCard',
+      cardNum: i,
+      versionNo: this.currentVersion,
     })
   }
 
