@@ -21,7 +21,10 @@ import RaceScene from './scene/raceScene'
 import { Space } from './settings/settings'
 import addResizeHandler from './loader/windowResizeManager'
 import initializeSplashScreen from './loader/splashLoader'
-import initializeErrorHandler from './loader/errorHandler'
+import initializeErrorHandler, {
+  hasWebGL,
+  showWebGLUnsupportedMessage,
+} from './loader/errorHandler'
 import initializeAnalytics from './loader/analyticsLoader'
 
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
@@ -141,6 +144,12 @@ window.onload = () => {
   initializeErrorHandler()
   initializeAnalytics()
   initializeSplashScreen()
+
+  // Show message to user if WebGL is missing
+  if (!hasWebGL()) {
+    showWebGLUnsupportedMessage()
+    return
+  }
 
   var game = new CelestialGame(config)
 }
