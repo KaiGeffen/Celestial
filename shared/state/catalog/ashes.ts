@@ -1,5 +1,5 @@
 import Card from '../card'
-import { race, condemnation } from './tokens'
+import { ashes, race, condemnation } from './tokens'
 import { Quality } from '../quality'
 import { Animation } from '../../animation'
 import { Zone } from '../zone'
