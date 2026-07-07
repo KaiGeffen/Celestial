@@ -97,7 +97,7 @@ class Witness extends DualCard {
 const witness = new Witness({
   name: 'Witness',
   id: 1104,
-  text: 'Becomes Witness\nWhen played, gain Sight 4.',
+  text: 'Becomes Subject\nWhen played, gain Sight 4.',
   theme: 5,
 })
 

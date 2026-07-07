@@ -334,9 +334,9 @@ const beginnersMind = new BeginnersMind({
 })
 
 class Interbeing extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
+  onMorning(player: number, game: GameModel, index: number): boolean {
     game.replacementCreateCardThisRound = interbeing
+    return true
   }
 }
 const interbeing = new Interbeing({
@@ -344,8 +344,7 @@ const interbeing = new Interbeing({
   id: 7046,
   cost: 2,
   points: 2,
-  qualities: [Quality.FLEETING],
-  text: 'Fleeting\nIf a card would be created this round, create an Interbeing instead.',
+  text: 'Morning: If a card would be created this round, create an Interbeing instead.',
 })
 
 export {

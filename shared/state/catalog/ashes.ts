@@ -1,5 +1,5 @@
 import Card from '../card'
-import { ashes, condemnation } from './tokens'
+import { race, condemnation } from './tokens'
 import { Quality } from '../quality'
 import { Animation } from '../../animation'
 import { Zone } from '../zone'
@@ -570,6 +570,21 @@ const judgement = new Judgement({
   text: 'When shuffled, Exhale 17: Add this to the story Revealed.\nReduce the cost by 1 for each card shuffled.',
 })
 
+class StartTheRace extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+    game.create(Zone.Hand, player, race)
+    game.create(Zone.Hand, player ^ 1, race)
+  }
+}
+const startTheRace = new StartTheRace({
+  name: 'Start the Race',
+  id: 2087,
+  cost: 1,
+  points: 1,
+  text: "Create a Race in each player's hand.",
+})
+
 export {
   dash,
   impulse,
@@ -593,6 +608,7 @@ export {
   // finale,
   // prometheus,
   // suddenDraw,
-  moth as zoomies,
+  moth,
   // judgement,
+  startTheRace,
 }

@@ -154,6 +154,7 @@ class Ice extends Card {
     return false
   }
 }
+
 const ice = new Ice({
   name: 'Ice',
   id: 1008,
@@ -179,6 +180,31 @@ const greatWheel = new GreatWheel({
   theme: 5,
 })
 
+class Race extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    for (let i = 0; i < game.story.acts.length; ) {
+      const cardId = game.story.acts[i].card.id
+
+      // Don't increment the index if we discard a card
+      if (cardId === race.id) {
+        game.removeAct(i)
+      } else {
+        i++
+      }
+    }
+  }
+}
+const race = new Race({
+  name: 'Race',
+  id: 1010,
+  points: 1,
+  qualities: [Quality.FLEETING],
+  text: 'Fleeting\nDiscard each Race later in the story.',
+  theme: 1,
+})
+
 export {
   seen,
   ashes,
@@ -189,4 +215,5 @@ export {
   condemnation,
   ice,
   greatWheel,
+  race,
 }
