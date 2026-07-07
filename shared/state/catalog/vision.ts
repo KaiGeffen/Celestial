@@ -6,6 +6,7 @@ import { Keywords } from '../keyword'
 import { Zone } from '../zone'
 import GameModel from '../gameModel'
 import Act from '../act'
+import { Animation, Visibility } from '../../animation'
 
 class Dawn extends SightCard {
   onMorning(player: number, game: GameModel, index: number): boolean {
@@ -354,6 +355,35 @@ const hermit = new Hermit({
   text: 'When played, gain 2 breath.\nWhen a card is played while this is in the story, discard this and gain 2 breath.',
 })
 
+class Coopy extends Card {
+  onPlay(player: number, game: GameModel) {
+    // If both players don't have a card in hand, return
+    if (game.hand[player].length === 0 || game.hand[player ^ 1].length === 0) {
+      return
+    }
+
+    const theirCard = game.hand[player ^ 1][0]
+
+    game.hand[player][0] = theirCard
+    game.animations[player].push(
+      new Animation({
+        from: Zone.Transform,
+        to: Zone.Hand,
+        card: theirCard,
+        index2: 0,
+        visibility: Visibility.FullyUnknown,
+      }),
+    )
+  }
+}
+const coopy = new Coopy({
+  name: 'Coopy',
+  id: 4089,
+  cost: 1,
+  points: 1,
+  text: "When played, transform the first card in your hand into the first card in your opponent's hand.",
+})
+
 export {
   dawn,
   nectar,
@@ -374,4 +404,5 @@ export {
   path,
   // switcheroo,
   // incense,
+  coopy,
 }

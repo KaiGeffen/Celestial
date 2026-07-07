@@ -2,7 +2,7 @@ import Card, { CardData } from '../card'
 import { Quality } from '../quality'
 import GameModel from '../gameModel'
 import { Zone } from '../zone'
-import { Animation } from '../../animation'
+import { Animation, Visibility } from '../../animation'
 import { wound } from './tokens'
 
 // A card that switches back and forth when you pass while it's in hand
@@ -23,6 +23,7 @@ abstract class DualCard extends Card {
           to: Zone.Hand,
           card: this,
           index2: index,
+          visibility: Visibility.FullyUnknown,
         }),
       )
     }
