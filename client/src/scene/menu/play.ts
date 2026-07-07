@@ -31,6 +31,8 @@ import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/Sc
 const menuWidth = 1000
 const deckPanelWidth = Space.cutoutWidth + Space.pad * 2
 const playPanelWidth = 527
+// Tall enough for a full-grown plant and its timer text
+const gardenHeight = 200
 
 export default class PlayMenu extends Menu {
   password: string
@@ -494,6 +496,7 @@ export default class PlayMenu extends Menu {
     const gardenSizer = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
       width: playPanelWidth,
+      height: gardenHeight,
       space: { item: Space.pad },
     })
 
@@ -511,85 +514,93 @@ export default class PlayMenu extends Menu {
     // Add space at the beginning to help center plants
     gardenSizer.addSpace()
 
-    // Create all plant slots (MAX_PLANTS), some may be empty
-    for (let i = 0; i < maxPlants; i++) {
-      // Create a sizer for each plant slot (plant + timer)
-      const plantSizer: RexUIPlugin.Sizer = this.scene.rexUI.add.sizer({
-        orientation: 'vertical',
-        space: { item: Space.padSmall },
-      })
+    // If the garden is empty, show a hint where the plants would be
+    if (!serverGarden.some((plant) => plant)) {
+      const txt = this.scene.add
+        .text(0, 0, 'Play games to plant your garden', Style.basicStylized)
+        .setOrigin(0.5)
+      gardenSizer.add(txt, { align: 'center' })
+    } else {
+      // Create all plant slots (MAX_PLANTS), some may be empty
+      for (let i = 0; i < maxPlants; i++) {
+        // Create a sizer for each plant slot (plant + timer)
+        const plantSizer: RexUIPlugin.Sizer = this.scene.rexUI.add.sizer({
+          orientation: 'vertical',
+          space: { item: Space.padSmall },
+        })
 
-      // Check if there's a plant at this index
-      if (i < serverGarden.length && serverGarden[i]) {
-        const plantTime = serverGarden[i]
-        this.gardenTimes[i] = plantTime
+        // Check if there's a plant at this index
+        if (i < serverGarden.length && serverGarden[i]) {
+          const plantTime = serverGarden[i]
+          this.gardenTimes[i] = plantTime
 
-        const plant = this.scene.add
-          .image(0, 0, 'relic-Dandelion')
-          .setInteractive()
+          const plant = this.scene.add
+            .image(0, 0, 'relic-Dandelion')
+            .setInteractive()
 
-        // Calculate growth stage
-        const growthStage = this.getGrowthStage(plantTime)
-        plant.setFrame(growthStage)
-        this.gardenPlants[i] = plant
+          // Calculate growth stage
+          const growthStage = this.getGrowthStage(plantTime)
+          plant.setFrame(growthStage)
+          this.gardenPlants[i] = plant
 
-        // Only add glow outline if plant is ready to harvest
-        const hoursRemaining = this.timeUntilFullyGrown(plantTime)
-        const isReady = hoursRemaining <= 0
-        if (isReady) {
-          const plugin = this.scene.plugins.get('rexOutlinePipeline')
-          plugin['add'](plant, {
-            thickness: 3,
-            outlineColor: Color.outline,
-            quality: 0.3,
-          })
+          // Only add glow outline if plant is ready to harvest
+          const hoursRemaining = this.timeUntilFullyGrown(plantTime)
+          const isReady = hoursRemaining <= 0
+          if (isReady) {
+            const plugin = this.scene.plugins.get('rexOutlinePipeline')
+            plugin['add'](plant, {
+              thickness: 3,
+              outlineColor: Color.outline,
+              quality: 0.3,
+            })
+          }
+
+          // Create timer text below plant - will be updated in update loop
+          const timer = this.scene.add
+            .text(0, 0, this.formatTimer(plantTime), Style.basicStylized)
+            .setOrigin(0.5)
+          this.gardenTimers[i] = timer
+
+          // Store the index in a closure for the click handler
+          const plantIndex = i
+
+          // Hover behavior - only show hint when plant is ready to harvest
+          plant
+            .on('pointerover', () => {
+              const hoursRemaining = this.timeUntilFullyGrown(plantTime)
+              if (hoursRemaining <= 0) {
+                this.scene.hint.showText('Click to harvest')
+              }
+            })
+            .on('pointerout', () => {
+              this.scene.hint.hide()
+            })
+            .on('pointerdown', () => {
+              // Hide hint when clicking
+              this.scene.hint.hide()
+              const hoursRemaining = this.timeUntilFullyGrown(plantTime)
+              if (hoursRemaining <= 0) {
+                // Track the clicked index
+                this.clickedHarvestIndex = plantIndex
+
+                // NOTE on the server the empty plots aren't counted, so have to adjust the index
+                // Count empty plots only up to plantIndex
+                const countEmptyPlots = this.gardenPlants
+                  .slice(0, plantIndex + 1)
+                  .filter((plot) => plot === null).length
+                const adjustedIndex = plantIndex - countEmptyPlots
+
+                Server.harvestGarden(adjustedIndex)
+              }
+              // Don't show error if not ready - just do nothing
+            })
+
+          plantSizer.add(plant).add(timer)
         }
 
-        // Create timer text below plant - will be updated in update loop
-        const timer = this.scene.add
-          .text(0, 0, this.formatTimer(plantTime), Style.basicStylized)
-          .setOrigin(0.5)
-        this.gardenTimers[i] = timer
-
-        // Store the index in a closure for the click handler
-        const plantIndex = i
-
-        // Hover behavior - only show hint when plant is ready to harvest
-        plant
-          .on('pointerover', () => {
-            const hoursRemaining = this.timeUntilFullyGrown(plantTime)
-            if (hoursRemaining <= 0) {
-              this.scene.hint.showText('Click to harvest')
-            }
-          })
-          .on('pointerout', () => {
-            this.scene.hint.hide()
-          })
-          .on('pointerdown', () => {
-            // Hide hint when clicking
-            this.scene.hint.hide()
-            const hoursRemaining = this.timeUntilFullyGrown(plantTime)
-            if (hoursRemaining <= 0) {
-              // Track the clicked index
-              this.clickedHarvestIndex = plantIndex
-
-              // NOTE on the server the empty plots aren't counted, so have to adjust the index
-              // Count empty plots only up to plantIndex
-              const countEmptyPlots = this.gardenPlants
-                .slice(0, plantIndex + 1)
-                .filter((plot) => plot === null).length
-              const adjustedIndex = plantIndex - countEmptyPlots
-
-              Server.harvestGarden(adjustedIndex)
-            }
-            // Don't show error if not ready - just do nothing
-          })
-
-        plantSizer.add(plant).add(timer)
+        gardenSizer.add(plantSizer)
+        this.plantSizers[i] = plantSizer
       }
-
-      gardenSizer.add(plantSizer)
-      this.plantSizers[i] = plantSizer
     }
 
     // Add space at the end to help center plants
