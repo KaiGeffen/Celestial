@@ -129,6 +129,33 @@ export default class StoryRegion extends Region {
     this.callback = callback
   }
 
+  /**
+   * Tween the on-board (unresolved) story cards into place. While a card is being
+   * staged, pass `lengthOverride` = acts.length + 1 to squish the row so the staged
+   * card fits before the sun; pass nothing to restore normal spacing on cancel.
+   */
+  reflowForStagedCard(state: GameModel, lengthOverride?: number): void {
+    const resolvedCount = state.story.resolvedActs.length
+    this.cards.forEach((card, i) => {
+      if (!card) return
+      const owner = state.story.acts[i]?.owner ?? 0
+      const [x, y] = CardLocation.story(
+        state,
+        resolvedCount + i,
+        this.container,
+        owner,
+        lengthOverride,
+      )
+      this.scene.tweens.add({
+        targets: card.container,
+        x,
+        y,
+        duration: Time.match.playCard,
+        ease: 'Sine.easeInOut',
+      })
+    })
+  }
+
   private animate(state: GameModel, cards: CardImage[]): void {
     if (state.story.acts.length === 0) {
       return

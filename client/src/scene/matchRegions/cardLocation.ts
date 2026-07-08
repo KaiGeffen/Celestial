@@ -75,35 +75,52 @@ export default class CardLocation {
     return [0, 0]
   }
 
+  // Left edge of the first story card, and blank space kept to the right of the
+  // last one so the story never runs under the sun.
+  static readonly STORY_X0 = 230
+  private static readonly STORY_RIGHT_PAD = 200
+
+  // Horizontal gap between story cards, squished so `length` of them still fit
+  // before the sun. Single source of truth for story spacing (see Animator).
+  static storyDx(length: number): number {
+    let dx = Space.cardWidth * 0.8 - Space.storyXOverlap
+    if (length <= 1) {
+      return dx
+    }
+
+    const maxOffset =
+      Space.windowWidth -
+      CardLocation.STORY_X0 -
+      Space.cardWidth / 2 -
+      CardLocation.STORY_RIGHT_PAD
+    const lastCardOffset = dx * (length - 1)
+    if (lastCardOffset > maxOffset) {
+      dx *= maxOffset / lastCardOffset
+    }
+    return dx
+  }
+
   static story(
     state: GameModel,
     i: number,
     container: Phaser.GameObjects.Container,
     owner: number,
+    /** Card count to space for; overrides the state's story length so the row
+     * can squish for a not-yet-committed card being staged. */
+    lengthOverride?: number,
   ): [number, number] {
-    const x0 = 230
-    let dx = Space.cardWidth * 0.8 - Space.storyXOverlap
-
-    // Space to the right of the last card
-    const rightPad = 200
-    const maxOffset = Space.windowWidth - x0 - Space.cardWidth / 2 - rightPad
-    if (state !== undefined) {
-      // Find the amount that we must scale down by
-      // This may be multiplied by a constant to fit within the max
-      // Length of cards displayed in the story
-      let length = state.story.acts.length
+    // Length of cards displayed in the story
+    let length = lengthOverride
+    if (length === undefined && state !== undefined) {
+      length = state.story.acts.length
       if (state.isRecap) {
         // TODO Greyed cards
         length += state.story.resolvedActs.length
       }
-
-      const lastCardOffset = dx * (length - 1)
-      if (lastCardOffset > maxOffset) {
-        dx *= maxOffset / lastCardOffset
-      }
     }
 
-    const x = x0 + dx * i
+    const dx = CardLocation.storyDx(length ?? 1)
+    const x = CardLocation.STORY_X0 + dx * i
 
     // Y
     let y

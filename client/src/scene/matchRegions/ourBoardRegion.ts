@@ -257,17 +257,24 @@ export default class OurBoardRegion extends Region {
     hand: CardImage[],
     state: GameModel,
   ): () => void {
+    // The staged card is a not-yet-committed extra act, so lay it (and the rest
+    // of the story) out for one more card than the state currently holds.
+    const projectedStoryLength = state.story.acts.length + 1
     const nextStoryPosition = CardLocation.story(
       state,
       state.story.acts.length,
       this.container,
       0,
+      projectedStoryLength,
     )
 
     return () => {
       this.stagedCardNum = i
 
       this.applyOptimisticBreathPlayability(state, i, hand)
+
+      // Squish the existing story so the staged card has room before the sun
+      this.scene.view.story.reflowForStagedCard(state, projectedStoryLength)
 
       // Reset raised card tracking
       this.raisedCardIndex = null
@@ -505,6 +512,8 @@ export default class OurBoardRegion extends Region {
     const state = this.lastHandState
     this.stagedCardNum = null
     this.onStageChanged?.(null)
+    // Un-squish the story now that the extra card is no longer staged
+    this.scene.view.story.reflowForStagedCard(state)
     // Rebuild the hand next tick — not mid-click, which would destroy the card
     // whose pointer event is still running — restoring the card to its slot.
     this.scene.time.delayedCall(0, () => {

@@ -512,20 +512,6 @@ export default class Animator {
     })
   }
 
-  // Compute the dx between cards in the story
-  private computeStoryDx(totalLength: number): number {
-    let dx = Space.cardWidth * 0.8 - Space.storyXOverlap
-    if (totalLength <= 1) return dx
-    const x0 = 230
-    const rightPad = 200
-    const maxOffset = Space.windowWidth - x0 - Space.cardWidth / 2 - rightPad
-    const lastCardOffset = dx * (totalLength - 1)
-    if (lastCardOffset > maxOffset) {
-      dx *= maxOffset / lastCardOffset
-    }
-    return dx
-  }
-
   // Animate the story shifting to accomodate a card being removed
   private animateStoryRemoveShift(
     removalActiveIndex: number,
@@ -536,8 +522,8 @@ export default class Animator {
     const lengthOld = resolvedCount + state.story.acts.length
     const lengthNew = lengthOld - 1
 
-    const dxOld = this.computeStoryDx(lengthOld)
-    const dxNew = this.computeStoryDx(lengthNew)
+    const dxOld = CardLocation.storyDx(lengthOld)
+    const dxNew = CardLocation.storyDx(lengthNew)
 
     // Starting from the where the card was removed, shift all to take up new space
     for (let k = removalActiveIndex; k < this.view.story.cards.length; k++) {
@@ -579,8 +565,8 @@ export default class Animator {
     // No pre-existing cards to shift (all insertions are new to the story this state)
     if (oldTotalLength <= 0) return
 
-    const oldDx = this.computeStoryDx(oldTotalLength)
-    const newDx = this.computeStoryDx(newTotalLength)
+    const oldDx = CardLocation.storyDx(oldTotalLength)
+    const newDx = CardLocation.storyDx(newTotalLength)
 
     // Cards being newly inserted this state should not be shifted — only pre-existing ones.
     // Use a contiguous range from insertionActiveIndex covering all totalInsertions slots.
