@@ -1,5 +1,5 @@
 import 'phaser'
-import GameModel from '../../../../shared/state/gameModel'
+import GameModel from '@shared/state/gameModel'
 import { Color, Depth } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'

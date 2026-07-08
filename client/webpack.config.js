@@ -22,6 +22,9 @@ module.exports = (_, argv) => {
       extensions: ['.ts', '.tsx', '.js'],
       alias: {
         path: require.resolve('path-browserify'),
+        // Mirror of the tsconfig `paths` aliases so the bundler resolves them too
+        '@shared': path.resolve(__dirname, '../shared'),
+        '@': path.resolve(__dirname, 'src'),
       },
     },
     output: {

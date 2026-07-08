@@ -2,7 +2,7 @@ import 'phaser'
 import Button from '../../lib/buttons/button'
 import Moon from '../../lib/buttons/moon'
 
-import GameModel from '../../../../shared/state/gameModel'
+import GameModel from '@shared/state/gameModel'
 import {
   Style,
   Time,

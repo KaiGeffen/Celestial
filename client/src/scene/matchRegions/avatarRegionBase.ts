@@ -1,5 +1,5 @@
 import 'phaser'
-import GameModel from '../../../../shared/state/gameModel'
+import GameModel from '@shared/state/gameModel'
 import Buttons from '../../lib/buttons/buttons'
 import AvatarButton from '../../lib/buttons/avatar'
 import { Color, Space, Style, Time } from '../../settings/settings'

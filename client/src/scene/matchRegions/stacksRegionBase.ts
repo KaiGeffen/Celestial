@@ -1,6 +1,6 @@
 import 'phaser'
 import { CardImage } from '../../lib/cardImage'
-import GameModel from '../../../../shared/state/gameModel'
+import GameModel from '@shared/state/gameModel'
 import { Space, UserSettings } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'

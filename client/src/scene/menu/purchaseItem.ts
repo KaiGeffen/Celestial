@@ -6,8 +6,8 @@ import Buttons from '../../lib/buttons/buttons'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Server from '../../server'
 import { CardImage } from '../../lib/cardImage'
-import Card from '../../../../shared/state/card'
-import { Purchaseable } from '../../../../shared/purchaseables/index'
+import Card from '@shared/state/card'
+import { Purchaseable } from '@shared/purchaseables/index'
 import { getCosmeticImageKey } from '../../utils/cosmetics'
 
 const CARD_COST = 1000

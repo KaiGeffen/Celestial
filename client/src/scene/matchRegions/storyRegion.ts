@@ -1,6 +1,6 @@
 import 'phaser'
 import { CardImage } from '../../lib/cardImage'
-import GameModel from '../../../../shared/state/gameModel'
+import GameModel from '@shared/state/gameModel'
 import {
   Space,
   Style,
@@ -12,8 +12,8 @@ import {
 import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
-import Act from '../../../../shared/state/act'
-import { Quality } from '../../../../shared/state/quality'
+import Act from '@shared/state/act'
+import { Quality } from '@shared/state/quality'
 import { SHRUNKEN_CARD_SCALE } from './matchRegionSettings'
 
 export default class StoryRegion extends Region {

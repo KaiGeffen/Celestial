@@ -12,10 +12,10 @@ import DeckThumbnail from '../../lib/deckThumbnail'
 import Decklist from '../../lib/decklist'
 import { Space, Style } from '../../settings/settings'
 import newScrollablePanel from '../../lib/scrollablePanel'
-import Card from '../../../../shared/state/card'
-import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
-import { MechanicsSettings } from '../../../../shared/settings'
-import { encodeShareableDeckCode } from '../../../../shared/codec'
+import Card from '@shared/state/card'
+import { CosmeticSet } from '@shared/types/cosmeticSet'
+import { MechanicsSettings } from '@shared/settings'
+import { encodeShareableDeckCode } from '@shared/codec'
 
 /** Props for the deck editor right column — initial list + thumbnails + actions by callback. */
 export type DeckEditorDeckOptions = {

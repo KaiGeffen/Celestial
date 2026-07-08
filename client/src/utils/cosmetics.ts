@@ -1,10 +1,10 @@
 import Server from '../server'
-import { achievementsMeta } from '../../../shared/achievementsData'
+import { achievementsMeta } from '@shared/achievementsData'
 import {
   borders,
   cardbacks,
   Purchaseable,
-} from '../../../shared/purchaseables/index'
+} from '@shared/purchaseables/index'
 import borderNames from '../data/borderNames'
 import cardbackNames from '../data/cardbackNames'
 

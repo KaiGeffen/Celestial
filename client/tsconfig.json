@@ -4,11 +4,15 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "strictPropertyInitialization": false,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["../shared/*"],
+      "@/*": ["src/*"]
+    }
   },
   "include": [
-    "src/*",
-    "**/*",
+    "src/**/*",
     "node_modules/phaser3-rex-plugins-types",
     "../shared/animation.ts",
     "../shared/state/keyword.ts",

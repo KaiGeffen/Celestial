@@ -12,7 +12,7 @@ import logEvent from '../../utils/analytics'
 import {
   URL,
   USERNAME_AVAILABILITY_PORT,
-} from '../../../../shared/network/settings'
+} from '@shared/network/settings'
 
 const width = 700
 

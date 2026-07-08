@@ -1,5 +1,5 @@
-import avatarNames from '../../../shared/data/avatarNames'
-import Catalog from '../../../shared/state/catalog'
+import avatarNames from '@shared/data/avatarNames'
+import Catalog from '@shared/state/catalog'
 import { assetLists } from './assetLists'
 
 const EXTENSION = 'webp'

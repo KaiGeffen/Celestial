@@ -1,12 +1,12 @@
 import 'phaser'
 
 import { Color } from '../../settings/settings'
-import Card from '../../../../shared/state/card'
+import Card from '@shared/state/card'
 import { CardImage } from '../../lib/cardImage'
 import { Style, UserSettings, Space, Flags } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import UButton from '../../lib/buttons/underlined'
-import Catalog from '../../../../shared/state/catalog'
+import Catalog from '@shared/state/catalog'
 
 import { BuilderBase } from '../builderScene'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite'

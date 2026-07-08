@@ -10,8 +10,8 @@ import { CardImage } from '../../lib/cardImage'
 import { Space, UserSettings, Flags } from '../../settings/settings'
 import { Style } from '../../settings/style'
 import newScrollablePanel from '../../lib/scrollablePanel'
-import Catalog from '../../../../shared/state/catalog'
-import Card from '../../../../shared/state/card'
+import Catalog from '@shared/state/catalog'
+import Card from '@shared/state/card'
 import {
   DECK_EDITOR_DECK_WIDTH,
   DECK_EDITOR_MAX_COST_FILTER,

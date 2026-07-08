@@ -1,14 +1,14 @@
 import 'phaser'
 import MenuScene from '../menuScene'
 import Menu from './menu'
-import Card from '../../../../shared/state/card'
+import Card from '@shared/state/card'
 import { Style, Space } from '../../settings/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import Catalog from '../../../../shared/state/catalog'
+import Catalog from '@shared/state/catalog'
 import Decklist from '../../lib/decklist'
 import newScrollablePanel from '../../lib/scrollablePanel'
-import { getCardWithVersion } from '../../../../shared/state/cardUpgrades'
-import { Deck } from '../../../../shared/types/deck'
+import { getCardWithVersion } from '@shared/state/cardUpgrades'
+import { Deck } from '@shared/types/deck'
 
 const width = 900
 

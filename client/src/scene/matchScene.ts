@@ -6,10 +6,10 @@ import Animator from './matchRegions/animator'
 import Region from './matchRegions/baseRegion'
 import Regions from './matchRegions/matchRegions'
 import OverlayRegion from './matchRegions/pileOverlayRegions'
-import GameModel from '../../../shared/state/gameModel'
-import { SoundEffect } from '../../../shared/state/soundEffect'
+import GameModel from '@shared/state/gameModel'
+import { SoundEffect } from '@shared/state/soundEffect'
 import PassRegion from './matchRegions/passRegion'
-import { Deck } from '../../../shared/types/deck'
+import { Deck } from '@shared/types/deck'
 import TheirAvatarRegion from './matchRegions/theirAvatarRegion'
 import OurAvatarRegion from './matchRegions/ourAvatarRegion'
 import OurBoardRegion from './matchRegions/ourBoardRegion'
@@ -28,7 +28,7 @@ import SearchingRegion from './matchRegions/searchingRegion'
 
 // TODO Figure out
 import { server } from '../server'
-import { ClientWS } from '../../../shared/network/celestialTypedWebsocket'
+import { ClientWS } from '@shared/network/celestialTypedWebsocket'
 import logEvent from '../utils/analytics'
 
 export class MatchScene extends BaseScene {

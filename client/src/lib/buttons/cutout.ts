@@ -10,7 +10,7 @@ import {
   BBStyle,
 } from '../../settings/settings'
 import Button from './button'
-import Card from '../../../../shared/state/card'
+import Card from '@shared/state/card'
 import Hint from '../hint'
 
 // Exported buttons

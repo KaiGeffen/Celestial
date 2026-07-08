@@ -1,4 +1,4 @@
-import { STEAM_STORE_URL } from '../../../shared/steam'
+import { STEAM_STORE_URL } from '@shared/steam'
 
 // Settings relating to various urls
 export const Url = {

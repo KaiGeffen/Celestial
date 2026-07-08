@@ -7,7 +7,7 @@ import {
   BBStyle,
   UserSettings,
 } from '../../settings/settings'
-import Catalog from '../../../../shared/state/catalog'
+import Catalog from '@shared/state/catalog'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
@@ -16,8 +16,8 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import AvatarButton from '../../lib/buttons/avatar'
 import BaseScene from '../baseScene'
 import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
-import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
-import { achievementsMeta } from '../../../../shared/achievementsData'
+import { CosmeticSet } from '@shared/types/cosmeticSet'
+import { achievementsMeta } from '@shared/achievementsData'
 import {
   getUnlockedAvatars,
   getUnlockedBorders,

@@ -1,4 +1,4 @@
-import { Deck } from '../../../shared/types/deck'
+import { Deck } from '@shared/types/deck'
 import Server from '../server'
 
 /*

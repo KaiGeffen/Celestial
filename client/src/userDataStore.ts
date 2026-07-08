@@ -1,6 +1,6 @@
-import { CosmeticSet } from '../../shared/types/cosmeticSet'
-import { Achievement } from '../../shared/types/achievement'
-import messagesToClient from '../../shared/network/messagesToClient'
+import { CosmeticSet } from '@shared/types/cosmeticSet'
+import { Achievement } from '@shared/types/achievement'
+import messagesToClient from '@shared/network/messagesToClient'
 
 /** The signed-in player's account data, as the client knows it. */
 export interface UserData {

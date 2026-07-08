@@ -4,17 +4,17 @@ import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import BaseScene from './baseScene'
 import Cutout from '../lib/buttons/cutout'
 import { UserSettings, Flags } from '../settings/settings'
-import Catalog from '../../../shared/state/catalog'
-import Card from '../../../shared/state/card'
-import { Deck } from '../../../shared/types/deck'
-import { CosmeticSet } from '../../../shared/types/cosmeticSet'
-import { MechanicsSettings } from '../../../shared/settings'
+import Catalog from '@shared/state/catalog'
+import Card from '@shared/state/card'
+import { Deck } from '@shared/types/deck'
+import { CosmeticSet } from '@shared/types/cosmeticSet'
+import { MechanicsSettings } from '@shared/settings'
 
 import Server from '../server'
 import {
   encodeShareableDeckCode,
   decodeShareableDeckCode,
-} from '../../../shared/codec'
+} from '@shared/codec'
 import { DeckEditorCatalog } from './deckEditor/deckEditorCatalog'
 import {
   DeckEditorDeck,
@@ -22,7 +22,7 @@ import {
   type DeckEditorDeckOptions,
   type RightCol,
 } from './deckEditor/deckEditorSideCol'
-import type { MissionDetails } from '../../../shared/journey/journey'
+import type { MissionDetails } from '@shared/journey/journey'
 import { Space } from '../settings/settings'
 export type { DeckEditorCatalogOptions } from './deckEditor/deckEditorCatalog'
 export type { DeckEditorDeckOptions } from './deckEditor/deckEditorSideCol'

@@ -5,7 +5,7 @@ import Button from '../../lib/buttons/button'
 import { Color, Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
-import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
+import { CosmeticSet } from '@shared/types/cosmeticSet'
 import Server from '../../server'
 import {
   getUnlockedAvatars,

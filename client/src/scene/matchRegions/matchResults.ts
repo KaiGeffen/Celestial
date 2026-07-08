@@ -14,13 +14,13 @@ import {
 } from '../../settings/settings'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
-import GameModel from '../../../../shared/state/gameModel'
-import avatarNames from '../../../../shared/data/avatarNames'
+import GameModel from '@shared/state/gameModel'
+import avatarNames from '@shared/data/avatarNames'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import logEvent from '../../utils/analytics'
 import { server } from '../../server'
 import { CardImage } from '../../lib/cardImage'
-import Catalog from '../../../../shared/state/catalog'
+import Catalog from '@shared/state/catalog'
 import { animateCardReveal } from '../../lib/cardReveal'
 
 export default class MatchResultsRegion extends Region {
@@ -417,7 +417,7 @@ export default class MatchResultsRegion extends Region {
 
 import { MatchScene } from '../matchScene'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
-import { TUTORIAL_LENGTH } from '../../../../shared/settings'
+import { TUTORIAL_LENGTH } from '@shared/settings'
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'

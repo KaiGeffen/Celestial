@@ -13,11 +13,11 @@ import {
   Flags,
 } from '../../settings/settings'
 import newScrollablePanel from '../../lib/scrollablePanel'
-import { DecklistSettings } from '../../../../shared/settings'
-import { Deck } from '../../../../shared/types/deck'
-import Catalog from '../../../../shared/state/catalog'
+import { DecklistSettings } from '@shared/settings'
+import { Deck } from '@shared/types/deck'
+import Catalog from '@shared/state/catalog'
 import type { BuilderScene } from '../builderScene'
-import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
+import { CosmeticSet } from '@shared/types/cosmeticSet'
 import Server from '../../server'
 
 const width = Space.decklistPanelWidth

@@ -7,7 +7,7 @@ import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
 import Server from '../../server'
 import { BBStyle, Ease, Space, Style, Time } from '../../settings/settings'
-import REWARD_AMOUNTS from '../../../../shared/config/rewardAmounts'
+import REWARD_AMOUNTS from '@shared/config/rewardAmounts'
 import newScrollablePanel from '../../lib/scrollablePanel'
 
 const PAD_LEFT_RIGHT = 50

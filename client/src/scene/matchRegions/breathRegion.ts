@@ -1,8 +1,8 @@
 import 'phaser'
-import GameModel from '../../../../shared/state/gameModel'
+import GameModel from '@shared/state/gameModel'
 import { Depth, Space, Style, Color } from '../../settings/settings'
 import Region from './baseRegion'
-import { MechanicsSettings } from '../../../../shared/settings'
+import { MechanicsSettings } from '@shared/settings'
 import { MatchScene } from '../matchScene'
 
 export default class BreathRegion extends Region {

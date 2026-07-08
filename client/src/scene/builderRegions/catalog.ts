@@ -1,9 +1,9 @@
 import 'phaser'
 
-import Card from '../../../../shared/state/card'
+import Card from '@shared/state/card'
 import { CardImage } from '../../lib/cardImage'
 import { Space, Time, Ease, Flags } from '../../settings/settings'
-import Catalog from '../../../../shared/state/catalog'
+import Catalog from '@shared/state/catalog'
 import { BuilderBase } from '../builderScene'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import { UserSettings } from '../../settings/userSettings'

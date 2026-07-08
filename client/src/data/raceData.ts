@@ -1,4 +1,4 @@
-import { decodeShareableDeckCode } from '../../../shared/codec'
+import { decodeShareableDeckCode } from '@shared/codec'
 
 // Race node types
 interface RaceBase {

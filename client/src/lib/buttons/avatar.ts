@@ -1,6 +1,6 @@
 import 'phaser'
 import Button from './button'
-import avatarNames from '../../../../shared/data/avatarNames'
+import avatarNames from '@shared/data/avatarNames'
 import borderNames from '../../data/borderNames'
 import { Color, Time } from '../../settings/settings'
 

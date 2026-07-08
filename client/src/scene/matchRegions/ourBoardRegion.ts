@@ -1,6 +1,6 @@
 import 'phaser'
 import { CardImage } from '../../lib/cardImage'
-import GameModel from '../../../../shared/state/gameModel'
+import GameModel from '@shared/state/gameModel'
 import {
   Depth,
   Space,
@@ -11,7 +11,7 @@ import {
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
 import { MatchScene } from '../matchScene'
-import { MechanicsSettings } from '../../../../shared/settings'
+import { MechanicsSettings } from '@shared/settings'
 import { server } from '../../server'
 import { SHRUNKEN_CARD_SCALE } from './matchRegionSettings'
 

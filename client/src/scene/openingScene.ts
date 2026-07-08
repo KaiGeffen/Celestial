@@ -4,7 +4,7 @@ import Loader from '../loader/loader'
 import Buttons from '../lib/buttons/buttons'
 import { Space, Style } from '../settings/settings'
 import { UserSettings } from '../settings/userSettings'
-import { TUTORIAL_LENGTH } from '../../../shared/settings'
+import { TUTORIAL_LENGTH } from '@shared/settings'
 
 const TYPEWRITER_DELAY_MS = 30
 const TWEEN_DURATION = 5000

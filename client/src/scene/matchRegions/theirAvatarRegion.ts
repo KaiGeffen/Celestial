@@ -2,7 +2,7 @@ import 'phaser'
 import { Space } from '../../settings/settings'
 import AvatarRegionBase from './avatarRegionBase'
 import { MatchScene } from '../matchScene'
-import GameModel from '../../../../shared/state/gameModel'
+import GameModel from '@shared/state/gameModel'
 
 export default class TheirAvatarRegion extends AvatarRegionBase {
   protected playerIndex(): 0 | 1 {

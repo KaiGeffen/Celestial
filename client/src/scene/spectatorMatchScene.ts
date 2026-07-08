@@ -1,6 +1,6 @@
 import 'phaser'
 
-import GameModel from '../../../shared/state/gameModel'
+import GameModel from '@shared/state/gameModel'
 
 import { server } from '../server'
 import { MatchResultsSimplifiedRegion } from './matchRegions/matchResults'

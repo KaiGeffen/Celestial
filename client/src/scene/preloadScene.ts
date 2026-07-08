@@ -16,7 +16,7 @@ import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 import ensureMusic from '../loader/audioManager'
 import Cinematic from '../lib/cinematic'
-import { TUTORIAL_LENGTH } from '../../../shared/settings'
+import { TUTORIAL_LENGTH } from '@shared/settings'
 
 // How long to wait for server before saying it's disconnected
 const GRACE_PERIOD_TO_CONNECT = 1000

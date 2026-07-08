@@ -10,10 +10,10 @@ import DeckThumbnail from '../lib/deckThumbnail'
 import { Color, Space, Style, UserSettings } from '../settings/settings'
 import Server from '../server'
 import newScrollablePanel from '../lib/scrollablePanel'
-import { MechanicsSettings } from '../../../shared/settings'
-import { Deck } from '../../../shared/types/deck'
-import { CosmeticSet } from '../../../shared/types/cosmeticSet'
-import Catalog from '../../../shared/state/catalog'
+import { MechanicsSettings } from '@shared/settings'
+import { Deck } from '@shared/types/deck'
+import { CosmeticSet } from '@shared/types/cosmeticSet'
+import Catalog from '@shared/state/catalog'
 
 const ROSTER_WIDTH = Space.cutoutWidth + 20
 

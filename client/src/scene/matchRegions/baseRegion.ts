@@ -1,8 +1,8 @@
 import 'phaser'
 
 import { CardImage } from '../../lib/cardImage'
-import Card from '../../../../shared/state/card'
-import GameModel from '../../../../shared/state/gameModel'
+import Card from '@shared/state/card'
+import GameModel from '@shared/state/gameModel'
 import { Time, Space, Color, Depth, Style } from '../../settings/settings'
 import { MatchScene } from '../matchScene'
 

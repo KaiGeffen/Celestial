@@ -2,7 +2,7 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 import { CardImage } from './cardImage'
-import Catalog from '../../../shared/state/catalog'
+import Catalog from '@shared/state/catalog'
 import { Time } from '../settings/settings'
 import { MatchScene } from '../scene/matchScene'
 

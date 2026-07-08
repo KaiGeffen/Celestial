@@ -5,8 +5,8 @@ import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
-import avatarNames from '../../../../shared/data/avatarNames'
-import GameModel from '../../../../shared/state/gameModel'
+import avatarNames from '@shared/data/avatarNames'
+import GameModel from '@shared/state/gameModel'
 import { server } from '../../server'
 import {
   notifyMatchFound,

@@ -1,9 +1,9 @@
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import BaseScene from '../scene/baseScene'
 import Cutout from './buttons/cutout'
-import Card from '../../../shared/state/card'
+import Card from '@shared/state/card'
 import { Space } from '../settings/settings'
-import { MechanicsSettings } from '../../../shared/settings'
+import { MechanicsSettings } from '@shared/settings'
 import ContainerLite from 'phaser3-rex-plugins/templates/ui/container/Container'
 import { UserSettings } from '../settings/userSettings'
 

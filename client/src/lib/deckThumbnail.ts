@@ -4,10 +4,10 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import BaseScene from '../scene/baseScene'
 import Buttons from './buttons/buttons'
 import { Color, Space, Style } from '../settings/settings'
-import { CosmeticSet } from '../../../shared/types/cosmeticSet'
+import { CosmeticSet } from '@shared/types/cosmeticSet'
 import cardbackNames from '../data/cardbackNames'
 import Server from '../server'
-import { MechanicsSettings } from '../../../shared/settings'
+import { MechanicsSettings } from '@shared/settings'
 
 // Composite visual for a deck tile: cardback, avatar, and name bar
 export default class DeckThumbnail {

@@ -10,7 +10,7 @@ import Server from '../../server'
 import {
   AchievementMeta,
   achievementsMeta,
-} from '../../../../shared/achievementsData'
+} from '@shared/achievementsData'
 
 const width = 900
 const height = 600

@@ -2,7 +2,7 @@
 
 import 'phaser'
 
-import GameModel from '../../../../shared/state/gameModel'
+import GameModel from '@shared/state/gameModel'
 import { Space, Flags } from '../../settings/settings'
 
 // TODO Remove this, deck and discard are no longer used

@@ -6,7 +6,7 @@ import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/Sc
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import Cutout from '../../lib/buttons/cutout'
-import Card from '../../../../shared/state/card'
+import Card from '@shared/state/card'
 import {
   Color,
   Space,
@@ -19,11 +19,11 @@ import {
 } from '../../settings/settings'
 import type { BuilderScene } from '../builderScene'
 import newScrollablePanel from '../../lib/scrollablePanel'
-import { MechanicsSettings } from '../../../../shared/settings'
-import { Deck } from '../../../../shared/types/deck'
-import Catalog from '../../../../shared/state/catalog'
+import { MechanicsSettings } from '@shared/settings'
+import { Deck } from '@shared/types/deck'
+import Catalog from '@shared/state/catalog'
 import AvatarButton from '../../lib/buttons/avatar'
-import { CosmeticSet } from '../../../../shared/types/cosmeticSet'
+import { CosmeticSet } from '@shared/types/cosmeticSet'
 import Decklist from '../../lib/decklist'
 const width = Space.cutoutWidth // + Space.pad * 2
 

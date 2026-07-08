@@ -1,12 +1,12 @@
 import 'phaser'
 import MenuScene from '../menuScene'
 import Menu from './menu'
-import Card from '../../../../shared/state/card'
+import Card from '@shared/state/card'
 import { CardImage } from '../../lib/cardImage'
 import { Style, Space } from '../../settings/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import Catalog from '../../../../shared/state/catalog'
-import { getAllCardVersions } from '../../../../shared/state/cardUpgrades'
+import Catalog from '@shared/state/catalog'
+import { getAllCardVersions } from '@shared/state/cardUpgrades'
 
 const numCards = 3
 const width = Space.cardWidth * numCards + Space.pad * (numCards + 1)

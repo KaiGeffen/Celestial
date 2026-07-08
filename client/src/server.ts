@@ -4,21 +4,21 @@ import 'phaser'
 
 import { Flags, Url, UserSettings } from './settings/settings'
 import BaseScene from './scene/baseScene'
-import { TypedWebSocket } from '../../shared/network/typedWebSocket'
+import { TypedWebSocket } from '@shared/network/typedWebSocket'
 import {
   URL,
   USER_DATA_PORT,
   UUID_NAMESPACE,
-} from '../../shared/network/settings'
+} from '@shared/network/settings'
 import type { GoogleJwtPayload } from './types/google'
 import jwt_decode from 'jwt-decode'
-import { ClientWS } from '../../shared/network/celestialTypedWebsocket'
-import { Deck } from '../../shared/types/deck'
-import { CosmeticSet } from '../../shared/types/cosmeticSet'
-import GameModel from '../../shared/state/gameModel'
+import { ClientWS } from '@shared/network/celestialTypedWebsocket'
+import { Deck } from '@shared/types/deck'
+import { CosmeticSet } from '@shared/types/cosmeticSet'
+import GameModel from '@shared/state/gameModel'
 import { v5 as uuidv5 } from 'uuid'
-import messagesToClient from '../../shared/network/messagesToClient'
-import messagesToServer from '../../shared/network/messagesToServer'
+import messagesToClient from '@shared/network/messagesToClient'
+import messagesToServer from '@shared/network/messagesToServer'
 import { UserData, userDataStore } from './userDataStore'
 
 // WebSocket normal-closure code (1000), used whenever we close the connection.

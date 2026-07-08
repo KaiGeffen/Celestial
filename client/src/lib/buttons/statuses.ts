@@ -2,7 +2,7 @@ import 'phaser'
 import Button, { Config } from './button'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import { Style } from '../../settings/settings'
-import { Keywords } from '../../../../shared/state/keyword'
+import { Keywords } from '@shared/state/keyword'
 import { fitTextToMaxWidth } from '../../utils/textFit'
 
 const STATUS_TEXT_INSPIRE = '#1c2962'

@@ -4,7 +4,7 @@ import Buttons from '../../lib/buttons/buttons'
 import { Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
-import { MechanicsSettings } from '../../../../shared/settings'
+import { MechanicsSettings } from '@shared/settings'
 
 const width = 420
 
