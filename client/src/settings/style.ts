@@ -307,10 +307,6 @@ export const BBStyle: Record<string, any> = {
       offset: 7,
     },
     halign: 'center',
-    // wrap: {
-    //   mode: 'word',
-    //   width: Space.maxTextWidth,
-    // },
     images: {
       coin: { key: 'icon-coin', height: 24 },
       gem: { key: 'icon-gem', height: 24 },
@@ -394,12 +390,6 @@ export const BBStyle: Record<string, any> = {
     fontFamily: primaryFont,
     fontSize: '50px',
     color: Color.header,
-    underline: {
-      color: Color.basicText,
-      thickness: 3,
-      offset: 7,
-    },
-    halign: 'center',
   },
   // Writing for announcements on home screen
   announcementCopy: {

@@ -22,10 +22,6 @@ import { server } from '../../server'
 import { CardImage } from '../../lib/cardImage'
 import Catalog from '@shared/state/catalog'
 import { animateCardReveal } from '../../lib/cardReveal'
-import {
-  ensureRowAlphaGradientTexture,
-  MENU_ROW_HIGHLIGHT_GRADIENT_KEY,
-} from '../../lib/rowAlphaGradientTexture'
 
 export default class MatchResultsRegion extends Region {
   // Whether the results have been seen already
@@ -62,16 +58,6 @@ export default class MatchResultsRegion extends Region {
       x: `50%`,
       y: `50%`,
     })
-
-    // Gold row-highlight gradient used for won/lost round rows (same as the
-    // leaderboard / online-players rows)
-    ensureRowAlphaGradientTexture(
-      this.scene,
-      MENU_ROW_HIGHLIGHT_GRADIENT_KEY,
-      Color.gold,
-      0.5,
-      0,
-    )
 
     this.createBackground()
     this.createContent()
@@ -394,23 +380,28 @@ export default class MatchResultsRegion extends Region {
       const ours = state.roundResults[0][i]
       const theirs = state.roundResults[1][i]
 
-      // Gold gradient to highlight the row's winner
-      const halfWidth = (this.WIDTH * 1) / 3
+      // Highlight the winner's half of the row with chrome
       const vPad = {
         top: HIGHLIGHT_VERTICAL_INSET - HIGHLIGHT_Y_OFFSET,
         bottom: HIGHLIGHT_VERTICAL_INSET + HIGHLIGHT_Y_OFFSET,
       }
       if (ours > theirs) {
         const background = this.scene.add
-          .image(0, 0, MENU_ROW_HIGHLIGHT_GRADIENT_KEY)
+          .image(0, 0, 'chrome-divider')
           .setDepth(Depth.results)
-        sizer.addBackground(background, { right: halfWidth, ...vPad })
+        background.setCrop(0, 0, background.width / 3, background.height)
+        sizer.addBackground(background, vPad)
       } else if (theirs > ours) {
         const background = this.scene.add
-          .image(0, 0, MENU_ROW_HIGHLIGHT_GRADIENT_KEY)
+          .image(0, 0, 'chrome-divider')
           .setDepth(Depth.results)
-          .setRotation(Math.PI)
-        sizer.addBackground(background, { left: halfWidth, ...vPad })
+        background.setCrop(
+          (background.width * 2) / 3,
+          0,
+          background.width / 3,
+          background.height,
+        )
+        sizer.addBackground(background, vPad)
       }
 
       // Round results per row
