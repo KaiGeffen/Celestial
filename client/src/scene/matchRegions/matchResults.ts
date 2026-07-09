@@ -310,7 +310,7 @@ export default class MatchResultsRegion extends Region {
 
   private createHeader(): FixWidthSizer {
     const background = this.scene.add
-      .rectangle(0, 0, this.WIDTH, this.HEIGHT, Color.backgroundDark)
+      .image(0, 0, 'background-Light')
       .setInteractive()
     this.scene.addShadow(background, -90)
 
