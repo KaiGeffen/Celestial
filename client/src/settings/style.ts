@@ -392,19 +392,14 @@ export const BBStyle: Record<string, any> = {
   // Last screen of match
   matchResultsHeader: {
     fontFamily: primaryFont,
-    fontSize: '30px',
-    color: Color.basicText,
-    wordWrap: { width: Space.maxTextWidth },
+    fontSize: '50px',
+    color: Color.header,
     underline: {
       color: Color.basicText,
       thickness: 3,
       offset: 7,
     },
     halign: 'center',
-    wrap: {
-      mode: 'word',
-      width: Space.maxTextWidth,
-    },
   },
   // Writing for announcements on home screen
   announcementCopy: {

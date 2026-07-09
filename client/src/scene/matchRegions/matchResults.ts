@@ -22,6 +22,10 @@ import { server } from '../../server'
 import { CardImage } from '../../lib/cardImage'
 import Catalog from '@shared/state/catalog'
 import { animateCardReveal } from '../../lib/cardReveal'
+import {
+  ensureRowAlphaGradientTexture,
+  MENU_ROW_HIGHLIGHT_GRADIENT_KEY,
+} from '../../lib/rowAlphaGradientTexture'
 
 export default class MatchResultsRegion extends Region {
   // Whether the results have been seen already
@@ -58,6 +62,16 @@ export default class MatchResultsRegion extends Region {
       x: `50%`,
       y: `50%`,
     })
+
+    // Gold row-highlight gradient used for won/lost round rows (same as the
+    // leaderboard / online-players rows)
+    ensureRowAlphaGradientTexture(
+      this.scene,
+      MENU_ROW_HIGHLIGHT_GRADIENT_KEY,
+      Color.gold,
+      0.5,
+      0,
+    )
 
     this.createBackground()
     this.createContent()
@@ -299,25 +313,18 @@ export default class MatchResultsRegion extends Region {
   }
 
   private createSizerBackground() {
-    const background = this.scene.rexUI.add
-      .roundRectangle(0, 0, 1, 1, Space.corner, Color.backgroundDark)
+    const background = this.scene.add
+      .image(0, 0, 'chrome-builderDecklist')
       .setDepth(Depth.results)
       // TODO This causes the panel to not be click and draggable
       .setInteractive()
-
-    // Add a border around the shape TODO Make a class for this to keep it dry
-    let postFxPlugin = this.scene.plugins.get('rexOutlinePipeline')
-    postFxPlugin['add'](background, {
-      thickness: 1,
-      outlineColor: Color.border,
-    })
 
     return background
   }
 
   private createHeader(): FixWidthSizer {
     const background = this.scene.add
-      .rectangle(0, 0, 1, 1, Color.backgroundLight)
+      .rectangle(0, 0, this.WIDTH, this.HEIGHT, Color.backgroundDark)
       .setInteractive()
     this.scene.addShadow(background, -90)
 
@@ -343,14 +350,7 @@ export default class MatchResultsRegion extends Region {
   }
 
   private createScrollablePanel() {
-    this.scrollablePanel = this.scene.rexUI.add.fixWidthSizer({
-      x: 0,
-      y: 0,
-      align: 'center',
-      space: {
-        top: Space.pad,
-      },
-    })
+    this.scrollablePanel = this.scene.rexUI.add.fixWidthSizer()
 
     return this.scrollablePanel
   }
@@ -388,26 +388,28 @@ export default class MatchResultsRegion extends Region {
       // Our points vs their points
       const ours = state.roundResults[0][i]
       const theirs = state.roundResults[1][i]
-      const s = `Round ${round}\n${ours} - ${theirs}`
+
+      // Gold gradient over the winner's half of the row (our avatar left, theirs
+      // right), fading out by the center. Padding insets the unused half.
+      const halfWidth = this.WIDTH / 2
+      if (ours > theirs) {
+        const background = this.scene.add
+          .image(0, 0, MENU_ROW_HIGHLIGHT_GRADIENT_KEY)
+          .setDepth(Depth.results)
+        sizer.addBackground(background, { right: halfWidth })
+      } else if (theirs > ours) {
+        const background = this.scene.add
+          .image(0, 0, MENU_ROW_HIGHLIGHT_GRADIENT_KEY)
+          .setDepth(Depth.results)
+          .setRotation(Math.PI)
+        sizer.addBackground(background, { left: halfWidth })
+      }
+
+      // Round results per row
+      const s = `[b]Round ${round}[/b]\n${ours} - ${theirs}`
       let txt = this.scene.add
         .rexBBCodeText(0, 0, s, BBStyle.basicStylized)
         .setDepth(Depth.results)
-
-      // Visual to show who is the winner
-      let background
-      if (ours > theirs) {
-        background = this.scene.add
-          .image(0, 0, 'chrome-ResultGlow')
-          .setDepth(Depth.results)
-          .setRotation(Math.PI)
-      } else if (theirs > ours) {
-        background = this.scene.add
-          .image(0, 0, 'chrome-ResultGlow')
-          .setDepth(Depth.results)
-      }
-      if (background) {
-        sizer.addBackground(background)
-      }
 
       sizer.add(txt)
       this.scrollablePanel.add(sizer)
