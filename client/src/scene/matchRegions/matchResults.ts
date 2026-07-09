@@ -370,6 +370,11 @@ export default class MatchResultsRegion extends Region {
 
   // Display details about how each round went in the scrollable panel
   private displayRoundResults(state: GameModel): void {
+    // Round-result win highlight vertical shaping (tweak to taste):
+    // inset trims the band's height (larger = shorter), offset shifts it up.
+    const HIGHLIGHT_VERTICAL_INSET = 34
+    const HIGHLIGHT_Y_OFFSET = 13
+
     for (let i = 0; i < state.roundResults[0].length; i++) {
       const round = i + 1
 
@@ -389,20 +394,23 @@ export default class MatchResultsRegion extends Region {
       const ours = state.roundResults[0][i]
       const theirs = state.roundResults[1][i]
 
-      // Gold gradient over the winner's half of the row (our avatar left, theirs
-      // right), fading out by the center. Padding insets the unused half.
-      const halfWidth = this.WIDTH / 2
+      // Gold gradient to highlight the row's winner
+      const halfWidth = (this.WIDTH * 1) / 3
+      const vPad = {
+        top: HIGHLIGHT_VERTICAL_INSET - HIGHLIGHT_Y_OFFSET,
+        bottom: HIGHLIGHT_VERTICAL_INSET + HIGHLIGHT_Y_OFFSET,
+      }
       if (ours > theirs) {
         const background = this.scene.add
           .image(0, 0, MENU_ROW_HIGHLIGHT_GRADIENT_KEY)
           .setDepth(Depth.results)
-        sizer.addBackground(background, { right: halfWidth })
+        sizer.addBackground(background, { right: halfWidth, ...vPad })
       } else if (theirs > ours) {
         const background = this.scene.add
           .image(0, 0, MENU_ROW_HIGHLIGHT_GRADIENT_KEY)
           .setDepth(Depth.results)
           .setRotation(Math.PI)
-        sizer.addBackground(background, { left: halfWidth })
+        sizer.addBackground(background, { left: halfWidth, ...vPad })
       }
 
       // Round results per row
