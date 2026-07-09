@@ -37,7 +37,7 @@ import ContainerLitePlugin from 'phaser3-rex-plugins/plugins/containerlite-plugi
 import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
 import StoreScene from './scene/storeScene'
 import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin.js'
-import MapScene from './scene/MapScene'
+import MapScene from './scene/mapScene'
 
 const config: Phaser.Types.Core.GameConfig = {
   title: 'Celestial',
