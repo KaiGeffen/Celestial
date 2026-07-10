@@ -45,6 +45,7 @@
     "path-browserify": "^1.0.1",
     "phaser": "^3.55.2",
     "phaser3-rex-plugins": "^1.80.14",
-    "process": "^0.11.10"
+    "process": "^0.11.10",
+    "uuid": "^11.0.5"
   }
 }
