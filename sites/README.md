@@ -42,47 +42,61 @@ Then open [http://127.0.0.1:4950/about/](http://127.0.0.1:4950/about/) (also `/p
 
 ## Production
 
-In production each site is served by a single nginx container built from
+In production all four sites are served by a single nginx container built from
 [Dockerfile](Dockerfile) + [nginx.conf](nginx.conf), and the reverse proxy
 (Nginx Proxy Manager) routes the four path prefixes to it. The game (`client`)
 container serves everything else on the domain.
 
 ### Compose service (on the droplet)
 
+Follows the same pattern as the `frontend`/`backend` services: the image is built
+separately and referenced by tag (no `build:` key), on the shared `net` network,
+with no published `ports:` — NPM reaches it container-to-container.
+
 ```yaml
-sites:
-  build:
-    context: ./sites # uses sites/Dockerfile
-  container_name: sites
-  networks: [celestial_net] # same network NPM uses
-  restart: unless-stopped
-  # no ports: — NPM reaches it as http://sites:80 on the shared network
+  sites:
+    image: sites
+    restart: always
+    environment:
+      TZ: America/New_York
+    networks:
+      - net
 ```
 
 ### Deploying (order matters — so indexed URLs never 404)
 
-1. **Commit and pull onto the droplet** (images build from the checked-out repo).
-2. **Bring up the sites container first:**
+1. **Commit and pull onto the droplet** (the image is built from the checked-out repo).
+2. **Build and start the sites container first:**
 
-```bash
- docker compose up -d --build sites
-```
+   ```bash
+   docker build -t sites ./sites
+   docker compose up -d sites
+   ```
 
 3. **Add proxy routes** in Nginx Proxy Manager on the `celestialdecks.gg` proxy
-   host → _Custom locations_, one per prefix:
+   host → _Custom locations_, one per prefix, each forwarding to `http://sites:80`:
+
+   ```
+   /about    → http://sites:80
+   /press    → http://sites:80
+   /privacy  → http://sites:80
+   /streamer → http://sites:80
+   ```
+
 4. **Verify through the proxy:**
 
-```bash
- for p in about press privacy streamer; do
-   curl -s -o /dev/null -w "%{http_code}  /$p/\n" https://celestialdecks.gg/$p/
- done
-```
+   ```bash
+   for p in about press privacy streamer; do
+     curl -s -o /dev/null -w "%{http_code}  /$p/\n" https://celestialdecks.gg/$p/
+   done
+   ```
 
-5. **Only then redeploy the client**, which no longer serves these:
+5. **Only then rebuild + redeploy the client**, which no longer serves these:
 
-```bash
- docker compose up -d --build client
-```
+   ```bash
+   docker build -t client -f DockerfileClient .
+   docker compose up -d frontend
+   ```
 
 **Rule:** sites container up → proxy routes added & verified → _then_ client
 redeploy. Flipping the client first 404s the four prefixes until NPM is updated.
