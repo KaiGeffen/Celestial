@@ -23,6 +23,10 @@ const app = express()
 // Don't serve source or dependencies
 app.use(['/src', '/node_modules'], (req, res) => res.status(404).end())
 
+// Note: the marketing sites (/about/, /press/, /privacy/, /streamer/) are served
+// by their own container from the repo-root sites/ dir, routed by the reverse
+// proxy — not from here. See sites/Dockerfile.
+
 app.use(
   express.static(__dirname, {
     setHeaders: (res, filePath) => {

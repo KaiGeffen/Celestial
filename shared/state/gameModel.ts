@@ -51,7 +51,10 @@ export default class GameModel {
   lastShuffle: Card[][] = [[], []]
   winner: number = null
   // The points each player got each round
-  roundResults: [number[], number[]] = [[], []]
+  roundResults: [number[], number[]] = [
+    [2, 4, 1, 2, 5, 7, 8, 4, 5],
+    [1, 2, 3, 4, 5, 0, 0, 4, 5],
+  ]
 
   // Game tracking
   wins: number[] = [0, 0]

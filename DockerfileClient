@@ -14,6 +14,8 @@ RUN npm install
 # robots.txt and sitemap.xml are served from the client root by prodServer
 COPY --chown=node:node ./client /home/node/app/client
 COPY --chown=node:node ./shared /home/node/app/shared
+# The marketing sites (about/press/privacy/streamer) ship in their own image
+# (see sites/Dockerfile), not here — the game image stays lean.
 
 # Build in the image, not at container start: the asset cache-busting version
 # is minted at build time, so building on start would bust every player's

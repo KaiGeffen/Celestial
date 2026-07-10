@@ -1,0 +1,4 @@
+# Build/meta files not part of the served content.
+# (nginx also 404s these, this just keeps them out of the image entirely.)
+**/.DS_Store
+press/PRESSKIT_SPEC.md
