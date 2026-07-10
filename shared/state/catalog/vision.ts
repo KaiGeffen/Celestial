@@ -1,6 +1,6 @@
 import Card from '../card'
 import { SightCard } from '../card'
-import { seen, predator, greatWheel } from './tokens'
+import { seen, predator } from './tokens'
 import { Quality } from '../quality'
 import { Keywords } from '../keyword'
 import { Zone } from '../zone'
@@ -277,28 +277,6 @@ const realms = new Realms({
   text: 'Switch your deck and discard pile.',
 })
 
-class Path extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    let exhaled = false
-    if (super.exhale(1, game, player)) {
-      bonus -= 2
-      exhaled = true
-    }
-
-    super.play(player, game, index, bonus)
-
-    if (exhaled) {
-      game.create(Zone.Hand, player, greatWheel)
-    }
-  }
-}
-const path = new Path({
-  name: 'Path',
-  id: 6102,
-  cost: 2,
-  text: 'Create a Great Wheel in your hand.',
-})
-
 class Switcheroo extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
@@ -400,9 +378,5 @@ export {
   beggingBowl,
   // NEW CARDS
   suddenInsight,
-  // realms,
-  path,
-  // switcheroo,
-  // incense,
   coopy,
 }

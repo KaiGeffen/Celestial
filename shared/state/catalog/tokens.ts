@@ -164,22 +164,6 @@ const ice = new Ice({
   theme: 7,
 })
 
-class GreatWheel extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
-    game.story.roundEndedForced = true
-  }
-}
-const greatWheel = new GreatWheel({
-  name: 'Great Wheel',
-  id: 1009,
-  cost: 8,
-  points: 8,
-  qualities: [Quality.FLEETING],
-  text: 'Fleeting\nEnd the current round.',
-  theme: 5,
-})
-
 class Race extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
@@ -214,6 +198,5 @@ export {
   heirloom,
   condemnation,
   ice,
-  greatWheel,
   race,
 }

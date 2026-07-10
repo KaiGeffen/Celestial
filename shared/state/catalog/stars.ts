@@ -406,7 +406,7 @@ const heavens = new Heavens({
   text: "Costs 2 less for each time you've triggered Exhale since the last story began.",
 })
 
-class Arise extends Card {
+class CosmicDance extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -416,11 +416,9 @@ class Arise extends Card {
     }
   }
 }
-const arise = new Arise({
-  name: 'Arise',
+const cosmicDance = new CosmicDance({
+  name: 'Cosmic Dance',
   id: 8020,
-  cost: 4,
-  points: 4,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nIf the top card of your discard pile has Morning, trigger its ability.',
 })
@@ -448,6 +446,29 @@ const realms = new Realms({
   text: 'Exhale 6: Worth +6.\nMorning: Add this to the story Revealed.',
 })
 
+class Morpheus extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    if (super.exhale(6, game, player)) {
+      bonus += 6
+    }
+
+    super.play(player, game, index, bonus)
+  }
+
+  onMorning(player: number, game: GameModel, index: number) {
+    game.moveBetweenZones(Zone.Discard, Zone.Story, player, index, {
+      revealed: true,
+    })
+
+    return true
+  }
+}
+const morpheus = new Morpheus({
+  name: 'Morpheus',
+  id: 8022,
+  text: 'When night falls, move this to the end of the story, then gain 1 breath for each card it passed through.',
+})
+
 export {
   stars,
   cosmos,
@@ -462,12 +483,9 @@ export {
   cloakOfStars,
   dreamer,
   pride,
-  // NEW
-  // rocketship,
-  // fable,
-  // boreas,
   starfall,
+  // NEW
   heavens,
-  arise,
   realms,
+  morpheus,
 }
