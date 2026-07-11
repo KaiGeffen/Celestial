@@ -25,6 +25,11 @@ export default class Cutout extends Button {
   required = false
 
   constructor(within: ContainerLite, card: Card) {
+    // Fall back to the default art if this card has no cutout image
+    const iconName = within.scene.textures.exists(`cutout-${card.name}`)
+      ? `cutout-${card.name}`
+      : 'cutout-Default'
+
     super(within, 0, 0, {
       text: {
         text: '',
@@ -33,7 +38,7 @@ export default class Cutout extends Button {
         offsetX: 150,
       },
       icon: {
-        name: `cutout-${card.name}`,
+        name: iconName,
         interactive: true,
         noGlow: true,
       },

@@ -263,6 +263,7 @@ export const assetLists = {
       "Dash",
       "Dawn",
       "Death",
+      "Default",
       "Defiance",
       "Dew",
       "Doll",
