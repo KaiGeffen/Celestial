@@ -1,9 +1,10 @@
 import 'phaser'
-import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
+import type RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 
 import BaseScene from './baseScene'
 import Cutout from '../lib/buttons/cutout'
-import { UserSettings, Flags } from '../settings/settings'
+import DeckStore from '../lib/deckStore'
+import { UserSettings, Flags, Space } from '../settings/settings'
 import Catalog from '@shared/state/catalog'
 import Card from '@shared/state/card'
 import { Deck } from '@shared/types/deck'
@@ -23,7 +24,6 @@ import {
   type RightCol,
 } from './deckEditor/deckEditorSideCol'
 import type { MissionDetails } from '@shared/journey/journey'
-import { Space } from '../settings/settings'
 export type { DeckEditorCatalogOptions } from './deckEditor/deckEditorCatalog'
 export type { DeckEditorDeckOptions } from './deckEditor/deckEditorSideCol'
 
@@ -69,8 +69,7 @@ export default class DeckEditorScene extends BaseScene {
     // Ensure there is a deck at this index
     this.ensureDeckAtIndex()
 
-    const decks = UserSettings._get('decks')
-    const deck: Deck = decks[this.deckIndex]
+    const deck: Deck = DeckStore.getDeck(this.deckIndex)
 
     // Initialize live state from the saved deck
     this.deckName = deck.name
@@ -115,7 +114,7 @@ export default class DeckEditorScene extends BaseScene {
   protected handlePlayClick(): void {
     this.saveCurrentDeck()
     // NOTE Necessary because play menu could change this, and if closed+reopened it be desync
-    UserSettings._set('equippedDeckIndex', this.deckIndex)
+    DeckStore.setEquippedIndex(this.deckIndex)
     this.scene.launch('MenuScene', { menu: 'play', activeScene: this })
   }
 
@@ -150,28 +149,7 @@ export default class DeckEditorScene extends BaseScene {
         this.scene.start(this.editorReturnScene())
       },
       onCosmetics: () => this.openStylesMenu(),
-      onShare: () => {
-        if (Flags.local) {
-          const deckArray = this.getDeckCode()
-          navigator.clipboard.writeText(JSON.stringify(deckArray))
-        }
-        this.scene.launch('MenuScene', {
-          menu: 'textEntry',
-          title: 'Deck Code',
-          confirmLabel: 'Import',
-          text: encodeShareableDeckCode(this.getDeckCode()),
-          placeholder: 'Deck code',
-          callback: (text: string) => {
-            const decoded = decodeShareableDeckCode(text.trim())
-            if (!decoded) {
-              return 'Invalid deck code.'
-            }
-            this.setDeck(Catalog.getCardListByIds(decoded))
-            return ''
-          },
-          activeScene: this,
-        })
-      },
+      onShare: () => this.openShareMenu(),
       onPlay: () => this.handlePlayClick(),
     })
 
@@ -255,9 +233,32 @@ export default class DeckEditorScene extends BaseScene {
 
   /** Callbacks */
   private addCardToDeck(card: Card): void {
-    this.deckRegion.decklist.addCard(card)
-    this.deckRegion.layoutDecklist()
+    this.deckRegion.addCard(card)
     this.syncDeckThumbnail()
+  }
+
+  /** Show the deck's shareable code, and allow importing one. */
+  private openShareMenu(): void {
+    if (Flags.local) {
+      const deckArray = this.getDeckCode()
+      navigator.clipboard.writeText(JSON.stringify(deckArray))
+    }
+    this.scene.launch('MenuScene', {
+      menu: 'textEntry',
+      title: 'Deck Code',
+      confirmLabel: 'Import',
+      text: encodeShareableDeckCode(this.getDeckCode()),
+      placeholder: 'Deck code',
+      callback: (text: string) => {
+        const decoded = decodeShareableDeckCode(text.trim())
+        if (!decoded) {
+          return 'Invalid deck code.'
+        }
+        this.setDeck(Catalog.getCardListByIds(decoded))
+        return ''
+      },
+      activeScene: this,
+    })
   }
 
   private openStylesMenu(): void {
@@ -300,10 +301,7 @@ export default class DeckEditorScene extends BaseScene {
           this.addCardToDeck(cutout.card)
         } else {
           // Remove 1 of the card
-          this.deckRegion.decklist.removeCard(cutout.card)
-          // Always refresh layout/footer state after a removal, even when the cutout remains.
-          this.deckRegion.layoutDecklist()
-
+          this.deckRegion.removeCard(cutout.card)
           // Update the thumbnail
           this.syncDeckThumbnail()
         }
@@ -311,25 +309,20 @@ export default class DeckEditorScene extends BaseScene {
     }
   }
 
-  // Persist current version of deck into UserSettings
+  // Persist current version of deck into the deck store
   protected saveCurrentDeck(): void {
     this.ensureDeckAtIndex()
 
-    // Get the deck
-    const decks: Deck[] = UserSettings._get('decks')
-    const deck = decks[this.deckIndex]
+    const deck = DeckStore.getDeck(this.deckIndex)
     if (!deck) return
 
     // Update its values
-    const updated: Deck = {
+    DeckStore.update(this.deckIndex, {
       name: this.deckName ?? deck.name,
       cards: this.getDeckCode(),
       cosmeticSet: this.cosmeticSet ??
         deck.cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 },
-    }
-
-    // Save it
-    UserSettings._setIndex('decks', this.deckIndex, updated)
+    })
   }
 
   private handleBack(): void {
@@ -381,7 +374,7 @@ export default class DeckEditorScene extends BaseScene {
 
   /** Utility */
   protected getDeckCode(): number[] {
-    return this.deckRegion.decklist.getDeckCode()
+    return this.deckRegion.getDeckCode()
   }
 
   private syncDeckThumbnail(): void {
@@ -397,28 +390,18 @@ export default class DeckEditorScene extends BaseScene {
 
   // Replaces the entire decklist at once (e.g. paste/import), unlike addCardToDeck which appends one card
   private setDeck(cards: Card[]): void {
-    this.deckRegion.decklist.setDeck(cards, !Flags.devCardsEnabled)
-    // Scroll to the top of the decklist
-    this.deckRegion.scrollDecklistToTop()
+    this.deckRegion.setDeck(cards, !Flags.devCardsEnabled)
     // Sync thumbnail so card count and valid/invalid state reflect the new deck
     this.syncDeckThumbnail()
   }
 
   // Ensure there is a deck at this index in users account (Fill with default cosmetics if not)
   private ensureDeckAtIndex(): void {
-    const decks: Deck[] = [...(UserSettings._get('decks') || [])]
-    if (decks[this.deckIndex]) return
-
-    // Push enough decks for there to be one at the given index
-    while (decks.length <= this.deckIndex) {
-      decks.push({
-        name: `Deck ${decks.length + 1}`,
-        cards: [],
-        cosmeticSet: Server.getUserData().cosmeticSet,
-      })
-    }
-
-    UserSettings._set('decks', decks)
+    DeckStore.ensureAtIndex(this.deckIndex, (i) => ({
+      name: `Deck ${i + 1}`,
+      cards: [],
+      cosmeticSet: Server.getUserData().cosmeticSet,
+    }))
   }
 
   onWindowResize(): void {
@@ -453,10 +436,6 @@ export class DeckEditorJourneyScene extends DeckEditorScene {
 
   protected editorReturnScene(): string {
     return 'JourneyScene'
-  }
-
-  protected getDiscardBackMessage(): string {
-    return 'Discard your changes and return to the journey map?'
   }
 
   protected shouldConfirmOnBack(): boolean {

@@ -34,7 +34,7 @@ export type DeckEditorDeckOptions = {
 export class RightCol {
   readonly scene: BaseScene
 
-  readonly decklist: Decklist
+  protected readonly decklist: Decklist
   readonly scrollPanel: ScrollablePanel
 
   protected readonly opts: DeckEditorDeckOptions
@@ -62,6 +62,29 @@ export class RightCol {
     })
 
     this.updateCardCounts()
+  }
+
+  /** Add one card to the decklist and refresh layout/footer state. */
+  addCard(card: Card): void {
+    this.decklist.addCard(card)
+    this.layoutDecklist()
+  }
+
+  /** Remove one copy of a card and refresh layout/footer state. */
+  removeCard(card: Card): void {
+    this.decklist.removeCard(card)
+    // Always refresh layout/footer state after a removal, even when the cutout remains.
+    this.layoutDecklist()
+  }
+
+  /** Replace the entire decklist at once (e.g. paste/import) and scroll to top. */
+  setDeck(cards: Card[], mustOwn = false): void {
+    this.decklist.setDeck(cards, mustOwn)
+    this.scrollDecklistToTop()
+  }
+
+  getDeckCode(): number[] {
+    return this.decklist.getDeckCode()
   }
 
   layoutDecklist(): void {

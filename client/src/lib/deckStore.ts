@@ -11,6 +11,25 @@ export default class DeckStore {
     return UserSettings._get('decks') || []
   }
 
+  static getDeck(index: number): Deck | undefined {
+    return this.getDecks()[index]
+  }
+
+  /** Overwrite the deck at `index`. */
+  static update(index: number, deck: Deck): void {
+    UserSettings._setIndex('decks', index, deck)
+  }
+
+  /** Ensure a deck exists at `index`, filling any gaps with `makeDefault(i)`. */
+  static ensureAtIndex(index: number, makeDefault: (i: number) => Deck): void {
+    const decks = [...this.getDecks()]
+    if (decks[index]) return
+    while (decks.length <= index) {
+      decks.push(makeDefault(decks.length))
+    }
+    UserSettings._set('decks', decks)
+  }
+
   static getEquippedIndex(): number | undefined {
     return UserSettings._get('equippedDeckIndex')
   }
