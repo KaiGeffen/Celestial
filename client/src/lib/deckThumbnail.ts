@@ -3,6 +3,7 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 import BaseScene from '../scene/baseScene'
 import Buttons from './buttons/buttons'
+import AvatarButton from './buttons/avatar'
 import { Color, Space, Style } from '../settings/settings'
 import { CosmeticSet } from '@shared/types/cosmeticSet'
 import cardbackNames from '../data/cardbackNames'
@@ -16,7 +17,7 @@ export default class DeckThumbnail {
 
   private nameText: Phaser.GameObjects.Text
   private nameBackground: Phaser.GameObjects.Image
-  private avatarButton: any
+  private avatarButton: AvatarButton
   private cardbackImages: Phaser.GameObjects.Image[] = []
   private selected = false
   private hovered = false
@@ -72,7 +73,7 @@ export default class DeckThumbnail {
         .image(-40, 70, `cardback-${cardbackName}`)
         .setOrigin(0.5, 1) // rotate around bottom-center
         .setDisplaySize(Space.cardWidth / 2, Space.cardHeight / 2)
-        .setRotation((angleFirst + angleStepDeg * i * Math.PI) / 180)
+        .setRotation(((angleFirst + angleStepDeg * i) * Math.PI) / 180)
       this.cardbackImages.push(cardBack)
       this.container.add(cardBack)
     }

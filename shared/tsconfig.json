@@ -1,0 +1,19 @@
+{
+  // Governs editor type-checking for shared/ files. Mirrors the (non-strict)
+  // settings the client and server actually build shared under, so the editor
+  // doesn't apply its inferred-project strict defaults (e.g. flagging number = null).
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "strictNullChecks": false,
+    "strictPropertyInitialization": false,
+    "noImplicitAny": false,
+    "lib": ["ESNext", "DOM"]
+  },
+  "include": ["**/*.ts"]
+}

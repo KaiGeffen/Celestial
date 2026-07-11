@@ -2,12 +2,14 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 
 import BaseScene from './baseScene'
 import Decklist from '../lib/decklist'
 import Buttons from '../lib/buttons/buttons'
 import DeckThumbnail from '../lib/deckThumbnail'
-import { Color, Space, Style, UserSettings } from '../settings/settings'
+import DeckStore from '../lib/deckStore'
+import { Color, Space, Style } from '../settings/settings'
 import Server from '../server'
 import newScrollablePanel from '../lib/scrollablePanel'
 import { MechanicsSettings } from '@shared/settings'
@@ -26,10 +28,12 @@ export default class DeckSelectorScene extends BaseScene {
   private decklist: Decklist
   private rosterPanel: ScrollablePanel | null
   private centerPanel: ScrollablePanel | null
+  /** Inner fixWidthSizer of `centerPanel` that holds the deck thumbnails. */
+  private centerListSizer: FixWidthSizer | null = null
   private deckThumbnails: DeckThumbnail[] = []
   private background: Phaser.GameObjects.Image | null
   /** Root layout; `windowResizeManager` calls `onWindowResize` so this relayouts after `Space` updates. */
-  private mainSizer: any = null
+  private mainSizer: Sizer | null = null
 
   // Drag-to-reorder state
   private dragState: {
@@ -125,7 +129,9 @@ export default class DeckSelectorScene extends BaseScene {
     })
     this.mainSizer.layout()
 
-    // Toggle the deck search menu when "\" is pressed
+    // Toggle the deck search menu when "\" is pressed. Remove any prior handler
+    // first so a recycled scene doesn't double-register and open the menu twice.
+    this.input.keyboard.removeListener('keydown-BACK_SLASH')
     this.input.keyboard.on('keydown-BACK_SLASH', () => {
       // If the search menu is already open, "\" closes it again
       if (this.scene.isActive('MenuScene')) {
@@ -151,8 +157,8 @@ export default class DeckSelectorScene extends BaseScene {
     })
 
     // Restore selection
-    const equippedDeckIndex = UserSettings._get('equippedDeckIndex')
-    const decks = UserSettings._get('decks') || []
+    const equippedDeckIndex = DeckStore.getEquippedIndex()
+    const decks = DeckStore.getDecks()
     if (
       equippedDeckIndex !== undefined &&
       equippedDeckIndex !== null &&
@@ -252,7 +258,7 @@ export default class DeckSelectorScene extends BaseScene {
   }
 
   /** Full-width header — same layout/padding as `DeckEditorScene` `createFilterHeader`. */
-  private createMainHeader(): any {
+  private createMainHeader(): Sizer {
     const background = this.add
       .image(0, 0, 'chrome-builderHeader')
       .setInteractive()
@@ -318,6 +324,7 @@ export default class DeckSelectorScene extends BaseScene {
         line: Space.pad * 2,
       },
     })
+    this.centerListSizer = panel
 
     const scrollable = newScrollablePanel(this, {
       width: centerColumnWidth,
@@ -325,12 +332,14 @@ export default class DeckSelectorScene extends BaseScene {
       panel: { child: panel },
     }).setOrigin(0)
 
-    this.refreshDeckList(panel)
+    this.refreshDeckList()
     scrollable.layout()
     return scrollable
   }
 
-  private refreshDeckList(panel: FixWidthSizer): void {
+  private refreshDeckList(): void {
+    const panel = this.centerListSizer
+    if (!panel) return
     panel.removeAll(true)
     this.deckThumbnails = []
 
@@ -343,7 +352,7 @@ export default class DeckSelectorScene extends BaseScene {
     })
     panel.add(newDeckThumb.container)
 
-    const decks: Deck[] = UserSettings._get('decks') || []
+    const decks: Deck[] = DeckStore.getDecks()
     for (let i = 0; i < decks.length; i++) {
       const deck = decks[i]
       const name = deck?.name ?? `Deck ${i + 1}`
@@ -466,12 +475,11 @@ export default class DeckSelectorScene extends BaseScene {
 
     if (!wasDragging) return
 
-    const panel = this.centerPanel.getElement('panel') as FixWidthSizer
     if (toIndex !== null && toIndex !== fromIndex) {
       this.reorderDecks(fromIndex, toIndex)
     } else {
       // Dropped in place or outside any thumbnail — restore positions
-      this.refreshDeckList(panel)
+      this.refreshDeckList()
       this.centerPanel.layout()
       // refreshDeckList recreates thumbnails with selected=false; re-apply selection
       if (this.savedDeckIndex !== undefined) {
@@ -499,36 +507,18 @@ export default class DeckSelectorScene extends BaseScene {
   }
 
   /**
-   * Move deck at `fromIndex` to `toIndex` in UserSettings, update the
-   * equipped-deck pointer, and refresh the panel.
+   * Move deck at `fromIndex` to `toIndex` (via `DeckStore`, which remaps the
+   * equipped-deck pointer), then refresh the panel and reselect.
    *
    * Both indices are data indices (0 = first deck in the saved array).
    */
   private reorderDecks(fromIndex: number, toIndex: number): void {
-    const decks: Deck[] = [...(UserSettings._get('decks') || [])]
-    const [moved] = decks.splice(fromIndex, 1)
-    decks.splice(toIndex, 0, moved)
-    UserSettings._set('decks', decks)
+    const newEq = DeckStore.reorder(fromIndex, toIndex)
 
-    // Remap the equipped-deck pointer to follow the moved deck
-    const eq: number | undefined = UserSettings._get('equippedDeckIndex')
-    let newEq = eq
-    if (newEq !== undefined) {
-      if (eq === fromIndex) {
-        newEq = toIndex
-      } else if (fromIndex < toIndex) {
-        if (newEq > fromIndex && newEq <= toIndex) newEq--
-      } else {
-        if (newEq >= toIndex && newEq < fromIndex) newEq++
-      }
-      UserSettings._set('equippedDeckIndex', newEq)
-    }
-
-    const panel = this.centerPanel.getElement('panel') as FixWidthSizer
-    this.refreshDeckList(panel)
+    this.refreshDeckList()
     this.centerPanel.layout()
 
-    if (newEq !== undefined && newEq < decks.length) {
+    if (newEq !== undefined && newEq < DeckStore.getDecks().length) {
       this.selectDeck(newEq)
     }
   }
@@ -536,8 +526,8 @@ export default class DeckSelectorScene extends BaseScene {
   // ────────────────────────────────────────────────────────────────────────────
 
   private onNewDeckClick(): void {
-    UserSettings._push('decks', {
-      name: `Deck ${(UserSettings._get('decks') || []).length + 1}`,
+    const newIndex = DeckStore.add({
+      name: `Deck ${DeckStore.getDecks().length + 1}`,
       cards: [],
       cosmeticSet: Server.getUserData().cosmeticSet ?? {
         avatar: 0,
@@ -545,8 +535,7 @@ export default class DeckSelectorScene extends BaseScene {
         cardback: 0,
       },
     })
-    const newIndex = (UserSettings._get('decks') || []).length - 1
-    UserSettings._set('equippedDeckIndex', newIndex)
+    DeckStore.setEquippedIndex(newIndex)
     this.scene.start('DeckEditorScene', { deckIndex: newIndex })
   }
 
@@ -558,15 +547,17 @@ export default class DeckSelectorScene extends BaseScene {
       t.setSelected(j === i)
     })
     this.savedDeckIndex = i
-    const deck: Deck = UserSettings._get('decks')[i]
-    this.decklist.setDeck(deck.cards.map((id) => Catalog.getCardById(id)))
-    UserSettings._set('equippedDeckIndex', i)
+    const deck: Deck = DeckStore.getDecks()[i]
+    this.decklist.setDeck(
+      (deck?.cards ?? []).map((id) => Catalog.getCardById(id)),
+    )
+    DeckStore.setEquippedIndex(i)
     this.rosterPanel.layout()
     this.rosterPanel.t = 0
   }
 
   selectDeck(i: number): void {
-    if (i < 0 || i >= (UserSettings._get('decks') || []).length) return
+    if (i < 0 || i >= DeckStore.getDecks().length) return
     this.onDeckClick(i)
   }
 
@@ -576,9 +567,10 @@ export default class DeckSelectorScene extends BaseScene {
    * contains `search` (case-insensitive partial match). Empty search shows all.
    */
   private filterDecks(search: string): void {
-    const panel = this.centerPanel.getElement('panel') as FixWidthSizer
+    const panel = this.centerListSizer
+    if (!panel) return
     const query = search.trim().toLowerCase()
-    const decks: Deck[] = UserSettings._get('decks') || []
+    const decks: Deck[] = DeckStore.getDecks()
 
     this.deckThumbnails.forEach((thumb, i) => {
       const visible = query === '' || this.deckMatchesSearch(decks[i], query)
@@ -600,7 +592,7 @@ export default class DeckSelectorScene extends BaseScene {
     )
   }
 
-  private createRightPanel(): any {
+  private createRightPanel(): Sizer {
     const sizer = this.rexUI.add.sizer({
       width: ROSTER_WIDTH,
       orientation: 1,
@@ -626,7 +618,7 @@ export default class DeckSelectorScene extends BaseScene {
     const colSizer = this.rexUI.add.sizer({
       orientation: 1,
       space: { item: Space.padSmall },
-    } as any)
+    })
     colSizer.add(makeBtn('Edit', () => this.onEdit()))
     colSizer.add(makeBtn('Delete', () => this.onDelete(), true))
 
@@ -648,7 +640,7 @@ export default class DeckSelectorScene extends BaseScene {
       .sizer({
         orientation: 0,
         space: { item: Space.padSmall },
-      } as any)
+      })
       .add(colSizer)
       .add(playContainer)
 
@@ -676,20 +668,12 @@ export default class DeckSelectorScene extends BaseScene {
         ) {
           this.savedDeckIndex--
         }
-        UserSettings._pop('decks', deckIndex)
-        const decks = UserSettings._get('decks') || []
-        const eq = UserSettings._get('equippedDeckIndex')
-        if (eq === deckIndex)
-          UserSettings._set('equippedDeckIndex', decks.length ? 0 : undefined)
-        else if (eq !== undefined && eq > deckIndex)
-          UserSettings._set('equippedDeckIndex', eq - 1)
-        this.refreshDeckList(
-          this.centerPanel.getElement('panel') as FixWidthSizer,
-        )
+        DeckStore.remove(deckIndex)
+        this.refreshDeckList()
         this.centerPanel.layout()
         if (
           this.savedDeckIndex !== undefined &&
-          this.savedDeckIndex < (UserSettings._get('decks') || []).length
+          this.savedDeckIndex < DeckStore.getDecks().length
         ) {
           this.selectDeck(this.savedDeckIndex)
         }
@@ -708,7 +692,7 @@ export default class DeckSelectorScene extends BaseScene {
 
   private onPlayMatch(): void {
     if (this.savedDeckIndex !== undefined) {
-      UserSettings._set('equippedDeckIndex', this.savedDeckIndex)
+      DeckStore.setEquippedIndex(this.savedDeckIndex)
     }
     this.scene.launch('MenuScene', { menu: 'play', activeScene: this })
   }

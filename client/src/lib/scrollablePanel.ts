@@ -8,7 +8,7 @@ import BaseScene, { BaseMenuScene } from '../scene/baseScene'
 
 export default function newScrollablePanel(
   scene: BaseScene | BaseMenuScene,
-  config?: ScrollablePanel.IConfig,
+  config: ScrollablePanel.IConfig,
 ): ScrollablePanel {
   let panel = new ScrollablePanel(scene, config)
 
