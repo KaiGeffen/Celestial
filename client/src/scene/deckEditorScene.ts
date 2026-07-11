@@ -261,12 +261,6 @@ export default class DeckEditorScene extends BaseScene {
   }
 
   private openStylesMenu(): void {
-    // Get the deck
-    this.ensureDeckAtIndex()
-    const decks = UserSettings._get('decks')
-    const deck = decks[this.deckIndex]
-
-    // Open the styles menu
     this.scene.launch('MenuScene', {
       menu: 'alterDeckCosmetics',
       // When confirming, set the values for this scene with the new selected values
@@ -430,34 +424,10 @@ export default class DeckEditorScene extends BaseScene {
   onWindowResize(): void {
     this.sizer?.layout()
   }
-
-  // TODO Removed? Is this used at all?
-  updateSavedDeck(
-    deckCode?: number[],
-    name?: string,
-    cosmeticSet?: CosmeticSet,
-  ): void {
-    this.ensureDeckAtIndex()
-    const decks = UserSettings._get('decks') || []
-    const deck = decks[this.deckIndex]
-    if (!deck) return
-    const updated: Deck = {
-      name: name ?? deck.name,
-      cards: deckCode ?? deck.cards ?? [],
-      cosmeticSet: cosmeticSet ??
-        deck.cosmeticSet ?? { avatar: 0, border: 0, cardback: 0 },
-    }
-    UserSettings._setIndex('decks', this.deckIndex, updated)
-    if (name !== undefined) this.deckName = name
-    if (cosmeticSet !== undefined) {
-      this.cosmeticSet = cosmeticSet
-    }
-    this.syncDeckThumbnail()
-  }
 }
 
 export class DeckEditorJourneyScene extends DeckEditorScene {
-  private mission!: MissionDetails
+  private mission: MissionDetails | undefined
 
   constructor() {
     super('DeckEditorJourneyScene', 'JourneyScene')
