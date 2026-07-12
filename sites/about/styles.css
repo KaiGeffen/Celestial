@@ -74,11 +74,8 @@ h2 {
   color: var(--color-navy);
 }
 
+/* Font styling shared with #mobile-message p below */
 .landing-p {
-  font-family: 'Josefin Sans', sans-serif;
-  font-size: 22px;
-  font-weight: bold;
-  color: var(--color-navy);
   line-height: 1.5;
   margin-bottom: 20px;
 }
@@ -222,7 +219,22 @@ p {
   color: #f0e3ca;
 }
 
-/* Mobile Discord button - uses same button1.png as Play Free */
+/* Text under the logo ("Strategy card game", mobile "Mobile in development /
+   Play on laptop", desktop "No download required"): one shared style, with a
+   soft light halo so the text stays readable over the bright cloud art */
+.landing-p,
+#mobile-message p {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--color-navy);
+  text-shadow:
+    0 0 6px rgba(240, 227, 202, 0.9),
+    0 0 14px rgba(240, 227, 202, 0.8),
+    0 0 28px rgba(240, 227, 202, 0.6);
+}
+
+/* Mobile wishlist button - uses same button1.png as Play Free */
 #mobile-message .signup-button {
   background-image: url('assets/button1.png');
   color: #f0e3ca;
@@ -355,7 +367,6 @@ p {
   }
 
   .landing-p {
-    font-size: 1rem;
     margin: 1rem 0;
   }
 
