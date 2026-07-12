@@ -234,10 +234,19 @@ p {
     0 0 28px rgba(240, 227, 202, 0.6);
 }
 
-/* Mobile wishlist button - uses same button1.png as Play Free */
+/* Mobile Discord + Wishlist buttons side by side */
+.mobile-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Mobile buttons - use same button1.png as Play Free */
 #mobile-message .signup-button {
   background-image: url('assets/button1.png');
   color: #f0e3ca;
+  padding: 20px 28px;
 }
 
 /* Discord button - uses button2.png */
