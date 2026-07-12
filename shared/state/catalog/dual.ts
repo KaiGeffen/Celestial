@@ -3,7 +3,7 @@ import { Quality } from '../quality'
 import GameModel from '../gameModel'
 import { Zone } from '../zone'
 import { Animation, Visibility } from '../../animation'
-import { wound } from './tokens'
+import { ashes, wound } from './tokens'
 
 // A card that switches back and forth when you pass while it's in hand
 abstract class DualCard extends Card {
@@ -30,6 +30,43 @@ abstract class DualCard extends Card {
   }
 }
 
+// Sky + Ashes
+class Peace extends DualCard {
+  get otherCard() {
+    return war
+  }
+}
+const peace = new Peace({
+  name: 'Peace',
+  id: 1101,
+  cost: 4,
+  points: 5,
+  qualities: [Quality.FLEETING],
+  text: 'Becomes War\nFleeting',
+  theme: 0,
+})
+
+class War extends DualCard {
+  get otherCard() {
+    return peace
+  }
+
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    if (this.upgradeVersion === 2) {
+      game.create(Zone.Deck, player ^ 1, ashes)
+    }
+  }
+}
+const war = new War({
+  name: 'War',
+  id: 1102,
+  text: 'Becomes Peace\nCreate 2 Ashes in your discard pile.',
+  theme: 1,
+})
+
+// Shadow + Pet
 class Agony extends DualCard {
   get otherCard() {
     return ecstasy
@@ -42,7 +79,7 @@ class Agony extends DualCard {
 }
 const agony = new Agony({
   name: 'Agony',
-  id: 1101,
+  id: 1103,
   cost: 1,
   text: "Becomes Ecstasy\nCreate a Wound in your opponent's hand.",
   theme: 2,
@@ -64,13 +101,14 @@ class Ecstasy extends DualCard {
 }
 const ecstasy = new Ecstasy({
   name: 'Ecstasy',
-  id: 1102,
+  id: 1104,
   cost: 2,
   points: 1,
   text: "Becomes Agony\nDouble each player's points.",
   theme: 3,
 })
 
+// Birth + Vision
 class Subject extends DualCard {
   get otherCard() {
     return witness
@@ -78,7 +116,7 @@ class Subject extends DualCard {
 }
 const subject = new Subject({
   name: 'Subject',
-  id: 1103,
+  id: 1105,
   cost: 2,
   points: 2,
   text: 'Becomes Witness',
@@ -96,7 +134,7 @@ class Witness extends DualCard {
 }
 const witness = new Witness({
   name: 'Witness',
-  id: 1104,
+  id: 1106,
   text: 'Becomes Subject\nWhen played, gain Sight 4.',
   theme: 5,
 })
@@ -108,5 +146,5 @@ function markBeta(cards: Card[]): void {
   }
 }
 
-markBeta([agony, ecstasy, subject, witness])
-export { agony, ecstasy, subject, witness }
+markBeta([peace, war, agony, ecstasy, subject, witness])
+export { peace, war, agony, ecstasy, subject, witness }

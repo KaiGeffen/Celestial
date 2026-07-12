@@ -154,7 +154,6 @@ class Ice extends Card {
     return false
   }
 }
-
 const ice = new Ice({
   name: 'Ice',
   id: 1008,

@@ -454,19 +454,13 @@ class Morpheus extends Card {
 
     super.play(player, game, index, bonus)
   }
-
-  onMorning(player: number, game: GameModel, index: number) {
-    game.moveBetweenZones(Zone.Discard, Zone.Story, player, index, {
-      revealed: true,
-    })
-
-    return true
-  }
 }
 const morpheus = new Morpheus({
   name: 'Morpheus',
   id: 8022,
-  text: 'When night falls, move this to the end of the story, then gain 1 breath for each card it passed through.',
+  cost: 4,
+  points: 4,
+  text: 'If you have at least 5 cards in hand, discard a card to Inspire 5.\nExhale 5: Draw a card.',
 })
 
 export {

@@ -105,7 +105,7 @@ export class Keywords {
   // Abiliites with a card name TODO
   static becomes = new Keyword(
     'Becomes',
-    '[color=#FABD5D]Becomes[/color]: When you pass while this is in your hand, transform into TODO.',
+    '[color=#FABD5D]Becomes[/color]: When you pass while this is in your hand, transform it into the listed card.',
     false,
   )
 }

@@ -50,6 +50,8 @@ const fullCatalog = [
   ...applyThemeAndSort(groundCatalog, 8), // Ground theme todo
   ...Object.values(dualCatalog), // Dual cards
 ]
+// TODO Sort by style so dual cards are in with the rest
+// .sort((a, b) => a.theme - b.theme)
 const nonCollectibles = [...Object.values(tokensCatalog)]
 const allCards = [...fullCatalog, ...nonCollectibles]
 
