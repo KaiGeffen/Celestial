@@ -95,7 +95,9 @@
       />
     </noscript>
     <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/recoleta" />
-    <link rel="stylesheet" href="styles.css" />
+    <!-- Bump ?v= on every styles.css change: CSS is cached for 30d (nginx +
+         Cloudflare edge), and only this HTML reference forces a refetch -->
+    <link rel="stylesheet" href="styles.css?v=2" />
 
     <!-- Optimize Google Analytics loading -->
     <script>
