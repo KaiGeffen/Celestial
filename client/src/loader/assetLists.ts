@@ -519,23 +519,7 @@ export const assetLists = {
     "pixelArt": false
   },
   "news": {
-    "files": [
-      "Birth",
-      "Conquer",
-      "Fates",
-      "Goliath",
-      "LayBare",
-      "LostInShadow",
-      "MeAndHer",
-      "Nightmare",
-      "Overflow",
-      "Possibilities",
-      "Posterity",
-      "Refresh",
-      "Rose",
-      "Spark"
-    ],
-    "pixelArt": true
+    "files": []
   },
   "sfx": {
     "files": [
