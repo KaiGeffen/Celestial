@@ -15,7 +15,9 @@ import Server from '../../server'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import AvatarButton from '../../lib/buttons/avatar'
 import BaseScene from '../baseScene'
-import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
+import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
+import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
+import newScrollablePanel from '../../lib/scrollablePanel'
 import { CosmeticSet } from '@shared/types/cosmeticSet'
 import { achievementsMeta } from '@shared/achievementsData'
 import {
@@ -30,8 +32,10 @@ export default class UserProfileMenu extends Menu {
   // TODO Refactor to remove this
   private currentTab: string = 'Icon'
   private currentAvatar: AvatarButton
-  private gridSizer: GridSizer // Store reference to grid sizer
-  private gridContainer: any // Container that holds the grid sizer (RexUI sizer)
+  // Wrapping sizer holding the current tab's items (like the deck editor catalog)
+  private contentSizer: FixWidthSizer
+  // Scrollable panel wrapping contentSizer, so any tab can outgrow the visible area
+  private scrollablePanel: ScrollablePanel
 
   // The home scene, which is closed when logging out
   private activeScene: BaseScene
@@ -204,76 +208,55 @@ export default class UserProfileMenu extends Menu {
     return container
   }
 
-  // Right column - grid of choices
+  // Right column - scrollable grid of choices
   private createRightColumn() {
-    // Create a sizer container to hold the grid sizer (which will be recreated dynamically)
-    this.gridContainer = this.scene.rexUI.add.sizer({
-      width: Space.avatarSize * 3 + Space.pad * 4,
-      height: 600,
-    })
-
-    this.updateGridContent()
-    this.sizer.add(this.gridContainer)
-  }
-
-  private updateGridContent() {
-    // Clear existing grid sizer from container
-    if (this.gridSizer) {
-      this.gridContainer.remove(this.gridSizer, true)
-      this.gridSizer = null
-    }
-
-    // Calculate number of rows needed based on current tab
-    let rows = 2
-    if (this.currentTab === 'Icon') {
-      const unlockedAvatars = getUnlockedAvatars()
-      rows = Math.max(2, Math.ceil(unlockedAvatars.length / 3))
-    } else if (this.currentTab === 'Border') {
-      const unlockedBorders = getUnlockedBorders()
-      rows = Math.max(2, Math.ceil(unlockedBorders.length / 3))
-    } else if (this.currentTab === 'Cardback') {
-      const unlockedCardbacks = getUnlockedCardbacks()
-      rows = Math.max(2, Math.ceil(unlockedCardbacks.length / 3))
-    }
-
-    // Create new grid sizer with correct number of rows
-    this.gridSizer = this.scene.rexUI.add.gridSizer({
-      column: 3,
-      row: rows,
-      width: Space.avatarSize * 3 + Space.pad * 4,
-      height: 600,
+    // Wrapping sizer: items flow left-to-right and wrap, like the deck editor catalog
+    this.contentSizer = this.scene.rexUI.add.fixWidthSizer({
       space: {
-        column: Space.pad,
-        row: Space.pad,
-        top: Space.pad,
-        bottom: Space.pad,
         left: Space.pad,
         right: Space.pad,
+        top: Space.pad,
+        bottom: Space.pad,
+        item: Space.pad,
+        line: Space.pad,
       },
     })
 
-    // Add grid sizer to container
-    this.gridContainer.add(this.gridSizer)
-    this.gridContainer.layout()
+    this.scrollablePanel = newScrollablePanel(this.scene, {
+      width: Space.avatarSize * 3 + Space.pad * 4,
+      height: 640,
+      panel: {
+        child: this.contentSizer,
+      },
+    })
 
-    // Populate grid based on current tab
+    this.updateGridContent()
+    this.sizer.add(this.scrollablePanel)
+  }
+
+  private updateGridContent() {
+    // Remove the previous tab's items
+    this.contentSizer.clear(true)
+
+    // Populate based on current tab
     if (this.currentTab === 'Icon') {
       this.createIconGrid()
     } else if (this.currentTab === 'Border') {
       this.createBorderGrid()
-    } else if (this.currentTab === 'Cardback') {
+    } else {
       this.createCardbackGrid()
     }
 
-    // Force layout update
-    this.gridSizer.layout()
+    // Re-layout and scroll back to the top
+    this.scrollablePanel.t = 0
+    this.scrollablePanel.layout()
   }
 
   private createIconGrid() {
     const unlockedAvatars = getUnlockedAvatars()
 
     // Add unlocked cosmetic items
-    Array.from(unlockedAvatars).forEach((avatarId, index) => {
+    Array.from(unlockedAvatars).forEach((avatarId) => {
       const container = new ContainerLite(
         this.scene,
         0,
@@ -293,7 +276,7 @@ export default class UserProfileMenu extends Menu {
           this.updateCosmeticSet(newSet)
         },
       })
-      this.gridSizer.add(container, index % 3, Math.floor(index / 3))
+      this.contentSizer.add(container)
     })
   }
 
@@ -301,7 +284,7 @@ export default class UserProfileMenu extends Menu {
     const unlockedBorders = getUnlockedBorders()
 
     // Add unlocked border options
-    Array.from(unlockedBorders).forEach((borderId, index) => {
+    Array.from(unlockedBorders).forEach((borderId) => {
       const container = new ContainerLite(
         this.scene,
         0,
@@ -325,7 +308,7 @@ export default class UserProfileMenu extends Menu {
         },
       })
 
-      this.gridSizer.add(container, index % 3, Math.floor(index / 3))
+      this.contentSizer.add(container)
     })
   }
 
@@ -335,7 +318,7 @@ export default class UserProfileMenu extends Menu {
     const width = Space.cardWidth * 0.85
     const height = Space.cardHeight * 0.85
 
-    Array.from(unlockedCardbacks).forEach((cardbackId, index) => {
+    Array.from(unlockedCardbacks).forEach((cardbackId) => {
       const container = new ContainerLite(this.scene, 0, 0, width, height)
 
       const selected =
@@ -365,7 +348,7 @@ export default class UserProfileMenu extends Menu {
         container.add(border)
       }
 
-      this.gridSizer.add(container, index % 2, Math.floor(index / 2))
+      this.contentSizer.add(container)
     })
   }
 

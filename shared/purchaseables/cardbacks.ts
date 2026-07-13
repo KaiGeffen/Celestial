@@ -16,6 +16,11 @@ const cardbacks: Purchaseable[] = [
     cost: 100,
     itemId: 3,
   },
+  {
+    id: 2004,
+    cost: 10000,
+    itemId: 4,
+  },
 ]
 
 export default cardbacks

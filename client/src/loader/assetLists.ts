@@ -58,6 +58,7 @@ export const assetLists = {
       "Astrology",
       "Blossom",
       "Default",
+      "Hill",
       "Lotus"
     ],
     "pixelArt": false
