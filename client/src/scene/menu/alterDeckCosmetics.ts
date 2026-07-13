@@ -14,7 +14,7 @@ import {
 } from '../../utils/cosmetics'
 import cardbackNames from '../../data/cardbackNames'
 import DeckThumbnail from '../../lib/deckThumbnail'
-import GridSizer from 'phaser3-rex-plugins/templates/ui/gridsizer/GridSizer'
+import CosmeticsGridPanel from './cosmeticsGridPanel'
 
 const width = 760
 
@@ -29,8 +29,8 @@ export default class AlterDeckCosmeticsMenu extends Menu {
 
   private currentTab: string = 'Icon'
   private deckThumbnail: DeckThumbnail
-  private gridSizer: GridSizer
-  private gridContainer: any
+  // Scrollable wrapping grid showing the current tab's items
+  private cosmeticsPanel: CosmeticsGridPanel
   private nameInput: any
 
   constructor(scene: MenuScene, params) {
@@ -181,61 +181,26 @@ export default class AlterDeckCosmeticsMenu extends Menu {
   }
 
   private createRightColumn() {
-    this.gridContainer = this.scene.rexUI.add.sizer({
-      width: Space.avatarSize * 3 + Space.pad * 4,
-      height: 600,
-    })
+    this.cosmeticsPanel = new CosmeticsGridPanel(this.scene)
 
     this.updateGridContent()
-    this.sizer.add(this.gridContainer)
+    this.sizer.add(this.cosmeticsPanel.panel)
   }
 
   private updateGridContent() {
-    if (this.gridSizer) {
-      this.gridContainer.remove(this.gridSizer, true)
-      this.gridSizer = null
-    }
-
-    let rows = 2
-    if (this.currentTab === 'Icon') {
-      rows = Math.max(2, Math.ceil(getUnlockedAvatars().length / 3))
-    } else if (this.currentTab === 'Border') {
-      rows = Math.max(2, Math.ceil(getUnlockedBorders().length / 3))
-    } else {
-      rows = Math.max(2, Math.ceil(getUnlockedCardbacks().length / 3))
-    }
-
-    this.gridSizer = this.scene.rexUI.add.gridSizer({
-      column: 3,
-      row: rows,
-      width: Space.avatarSize * 3 + Space.pad * 4,
-      height: 600,
-      space: {
-        column: Space.pad,
-        row: Space.pad,
-        top: Space.pad,
-        bottom: Space.pad,
-        left: Space.pad,
-        right: Space.pad,
-      },
+    this.cosmeticsPanel.repopulate(() => {
+      if (this.currentTab === 'Icon') {
+        this.createIconGrid()
+      } else if (this.currentTab === 'Border') {
+        this.createBorderGrid()
+      } else {
+        this.createCardbackGrid()
+      }
     })
-
-    this.gridContainer.add(this.gridSizer)
-    this.gridContainer.layout()
-
-    if (this.currentTab === 'Icon') {
-      this.createIconGrid()
-    } else if (this.currentTab === 'Border') {
-      this.createBorderGrid()
-    } else {
-      this.createCardbackGrid()
-    }
-
-    this.gridSizer.layout()
   }
 
   private createIconGrid() {
-    getUnlockedAvatars().forEach((avatarId, index) => {
+    getUnlockedAvatars().forEach((avatarId) => {
       const container = new ContainerLite(
         this.scene,
         0,
@@ -258,12 +223,12 @@ export default class AlterDeckCosmeticsMenu extends Menu {
           })
         },
       })
-      this.gridSizer.add(container, index % 3, Math.floor(index / 3))
+      this.cosmeticsPanel.add(container)
     })
   }
 
   private createBorderGrid() {
-    getUnlockedBorders().forEach((borderId, index) => {
+    getUnlockedBorders().forEach((borderId) => {
       const container = new ContainerLite(
         this.scene,
         0,
@@ -286,7 +251,7 @@ export default class AlterDeckCosmeticsMenu extends Menu {
           })
         },
       })
-      this.gridSizer.add(container, index % 3, Math.floor(index / 3))
+      this.cosmeticsPanel.add(container)
     })
   }
 
@@ -315,7 +280,7 @@ export default class AlterDeckCosmeticsMenu extends Menu {
 
     this.scene.plugins.get('rexAnchor')['add'](this.nameInput, {
       x: '50%-235',
-      y: '50%-75',
+      y: '50%-95',
     })
   }
 
@@ -323,7 +288,7 @@ export default class AlterDeckCosmeticsMenu extends Menu {
     const cbWidth = Space.cardWidth * 0.85
     const cbHeight = Space.cardHeight * 0.85
 
-    getUnlockedCardbacks().forEach((cardbackId, index) => {
+    getUnlockedCardbacks().forEach((cardbackId) => {
       const container = new ContainerLite(this.scene, 0, 0, cbWidth, cbHeight)
 
       const image = this.scene.add
@@ -353,7 +318,7 @@ export default class AlterDeckCosmeticsMenu extends Menu {
         )
       }
 
-      this.gridSizer.add(container, index % 2, Math.floor(index / 2))
+      this.cosmeticsPanel.add(container)
     })
   }
 }

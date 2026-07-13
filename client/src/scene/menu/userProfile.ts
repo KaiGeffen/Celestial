@@ -15,9 +15,7 @@ import Server from '../../server'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import AvatarButton from '../../lib/buttons/avatar'
 import BaseScene from '../baseScene'
-import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
-import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
-import newScrollablePanel from '../../lib/scrollablePanel'
+import CosmeticsGridPanel from './cosmeticsGridPanel'
 import { CosmeticSet } from '@shared/types/cosmeticSet'
 import { achievementsMeta } from '@shared/achievementsData'
 import {
@@ -32,10 +30,8 @@ export default class UserProfileMenu extends Menu {
   // TODO Refactor to remove this
   private currentTab: string = 'Icon'
   private currentAvatar: AvatarButton
-  // Wrapping sizer holding the current tab's items (like the deck editor catalog)
-  private contentSizer: FixWidthSizer
-  // Scrollable panel wrapping contentSizer, so any tab can outgrow the visible area
-  private scrollablePanel: ScrollablePanel
+  // Scrollable wrapping grid showing the current tab's items
+  private cosmeticsPanel: CosmeticsGridPanel
 
   // The home scene, which is closed when logging out
   private activeScene: BaseScene
@@ -210,46 +206,22 @@ export default class UserProfileMenu extends Menu {
 
   // Right column - scrollable grid of choices
   private createRightColumn() {
-    // Wrapping sizer: items flow left-to-right and wrap, like the deck editor catalog
-    this.contentSizer = this.scene.rexUI.add.fixWidthSizer({
-      space: {
-        left: Space.pad,
-        right: Space.pad,
-        top: Space.pad,
-        bottom: Space.pad,
-        item: Space.pad,
-        line: Space.pad,
-      },
-    })
-
-    this.scrollablePanel = newScrollablePanel(this.scene, {
-      width: Space.avatarSize * 3 + Space.pad * 4,
-      height: 640,
-      panel: {
-        child: this.contentSizer,
-      },
-    })
+    this.cosmeticsPanel = new CosmeticsGridPanel(this.scene)
 
     this.updateGridContent()
-    this.sizer.add(this.scrollablePanel)
+    this.sizer.add(this.cosmeticsPanel.panel)
   }
 
   private updateGridContent() {
-    // Remove the previous tab's items
-    this.contentSizer.clear(true)
-
-    // Populate based on current tab
-    if (this.currentTab === 'Icon') {
-      this.createIconGrid()
-    } else if (this.currentTab === 'Border') {
-      this.createBorderGrid()
-    } else {
-      this.createCardbackGrid()
-    }
-
-    // Re-layout and scroll back to the top
-    this.scrollablePanel.t = 0
-    this.scrollablePanel.layout()
+    this.cosmeticsPanel.repopulate(() => {
+      if (this.currentTab === 'Icon') {
+        this.createIconGrid()
+      } else if (this.currentTab === 'Border') {
+        this.createBorderGrid()
+      } else {
+        this.createCardbackGrid()
+      }
+    })
   }
 
   private createIconGrid() {
@@ -276,7 +248,7 @@ export default class UserProfileMenu extends Menu {
           this.updateCosmeticSet(newSet)
         },
       })
-      this.contentSizer.add(container)
+      this.cosmeticsPanel.add(container)
     })
   }
 
@@ -308,7 +280,7 @@ export default class UserProfileMenu extends Menu {
         },
       })
 
-      this.contentSizer.add(container)
+      this.cosmeticsPanel.add(container)
     })
   }
 
@@ -348,7 +320,7 @@ export default class UserProfileMenu extends Menu {
         container.add(border)
       }
 
-      this.contentSizer.add(container)
+      this.cosmeticsPanel.add(container)
     })
   }
 
