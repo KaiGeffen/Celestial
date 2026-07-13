@@ -141,6 +141,11 @@ export default class DeckEditorScene extends BaseScene {
       filterRegion: this.filterRegion,
     })
 
+    // The filter bar must render above the catalog cards, so that its
+    // interactive background swallows clicks on cards that have scrolled
+    // beneath it (the panel's mask hides them but doesn't block input)
+    this.filterRegion.sizer.setDepth(1)
+
     // Decklist region (right column)
     this.decklistRegion = this.createDecklistRegion({
       deckName: this.deckName,

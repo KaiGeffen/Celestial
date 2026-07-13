@@ -177,6 +177,7 @@ export default class BaseScene extends SharedBaseScene {
       .setOrigin(1, 0)
       .setDepth(5)
       .setScrollFactor(0)
+      .setVisible(false)
     this.plugins.get('rexAnchor')['add'](this.txtFPS, {
       x: `100%`,
       y: `0%`,
