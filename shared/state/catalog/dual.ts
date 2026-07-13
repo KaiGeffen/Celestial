@@ -109,23 +109,29 @@ const ecstasy = new Ecstasy({
 })
 
 // Birth + Vision
-class Subject extends DualCard {
+class Manifest extends DualCard {
   get otherCard() {
     return witness
   }
+
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    super.birth(4, game, player)
+  }
 }
-const subject = new Subject({
-  name: 'Subject',
+const manifest = new Manifest({
+  name: 'Manifest',
   id: 1105,
-  cost: 2,
-  points: 2,
-  text: 'Becomes Witness',
+  cost: 4,
+  points: 1,
+  text: 'Becomes Witness\nBirth 4',
   theme: 4,
 })
 
 class Witness extends DualCard {
   get otherCard() {
-    return subject
+    return manifest
   }
 
   onPlay(player: number, game: GameModel): void {
@@ -137,7 +143,7 @@ const witness = new Witness({
   id: 1106,
   cost: 1,
   points: 1,
-  text: 'Becomes Subject\nWhen played, gain Sight 4.',
+  text: 'Becomes Manifest\nWhen played, gain Sight 4.',
   theme: 5,
 })
 
@@ -148,5 +154,5 @@ function markBeta(cards: Card[]): void {
   }
 }
 
-markBeta([peace, war, agony, ecstasy, subject, witness])
-export { peace, war, agony, ecstasy, subject, witness }
+markBeta([peace, war, agony, ecstasy, manifest, witness])
+export { peace, war, agony, ecstasy, manifest, witness }
