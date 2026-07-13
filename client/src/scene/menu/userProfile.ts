@@ -290,35 +290,50 @@ export default class UserProfileMenu extends Menu {
     const width = Space.cardWidth * 0.85
     const height = Space.cardHeight * 0.85
 
+    // Outline pipeline on the image marks the selected cardback (same fx as
+    // Button's hover glow). Part of the image's render, so unlike a separate
+    // rectangle it respects the panel's scroll mask.
+    const outlinePlugin = this.scene.plugins.get('rexOutlinePipeline')
+    const outlines: any[] = []
+
     Array.from(unlockedCardbacks).forEach((cardbackId) => {
       const container = new ContainerLite(this.scene, 0, 0, width, height)
 
       const selected =
         (Server.getUserData().cosmeticSet.cardback ?? 0) === cardbackId
+
       const image = this.scene.add
         .image(0, 0, `cardback-${cardbackNames[cardbackId]}`)
         .setDisplaySize(width, height)
         .setInteractive()
-        .on('pointerdown', () => {
-          this.scene.sound.play('click')
-          const newSet = {
-            avatar: Server.getUserData().cosmeticSet.avatar,
-            border: Server.getUserData().cosmeticSet.border,
-            cardback: cardbackId,
-          }
-          this.updateCosmeticSet(newSet)
-          this.updateGridContent()
+
+      // The outline pipeline is WebGL-only, matching Button's glow
+      let outlineFx = null
+      if (!Flags.mobile) {
+        outlineFx = outlinePlugin['add'](image, {
+          thickness: 5,
+          outlineColor: Color.outline,
+          quality: 0.3,
         })
+        outlineFx.active = selected
+        outlines.push(outlineFx)
+      }
+
+      image.on('pointerdown', () => {
+        this.scene.sound.play('click')
+        const newSet = {
+          avatar: Server.getUserData().cosmeticSet.avatar,
+          border: Server.getUserData().cosmeticSet.border,
+          cardback: cardbackId,
+        }
+        this.updateCosmeticSet(newSet)
+
+        // Move the selection outline to this cardback
+        outlines.forEach((o) => (o.active = false))
+        if (outlineFx) outlineFx.active = true
+      })
 
       container.add(image)
-
-      if (selected) {
-        const border = this.scene.add
-          .rectangle(0, 0, width, height)
-          .setFillStyle(0x000000, 0)
-          .setStrokeStyle(5, Color.outline)
-        container.add(border)
-      }
 
       this.cosmeticsPanel.add(container)
     })

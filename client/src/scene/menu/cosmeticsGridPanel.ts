@@ -48,7 +48,11 @@ export default class CosmeticsGridPanel {
     this.contentSizer.add(item)
   }
 
-  /** Replace the grid's items: clear, run populate, re-layout at the top. */
+  /**
+   * Replace the grid's items on tab change: clear, run populate, re-layout at
+   * the top. Selection changes within a tab should not repopulate — toggle
+   * the item's selected visual instead.
+   */
   repopulate(populate: () => void): void {
     this.contentSizer.clear(true)
     populate()
