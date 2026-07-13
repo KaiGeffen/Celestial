@@ -83,6 +83,7 @@ export const assetLists = {
   },
   "card/subject": {
     "files": [
+      "Abandoned",
       "Abundance",
       "Ancestry",
       "Arsonist",
@@ -138,6 +139,7 @@ export const assetLists = {
       "Hug",
       "Hungry Ghost",
       "Hurricane",
+      "Ice",
       "Iceberg",
       "Immolant",
       "Imprison",
@@ -152,6 +154,7 @@ export const assetLists = {
       "Me and Her",
       "Mercy",
       "Mine",
+      "Moloch",
       "Moon",
       "Nascence",
       "Nectar",
@@ -189,6 +192,7 @@ export const assetLists = {
       "Starling",
       "Stars",
       "Storytime",
+      "Sudden Insight",
       "Sun",
       "Sunflower",
       "The Future",
@@ -198,6 +202,7 @@ export const assetLists = {
       "Vampire",
       "Veteran",
       "Victim",
+      "Voices",
       "Vulture",
       "Wing Clipping",
       "Yearn"
@@ -240,6 +245,7 @@ export const assetLists = {
   },
   "cutout": {
     "files": [
+      "Abandoned",
       "Abundance",
       "Ancestry",
       "Arsonist",
@@ -306,6 +312,7 @@ export const assetLists = {
       "Me and Her",
       "Mercy",
       "Mine",
+      "Moloch",
       "Moon",
       "Nascence",
       "Nectar",
@@ -341,6 +348,7 @@ export const assetLists = {
       "Starling",
       "Stars",
       "Storytime",
+      "Sudden Insight",
       "Sun",
       "Sunflower",
       "The Future",
@@ -350,6 +358,7 @@ export const assetLists = {
       "Vampire",
       "Veteran",
       "Victim",
+      "Voices",
       "Vulture",
       "Wing Clipping",
       "Yearn"
