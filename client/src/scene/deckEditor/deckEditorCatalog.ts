@@ -25,6 +25,8 @@ export type DeckEditorCatalogOptions = {
   onCardPick: (card: Card) => void
   onBack: () => void
   useJourneyInventory?: boolean
+  /** Current deck contents, backing the `present` search keyword. */
+  getDeckCardIds?: () => number[]
 }
 
 // The cost chip buttons
@@ -44,6 +46,7 @@ export class DeckEditorCatalog {
   headerSizer: any = null
 
   private readonly onBack: () => void
+  private readonly getDeckCardIds: () => number[]
 
   private cardImages: CardImage[] = []
   private searchText = ''
@@ -55,6 +58,7 @@ export class DeckEditorCatalog {
   constructor(scene: BaseScene, opts: DeckEditorCatalogOptions) {
     this.scene = scene
     this.onBack = opts.onBack
+    this.getDeckCardIds = opts.getDeckCardIds ?? (() => [])
     for (let i = 0; i <= DECK_EDITOR_MAX_COST_FILTER; i++) {
       this.filterCostAry[i] = false
     }
@@ -295,8 +299,10 @@ export class DeckEditorCatalog {
     this.gridSizer.clear()
 
     const tokens = parseDeckEditorSearchQuery(this.searchText)
+    // Snapshot of the deck for the `present` keyword
+    const deckCardIds = new Set(this.getDeckCardIds())
     const passes = (card: Card) =>
-      cardPassesDeckEditorFilters(card, tokens, this.filterCostAry)
+      cardPassesDeckEditorFilters(card, tokens, this.filterCostAry, deckCardIds)
 
     const sorted = [...this.cardImages]
     if (this.orderedByCost) {

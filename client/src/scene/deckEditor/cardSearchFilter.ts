@@ -66,6 +66,11 @@ function createSearchToken(
     text = text.substring(1)
     token.text = text
   }
+  // Bare keyword: matches cards that are currently in the deck
+  if (text.toLowerCase() === 'present') {
+    token.field = 'present'
+    return token
+  }
   const fieldMatch = text.match(/^(cost|points|name|text):(.+)$/i)
   if (fieldMatch) {
     token.field = fieldMatch[1].toLowerCase()
@@ -91,9 +96,15 @@ function createSearchToken(
   return token
 }
 
-function matchesToken(card: Card, token: DeckEditorSearchToken): boolean {
+function matchesToken(
+  card: Card,
+  token: DeckEditorSearchToken,
+  deckCardIds: ReadonlySet<number>,
+): boolean {
   let matches = false
-  if (token.field === 'cost') {
+  if (token.field === 'present') {
+    matches = deckCardIds.has(card.id)
+  } else if (token.field === 'cost') {
     if (token.rangeMin !== null && token.rangeMax !== null) {
       matches = card.cost >= token.rangeMin && card.cost <= token.rangeMax
     }
@@ -123,11 +134,16 @@ function searchEverywhere(card: Card, query: string): boolean {
   return searchableText.toLowerCase().includes(query.toLowerCase())
 }
 
-/** Combined cost chips + pre-parsed search token predicate for the catalog grid. */
+/**
+ * Combined cost chips + pre-parsed search token predicate for the catalog grid.
+ * `deckCardIds` backs the `present` keyword — a snapshot of the deck taken when
+ * the filter is applied, not kept in sync with later deck edits.
+ */
 export function cardPassesDeckEditorFilters(
   card: Card,
   tokens: DeckEditorSearchToken[],
   filterCostAry: boolean[],
+  deckCardIds: ReadonlySet<number>,
 ): boolean {
   if (filterCostAry.includes(true)) {
     if (!filterCostAry[Math.min(card.cost, DECK_EDITOR_MAX_COST_FILTER)]) {
@@ -136,7 +152,7 @@ export function cardPassesDeckEditorFilters(
   }
 
   for (const token of tokens) {
-    if (!matchesToken(card, token)) return false
+    if (!matchesToken(card, token, deckCardIds)) return false
   }
 
   return true

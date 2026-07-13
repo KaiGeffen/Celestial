@@ -12,10 +12,7 @@ import { CosmeticSet } from '@shared/types/cosmeticSet'
 import { MechanicsSettings } from '@shared/settings'
 
 import Server from '../server'
-import {
-  encodeShareableDeckCode,
-  decodeShareableDeckCode,
-} from '@shared/codec'
+import { encodeShareableDeckCode, decodeShareableDeckCode } from '@shared/codec'
 import { DeckEditorCatalog } from './deckEditor/deckEditorCatalog'
 import {
   DeckEditorDeck,
@@ -135,6 +132,8 @@ export default class DeckEditorScene extends BaseScene {
       onCardPick: (card) => this.addCardToDeck(card),
       onBack: () => this.handleBack(),
       useJourneyInventory: this.shouldUseJourneyUnlocksForCatalog(),
+      // Gets the contents of the deck
+      getDeckCardIds: () => this.deckRegion?.getDeckCode() ?? [],
     })
 
     // Deck region
