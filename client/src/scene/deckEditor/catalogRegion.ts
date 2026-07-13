@@ -49,18 +49,20 @@ export class CatalogRegion {
       },
     })
 
-    // Make a card image for each card the player can pick from
-    let pool: Card[] = []
-    if (Flags.devCardsEnabled) {
-      pool = [...Catalog.collectibleCardsWithBetaCards]
-    } else {
-      pool = [...Catalog.collectibleCards]
-      const inventory = opts.useJourneyInventory
-        ? UserSettings._get('inventory') || []
-        : UserSettings._get('cardInventory') || []
-      pool = pool.filter((c) => inventory[c.id] === true)
-    }
+    // The full pool of cards, possibly including dev cards
+    let pool: Card[] = [
+      ...(Flags.devCardsEnabled
+        ? Catalog.collectibleCardsWithBetaCards
+        : Catalog.collectibleCards),
+    ]
 
+    // Filter based on collection within the given context
+    const inventory = opts.useJourneyInventory
+      ? UserSettings._get('inventory') || []
+      : UserSettings._get('cardInventory') || []
+    pool = pool.filter((c) => inventory[c.id] === true)
+
+    // Create each card
     pool.forEach((card) => {
       const cardImage = new CardImage(
         card,
@@ -74,13 +76,13 @@ export class CatalogRegion {
       this.cardImages.push(cardImage)
     })
 
-    const thumb = scene.add.image(0, 0, 'icon-ThumbTall').setOrigin(1, 0.5)
     this.scrollPanel = newScrollablePanel(scene, {
       header: this.filterRegion.sizer,
       panel: { child: this.gridSizer },
       slider: {
+        // NOTE The visual for this is handled elsewhere, this is just for hitbox
         track: scene.add.rectangle(0, 0, 41, 1, 0x000000, 0.01),
-        thumb,
+        thumb: scene.add.image(0, 0, 'icon-ThumbTall').setOrigin(1, 0.5),
         input: 'click',
       },
       background: scene.add.image(0, 0, 'chrome-body').setDepth(-1),
@@ -94,6 +96,7 @@ export class CatalogRegion {
     column.add(this.scrollPanel, { proportion: 1, expand: true })
     this.columnSizer = column
 
+    // Apply any filters from the filter region
     this.applyFilters()
   }
 

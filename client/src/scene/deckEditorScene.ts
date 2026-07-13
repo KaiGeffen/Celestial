@@ -244,10 +244,6 @@ export default class DeckEditorScene extends BaseScene {
 
   /** Show the deck's shareable code, and allow importing one. */
   private openShareMenu(): void {
-    if (Flags.local) {
-      const deckArray = this.getDeckCode()
-      navigator.clipboard.writeText(JSON.stringify(deckArray))
-    }
     this.scene.launch('MenuScene', {
       menu: 'textEntry',
       title: 'Deck Code',
