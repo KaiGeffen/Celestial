@@ -17,8 +17,8 @@ import { CosmeticSet } from '@shared/types/cosmeticSet'
 import { MechanicsSettings } from '@shared/settings'
 import { encodeShareableDeckCode } from '@shared/codec'
 
-/** Props for the deck editor right column — initial list + thumbnails + actions by callback. */
-export type DeckEditorDeckOptions = {
+/** Props for the decklist region (right column) — initial list + thumbnails + actions by callback. */
+export type DecklistRegionOptions = {
   deckName: string
   cosmeticSet: CosmeticSet
   deckCards: Card[]
@@ -31,15 +31,15 @@ export type DeckEditorDeckOptions = {
   onPlay: () => void
 }
 
-export class RightCol {
+export class DecklistRegion {
   readonly scene: BaseScene
 
   protected readonly decklist: Decklist
   readonly scrollPanel: ScrollablePanel
 
-  protected readonly opts: DeckEditorDeckOptions
+  protected readonly opts: DecklistRegionOptions
 
-  constructor(scene: BaseScene, opts: DeckEditorDeckOptions) {
+  constructor(scene: BaseScene, opts: DecklistRegionOptions) {
     this.scene = scene
     this.opts = opts
 
@@ -188,7 +188,7 @@ export class RightCol {
  * Deck editor right column: thumbnail, scrolling decklist, footer actions.
  * Rex child order: header → scroll panel → footer (fixed heights on header/footer).
  */
-export class DeckEditorDeck extends RightCol {
+export class StandardDecklistRegion extends DecklistRegion {
   deckThumbnail!: DeckThumbnail
 
   protected createHeader(): FixWidthSizer {
@@ -238,7 +238,7 @@ export class DeckEditorDeck extends RightCol {
   }
 }
 
-export class DeckEditorDeckJourney extends RightCol {
+export class JourneyDecklistRegion extends DecklistRegion {
   private playBtn?: Button
   private requiredDecklist?: Decklist
   private requiredLabel?: Phaser.GameObjects.Text

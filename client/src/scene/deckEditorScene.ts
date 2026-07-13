@@ -13,18 +13,16 @@ import { MechanicsSettings } from '@shared/settings'
 
 import Server from '../server'
 import { encodeShareableDeckCode, decodeShareableDeckCode } from '@shared/codec'
-import { DeckEditorCatalog } from './deckEditor/deckEditorCatalog'
+import { FilterRegion } from './deckEditor/filterRegion'
+import { CatalogRegion } from './deckEditor/catalogRegion'
 import {
-  DeckEditorDeck,
-  DeckEditorDeckJourney,
-  type DeckEditorDeckOptions,
-  type RightCol,
-} from './deckEditor/deckEditorSideCol'
+  StandardDecklistRegion,
+  JourneyDecklistRegion,
+  type DecklistRegionOptions,
+  type DecklistRegion,
+} from './deckEditor/decklistRegion'
+import { DECK_EDITOR_DECK_WIDTH } from './deckEditor/constants'
 import type { MissionDetails } from '@shared/journey/journey'
-export type { DeckEditorCatalogOptions } from './deckEditor/deckEditorCatalog'
-export type { DeckEditorDeckOptions } from './deckEditor/deckEditorSideCol'
-
-const ROSTER_WIDTH = Space.cutoutWidth + 20
 
 export default class DeckEditorScene extends BaseScene {
   // Currently selected deck index
@@ -41,11 +39,12 @@ export default class DeckEditorScene extends BaseScene {
   private originalName: string
   private originalCosmeticSet: CosmeticSet
 
-  // Regions
-  private catalogRegion: DeckEditorCatalog
-  protected deckRegion: RightCol
+  // Regions: filter bar (top left), catalog below it, decklist on the right
+  private filterRegion: FilterRegion
+  private catalogRegion: CatalogRegion
+  protected decklistRegion: DecklistRegion
 
-  // Root sizer spanning the full window — catalog on the left, deck on the right
+  // Root sizer spanning the full window — catalog column left, decklist right
   private sizer: RexUIPlugin.Sizer
 
   constructor(
@@ -80,7 +79,7 @@ export default class DeckEditorScene extends BaseScene {
     this.originalName = deck.name
     this.originalCosmeticSet = { ...deck.cosmeticSet }
 
-    // Working copy — cards may differ from deck.cards when a subclass overrides getInitialCardIds
+    // Working copy of the deck
     const editingDeck: Deck = {
       ...deck,
       cards: cardIds,
@@ -115,8 +114,8 @@ export default class DeckEditorScene extends BaseScene {
     this.scene.launch('MenuScene', { menu: 'play', activeScene: this })
   }
 
-  protected createDeckRegion(opts: DeckEditorDeckOptions): RightCol {
-    return new DeckEditorDeck(this, opts)
+  protected createDecklistRegion(opts: DecklistRegionOptions): DecklistRegion {
+    return new StandardDecklistRegion(this, opts)
   }
 
   protected shouldUseJourneyUnlocksForCatalog(): boolean {
@@ -127,17 +126,23 @@ export default class DeckEditorScene extends BaseScene {
     this.createBackground()
     this.createChrome()
 
-    // Catalog region
-    this.catalogRegion = new DeckEditorCatalog(this, {
-      onCardPick: (card) => this.addCardToDeck(card),
+    // Filter region (top left): search / cost chips / sort state
+    this.filterRegion = new FilterRegion(this, {
       onBack: () => this.handleBack(),
-      useJourneyInventory: this.shouldUseJourneyUnlocksForCatalog(),
-      // Gets the contents of the deck
-      getDeckCardIds: () => this.deckRegion?.getDeckCode() ?? [],
+      onChange: () => this.catalogRegion.applyFilters(),
+      // Gets the contents of the deck, backing the `present` keyword
+      getDeckCardIds: () => this.decklistRegion?.getDeckCode() ?? [],
     })
 
-    // Deck region
-    this.deckRegion = this.createDeckRegion({
+    // Catalog region (below the filter): grid of pickable cards
+    this.catalogRegion = new CatalogRegion(this, {
+      onCardPick: (card) => this.addCardToDeck(card),
+      useJourneyInventory: this.shouldUseJourneyUnlocksForCatalog(),
+      filterRegion: this.filterRegion,
+    })
+
+    // Decklist region (right column)
+    this.decklistRegion = this.createDecklistRegion({
       deckName: this.deckName,
       cosmeticSet: this.cosmeticSet,
       deckCards: Catalog.getCardListByIds(deck.cards),
@@ -152,10 +157,11 @@ export default class DeckEditorScene extends BaseScene {
       onPlay: () => this.handlePlayClick(),
     })
 
-    // Root sizer: catalog column fills remaining width, deck column is fixed-width on the right
+    // Root sizer: catalog column (filter bar as its header) fills remaining
+    // width, decklist is fixed-width on the right
     this.sizer = this.rexUI.add.sizer()
     this.sizer.add(this.catalogRegion.columnSizer)
-    this.sizer.add(this.deckRegion.scrollPanel)
+    this.sizer.add(this.decklistRegion.scrollPanel)
 
     // Anchor this to take up full screen
     this.plugins.get('rexAnchor')['add'](this.sizer, {
@@ -185,8 +191,8 @@ export default class DeckEditorScene extends BaseScene {
       .setOrigin(1, 0)
       .setAlpha(0.7)
     this.plugins.get('rexAnchor')['add'](centralSizerBackground, {
-      x: `100%-${ROSTER_WIDTH}`,
-      width: `100%-${ROSTER_WIDTH}`,
+      x: `100%-${DECK_EDITOR_DECK_WIDTH}`,
+      width: `100%-${DECK_EDITOR_DECK_WIDTH}`,
       height: '100%',
     })
 
@@ -203,19 +209,19 @@ export default class DeckEditorScene extends BaseScene {
       .setOrigin(1, 0)
       .setScale(0.5)
     this.plugins.get('rexAnchor')['add'](topRightCorner, {
-      x: `100%-${ROSTER_WIDTH}`,
+      x: `100%-${DECK_EDITOR_DECK_WIDTH}`,
     })
     // The scalable scroll part, and its bottom
     const scroll = this.add.image(0, 100, 'chrome-editorScroll').setOrigin(1, 0)
     this.plugins.get('rexAnchor')['add'](scroll, {
-      x: `100%-${ROSTER_WIDTH}`,
+      x: `100%-${DECK_EDITOR_DECK_WIDTH}`,
       height: '100%',
     })
     const scrollBottom = this.add
       .image(0, 0, 'chrome-editorScrollBottom')
       .setOrigin(1, 1)
     this.plugins.get('rexAnchor')['add'](scrollBottom, {
-      x: `100%-${ROSTER_WIDTH}`,
+      x: `100%-${DECK_EDITOR_DECK_WIDTH}`,
       y: `100%`,
     })
 
@@ -225,14 +231,14 @@ export default class DeckEditorScene extends BaseScene {
       .setOrigin(1, 0)
     this.plugins.get('rexAnchor')['add'](rightColumnBackground, {
       x: `100%`,
-      width: `0%+${ROSTER_WIDTH}`,
+      width: `0%+${DECK_EDITOR_DECK_WIDTH}`,
       height: '100%',
     })
   }
 
   /** Callbacks */
   private addCardToDeck(card: Card): void {
-    this.deckRegion.addCard(card)
+    this.decklistRegion.addCard(card)
     this.syncDeckThumbnail()
   }
 
@@ -289,7 +295,7 @@ export default class DeckEditorScene extends BaseScene {
     })
   }
 
-  // Returns a factory: DeckEditorDeck calls this once at construction to get a per-cutout
+  // Returns a factory: the decklist region calls this once at construction to get a per-cutout
   // click-handler factory. The outer call receives a Cutout; the inner closure is the
   // actual click handler bound to that cutout's card.
   private onClickCutout(): (cutout: Cutout) => () => void {
@@ -300,7 +306,7 @@ export default class DeckEditorScene extends BaseScene {
           this.addCardToDeck(cutout.card)
         } else {
           // Remove 1 of the card
-          this.deckRegion.removeCard(cutout.card)
+          this.decklistRegion.removeCard(cutout.card)
           // Update the thumbnail
           this.syncDeckThumbnail()
         }
@@ -373,13 +379,13 @@ export default class DeckEditorScene extends BaseScene {
 
   /** Utility */
   protected getDeckCode(): number[] {
-    return this.deckRegion.getDeckCode()
+    return this.decklistRegion.getDeckCode()
   }
 
   private syncDeckThumbnail(): void {
     const cardCount = this.getDeckCode().length
     const isValid = cardCount === MechanicsSettings.DECK_SIZE
-    this.deckRegion.syncThumbnail({
+    this.decklistRegion.syncThumbnail({
       name: this.deckName,
       cosmeticSet: this.cosmeticSet,
       isValid,
@@ -389,7 +395,7 @@ export default class DeckEditorScene extends BaseScene {
 
   // Replaces the entire decklist at once (e.g. paste/import), unlike addCardToDeck which appends one card
   private setDeck(cards: Card[]): void {
-    this.deckRegion.setDeck(cards, !Flags.devCardsEnabled)
+    this.decklistRegion.setDeck(cards, !Flags.devCardsEnabled)
     // Sync thumbnail so card count and valid/invalid state reflect the new deck
     this.syncDeckThumbnail()
   }
@@ -426,8 +432,8 @@ export class DeckEditorJourneyScene extends DeckEditorScene {
     super.create({ deckIndex: 0 })
   }
 
-  protected createDeckRegion(opts: DeckEditorDeckOptions): RightCol {
-    return new DeckEditorDeckJourney(this, {
+  protected createDecklistRegion(opts: DecklistRegionOptions): DecklistRegion {
+    return new JourneyDecklistRegion(this, {
       ...opts,
       requiredCards: Catalog.getCardListByIds(this.mission.deck ?? []),
     })
@@ -467,7 +473,7 @@ export class DeckEditorJourneyScene extends DeckEditorScene {
 
     const playerDeck: Deck = {
       name: this.deckName,
-      cards: (this.deckRegion as DeckEditorDeckJourney).getFullDeckCode(),
+      cards: (this.decklistRegion as JourneyDecklistRegion).getFullDeckCode(),
       cosmeticSet,
     }
 
