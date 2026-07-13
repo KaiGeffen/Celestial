@@ -370,10 +370,12 @@ export const BBStyle: Record<string, any> = {
   // Daily Hint on home screen
   dailyHint: {
     fontFamily: secondaryFont,
+    fontStyle: 'bold',
     fontSize: '20px',
-    color: Color.blueS,
-    backgroundColor: Color.backgroundLight,
-    backgroundCornerRadius: 5,
+    color: Color.darkUmberS,
+    backgroundColor: 'rgba(245, 242, 235, 0.6)',
+    backgroundStrokeColor: Color.darkUmberS,
+    backgroundStrokeLineWidth: 1,
     padding: {
       left: Space.padSmall,
       right: Space.padSmall,

@@ -86,9 +86,14 @@ export default class HomeScene extends BaseScene {
 
     // Hint at the bottom
     const hint = this.rexUI.add
-      .BBCodeText(0, 0, `[b]Daily Tip:[/b]\n${getDailyHomeTip()}`, {
-        ...BBStyle.dailyHint,
-      })
+      .BBCodeText(
+        0,
+        0,
+        `[b]Daily Tip:[/b]\n${getDailyHomeTip()}`,
+        {
+          ...BBStyle.dailyHint,
+        },
+      )
       .setOrigin(0.5, 1)
     this.plugins.get('rexAnchor')['add'](hint, {
       x: `50%`,
