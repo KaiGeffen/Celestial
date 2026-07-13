@@ -60,7 +60,10 @@ export class CatalogRegion {
     const inventory = opts.useJourneyInventory
       ? UserSettings._get('inventory') || []
       : UserSettings._get('cardInventory') || []
-    pool = pool.filter((c) => inventory[c.id] === true)
+    // Must own the card, or its a dev card
+    pool = pool.filter((c) => {
+      return inventory[c.id] === true || c.beta
+    })
 
     // Create each card
     pool.forEach((card) => {
@@ -104,12 +107,16 @@ export class CatalogRegion {
   applyFilters(): void {
     this.gridSizer.clear()
 
+    // Build the predicate
     const passes = this.filterRegion.buildPredicate()
 
+    // Sort the cards
     const sorted = [...this.cardImages]
     if (this.filterRegion.orderedByCost) {
       sorted.sort((a, b) => a.card.cost - b.card.cost)
     }
+
+    // Make each card visible if it passes the predicates
     for (const cardImage of sorted) {
       if (passes(cardImage.card)) {
         cardImage.container.setVisible(true)
@@ -118,6 +125,8 @@ export class CatalogRegion {
         cardImage.container.setVisible(false)
       }
     }
+
+    // Scroll to the top
     this.scrollPanel.t = 0
     this.scrollPanel.layout()
   }
