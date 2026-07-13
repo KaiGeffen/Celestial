@@ -51,7 +51,7 @@ export class CatalogRegion {
 
     // The full pool of cards, possibly including dev cards
     let pool: Card[] = [
-      ...(Flags.devCardsEnabled
+      ...(Flags.devCardsEnabled && !opts.useJourneyInventory
         ? Catalog.collectibleCardsWithBetaCards
         : Catalog.collectibleCards),
     ]
