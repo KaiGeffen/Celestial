@@ -102,16 +102,6 @@ export default class Loader {
   }
 
   private static loadAnimations(scene: Phaser.Scene): void {
-    ;['Win', 'Lose', 'Tie'].forEach((s) => {
-      const name = `roundResult-${s}`
-
-      scene.anims.create({
-        key: name,
-        frameRate: 2,
-        frames: scene.anims.generateFrameNumbers(name, { start: 0, end: 3 }),
-      })
-    })
-
     // Umbra animations
     let umbraKey = 'avatar-umbra1'
     scene.anims.create({

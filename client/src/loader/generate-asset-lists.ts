@@ -28,7 +28,9 @@ const DIRECTORIES = [
   'img/background',
   'img/border',
   'img/relic',
-  'img/roundResult',
+  'img/roundResult/Win',
+  'img/roundResult/Loss',
+  'img/roundResult/Tie',
   'img/chrome',
   'img/news',
   'sfx',
@@ -43,7 +45,9 @@ const NON_PIXEL_ART_DIRS = [
   'cardback',
   'sfx',
   'dialog',
-  'roundResult',
+  'roundResult/Win',
+  'roundResult/Loss',
+  'roundResult/Tie',
   'background',
   'card/background',
   'card/subject',
@@ -54,6 +58,7 @@ const NON_PIXEL_ART_DIRS = [
   'icon',
   'cardback',
   'tutorial',
+  'roundResult/win',
 ]
 
 function getDirectoryKey(dir: string): string {

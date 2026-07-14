@@ -373,6 +373,7 @@ export const assetLists = {
       "BreathHover",
       "BreathOom",
       "BreathSpent",
+      "BreathUnavailable",
       "DeckbuilderTab",
       "Discord",
       "InputText",
@@ -460,26 +461,48 @@ export const assetLists = {
     },
     "pixelArt": true
   },
-  "roundResult": {
+  "roundResult/Win": {
     "files": [
-      "Lose",
-      "Tie",
-      "Win"
+      "backdrop",
+      "sun",
+      "sunbeam1",
+      "sunbeam2",
+      "sunbeam3",
+      "sunbeam4",
+      "text",
+      "umbra"
     ],
-    "dimensions": {
-      "Lose": {
-        "width": 563,
-        "height": 258
-      },
-      "Tie": {
-        "width": 563,
-        "height": 258
-      },
-      "Win": {
-        "width": 563,
-        "height": 258
-      }
-    },
+    "pixelArt": false
+  },
+  "roundResult/Loss": {
+    "files": [
+      "backdrop",
+      "cloud1",
+      "cloud2",
+      "cloud3",
+      "puddles",
+      "rainBack",
+      "rainClose",
+      "rainMid",
+      "text",
+      "umbra"
+    ],
+    "pixelArt": false
+  },
+  "roundResult/Tie": {
+    "files": [
+      "DRAW_backdrop",
+      "DRAW_gust_back",
+      "DRAW_gust_close",
+      "DRAW_gust_mid",
+      "DRAW_leaves1",
+      "DRAW_leaves2",
+      "DRAW_leaves3",
+      "DRAW_leaves4",
+      "DRAW_leaves5",
+      "DRAW_text",
+      "DRAW_umbras"
+    ],
     "pixelArt": false
   },
   "chrome": {
