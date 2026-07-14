@@ -119,7 +119,7 @@ function matchesToken(card, token) {
 // Like the game: free text also searches referenced keywords' reminder text
 // and referenced cards' text
 function searchEverywhere(card, query) {
-  let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points}`
+  let searchableText = `${card.name} ${card.text} ${card.cost} ${card.points} ${card.token ? 'token' : ''}`
   for (const keyword of gameData.keywords) {
     if (new RegExp(`\\b${keyword.name}\\b`).test(card.text)) {
       searchableText += ` ${keyword.text}`
@@ -141,8 +141,16 @@ const cardPassesFilters = (card, tokens) =>
 
 // ------------------------------------------------------------- rendering
 
-function resultEntry(fields, { credit = '', onClick = null } = {}) {
-  const wrap = document.createElement(onClick ? 'button' : 'div')
+// Must match slugify in generateAssets.ts
+const slugify = (name) =>
+  name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+
+function resultEntry(fields, { credit = '', onClick = null, href = null } = {}) {
+  const wrap = document.createElement(href ? 'a' : onClick ? 'button' : 'div')
+  if (href) wrap.href = href
   wrap.className = 'gallery-card'
 
   // Half-resolution canvas: displayed small, and far lighter in memory
@@ -177,7 +185,11 @@ async function runSearch() {
     const tokens = parseSearchQuery(query)
     const matches = gameData.cards.filter((c) => cardPassesFilters(c, tokens))
     for (const card of matches) {
-      results.appendChild(resultEntry(realCardFields(card)))
+      results.appendChild(
+        resultEntry(realCardFields(card), {
+          href: `../${slugify(card.name)}/`,
+        }),
+      )
     }
     status.textContent =
       matches.length === 0

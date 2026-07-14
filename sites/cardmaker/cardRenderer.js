@@ -80,6 +80,11 @@ function loadImage(src) {
 
 // Mirrors CardImage.createText: keywords (with optional trailing number) and
 // referenced card names render in gold.
+// Like the game's getReferencedCardNames, a card whose name is also a keyword
+// name is never treated as a card reference
+const isKeywordName = (name) =>
+  gameData.keywords.some((k) => k.name === name)
+
 function buildGoldPatterns() {
   goldPatterns = []
   for (const keyword of gameData.keywords) {
@@ -88,6 +93,7 @@ function buildGoldPatterns() {
     )
   }
   for (const card of gameData.cards) {
+    if (isKeywordName(card.name)) continue
     goldPatterns.push(new RegExp(`\\b${escapeRegex(card.name)}\\b`, 'g'))
   }
 }
@@ -110,9 +116,10 @@ const inRanges = (ranges, idx) => ranges.some(([a, b]) => idx >= a && idx < b)
 
 // ------------------------------------------- keyword reminders / references
 
-/** First real card referenced in the text, or null (like the game's hint). */
+/** First real card (or token) referenced in the text, or null (like the game's hint). */
 export function findReferencedCard(text) {
   for (const card of gameData.cards) {
+    if (isKeywordName(card.name)) continue
     if (new RegExp(`\\b${escapeRegex(card.name)}\\b`).test(text)) return card
   }
   return null

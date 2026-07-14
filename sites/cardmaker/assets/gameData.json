@@ -855,6 +855,78 @@
       "points": 0,
       "text": "Add the top three cards of your discard pile to the story after this.\n(Besides Paramountcy)",
       "theme": 8
+    },
+    {
+      "name": "Ashes",
+      "cost": 1,
+      "points": 0,
+      "text": "Fleeting\nDraw a card.",
+      "theme": 1,
+      "token": true
+    },
+    {
+      "name": "Child",
+      "cost": 0,
+      "points": 0,
+      "text": "Fleeting",
+      "theme": 4,
+      "token": true
+    },
+    {
+      "name": "Condemnation",
+      "cost": 9,
+      "points": -3,
+      "text": "Visible\nWhen this is shuffled, add it to the story.",
+      "theme": 0,
+      "token": true
+    },
+    {
+      "name": "Heirloom",
+      "cost": 0,
+      "points": 4,
+      "text": "",
+      "theme": 4,
+      "token": true
+    },
+    {
+      "name": "Ice",
+      "cost": 1,
+      "points": 1,
+      "text": "When drawn, add this to the story Revealed.",
+      "theme": 7,
+      "token": true
+    },
+    {
+      "name": "Predator",
+      "cost": 1,
+      "points": 0,
+      "text": "Fleeting\nWorth +2 for each Prey in your opponent's discard pile.",
+      "theme": 5,
+      "token": true
+    },
+    {
+      "name": "Race",
+      "cost": 0,
+      "points": 1,
+      "text": "Fleeting\nDiscard each Race later in the story.",
+      "theme": 1,
+      "token": true
+    },
+    {
+      "name": "Seen",
+      "cost": 2,
+      "points": 1,
+      "text": "Fleeting\nAt the start of each round, if this is in your hand, give your opponent Sight 3.",
+      "theme": 5,
+      "token": true
+    },
+    {
+      "name": "Wound",
+      "cost": 0,
+      "points": -3,
+      "text": "Fleeting\nWhen this is discarded, add it next in the story Revealed.",
+      "theme": 2,
+      "token": true
     }
   ],
   "subjects": [

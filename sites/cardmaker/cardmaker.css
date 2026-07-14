@@ -85,6 +85,11 @@ body {
   padding: 1px 4px;
 }
 
+/* Search results show cards at half card size (bigger than the maker gallery) */
+.search-page .gallery-card {
+  width: 236px; /* 472 * 0.5 */
+}
+
 /* Maker: form + card, side by side */
 .maker {
   display: flex;
@@ -312,6 +317,33 @@ button:disabled {
   padding: 0;
   cursor: pointer;
   width: 177px; /* 472 * 0.375 */
+  display: inline-block;
+  text-decoration: none;
+}
+
+/* Per-card page (/cardmaker/{slug}/): card on the left, details (keyword
+   reminders + referenced card) on the right; stacks on narrow screens */
+.card-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 32px;
+  padding: 24px;
+  flex-wrap: wrap;
+}
+
+.card-page #card-canvas {
+  width: min(354px, 90vw);
+  height: auto;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+}
+
+.card-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  max-width: 354px;
 }
 
 .gallery-card canvas {
