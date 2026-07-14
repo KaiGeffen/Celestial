@@ -20,9 +20,9 @@ const API_BASE = '/cardmaker/api'
 
 const DEFAULTS = {
   name: 'My Card',
-  cost: 2,
-  points: 2,
-  text: 'When this resolves, Nourish 2.',
+  cost: 1,
+  points: 1,
+  text: 'Fleeting\nVisible',
   theme: 0,
   subject: null, // set to Dove's index once gameData loads
   creator: '',
@@ -308,11 +308,6 @@ async function init() {
     $(id).addEventListener('input', onFieldInput)
   }
 
-  $('btn-reset').addEventListener('click', () => {
-    Object.assign(state, DEFAULTS)
-    writeStateIntoFields()
-    rerender()
-  })
   $('btn-download').addEventListener('click', downloadCard)
   if (navigator.clipboard && window.ClipboardItem) {
     $('btn-copy').addEventListener('click', copyCard)

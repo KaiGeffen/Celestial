@@ -32,8 +32,6 @@ async function init() {
   if (refCard) {
     renderCard(document.getElementById('ref-canvas'), realCardFields(refCard))
     document.getElementById('ref-link').href = `../${slugify(refCard.name)}/`
-    figure.querySelector('figcaption').textContent =
-      `Referenced card: ${refCard.name}`
   }
 
   // Keyword reminders

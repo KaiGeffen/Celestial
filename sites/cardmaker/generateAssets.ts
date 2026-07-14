@@ -136,14 +136,13 @@ ${GENERATED_MARKER}
     </header>
 
     <main class="card-page">
-      <canvas id="card-canvas" width="472" height="672"></canvas>
-      <div class="card-details">
+      <div class="card-column">
+        <canvas id="card-canvas" width="472" height="672"></canvas>
         <div id="reminders" class="reminders" hidden></div>
-        <figure id="ref-card" class="ref-card" hidden>
-          <figcaption>Referenced card</figcaption>
-          <a id="ref-link"><canvas id="ref-canvas" width="472" height="672"></canvas></a>
-        </figure>
       </div>
+      <figure id="ref-card" class="ref-card" hidden>
+        <a id="ref-link"><canvas id="ref-canvas" width="472" height="672"></canvas></a>
+      </figure>
     </main>
 
     <footer class="site-footer">

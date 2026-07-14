@@ -31,11 +31,11 @@
         <div class="stat-row">
           <label>
             Cost
-            <input id="field-cost" type="number" min="0" max="9" value="2" />
+            <input id="field-cost" type="number" min="0" max="9" value="1" />
           </label>
           <label>
             Points
-            <input id="field-points" type="number" min="0" max="9" value="2" />
+            <input id="field-points" type="number" min="0" max="9" value="1" />
           </label>
         </div>
 
@@ -70,8 +70,6 @@
           Creator <span class="optional">(optional, shown in gallery)</span>
           <input id="field-creator" type="text" maxlength="20" />
         </label>
-
-        <button id="btn-reset" type="button">Reset</button>
       </section>
 
       <!-- Right: the card -->
@@ -89,7 +87,6 @@
 
         <!-- Referenced card, like the game's hint shows it -->
         <figure id="ref-card" class="ref-card" hidden>
-          <figcaption>Referenced card</figcaption>
           <canvas id="ref-canvas" width="472" height="672"></canvas>
         </figure>
       </section>

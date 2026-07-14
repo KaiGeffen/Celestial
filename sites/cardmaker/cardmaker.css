@@ -252,11 +252,6 @@ button:disabled {
   cursor: default;
 }
 
-#btn-reset {
-  background: transparent;
-  align-self: flex-start;
-}
-
 .publish-result {
   max-width: 340px;
   word-break: break-all;
@@ -284,11 +279,6 @@ button:disabled {
 .ref-card {
   margin: 0;
   text-align: center;
-}
-
-.ref-card figcaption {
-  font-weight: bold;
-  margin-bottom: 6px;
 }
 
 .ref-card canvas {
@@ -321,8 +311,8 @@ button:disabled {
   text-decoration: none;
 }
 
-/* Per-card page (/cardmaker/{slug}/): card on the left, details (keyword
-   reminders + referenced card) on the right; stacks on narrow screens */
+/* Per-card page (/cardmaker/{slug}/): card with its keyword reminders below
+   on the left, referenced card on the right; stacks on narrow screens */
 .card-page {
   display: flex;
   justify-content: center;
@@ -338,10 +328,10 @@ button:disabled {
   filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
 }
 
-.card-details {
+.card-column {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 18px;
   max-width: 354px;
 }
