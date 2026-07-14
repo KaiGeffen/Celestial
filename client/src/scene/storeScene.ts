@@ -128,9 +128,13 @@ export default class StoreScene extends BaseSceneWithHeader {
 
     if (this.currentTab === 'cosmetics') {
       const ownedItems = new Set(Server.getUserData().ownedItems ?? [])
-      const unowned = allPurchaseables.filter(
-        (item) => !ownedItems.has(item.id),
-      )
+      const unowned = allPurchaseables
+        .filter((item) => !ownedItems.has(item.id))
+        // Show all cardbacks first, then borders (stable within each type)
+        .sort(
+          (a, b) =>
+            Number(b.type === 'cardback') - Number(a.type === 'cardback'),
+        )
 
       if (unowned.length === 0) {
         sizer.add(this.createEmptyMessage('All Cosmetics owned'))
