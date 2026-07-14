@@ -1,0 +1,985 @@
+{
+  "keywords": [
+    {
+      "name": "Visible",
+      "text": "[color=#FABD5D]Visible[/color]: Both players can see this card while it's in the story.",
+      "hasX": false
+    },
+    {
+      "name": "Revealed",
+      "text": "[color=#FABD5D]Revealed[/color]: Both players can see this card until it leaves the story.",
+      "hasX": false
+    },
+    {
+      "name": "Fleeting",
+      "text": "[color=#FABD5D]Fleeting[/color]: After resolving, this card is removed from the game.",
+      "hasX": false
+    },
+    {
+      "name": "Morning",
+      "text": "[color=#FABD5D]Morning[/color]: At the start of each round, if this is the top card of your discard pile, trigger the following effect.",
+      "hasX": false
+    },
+    {
+      "name": "Sight",
+      "text": "[color=#FABD5D]Sight X[/color]: The first X cards in the story are visible to you this round. Additional Sight adds to this number.",
+      "hasX": true
+    },
+    {
+      "name": "Inspire",
+      "text": "[color=#FABD5D]Inspire X[/color]: Next round you have X extra breath.",
+      "hasX": true
+    },
+    {
+      "name": "Inspired",
+      "text": "[color=#FABD5D]Inspired X[/color]: This round you have X extra breath.",
+      "hasX": true
+    },
+    {
+      "name": "Possibility",
+      "text": "[color=#FABD5D]Possibility X[/color]: At the start of each round, you gain X extra breath.",
+      "hasX": true
+    },
+    {
+      "name": "Retain",
+      "text": "[color=#FABD5D]Retain X[/color]: The next X times you play a card, keep priority.",
+      "hasX": true
+    },
+    {
+      "name": "Nourish",
+      "text": "[color=#FABD5D]Nourish X[/color]: The next card you resolve is worth +X points.",
+      "hasX": true
+    },
+    {
+      "name": "Birth",
+      "text": "[color=#FABD5D]Birth X[/color]: Create a Child (0:0, Fleeting) in hand if there is none. Then increase the points of each Child in hand by X.",
+      "hasX": true
+    },
+    {
+      "name": "Exhale",
+      "text": "[color=#FABD5D]Exhale X[/color]: If you can, spend X breath to trigger the following effect.",
+      "hasX": true
+    },
+    {
+      "name": "Refresh",
+      "text": "[color=#FABD5D]Refresh[/color]: When played, put the leftmost card in your hand on the bottom of your deck, then draw a card if you did. Your opponent doesn’t see you do this.",
+      "hasX": false
+    },
+    {
+      "name": "Becomes",
+      "text": "[color=#FABD5D]Becomes[/color]: When you pass while this is in your hand, transform it into the listed card.",
+      "hasX": false
+    }
+  ],
+  "cards": [
+    {
+      "name": "Dove",
+      "cost": 1,
+      "points": 1,
+      "text": "Visible\nFleeting",
+      "theme": 0
+    },
+    {
+      "name": "Fledgling",
+      "cost": 1,
+      "points": 0,
+      "text": "Morning: Worth +1 permanently.",
+      "theme": 0
+    },
+    {
+      "name": "Rooster",
+      "cost": 1,
+      "points": 1,
+      "text": "Morning: Trigger the morning ability of the top card below this with morning.",
+      "theme": 0
+    },
+    {
+      "name": "Heron",
+      "cost": 2,
+      "points": 0,
+      "text": "Visible\nSet both players' points to 0.\nCosts 1 more for each card in your discard pile.",
+      "theme": 0
+    },
+    {
+      "name": "Lay Bare",
+      "cost": 2,
+      "points": 2,
+      "text": "Visible\nExhale 1: The next card in the story loses all card-text.",
+      "theme": 0
+    },
+    {
+      "name": "Nest",
+      "cost": 2,
+      "points": 1,
+      "text": "Morning: Create a Dove in the story.",
+      "theme": 0
+    },
+    {
+      "name": "Sky Burial",
+      "cost": 2,
+      "points": 7,
+      "text": "Fleeting\nVisible\nWhen played, create a Vulture before this for your opponent.",
+      "theme": 0
+    },
+    {
+      "name": "Starling",
+      "cost": 2,
+      "points": 2,
+      "text": "Visible\nFleeting\nWorth +1 if the next card in the story has base cost 1.",
+      "theme": 0
+    },
+    {
+      "name": "Birdsong",
+      "cost": 3,
+      "points": 2,
+      "text": "Visible\nWhen you pass while this is in the story, create a Dove in the story.",
+      "theme": 0
+    },
+    {
+      "name": "Vulture",
+      "cost": 3,
+      "points": 5,
+      "text": "Visible\nFleeting\nWhen played, gain Nourish -2.",
+      "theme": 0
+    },
+    {
+      "name": "Let Go",
+      "cost": 4,
+      "points": 4,
+      "text": "Remove from the game the top four cards of your discard pile.",
+      "theme": 0
+    },
+    {
+      "name": "Secretary Bird",
+      "cost": 4,
+      "points": 4,
+      "text": "Visible\nWorth +1 for each card in your hand with base cost 0 or 1. Remove them from the game.",
+      "theme": 0
+    },
+    {
+      "name": "Defiance",
+      "cost": 5,
+      "points": 3,
+      "text": "Costs 1 less for each card your opponent can see in the story.",
+      "theme": 0
+    },
+    {
+      "name": "Phoenix",
+      "cost": 5,
+      "points": 3,
+      "text": "Visible\nFleeting\nGive your other Fleeting cards everywhere +1 point.",
+      "theme": 0
+    },
+    {
+      "name": "Truth",
+      "cost": 6,
+      "points": 8,
+      "text": "",
+      "theme": 0
+    },
+    {
+      "name": "Firebug",
+      "cost": 0,
+      "points": 1,
+      "text": "Discard a card.",
+      "theme": 1
+    },
+    {
+      "name": "Immolant",
+      "cost": 1,
+      "points": 1,
+      "text": "When this is discarded, add it next in the story Revealed.",
+      "theme": 1
+    },
+    {
+      "name": "Impulse",
+      "cost": 1,
+      "points": 1,
+      "text": "Fleeting\nCreate two Ashes in your discard pile.",
+      "theme": 1
+    },
+    {
+      "name": "Spark",
+      "cost": 1,
+      "points": 0,
+      "text": "When played, gain 3 breath.\nDiscard your next card in the story.",
+      "theme": 1
+    },
+    {
+      "name": "Dash",
+      "cost": 2,
+      "points": 3,
+      "text": "Worth -1 for each card before this in the story.",
+      "theme": 1
+    },
+    {
+      "name": "From Ashes",
+      "cost": 2,
+      "points": 0,
+      "text": "When this is shuffled, set its points to 1/3 the number of cards with Fleeting shuffled or in your hand, rounded down.",
+      "theme": 1
+    },
+    {
+      "name": "Mine",
+      "cost": 3,
+      "points": 3,
+      "text": "Inspire 1\nCreate an Ashes on top of your deck, your hand, and your discard pile.",
+      "theme": 1
+    },
+    {
+      "name": "Parch",
+      "cost": 3,
+      "points": 3,
+      "text": "Worth +2 for each of your cards later in the story. Discard those cards.",
+      "theme": 1
+    },
+    {
+      "name": "Arsonist",
+      "cost": 4,
+      "points": 4,
+      "text": "Fleeting\nCreate three Ashes in your discard pile.",
+      "theme": 1
+    },
+    {
+      "name": "Veteran",
+      "cost": 5,
+      "points": 4,
+      "text": "Worth +3 if your discard pile has at least eight cards in it.",
+      "theme": 1
+    },
+    {
+      "name": "Cling",
+      "cost": 6,
+      "points": 0,
+      "text": "Worth +X, where X is the highest base-cost in your discard pile. Put that card on top of your deck.",
+      "theme": 1
+    },
+    {
+      "name": "Death",
+      "cost": 7,
+      "points": 7,
+      "text": "Costs 0 if you have at least twelve cards in your discard pile.",
+      "theme": 1
+    },
+    {
+      "name": "Goliath",
+      "cost": 8,
+      "points": 8,
+      "text": "Discard the next card in the story and the top 2 cards of your deck.",
+      "theme": 1
+    },
+    {
+      "name": "Dagger",
+      "cost": 1,
+      "points": 0,
+      "text": "Your opponent discards a card.",
+      "theme": 2
+    },
+    {
+      "name": "Hungry Ghost",
+      "cost": 2,
+      "points": 4,
+      "text": "Nourish -4",
+      "theme": 2
+    },
+    {
+      "name": "Lost in Shadow",
+      "cost": 2,
+      "points": 4,
+      "text": "Discard your hand unless you have a card with base-cost 6 or more later in the story.",
+      "theme": 2
+    },
+    {
+      "name": "Nightmare",
+      "cost": 2,
+      "points": 2,
+      "text": "Morning: If you have more cards in hand than your opponent, add this to the story Revealed.",
+      "theme": 2
+    },
+    {
+      "name": "Victim",
+      "cost": 2,
+      "points": 0,
+      "text": "If you lose this round, Nourish -1 your opponent for each point you lost by.",
+      "theme": 2
+    },
+    {
+      "name": "Imprison",
+      "cost": 3,
+      "points": 3,
+      "text": "At the end of this round, if your opponent has three or fewer points, they Nourish -1.",
+      "theme": 2
+    },
+    {
+      "name": "Sickness",
+      "cost": 3,
+      "points": -1,
+      "text": "Fleeting\nGive your opponent Nourish -4, create a Sickness in their hand.",
+      "theme": 2
+    },
+    {
+      "name": "Hurricane",
+      "cost": 4,
+      "points": 0,
+      "text": "Set both players' points to 0.",
+      "theme": 2
+    },
+    {
+      "name": "Wing Clipping",
+      "cost": 4,
+      "points": 4,
+      "text": "If your opponent has more points than you, they discard a card.",
+      "theme": 2
+    },
+    {
+      "name": "Boa",
+      "cost": 6,
+      "points": 6,
+      "text": "If this is nourished, your opponent discards a card and you draw a card.",
+      "theme": 2
+    },
+    {
+      "name": "Shadow",
+      "cost": 6,
+      "points": 4,
+      "text": "Costs X, where X is the number of cards in your opponent's hand.",
+      "theme": 2
+    },
+    {
+      "name": "Vampire",
+      "cost": 6,
+      "points": 5,
+      "text": "Worth -X where X is your opponent's points.\nCosts 1 less for each card in the story.",
+      "theme": 2
+    },
+    {
+      "name": "Isolation",
+      "cost": 7,
+      "points": 7,
+      "text": "Costs 0 if you won last round without playing any cards.",
+      "theme": 2
+    },
+    {
+      "name": "Hollow",
+      "cost": 0,
+      "points": 0,
+      "text": "Set your points to 0. Nourish 1 for each point you lost this way.",
+      "theme": 3
+    },
+    {
+      "name": "Doll",
+      "cost": 1,
+      "points": 1,
+      "text": "Morning: Worth X permanently, where X is how many points you won the previous round by.\nIf you didn't win, X is 0.",
+      "theme": 3
+    },
+    {
+      "name": "Rose",
+      "cost": 1,
+      "points": -1,
+      "text": "Fleeting\nNourish 2",
+      "theme": 3
+    },
+    {
+      "name": "Yearn",
+      "cost": 1,
+      "points": 1,
+      "text": "Exhale 3: Add the top card of your discard pile to the story after this if it has base cost 3 or less.",
+      "theme": 3
+    },
+    {
+      "name": "Abundance",
+      "cost": 2,
+      "points": 2,
+      "text": "If you have 7 or more points, Exhale 1: Nourish 3.",
+      "theme": 3
+    },
+    {
+      "name": "Hold Tight",
+      "cost": 2,
+      "points": 2,
+      "text": "Put the top card of your discard pile on top of your deck.",
+      "theme": 3
+    },
+    {
+      "name": "Pet",
+      "cost": 2,
+      "points": 2,
+      "text": "This permanently retains all changes to its points.",
+      "theme": 3
+    },
+    {
+      "name": "Bounty",
+      "cost": 3,
+      "points": 3,
+      "text": "Both players Nourish 2.",
+      "theme": 3
+    },
+    {
+      "name": "Fruit",
+      "cost": 3,
+      "points": 0,
+      "text": "Nourish 3",
+      "theme": 3
+    },
+    {
+      "name": "Heart",
+      "cost": 3,
+      "points": 4,
+      "text": "When a card is played while this is in the story, discard this and Nourish 3.",
+      "theme": 3
+    },
+    {
+      "name": "Parade",
+      "cost": 3,
+      "points": 3,
+      "text": "Exhale 4: Add each card with base-cost 3 or less from your hand to the story after this.",
+      "theme": 3
+    },
+    {
+      "name": "Me and Her",
+      "cost": 4,
+      "points": 4,
+      "text": "Exhale 4: Double your points.",
+      "theme": 3
+    },
+    {
+      "name": "Sensualist",
+      "cost": 4,
+      "points": 4,
+      "text": "Costs 1 less for each of the following statuses you have: Nourish, Inspired, Sight.",
+      "theme": 3
+    },
+    {
+      "name": "Pomegranate",
+      "cost": 5,
+      "points": 0,
+      "text": "Nourish 6",
+      "theme": 3
+    },
+    {
+      "name": "Oak",
+      "cost": 8,
+      "points": 8,
+      "text": "If you win this round, Nourish 1 for each point you won by.",
+      "theme": 3
+    },
+    {
+      "name": "Nascence",
+      "cost": 0,
+      "points": 0,
+      "text": "Birth 1",
+      "theme": 4
+    },
+    {
+      "name": "Beginner's Mind",
+      "cost": 1,
+      "points": 1,
+      "text": "When this is shuffled, move it to the top of your deck.",
+      "theme": 4
+    },
+    {
+      "name": "Just Like Dad",
+      "cost": 1,
+      "points": 1,
+      "text": "Exhale 2: Create a copy in hand of the last card in the story.",
+      "theme": 4
+    },
+    {
+      "name": "Pregnant",
+      "cost": 1,
+      "points": 1,
+      "text": "Create a Child on top of your deck.",
+      "theme": 4
+    },
+    {
+      "name": "Rebirth",
+      "cost": 1,
+      "points": 0,
+      "text": "Fleeting\nTransform each of your cards later in the story into a 0:X Child, where X is its cost.",
+      "theme": 4
+    },
+    {
+      "name": "Birth",
+      "cost": 2,
+      "points": 1,
+      "text": "Birth 2",
+      "theme": 4
+    },
+    {
+      "name": "Hug",
+      "cost": 2,
+      "points": 2,
+      "text": "Worth +1 if the next card in the story is yours.",
+      "theme": 4
+    },
+    {
+      "name": "Ancestry",
+      "cost": 3,
+      "points": 0,
+      "text": "Birth 1 for each card later in the story.",
+      "theme": 4
+    },
+    {
+      "name": "Cradle",
+      "cost": 3,
+      "points": 2,
+      "text": "Birth 2",
+      "theme": 4
+    },
+    {
+      "name": "Pass On",
+      "cost": 4,
+      "points": 0,
+      "text": "Fleeting\nCreate an Heirloom in hand.",
+      "theme": 4
+    },
+    {
+      "name": "Posterity",
+      "cost": 4,
+      "points": 4,
+      "text": "Morning: Birth 1",
+      "theme": 4
+    },
+    {
+      "name": "Storytime",
+      "cost": 6,
+      "points": 4,
+      "text": "Create a copy in hand of each card later in the \tstory with base-cost 0.",
+      "theme": 4
+    },
+    {
+      "name": "Uprising",
+      "cost": 6,
+      "points": 4,
+      "text": "Worth +1 for each card before this in the story.",
+      "theme": 4
+    },
+    {
+      "name": "The Future",
+      "cost": 8,
+      "points": 5,
+      "text": "Draw a card.\nCosts X less, where X is the total point value of each Child in your hand.",
+      "theme": 4
+    },
+    {
+      "name": "Dawn",
+      "cost": 0,
+      "points": 0,
+      "text": "When played, gain Sight 4.\nMorning: Return this to hand.",
+      "theme": 5
+    },
+    {
+      "name": "Clear View",
+      "cost": 1,
+      "points": 0,
+      "text": "Create a Seen in your opponent's hand.",
+      "theme": 5
+    },
+    {
+      "name": "Nectar",
+      "cost": 1,
+      "points": 0,
+      "text": "Nourish 1\nWhen played, gain Sight 3.",
+      "theme": 5
+    },
+    {
+      "name": "Prey",
+      "cost": 1,
+      "points": 2,
+      "text": "Create a Predator in your opponent's hand.",
+      "theme": 5
+    },
+    {
+      "name": "Timid",
+      "cost": 1,
+      "points": 1,
+      "text": "When played, gain Sight 4.\nExhale 1: Return your cards later in the story to your hand.",
+      "theme": 5
+    },
+    {
+      "name": "Balance",
+      "cost": 2,
+      "points": 2,
+      "text": "Worth +2 if the number of cards before this in the story is equal to the number of cards after this.",
+      "theme": 5
+    },
+    {
+      "name": "Begging Bowl",
+      "cost": 2,
+      "points": 0,
+      "text": "This consumes your opponent's Nourish.",
+      "theme": 5
+    },
+    {
+      "name": "Riddle",
+      "cost": 2,
+      "points": 1,
+      "text": "Fleeting\nWhen played, double this card's points.",
+      "theme": 5
+    },
+    {
+      "name": "Awakening",
+      "cost": 3,
+      "points": 3,
+      "text": "When played, gain Sight 5.",
+      "theme": 5
+    },
+    {
+      "name": "Bull",
+      "cost": 3,
+      "points": 3,
+      "text": "Costs 1 less if the last card in the story has the same base-cost as the top card of your deck.",
+      "theme": 5
+    },
+    {
+      "name": "Conquer",
+      "cost": 5,
+      "points": 3,
+      "text": "Costs 1 less for each card you can see in the story.",
+      "theme": 5
+    },
+    {
+      "name": "Lantern",
+      "cost": 5,
+      "points": 5,
+      "text": "Fleeting\nIf this is the last card in the story, transform a card in hand into a copy of this with +2 point.",
+      "theme": 5
+    },
+    {
+      "name": "Enlightenment",
+      "cost": 7,
+      "points": 7,
+      "text": "Costs 0 if you can see at least three of your opponent's cards in the story.",
+      "theme": 5
+    },
+    {
+      "name": "Fates",
+      "cost": 0,
+      "points": 0,
+      "text": "Exhale 5: Set both players' points to 0.\nExhale 2: Nourish 2\nExhale 1: Birth 1",
+      "theme": 6
+    },
+    {
+      "name": "Hero",
+      "cost": 0,
+      "points": 0,
+      "text": "Exhale 5: Worth +2.\nExhale 3: Discard the next card in the story.\nExhale 1: Inspire 1",
+      "theme": 6
+    },
+    {
+      "name": "Stars",
+      "cost": 0,
+      "points": 0,
+      "text": "Inspire 1",
+      "theme": 6
+    },
+    {
+      "name": "Dreamer",
+      "cost": 1,
+      "points": 1,
+      "text": "Draw a card if your hand is empty.\nExhale 1: Worth +1.",
+      "theme": 6
+    },
+    {
+      "name": "Night Vision",
+      "cost": 1,
+      "points": 0,
+      "text": "Put the top card with base cost 2 from your deck into your hand.\nWhen played, gain Sight 4.",
+      "theme": 6
+    },
+    {
+      "name": "Cosmos",
+      "cost": 2,
+      "points": 0,
+      "text": "Inspire 1 for this and each of your cards later in the story.",
+      "theme": 6
+    },
+    {
+      "name": "Sunflower",
+      "cost": 2,
+      "points": 1,
+      "text": "Inspire 1 for each point this is worth.",
+      "theme": 6
+    },
+    {
+      "name": "Cloak of Stars",
+      "cost": 3,
+      "points": 0,
+      "text": "Gain 3 breath.\nMorning: Inspired 1 for each breath you ended the last round with.",
+      "theme": 6
+    },
+    {
+      "name": "Possibility",
+      "cost": 3,
+      "points": 0,
+      "text": "Fleeting\nIncrease your max breath by 1 permanently.",
+      "theme": 6
+    },
+    {
+      "name": "Pride",
+      "cost": 3,
+      "points": 3,
+      "text": "Morning: Exhale 1: Add this to the story Revealed. Discard a card.",
+      "theme": 6
+    },
+    {
+      "name": "Moon",
+      "cost": 5,
+      "points": 4,
+      "text": "Morning: Trigger the morning abilities of the top 2 cards below this with morning.",
+      "theme": 6
+    },
+    {
+      "name": "Starfall",
+      "cost": 6,
+      "points": 7,
+      "text": "At the start of each round, if your hand has at least 5 cards including this, discard this to Inspired 1.",
+      "theme": 6
+    },
+    {
+      "name": "Ecology",
+      "cost": 7,
+      "points": 0,
+      "text": "When played, gain 10 breath.",
+      "theme": 6
+    },
+    {
+      "name": "Sun",
+      "cost": 8,
+      "points": 8,
+      "text": "Inspire 1\nMorning: Inspired 2",
+      "theme": 6
+    },
+    {
+      "name": "Liquidity",
+      "cost": 0,
+      "points": 0,
+      "text": "Refresh, Refresh\nExhale 1: Draw a card.",
+      "theme": 7
+    },
+    {
+      "name": "Dew",
+      "cost": 1,
+      "points": 1,
+      "text": "Morning: Create a Dew in your hand.",
+      "theme": 7
+    },
+    {
+      "name": "Drown",
+      "cost": 1,
+      "points": 1,
+      "text": "Discard the top three cards of your deck.",
+      "theme": 7
+    },
+    {
+      "name": "Refresh",
+      "cost": 1,
+      "points": 1,
+      "text": "Refresh",
+      "theme": 7
+    },
+    {
+      "name": "Fishing Boat",
+      "cost": 2,
+      "points": 1,
+      "text": "Put the top 3 cards with base cost 1 from your deck into your hand.",
+      "theme": 7
+    },
+    {
+      "name": "Gain and Loss",
+      "cost": 2,
+      "points": 1,
+      "text": "Discard your hand, draw that many cards.",
+      "theme": 7
+    },
+    {
+      "name": "Fish",
+      "cost": 3,
+      "points": 2,
+      "text": "When you draw this, increase its points by 1 permanently.",
+      "theme": 7
+    },
+    {
+      "name": "Gentle Rain",
+      "cost": 3,
+      "points": 1,
+      "text": "Nourish 1 for each card you've drawn this round.",
+      "theme": 7
+    },
+    {
+      "name": "Mercy",
+      "cost": 3,
+      "points": 3,
+      "text": "Each player draws a card.",
+      "theme": 7
+    },
+    {
+      "name": "Overflow",
+      "cost": 3,
+      "points": 0,
+      "text": "Refresh\nWorth +1 for each card in your hand.",
+      "theme": 7
+    },
+    {
+      "name": "Dam Breaks",
+      "cost": 4,
+      "points": 4,
+      "text": "Exhale 1: Discard 3 cards. Add your hand to the story after this.",
+      "theme": 7
+    },
+    {
+      "name": "Iceberg",
+      "cost": 4,
+      "points": 2,
+      "text": "Draw two cards.\nCosts 1 less for each time you’ve passed this round.",
+      "theme": 7
+    },
+    {
+      "name": "Cloud",
+      "cost": 5,
+      "points": 5,
+      "text": "Refresh\nExhale 1: Draw a card.\nExhale 1: Draw a card.\nExhale 2: Draw a card.",
+      "theme": 7
+    },
+    {
+      "name": "Excess",
+      "cost": 7,
+      "points": 7,
+      "text": "Costs 0 if you have exactly four cards in the story.",
+      "theme": 7
+    },
+    {
+      "name": "Paramountcy",
+      "cost": 9,
+      "points": 0,
+      "text": "Add the top three cards of your discard pile to the story after this.\n(Besides Paramountcy)",
+      "theme": 8
+    }
+  ],
+  "subjects": [
+    "Abandoned",
+    "Abundance",
+    "Ancestry",
+    "Arsonist",
+    "Ashes",
+    "Awakening",
+    "Balance",
+    "Begging Bowl",
+    "Beginner's Mind",
+    "Birdsong",
+    "Birth",
+    "Boa",
+    "Bounty",
+    "Bull",
+    "Child",
+    "Clear View",
+    "Cling",
+    "Cloak of Stars",
+    "Cloud",
+    "Conquer",
+    "Cosmos",
+    "Cradle",
+    "Dagger",
+    "Dam Breaks",
+    "Dash",
+    "Dawn",
+    "Death",
+    "Defiance",
+    "Dew",
+    "Doll",
+    "Dove",
+    "Dreamer",
+    "Drown",
+    "Ecology",
+    "Enlightenment",
+    "Enlightment",
+    "Excess",
+    "Fates",
+    "Firebug",
+    "Fish",
+    "Fishing Boat",
+    "Fledgling",
+    "From Ashes",
+    "Fruit",
+    "Gain and Loss",
+    "Gentle Rain",
+    "Goliath",
+    "Heart",
+    "Heirloom",
+    "Hero",
+    "Heron",
+    "Hold Tight",
+    "Hollow",
+    "Hug",
+    "Hungry Ghost",
+    "Hurricane",
+    "Ice",
+    "Iceberg",
+    "Immolant",
+    "Imprison",
+    "Impulse",
+    "Isolation",
+    "Just Like Dad",
+    "Lantern",
+    "Lay Bare",
+    "Let Go",
+    "Liquidity",
+    "Lost in Shadow",
+    "Me and Her",
+    "Mercy",
+    "Mine",
+    "Moloch",
+    "Moon",
+    "Nascence",
+    "Nectar",
+    "Nest",
+    "Night Vision",
+    "Nightmare",
+    "Oak",
+    "Overflow",
+    "Parade",
+    "Paramountcy",
+    "Parch",
+    "Pass On",
+    "Pet",
+    "Phoenix",
+    "Pomegranate",
+    "Possibility",
+    "Posterity",
+    "Predator",
+    "Pregnant",
+    "Prey",
+    "Pride",
+    "Rebirth",
+    "Refresh",
+    "Riddle",
+    "Rooster",
+    "Rose",
+    "Secretary Bird",
+    "Seen",
+    "Sensualist",
+    "Shadow",
+    "Sickness",
+    "Sky Burial",
+    "Spark",
+    "Starfall",
+    "Starling",
+    "Stars",
+    "Storytime",
+    "Sudden Insight",
+    "Sun",
+    "Sunflower",
+    "The Future",
+    "Timid",
+    "Truth",
+    "Uprising",
+    "Vampire",
+    "Veteran",
+    "Victim",
+    "Voices",
+    "Vulture",
+    "Wing Clipping",
+    "Yearn"
+  ]
+}

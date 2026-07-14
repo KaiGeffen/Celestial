@@ -10,8 +10,9 @@ Static auxilary sites, served at path prefixes on the main domain:
 | `/press/`    | [press/](press/)       | Press kit, has standard info, links, and assets.                                                           |
 | `/privacy/`  | [privacy/](privacy/)   | Basic privacy policy.                                                                                      |
 | `/streamer/` | [streamer/](streamer/) | Stream overlay. Must have a ref passed in to the url and be an approved ref in the database to show count. |
+| `/cardmaker/` | [cardmaker/](cardmaker/) | Custom card maker + community gallery. **Ships as its own image** (own Dockerfile/nginx.conf; see [SPEC](cardmaker/SPEC.md)), not part of the shared `sites` image. Its `/cardmaker/api` prefix routes to the game server. |
 
-Each of these is a plain HTML/CSS/image.
+Each of these is a plain HTML/CSS/image (the card maker adds a JS canvas renderer).
 
 ## Shared assets
 

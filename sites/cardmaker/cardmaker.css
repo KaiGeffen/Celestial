@@ -1,0 +1,304 @@
+/* Card Maker — palette mirrors the game: parchment #F5F2EB, ink #321A0F,
+   gold #EDAA24 (reserved for interactive elements). */
+
+:root {
+  --parchment: #f5f2eb;
+  --ink: #321a0f;
+  --gold: #edaa24;
+  --line: rgba(50, 26, 15, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  border-bottom: 2px solid var(--line);
+}
+
+.site-header .logo {
+  height: 44px;
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+/* Maker: form + card, side by side */
+.maker {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px;
+  flex-wrap: wrap;
+}
+
+.form-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(420px, 100%);
+}
+
+.form-pane label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-weight: bold;
+}
+
+.form-pane .optional {
+  font-weight: normal;
+  opacity: 0.7;
+  font-size: 0.85em;
+}
+
+.form-pane input,
+.form-pane textarea {
+  font: inherit;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+}
+
+.stat-row {
+  display: flex;
+  gap: 14px;
+}
+
+.stat-row label {
+  flex: 1;
+}
+
+fieldset {
+  border: 1px solid var(--line);
+  padding: 10px;
+  margin: 0;
+}
+
+legend {
+  font-weight: bold;
+  padding: 0 6px;
+}
+
+/* Theme swatches */
+.theme-picker {
+  display: block;
+}
+
+.theme-swatches {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.theme-swatch {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--line);
+  border-radius: 0;
+  padding: 0;
+  cursor: pointer;
+  background-size: 400%;
+  background-position: center;
+}
+
+.theme-swatch.selected {
+  border-color: var(--gold);
+  outline: 2px solid var(--gold);
+}
+
+/* Subject picker */
+.subject-picker input[type='search'] {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.subject-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.subject-thumb {
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+}
+
+.subject-thumb img {
+  width: 100%;
+  display: block;
+}
+
+.subject-thumb.selected {
+  border-color: var(--gold);
+}
+
+.subject-thumb .thumb-name {
+  font-size: 10px;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Card pane */
+.card-pane {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+#card-canvas {
+  width: min(354px, 90vw); /* displayed at 3/4; exports at full 472x672 */
+  height: auto;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  font: inherit;
+  font-weight: bold;
+  padding: 8px 18px;
+  border: 2px solid var(--ink);
+  background: var(--gold);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(1.08);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+#btn-reset {
+  background: transparent;
+  align-self: flex-start;
+}
+
+.publish-result {
+  max-width: 340px;
+  word-break: break-all;
+  text-align: center;
+}
+
+/* Keyword reminders — dark backing like the game's hint popups */
+.reminders {
+  max-width: 354px;
+  background: rgba(10, 6, 4, 0.88);
+  color: var(--parchment);
+  padding: 10px 14px;
+  font-size: 15px;
+}
+
+.reminders p {
+  margin: 6px 0;
+}
+
+.reminders[hidden] {
+  display: none;
+}
+
+/* Referenced card preview */
+.ref-card {
+  margin: 0;
+  text-align: center;
+}
+
+.ref-card figcaption {
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+.ref-card canvas {
+  width: 236px; /* half size */
+  height: auto;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+}
+
+/* Gallery */
+.gallery {
+  padding: 24px;
+  border-top: 2px solid var(--line);
+  text-align: center;
+}
+
+.gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
+}
+
+.gallery-card {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  width: 177px; /* 472 * 0.375 */
+}
+
+.gallery-card canvas {
+  width: 100%;
+  height: auto;
+}
+
+.gallery-card .credit {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.gallery-status {
+  opacity: 0.75;
+}
+
+.site-footer {
+  padding: 18px 24px;
+  border-top: 2px solid var(--line);
+  text-align: center;
+  font-size: 14px;
+}
+
+a {
+  color: var(--gold);
+}
+
+@media (max-width: 860px) {
+  .maker {
+    flex-direction: column;
+    align-items: center;
+  }
+  .form-pane {
+    order: 2;
+  }
+  .card-pane {
+    order: 1;
+  }
+}

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Celestial — Card Maker</title>
+    <meta
+      name="description"
+      content="Design your own Celestial card and share it with the community."
+    />
+    <link rel="icon" type="image/svg+xml" href="../about/assets/favicon.svg" />
+    <link rel="stylesheet" href="cardmaker.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a href="https://celestialdecks.gg">
+        <img src="../about/assets/logo.svg" alt="Celestial" class="logo" />
+      </a>
+      <h1>Card Maker</h1>
+    </header>
+
+    <main class="maker">
+      <!-- Left: the form -->
+      <section class="form-pane">
+        <label>
+          Name
+          <input id="field-name" type="text" maxlength="24" value="My Card" />
+        </label>
+
+        <div class="stat-row">
+          <label>
+            Cost
+            <input id="field-cost" type="number" min="0" max="9" value="2" />
+          </label>
+          <label>
+            Points
+            <input id="field-points" type="number" min="0" max="9" value="2" />
+          </label>
+        </div>
+
+        <label>
+          Text
+          <textarea
+            id="field-text"
+            maxlength="200"
+            rows="4"
+            placeholder="When this resolves, Nourish 2."
+          ></textarea>
+        </label>
+
+        <fieldset class="theme-picker" id="theme-picker">
+          <legend>Theme</legend>
+          <!-- populated by JS: one swatch per theme 0-8 -->
+        </fieldset>
+
+        <fieldset class="subject-picker">
+          <legend>Art</legend>
+          <input
+            id="subject-search"
+            type="search"
+            placeholder="Search art by name"
+          />
+          <div id="subject-grid" class="subject-grid">
+            <!-- populated by JS: lazy-loaded thumbnails -->
+          </div>
+        </fieldset>
+
+        <label>
+          Creator <span class="optional">(optional, shown in gallery)</span>
+          <input id="field-creator" type="text" maxlength="20" />
+        </label>
+
+        <button id="btn-reset" type="button">Reset</button>
+      </section>
+
+      <!-- Right: the card -->
+      <section class="card-pane">
+        <canvas id="card-canvas" width="472" height="672"></canvas>
+        <div class="card-actions">
+          <button id="btn-download" type="button">Download</button>
+          <button id="btn-copy" type="button">Copy</button>
+          <button id="btn-publish" type="button">Publish</button>
+        </div>
+        <p id="publish-result" class="publish-result" hidden></p>
+
+        <!-- Keyword reminders, like the game's hint text -->
+        <div id="reminders" class="reminders"></div>
+
+        <!-- Referenced card, like the game's hint shows it -->
+        <figure id="ref-card" class="ref-card" hidden>
+          <figcaption>Referenced card</figcaption>
+          <canvas id="ref-canvas" width="472" height="672"></canvas>
+        </figure>
+      </section>
+    </main>
+
+    <!-- Gallery -->
+    <section class="gallery">
+      <h2>Recent cards</h2>
+      <div id="gallery-grid" class="gallery-grid"></div>
+      <button id="btn-load-more" type="button" hidden>Load more</button>
+      <p id="gallery-status" class="gallery-status"></p>
+    </section>
+
+    <footer class="site-footer">
+      <p>
+        Made with Celestial's card frame —
+        <a href="https://celestialdecks.gg">play the game</a> ·
+        <a href="https://discord.gg/UXWswspB8S">Discord</a> (report a card
+        there)
+      </p>
+    </footer>
+
+    <script src="cardmaker.js"></script>
+  </body>
+</html>
