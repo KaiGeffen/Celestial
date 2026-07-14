@@ -245,7 +245,7 @@ export default class RaceScene extends BaseScene {
       }
     })
 
-    // Make it scrollable - match builderRegions/deck.ts exactly
+    // Make it scrollable (same pattern as the deck editor's decklist)
     const scrollablePanel = newScrollablePanel(this, {
       x: Space.windowWidth - Space.cutoutWidth - Space.pad * 2,
       y: Space.pad * 4 + title.height + yOffset,

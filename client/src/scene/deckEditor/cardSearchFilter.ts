@@ -2,7 +2,7 @@ import Catalog from '@shared/state/catalog'
 import Card from '@shared/state/card'
 import { DECK_EDITOR_MAX_COST_FILTER } from './constants'
 
-/** Parsed token from the deck editor search box (aligned with builder `filter.ts` semantics). */
+/** Parsed token from the deck editor search box. */
 export interface DeckEditorSearchToken {
   text: string
   isPhrase: boolean

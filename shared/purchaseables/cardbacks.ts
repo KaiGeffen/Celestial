@@ -18,7 +18,7 @@ const cardbacks: Purchaseable[] = [
   },
   {
     id: 2004,
-    cost: 10000,
+    cost: 100,
     itemId: 4,
   },
 ]
