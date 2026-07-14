@@ -14,6 +14,13 @@ Static auxilary sites, served at path prefixes on the main domain:
 
 Each of these is a plain HTML/CSS/image (the card maker adds a JS canvas renderer).
 
+> **Card maker exception to the self-containment rule:** its `assets/` are
+> *generated* from `client/` and `shared/` by `cardmaker/generateAssets.ts`
+> (gitignored, regenerated at image build) so its cards always match the game.
+> Build it from the **repo root**: `docker build -t cardmaker -f sites/cardmaker/Dockerfile .`
+> For local dev, run `npx -y tsx sites/cardmaker/generateAssets.ts` once
+> (and again after card/asset changes).
+
 ## Shared assets
 
 `about/assets/` holds the logo, favicon, feature screenshots, and backgrounds reused across sites. Other sites reference them relatively, e.g. from `press/` or `streamer/`:

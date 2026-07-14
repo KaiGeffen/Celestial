@@ -14,8 +14,7 @@ const SCALE_X = CANVAS_W / 235.2
 const SCALE_Y = CANVAS_H / 336
 
 // Colors from the game (client/src/settings/color.ts + cardImage.ts)
-const COLOR_WHITE = '#F5F2EB' // whiteS: title, cost, rules text
-const COLOR_GOLD_POINTS = '#EDAA24' // goldS: points stat
+const COLOR_WHITE = '#F5F2EB' // whiteS: title, cost, points, rules text
 const COLOR_GOLD_TEXT = '#FABD5D' // keywords + card references in rules text
 const COLOR_STROKE = '#000000'
 
@@ -246,7 +245,7 @@ export async function renderCard(canvas, fields) {
     String(fields.points),
     27 * SCALE_X,
     102 * SCALE_Y,
-    COLOR_GOLD_POINTS,
+    COLOR_WHITE,
   )
 
   // Rules text: centered block whose center sits 40px (display) above the bottom
