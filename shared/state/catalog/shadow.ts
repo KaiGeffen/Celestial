@@ -419,20 +419,6 @@ const mire = new Mire({
   text: 'Fleeting\nAt the end of this round, create a Revealed copy of this with -1 point.',
 })
 
-class Ink extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    bonus += game.amtPasses[player]
-    super.play(player, game, index, bonus)
-  }
-}
-const ink = new Ink({
-  name: 'Ink',
-  id: 3044,
-  cost: 2,
-  points: 1,
-  text: 'Worth +1 for each time you passed this round.',
-})
-
 class Sharpness extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
