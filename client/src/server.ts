@@ -60,7 +60,7 @@ const LOGGED_OUT_USER_DATA: UserData = {
 }
 
 export default class Server {
-  static pendingReconnect: { state: GameModel } | null = null
+  static pendingReconnect: { state: GameModel; isPvp: boolean } | null = null
   static activePlayers: {
     uuid: string
     username: string
@@ -321,7 +321,7 @@ export default class Server {
       )
       .on('promptReconnect', (data) => {
         // Store reconnect data for PreloadScene to handle after assets load
-        this.pendingReconnect = { state: data.state }
+        this.pendingReconnect = { state: data.state, isPvp: data.isPvp }
       })
       .on(
         'broadcastOnlinePlayersList',

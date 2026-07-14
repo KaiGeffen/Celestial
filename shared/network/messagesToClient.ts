@@ -42,6 +42,7 @@ export default interface messagesToClient {
   }
   promptReconnect: {
     state: GameModel
+    isPvp: boolean
   }
   // MATCH RELEVANT
   transmitState: {

@@ -222,6 +222,10 @@ class Match implements Match {
     return this.game && this.game.model.winner !== null
   }
 
+  isPvp(): boolean {
+    return false
+  }
+
   // Get the list of all active websockets connected to this match
   protected getActiveWsList(): ServerWS[] {
     return [this.ws1, this.ws2].filter((ws) => ws)
@@ -260,6 +264,7 @@ class Match implements Match {
     await ws.send({
       type: 'promptReconnect',
       state: getClientGameModel(this.game.model, playerNumber, false),
+      isPvp: this.isPvp(),
     })
 
     // Send opp a message that their opp is back

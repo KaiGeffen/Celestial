@@ -255,7 +255,7 @@ export class SigninScene extends Phaser.Scene {
 
         // Start the match scene for the reconnected match
         this.scene.start('StandardMatchScene', {
-          isPvp: true,
+          isPvp: reconnect.isPvp,
           deck: [],
           aiDeck: [],
           gameStartState: reconnect.state,

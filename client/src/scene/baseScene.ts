@@ -285,7 +285,7 @@ export default class BaseScene extends SharedBaseScene {
 
       // Stop current scenes and start the match scene for the reconnected match
       this.scene.start('StandardMatchScene', {
-        isPvp: true,
+        isPvp: reconnect.isPvp,
         deck: [],
         aiDeck: [],
         gameStartState: reconnect.state,

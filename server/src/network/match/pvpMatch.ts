@@ -31,6 +31,10 @@ class PvpMatch extends Match {
     }
   }
 
+  isPvp(): boolean {
+    return true
+  }
+
   protected async updateDatabases() {
     const winner = this.game.model.winner
 
