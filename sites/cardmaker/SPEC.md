@@ -127,6 +127,19 @@ Single page, two panes (stacked on mobile), plus a gallery section below.
   **Remix** button that loads its fields into the maker.
 - Opening `/cardmaker/?id={id}` deep-links to that card.
 
+**Search page** (`/cardmaker/search/`)
+
+- A second page for finding cards, with a toggle between two sources:
+  - **Game cards** — all collectible cards, searched client-side over
+    `gameData.json` using the deck editor's search syntax (`name:`, `text:`,
+    `cost:2`, `cost:3+`, `points:1-3`, quoted phrases, `!` negation — ported
+    from `client/src/scene/deckEditor/cardSearchFilter.ts`, minus the
+    deck-specific `present`). Free text also searches referenced keywords'
+    reminder text and referenced cards' text, like the game.
+  - **Community cards** — published custom cards, searched via the API
+    (`q` param). Clicking one opens it in the maker (`../?id={id}`).
+- Results render on half-resolution canvases via the shared renderer.
+
 **Page dressing**
 
 - Header: game logo (from `../about/assets/`), title "Card Maker".
@@ -160,8 +173,9 @@ hundred **bytes**, not kilobytes — storage is a non-issue.
   - `POST /cardmaker/api/cards` — body: the fields. Server re-validates every
     cap (name/text/creator length, cost/points range, theme range, subject
     range). Returns `{ id }`.
-  - `GET /cardmaker/api/cards?before={id}&limit=20` — newest-first page of
-    full card fields (enough to render each card client-side).
+  - `GET /cardmaker/api/cards?before={id}&limit=20&q={query}` — newest-first
+    page of full card fields (enough to render each card client-side).
+    Optional `q` filters by name/text/creator substring (for the search page).
   - `GET /cardmaker/api/cards/{id}` — one card's fields.
 
 - **Where the API lives:** the game server (it already has Express, Drizzle,

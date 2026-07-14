@@ -36,6 +36,55 @@ body {
   font-size: 28px;
 }
 
+.page-nav {
+  margin-left: auto;
+  font-weight: bold;
+}
+
+/* Search page */
+.search-page {
+  padding: 24px;
+}
+
+.search-controls {
+  max-width: 640px;
+  margin: 0 auto 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.source-toggle {
+  display: flex;
+  gap: 0;
+}
+
+.source-toggle button {
+  flex: 1;
+  background: transparent;
+}
+
+.source-toggle button.selected {
+  background: var(--gold);
+}
+
+#search-input {
+  font: inherit;
+  padding: 10px;
+  border: 1px solid var(--line);
+}
+
+.search-help {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.search-help code {
+  background: rgba(50, 26, 15, 0.08);
+  padding: 1px 4px;
+}
+
 /* Maker: form + card, side by side */
 .maker {
   display: flex;
