@@ -37,7 +37,7 @@ it critically and judge its quality, don't run a mechanical checklist.
 | --- | --- | --- |
 | `client/src/scene/matchRegions/roundResultRegion.ts` | 2026-07-15 | Full audit: FadeGroup type + shared fadeInGroups helper, per-sunbeam/leaf/gust config dicts, dead fadeLoopGroups removed, IMG_WIDTH/HEIGHT named, sound bug fixed (played once per group instead of once per cycle) |
 | `client/src/scene/baseScene.ts` | 2026-07-15 | Spot fix only, not a full audit: playSound now no-ops while the tab is hidden (queued sounds all fired at once on refocus) |
-| `client/src/lib/cardImage.ts` | 2026-07-15 | Full audit, all findings fixed: dead FullSizeCardImage removed; interactivity API (setOnClick enables the subject's input; text/stat elements interactive only on interactive cards; storeScene workaround deleted); setCard no longer draws a title over a cardback and clears stale tint/glow/cost; destroy() kills tweens on its objects |
+| `client/src/lib/cardImage.ts` | 2026-07-15 | Full audit, all findings fixed: dead FullSizeCardImage removed; interactivity API (setOnClick enables the subject's input; text/stat elements interactive only on interactive cards; storeScene workaround deleted); setCard no longer draws a title over a cardback and clears stale tint/glow/cost; destroy() kills tweens on its objects; moveToTopOnHover keeps its intended reversal (cards right of the hovered one flip so the nearest is on top) but now snapshots/restores the order via parent data with an owner check, so interleaved enter/exit between cards can't scramble the hand |
 
 ### Next up (proposed order)
 

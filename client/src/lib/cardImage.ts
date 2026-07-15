@@ -66,9 +66,6 @@ export class CardImage {
   exitCallback: () => void = () => {}
   clickCallback: () => void = () => {}
 
-  // The index of this container within its parent container before it was brought to top
-  renderIndex: number = undefined
-
   // X icon shown when this card is selected for mulligan
   icon: Phaser.GameObjects.Image
 
@@ -533,32 +530,40 @@ export class CardImage {
     this.container.add(this.txtTitle)
   }
 
-  // Move this cardImage above everything else in its container when it's hovered
+  /**
+   * While hovered, render this card above the others in its container, with
+   * the cards to its right reversed (so the card nearest the hovered one is
+   * on top of its own right neighbor).
+   */
   moveToTopOnHover(): CardImage {
-    let container = this.container
-    let parentContainer = container.parentContainer
+    const fHover = () => {
+      const parent = this.container.parentContainer
 
-    // Reverse the order of everything from this objects index on
-    // This makes this appear above everything, and things to the right to be in reverse order
-    let fHover = () => {
-      // If the render index has already been set, we are already reversed
-      if (this.renderIndex !== undefined) {
+      // Another card's hover may still be active (its exit can arrive after
+      // our enter), so always start from the natural order
+      CardImage.restoreHoverOrder(parent)
+
+      // Snapshot the natural order and mark this card as the active hover
+      const natural = parent.list.slice()
+      parent.setData('hoverOrder', natural)
+      parent.setData('hoverOwner', this)
+
+      // Reverse the render order from this card to the end
+      const index = natural.indexOf(this.container)
+      for (let i = natural.length - 1; i >= index; i--) {
+        parent.bringToTop(natural[i])
+      }
+    }
+
+    const fExit = () => {
+      const parent = this.container.parentContainer
+
+      // A newer hover owns the order; our exit arrived late
+      if (parent.getData('hoverOwner') !== this) {
         return
       }
 
-      // Remember the index that this was at
-      this.renderIndex = parentContainer.getIndex(container)
-
-      // From the top of the list until this cardImage, reverse the order
-      this.revertCenteringInHand()
-    }
-
-    let fExit = () => {
-      // From INDEX to the top is reversed, flip it back
-      this.revertCenteringInHand()
-
-      // Reset the render index to show no longer reversed
-      this.renderIndex = undefined
+      CardImage.restoreHoverOrder(parent)
     }
 
     this.setOnHover(fHover, fExit)
@@ -566,16 +571,20 @@ export class CardImage {
     return this
   }
 
-  // Reverse the depth ordering of cards in hand from this on
-  revertCenteringInHand(): CardImage {
-    const parentContainer = this.container.parentContainer
+  // Restore the container's natural render order, if a hover reversed it
+  private static restoreHoverOrder(parent: Phaser.GameObjects.Container): void {
+    const natural: Phaser.GameObjects.GameObject[] =
+      parent.getData('hoverOrder') ?? []
 
-    // From INDEX to the top is reversed, flip it back
-    for (let i = parentContainer.length - 1; i >= this.renderIndex; i--) {
-      parentContainer.bringToTop(parentContainer.getAt(i))
-    }
+    // Cards can leave the container mid-hover; reorder those still present
+    natural.forEach((child) => {
+      if (parent.exists(child)) {
+        parent.bringToTop(child)
+      }
+    })
 
-    return this
+    parent.setData('hoverOrder', undefined)
+    parent.setData('hoverOwner', undefined)
   }
 
   // Toggle whether this card appears as being set to mulligan or not
