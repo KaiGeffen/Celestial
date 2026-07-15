@@ -1,6 +1,6 @@
 import 'phaser'
 import GameModel from '@shared/state/gameModel'
-import { Depth, Time } from '../../settings/settings'
+import { Depth, Time, Ease } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
@@ -17,6 +17,15 @@ abstract class RoundToast {
 
   /** This toast's layers by asset name, in the order they were added */
   protected layers: Record<string, Phaser.GameObjects.Image> = {}
+
+  /** Constant stagger between each group starting its fade-in. */
+  protected static readonly GROUP_DELTA_MS = 200
+
+  /** How long the fully faded-in toast holds before fading out each loop. */
+  protected static readonly HOLD_MS = 1650
+
+  /** How long the fade-out at the end of each loop takes. */
+  protected static readonly FADE_OUT_MS = 500
 
   constructor(scene: MatchScene, parent: Phaser.GameObjects.Container) {
     this.scene = scene
@@ -48,6 +57,43 @@ abstract class RoundToast {
     )
   }
 
+  /**
+   * Loop forever: fade groups in one after another (GROUP_DELTA_MS apart),
+   * hold, fade everything out, then repeat. Stops when the toast's tweens are
+   * killed (e.g. when the toast finishes playing).
+   *
+   * For a toast with animations beyond the fade-in, write a dedicated runLoop
+   * instead (see WinToast / LoseToast).
+   */
+  protected fadeLoopGroups(
+    groups: { names: string[]; fadeMs: number }[],
+  ): void {
+    // Track when the last piece finishes fading in. It isn't necessarily the
+    // last group — a longer earlier group can finish after it.
+    let fadeInEndMs = 0
+    groups.forEach((group, i) => {
+      const startMs = i * RoundToast.GROUP_DELTA_MS
+      fadeInEndMs = Math.max(fadeInEndMs, startMs + group.fadeMs)
+
+      this.scene.tweens.add({
+        targets: group.names.map((name) => this.layers[name]),
+        alpha: { from: 0, to: 1 },
+        delay: startMs,
+        duration: group.fadeMs,
+        ease: Ease.basic,
+      })
+    })
+
+    // Fade everything out once every piece is in, after the hold, then repeat
+    this.scene.tweens.add({
+      targets: Object.values(this.layers),
+      alpha: 0,
+      delay: fadeInEndMs + RoundToast.HOLD_MS,
+      duration: RoundToast.FADE_OUT_MS,
+      onComplete: () => this.fadeLoopGroups(groups),
+    })
+  }
+
   /** Show the toast, run its animation, then hide and call onComplete. */
   play(onComplete?: () => void): void {
     this.container.setVisible(true).setAlpha(0)
@@ -77,15 +123,6 @@ abstract class RoundToast {
 }
 
 class WinToast extends RoundToast {
-  /** How long the fully faded-in toast holds before fading out. */
-  private static readonly HOLD_MS = 1200
-
-  /** Constant stagger between each group starting its fade-in. */
-  private static readonly GROUP_DELTA_MS = 200
-
-  /** How long the fade-out at the end of each loop takes. */
-  private static readonly FADE_OUT_MS = 500
-
   /** Fade-in duration for each group (backdrop+sun, umbra, sunbeams, text). */
   private static readonly BACKDROP_SUN_FADE_MS = 600
   private static readonly UMBRA_FADE_MS = 500
@@ -114,7 +151,7 @@ class WinToast extends RoundToast {
   /** Fade-in order; groups start GROUP_DELTA_MS apart. */
   private static readonly GROUPS: { names: string[]; fadeMs: number }[] = [
     {
-      names: ['backdrop', 'sun'],
+      names: ['backdrop', 'sun', 'text'],
       fadeMs: WinToast.BACKDROP_SUN_FADE_MS,
     },
     { names: ['umbra'], fadeMs: WinToast.UMBRA_FADE_MS },
@@ -122,7 +159,7 @@ class WinToast extends RoundToast {
       names: ['sunbeam1', 'sunbeam2', 'sunbeam3', 'sunbeam4'],
       fadeMs: WinToast.SUNBEAMS_FADE_MS,
     },
-    { names: ['text'], fadeMs: WinToast.TEXT_FADE_MS },
+    // { names: ['text'], fadeMs: WinToast.TEXT_FADE_MS },
   ]
 
   private static readonly SUNBEAMS: {
@@ -195,7 +232,7 @@ class WinToast extends RoundToast {
         alpha: { from: 0, to: 1 },
         delay: startMs,
         duration: group.fadeMs,
-        ease: 'Quad.InOut',
+        ease: Ease.basic,
       })
     })
 
@@ -214,9 +251,10 @@ class WinToast extends RoundToast {
       rotation: { from: 0, to: WinToast.SUN_ROTATION_RAD },
       delay: sunFadeEndMs,
       duration: sunHoldMs,
-      ease: 'Sine.easeInOut',
+      ease: 'Linear',
     })
 
+    // Sun scale
     this.scene.tweens.add({
       targets: this.layers['sun'],
       scale: { from: 1, to: WinToast.SUN_SCALE },
@@ -270,44 +308,260 @@ class WinToast extends RoundToast {
 }
 
 class LoseToast extends RoundToast {
+  /** Fade-in duration for each group. */
+  private static readonly BACKDROP_FADE_MS = 600
+  private static readonly UMBRA_FADE_MS = 500
+  private static readonly CLOUDS_FADE_MS = 1000
+  private static readonly TEXT_FADE_MS = 400
+
+  /**
+   * The clouds live in one container that fades in with the group. On top of
+   * that fade, each cloud drifts from its offset (1 & 3 to the right, 2 to the
+   * left) to its home x (0), starting as the fade-in begins so each is moving
+   * before it is fully opaque.
+   */
+  private static readonly CLOUD_DRIFT: { name: string; fromX: number }[] = [
+    { name: 'cloud1', fromX: 100 },
+    { name: 'cloud2', fromX: -70 },
+    { name: 'cloud3', fromX: 45 },
+  ]
+
+  /** Container the clouds share, so they fade in together as a unit. */
+  private clouds: Phaser.GameObjects.Container
+
+  /** The cloud images (inside `clouds`), by name, for per-cloud drift. */
+  private cloudLayers: Record<string, Phaser.GameObjects.Image>
+
+  /**
+   * The rain layers live in one container that fades in with the clouds. On
+   * top of that fade, each rain layer pulses its own alpha (fully out and back
+   * in) this many times across the whole cycle — starting immediately, not
+   * waiting for the container's fade-in.
+   */
+  private static readonly RAIN_PULSE: { name: string; pulseCount: number }[] = [
+    { name: 'rainBack', pulseCount: 2 },
+    { name: 'rainMid', pulseCount: 3 },
+    { name: 'rainClose', pulseCount: 4 },
+  ]
+
+  /** Container the rain layers share, so they fade in together as a unit. */
+  private rain: Phaser.GameObjects.Container
+
+  /** The rain layer images (inside `rain`), by name, for per-layer pulsing. */
+  private rainLayers: Record<string, Phaser.GameObjects.Image>
+
+  /**
+   * Plain-layer fade-in order; groups start GROUP_DELTA_MS apart. Two more
+   * groups follow these in runLoop: the clouds container (index 2), then the
+   * rain container + puddles (index 3).
+   */
+  private static readonly GROUPS: { names: string[]; fadeMs: number }[] = [
+    { names: ['backdrop', 'text'], fadeMs: LoseToast.BACKDROP_FADE_MS },
+    { names: ['umbra'], fadeMs: LoseToast.UMBRA_FADE_MS },
+    // { names: ['text'], fadeMs: LoseToast.TEXT_FADE_MS },
+  ]
+
   protected createElements(): void {
-    this.addLayers('Loss', [
-      'LOSS_Backdrop',
-      'LOSS_Cloud1',
-      'LOSS_Cloud2',
-      'LOSS_Cloud3',
-      'LOSS_Rain_back',
-      'LOSS_Rain_mid',
-      'LOSS_Rain_close',
-      'LOSS_Puddles',
-      'LOSS_Umbras',
-      'LOSS_Text',
-    ])
+    // Added bottom to top (reverse of the intended front-to-back layer order).
+    // Rain and clouds each share a container so they fade in as a unit.
+    this.addLayers('Loss', ['backdrop', 'text', 'puddles'])
+
+    // Rain container, inserted between puddles and umbra
+    this.rain = this.scene.add.container()
+    this.container.add(this.rain)
+    this.rainLayers = {}
+    LoseToast.RAIN_PULSE.forEach(({ name }) => {
+      const image = this.scene.add.image(0, 0, `roundResult/Loss-${name}`)
+      this.rain.add(image)
+      this.rainLayers[name] = image
+    })
+
+    this.addLayers('Loss', ['umbra'])
+
+    // Clouds container, front-most (cloud1 on top, so added last)
+    this.clouds = this.scene.add.container()
+    this.container.add(this.clouds)
+    this.cloudLayers = {}
+    ;['cloud3', 'cloud2', 'cloud1'].forEach((name) => {
+      const image = this.scene.add.image(0, 0, `roundResult/Loss-${name}`)
+      this.clouds.add(image)
+      this.cloudLayers[name] = image
+    })
   }
 
   protected animateElements(): void {
-    // TODO Animate the rain / clouds
+    this.stopElementTweens()
+    this.resetElements()
+    this.runLoop()
+  }
+
+  // One cycle: groups fade in one after another, hold, all fade out,
+  // then the cycle repeats (until the toast's tweens are stopped)
+  private runLoop(): void {
+    const groups = LoseToast.GROUPS
+
+    // Group fade-in start times (each group starts GROUP_DELTA_MS after the
+    // previous). The clouds container fades in one group after the plain
+    // layers, then the rain container + puddles fade in the group after that.
+    const cloudsStartMs = 2 * LoseToast.GROUP_DELTA_MS
+    const rainStartMs = 3 * LoseToast.GROUP_DELTA_MS
+
+    // Track when the last piece finishes fading in. It isn't necessarily the
+    // last group — a longer earlier group can finish after it.
+    let fadeInEndMs = 0
+    groups.forEach((group, i) => {
+      this.scene.playSound('lose')
+
+      const startMs = i * LoseToast.GROUP_DELTA_MS
+      fadeInEndMs = Math.max(fadeInEndMs, startMs + group.fadeMs)
+
+      this.scene.tweens.add({
+        targets: group.names.map((name) => this.layers[name]),
+        alpha: { from: 0, to: 1 },
+        delay: startMs,
+        duration: group.fadeMs,
+        ease: Ease.basic,
+      })
+    })
+    // Fold in the clouds and rain container groups
+    fadeInEndMs = Math.max(
+      fadeInEndMs,
+      cloudsStartMs + LoseToast.CLOUDS_FADE_MS,
+      rainStartMs + LoseToast.CLOUDS_FADE_MS,
+    )
+
+    const fadeOutStartMs = fadeInEndMs + LoseToast.HOLD_MS
+
+    // --- Animations after the fade-in (add more here) ---
+
+    // The clouds container fades in as a unit...
+    this.scene.tweens.add({
+      targets: this.clouds,
+      alpha: { from: 0, to: 1 },
+      delay: cloudsStartMs,
+      duration: LoseToast.CLOUDS_FADE_MS,
+      ease: Ease.basic,
+    })
+
+    // ...while each cloud inside drifts from its offset to its home x, starting
+    // as the fade-in begins (so it moves before fully opaque) and settling
+    // before the toast fades out
+    LoseToast.CLOUD_DRIFT.forEach(({ name }) => {
+      this.scene.tweens.add({
+        targets: this.cloudLayers[name],
+        x: 0,
+        delay: cloudsStartMs,
+        duration: fadeOutStartMs - cloudsStartMs,
+        ease: 'Linear',
+      })
+    })
+
+    // The rain container and puddles fade in together, one group after the
+    // clouds...
+    this.scene.tweens.add({
+      targets: [this.rain, this.layers['puddles']],
+      alpha: { from: 0, to: 1 },
+      delay: rainStartMs,
+      duration: LoseToast.CLOUDS_FADE_MS,
+      ease: Ease.basic,
+    })
+
+    // ...while each rain layer inside pulses its own alpha (fully out and back
+    // in) the whole cycle, starting immediately rather than after the fade-in.
+    // Pulses fit into the window before the toast fades out.
+    LoseToast.RAIN_PULSE.forEach(({ name, pulseCount }) => {
+      if (pulseCount <= 0) return
+      const halfPulseMs = fadeOutStartMs / (pulseCount * 2)
+      this.scene.tweens.add({
+        targets: this.rainLayers[name],
+        alpha: { from: 1, to: 0 },
+        duration: halfPulseMs,
+        yoyo: true,
+        repeat: pulseCount - 1,
+        ease: 'Sine.easeInOut',
+      })
+    })
+
+    // Fade everything out once every piece is in, after the hold, then repeat
+    this.scene.tweens.add({
+      targets: [...Object.values(this.layers), this.clouds, this.rain],
+      alpha: 0,
+      delay: fadeOutStartMs,
+      duration: LoseToast.FADE_OUT_MS,
+      onComplete: () => {
+        // Reset motion while hidden, before the next loop
+        this.resetElements()
+        this.runLoop()
+      },
+    })
+  }
+
+  /** Restore every animated element to its start state, before a loop. */
+  private resetElements(): void {
+    // Containers hidden (they fade in); clouds back at their offset x
+    this.clouds.setAlpha(0)
+    LoseToast.CLOUD_DRIFT.forEach(({ name, fromX }) =>
+      this.cloudLayers[name].setX(fromX),
+    )
+    // Rain layers at full alpha, ready to pulse
+    this.rain.setAlpha(0)
+    Object.values(this.rainLayers).forEach((layer) => layer.setAlpha(1))
+  }
+
+  // Also stop the containers and their layers, which live outside `layers`
+  protected stopElementTweens(): void {
+    super.stopElementTweens()
+    ;[this.clouds, this.rain].forEach((c) => this.scene.tweens.killTweensOf(c))
+    ;[
+      ...Object.values(this.cloudLayers),
+      ...Object.values(this.rainLayers),
+    ].forEach((layer) => this.scene.tweens.killTweensOf(layer))
   }
 }
 
 class TieToast extends RoundToast {
+  /** Fade-in duration for each group. */
+  private static readonly BACKDROP_FADE_MS = 600
+  private static readonly UMBRA_FADE_MS = 500
+  private static readonly WIND_FADE_MS = 1000
+  private static readonly LEAVES_FADE_MS = 1000
+  private static readonly TEXT_FADE_MS = 400
+
+  /** Fade-in order; groups start GROUP_DELTA_MS apart. */
+  private static readonly GROUPS: { names: string[]; fadeMs: number }[] = [
+    { names: ['backdrop', 'text'], fadeMs: TieToast.BACKDROP_FADE_MS },
+    { names: ['umbras'], fadeMs: TieToast.UMBRA_FADE_MS },
+    {
+      names: ['guestBack', 'gustMid', 'gustClose'],
+      fadeMs: TieToast.WIND_FADE_MS,
+    },
+    {
+      names: ['leaves1', 'leaves2', 'leaves3', 'leaves4', 'leaves5'],
+      fadeMs: TieToast.LEAVES_FADE_MS,
+    },
+    // { names: ['text'], fadeMs: TieToast.TEXT_FADE_MS },
+  ]
+
   protected createElements(): void {
+    // Added bottom to top (reverse of the intended front-to-back layer order)
     this.addLayers('Tie', [
-      'DRAW_backdrop',
-      'DRAW_gust_back',
-      'DRAW_gust_mid',
-      'DRAW_gust_close',
-      'DRAW_leaves1',
-      'DRAW_leaves2',
-      'DRAW_leaves3',
-      'DRAW_leaves4',
-      'DRAW_leaves5',
-      'DRAW_umbras',
-      'DRAW_text',
+      'backdrop',
+      'guestBack',
+      'text',
+      'gustMid',
+      'umbras',
+      'gustClose',
+      'leaves1',
+      'leaves2',
+      'leaves3',
+      'leaves4',
+      'leaves5',
     ])
   }
 
   protected animateElements(): void {
+    this.stopElementTweens()
+    this.fadeLoopGroups(TieToast.GROUPS)
     // TODO Animate the gusts / leaves
   }
 }
@@ -333,7 +587,7 @@ export default class RoundResultRegion extends Region {
     }
 
     // TESTING Remove: keep the win toast visible while iterating on its art
-    this.toasts.win.showForTesting()
+    this.toasts.lose.showForTesting()
 
     return this
   }

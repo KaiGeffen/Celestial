@@ -491,17 +491,17 @@ export const assetLists = {
   },
   "roundResult/Tie": {
     "files": [
-      "DRAW_backdrop",
-      "DRAW_gust_back",
-      "DRAW_gust_close",
-      "DRAW_gust_mid",
-      "DRAW_leaves1",
-      "DRAW_leaves2",
-      "DRAW_leaves3",
-      "DRAW_leaves4",
-      "DRAW_leaves5",
-      "DRAW_text",
-      "DRAW_umbras"
+      "backdrop",
+      "guestBack",
+      "gustClose",
+      "gustMid",
+      "leaves1",
+      "leaves2",
+      "leaves3",
+      "leaves4",
+      "leaves5",
+      "text",
+      "umbras"
     ],
     "pixelArt": false
   },
