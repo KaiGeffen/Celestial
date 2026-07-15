@@ -543,9 +543,27 @@ class TieToast extends RoundToast {
     highAlpha: number
     offsetMs: number
   }[] = [
-    { name: 'gustBack', pulseCount: 3, lowAlpha: 0.0, highAlpha: 0.3, offsetMs: 0 },
-    { name: 'gustMid', pulseCount: 2, lowAlpha: 0.0, highAlpha: 0.4, offsetMs: 0 },
-    { name: 'gustClose', pulseCount: 1, lowAlpha: 0.0, highAlpha: 0.5, offsetMs: 0 },
+    {
+      name: 'gustBack',
+      pulseCount: 3,
+      lowAlpha: 0.0,
+      highAlpha: 0.3,
+      offsetMs: 0,
+    },
+    {
+      name: 'gustMid',
+      pulseCount: 2,
+      lowAlpha: 0.0,
+      highAlpha: 0.4,
+      offsetMs: 0,
+    },
+    {
+      name: 'gustClose',
+      pulseCount: 1,
+      lowAlpha: 0.0,
+      highAlpha: 0.5,
+      offsetMs: 0,
+    },
   ]
 
   /** How far the right edge lags the left in each pulse (left-to-right desync). */
@@ -562,6 +580,63 @@ class TieToast extends RoundToast {
     // { names: ['text'], fadeMs: TieToast.TEXT_FADE_MS },
   ]
 
+  /**
+   * Per-leaf animation. Each leaf rotates throughout the whole cycle. It also
+   * has a custom origin (its rotation pivot), a staggered fade-in delay, and an
+   * initial x offset to the left that drifts home (x 0) by the time the hold is
+   * over. For now only the rotation is enabled — the rest is set up but
+   * commented out (in createElements / runLoop / resetElements).
+   */
+  private static readonly LEAVES: {
+    name: string
+    originX: number
+    originY: number
+    fadeDelayMs: number
+    fromXOffset: number
+    rotationRad: number
+  }[] = [
+    {
+      name: 'leaves1',
+      originX: 270 / 600,
+      originY: 200 / 500,
+      fadeDelayMs: 0,
+      fromXOffset: -120,
+      rotationRad: Math.PI * 5,
+    },
+    {
+      name: 'leaves2',
+      originX: 150 / 600,
+      originY: 385 / 500,
+      fadeDelayMs: 80,
+      fromXOffset: -100,
+      rotationRad: Math.PI * 3,
+    },
+    {
+      name: 'leaves3',
+      originX: 515 / 600,
+      originY: 320 / 500,
+      fadeDelayMs: 160,
+      fromXOffset: -140,
+      rotationRad: Math.PI * 5,
+    },
+    {
+      name: 'leaves4',
+      originX: 110 / 600,
+      originY: 279 / 500,
+      fadeDelayMs: 240,
+      fromXOffset: -110,
+      rotationRad: 15,
+    },
+    {
+      name: 'leaves5',
+      originX: 327 / 600,
+      originY: 320 / 500,
+      fadeDelayMs: 320,
+      fromXOffset: -130,
+      rotationRad: 18,
+    },
+  ]
+
   protected createElements(): void {
     // Added bottom to top (reverse of the intended front-to-back layer order)
     this.addLayers('Tie', [
@@ -569,14 +644,19 @@ class TieToast extends RoundToast {
       'gustBack',
       'gustMid',
       'gustClose',
-      'umbras',
       'text',
       'leaves1',
       'leaves2',
       'leaves3',
       'leaves4',
       'leaves5',
+      'umbras',
     ])
+
+    // Leaf origins = rotation pivots (enable with the leaf fade-in / drift)
+    // TieToast.LEAVES.forEach((leaf) =>
+    //   this.layers[leaf.name].setOrigin(leaf.originX, leaf.originY),
+    // )
   }
 
   protected animateElements(): void {
@@ -649,6 +729,46 @@ class TieToast extends RoundToast {
       },
     )
 
+    // Each leaf rotates throughout the whole cycle. Its fade-in (staggered by
+    // delay) and initial left offset drifting home by the end of the hold are
+    // set up but commented out — only the rotation is active for now. (To
+    // enable the fade-in, drop the leaves from GROUPS above so they aren't
+    // faded in twice.)
+    TieToast.LEAVES.forEach((leaf) => {
+      const image = this.layers[leaf.name]
+
+      // Set origin and position correctly
+      image.setOrigin(leaf.originX, leaf.originY)
+      image.setX(leaf.originX * 600 - 300)
+      image.setY(leaf.originY * 500 - 250)
+
+      // Rotate throughout the whole cycle
+      this.scene.tweens.add({
+        targets: image,
+        rotation: { from: 0, to: leaf.rotationRad },
+        duration: fadeOutStartMs + TieToast.FADE_OUT_MS,
+        ease: 'Linear',
+      })
+
+      // // Fade in after this leaf's delay
+      // this.scene.tweens.add({
+      //   targets: image,
+      //   alpha: { from: 0, to: 1 },
+      //   delay: leaf.fadeDelayMs,
+      //   duration: TieToast.LEAVES_FADE_MS,
+      //   ease: Ease.basic,
+      // })
+
+      // // Drift from its left offset to home (x 0) by the end of the hold
+      // this.scene.tweens.add({
+      //   targets: image,
+      //   x: 0,
+      //   delay: leaf.fadeDelayMs,
+      //   duration: fadeOutStartMs - leaf.fadeDelayMs,
+      //   ease: 'Sine.easeOut',
+      // })
+    })
+
     // Fade everything out once every piece is in, after the hold, then repeat
     this.scene.tweens.add({
       targets: Object.values(this.layers),
@@ -669,6 +789,10 @@ class TieToast extends RoundToast {
     TieToast.WIND_PULSE.forEach(({ name, lowAlpha }) =>
       this.layers[name].setAlpha(lowAlpha),
     )
+
+    // Leaves start unrotated each cycle. (With the fade-in / drift enabled,
+    // also start each hidden at its left offset: setAlpha(0).setX(fromXOffset))
+    TieToast.LEAVES.forEach((leaf) => this.layers[leaf.name].setRotation(0))
   }
 }
 
