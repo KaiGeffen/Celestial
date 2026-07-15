@@ -1,6 +1,6 @@
 import 'phaser'
 import Catalog from '@shared/state/catalog'
-import { Color, Style, BBStyle, Space, Flags, Time } from '../settings/settings'
+import { Color, Style, BBStyle, Space, Time } from '../settings/settings'
 import Card from '@shared/state/card'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import BaseScene from '../scene/baseScene'
@@ -8,8 +8,11 @@ import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 import { Keywords } from '@shared/state/keyword'
 import cardbackNames from '../data/cardbackNames'
 
+// Stat text / glow colors when a stat is better or worse than its base value
 const COLOR_BETTER = '#55dd55'
 const COLOR_WORSE = '#e45555'
+const GLOW_BETTER = 0x55dd55
+const GLOW_WORSE = 0xe45555
 const STAT_STROKE = '#000000'
 
 /** Name on the story points-resolve bubble container so setResolved can keep it visible. */
@@ -66,7 +69,8 @@ export class CardImage {
   // The index of this container within its parent container before it was brought to top
   renderIndex: number = undefined
 
-  // The outline visual effect
+  // X icon shown when this card is selected for mulligan
+  icon: Phaser.GameObjects.Image
 
   constructor(
     card: Card,
@@ -93,6 +97,7 @@ export class CardImage {
   ) {
     this.card = card
     this.cardback = cardback
+    this.interactive = interactive
     this.scene = outerContainer.scene
     this.createContainer(outerContainer)
 
@@ -114,7 +119,6 @@ export class CardImage {
 
     if (interactive) {
       this.imageSubject.setInteractive()
-      this.interactive = true
     }
   }
 
@@ -136,7 +140,12 @@ export class CardImage {
 
   setOnClick(f: () => void): this {
     this.clickCallback = f
+
+    // Make the card clickable via its subject image (an exact card-sized hit
+    // area), even if it was constructed non-interactive
+    this.imageSubject.setInteractive()
     this.interactive = true
+
     return this
   }
 
@@ -236,10 +245,10 @@ export class CardImage {
 
       if (this.card.cost > cost) {
         this.txtCost.setColor(COLOR_BETTER)
-        this.imageShadow.setGlow(0x55dd55)
+        this.imageShadow.setGlow(GLOW_BETTER)
       } else if (this.card.cost < cost) {
         this.txtCost.setColor(COLOR_WORSE)
-        this.imageShadow.setGlow(0xe45555)
+        this.imageShadow.setGlow(GLOW_WORSE)
       } else {
         this.txtCost.setColor(Color.cardCost)
         this.imageShadow.clearGlow()
@@ -424,9 +433,11 @@ export class CardImage {
       .on('pointerdown', () => this.clickCallback())
     this.setPoints(this.card.points)
 
-    // Make cost and points interactive
-    this.txtCost.setInteractive()
-    this.txtPoints.setInteractive()
+    // Stats respond to hover/click only on interactive cards
+    if (this.interactive) {
+      this.txtCost.setInteractive()
+      this.txtPoints.setInteractive()
+    }
 
     this.container.add([this.txtCost, this.txtPoints])
   }
@@ -452,7 +463,7 @@ export class CardImage {
       })
     }
 
-    // Replace each reference to a card by changing its color, but ignore text inside specific BBCode tags
+    // Highlight each reference to a card that isn't a keyword
     Catalog.getReferencedCardNames(this.card).forEach((card) => {
       const regex = new RegExp(`\\b${card}\\b`, 'g')
       s = s.replace(
@@ -489,7 +500,11 @@ export class CardImage {
       .on('areaout', () => hint.hide())
       .on('pointerout', this.onHoverExit())
       .on('pointerdown', () => this.clickCallback())
-      .setInteractive()
+
+    // Text responds to hover/click only on interactive cards
+    if (this.interactive) {
+      this.txtText.setInteractive()
+    }
 
     this.container.add(this.txtText)
   }
@@ -552,7 +567,6 @@ export class CardImage {
   }
 
   // Toggle whether this card appears as being set to mulligan or not
-  icon: Phaser.GameObjects.Image
   toggleSelectedForMulligan(): CardImage {
     if (this.icon !== undefined) {
       this.icon.destroy()
@@ -707,7 +721,3 @@ class CardShadow extends Phaser.GameObjects.Image {
     this.setVisible(true)
   }
 }
-
-// TODO Deprecated - remove
-// For mobile, the larger, full-sized CardImage
-export class FullSizeCardImage extends CardImage {}

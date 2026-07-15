@@ -228,20 +228,13 @@ export default class StoreScene extends BaseSceneWithHeader {
       Space.cardWidth,
       Space.cardHeight,
     )
-    // Pass interactive=false so CardImage doesn't call setInteractive() on the subject image.
-    // We then manually set imageSubject as the sole hit area (exact card size, no overflow)
-    // and strip interactivity from the text elements, whose hit regions can extend beyond card
-    // bounds and intercept clicks intended for adjacent cards.
+    // Non-interactive keeps the text elements inert (their hit regions can
+    // extend beyond card bounds); setOnClick makes just the subject clickable
     const cardImage = new CardImage(card, cardImageContainer, false, false)
 
     cardImage.setOnClick(() => {
       this.scene.launch('MenuScene', { menu: 'purchaseItem', card })
     })
-
-    cardImage.imageSubject.setInteractive()
-    cardImage.txtCost.disableInteractive()
-    cardImage.txtPoints.disableInteractive()
-    cardImage.txtText.disableInteractive()
 
     return cardImageContainer
   }
