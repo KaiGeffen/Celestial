@@ -1,6 +1,6 @@
 import 'phaser'
 import GameModel from '@shared/state/gameModel'
-import { Depth, Time, Ease } from '../../settings/settings'
+import { Depth, Ease } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
@@ -22,7 +22,7 @@ abstract class RoundToast {
   protected static readonly GROUP_DELTA_MS = 200
 
   /** How long the fully faded-in toast holds before fading out each loop. */
-  protected static readonly HOLD_MS = 1650
+  protected static readonly HOLD_MS = 1800
 
   /** How long the fade-out at the end of each loop takes. */
   protected static readonly FADE_OUT_MS = 500
@@ -38,8 +38,12 @@ abstract class RoundToast {
   /** Create this toast's layers, bottom to top. */
   protected abstract createElements(): void
 
-  /** Start this toast's animation; runs while the toast fades in/out. */
-  protected abstract animateElements(): void
+  /**
+   * Start this toast's animation. When `loop` is true it repeats forever (for
+   * testing). Otherwise it plays a single pass — fade in, hold, fade out — and
+   * calls `onDone` once that fade-out finishes.
+   */
+  protected abstract animateElements(loop: boolean, onDone?: () => void): void
 
   /** Add each named layer image (bottom to top) from this toast's asset dir. */
   protected addLayers(dir: 'Win' | 'Loss' | 'Tie', names: string[]): void {
@@ -94,31 +98,25 @@ abstract class RoundToast {
     })
   }
 
-  /** Show the toast, run its animation, then hide and call onComplete. */
+  /**
+   * Show the toast and play its animation once (the toast's own fade in / hold
+   * / fade out drives the timing), then hide and call onComplete.
+   */
   play(onComplete?: () => void): void {
-    this.container.setVisible(true).setAlpha(0)
+    this.container.setVisible(true).setAlpha(1)
 
-    this.scene.tweens.add({
-      targets: this.container,
-      alpha: 1,
-      duration: Time.match.roundResultFade,
-      hold: Time.match.roundResultHold,
-      yoyo: true,
-      ease: 'Sine.easeInOut',
-      onStart: () => this.animateElements(),
-      onComplete: () => {
-        this.container.setVisible(false)
-        // Looping element tweens shouldn't keep running while hidden
-        this.stopElementTweens()
-        onComplete?.()
-      },
+    this.animateElements(false, () => {
+      this.container.setVisible(false)
+      // Looping element tweens shouldn't keep running while hidden
+      this.stopElementTweens()
+      onComplete?.()
     })
   }
 
   /** TESTING Keep the toast on screen indefinitely, with its animation running. */
   showForTesting(): void {
     this.container.setVisible(true).setAlpha(1)
-    this.animateElements()
+    this.animateElements(true)
   }
 }
 
@@ -142,11 +140,11 @@ class WinToast extends RoundToast {
   private static readonly SUNBEAM4_ROTATION_RAD = 0 //-Math.PI / 22
 
   /** How many times each sunbeam fades out and back in after its first fade-in. */
-  private static readonly PULSE_ALPHA = 0.9
-  private static readonly SUNBEAM1_PULSE_COUNT = 1
-  private static readonly SUNBEAM2_PULSE_COUNT = 0
+  private static readonly PULSE_ALPHA = 0.6
+  private static readonly SUNBEAM1_PULSE_COUNT = 3
+  private static readonly SUNBEAM2_PULSE_COUNT = 4
   private static readonly SUNBEAM3_PULSE_COUNT = 2
-  private static readonly SUNBEAM4_PULSE_COUNT = 0
+  private static readonly SUNBEAM4_PULSE_COUNT = 1
 
   /** Fade-in order; groups start GROUP_DELTA_MS apart. */
   private static readonly GROUPS: { names: string[]; fadeMs: number }[] = [
@@ -193,12 +191,12 @@ class WinToast extends RoundToast {
     this.addLayers('Win', [
       'backdrop',
       'sunbeam1',
-      'sunbeam2',
       'sunbeam3',
       'sunbeam4',
-      'sun',
       'umbra',
+      'sunbeam2',
       'text',
+      'sun',
     ])
     // NOTE Sun sits above the beams but below umbra/text; move 'sun' last if
     // it should instead render on top of everything
@@ -208,15 +206,21 @@ class WinToast extends RoundToast {
     this.layers['sun'].y -= 96
   }
 
-  protected animateElements(): void {
+  protected animateElements(loop: boolean, onDone?: () => void): void {
     this.stopElementTweens()
-    this.runLoop()
+    this.runLoop(loop, onDone)
   }
 
-  // One cycle: groups fade in one after another, hold, all fade out,
-  // then the cycle repeats (until the toast's tweens are stopped)
-  private runLoop(): void {
+  // One cycle: groups fade in one after another, hold, all fade out. When
+  // looping, the fade-out restarts the cycle; otherwise it plays once and
+  // calls onDone.
+  private runLoop(loop: boolean, onDone?: () => void): void {
     const groups = WinToast.GROUPS
+
+    // Start unrotated/unscaled so the fade-in doesn't show leftover motion
+    // from a previous pass (their rotation tweens only begin after a delay)
+    this.layers['sun'].setRotation(0).setScale(1)
+    WinToast.SUNBEAMS.forEach(({ name }) => this.layers[name].setRotation(0))
 
     // Track when the last piece finishes fading in. It isn't necessarily the
     // last group — a longer earlier group (e.g. sunbeams) can finish after it.
@@ -227,8 +231,12 @@ class WinToast extends RoundToast {
       const startMs = i * WinToast.GROUP_DELTA_MS
       fadeInEndMs = Math.max(fadeInEndMs, startMs + group.fadeMs)
 
+      const targets = group.names.map((name) => this.layers[name])
+      // Start hidden so a delayed group doesn't flash at full alpha before its
+      // fade-in begins
+      targets.forEach((layer) => layer.setAlpha(0))
       this.scene.tweens.add({
-        targets: group.names.map((name) => this.layers[name]),
+        targets,
         alpha: { from: 0, to: 1 },
         delay: startMs,
         duration: group.fadeMs,
@@ -289,19 +297,17 @@ class WinToast extends RoundToast {
       }
     })
 
-    // Fade-out starts once every piece is in, after the hold
+    // Fade out once every piece is in, after the hold. Loop mode fades the
+    // layers so it can reset and replay; a single pass fades the whole toast.
     this.scene.tweens.add({
-      targets: Object.values(this.layers),
+      targets: loop ? Object.values(this.layers) : this.container,
       alpha: 0,
       delay: fadeOutStartMs,
       duration: WinToast.FADE_OUT_MS,
       onComplete: () => {
-        // Reset motion while hidden, before the next loop
-        this.layers['sun'].setRotation(0).setScale(1)
-        WinToast.SUNBEAMS.forEach(({ name }) =>
-          this.layers[name].setRotation(0),
-        )
-        this.runLoop()
+        // (runLoop resets the sun/sunbeam motion at the start of each pass)
+        if (loop) this.runLoop(loop, onDone)
+        else onDone?.()
       },
     })
   }
@@ -339,9 +345,9 @@ class LoseToast extends RoundToast {
    * waiting for the container's fade-in.
    */
   private static readonly RAIN_PULSE: { name: string; pulseCount: number }[] = [
-    { name: 'rainBack', pulseCount: 2 },
-    { name: 'rainMid', pulseCount: 3 },
-    { name: 'rainClose', pulseCount: 4 },
+    { name: 'rainBack', pulseCount: 8 },
+    { name: 'rainMid', pulseCount: 7 },
+    { name: 'rainClose', pulseCount: 6 },
   ]
 
   /** Container the rain layers share, so they fade in together as a unit. */
@@ -389,15 +395,16 @@ class LoseToast extends RoundToast {
     })
   }
 
-  protected animateElements(): void {
+  protected animateElements(loop: boolean, onDone?: () => void): void {
     this.stopElementTweens()
     this.resetElements()
-    this.runLoop()
+    this.runLoop(loop, onDone)
   }
 
-  // One cycle: groups fade in one after another, hold, all fade out,
-  // then the cycle repeats (until the toast's tweens are stopped)
-  private runLoop(): void {
+  // One cycle: groups fade in one after another, hold, all fade out. When
+  // looping, the fade-out restarts the cycle; otherwise it plays once and
+  // calls onDone.
+  private runLoop(loop: boolean, onDone?: () => void): void {
     const groups = LoseToast.GROUPS
 
     // Group fade-in start times (each group starts GROUP_DELTA_MS after the
@@ -415,8 +422,12 @@ class LoseToast extends RoundToast {
       const startMs = i * LoseToast.GROUP_DELTA_MS
       fadeInEndMs = Math.max(fadeInEndMs, startMs + group.fadeMs)
 
+      const targets = group.names.map((name) => this.layers[name])
+      // Start hidden so a delayed group doesn't flash at full alpha before its
+      // fade-in begins
+      targets.forEach((layer) => layer.setAlpha(0))
       this.scene.tweens.add({
-        targets: group.names.map((name) => this.layers[name]),
+        targets,
         alpha: { from: 0, to: 1 },
         delay: startMs,
         duration: group.fadeMs,
@@ -482,16 +493,23 @@ class LoseToast extends RoundToast {
       })
     })
 
-    // Fade everything out once every piece is in, after the hold, then repeat
+    // Fade out once every piece is in, after the hold. Loop mode fades the
+    // layers so it can reset and replay; a single pass fades the whole toast.
     this.scene.tweens.add({
-      targets: [...Object.values(this.layers), this.clouds, this.rain],
+      targets: loop
+        ? [...Object.values(this.layers), this.clouds, this.rain]
+        : this.container,
       alpha: 0,
       delay: fadeOutStartMs,
       duration: LoseToast.FADE_OUT_MS,
       onComplete: () => {
-        // Reset motion while hidden, before the next loop
-        this.resetElements()
-        this.runLoop()
+        if (loop) {
+          // Reset motion while hidden, before the next loop
+          this.resetElements()
+          this.runLoop(loop, onDone)
+        } else {
+          onDone?.()
+        }
       },
     })
   }
@@ -589,6 +607,8 @@ class TieToast extends RoundToast {
    */
   private static readonly LEAVES: {
     name: string
+    // Where in the image this leaf is positioned
+    x: number
     originX: number
     originY: number
     fadeDelayMs: number
@@ -598,43 +618,48 @@ class TieToast extends RoundToast {
   }[] = [
     {
       name: 'leaves1',
+      x: 470,
       originX: 270 / 600,
       originY: 200 / 500,
       fadeDelayMs: 0,
-      fromXOffset: -120,
-      rotations: 4 * 4,
+      fromXOffset: -300,
+      rotations: 4 * 6,
     },
     {
       name: 'leaves2',
+      x: 150,
       originX: 150 / 600,
       originY: 385 / 500,
-      fadeDelayMs: 80,
-      fromXOffset: -100,
-      rotations: 2 * 4,
+      fadeDelayMs: 0,
+      fromXOffset: -300,
+      rotations: 2 * 6,
     },
     {
       name: 'leaves3',
+      x: 515,
       originX: 515 / 600,
       originY: 320 / 500,
-      fadeDelayMs: 160,
-      fromXOffset: -140,
-      rotations: 3 * 4,
+      fadeDelayMs: 0,
+      fromXOffset: -300,
+      rotations: 3 * 6,
     },
     {
       name: 'leaves4',
+      x: 110,
       originX: 110 / 600,
       originY: 279 / 500,
-      fadeDelayMs: 240,
-      fromXOffset: -110,
-      rotations: 3 * 4,
+      fadeDelayMs: 0,
+      fromXOffset: -300,
+      rotations: 3 * 6,
     },
     {
       name: 'leaves5',
+      x: 327,
       originX: 327 / 600,
       originY: 320 / 500,
-      fadeDelayMs: 320,
-      fromXOffset: -130,
-      rotations: 1 * 4,
+      fadeDelayMs: 0,
+      fromXOffset: -300,
+      rotations: 3 * 6,
     },
   ]
 
@@ -660,15 +685,16 @@ class TieToast extends RoundToast {
     // )
   }
 
-  protected animateElements(): void {
+  protected animateElements(loop: boolean, onDone?: () => void): void {
     this.stopElementTweens()
     this.resetElements()
-    this.runLoop()
+    this.runLoop(loop, onDone)
   }
 
-  // One cycle: groups fade in one after another, hold, all fade out,
-  // then the cycle repeats (until the toast's tweens are stopped)
-  private runLoop(): void {
+  // One cycle: groups fade in one after another, hold, all fade out. When
+  // looping, the fade-out restarts the cycle; otherwise it plays once and
+  // calls onDone.
+  private runLoop(loop: boolean, onDone?: () => void): void {
     const groups = TieToast.GROUPS
 
     // Track when the last piece finishes fading in. It isn't necessarily the
@@ -678,8 +704,12 @@ class TieToast extends RoundToast {
       const startMs = i * TieToast.GROUP_DELTA_MS
       fadeInEndMs = Math.max(fadeInEndMs, startMs + group.fadeMs)
 
+      const targets = group.names.map((name) => this.layers[name])
+      // Start hidden so a delayed group doesn't flash at full alpha before its
+      // fade-in begins
+      targets.forEach((layer) => layer.setAlpha(0))
       this.scene.tweens.add({
-        targets: group.names.map((name) => this.layers[name]),
+        targets,
         alpha: { from: 0, to: 1 },
         delay: startMs,
         duration: group.fadeMs,
@@ -740,7 +770,7 @@ class TieToast extends RoundToast {
 
       // Set origin and position correctly
       image.setOrigin(leaf.originX, leaf.originY)
-      image.setX(leaf.originX * 600 - 300)
+      image.setX(leaf.x - (600 / 2 + 200))
       image.setY(leaf.originY * 500 - 250)
 
       // Rotate throughout the whole cycle
@@ -752,35 +782,40 @@ class TieToast extends RoundToast {
         ease: 'Linear',
       })
 
-      // // Fade in after this leaf's delay
-      // this.scene.tweens.add({
-      //   targets: image,
-      //   alpha: { from: 0, to: 1 },
-      //   delay: leaf.fadeDelayMs,
-      //   duration: TieToast.LEAVES_FADE_MS,
-      //   ease: Ease.basic,
-      // })
+      // Fade in after this leaf's delay
+      this.scene.tweens.add({
+        targets: image,
+        alpha: { from: 0, to: 1 },
+        delay: leaf.fadeDelayMs,
+        duration: TieToast.LEAVES_FADE_MS,
+        ease: Ease.basic,
+      })
 
-      // // Drift from its left offset to home (x 0) by the end of the hold
-      // this.scene.tweens.add({
-      //   targets: image,
-      //   x: 0,
-      //   delay: leaf.fadeDelayMs,
-      //   duration: fadeOutStartMs - leaf.fadeDelayMs,
-      //   ease: 'Sine.easeOut',
-      // })
+      // Drift from its left offset to home (x 0) by the end of the hold
+      this.scene.tweens.add({
+        targets: image,
+        x: leaf.x - 600 / 2,
+        delay: leaf.fadeDelayMs,
+        duration: fadeOutStartMs - leaf.fadeDelayMs,
+        ease: 'Linear',
+      })
     })
 
-    // Fade everything out once every piece is in, after the hold, then repeat
+    // Fade out once every piece is in, after the hold. Loop mode fades the
+    // layers so it can reset and replay; a single pass fades the whole toast.
     this.scene.tweens.add({
-      targets: Object.values(this.layers),
+      targets: loop ? Object.values(this.layers) : this.container,
       alpha: 0,
       delay: fadeOutStartMs,
       duration: TieToast.FADE_OUT_MS,
       onComplete: () => {
-        // Reset motion while hidden, before the next loop
-        this.resetElements()
-        this.runLoop()
+        if (loop) {
+          // Reset motion while hidden, before the next loop
+          this.resetElements()
+          this.runLoop(loop, onDone)
+        } else {
+          onDone?.()
+        }
       },
     })
   }
@@ -819,7 +854,7 @@ export default class RoundResultRegion extends Region {
     }
 
     // TESTING Remove: keep the win toast visible while iterating on its art
-    this.toasts.tie.showForTesting()
+    this.toasts.win.showForTesting()
 
     return this
   }

@@ -32,9 +32,9 @@ export const MatchTiming = {
   mulliganPause: -120,
 
   /** Round-result stamp fade in/out duration */
-  roundResultFade: 200,
+  roundResultFade: 0,
   /** Round-result stamp hold at full alpha */
-  roundResultHold: 1500,
+  roundResultHold: 3000,
 
   // NOTE This applies every step, not just the transition day/night
   // NOTE Therefore, each step must take at least this long
