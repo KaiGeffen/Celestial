@@ -31,11 +31,6 @@ export const MatchTiming = {
   /** A special pause for actions during mulligan */
   mulliganPause: -120,
 
-  /** Round-result stamp fade in/out duration */
-  roundResultFade: 0,
-  /** Round-result stamp hold at full alpha */
-  roundResultHold: 3000,
-
   // NOTE This applies every step, not just the transition day/night
   // NOTE Therefore, each step must take at least this long
   /** Match background tint transition when entering/exiting recap */

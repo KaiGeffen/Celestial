@@ -4,6 +4,9 @@ import { Depth, Ease } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
+/** A set of layers that fade in together, over fadeMs. */
+type FadeGroup = { names: string[]; fadeMs: number }
+
 /**
  * A toast announcing the round's result: a backdrop with elements that
  * animate over it. Each result (win / lose / tie) subclasses this with its
@@ -62,40 +65,31 @@ abstract class RoundToast {
   }
 
   /**
-   * Loop forever: fade groups in one after another (GROUP_DELTA_MS apart),
-   * hold, fade everything out, then repeat. Stops when the toast's tweens are
-   * killed (e.g. when the toast finishes playing).
-   *
-   * For a toast with animations beyond the fade-in, write a dedicated runLoop
-   * instead (see WinToast / LoseToast).
+   * Fade each group of layers in, one group after another (GROUP_DELTA_MS
+   * apart), playing the given sound. Returns when the last piece finishes
+   * fading in — not necessarily the last group, since a longer earlier group
+   * can finish after it.
    */
-  protected fadeLoopGroups(
-    groups: { names: string[]; fadeMs: number }[],
-  ): void {
-    // Track when the last piece finishes fading in. It isn't necessarily the
-    // last group — a longer earlier group can finish after it.
+  protected fadeInGroups(groups: FadeGroup[], sound: string): number {
+    this.scene.playSound(sound)
+
     let fadeInEndMs = 0
     groups.forEach((group, i) => {
       const startMs = i * RoundToast.GROUP_DELTA_MS
       fadeInEndMs = Math.max(fadeInEndMs, startMs + group.fadeMs)
 
+      const targets = group.names.map((name) => this.layers[name])
+      // Start hidden so a delayed group doesn't flash before its fade-in
+      targets.forEach((layer) => layer.setAlpha(0))
       this.scene.tweens.add({
-        targets: group.names.map((name) => this.layers[name]),
+        targets,
         alpha: { from: 0, to: 1 },
         delay: startMs,
         duration: group.fadeMs,
         ease: Ease.basic,
       })
     })
-
-    // Fade everything out once every piece is in, after the hold, then repeat
-    this.scene.tweens.add({
-      targets: Object.values(this.layers),
-      alpha: 0,
-      delay: fadeInEndMs + RoundToast.HOLD_MS,
-      duration: RoundToast.FADE_OUT_MS,
-      onComplete: () => this.fadeLoopGroups(groups),
-    })
+    return fadeInEndMs
   }
 
   /**
@@ -121,33 +115,22 @@ abstract class RoundToast {
 }
 
 class WinToast extends RoundToast {
-  /** Fade-in duration for each group (backdrop+sun, umbra, sunbeams, text). */
+  /** Fade-in duration for each group (backdrop+sun+text, umbra, sunbeams). */
   private static readonly BACKDROP_SUN_FADE_MS = 600
   private static readonly UMBRA_FADE_MS = 500
   private static readonly SUNBEAMS_FADE_MS = 1000
-  private static readonly TEXT_FADE_MS = 400
 
-  /** How far the sun rotates (radians) once it has faded in. */
+  /** How far the sun rotates (radians) over the cycle. */
   private static readonly SUN_ROTATION_RAD = Math.PI / 6
 
   /** Scale the sun grows to once it has faded in. */
   private static readonly SUN_SCALE = 1
 
-  /** How far each sunbeam rotates (radians) once it has faded in. */
-  private static readonly SUNBEAM1_ROTATION_RAD = 0
-  private static readonly SUNBEAM2_ROTATION_RAD = 0
-  private static readonly SUNBEAM3_ROTATION_RAD = 0
-  private static readonly SUNBEAM4_ROTATION_RAD = 0 //-Math.PI / 22
-
-  /** How many times each sunbeam fades out and back in after its first fade-in. */
+  /** Alpha the sunbeams dim to on each pulse. */
   private static readonly PULSE_ALPHA = 0.6
-  private static readonly SUNBEAM1_PULSE_COUNT = 3
-  private static readonly SUNBEAM2_PULSE_COUNT = 4
-  private static readonly SUNBEAM3_PULSE_COUNT = 2
-  private static readonly SUNBEAM4_PULSE_COUNT = 1
 
   /** Fade-in order; groups start GROUP_DELTA_MS apart. */
-  private static readonly GROUPS: { names: string[]; fadeMs: number }[] = [
+  private static readonly GROUPS: FadeGroup[] = [
     {
       names: ['backdrop', 'sun', 'text'],
       fadeMs: WinToast.BACKDROP_SUN_FADE_MS,
@@ -157,34 +140,21 @@ class WinToast extends RoundToast {
       names: ['sunbeam1', 'sunbeam2', 'sunbeam3', 'sunbeam4'],
       fadeMs: WinToast.SUNBEAMS_FADE_MS,
     },
-    // { names: ['text'], fadeMs: WinToast.TEXT_FADE_MS },
   ]
 
+  /**
+   * Per-sunbeam animation: radians it rotates once faded in, and how many
+   * times it pulses (dips to PULSE_ALPHA and back) before the fade-out.
+   */
   private static readonly SUNBEAMS: {
     name: string
     rotation: number
     pulseCount: number
   }[] = [
-    {
-      name: 'sunbeam1',
-      rotation: WinToast.SUNBEAM1_ROTATION_RAD,
-      pulseCount: WinToast.SUNBEAM1_PULSE_COUNT,
-    },
-    {
-      name: 'sunbeam2',
-      rotation: WinToast.SUNBEAM2_ROTATION_RAD,
-      pulseCount: WinToast.SUNBEAM2_PULSE_COUNT,
-    },
-    {
-      name: 'sunbeam3',
-      rotation: WinToast.SUNBEAM3_ROTATION_RAD,
-      pulseCount: WinToast.SUNBEAM3_PULSE_COUNT,
-    },
-    {
-      name: 'sunbeam4',
-      rotation: WinToast.SUNBEAM4_ROTATION_RAD,
-      pulseCount: WinToast.SUNBEAM4_PULSE_COUNT,
-    },
+    { name: 'sunbeam1', rotation: 0, pulseCount: 3 },
+    { name: 'sunbeam2', rotation: 0, pulseCount: 4 },
+    { name: 'sunbeam3', rotation: 0, pulseCount: 2 },
+    { name: 'sunbeam4', rotation: 0, pulseCount: 1 },
   ]
 
   protected createElements(): void {
@@ -198,8 +168,6 @@ class WinToast extends RoundToast {
       'text',
       'sun',
     ])
-    // NOTE Sun sits above the beams but below umbra/text; move 'sun' last if
-    // it should instead render on top of everything
 
     // Sun is off center in its image size
     this.layers['sun'].setOrigin(0.5, 154 / 500)
@@ -215,34 +183,12 @@ class WinToast extends RoundToast {
   // looping, the fade-out restarts the cycle; otherwise it plays once and
   // calls onDone.
   private runLoop(loop: boolean, onDone?: () => void): void {
-    const groups = WinToast.GROUPS
-
     // Start unrotated/unscaled so the fade-in doesn't show leftover motion
     // from a previous pass (their rotation tweens only begin after a delay)
     this.layers['sun'].setRotation(0).setScale(1)
     WinToast.SUNBEAMS.forEach(({ name }) => this.layers[name].setRotation(0))
 
-    // Track when the last piece finishes fading in. It isn't necessarily the
-    // last group — a longer earlier group (e.g. sunbeams) can finish after it.
-    let fadeInEndMs = 0
-    groups.forEach((group, i) => {
-      this.scene.playSound('win')
-
-      const startMs = i * WinToast.GROUP_DELTA_MS
-      fadeInEndMs = Math.max(fadeInEndMs, startMs + group.fadeMs)
-
-      const targets = group.names.map((name) => this.layers[name])
-      // Start hidden so a delayed group doesn't flash at full alpha before its
-      // fade-in begins
-      targets.forEach((layer) => layer.setAlpha(0))
-      this.scene.tweens.add({
-        targets,
-        alpha: { from: 0, to: 1 },
-        delay: startMs,
-        duration: group.fadeMs,
-        ease: Ease.basic,
-      })
-    })
+    const fadeInEndMs = this.fadeInGroups(WinToast.GROUPS, 'win')
 
     // Rotations start once their piece has faded in, and finish before
     // fade-out so nothing is mid-rotation as the toast fades away
@@ -320,7 +266,6 @@ class LoseToast extends RoundToast {
   private static readonly BACKDROP_FADE_MS = 600
   private static readonly UMBRA_FADE_MS = 500
   private static readonly CLOUDS_FADE_MS = 1000
-  private static readonly TEXT_FADE_MS = 400
 
   /**
    * The clouds live in one container that fades in with the group. On top of
@@ -363,10 +308,9 @@ class LoseToast extends RoundToast {
    * groups follow these in runLoop: the clouds container (index 2), then the
    * rain container + puddles (index 3).
    */
-  private static readonly GROUPS: { names: string[]; fadeMs: number }[] = [
+  private static readonly GROUPS: FadeGroup[] = [
     { names: ['backdrop', 'text'], fadeMs: LoseToast.BACKDROP_FADE_MS },
     { names: ['umbra'], fadeMs: LoseToast.UMBRA_FADE_MS },
-    // { names: ['text'], fadeMs: LoseToast.TEXT_FADE_MS },
   ]
 
   protected createElements(): void {
@@ -407,38 +351,15 @@ class LoseToast extends RoundToast {
   // looping, the fade-out restarts the cycle; otherwise it plays once and
   // calls onDone.
   private runLoop(loop: boolean, onDone?: () => void): void {
-    const groups = LoseToast.GROUPS
-
     // Group fade-in start times (each group starts GROUP_DELTA_MS after the
     // previous). The clouds container fades in one group after the plain
     // layers, then the rain container + puddles fade in the group after that.
     const cloudsStartMs = 2 * LoseToast.GROUP_DELTA_MS
     const rainStartMs = 3 * LoseToast.GROUP_DELTA_MS
 
-    // Track when the last piece finishes fading in. It isn't necessarily the
-    // last group — a longer earlier group can finish after it.
-    let fadeInEndMs = 0
-    groups.forEach((group, i) => {
-      this.scene.playSound('lose')
-
-      const startMs = i * LoseToast.GROUP_DELTA_MS
-      fadeInEndMs = Math.max(fadeInEndMs, startMs + group.fadeMs)
-
-      const targets = group.names.map((name) => this.layers[name])
-      // Start hidden so a delayed group doesn't flash at full alpha before its
-      // fade-in begins
-      targets.forEach((layer) => layer.setAlpha(0))
-      this.scene.tweens.add({
-        targets,
-        alpha: { from: 0, to: 1 },
-        delay: startMs,
-        duration: group.fadeMs,
-        ease: Ease.basic,
-      })
-    })
-    // Fold in the clouds and rain container groups
-    fadeInEndMs = Math.max(
-      fadeInEndMs,
+    // Fade in the plain layers, then fold in the clouds and rain groups
+    const fadeInEndMs = Math.max(
+      this.fadeInGroups(LoseToast.GROUPS, 'lose'),
       cloudsStartMs + LoseToast.CLOUDS_FADE_MS,
       rainStartMs + LoseToast.CLOUDS_FADE_MS,
     )
@@ -542,11 +463,14 @@ class LoseToast extends RoundToast {
 }
 
 class TieToast extends RoundToast {
+  /** Size of the tie layer images, for converting image coords to scene x/y. */
+  private static readonly IMG_WIDTH = 600
+  private static readonly IMG_HEIGHT = 500
+
   /** Fade-in duration for each group. */
   private static readonly BACKDROP_FADE_MS = 600
   private static readonly UMBRA_FADE_MS = 500
   private static readonly LEAVES_FADE_MS = 1000
-  private static readonly TEXT_FADE_MS = 400
 
   /**
    * The wind gusts don't move or alpha-fade with a group. Instead each pulses
@@ -589,33 +513,31 @@ class TieToast extends RoundToast {
   /** How far the right edge lags the left in each pulse (left-to-right desync). */
   private static readonly WIND_DESYNC_MS = 150
 
-  /** Plain-layer fade-in order; groups start GROUP_DELTA_MS apart. */
-  private static readonly GROUPS: { names: string[]; fadeMs: number }[] = [
+  /**
+   * Plain-layer fade-in order; groups start GROUP_DELTA_MS apart. Leaves are
+   * not here — they fade in per-leaf (with their own fadeDelayMs) in runLoop.
+   */
+  private static readonly GROUPS: FadeGroup[] = [
     { names: ['backdrop', 'text'], fadeMs: TieToast.BACKDROP_FADE_MS },
     { names: ['umbras'], fadeMs: TieToast.UMBRA_FADE_MS },
-    {
-      names: ['leaves1', 'leaves2', 'leaves3', 'leaves4', 'leaves5'],
-      fadeMs: TieToast.LEAVES_FADE_MS,
-    },
-    // { names: ['text'], fadeMs: TieToast.TEXT_FADE_MS },
   ]
 
   /**
-   * Per-leaf animation. Each leaf rotates throughout the whole cycle. It also
-   * has a custom origin (its rotation pivot), a staggered fade-in delay, and an
-   * initial x offset to the left that drifts home (x 0) by the time the hold is
-   * over. For now only the rotation is enabled — the rest is set up but
-   * commented out (in createElements / runLoop / resetElements).
+   * Per-leaf animation. Each leaf fades in after its own delay, drifts from
+   * xDelta away back to its resting x by the end of the hold, and rotates
+   * around its origin throughout the whole cycle.
    */
   private static readonly LEAVES: {
     name: string
-    // Where in the image this leaf is positioned
+    /** Resting x (image space, 0..IMG_WIDTH) the leaf drifts to and holds at. */
     x: number
+    /** Start offset from the resting x; negative starts the leaf to the left. */
+    xDelta: number
+    /** Origin of the image = the pivot the leaf rotates around. */
     originX: number
     originY: number
     fadeDelayMs: number
-    fromXOffset: number
-    /** Number of full turns (2π each) the leaf makes over the cycle. */
+    /** Radians the leaf rotates over the whole cycle. */
     rotations: number
   }[] = [
     {
@@ -623,8 +545,8 @@ class TieToast extends RoundToast {
       x: 470,
       originX: 270 / 600,
       originY: 200 / 500,
-      fadeDelayMs: 0,
-      fromXOffset: -300,
+      fadeDelayMs: 10,
+      xDelta: -450,
       rotations: 4 * 6,
     },
     {
@@ -632,9 +554,9 @@ class TieToast extends RoundToast {
       x: 150,
       originX: 150 / 600,
       originY: 385 / 500,
-      fadeDelayMs: 0,
-      fromXOffset: -300,
-      rotations: 2 * 6,
+      fadeDelayMs: 1700,
+      xDelta: -90,
+      rotations: 10,
     },
     {
       name: 'leaves3',
@@ -642,17 +564,17 @@ class TieToast extends RoundToast {
       originX: 515 / 600,
       originY: 320 / 500,
       fadeDelayMs: 0,
-      fromXOffset: -300,
+      xDelta: -300,
       rotations: 3 * 6,
     },
     {
       name: 'leaves4',
-      x: 110,
+      x: 190,
       originX: 110 / 600,
       originY: 279 / 500,
-      fadeDelayMs: 0,
-      fromXOffset: -300,
-      rotations: 3 * 6,
+      fadeDelayMs: 1500,
+      xDelta: -160,
+      rotations: 14,
     },
     {
       name: 'leaves5',
@@ -660,7 +582,7 @@ class TieToast extends RoundToast {
       originX: 327 / 600,
       originY: 320 / 500,
       fadeDelayMs: 0,
-      fromXOffset: -300,
+      xDelta: -300,
       rotations: 3 * 6,
     },
   ]
@@ -680,11 +602,6 @@ class TieToast extends RoundToast {
       'leaves5',
       'umbras',
     ])
-
-    // Leaf origins = rotation pivots (enable with the leaf fade-in / drift)
-    // TieToast.LEAVES.forEach((leaf) =>
-    //   this.layers[leaf.name].setOrigin(leaf.originX, leaf.originY),
-    // )
   }
 
   protected animateElements(loop: boolean, onDone?: () => void): void {
@@ -697,28 +614,7 @@ class TieToast extends RoundToast {
   // looping, the fade-out restarts the cycle; otherwise it plays once and
   // calls onDone.
   private runLoop(loop: boolean, onDone?: () => void): void {
-    const groups = TieToast.GROUPS
-
-    // Track when the last piece finishes fading in. It isn't necessarily the
-    // last group — a longer earlier group can finish after it.
-    let fadeInEndMs = 0
-    groups.forEach((group, i) => {
-      const startMs = i * TieToast.GROUP_DELTA_MS
-      fadeInEndMs = Math.max(fadeInEndMs, startMs + group.fadeMs)
-
-      const targets = group.names.map((name) => this.layers[name])
-      // Start hidden so a delayed group doesn't flash at full alpha before its
-      // fade-in begins
-      targets.forEach((layer) => layer.setAlpha(0))
-      this.scene.tweens.add({
-        targets,
-        alpha: { from: 0, to: 1 },
-        delay: startMs,
-        duration: group.fadeMs,
-        ease: Ease.basic,
-      })
-    })
-
+    const fadeInEndMs = this.fadeInGroups(TieToast.GROUPS, 'tie')
     const fadeOutStartMs = fadeInEndMs + TieToast.HOLD_MS
 
     // --- Animations after the fade-in (add more here) ---
@@ -762,21 +658,20 @@ class TieToast extends RoundToast {
       },
     )
 
-    // Each leaf rotates throughout the whole cycle. Its fade-in (staggered by
-    // delay) and initial left offset drifting home by the end of the hold are
-    // set up but commented out — only the rotation is active for now. (To
-    // enable the fade-in, drop the leaves from GROUPS above so they aren't
-    // faded in twice.)
+    // Each leaf rotates throughout the whole cycle, fades in after its own
+    // delay, and drifts from its start offset to its resting x by the end of
+    // the hold. (Leaves are kept out of GROUPS so they aren't faded in twice.)
     TieToast.LEAVES.forEach((leaf) => {
       const image = this.layers[leaf.name]
 
-      // Set origin and position correctly
+      // Set origin, and start the leaf xDelta away from its resting x. Start
+      // hidden so a delayed fade-in doesn't flash at full alpha first.
       image.setOrigin(leaf.originX, leaf.originY)
-      image.setX(leaf.x - (600 / 2 + 200))
-      image.setY(leaf.originY * 500 - 250)
+      image.setX(leaf.x - TieToast.IMG_WIDTH / 2 + leaf.xDelta)
+      image.setY((leaf.originY - 0.5) * TieToast.IMG_HEIGHT)
+      image.setAlpha(0)
 
       // Rotate throughout the whole cycle
-      console.log(leaf.rotations)
       this.scene.tweens.add({
         targets: image,
         rotation: { from: 0, to: leaf.rotations },
@@ -793,10 +688,10 @@ class TieToast extends RoundToast {
         ease: Ease.basic,
       })
 
-      // Drift from its left offset to home (x 0) by the end of the hold
+      // Drift from its start offset to its resting x by the end of the hold
       this.scene.tweens.add({
         targets: image,
-        x: leaf.x - 600 / 2,
+        x: leaf.x - TieToast.IMG_WIDTH / 2,
         delay: leaf.fadeDelayMs,
         duration: fadeOutStartMs - leaf.fadeDelayMs,
         ease: 'Linear',
@@ -829,8 +724,7 @@ class TieToast extends RoundToast {
       this.layers[name].setAlpha(lowAlpha),
     )
 
-    // Leaves start unrotated each cycle. (With the fade-in / drift enabled,
-    // also start each hidden at its left offset: setAlpha(0).setX(fromXOffset))
+    // Leaves start unrotated (runLoop re-hides and repositions them itself)
     TieToast.LEAVES.forEach((leaf) => this.layers[leaf.name].setRotation(0))
   }
 }
@@ -856,7 +750,7 @@ export default class RoundResultRegion extends Region {
     }
 
     // TESTING Remove: keep the win toast visible while iterating on its art
-    this.toasts.win.showForTesting()
+    // this.toasts.tie.showForTesting()
 
     return this
   }
