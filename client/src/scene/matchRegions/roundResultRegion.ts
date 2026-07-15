@@ -593,7 +593,8 @@ class TieToast extends RoundToast {
     originY: number
     fadeDelayMs: number
     fromXOffset: number
-    rotationRad: number
+    /** Number of full turns (2π each) the leaf makes over the cycle. */
+    rotations: number
   }[] = [
     {
       name: 'leaves1',
@@ -601,7 +602,7 @@ class TieToast extends RoundToast {
       originY: 200 / 500,
       fadeDelayMs: 0,
       fromXOffset: -120,
-      rotationRad: Math.PI * 5,
+      rotations: 4 * 4,
     },
     {
       name: 'leaves2',
@@ -609,7 +610,7 @@ class TieToast extends RoundToast {
       originY: 385 / 500,
       fadeDelayMs: 80,
       fromXOffset: -100,
-      rotationRad: Math.PI * 3,
+      rotations: 2 * 4,
     },
     {
       name: 'leaves3',
@@ -617,7 +618,7 @@ class TieToast extends RoundToast {
       originY: 320 / 500,
       fadeDelayMs: 160,
       fromXOffset: -140,
-      rotationRad: Math.PI * 5,
+      rotations: 3 * 4,
     },
     {
       name: 'leaves4',
@@ -625,7 +626,7 @@ class TieToast extends RoundToast {
       originY: 279 / 500,
       fadeDelayMs: 240,
       fromXOffset: -110,
-      rotationRad: 15,
+      rotations: 3 * 4,
     },
     {
       name: 'leaves5',
@@ -633,7 +634,7 @@ class TieToast extends RoundToast {
       originY: 320 / 500,
       fadeDelayMs: 320,
       fromXOffset: -130,
-      rotationRad: 18,
+      rotations: 1 * 4,
     },
   ]
 
@@ -743,9 +744,10 @@ class TieToast extends RoundToast {
       image.setY(leaf.originY * 500 - 250)
 
       // Rotate throughout the whole cycle
+      console.log(leaf.rotations)
       this.scene.tweens.add({
         targets: image,
-        rotation: { from: 0, to: leaf.rotationRad },
+        rotation: { from: 0, to: leaf.rotations },
         duration: fadeOutStartMs + TieToast.FADE_OUT_MS,
         ease: 'Linear',
       })
