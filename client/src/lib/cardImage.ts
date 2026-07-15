@@ -123,6 +123,10 @@ export class CardImage {
   }
 
   destroy(): void {
+    // Kill tweens so they don't keep animating destroyed objects
+    ;[this.container, this.artContainer, ...this.artContainer.list].forEach(
+      (obj) => this.scene.tweens.killTweensOf(obj),
+    )
     this.container.destroy()
   }
 
@@ -266,6 +270,11 @@ export class CardImage {
     ) {
       this.card = card
 
+      // Clear visual state left over from the previous card
+      this.clearTint()
+      this.imageShadow.clearGlow()
+      this.cost = undefined
+
       // Destroy each of the existing elements
       ;[this.txtCost, this.txtPoints, this.txtText, this.txtTitle].forEach(
         (obj) => {
@@ -274,6 +283,7 @@ export class CardImage {
           }
         },
       )
+      this.txtTitle = undefined
 
       // Set to cardback if valid
       const showingBack = this.card.id === Catalog.cardback.id
@@ -288,10 +298,12 @@ export class CardImage {
       this.imageArc.setTexture(`card/arc-${this.card.theme}`)
       this.imageContainer.setTexture(`card/container-${this.card.theme}`)
 
-      // Recreate text elements
+      // Recreate text elements (no title over a cardback)
       this.createStats()
       this.createText()
-      this.createTitle()
+      if (!showingBack) {
+        this.createTitle()
+      }
     }
     return this
   }

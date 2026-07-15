@@ -37,7 +37,7 @@ it critically and judge its quality, don't run a mechanical checklist.
 | --- | --- | --- |
 | `client/src/scene/matchRegions/roundResultRegion.ts` | 2026-07-15 | Full audit: FadeGroup type + shared fadeInGroups helper, per-sunbeam/leaf/gust config dicts, dead fadeLoopGroups removed, IMG_WIDTH/HEIGHT named, sound bug fixed (played once per group instead of once per cycle) |
 | `client/src/scene/baseScene.ts` | 2026-07-15 | Spot fix only, not a full audit: playSound now no-ops while the tab is hidden (queued sounds all fired at once on refocus) |
-| `client/src/lib/cardImage.ts` | 2026-07-15 | Full audit. Fixed: dead FullSizeCardImage, unused import, interactivity API (setOnClick now enables the subject's input; text/stat elements interactive only on interactive cards; storeScene workaround deleted). Open minor bugs, fix when convenient: setCard(cardback) draws title over the back; setCard keeps stale tint/glow from the previous card; destroy() doesn't kill tweens on its objects |
+| `client/src/lib/cardImage.ts` | 2026-07-15 | Full audit, all findings fixed: dead FullSizeCardImage removed; interactivity API (setOnClick enables the subject's input; text/stat elements interactive only on interactive cards; storeScene workaround deleted); setCard no longer draws a title over a cardback and clears stale tint/glow/cost; destroy() kills tweens on its objects |
 
 ### Next up (proposed order)
 
