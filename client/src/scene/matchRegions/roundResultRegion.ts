@@ -254,11 +254,13 @@ class WinToast extends RoundToast {
 
     const sunHoldMs = fadeOutStartMs - sunFadeEndMs
 
+    // Sun starts rotating as soon as the fade-in starts (not once it's in),
+    // finishing before the toast fades out
     this.scene.tweens.add({
       targets: this.layers['sun'],
       rotation: { from: 0, to: WinToast.SUN_ROTATION_RAD },
-      delay: sunFadeEndMs,
-      duration: sunHoldMs,
+      delay: 0,
+      duration: fadeOutStartMs,
       ease: 'Linear',
     })
 
