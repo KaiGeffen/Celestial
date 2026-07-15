@@ -114,6 +114,12 @@ class SharedBaseScene extends Phaser.Scene {
 
   // Play the given sound, or one of its variants if it has any
   playSound(s: string): void {
+    // Don't play queue up a bunch of sounds when tab hidden cuz then they all play at once and oh boy it's loud
+    if (typeof document !== 'undefined' && document.hidden) {
+      console.log('Sound not played because the tab is hidden')
+      return
+    }
+
     const amt_variants = {
       open: 2,
       close: 2,
