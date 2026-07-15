@@ -503,8 +503,10 @@ class LoseToast extends RoundToast {
     LoseToast.CLOUD_DRIFT.forEach(({ name, fromX }) =>
       this.cloudLayers[name].setX(fromX),
     )
-    // Rain layers at full alpha, ready to pulse
+    // Rain container + puddles hidden (they fade in together); rain layers at
+    // full alpha, ready to pulse
     this.rain.setAlpha(0)
+    this.layers['puddles'].setAlpha(0)
     Object.values(this.rainLayers).forEach((layer) => layer.setAlpha(1))
   }
 
@@ -523,18 +525,36 @@ class TieToast extends RoundToast {
   /** Fade-in duration for each group. */
   private static readonly BACKDROP_FADE_MS = 600
   private static readonly UMBRA_FADE_MS = 500
-  private static readonly WIND_FADE_MS = 1000
   private static readonly LEAVES_FADE_MS = 1000
   private static readonly TEXT_FADE_MS = 400
 
-  /** Fade-in order; groups start GROUP_DELTA_MS apart. */
+  /**
+   * The wind gusts don't move or alpha-fade with a group. Instead each pulses
+   * between its low and high alpha this many times via its per-corner edge
+   * alpha: the left edge leads and the right edge lags (WIND_DESYNC_MS), so
+   * each pulse reads as sweeping left to right across the image. `offsetMs`
+   * delays a gust's whole pulse, to stagger the gusts against each other.
+   * See https://docs.phaser.io/phaser/concepts/gameobjects#alpha
+   */
+  private static readonly WIND_PULSE: {
+    name: string
+    pulseCount: number
+    lowAlpha: number
+    highAlpha: number
+    offsetMs: number
+  }[] = [
+    { name: 'gustBack', pulseCount: 3, lowAlpha: 0.0, highAlpha: 0.3, offsetMs: 0 },
+    { name: 'gustMid', pulseCount: 2, lowAlpha: 0.0, highAlpha: 0.4, offsetMs: 0 },
+    { name: 'gustClose', pulseCount: 1, lowAlpha: 0.0, highAlpha: 0.5, offsetMs: 0 },
+  ]
+
+  /** How far the right edge lags the left in each pulse (left-to-right desync). */
+  private static readonly WIND_DESYNC_MS = 150
+
+  /** Plain-layer fade-in order; groups start GROUP_DELTA_MS apart. */
   private static readonly GROUPS: { names: string[]; fadeMs: number }[] = [
     { names: ['backdrop', 'text'], fadeMs: TieToast.BACKDROP_FADE_MS },
     { names: ['umbras'], fadeMs: TieToast.UMBRA_FADE_MS },
-    {
-      names: ['guestBack', 'gustMid', 'gustClose'],
-      fadeMs: TieToast.WIND_FADE_MS,
-    },
     {
       names: ['leaves1', 'leaves2', 'leaves3', 'leaves4', 'leaves5'],
       fadeMs: TieToast.LEAVES_FADE_MS,
@@ -546,11 +566,11 @@ class TieToast extends RoundToast {
     // Added bottom to top (reverse of the intended front-to-back layer order)
     this.addLayers('Tie', [
       'backdrop',
-      'guestBack',
-      'text',
+      'gustBack',
       'gustMid',
-      'umbras',
       'gustClose',
+      'umbras',
+      'text',
       'leaves1',
       'leaves2',
       'leaves3',
@@ -561,8 +581,94 @@ class TieToast extends RoundToast {
 
   protected animateElements(): void {
     this.stopElementTweens()
-    this.fadeLoopGroups(TieToast.GROUPS)
-    // TODO Animate the gusts / leaves
+    this.resetElements()
+    this.runLoop()
+  }
+
+  // One cycle: groups fade in one after another, hold, all fade out,
+  // then the cycle repeats (until the toast's tweens are stopped)
+  private runLoop(): void {
+    const groups = TieToast.GROUPS
+
+    // Track when the last piece finishes fading in. It isn't necessarily the
+    // last group — a longer earlier group can finish after it.
+    let fadeInEndMs = 0
+    groups.forEach((group, i) => {
+      const startMs = i * TieToast.GROUP_DELTA_MS
+      fadeInEndMs = Math.max(fadeInEndMs, startMs + group.fadeMs)
+
+      this.scene.tweens.add({
+        targets: group.names.map((name) => this.layers[name]),
+        alpha: { from: 0, to: 1 },
+        delay: startMs,
+        duration: group.fadeMs,
+        ease: Ease.basic,
+      })
+    })
+
+    const fadeOutStartMs = fadeInEndMs + TieToast.HOLD_MS
+
+    // --- Animations after the fade-in (add more here) ---
+
+    // Each gust fades in and out a few times via its edge alpha. The left edge
+    // leads and the right edge lags by WIND_DESYNC_MS, so each pulse reads as
+    // sweeping left to right across the image. Both edges fit their pulses into
+    // the window before the toast fades out.
+    TieToast.WIND_PULSE.forEach(
+      ({ name, pulseCount, lowAlpha, highAlpha, offsetMs }) => {
+        if (pulseCount <= 0) return
+        const image = this.layers[name]
+
+        // Left edge leads, starting after this gust's offset
+        this.scene.tweens.add({
+          targets: image,
+          alphaTopLeft: { from: lowAlpha, to: highAlpha },
+          alphaTopRight: { from: lowAlpha, to: highAlpha },
+          alphaBottomLeft: { from: lowAlpha, to: highAlpha },
+          alphaBottomRight: { from: lowAlpha, to: highAlpha },
+          delay: offsetMs,
+          duration: (fadeOutStartMs - offsetMs) / (pulseCount * 2),
+          yoyo: true,
+          repeat: pulseCount - 1,
+          ease: 'Sine.easeInOut',
+        })
+
+        // Right edge lags by the desync, but still lands by fadeOutStartMs
+        this.scene.tweens.add({
+          targets: image,
+          alphaTopRight: { from: lowAlpha, to: highAlpha },
+          alphaBottomRight: { from: lowAlpha, to: highAlpha },
+          delay: offsetMs + TieToast.WIND_DESYNC_MS,
+          duration:
+            (fadeOutStartMs - offsetMs - TieToast.WIND_DESYNC_MS) /
+            (pulseCount * 2),
+          yoyo: true,
+          repeat: pulseCount - 1,
+          ease: 'Sine.easeInOut',
+        })
+      },
+    )
+
+    // Fade everything out once every piece is in, after the hold, then repeat
+    this.scene.tweens.add({
+      targets: Object.values(this.layers),
+      alpha: 0,
+      delay: fadeOutStartMs,
+      duration: TieToast.FADE_OUT_MS,
+      onComplete: () => {
+        // Reset motion while hidden, before the next loop
+        this.resetElements()
+        this.runLoop()
+      },
+    })
+  }
+
+  /** Restore every animated element to its start state, before a loop. */
+  private resetElements(): void {
+    // Wind starts at its low alpha; its edge-alpha pulses swing it to high
+    TieToast.WIND_PULSE.forEach(({ name, lowAlpha }) =>
+      this.layers[name].setAlpha(lowAlpha),
+    )
   }
 }
 
@@ -587,7 +693,7 @@ export default class RoundResultRegion extends Region {
     }
 
     // TESTING Remove: keep the win toast visible while iterating on its art
-    this.toasts.lose.showForTesting()
+    this.toasts.tie.showForTesting()
 
     return this
   }

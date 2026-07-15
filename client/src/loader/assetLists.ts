@@ -492,7 +492,7 @@ export const assetLists = {
   "roundResult/Tie": {
     "files": [
       "backdrop",
-      "guestBack",
+      "gustBack",
       "gustClose",
       "gustMid",
       "leaves1",
