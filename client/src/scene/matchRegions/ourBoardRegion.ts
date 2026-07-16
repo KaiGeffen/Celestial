@@ -1,5 +1,6 @@
 import 'phaser'
 import { CardImage } from '../../lib/cardImage'
+import Card from '@shared/state/card'
 import GameModel from '@shared/state/gameModel'
 import {
   Depth,
@@ -62,6 +63,15 @@ export default class OurBoardRegion extends Region {
   /** Card animating hand→story; hand-wide tweens must not move it (see `onCardExit`). */
   private cardTweeningToStory: CardImage | null = null
 
+  /**
+   * Hand cards live here, not directly in the region container. The deck /
+   * discard stacks (StacksRegionBase) are parented into the same region
+   * container, and card hover reordering (`moveToTopOnHover`) reorders a card's
+   * parent — scoping the hand to its own container keeps that reorder from
+   * scrambling the stacks (e.g. deck cardbacks jumping above their count badge).
+   */
+  private handContainer: Phaser.GameObjects.Container
+
   create(scene: MatchScene): this {
     this.scene = scene
     this.cards = []
@@ -71,7 +81,25 @@ export default class OurBoardRegion extends Region {
       y: `100%`,
     })
 
+    this.handContainer = scene.add.container()
+    this.container.add(this.handContainer)
+
     return this
+  }
+
+  /** Hand cards go in `handContainer` so hover reordering stays scoped to them. */
+  override addCard(
+    card: Card,
+    position: [number, number] = [0, 0],
+    cardback = 0,
+  ): CardImage {
+    return new CardImage(
+      card,
+      this.handContainer,
+      true,
+      true,
+      cardback,
+    ).setPosition(position)
   }
 
   private addCardHotkeys() {
@@ -387,6 +415,10 @@ export default class OurBoardRegion extends Region {
       this.cards.push(card)
       this.temp.push(card)
     }
+
+    // Hand renders above the deck / discard stacks that share this container
+    // (the stacks were parented in after handContainer was created)
+    this.container.bringToTop(this.handContainer)
 
     // Hover-active: wide spread + raised (flat rotation like before)
     if (this.raisedCardIndex !== null) {
