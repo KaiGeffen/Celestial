@@ -1,6 +1,6 @@
 import 'phaser'
 import Button from './button'
-import { Style, Flags } from '../../settings/settings'
+import { Style } from '../../settings/settings'
 
 export default class Sun extends Button {
   // Used in the tutorial to reduce the functionality while player is learning
@@ -19,7 +19,7 @@ export default class Sun extends Button {
         style: Style.sun,
       },
       icon: {
-        name: `${Flags.mobile ? 'Mobile' : ''}Sun`,
+        name: 'Sun',
         interactive: true,
         circular: true,
       },

@@ -2,7 +2,7 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
-import { Color, Space, Style, Flags } from '../../settings/settings'
+import { Color, Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import { CosmeticSet } from '@shared/types/cosmeticSet'
@@ -302,17 +302,13 @@ export default class AlterDeckCosmeticsMenu extends Menu {
         .setDisplaySize(cbWidth, cbHeight)
         .setInteractive()
 
-      // The outline pipeline is WebGL-only, matching Button's glow
-      let outlineFx = null
-      if (!Flags.mobile) {
-        outlineFx = outlinePlugin['add'](image, {
-          thickness: 5,
-          outlineColor: Color.outline,
-          quality: 0.3,
-        })
-        outlineFx.active = this.selectedCardback === cardbackId
-        outlines.push(outlineFx)
-      }
+      const outlineFx = outlinePlugin['add'](image, {
+        thickness: 5,
+        outlineColor: Color.outline,
+        quality: 0.3,
+      })
+      outlineFx.active = this.selectedCardback === cardbackId
+      outlines.push(outlineFx)
 
       image.on('pointerdown', () => {
         this.scene.sound.play('click')
@@ -327,7 +323,7 @@ export default class AlterDeckCosmeticsMenu extends Menu {
 
         // Move the selection outline to this cardback
         outlines.forEach((o) => (o.active = false))
-        if (outlineFx) outlineFx.active = true
+        outlineFx.active = true
       })
       container.add(image)
 

@@ -6,7 +6,6 @@ import {
   Style,
   Depth,
   Time,
-  Flags,
   Color,
 } from '../../settings/settings'
 import { MatchScene } from '../matchScene'
@@ -100,11 +99,6 @@ export default class StoryRegion extends Region {
         act.owner === 1
       ) {
         card.setSeenGlow()
-      }
-
-      // Only allow jumping around in the recap if we are playing a recap
-      if (state.isRecap && !Flags.mobile) {
-        // card.setOnClick(this.callback(resolvedI + i))
       }
 
       card.container.setScale(SHRUNKEN_CARD_SCALE)

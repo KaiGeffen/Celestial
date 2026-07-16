@@ -307,17 +307,13 @@ export default class UserProfileMenu extends Menu {
         .setDisplaySize(width, height)
         .setInteractive()
 
-      // The outline pipeline is WebGL-only, matching Button's glow
-      let outlineFx = null
-      if (!Flags.mobile) {
-        outlineFx = outlinePlugin['add'](image, {
-          thickness: 5,
-          outlineColor: Color.outline,
-          quality: 0.3,
-        })
-        outlineFx.active = selected
-        outlines.push(outlineFx)
-      }
+      const outlineFx = outlinePlugin['add'](image, {
+        thickness: 5,
+        outlineColor: Color.outline,
+        quality: 0.3,
+      })
+      outlineFx.active = selected
+      outlines.push(outlineFx)
 
       image.on('pointerdown', () => {
         this.scene.sound.play('click')
@@ -330,7 +326,7 @@ export default class UserProfileMenu extends Menu {
 
         // Move the selection outline to this cardback
         outlines.forEach((o) => (o.active = false))
-        if (outlineFx) outlineFx.active = true
+        outlineFx.active = true
       })
 
       container.add(image)

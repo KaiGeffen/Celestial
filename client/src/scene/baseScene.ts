@@ -13,7 +13,6 @@ import {
 } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Hint from '../lib/hint'
-import ensureMusic from '../loader/audioManager'
 import Buttons from '../lib/buttons/buttons'
 import Server from '../server'
 import { server } from '../server'
@@ -188,13 +187,6 @@ export default class BaseScene extends SharedBaseScene {
       x: `100%`,
       y: `0%`,
     })
-
-    // On mobile, ensure music is playing the first time a click happens
-    if (Flags.mobile) {
-      this.input.once('pointerdown', () => {
-        ensureMusic(this)
-      })
-    }
 
     // Friends list button (to the left of options)
     this.btnFriends = new Buttons.Icon({

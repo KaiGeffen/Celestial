@@ -1,14 +1,7 @@
 import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
-import {
-  Space,
-  Style,
-  Color,
-  Time,
-  Flags,
-  BBStyle,
-} from '../../settings/settings'
+import { Space, Style, Color, Time, BBStyle } from '../../settings/settings'
 import Button from './button'
 import Card from '@shared/state/card'
 import Hint from '../hint'
@@ -62,9 +55,6 @@ export default class Cutout extends Button {
           hint.hide()
           this.icon.clearTint()
         },
-      },
-      sound: {
-        mute: Flags.mobile,
       },
     })
 

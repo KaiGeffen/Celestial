@@ -40,7 +40,6 @@
   },
   "dependencies": {
     "express": "^4.17.1",
-    "is-mobile": "^3.0.0",
     "jwt-decode": "^3.1.2",
     "path-browserify": "^1.0.1",
     "phaser": "^3.55.2",
