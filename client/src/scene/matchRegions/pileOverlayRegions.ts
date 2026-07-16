@@ -12,6 +12,15 @@ export default class OverlayRegion extends Region {
   cardImages: CardImage[] = []
   hoveredCard: CardImage | null = null
 
+  /**
+   * Overlay cards live here, not directly in the region container. Card hover
+   * reordering (`moveToTopOnHover`) reorders a card's parent and snapshots it;
+   * scoping the cards to their own container keeps that from pulling the
+   * full-screen dark background above the cards (e.g. after a mid-hover state
+   * change destroys the hovered card).
+   */
+  private cardsContainer: Phaser.GameObjects.Container
+
   create(scene: MatchScene, title: string): OverlayRegion {
     this.scene = scene
 
@@ -43,7 +52,27 @@ export default class OverlayRegion extends Region {
 
     this.container.add([background, this.txtTitle])
 
+    // Cards sit above the background / title, in their own container so hover
+    // reordering stays scoped to them (see cardsContainer)
+    this.cardsContainer = scene.add.container()
+    this.container.add(this.cardsContainer)
+
     return this
+  }
+
+  /** Overlay cards go in `cardsContainer` so hover reordering stays scoped to them. */
+  override addCard(
+    card: Card,
+    position: [number, number] = [0, 0],
+    cardback = 0,
+  ): CardImage {
+    return new CardImage(
+      card,
+      this.cardsContainer,
+      true,
+      true,
+      cardback,
+    ).setPosition(position)
   }
 
   displayState(state: GameModel): void {}
