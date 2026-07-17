@@ -28,9 +28,6 @@ export default class ChapterMessageMenu extends MessageMenu {
   protected createContent(params): void {
     this.claimGoldMissionId = params.claimGoldMissionId
 
-    const contentWidth = this.width - 100 // PAD_LEFT_RIGHTpx gap on each side
-    const sidePad = { padding: { left: PAD_LEFT_RIGHT, right: PAD_LEFT_RIGHT } }
-
     this.createChapterHeader(params)
 
     this.createChapterBody(params)

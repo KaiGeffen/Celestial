@@ -1,7 +1,7 @@
 import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Buttons from '../../lib/buttons/buttons'
-import { Color, Space, Style, Url } from '../../settings/settings'
+import { Space, Style, Url } from '../../settings/settings'
 import { Flags } from '../../settings/flags'
 import Menu from './menu'
 import MenuScene from '../menuScene'

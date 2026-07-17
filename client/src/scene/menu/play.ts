@@ -3,14 +3,11 @@ import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
 import {
-  Color,
   Messages,
   Space,
   Style,
   BBStyle,
   UserSettings,
-  Ease,
-  Time,
 } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
@@ -19,10 +16,11 @@ import { Deck } from '@shared/types/deck'
 import logEvent from '../../utils/analytics'
 import { server } from '../../server'
 import Decklist from '../../lib/decklist'
+import Garden from '../../lib/garden'
 import Catalog from '@shared/state/catalog'
 import Card from '@shared/state/card'
 import Server from '../../server'
-import { GardenSettings, MechanicsSettings } from '@shared/settings'
+import { MechanicsSettings } from '@shared/settings'
 import { decodeShareableDeckCode } from '@shared/codec'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import newScrollablePanel from '../../lib/scrollablePanel'
@@ -31,8 +29,6 @@ import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/Sc
 const menuWidth = 1000
 const deckPanelWidth = Space.cutoutWidth + Space.pad * 2
 const playPanelWidth = 527
-// Tall enough for a full-grown plant and its timer text
-const gardenHeight = 200
 
 export default class PlayMenu extends Menu {
   password: string
@@ -40,16 +36,10 @@ export default class PlayMenu extends Menu {
   pwdBtn: Button
   decklist: Decklist
   deck: Deck
-  gardenTimes: (Date | null)[] // Fixed-length array, some indices may be null
-  gardenPlants: (Phaser.GameObjects.Image | null)[] // Fixed-length array, some indices may be null
-  gardenTimers: (Phaser.GameObjects.Text | null)[] // Fixed-length array, some indices may be null
-  plantSizers: (any | null)[] // Fixed-length array of plant sizers
-  plantGlowTweens: (Phaser.Tweens.Tween | null)[] // Fixed-length array of glow tweens for each plant
-  clickedHarvestIndex: number | null = null // Track which index was clicked for harvest
+  garden: Garden
   txtDeckName: RexUIPlugin.BBCodeText
   txtDeckValidation: Phaser.GameObjects.Text
   playOptionButtons: Button[] = []
-  gardenSizer: any // Store reference to garden sizer for updates
   btnPrevDeck: Button
   btnNextDeck: Button
   scrollableDeck: ScrollablePanel
@@ -58,6 +48,19 @@ export default class PlayMenu extends Menu {
 
   private getReturnSceneKey(): string {
     return this.activeScene?.scene?.key ?? 'HomeScene'
+  }
+
+  // Resolve the equipped deck's card ids to Cards, skipping any unknown ids
+  private getDeckCards(): Card[] {
+    return this.deck.cards
+      .map((id) => {
+        try {
+          return Catalog.getCardById(id)
+        } catch (e) {
+          return null
+        }
+      })
+      .filter((card) => card !== null && card !== undefined) as Card[]
   }
 
   constructor(scene: MenuScene, params) {
@@ -90,9 +93,6 @@ export default class PlayMenu extends Menu {
 
     // Reskin input text after layout
     this.reskinInputText()
-
-    // Listen for garden harvest events
-    this.scene.game.events.on('gardenHarvested', this.onGardenHarvested, this)
   }
 
   private switchToPreviousDeck(): void {
@@ -122,17 +122,7 @@ export default class PlayMenu extends Menu {
     this.txtDeckName.setText(this.deck.name || '')
 
     // Update decklist
-    const deckCards: Card[] = this.deck.cards
-      .map((id) => {
-        try {
-          return Catalog.getCardById(id)
-        } catch (e) {
-          return null
-        }
-      })
-      .filter((card) => card !== null && card !== undefined)
-
-    this.decklist.setDeck(deckCards, false)
+    this.decklist.setDeck(this.getDeckCards(), false)
     if (this.scrollableDeck) {
       this.scrollableDeck.layout()
       this.scrollableDeck.t = 0
@@ -161,18 +151,6 @@ export default class PlayMenu extends Menu {
 
     // Update PWD button (depends on both password and deck validity)
     this.updatePwdButton()
-  }
-
-  close() {
-    // Clean up event listener
-    if (this.scene && this.scene.game) {
-      this.scene.game.events.off(
-        'gardenHarvested',
-        this.onGardenHarvested,
-        this,
-      )
-    }
-    super.close()
   }
 
   private reskinInputText(): void {
@@ -206,7 +184,8 @@ export default class PlayMenu extends Menu {
       space: { top: 10, line: 60 },
     })
     leftColumn.add(this.createPlayPanel()).addNewLine()
-    leftColumn.add(this.createGardenPanel())
+    this.garden = new Garden(this.scene, playPanelWidth)
+    leftColumn.add(this.garden.sizer)
     mainSizer.add(leftColumn)
 
     // Right column: deck panel (title+arrows then decklist)
@@ -277,16 +256,7 @@ export default class PlayMenu extends Menu {
     // Decklist
     this.decklist = new Decklist(this.scene as any, () => () => {})
 
-    const deckCards: Card[] = this.deck.cards
-      .map((id) => {
-        try {
-          return Catalog.getCardById(id)
-        } catch (e) {
-          return null
-        }
-      })
-      .filter((card) => card !== null && card !== undefined) as Card[]
-
+    const deckCards = this.getDeckCards()
     if (deckCards.length > 0) {
       this.decklist.setDeck(deckCards, false)
     }
@@ -338,7 +308,7 @@ export default class PlayMenu extends Menu {
           lastScene: this.getReturnSceneKey(),
         })
         logEvent('queue_pve')
-      }),
+      }).row,
       { expand: true },
     )
 
@@ -359,7 +329,7 @@ export default class PlayMenu extends Menu {
           lastScene: this.getReturnSceneKey(),
         })
         logEvent('queue_pvp')
-      }),
+      }).row,
       { expand: true },
     )
 
@@ -384,10 +354,10 @@ export default class PlayMenu extends Menu {
       })
       logEvent('queue_pwd')
     })
-    this.pwdBtn = this.playOptionButtons[this.playOptionButtons.length - 1]
+    this.pwdBtn = friendlyMatchOption.button
     this.updatePwdButton()
 
-    panel.add(friendlyMatchOption, { expand: true })
+    panel.add(friendlyMatchOption.row, { expand: true })
 
     this.inputText = this.scene.add
       .rexInputText(0, 0, Space.inputTextWidth, 40, {
@@ -431,11 +401,10 @@ export default class PlayMenu extends Menu {
     return panel
   }
 
-  private createGardenPanel(): any {
-    return this.createGarden()
-  }
-
-  private createPlayOption(text: string, callback: () => void): any {
+  private createPlayOption(
+    text: string,
+    callback: () => void,
+  ): { row: any; button: Button } {
     const row = this.scene.rexUI.add.sizer({
       orientation: 'horizontal',
       width: playPanelWidth,
@@ -471,7 +440,7 @@ export default class PlayMenu extends Menu {
       .add(txt, { align: 'center' })
       .addSpace(1)
       .add(container, { align: 'center' })
-    return row
+    return { row, button }
   }
 
   private isDeckValid(): boolean {
@@ -492,298 +461,7 @@ export default class PlayMenu extends Menu {
     }
   }
 
-  private createGarden(): any {
-    const gardenSizer = this.scene.rexUI.add.sizer({
-      orientation: 'horizontal',
-      width: playPanelWidth,
-      height: gardenHeight,
-      space: { item: Space.pad },
-    })
-
-    // Initialize fixed-length arrays
-    const maxPlants = GardenSettings.MAX_PLANTS
-    this.gardenTimes = new Array(maxPlants).fill(null)
-    this.gardenPlants = new Array(maxPlants).fill(null)
-    this.gardenTimers = new Array(maxPlants).fill(null)
-    this.plantSizers = new Array(maxPlants).fill(null)
-    this.plantGlowTweens = new Array(maxPlants).fill(null)
-
-    // Get garden data from server
-    const serverGarden = Server.getUserData().garden || []
-
-    // Add space at the beginning to help center plants
-    gardenSizer.addSpace()
-
-    // If the garden is empty, show a hint where the plants would be
-    if (!serverGarden.some((plant) => plant)) {
-      const txt = this.scene.add
-        .text(0, 0, 'Play games to plant your garden', Style.basicStylized)
-        .setOrigin(0.5)
-      gardenSizer.add(txt, { align: 'center' })
-    } else {
-      // Create all plant slots (MAX_PLANTS), some may be empty
-      for (let i = 0; i < maxPlants; i++) {
-        // Create a sizer for each plant slot (plant + timer)
-        const plantSizer: RexUIPlugin.Sizer = this.scene.rexUI.add.sizer({
-          orientation: 'vertical',
-          space: { item: Space.padSmall },
-        })
-
-        // Check if there's a plant at this index
-        if (i < serverGarden.length && serverGarden[i]) {
-          const plantTime = serverGarden[i]
-          this.gardenTimes[i] = plantTime
-
-          const plant = this.scene.add
-            .image(0, 0, 'relic-Dandelion')
-            .setInteractive()
-
-          // Calculate growth stage
-          const growthStage = this.getGrowthStage(plantTime)
-          plant.setFrame(growthStage)
-          this.gardenPlants[i] = plant
-
-          // Only add glow outline if plant is ready to harvest
-          const hoursRemaining = this.timeUntilFullyGrown(plantTime)
-          const isReady = hoursRemaining <= 0
-          if (isReady) {
-            const plugin = this.scene.plugins.get('rexOutlinePipeline')
-            plugin['add'](plant, {
-              thickness: 3,
-              outlineColor: Color.outline,
-              quality: 0.3,
-            })
-          }
-
-          // Create timer text below plant - will be updated in update loop
-          const timer = this.scene.add
-            .text(0, 0, this.formatTimer(plantTime), Style.basicStylized)
-            .setOrigin(0.5)
-          this.gardenTimers[i] = timer
-
-          // Store the index in a closure for the click handler
-          const plantIndex = i
-
-          // Hover behavior - only show hint when plant is ready to harvest
-          plant
-            .on('pointerover', () => {
-              const hoursRemaining = this.timeUntilFullyGrown(plantTime)
-              if (hoursRemaining <= 0) {
-                this.scene.hint.showText('Click to harvest')
-              }
-            })
-            .on('pointerout', () => {
-              this.scene.hint.hide()
-            })
-            .on('pointerdown', () => {
-              // Hide hint when clicking
-              this.scene.hint.hide()
-              const hoursRemaining = this.timeUntilFullyGrown(plantTime)
-              if (hoursRemaining <= 0) {
-                // Track the clicked index
-                this.clickedHarvestIndex = plantIndex
-
-                // NOTE on the server the empty plots aren't counted, so have to adjust the index
-                // Count empty plots only up to plantIndex
-                const countEmptyPlots = this.gardenPlants
-                  .slice(0, plantIndex + 1)
-                  .filter((plot) => plot === null).length
-                const adjustedIndex = plantIndex - countEmptyPlots
-
-                Server.harvestGarden(adjustedIndex)
-              }
-              // Don't show error if not ready - just do nothing
-            })
-
-          plantSizer.add(plant).add(timer)
-        }
-
-        gardenSizer.add(plantSizer)
-        this.plantSizers[i] = plantSizer
-      }
-    }
-
-    // Add space at the end to help center plants
-    gardenSizer.addSpace()
-
-    // Store reference to garden sizer for updates
-    this.gardenSizer = gardenSizer
-
-    return gardenSizer
-  }
-
-  private onGardenHarvested(data: {
-    success: boolean
-    newGarden?: Date[]
-    goldReward?: number
-    gemReward?: number
-  }): void {
-    if (!data.success || this.clickedHarvestIndex === null) {
-      this.clickedHarvestIndex = null
-      return
-    }
-
-    const harvestedIndex = this.clickedHarvestIndex
-    this.clickedHarvestIndex = null
-
-    // Get the plant sizer for this index
-    const plantSizer = this.plantSizers[harvestedIndex]
-    if (!plantSizer) {
-      return
-    }
-
-    const harvestedPlant = this.gardenPlants[harvestedIndex]
-    const rewardPosition = harvestedPlant
-      ? harvestedPlant.getCenter()
-      : { x: 0, y: 0 }
-
-    // Clear the plant data at this index
-    if (this.gardenPlants[harvestedIndex]) {
-      this.gardenPlants[harvestedIndex].destroy()
-      this.gardenPlants[harvestedIndex] = null
-    }
-    if (this.gardenTimers[harvestedIndex]) {
-      this.gardenTimers[harvestedIndex].destroy()
-      this.gardenTimers[harvestedIndex] = null
-    }
-    this.gardenTimes[harvestedIndex] = null
-
-    // Remove the plant and timer from the plant sizer
-    plantSizer.removeAll(true)
-
-    const goldText = this.scene.add
-      .rexBBCodeText(
-        rewardPosition.x,
-        rewardPosition.y + 40,
-        `[stroke]+${data.goldReward}[/stroke][img=coin]`,
-        BBStyle.reward,
-      )
-      .setOrigin(0.5, 1)
-
-    this.scene.tweens.add({
-      targets: goldText,
-      y: rewardPosition.y,
-      alpha: 0,
-      duration: Time.general.rewardFloatMs,
-      ease: Ease.basic,
-      onComplete: () => goldText.destroy(),
-    })
-
-    // Tween the gem rewards if present
-    if (data.gemReward > 0) {
-      const gemText = this.scene.add
-        .rexBBCodeText(
-          rewardPosition.x,
-          rewardPosition.y + 40,
-          `[stroke]+${data.gemReward}[/stroke][img=gem]`,
-          BBStyle.reward,
-        )
-        .setOrigin(0.5, 1)
-        .setVisible(false)
-
-      this.scene.tweens.add({
-        targets: gemText,
-        y: rewardPosition.y,
-        alpha: 0,
-        delay: Time.general.rewardFloatMs,
-        duration: Time.general.rewardFloatMs,
-        ease: Ease.basic,
-        onStart: () => gemText.setVisible(true),
-        onComplete: () => gemText.destroy(),
-      })
-    }
-  }
-
-  private getGrowthStage(plantedTime: Date): number {
-    const hoursElapsed =
-      GardenSettings.GROWTH_TIME_HOURS - this.timeUntilFullyGrown(plantedTime)
-    return Math.min(
-      Math.floor(
-        (hoursElapsed / GardenSettings.GROWTH_TIME_HOURS) *
-          (GardenSettings.GROWTH_STAGES - 1),
-      ),
-      GardenSettings.GROWTH_STAGES - 1,
-    )
-  }
-
-  private timeUntilFullyGrown(plantedTime: Date): number {
-    const now = new Date()
-    const hoursElapsed =
-      (now.getTime() - plantedTime.getTime()) / (1000 * 60 * 60)
-    return Math.max(GardenSettings.GROWTH_TIME_HOURS - hoursElapsed, 0)
-  }
-
-  // Manage the garden timers and visuals
   update(_time: number, _delta: number): void {
-    if (this.gardenTimers && this.gardenTimes) {
-      for (let i = 0; i < GardenSettings.MAX_PLANTS; i++) {
-        if (
-          this.gardenTimers[i] &&
-          this.gardenTimes[i] &&
-          this.gardenPlants[i]
-        ) {
-          this.gardenTimers[i].setText(this.formatTimer(this.gardenTimes[i]))
-
-          // Update plant frame based on current growth stage
-          const growthStage = this.getGrowthStage(this.gardenTimes[i])
-          this.gardenPlants[i].setFrame(growthStage)
-
-          // Check if plant is ready to harvest and animate glow
-          const hoursRemaining = this.timeUntilFullyGrown(this.gardenTimes[i])
-          const isReady = hoursRemaining <= 0
-          const plant = this.gardenPlants[i]
-
-          if (isReady) {
-            // Plant is ready - start pulsing glow animation if not already running
-            if (
-              !this.plantGlowTweens[i] ||
-              !this.plantGlowTweens[i].isActive()
-            ) {
-              // Stop any existing tween first
-              if (this.plantGlowTweens[i]) {
-                this.plantGlowTweens[i].stop()
-              }
-
-              // Reset alpha to 1 before starting
-              plant.setAlpha(1)
-
-              // Create pulsing tween
-              this.plantGlowTweens[i] = this.scene.tweens.add({
-                targets: plant,
-                delay: i * 200,
-                alpha: 0.5,
-                duration: Time.general.gardenReadyPulseMs,
-                ease: 'Sine.easeInOut',
-                yoyo: true,
-                repeat: -1, // Repeat forever
-              })
-            }
-          } else {
-            // Plant is not ready - stop tween and reset alpha
-            if (this.plantGlowTweens[i]) {
-              this.plantGlowTweens[i].stop()
-              this.plantGlowTweens[i] = null
-            }
-            plant.setAlpha(1)
-          }
-        }
-      }
-    }
-  }
-
-  // Utility method for timer
-  private formatTimer(plantedTime: Date): string {
-    const hoursRemaining = this.timeUntilFullyGrown(plantedTime)
-
-    if (hoursRemaining <= 0) {
-      return 'Ready'
-    }
-
-    const totalSeconds = Math.floor(hoursRemaining * 3600)
-    const hours = Math.floor(totalSeconds / 3600)
-    const minutes = Math.floor((totalSeconds % 3600) / 60)
-    const seconds = totalSeconds % 60
-
-    return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+    this.garden?.update()
   }
 }

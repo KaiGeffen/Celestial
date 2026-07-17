@@ -7,14 +7,13 @@ import { Style, Space } from '../../settings/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import newScrollablePanel from '../../lib/scrollablePanel'
 import Catalog from '@shared/state/catalog'
-import Buttons from '../../lib/buttons/buttons'
 import Decklist from '../../lib/decklist'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
 
 // A message to the user
 const DEFAULT_WIDTH = 700
 
-export default class ConfirmMenu extends Menu {
+export default class MessageMenu extends Menu {
   protected textScrollablePanel: ScrollablePanel
 
   constructor(scene: MenuScene, params, width: number = DEFAULT_WIDTH) {
@@ -134,36 +133,9 @@ export default class ConfirmMenu extends Menu {
 
     // Add confirm/cancel buttons if onConfirm is provided
     if (onConfirm) {
-      const buttonsSizer = this.scene.rexUI.add.sizer({
-        width: this.width - Space.pad * 2,
-        space: {
-          item: Space.pad,
-          left: Space.pad,
-          right: Space.pad,
-        },
-      })
-
-      buttonsSizer.add(this.createCancelButton()).addSpace()
-
-      const confirmContainer = new ContainerLite(
-        this.scene,
-        0,
-        0,
-        Space.buttonWidth,
-        50,
-      )
-      new Buttons.Basic({
-        within: confirmContainer,
-        text: 'Confirm',
-        f: () => {
-          onConfirm()
-          this.close()
-        },
-        returnHotkey: true,
-      })
-      buttonsSizer.add(confirmContainer)
-
-      this.sizer.add(buttonsSizer).addNewLine()
+      this.sizer
+        .add(this.createConfirmCancelRow('Confirm', onConfirm))
+        .addNewLine()
     }
   }
 }

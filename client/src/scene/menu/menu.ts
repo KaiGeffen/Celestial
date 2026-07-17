@@ -150,6 +150,38 @@ export default class Menu {
     })
     this.sizer.add(txt)
   }
+
+  // A row with Cancel on the left and a primary confirm button on the right
+  protected createConfirmCancelRow(
+    label: string,
+    onConfirm: () => void,
+    opts: { width?: number; muteClick?: boolean } = {},
+  ): RexUIPlugin.Sizer {
+    const sizer = this.scene.rexUI.add.sizer({
+      width: opts.width ?? this.width - Space.pad * 2,
+      space: { item: Space.pad, left: Space.pad, right: Space.pad },
+    })
+
+    const confirmContainer = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth,
+      50,
+    )
+    new Buttons.Basic({
+      within: confirmContainer,
+      text: label,
+      f: () => {
+        onConfirm()
+        this.close()
+      },
+      returnHotkey: true,
+      muteClick: opts.muteClick ?? false,
+    })
+
+    return sizer.add(this.createCancelButton()).addSpace().add(confirmContainer)
+  }
 }
 
 import OptionsMenu from './options'

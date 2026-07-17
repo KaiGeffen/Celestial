@@ -384,6 +384,7 @@ export const assetLists = {
       "Left",
       "MatchHistoryTab",
       "Moon",
+      "Moon",
       "Network",
       "Nourish",
       "Options",
