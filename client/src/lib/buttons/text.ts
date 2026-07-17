@@ -1,6 +1,5 @@
 import 'phaser'
 import Button from './button'
-import { Style, Color } from '../../settings/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 export default class TextButton extends Button {

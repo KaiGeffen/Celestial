@@ -207,19 +207,11 @@ export default class DeckThumbnail {
       return
     }
 
-    if (this.selected) {
+    if (this.selected || this.hovered) {
       this.nameBackground.setTint(Color.gold)
-      if (this.nameText) this.nameText.setColor(Color.basicText)
-      this.applyDeckNameStroke()
-      return
+    } else {
+      this.nameBackground.clearTint()
     }
-    if (this.hovered) {
-      this.nameBackground.setTint(Color.gold)
-      if (this.nameText) this.nameText.setColor(Color.basicText)
-      this.applyDeckNameStroke()
-      return
-    }
-    this.nameBackground.clearTint()
     if (this.nameText) this.nameText.setColor(Color.basicText)
     this.applyDeckNameStroke()
   }

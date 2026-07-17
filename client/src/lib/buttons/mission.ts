@@ -1,9 +1,7 @@
 import 'phaser'
-import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import { Space, Style, Color } from '../../settings/settings'
 import Button from './button'
 
-// Exported buttons
+// TODO Only used by the deprecated raceScene; remove with it
 export default class MissionButton extends Button {
   constructor(
     within: Phaser.Scene | Phaser.GameObjects.Container,

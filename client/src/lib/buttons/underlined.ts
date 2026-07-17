@@ -1,6 +1,5 @@
 import 'phaser'
 import Button from './button'
-import { Style, Color } from '../../settings/settings'
 
 const DESELECTED_ALPHA = 0.3
 

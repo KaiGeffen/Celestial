@@ -1,10 +1,8 @@
-import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
 import BaseScene from '../scene/baseScene'
 import Cutout from './buttons/cutout'
 import Card from '@shared/state/card'
 import { Space } from '../settings/settings'
-import { MechanicsSettings } from '@shared/settings'
-import ContainerLite from 'phaser3-rex-plugins/templates/ui/container/Container'
+import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import { UserSettings } from '../settings/userSettings'
 
 // TODO The cutouts arent being destroyed when cutouts destroy themselves
@@ -132,13 +130,6 @@ export default class Decklist {
     this.cutouts.forEach((cutout) => {
       cutout.setRequired()
     })
-  }
-
-  // Get all cards in the deck listed as their id
-  getCards(): number[] {
-    return this.cutouts.reduce((acc, cutout) => {
-      return [...acc, ...Array(cutout.count).fill(cutout.card.id)]
-    }, [] as number[])
   }
 
   // Get the quick copy/paste code for the deck

@@ -48,14 +48,6 @@ export default class AvatarButton extends Button {
     this.setOrigin(...origin)
   }
 
-  setOnClick(f, once = false, overwrite = true): Button {
-    let fWithSound = () => {
-      f()
-    }
-
-    return super.setOnClick(fWithSound, once, overwrite)
-  }
-
   setOrigin(...args): Button {
     super.setOrigin(...args)
     this.border.setOrigin(...args)
