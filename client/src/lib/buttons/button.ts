@@ -126,10 +126,10 @@ export default class Button {
           .on('pointerover', () => this.glow())
           .on('pointerout', () => this.stopGlow())
 
-        // When menu opens, stop glow
+        // When menu opens, stop glow (removed in destroy so it doesn't outlive us)
         this.scene.scene
           .get('MenuScene')
-          .events.on('start', () => this.stopGlow())
+          .events.on('start', this.stopGlow, this)
       }
 
       // Add events (Even if not interactive)
@@ -262,7 +262,7 @@ export default class Button {
       return this.txt.visible
     }
     if (this.icon) {
-      this.icon.visible
+      return this.icon.visible
     }
   }
 
@@ -306,6 +306,8 @@ export default class Button {
   }
 
   destroy() {
+    this.scene.scene.get('MenuScene').events.off('start', this.stopGlow, this)
+
     if (this.txt) {
       this.txt.destroy()
     }
