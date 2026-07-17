@@ -12,7 +12,6 @@ import {
   UserSettings,
   Time,
   Flags,
-  Url,
 } from '../../settings/settings'
 import Button from '../../lib/buttons/button'
 import Buttons from '../../lib/buttons/buttons'
@@ -31,7 +30,7 @@ const COLOR = Color.backgroundLight
 const OPTIONS_PANEL_BG_ALPHA = 0.4
 
 // The currently selected tab, preserved if the menu is closed/opened
-var selectedTab = 'general'
+let selectedTab = 'general'
 
 export default class OptionsMenu extends Menu {
   // Width of the subpanel that shows selected tab's contents
@@ -76,7 +75,7 @@ export default class OptionsMenu extends Menu {
 
     // Only add header if it fits
     if (Space.windowHeight >= 375) {
-      const header = this.createHeader('Options', this.width + Space.pad * 2)
+      this.createHeader('Options', this.width + Space.pad * 2)
     }
 
     // Sizer with tabs on left, contents on right
@@ -96,8 +95,8 @@ export default class OptionsMenu extends Menu {
     // Create a sizer for each of the tabs
     this.subpanels['general'] = this.createGeneralPanel()
     this.subpanels['audio'] = this.createAudioPanel()
-    this.subpanels['rulebook'] = this.createRulebookPanel()
-    this.subpanels['credits'] = this.createCreditsPanel()
+    this.subpanels['rulebook'] = this.createScrollableTextPanel(rulebookString)
+    this.subpanels['credits'] = this.createScrollableTextPanel(creditsString)
 
     // Put the currently selected tab's contents in the main sizer
     const subpanel = this.subpanels[selectedTab]
@@ -205,11 +204,32 @@ export default class OptionsMenu extends Menu {
       .hide()
 
     sizer
-      .add(this.createAutopass(), { expand: true })
+      .add(
+        this.createToggle(
+          'Autopass:',
+          () => UserSettings._get('autopass'),
+          (value) => UserSettings._set('autopass', value),
+        ),
+        { expand: true },
+      )
       .addSpace()
-      .add(this.createCanBeSpectated(), { expand: true })
+      .add(
+        this.createToggle(
+          'Can be spectated:',
+          () => Server.getUserData().canBeSpectated !== false,
+          (value) => Server.setCanBeSpectated(value),
+        ),
+        { expand: true },
+      )
       .addSpace()
-      .add(this.createHotkeys(), { expand: true })
+      .add(
+        this.createToggle(
+          'Hotkeys:',
+          () => UserSettings._get('hotkeys'),
+          (value) => UserSettings._set('hotkeys', value),
+        ),
+        { expand: true },
+      )
 
     return sizer
   }
@@ -283,45 +303,10 @@ export default class OptionsMenu extends Menu {
     return sizer
   }
 
-  private createRulebookPanel() {
-    let sizer = this.scene.rexUI.add.fixWidthSizer({ width: this.subwidth })
-    let scrollable = this.scene.rexUI.add
-      .scrollablePanel({
-        space: {
-          // top: Space.pad,
-          // bottom: Space.pad,
-          left: Space.pad,
-          right: Space.pad,
-        },
-
-        panel: {
-          child: sizer,
-        },
-
-        mouseWheelScroller: {
-          speed: 1,
-        },
-      })
-      .addBackground(
-        this.scene.add.rectangle(0, 0, 1, 1, COLOR, OPTIONS_PANEL_BG_ALPHA),
-      )
-      .hide()
-
-    // Add text to the scrollable panel
-    let txt = this.scene.rexUI.add.BBCodeText(0, 0, rulebookString, {
-      ...BBStyle.basicStylized,
-      halign: 'left',
-      wrap: { width: this.subwidth },
-    })
-
-    sizer.add(txt)
-
-    return scrollable
-  }
-
-  private createCreditsPanel() {
-    let sizer = this.scene.rexUI.add.fixWidthSizer({ width: this.subwidth })
-    let scrollable = this.scene.rexUI.add
+  // A hidden scrollable panel showing a block of BBCode text (rulebook, credits)
+  private createScrollableTextPanel(text: string) {
+    const sizer = this.scene.rexUI.add.fixWidthSizer({ width: this.subwidth })
+    const scrollable = this.scene.rexUI.add
       .scrollablePanel({
         space: {
           left: Space.pad,
@@ -341,8 +326,7 @@ export default class OptionsMenu extends Menu {
       )
       .hide()
 
-    // Add text to the scrollable panel
-    let txt = this.scene.rexUI.add.BBCodeText(0, 0, creditsString, {
+    const txt = this.scene.rexUI.add.BBCodeText(0, 0, text, {
       ...BBStyle.basicStylized,
       halign: 'left',
       wrap: { width: this.subwidth },
@@ -353,102 +337,32 @@ export default class OptionsMenu extends Menu {
     return scrollable
   }
 
-  // Elements within the panels:
-  private createAutopass() {
-    let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
+  // A labeled Enabled/Disabled toggle row driven by a getter/setter
+  private createToggle(
+    label: string,
+    getValue: () => boolean,
+    setValue: (value: boolean) => void,
+  ) {
+    const sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
 
-    let txtHint = this.scene.add.text(0, 0, 'Autopass:', Style.basicStylized)
+    const txtHint = this.scene.add.text(0, 0, label, Style.basicStylized)
     sizer.add(txtHint)
     sizer.addSpace()
 
-    const s = UserSettings._get('autopass') ? 'Enabled' : 'Disabled'
-    let container = new ContainerLite(
+    const container = new ContainerLite(
       this.scene,
       0,
       0,
       Space.buttonWidth,
       Space.buttonHeight,
     )
-    let btn = new Buttons.Basic({
+    const btn = new Buttons.Basic({
       within: container,
-      text: s,
+      text: getValue() ? 'Enabled' : 'Disabled',
       f: () => {
-        if (UserSettings._get('autopass')) {
-          btn.setText('Disabled')
-          UserSettings._set('autopass', false)
-        } else {
-          btn.setText('Enabled')
-          UserSettings._set('autopass', true)
-        }
-      },
-    })
-    sizer.add(container)
-
-    return sizer
-  }
-
-  private createCanBeSpectated(): import('phaser').GameObjects.GameObject {
-    let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
-
-    let txtHint = this.scene.add.text(
-      0,
-      0,
-      'Can be spectated:',
-      Style.basicStylized,
-    )
-    sizer.add(txtHint)
-    sizer.addSpace()
-
-    const s =
-      Server.getUserData().canBeSpectated !== false ? 'Enabled' : 'Disabled'
-    let container = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    let btn = new Buttons.Basic({
-      within: container,
-      text: s,
-      f: () => {
-        const enabled = Server.getUserData().canBeSpectated !== false
-        const next = !enabled
+        const next = !getValue()
+        setValue(next)
         btn.setText(next ? 'Enabled' : 'Disabled')
-        Server.setCanBeSpectated(next)
-      },
-    })
-    sizer.add(container)
-
-    return sizer
-  }
-
-  private createHotkeys(): import('phaser').GameObjects.GameObject {
-    let sizer = this.scene.rexUI.add.sizer({ width: this.subwidth })
-
-    let txtHint = this.scene.add.text(0, 0, 'Hotkeys:', Style.basicStylized)
-    sizer.add(txtHint)
-    sizer.addSpace()
-
-    const s = UserSettings._get('hotkeys') ? 'Enabled' : 'Disabled'
-    let container = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    let btn = new Buttons.Basic({
-      within: container,
-      text: s,
-      f: () => {
-        if (UserSettings._get('hotkeys')) {
-          btn.setText('Disabled')
-          UserSettings._set('hotkeys', false)
-        } else {
-          btn.setText('Enabled')
-          UserSettings._set('hotkeys', true)
-        }
       },
     })
     sizer.add(container)
@@ -467,7 +381,7 @@ export default class OptionsMenu extends Menu {
     sizer.add(this.createCancelButton())
 
     // For Electron builds, add an exit game button
-    if (typeof (window as any).electronAPI !== 'undefined') {
+    if (Flags.isElectronBuild()) {
       const exitContainer = new ContainerLite(
         this.scene,
         0,
