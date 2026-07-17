@@ -243,6 +243,46 @@ const earthquake = new Earthquake({
   text: "Retain 1\nIf you have two or more cards in a row earlier in the story, set both players' points to 0.",
 })
 
+class Magnitude extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    // If there is a next card in the story
+    if (game.story.acts.length > 0) {
+      const nextAct = game.story.acts[0]
+      const owner = nextAct.owner
+      const nextCard = nextAct.card
+
+      // If the next card's owner has a card in hand
+      if (game.hand[owner].length > 0) {
+        // Get the card and index of the highest cost card in hand
+        let highestCostCardInHand = game.hand[owner][0]
+        let highestCardIndex = 0
+        for (let i = 1; i < game.hand[owner].length; i++) {
+          const card = game.hand[owner][i]
+          if (card.cost > highestCostCardInHand.cost) {
+            highestCostCardInHand = card
+            highestCardIndex = i
+          }
+        }
+
+        // Replace the card in the story
+        game.story.acts[0].card = highestCostCardInHand
+
+        // Replace the card in hand with the card from story
+        game.hand[owner][highestCardIndex] = nextCard
+      }
+    }
+  }
+}
+const magnitude = new Magnitude({
+  name: 'Magnitude',
+  id: 9016,
+  // cost: 8,
+  points: 8,
+  text: 'Switch the next card in the story with the highest cost card from its owners hand.',
+})
+
 // RESOURCEFULNESS - Unspent breath
 class Salvage extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
@@ -292,4 +332,5 @@ export {
   patience,
   earthquake,
   everyday,
+  magnitude,
 }
