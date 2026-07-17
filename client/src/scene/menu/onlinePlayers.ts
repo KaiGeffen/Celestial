@@ -243,7 +243,7 @@ export default class OnlinePlayersMenu extends Menu {
       Space.avatarSize,
       Space.avatarSize,
     )
-    const avatar = new Buttons.Avatar({
+    new Buttons.Avatar({
       within: avatarContainer,
       avatarId: player.cosmeticSet.avatar,
       border: player.cosmeticSet.border,

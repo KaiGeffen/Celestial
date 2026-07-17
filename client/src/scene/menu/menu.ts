@@ -185,8 +185,6 @@ export default class Menu {
 }
 
 import OptionsMenu from './options'
-import CreditsMenu from './credits'
-import RulebookMenu from './rulebook'
 import AlterDeckCosmeticsMenu from './alterDeckCosmetics'
 import TextEntryMenu from './textEntry'
 import ConfirmMenu from './confirm'
@@ -209,8 +207,6 @@ import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 
 const menus = {
   options: OptionsMenu,
-  credits: CreditsMenu,
-  rulebook: RulebookMenu,
   play: PlayMenu,
 
   alterDeckCosmetics: AlterDeckCosmeticsMenu,

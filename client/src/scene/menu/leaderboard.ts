@@ -247,7 +247,7 @@ export default class LeaderboardMenu extends Menu {
       Space.avatarSize,
       Space.avatarSize,
     )
-    const avatar = new Buttons.Avatar({
+    new Buttons.Avatar({
       within: avatarContainer,
       avatarId: entry.cosmeticSet.avatar,
       border: entry.cosmeticSet.border,

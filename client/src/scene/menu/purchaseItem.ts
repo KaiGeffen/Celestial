@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Color, Space } from '../../settings/settings'
+import { Space } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
