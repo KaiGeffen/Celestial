@@ -278,9 +278,6 @@ export default class Button {
   }
 
   select(): Button {
-    // TODO This gets overwritten and super is called, but the tint is never used?
-    this.icon.setTint(Color.buttonSelected)
-
     this.selected = true
 
     return this

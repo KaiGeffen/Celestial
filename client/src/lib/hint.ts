@@ -69,10 +69,12 @@ export default class Hint {
 
   // Show the given hint text, or hide if empty
   showText(s: string): void {
-    if (s !== '') {
-      this.show()
+    if (s === '') {
+      this.hide()
+      return
     }
 
+    this.show()
     this.txt.setText(`[stroke=#000000]${s}[/stroke]`).setFixedSize(0, 0)
     this.mainCard.hide()
     this.referencedCard.hide()
@@ -134,7 +136,8 @@ export default class Hint {
     if (keyword) {
       let s = keyword.text
 
-      s = s.replace(/X/g, x)
+      // Replace only the standalone X placeholder, not X's inside words
+      s = s.split(/\bX\b/).join(x)
 
       // NOTE Special case for occurences of +X, where X could be -N, so you want -N instead of +-N
       s = s.split(/\+\-/).join('-')
