@@ -34,7 +34,6 @@ import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin.js'
 import OutlinePipelinePlugin from 'phaser3-rex-plugins/plugins/outlinepipeline-plugin.js'
 import DropShadowPipelinePlugin from 'phaser3-rex-plugins/plugins/dropshadowpipeline-plugin.js'
 import ContainerLitePlugin from 'phaser3-rex-plugins/plugins/containerlite-plugin.js'
-import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
 import StoreScene from './scene/storeScene'
 import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin.js'
 import MapScene from './scene/mapScene'
@@ -84,11 +83,6 @@ const config: Phaser.Types.Core.GameConfig = {
         key: 'rexUI',
         plugin: UIPlugin,
         mapping: 'rexUI',
-      },
-      {
-        key: 'rexGestures',
-        plugin: GesturesPlugin,
-        mapping: 'rexGestures',
       },
     ],
     global: [

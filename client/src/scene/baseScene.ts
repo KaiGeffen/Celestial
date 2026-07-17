@@ -1,6 +1,5 @@
 import 'phaser'
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
-import GesturesPlugin from 'phaser3-rex-plugins/plugins/gestures-plugin.js'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 
 import {
@@ -26,7 +25,6 @@ let hasShownDisconnectError = false
 class SharedBaseScene extends Phaser.Scene {
   // Allows for typing objects in RexUI library
   rexUI: RexUIPlugin
-  rexGestures: GesturesPlugin
 
   // Error message components
   errorMessageBg: Phaser.GameObjects.Image
