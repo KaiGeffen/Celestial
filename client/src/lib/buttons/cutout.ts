@@ -111,13 +111,17 @@ export default class Cutout extends Button {
     return this
   }
 
-  // Decrement the count of this card, and delete if we reach 0
-  decrement(): Cutout {
+  // Decrement the count, destroying self at 0. Returns whether it was destroyed.
+  decrement(): boolean {
     this.count -= 1
 
-    this.updateText()
+    if (this.count <= 0) {
+      this.destroy()
+      return true
+    }
 
-    return this
+    this.updateText()
+    return false
   }
 
   destroy(): Cutout {

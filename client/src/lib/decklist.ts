@@ -7,6 +7,9 @@ import { UserSettings } from '../settings/userSettings'
 
 // TODO The cutouts arent being destroyed when cutouts destroy themselves
 
+// Upper bound on total cards in the list (a loose UI guard, not the legal deck size)
+const MAX_CARDS = 99
+
 export default class Decklist {
   private scene: BaseScene
   sizer
@@ -35,7 +38,7 @@ export default class Decklist {
 
   // Add a new card to the deck
   addCard(card: Card) {
-    if (this.countCards >= 99) {
+    if (this.countCards >= MAX_CARDS) {
       this.scene.signalError('Too many cards!')
       return
     }
@@ -70,15 +73,11 @@ export default class Decklist {
         cutout.card.upgradeVersion === card.upgradeVersion &&
         !cutout.required
       ) {
-        // Update values
-        cutout.decrement()
         this.countCards--
 
-        // If fully removed, remove from deck list
-        if (cutout.count === 0) {
+        // The cutout destroys itself at 0; drop it from our list to match
+        if (cutout.decrement()) {
           this.cutouts.splice(i, 1)
-          cutout.destroy()
-
           return true
         }
 
