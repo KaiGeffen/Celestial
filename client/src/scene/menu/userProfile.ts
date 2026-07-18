@@ -17,13 +17,6 @@ import AvatarButton from '../../lib/buttons/avatar'
 import BaseScene from '../baseScene'
 import CosmeticsGridPanel from './cosmeticsGridPanel'
 import { CosmeticSet } from '@shared/types/cosmeticSet'
-import { achievementsMeta } from '@shared/achievementsData'
-import {
-  getUnlockedAvatars,
-  getUnlockedBorders,
-  getUnlockedCardbacks,
-} from '../../utils/cosmetics'
-import cardbackNames from '../../data/cardbackNames'
 import { fitTextToMaxWidth } from '../../utils/textFit'
 
 export default class UserProfileMenu extends Menu {
@@ -213,126 +206,44 @@ export default class UserProfileMenu extends Menu {
   }
 
   private updateGridContent() {
-    this.cosmeticsPanel.repopulate(() => {
-      if (this.currentTab === 'Icon') {
-        this.createIconGrid()
-      } else if (this.currentTab === 'Border') {
-        this.createBorderGrid()
-      } else {
-        this.createCardbackGrid()
-      }
-    })
-  }
-
-  private createIconGrid() {
-    const unlockedAvatars = getUnlockedAvatars()
-
-    // Add unlocked cosmetic items
-    Array.from(unlockedAvatars).forEach((avatarId) => {
-      const container = new ContainerLite(
-        this.scene,
-        0,
-        0,
-        Space.avatarSize,
-        Space.avatarSize,
-      )
-      new Buttons.Avatar({
-        within: container,
-        avatarId: avatarId,
-        f: () => {
-          const newSet = {
-            avatar: avatarId,
-            border: Server.getUserData().cosmeticSet.border,
-            cardback: Server.getUserData().cosmeticSet.cardback ?? 0,
-          }
-          this.updateCosmeticSet(newSet)
+    if (this.currentTab === 'Icon') {
+      // Icon options wear the currently-selected border, like the deck editor
+      this.cosmeticsPanel.showAvatars(
+        Server.getUserData().cosmeticSet.border,
+        (avatar) => {
+          const set = Server.getUserData().cosmeticSet
+          this.updateCosmeticSet({
+            avatar,
+            border: set.border,
+            cardback: set.cardback ?? 0,
+          })
         },
-      })
-      this.cosmeticsPanel.add(container)
-    })
-  }
-
-  private createBorderGrid() {
-    const unlockedBorders = getUnlockedBorders()
-
-    // Add unlocked border options
-    Array.from(unlockedBorders).forEach((borderId) => {
-      const container = new ContainerLite(
-        this.scene,
-        0,
-        0,
-        Space.avatarSize,
-        Space.avatarSize,
       )
-
-      // Create avatar with current border
-      const avatar = new Buttons.Avatar({
-        within: container,
-        name: this.currentAvatar.name,
-        border: borderId,
-        f: () => {
-          const newSet = {
-            avatar: Server.getUserData().cosmeticSet.avatar,
-            border: borderId,
-            cardback: Server.getUserData().cosmeticSet.cardback ?? 0,
-          }
-          this.updateCosmeticSet(newSet)
+    } else if (this.currentTab === 'Border') {
+      this.cosmeticsPanel.showBorders(
+        Server.getUserData().cosmeticSet.avatar,
+        (border) => {
+          const set = Server.getUserData().cosmeticSet
+          this.updateCosmeticSet({
+            avatar: set.avatar,
+            border,
+            cardback: set.cardback ?? 0,
+          })
         },
-      })
-
-      this.cosmeticsPanel.add(container)
-    })
-  }
-
-  private createCardbackGrid() {
-    const unlockedCardbacks = getUnlockedCardbacks()
-
-    const width = Space.cardWidth * 0.85
-    const height = Space.cardHeight * 0.85
-
-    // Outline pipeline on the image marks the selected cardback (same fx as
-    // Button's hover glow). Part of the image's render, so unlike a separate
-    // rectangle it respects the panel's scroll mask.
-    const outlinePlugin = this.scene.plugins.get('rexOutlinePipeline')
-    const outlines: any[] = []
-
-    Array.from(unlockedCardbacks).forEach((cardbackId) => {
-      const container = new ContainerLite(this.scene, 0, 0, width, height)
-
-      const selected =
-        (Server.getUserData().cosmeticSet.cardback ?? 0) === cardbackId
-
-      const image = this.scene.add
-        .image(0, 0, `cardback-${cardbackNames[cardbackId]}`)
-        .setDisplaySize(width, height)
-        .setInteractive()
-
-      const outlineFx = outlinePlugin['add'](image, {
-        thickness: 5,
-        outlineColor: Color.outline,
-        quality: 0.3,
-      })
-      outlineFx.active = selected
-      outlines.push(outlineFx)
-
-      image.on('pointerdown', () => {
-        this.scene.sound.play('click')
-        const newSet = {
-          avatar: Server.getUserData().cosmeticSet.avatar,
-          border: Server.getUserData().cosmeticSet.border,
-          cardback: cardbackId,
-        }
-        this.updateCosmeticSet(newSet)
-
-        // Move the selection outline to this cardback
-        outlines.forEach((o) => (o.active = false))
-        outlineFx.active = true
-      })
-
-      container.add(image)
-
-      this.cosmeticsPanel.add(container)
-    })
+      )
+    } else {
+      this.cosmeticsPanel.showCardbacks(
+        Server.getUserData().cosmeticSet.cardback ?? 0,
+        (cardback) => {
+          const set = Server.getUserData().cosmeticSet
+          this.updateCosmeticSet({
+            avatar: set.avatar,
+            border: set.border,
+            cardback,
+          })
+        },
+      )
+    }
   }
 
   private updateCosmeticSet(newSet: CosmeticSet) {

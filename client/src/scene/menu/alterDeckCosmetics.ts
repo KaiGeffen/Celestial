@@ -7,12 +7,6 @@ import Menu from './menu'
 import MenuScene from '../menuScene'
 import { CosmeticSet } from '@shared/types/cosmeticSet'
 import Server from '../../server'
-import {
-  getUnlockedAvatars,
-  getUnlockedBorders,
-  getUnlockedCardbacks,
-} from '../../utils/cosmetics'
-import cardbackNames from '../../data/cardbackNames'
 import DeckThumbnail from '../../lib/deckThumbnail'
 import CosmeticsGridPanel from './cosmeticsGridPanel'
 
@@ -50,6 +44,14 @@ export default class AlterDeckCosmeticsMenu extends Menu {
     this.createContent(params.callback)
     this.layout()
     this.createNameInput()
+  }
+
+  private currentCosmeticSet(): CosmeticSet {
+    return {
+      avatar: this.selectedAvatar,
+      border: this.selectedBorder,
+      cardback: this.selectedCardback,
+    }
   }
 
   private createContent(
@@ -165,12 +167,7 @@ export default class AlterDeckCosmeticsMenu extends Menu {
       within: confirmContainer,
       text: 'Update',
       f: () => {
-        const cosmeticSet: CosmeticSet = {
-          avatar: this.selectedAvatar,
-          border: this.selectedBorder,
-          cardback: this.selectedCardback,
-        }
-        callback(this.name, cosmeticSet, this.deckCode)
+        callback(this.name, this.currentCosmeticSet(), this.deckCode)
         this.scene.scene.stop()
       },
       returnHotkey: true,
@@ -188,71 +185,29 @@ export default class AlterDeckCosmeticsMenu extends Menu {
   }
 
   private updateGridContent() {
-    this.cosmeticsPanel.repopulate(() => {
-      if (this.currentTab === 'Icon') {
-        this.createIconGrid()
-      } else if (this.currentTab === 'Border') {
-        this.createBorderGrid()
-      } else {
-        this.createCardbackGrid()
-      }
-    })
-  }
-
-  private createIconGrid() {
-    getUnlockedAvatars().forEach((avatarId) => {
-      const container = new ContainerLite(
-        this.scene,
-        0,
-        0,
-        Space.avatarSize,
-        Space.avatarSize,
-      )
-      new Buttons.Avatar({
-        within: container,
-        avatarId,
-        border: this.selectedBorder,
-        f: () => {
-          this.selectedAvatar = avatarId
-          this.deckThumbnail.updateDisplay({
-            cosmeticSet: {
-              avatar: this.selectedAvatar,
-              border: this.selectedBorder,
-              cardback: this.selectedCardback,
-            },
-          })
-        },
+    if (this.currentTab === 'Icon') {
+      // Deck cosmetics preview icon options wearing the selected border
+      this.cosmeticsPanel.showAvatars(this.selectedBorder, (avatar) => {
+        this.selectedAvatar = avatar
+        this.deckThumbnail.updateDisplay({
+          cosmeticSet: this.currentCosmeticSet(),
+        })
       })
-      this.cosmeticsPanel.add(container)
-    })
-  }
-
-  private createBorderGrid() {
-    getUnlockedBorders().forEach((borderId) => {
-      const container = new ContainerLite(
-        this.scene,
-        0,
-        0,
-        Space.avatarSize,
-        Space.avatarSize,
-      )
-      new Buttons.Avatar({
-        within: container,
-        avatarId: this.selectedAvatar,
-        border: borderId,
-        f: () => {
-          this.selectedBorder = borderId
-          this.deckThumbnail.updateDisplay({
-            cosmeticSet: {
-              avatar: this.selectedAvatar,
-              border: this.selectedBorder,
-              cardback: this.selectedCardback,
-            },
-          })
-        },
+    } else if (this.currentTab === 'Border') {
+      this.cosmeticsPanel.showBorders(this.selectedAvatar, (border) => {
+        this.selectedBorder = border
+        this.deckThumbnail.updateDisplay({
+          cosmeticSet: this.currentCosmeticSet(),
+        })
       })
-      this.cosmeticsPanel.add(container)
-    })
+    } else {
+      this.cosmeticsPanel.showCardbacks(this.selectedCardback, (cardback) => {
+        this.selectedCardback = cardback
+        this.deckThumbnail.updateDisplay({
+          cosmeticSet: this.currentCosmeticSet(),
+        })
+      })
+    }
   }
 
   private createNameInput() {
@@ -281,53 +236,6 @@ export default class AlterDeckCosmeticsMenu extends Menu {
     this.scene.plugins.get('rexAnchor')['add'](this.nameInput, {
       x: '50%-235',
       y: '50%-95',
-    })
-  }
-
-  private createCardbackGrid() {
-    const cbWidth = Space.cardWidth * 0.85
-    const cbHeight = Space.cardHeight * 0.85
-
-    // Outline pipeline on the image marks the selected cardback (same fx as
-    // Button's hover glow). Part of the image's render, so unlike a separate
-    // rectangle it respects the panel's scroll mask.
-    const outlinePlugin = this.scene.plugins.get('rexOutlinePipeline')
-    const outlines: any[] = []
-
-    getUnlockedCardbacks().forEach((cardbackId) => {
-      const container = new ContainerLite(this.scene, 0, 0, cbWidth, cbHeight)
-
-      const image = this.scene.add
-        .image(0, 0, `cardback-${cardbackNames[cardbackId]}`)
-        .setDisplaySize(cbWidth, cbHeight)
-        .setInteractive()
-
-      const outlineFx = outlinePlugin['add'](image, {
-        thickness: 5,
-        outlineColor: Color.outline,
-        quality: 0.3,
-      })
-      outlineFx.active = this.selectedCardback === cardbackId
-      outlines.push(outlineFx)
-
-      image.on('pointerdown', () => {
-        this.scene.sound.play('click')
-        this.selectedCardback = cardbackId
-        this.deckThumbnail.updateDisplay({
-          cosmeticSet: {
-            avatar: this.selectedAvatar,
-            border: this.selectedBorder,
-            cardback: this.selectedCardback,
-          },
-        })
-
-        // Move the selection outline to this cardback
-        outlines.forEach((o) => (o.active = false))
-        outlineFx.active = true
-      })
-      container.add(image)
-
-      this.cosmeticsPanel.add(container)
     })
   }
 }
