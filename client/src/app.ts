@@ -14,7 +14,6 @@ import DeckEditorScene, {
 import MatchHistoryScene from './scene/matchHistoryScene'
 
 import OpeningScene from './scene/openingScene'
-import PlaceholderScene from './scene/placeholderScene'
 import JourneyScene from './scene/journeyScene'
 import RaceScene from './scene/raceScene'
 
@@ -36,7 +35,6 @@ import DropShadowPipelinePlugin from 'phaser3-rex-plugins/plugins/dropshadowpipe
 import ContainerLitePlugin from 'phaser3-rex-plugins/plugins/containerlite-plugin.js'
 import StoreScene from './scene/storeScene'
 import AnchorPlugin from 'phaser3-rex-plugins/plugins/anchor-plugin.js'
-import MapScene from './scene/mapScene'
 
 const config: Phaser.Types.Core.GameConfig = {
   title: 'Celestial',
@@ -62,11 +60,9 @@ const config: Phaser.Types.Core.GameConfig = {
     StandardMatchScene,
     TutorialMatchScene,
     OpeningScene,
-    PlaceholderScene,
     DeckSelectorScene,
     DeckEditorScene,
     DeckEditorJourneyScene,
-    MapScene,
     MatchHistoryScene,
     StoreScene,
     // Allowing old map based journey mode
