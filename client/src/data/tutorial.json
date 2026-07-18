@@ -2,80 +2,80 @@
   {
     "hints": [
       {
-        "bold": "The tutorial is highly recommended, but can be skipped from the options menu (Top right of screen, or esc key).",
+        "text": "The tutorial is highly recommended, but can be skipped from the options menu (Top right of screen, or esc key).",
         "align": "center"
       },
       {
-        "bold": "Win 5 rounds to win the match.\n\nIn the tutorial, you start with 2 wins.",
+        "text": "Win 5 rounds to win the match.\n\nIn the tutorial, you start with 2 wins.",
         "align": "center"
       },
       {
-        "bold": "Breath is the energy used to play cards.\n\nYou start with 1 breath and gain 1 more each round.",
+        "text": "Breath is the energy used to play cards.\n\nYou start with 1 breath and gain 1 more each round.",
         "align": "center"
       },
       {
-        "bold": "Mouse over each number and keyword on a card to learn more.",
+        "text": "Mouse over each number and keyword on a card to learn more.",
         "align": "card"
       },
       {
-        "bold": "Dove costs 1 breath to play and earns 1 point.\n\nMouse over its keywords to learn more.",
+        "text": "Dove costs 1 breath to play and earns 1 point.\n\nMouse over its keywords to learn more.",
         "align": "card"
       },
       {
-        "bold": "Dash is worth 3 points, minus 1 for each card that was played before it.",
+        "text": "Dash is worth 3 points, minus 1 for each card that was played before it.",
         "align": "card"
       },
       {
-        "bold": "When a round is over, day turns to night.",
+        "text": "When a round is over, day turns to night.",
         "align": "card"
       },
       {
-        "bold": "A card like Mercy will draw cards at night when it resolves, not during the day when it's played.",
+        "text": "A card like Mercy will draw cards at night when it resolves, not during the day when it's played.",
         "align": "card"
       },
       {
-        "bold": "Start each match with 3 cards in hand.\n\nYour max hand size is 6.",
+        "text": "Start each match with 3 cards in hand.\n\nYour max hand size is 6.",
         "align": "center"
       },
       {
-        "bold": "When you're ready, click a card in your hand to add it to the story.",
+        "text": "When you're ready, click a card in your hand to add it to the story.",
         "align": "center",
         "final": true
       },
       null,
       {
-        "bold": "Your opponent has played a card, too.\n\nYou can't see the cards they play until nighttime.",
+        "text": "Your opponent has played a card, too.\n\nYou can't see the cards they play until nighttime.",
         "align": "story"
       },
       {
-        "bold": "You don't have enough breath to play another card, so you must pass.\n\nOnce both players pass, night begins, and the cards in the story resolve from left to right.",
+        "text": "You don't have enough breath to play another card, so you must pass.\n\nOnce both players pass, night begins, and the cards in the story resolve from left to right.",
         "align": "story"
       },
       null,
       null,
       {
-        "bold": "A new round begins, both players draw 2 cards.\n\nMax breath goes up by 1, and refills completely.",
+        "text": "A new round begins, both players draw 2 cards.\n\nMax breath goes up by 1, and refills completely.",
         "align": "center"
       },
       {
-        "bold": "Playing Dash here earns 3 points, an exceptionally strong play in round 2.",
+        "text": "Playing Dash here earns 3 points, an exceptionally strong play in round 2.",
         "align": "center",
         "final": true
       },
       null,
       {
-        "bold": "You're on your own for the rest of this match, good luck!",
+        "text": "You're on your own for the rest of this match, good luck!",
         "align": "center",
         "final": false
       }
     ],
     "night": [
       {
-        "bold": "Both players earned 1 point, so it's a tie!\n\nClick the moon when you're ready for the next round to begin.",
+        "text": "Both players earned 1 point, so it's a tie!\n\nClick the moon when you're ready for the next round to begin.",
         "align": "story"
       },
       {
-        "bold": "Another round ends.\n\nClick the moon to continue.",
+        "text": "Another round ends.\n\nClick the moon to continue.",
         "align": "story"
       }
     ]
@@ -83,7 +83,7 @@
   {
     "hints": [
       {
-        "bold": "If you play a card with Inspire, you will have extra breath on the next round.",
+        "text": "If you play a card with Inspire, you will have extra breath on the next round.",
         "align": "center",
         "final": true
       },
@@ -92,29 +92,29 @@
       null,
       null,
       {
-        "bold": "This round you're Inspired for 1 extra breath.\n\nInspired and other statuses appear above your hand.",
+        "text": "This round you're Inspired for 1 extra breath.\n\nInspired and other statuses appear above your hand.",
         "align": "center"
       },
       {
-        "bold": "With your 3 breath you can afford Mercy.\n\nConsider saving Stars as it would put you at 5 breath next round, not enough to play Uprising.",
+        "text": "With your 3 breath you can afford Mercy.\n\nConsider saving Stars as it would put you at 5 breath next round, not enough to play Uprising.",
         "align": "center",
         "final": true
       },
       null,
       {
-        "bold": "Sometimes it's better to pass instead of playing a card. Click the sun to pass.",
+        "text": "Sometimes it's better to pass instead of playing a card. Click the sun to pass.",
         "align": "center",
         "final": true
       },
       null,
       {
-        "bold": "A round only ends when both players pass in a row.",
+        "text": "A round only ends when both players pass in a row.",
         "align": "story",
         "final": true
       },
       null,
       {
-        "bold": "Dove probably isn't enough to win this round.\n\nBut if you play enough Stars you can play Uprising next round to win for sure!",
+        "text": "Dove probably isn't enough to win this round.\n\nBut if you play enough Stars you can play Uprising next round to win for sure!",
         "align": "center",
         "final": true
       },
@@ -125,23 +125,23 @@
   {
     "hints": [
       {
-        "bold": "You draw cards from your deck, which starts with 15 cards in it.\n\nClick your deck to see everything in it.",
+        "text": "You draw cards from your deck, which starts with 15 cards in it.\n\nClick your deck to see everything in it.",
         "align": "center"
       },
       {
-        "bold": "When cards resolve, they go to the discard pile.",
+        "text": "When cards resolve, they go to the discard pile.",
         "align": "center"
       },
       {
-        "bold": "If your deck is empty when you would draw a card, your discard pile is shuffled to form a new deck.",
+        "text": "If your deck is empty when you would draw a card, your discard pile is shuffled to form a new deck.",
         "align": "center"
       },
       {
-        "bold": "Fruit gives Nourish when it resolves.\n\nNourish will make the next card you resolve worth extra points, even if it's played on a future round.",
+        "text": "Fruit gives Nourish when it resolves.\n\nNourish will make the next card you resolve worth extra points, even if it's played on a future round.",
         "align": "center"
       },
       {
-        "bold": "From here on it's up to you, show me what you've learned!",
+        "text": "From here on it's up to you, show me what you've learned!",
         "align": "center",
         "final": true
       },

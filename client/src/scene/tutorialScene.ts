@@ -13,7 +13,6 @@ import RoundResultRegion from './matchRegions/roundResultRegion'
 import { Animation } from '@shared/animation'
 import { Zone } from '@shared/state/zone'
 import GameModel from '@shared/state/gameModel'
-import Loader from '../loader/loader'
 
 /** Card IDs unlocked when each tutorial mission is won (shown on the unlock screen). */
 const TUTORIAL_MISSION_CARDS: number[][] = [
@@ -97,6 +96,7 @@ export default class TutorialMatchScene extends MatchScene {
 
     // Must reset progress
     this.progress = -1
+    this.card = undefined
 
     // Hint text
     this.txt = this.rexUI.add
@@ -220,7 +220,7 @@ export default class TutorialMatchScene extends MatchScene {
     const datum = data[mission].night[round]
     if (!datum) return
 
-    const s = `[b]${datum.bold}[/b]`
+    const s = datum.text
     this.txt.setAlpha(0)
     this.txt.setText(s).setVisible(true)
 
@@ -253,7 +253,7 @@ export default class TutorialMatchScene extends MatchScene {
     }
 
     // Set the appropriate text
-    const s = `${datum.bold}`
+    const s = datum.text
 
     this.txt.setAlpha(0)
     this.txt.setText(s).setVisible(s !== '')
