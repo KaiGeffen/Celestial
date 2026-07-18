@@ -122,7 +122,7 @@ export default class PlayMenu extends Menu {
     this.txtDeckName.setText(this.deck.name || '')
 
     // Update decklist
-    this.decklist.setDeck(this.getDeckCards(), false)
+    this.decklist.setDeck(this.getDeckCards())
     if (this.scrollableDeck) {
       this.scrollableDeck.layout()
       this.scrollableDeck.t = 0
@@ -258,7 +258,7 @@ export default class PlayMenu extends Menu {
 
     const deckCards = this.getDeckCards()
     if (deckCards.length > 0) {
-      this.decklist.setDeck(deckCards, false)
+      this.decklist.setDeck(deckCards)
     }
 
     this.scrollableDeck = newScrollablePanel(this.scene, {

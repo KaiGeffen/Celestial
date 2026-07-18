@@ -16,8 +16,7 @@ import { MechanicsSettings } from '@shared/settings'
 import { Deck } from '@shared/types/deck'
 import { CosmeticSet } from '@shared/types/cosmeticSet'
 import Catalog from '@shared/state/catalog'
-
-const ROSTER_WIDTH = Space.cutoutWidth + 20
+import { DECK_EDITOR_DECK_WIDTH } from './deckEditor/constants'
 
 /** Minimum pointer travel (px) before a press becomes a drag. */
 const DRAG_THRESHOLD_PX = 15
@@ -62,7 +61,6 @@ export default class DeckSelectorScene extends BaseScene {
   create() {
     super.create()
 
-    // TODO This ai code has issues, more thoroughly fix
     this.savedDeckIndex = undefined
 
     // Reset drag state (scene object is recycled; constructor doesn't re-run)
@@ -80,7 +78,7 @@ export default class DeckSelectorScene extends BaseScene {
     this.decklist = new Decklist(this, () => () => {}) // no-op cutout callback
     const rosterDeckSizer = this.rexUI.add
       .sizer({
-        width: ROSTER_WIDTH,
+        width: DECK_EDITOR_DECK_WIDTH,
         orientation: 0,
       })
       .setOrigin(0)
@@ -93,7 +91,7 @@ export default class DeckSelectorScene extends BaseScene {
       })
       .addSpace(1)
     this.rosterPanel = newScrollablePanel(this, {
-      width: ROSTER_WIDTH,
+      width: DECK_EDITOR_DECK_WIDTH,
       height: bodyScrollHeight,
       panel: { child: rosterDeckSizer },
       footer: this.createRightPanel(),
@@ -178,14 +176,14 @@ export default class DeckSelectorScene extends BaseScene {
     // Like `CatalogRegion.resize`: scroll panels get an explicit `setMinSize` on every resize so
     // they shrink when the window narrows (root `layout()` alone mostly grows proportion slots).
     const bodyH = Math.max(1, Space.windowHeight - Space.filterBarHeight)
-    const centerW = Math.max(1, Space.windowWidth - ROSTER_WIDTH)
+    const centerW = Math.max(1, Space.windowWidth - DECK_EDITOR_DECK_WIDTH)
     if (this.centerPanel) {
       const ratio = this.centerPanel.t
       this.centerPanel.setMinSize(centerW, bodyH).layout()
       this.centerPanel.t = Math.min(0.999999, ratio)
     }
     if (this.rosterPanel) {
-      this.rosterPanel.setMinSize(ROSTER_WIDTH, bodyH).layout()
+      this.rosterPanel.setMinSize(DECK_EDITOR_DECK_WIDTH, bodyH).layout()
     }
     this.mainSizer.setMinSize(Space.windowWidth, Space.windowHeight)
     this.mainSizer.layout()
@@ -205,11 +203,11 @@ export default class DeckSelectorScene extends BaseScene {
     const y2 = y - 1
 
     // Top left corner
-    const LeftVertical = this.add
+    const leftVertical = this.add
       .image(-3.5, y, 'chrome-builderVertical')
       .setOrigin(0, 0)
       .setDepth(1)
-    this.plugins.get('rexAnchor')['add'](LeftVertical, {
+    this.plugins.get('rexAnchor')['add'](leftVertical, {
       height: '100%',
     })
     const topLeftCorner = this.add
@@ -218,7 +216,7 @@ export default class DeckSelectorScene extends BaseScene {
       .setDepth(1)
 
     // Top right corner
-    const dx = ROSTER_WIDTH - 5
+    const dx = DECK_EDITOR_DECK_WIDTH - 5
     const rightVertical = this.add
       .image(0, y2, 'chrome-builderVertical')
       .setOrigin(1, 0)
@@ -241,8 +239,8 @@ export default class DeckSelectorScene extends BaseScene {
       .setOrigin(1, 0)
       .setAlpha(0.7)
     this.plugins.get('rexAnchor')['add'](centralSizerBackground, {
-      x: `100%-${ROSTER_WIDTH}`,
-      width: `100%-${ROSTER_WIDTH}`,
+      x: `100%-${DECK_EDITOR_DECK_WIDTH}`,
+      width: `100%-${DECK_EDITOR_DECK_WIDTH}`,
       height: '100%',
     })
 
@@ -252,7 +250,7 @@ export default class DeckSelectorScene extends BaseScene {
       .setOrigin(1, 0)
     this.plugins.get('rexAnchor')['add'](rightColumnBackground, {
       x: `100%`,
-      width: `0%+${ROSTER_WIDTH}`,
+      width: `0%+${DECK_EDITOR_DECK_WIDTH}`,
       height: '100%',
     })
   }
@@ -314,7 +312,7 @@ export default class DeckSelectorScene extends BaseScene {
   }
 
   private createCenterPanel(bodyScrollHeight: number): ScrollablePanel {
-    const centerColumnWidth = Space.windowWidth - ROSTER_WIDTH
+    const centerColumnWidth = Space.windowWidth - DECK_EDITOR_DECK_WIDTH
     const panel = this.rexUI.add.fixWidthSizer({
       align: 'center',
       space: {
@@ -390,6 +388,11 @@ export default class DeckSelectorScene extends BaseScene {
     }
     for (let i = this.deckThumbnails.length - 1; i >= 0; i--) {
       panel.add(this.deckThumbnails[i].container)
+    }
+
+    // Recreated thumbnails start unselected; re-apply the current selection
+    if (this.savedDeckIndex !== undefined) {
+      this.deckThumbnails[this.savedDeckIndex]?.setSelected(true)
     }
 
     this.cleanupDrag()
@@ -481,10 +484,6 @@ export default class DeckSelectorScene extends BaseScene {
       // Dropped in place or outside any thumbnail — restore positions
       this.refreshDeckList()
       this.centerPanel.layout()
-      // refreshDeckList recreates thumbnails with selected=false; re-apply selection
-      if (this.savedDeckIndex !== undefined) {
-        this.deckThumbnails[this.savedDeckIndex]?.setSelected(true)
-      }
     }
   }
 
@@ -594,7 +593,7 @@ export default class DeckSelectorScene extends BaseScene {
 
   private createRightPanel(): Sizer {
     const sizer = this.rexUI.add.sizer({
-      width: ROSTER_WIDTH,
+      width: DECK_EDITOR_DECK_WIDTH,
       orientation: 1,
       space: {
         top: Space.pad,
@@ -659,24 +658,12 @@ export default class DeckSelectorScene extends BaseScene {
     this.scene.launch('MenuScene', {
       menu: 'confirm',
       callback: () => {
-        if (this.savedDeckIndex === deckIndex) {
-          this.savedDeckIndex = undefined
-          this.decklist.setDeck([])
-        } else if (
-          this.savedDeckIndex !== undefined &&
-          this.savedDeckIndex > deckIndex
-        ) {
-          this.savedDeckIndex--
-        }
+        // Only the selected deck can be deleted; clear the selection
+        this.savedDeckIndex = undefined
+        this.decklist.setDeck([])
         DeckStore.remove(deckIndex)
         this.refreshDeckList()
         this.centerPanel.layout()
-        if (
-          this.savedDeckIndex !== undefined &&
-          this.savedDeckIndex < DeckStore.getDecks().length
-        ) {
-          this.selectDeck(this.savedDeckIndex)
-        }
       },
       hint: 'delete this deck',
     })

@@ -23,7 +23,6 @@ export type DecklistRegionOptions = {
   cosmeticSet: CosmeticSet
   deckCards: Card[]
   requiredCards?: Card[]
-  mustOwnCardsInList: boolean
   createCutoutInteraction: () => (cutout: Cutout) => () => void
   onSave: () => void
   onCosmetics: () => void
@@ -45,7 +44,6 @@ export class DecklistRegion {
 
     this.decklist = new Decklist(scene, opts.createCutoutInteraction())
 
-    // TODO MustOwnCardsInList
     this.decklist.setDeck(opts.deckCards)
 
     // Create the scroll panel
@@ -78,8 +76,8 @@ export class DecklistRegion {
   }
 
   /** Replace the entire decklist at once (e.g. paste/import) and scroll to top. */
-  setDeck(cards: Card[], mustOwn = false): void {
-    this.decklist.setDeck(cards, mustOwn)
+  setDeck(cards: Card[]): void {
+    this.decklist.setDeck(cards)
     this.scrollDecklistToTop()
   }
 

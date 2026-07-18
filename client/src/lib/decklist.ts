@@ -3,7 +3,6 @@ import Cutout from './buttons/cutout'
 import Card from '@shared/state/card'
 import { Space } from '../settings/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import { UserSettings } from '../settings/userSettings'
 
 // TODO The cutouts arent being destroyed when cutouts destroy themselves
 
@@ -90,38 +89,18 @@ export default class Decklist {
   }
 
   // Set the deck to the given cards
-  setDeck(deck: Card[], mustOwn = false) {
+  setDeck(deck: Card[]) {
     // Remove the current deck
     this.cutouts.forEach((cutout) => cutout.destroy())
     this.cutouts = []
     this.countCards = 0
 
-    // Get card inventory (owned cards)
-    const cardInventory = UserSettings._get('cardInventory') || []
-
-    // Add the new deck, only including cards the player owns
-    let someCardsNotOwned = false
     this.layoutDeferred = true
-    for (let i = 0; i < deck.length; i++) {
-      let card = deck[i]
-      if (!card) continue
-
-      // Only add cards that the player owns
-      if (cardInventory[card.id] || !mustOwn) {
-        this.addCard(card)
-      } else {
-        someCardsNotOwned = true
-      }
+    for (const card of deck) {
+      if (card) this.addCard(card)
     }
     this.layoutDeferred = false
     this.sizer.layout()
-
-    // Signal to user if they're missing any cards
-    if (someCardsNotOwned && mustOwn) {
-      this.scene.signalError("You don't own some of those cards.")
-    }
-
-    return true
   }
 
   setJourneyDeck(requiredCards: Card[]) {

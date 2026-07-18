@@ -151,7 +151,6 @@ export default class DeckEditorScene extends BaseScene {
       deckName: this.deckName,
       cosmeticSet: this.cosmeticSet,
       deckCards: Catalog.getCardListByIds(deck.cards),
-      mustOwnCardsInList: !Flags.devCardsEnabled,
       createCutoutInteraction: () => this.onClickCutout(),
       onSave: () => {
         this.saveCurrentDeck()
@@ -260,7 +259,12 @@ export default class DeckEditorScene extends BaseScene {
         if (!decoded) {
           return 'Invalid deck code.'
         }
-        this.setDeck(Catalog.getCardListByIds(decoded))
+        // Pasted cards the user doesn't own are simply not added
+        const inventory = UserSettings._get('cardInventory') || []
+        const ownedIds = Flags.devCardsEnabled
+          ? decoded
+          : decoded.filter((id) => inventory[id])
+        this.setDeck(Catalog.getCardListByIds(ownedIds))
         return ''
       },
       activeScene: this,
@@ -396,7 +400,7 @@ export default class DeckEditorScene extends BaseScene {
 
   // Replaces the entire decklist at once (e.g. paste/import), unlike addCardToDeck which appends one card
   private setDeck(cards: Card[]): void {
-    this.decklistRegion.setDeck(cards, !Flags.devCardsEnabled)
+    this.decklistRegion.setDeck(cards)
     // Sync thumbnail so card count and valid/invalid state reflect the new deck
     this.syncDeckThumbnail()
   }
@@ -425,7 +429,8 @@ export class DeckEditorJourneyScene extends DeckEditorScene {
   create(params: { deckIndex: number; mission?: MissionDetails }) {
     this.mission = params.mission
     if (!this.mission) {
-      this.showMessage('Mission data is missing.')
+      // Can't showMessage here: its elements aren't created until super.create
+      console.error('Journey deck editor opened without mission data')
       this.scene.start('JourneyScene')
       return
     }
