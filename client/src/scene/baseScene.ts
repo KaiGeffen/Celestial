@@ -21,6 +21,17 @@ import Loader from '../loader/loader'
 // Whether the user has seen the disconnect error message since their last connection
 let hasShownDisconnectError = false
 
+// Number of interchangeable variant files for sounds that have them
+const SOUND_VARIANT_COUNTS = {
+  open: 2,
+  close: 2,
+  play: 4,
+  'play them': 4,
+  discard: 3,
+  create: 3,
+  resolve: 5,
+}
+
 // Functionality shared between BaseScene and MenuBaseScene
 class SharedBaseScene extends Phaser.Scene {
   // Allows for typing objects in RexUI library
@@ -117,17 +128,8 @@ class SharedBaseScene extends Phaser.Scene {
       return
     }
 
-    const amt_variants = {
-      open: 2,
-      close: 2,
-      play: 4,
-      'play them': 4,
-      discard: 3,
-      create: 3,
-      resolve: 5,
-    }
-    if (s in amt_variants) {
-      s += ` ${this.getRandomInRange(amt_variants[s])}`
+    if (s in SOUND_VARIANT_COUNTS) {
+      s += ` ${this.getRandomInRange(SOUND_VARIANT_COUNTS[s])}`
     }
 
     // Check if sound exists before playing
@@ -396,7 +398,7 @@ export class BaseSceneWithHeader extends BaseScene {
     })
 
     // Back button
-    const btnBack = new Buttons.Basic({
+    new Buttons.Basic({
       within: this,
       text: 'Back',
       x: Space.pad + Space.buttonWidth / 2,
