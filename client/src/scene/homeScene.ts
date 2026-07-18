@@ -16,6 +16,7 @@ import logEvent from '../utils/analytics'
 import showTooltip from '../utils/tooltips'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import { getDailyHomeTip } from '../data/homeTips'
+import ANNOUNCEMENT_PAIRS from '../data/announcements'
 import packageJson from '../../package.json'
 
 const NAVIGATION_BUTTON_WIDTH = 278
@@ -44,8 +45,9 @@ export default class HomeScene extends BaseScene {
   create(): void {
     super.create()
 
-    // Some events must fire when this scene exits
-    this.events.on('shutdown', () => this.beforeExit())
+    // Some events must fire when this scene exits (once per visit; scene
+    // events survive shutdown, so a plain `on` would accumulate across visits)
+    this.events.once('shutdown', () => this.beforeExit())
 
     // Cinematic plays while this is active
     Cinematic.ensure()
@@ -55,6 +57,7 @@ export default class HomeScene extends BaseScene {
 
     // Keep the profile section (avatar, name, elo, currencies) in sync with
     // account data — e.g. a cosmetic change in the profile menu or a reward.
+    // Also surfaces the quests menu when unseen achievements arrive.
     this.bindUserData((data) => {
       if (!data) return
       this.avatar.setAvatar(data.cosmeticSet.avatar)
@@ -65,10 +68,17 @@ export default class HomeScene extends BaseScene {
       this.coinsDisplayText.setText(
         `${(data.coins || 0).toLocaleString()} [img=coin]`,
       )
+
+      this.checkAndShowUnseenAchievements()
     })
 
-    // Check if there are any unseen achievements and show achievements menu if so
-    this.checkAndShowUnseenAchievements()
+    // The check above skips while a menu is open, so re-check when one closes
+    const menuEvents = this.scene.get('MenuScene').events
+    const recheckAchievements = () => this.checkAndShowUnseenAchievements()
+    menuEvents.on('shutdown', recheckAchievements)
+    this.events.once('shutdown', () =>
+      menuEvents.off('shutdown', recheckAchievements),
+    )
 
     // Show tooltip for new users, or if not, show Discord prompt
     if (!showTooltip(this)) {
@@ -296,9 +306,14 @@ export default class HomeScene extends BaseScene {
         outlineFx.active = false
       })
 
-    this.scene.get('MenuScene').events.on('start', () => {
+    // When a menu opens, stop the outline (removed on shutdown so revisits
+    // don't accumulate listeners on MenuScene's emitter)
+    const menuEvents = this.scene.get('MenuScene').events
+    const stopOutline = () => {
       outlineFx.active = false
-    })
+    }
+    menuEvents.on('start', stopOutline)
+    this.events.once('shutdown', () => menuEvents.off('start', stopOutline))
 
     mainSizer.addBackground(background)
 
@@ -490,57 +505,9 @@ export default class HomeScene extends BaseScene {
     }
   }
 
-  update(time: number, delta: number): void {
-    super.update(time, delta)
-
-    // Show any unseen achievements
-    this.checkAndShowUnseenAchievements()
-  }
-
   beforeExit(): void {
     Cinematic.hide()
 
     super.beforeExit()
   }
 }
-
-const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
-  // {
-  //   subheader: 'Steam',
-  //   body: `Our [area=_link_steam][stroke=${Color.goldS}]Steam page[/stroke][/area] is up! We'd love if you could wishlist, and look forward to the demo release at [area=_link_nextfest][stroke=${Color.goldS}]Steam Next Fest[/stroke][/area] in October.`,
-  // },
-  {
-    subheader: 'Tournament',
-    body: `Our next tournament will kick off July 25th at 1 PM EST.
-[area=_link_tournament][stroke=${Color.goldS}]Register here![/stroke][/area]
-
-250$ prize pool split as follows: $100 for 1st, $75 for 2nd, $50 for 3rd, and $25 consolation prize for a random non-placing participant. All attendees will receive an all-new cardback.`,
-  },
-  // {
-  //   subheader: 'Currencies & Cosmetics',
-  //   body: `Gems have arrived in the Celestial realm!
-
-  //   Earn 1[img=gem] for each PvP match played, plus a small chance to get 3-5[img=gem] from each plant in your garden. These shiny rewards can be traded for new cosmetic items in the Store under the Cosmetics tab.`,
-  // },
-  {
-    subheader: 'Ranked',
-    body: `July 1st - 31st marks our second ranked season!
-
-Each player's ELO has been reset, and the #1 player at the end of the season picks the theme for the next cardback. Once it's ready, each player in the top 10 will get a free copy.`,
-  },
-  {
-    subheader: 'New Cards',
-    body: `[area=_Liquidity][stroke=${Color.goldS}]Liquidity[/stroke][/area]
-[area=_Doll][stroke=${Color.goldS}]Doll[/stroke][/area]
-[area=_Heart][stroke=${Color.goldS}]Heart[/stroke][/area]
-[area=_Isolation][stroke=${Color.goldS}]Isolation[/stroke][/area]`,
-
-    // [area=_Paramountcy][stroke=${Color.goldS}]Paramountcy[/stroke][/area] cards added 4 → 3
-    // [area=_Heron][stroke=${Color.goldS}]Heron[/stroke][/area] cost 1 → 2
-    // [area=_Clear View][stroke=${Color.goldS}]Clear View[/stroke][/area] the created [area=_Seen][stroke=${Color.goldS}]Seen[/stroke][/area] points 0 → 1
-    // [area=_Moon][stroke=${Color.goldS}]Moon[/stroke][/area] points 5 → 4
-    // [area=_Sensualist][stroke=${Color.goldS}]Sensualist[/stroke][/area] cost and points 5 → 4
-    // [area=_Fates][stroke=${Color.goldS}]Fates[/stroke][/area] 2nd Exhale cost 3 → 2
-    // [area=_The Future][stroke=${Color.goldS}]The Future[/stroke][/area] points 4 → 5,
-  },
-]
