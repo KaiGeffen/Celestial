@@ -207,7 +207,6 @@ export default class StoreScene extends BaseSceneWithHeader {
         BBStyle.currency,
       )
       .setOrigin(0.5)
-      .setBackgroundColor()
 
     const sizer = this.rexUI.add
       .sizer({
