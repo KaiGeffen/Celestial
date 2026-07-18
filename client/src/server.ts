@@ -384,6 +384,24 @@ export default class Server {
     Server.send({ type: 'reportLoadTime', ms })
   }
 
+  // If a match reconnect is pending, consume it and start the match scene.
+  // Returns whether a reconnect was started. Callers decide their own timing.
+  static startPendingReconnect(scene: Phaser.Scene): boolean {
+    const reconnect = Server.pendingReconnect
+    if (!reconnect) {
+      return false
+    }
+
+    Server.pendingReconnect = null
+    scene.scene.start('StandardMatchScene', {
+      isPvp: reconnect.isPvp,
+      deck: [],
+      aiDeck: [],
+      gameStartState: reconnect.state,
+    })
+    return true
+  }
+
   // Send player's choice for the ending to a character's journey (silent: fired
   // opportunistically, so a closed socket shouldn't log)
   static sendJourneyChoice(characterIndex: number, choice: 0 | 1): void {

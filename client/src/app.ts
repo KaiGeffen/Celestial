@@ -1,7 +1,7 @@
 import 'phaser'
 
 import MenuScene from './scene/menuScene'
-import { PreloadScene, SigninScene } from './scene/preloadScene'
+import { PreloadScene, SigninScene } from './scene/signinScene'
 import HomeScene from './scene/homeScene'
 import { StandardMatchScene, RaceMatchScene } from './scene/matchScene'
 import JourneyMatchScene from './scene/journeyMatchScene'

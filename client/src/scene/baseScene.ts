@@ -275,19 +275,8 @@ export default class BaseScene extends SharedBaseScene {
       this.txtFPS.setText(`${fps}`)
     }
 
-    // Check for pending reconnect - if so, start the match scene
-    const reconnect = Server.pendingReconnect
-    if (reconnect) {
-      // Clear the pending reconnect
-      Server.pendingReconnect = null
-
-      // Stop current scenes and start the match scene for the reconnected match
-      this.scene.start('StandardMatchScene', {
-        isPvp: reconnect.isPvp,
-        deck: [],
-        aiDeck: [],
-        gameStartState: reconnect.state,
-      })
+    // Check for pending reconnect - if so, start the match scene immediately
+    if (Server.startPendingReconnect(this)) {
       return
     }
 

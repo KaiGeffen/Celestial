@@ -4,14 +4,7 @@ import type { CredentialResponse } from 'google-one-tap'
 import Loader from '../loader/loader'
 import Server from '../server'
 import { server } from '../server'
-import {
-  Space,
-  Url,
-  UserSettings,
-  Flags,
-  Style,
-  Messages,
-} from '../settings/settings'
+import { Space, Url, UserSettings, Flags, Style } from '../settings/settings'
 import Button from '../lib/buttons/button'
 import Buttons from '../lib/buttons/buttons'
 import ensureMusic from '../loader/audioManager'
@@ -107,8 +100,8 @@ export class SigninScene extends Phaser.Scene {
       !server.isOpen() &&
       Date.now() - this.timeSceneStart > GRACE_PERIOD_TO_CONNECT
     ) {
-      // NOTE Removed because it would flicker on when first registering
-      // this.txt.setText(Messages.disconnectError)
+      // A disconnect message here was removed because it flickered on during
+      // the first-registration step; keep the line blank while disconnected.
       this.txt.setText('')
     } else if (Server.pendingReconnect) {
       this.txt.setText('Reconnecting to match...')
@@ -241,26 +234,13 @@ export class SigninScene extends Phaser.Scene {
   protected startFirstScene(): void {
     this.removeLoadingText()
 
-    // Check if there's a pending reconnect - if so, start the match scene
-    const reconnect = Server.pendingReconnect
-    if (reconnect) {
-      const timeToWait = Math.max(
-        0,
-        Date.now() - this.timeSceneStart - RECONNECT_MESSAGE_TIME,
+    // Check if there's a pending reconnect - if so, let the "Reconnecting..."
+    // message linger for a constant time, then start the match scene
+    if (Server.pendingReconnect) {
+      setTimeout(
+        () => Server.startPendingReconnect(this),
+        RECONNECT_MESSAGE_TIME,
       )
-
-      setTimeout(() => {
-        // Clear the pending reconnect
-        Server.pendingReconnect = null
-
-        // Start the match scene for the reconnected match
-        this.scene.start('StandardMatchScene', {
-          isPvp: reconnect.isPvp,
-          deck: [],
-          aiDeck: [],
-          gameStartState: reconnect.state,
-        })
-      }, timeToWait)
       return
     }
 
