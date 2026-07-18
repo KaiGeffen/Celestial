@@ -74,7 +74,6 @@ export default class OpeningScene extends BaseScene {
   private slideMask: Phaser.GameObjects.Rectangle
   // Border image framing that window
   private slideBox: Phaser.GameObjects.Image
-  private imageW: number
   private bodyText: Phaser.GameObjects.Text
   private typewriterEvent: Phaser.Time.TimerEvent | null = null
   private slideTween: Phaser.Tweens.Tween | null = null
@@ -149,8 +148,6 @@ export default class OpeningScene extends BaseScene {
 
   // The images that are shown one after another
   private createSlideImage(): void {
-    this.imageW = Space.windowWidth
-
     this.slideImage = this.add.image(0, 0, 'tutorial-1').setOrigin(0.5, 0)
 
     // Border framing the window, drawn over the slide.
@@ -446,12 +443,7 @@ export default class OpeningScene extends BaseScene {
     const missions: boolean[] = UserSettings._get('completedMissions') || []
     for (let i = 0; i < TUTORIAL_LENGTH; i++) {
       if (!missions[i]) {
-        this.scene.start('TutorialMatchScene', {
-          isTutorial: false,
-          deck: undefined,
-          mmCode: `ai:t${i}`,
-          missionID: i,
-        })
+        this.scene.start('TutorialMatchScene', { missionID: i })
         return
       }
     }

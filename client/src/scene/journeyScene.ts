@@ -857,12 +857,7 @@ export default class JourneyScene extends BaseScene {
       x: (Space.buttonWidth * 5) / 2 + Space.pad * 3,
       y: Space.padSmall + Space.buttonHeight / 2,
       f: () => {
-        this.scene.start('TutorialMatchScene', {
-          isTutorial: false,
-          deck: undefined,
-          mmCode: 'ai:t0',
-          missionID: 0,
-        })
+        this.scene.start('TutorialMatchScene', { missionID: 0 })
       },
     }).setNoScroll()
   }
