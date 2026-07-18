@@ -119,11 +119,20 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     this.plugins.get('rexAnchor')['add'](bodyBg, anchor)
   }
 
+  private clearLoadingText(): void {
+    if (this.loadingText) {
+      this.loadingText.destroy()
+      this.loadingText = null
+    }
+  }
+
   private async fetchMatchHistoryData() {
     try {
       const uuid = Server.getUserData().uuid
       if (!uuid) {
-        this.signalError('Log in to view your match history')
+        // Everyone (guests included) should have a uuid; this is an error
+        this.clearLoadingText()
+        this.signalError('You lack a player id somehow')
         return
       }
 
@@ -137,15 +146,10 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       }
       this.matchHistoryData = await response.json()
       this.filterAndRefreshContent()
-      console.log('Match history data', this.matchHistoryData)
       this.createContent()
     } catch (error) {
       console.error('Error fetching match history data:', error)
-      // Hide loading message on error
-      if (this.loadingText) {
-        this.loadingText.destroy()
-        this.loadingText = null
-      }
+      this.clearLoadingText()
       this.signalError('Failed to load match history data')
     }
   }
@@ -156,11 +160,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
   }
 
   private createContent() {
-    // Hide loading message
-    if (this.loadingText) {
-      this.loadingText.destroy()
-      this.loadingText = null
-    }
+    this.clearLoadingText()
 
     // If panel exists, destroy it first
     if (this.basePanel) {
@@ -223,32 +223,30 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       .layout()
 
     // Create scrollable panel with header
-    if (!this.basePanel) {
-      this.basePanel = this.rexUI.add
-        .scrollablePanel({
-          x: Space.windowWidth / 2,
-          y: this.headerHeight,
-          height: Space.windowHeight - this.headerHeight,
+    this.basePanel = this.rexUI.add
+      .scrollablePanel({
+        x: Space.windowWidth / 2,
+        y: this.headerHeight,
+        height: Space.windowHeight - this.headerHeight,
 
-          header: headerSizer,
+        header: headerSizer,
 
-          panel: {
-            child: this.createMatchRows(),
-          },
-        })
-        .setOrigin(0.5, 0)
-        .layout()
-
-      // Update the mousewheel handler bounds check
-      this.input.on(
-        'wheel',
-        (pointer: Phaser.Input.Pointer, gameObject, dx, dy, dz, event) => {
-          this.basePanel.childOY -= dy
-          this.basePanel.t = Math.max(0, this.basePanel.t)
-          this.basePanel.t = Math.min(0.999999, this.basePanel.t)
+        panel: {
+          child: this.createMatchRows(),
         },
-      )
-    }
+      })
+      .setOrigin(0.5, 0)
+      .layout()
+
+    // Scroll the panel with the mousewheel
+    this.input.on(
+      'wheel',
+      (pointer: Phaser.Input.Pointer, gameObject, dx, dy, dz, event) => {
+        this.basePanel.childOY -= dy
+        this.basePanel.t = Math.max(0, this.basePanel.t)
+        this.basePanel.t = Math.min(0.999999, this.basePanel.t)
+      },
+    )
   }
 
   private createMatchRows(): Sizer {
@@ -382,7 +380,6 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
     })
 
     collapsedSizer
-      .addBackground(background)
       .add(timeText, { proportion: 1.5 })
       .add(oppSizer, { proportion: 2 })
       .add(resultsText, { proportion: 1.5 })
