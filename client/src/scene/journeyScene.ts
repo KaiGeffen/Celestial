@@ -5,19 +5,13 @@ import {
   Space,
   Color,
   UserSettings,
-  Time,
-  Ease,
-  Flags,
   BBStyle,
 } from '../settings/settings'
 import Buttons from '../lib/buttons/buttons'
 
 import Catalog from '@shared/state/catalog'
-import {
-  getMissionsByTheme,
-  MissionDetails,
-  THEME_KEYS,
-} from '@shared/journey/journey'
+import { getMissionsByTheme, MissionDetails } from '@shared/journey/journey'
+import JourneyMapScene, { STARS_THEME_INDEX } from './journeyMapScene'
 import Loader from '../loader/loader'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
@@ -38,56 +32,22 @@ const OVERLAY_WIDTH = 680
 const OVERLAY_HEIGHT = 620
 const OVERLAY_TOP = 80
 
-// TODO Remove 'message' menus, they are no longer used
-
-/** Camera center position (x, y) per overlay theme, in theme order: Jules, Adonis, Mia, Kitz, Renata, Mitra, Water, Stars */
-const THEME_CAMERA_POSITIONS: { x: number; y: number }[] = [
-  { x: 4000, y: 670 }, // birds (Jules)
-  { x: 2100, y: 1270 }, // ashes (Adonis)
-  { x: 4860, y: 1940 }, // shadow (Mia)
-  { x: 1260, y: 2250 }, // pet (Kitz)
-  { x: 1590, y: 4140 }, // birth (Renata)
-  { x: 4850, y: 4130 }, // vision (Mitra)
-  { x: 3180, y: 3100 }, // water
-  { x: 3080, y: 2800 }, // stars
-]
-
-const DRIFT_RADIUS_X = 150
-const DRIFT_RADIUS_Y = 80
-const DRIFT_SPEED = 0.0003
-const DRIFT_PHASE = 1.3
-const THEME_CAMERA_TWEEN_DURATION = 400
-
-const STARS_THEME_INDEX = THEME_KEYS.indexOf('stars')
-const ALT_MAP_FADE_DURATION = 400
 const MISSION_TIP_FADE_DURATION = 200
 /** Tip box width: from left pad to just left of the overlay panel (one extra pad) */
 const MISSION_TIP_BOX_WIDTH = Space.windowWidth - OVERLAY_WIDTH - Space.pad * 3
-const ALT_MAP_SWAY_SPEED = 0.0004
-const ALT_MAP_SWAY_PHASE = 1.5
-const ALT_MAP_SWAY_RADIUS = 80
 
 /** Rex TextBox delay between characters (ms). 0 = full text at once. */
 const JOURNEY_TEXTBOX_TYPE_MS = 0
 
 export default class JourneyScene extends BaseScene {
-  map: Phaser.GameObjects.Image
-  private altMap: Phaser.GameObjects.Image
-
   // The character art
   private overlayCharacterImage: Phaser.GameObjects.Image
   private overlayCharacterStroke: Phaser.GameObjects.Rectangle
 
-  /** Center point the camera drifts around (theme position) */
-  private driftCenterX = 0
-  private driftCenterY = 0
-
   // Button that toggles writing about the character
   private btnCharacterDescription: Button
 
-  private isTweeningCamera = false
   private selectedThemeIndex = 0
-  private previousThemeIndex = 0
   private showOverlayCharacterView = false
   private overlayHeaderText: Phaser.GameObjects.Text
   private overlayPanel: ScrollablePanel
@@ -117,52 +77,24 @@ export default class JourneyScene extends BaseScene {
     // Allow starting on a specific theme (e.g. stars after a mission)
     if (params.themeIndex !== undefined) {
       this.selectedThemeIndex = params.themeIndex
-      this.previousThemeIndex = params.themeIndex
     } else if (params.theme === 'stars') {
       this.selectedThemeIndex = STARS_THEME_INDEX
-      this.previousThemeIndex = STARS_THEME_INDEX
     }
 
-    // Create the background
-    this.map = this.add.image(0, 0, 'journey-Map').setOrigin(0)
-
-    this.altMap = this.add
-      .image(0, 0, 'journey-AltMap')
-      .setOrigin(0.5, 0.5)
-      .setAlpha(0)
-      .setScrollFactor(0)
-    this.plugins.get('rexAnchor')['add'](this.altMap, {
-      x: '50%',
-      y: '50%',
-      width: '120%',
-      height: '120%',
+    // The panning map runs as its own scene below this one
+    this.scene.launch('JourneyMapScene', {
+      themeIndex: this.selectedThemeIndex,
     })
-
-    this.cameras.main.setBounds(0, 0, this.map.width, this.map.height)
+    this.events.once('shutdown', () => this.scene.stop('JourneyMapScene'))
 
     // Add buttons
     this.createBackButton()
     this.createOpeningButton()
 
-    // Make up pop-up for the card you just received, if there is one
-    if (params.card) {
-      this.createCardPopup(params)
-    } else if (params.txt) {
-      this.createTipPopup(params)
-    }
-
-    // Start at selected theme position immediately (no transition on open)
-    this.snapCameraToTheme(this.selectedThemeIndex)
-
     // Mission list overlay on the right
     this.createOverlayCharacterArt()
     this.createJourneyOverlay()
     this.createMissionCardImage()
-
-    // If we started on stars, show alt map immediately (no fade-in delay)
-    if (this.selectedThemeIndex === STARS_THEME_INDEX) {
-      this.altMap.alpha = 1
-    }
 
     // Refresh the overlay when claim/completion state changes. `userDataUpdated`
     // fires when the server pushes a fresh snapshot (e.g. after a mission-gold
@@ -179,36 +111,6 @@ export default class JourneyScene extends BaseScene {
     })
 
     showTooltip(this)
-  }
-
-  update(time: number, _delta: number): void {
-    if (this.isTweeningCamera) return
-    const camera = this.cameras.main
-    const offsetX = Math.sin(time * DRIFT_SPEED) * DRIFT_RADIUS_X
-    const offsetY =
-      Math.sin(time * DRIFT_SPEED * 0.7 + DRIFT_PHASE) * DRIFT_RADIUS_Y
-    camera.scrollX = Phaser.Math.Clamp(
-      this.driftCenterX - camera.width / 2 + offsetX,
-      0,
-      Math.max(0, this.map.width - camera.width),
-    )
-    camera.scrollY = Phaser.Math.Clamp(
-      this.driftCenterY - camera.height / 2 + offsetY,
-      0,
-      Math.max(0, this.map.height - camera.height),
-    )
-    JourneyScene.rememberCoordinates(camera)
-
-    // Gentle sway on alt map when visible (stars theme)
-    if (this.altMap.alpha > 0) {
-      this.altMap.x =
-        camera.width / 2 +
-        Math.sin(time * ALT_MAP_SWAY_SPEED) * ALT_MAP_SWAY_RADIUS
-      this.altMap.y =
-        camera.height / 2 +
-        Math.sin(time * ALT_MAP_SWAY_SPEED * 0.7 + ALT_MAP_SWAY_PHASE) *
-          ALT_MAP_SWAY_RADIUS
-    }
   }
 
   private createJourneyOverlay(): void {
@@ -232,7 +134,6 @@ export default class JourneyScene extends BaseScene {
       panel: { child: contentSizer },
       space: { header: 0 },
     })
-    this.overlayPanel.setScrollFactor(0)
 
     const strokeBg = this.add
       .rectangle(0, 0, 1, 1)
@@ -249,7 +150,6 @@ export default class JourneyScene extends BaseScene {
     this.overlayCharacterImage = this.add
       .image(x, OVERLAY_TOP, 'avatar-JulesFull')
       .setOrigin(1, 0)
-      .setScrollFactor(0)
       .setVisible(false)
       .setScale(
         OVERLAY_HEIGHT /
@@ -267,7 +167,6 @@ export default class JourneyScene extends BaseScene {
       )
       .setOrigin(1, 0)
       .setStrokeStyle(3, Color.backgroundStroke)
-      .setScrollFactor(0)
   }
 
   private createMissionTipBox(): void {
@@ -317,7 +216,6 @@ export default class JourneyScene extends BaseScene {
       txt,
       this.missionTipTextBox,
     ])
-    this.missionTipContainer.setScrollFactor(0)
     this.missionTipContainer.setAlpha(0)
   }
 
@@ -347,10 +245,7 @@ export default class JourneyScene extends BaseScene {
     const x = Space.pad + MISSION_TIP_BOX_WIDTH / 2
     const y = tipBoxTop - Space.pad - Space.cardHeight / 2
 
-    this.missionCardContainer = this.add
-      .container(x, y)
-      .setScrollFactor(0)
-      .setAlpha(0)
+    this.missionCardContainer = this.add.container(x, y).setAlpha(0)
     this.missionCardImage = new CardImage(
       Catalog.cardback,
       this.missionCardContainer,
@@ -479,16 +374,12 @@ export default class JourneyScene extends BaseScene {
     }
     this.refreshOverlayCharacterArt()
     this.overlayPanel.layout()
-    if (moveCamera && this.selectedThemeIndex !== STARS_THEME_INDEX) {
-      const leavingStars = this.previousThemeIndex === STARS_THEME_INDEX
-      if (leavingStars) {
-        this.snapCameraToTheme(this.selectedThemeIndex)
-      } else {
-        this.moveCameraToTheme(this.selectedThemeIndex)
-      }
+
+    // moveCamera is false for refreshes where the theme didn't change
+    if (moveCamera) {
+      const mapScene = this.scene.get('JourneyMapScene') as JourneyMapScene
+      mapScene.selectTheme(this.selectedThemeIndex)
     }
-    this.previousThemeIndex = this.selectedThemeIndex
-    this.updateAltMapFade()
   }
 
   private createOverlayCharacterText(): Phaser.GameObjects.GameObject {
@@ -529,18 +420,6 @@ export default class JourneyScene extends BaseScene {
       .add(textBox)
   }
 
-  private updateAltMapFade(): void {
-    const showAltMap = this.selectedThemeIndex === STARS_THEME_INDEX
-    const targetAlpha = showAltMap ? 1 : 0
-    if (this.altMap.alpha === targetAlpha) return
-    this.tweens.add({
-      targets: this.altMap,
-      alpha: targetAlpha,
-      duration: ALT_MAP_FADE_DURATION,
-      ease: 'Power2.InOut',
-    })
-  }
-
   private refreshOverlayCharacterArt(): void {
     const hasCharacterArt = this.selectedThemeIndex < avatarNames.length
 
@@ -562,53 +441,6 @@ export default class JourneyScene extends BaseScene {
 
   private onMissionGoldClaimed(): void {
     this.refreshOverlayContent(false)
-  }
-
-  /** Set camera and drift center to theme position without tweening */
-  private snapCameraToTheme(themeIndex: number): void {
-    const pos = THEME_CAMERA_POSITIONS[themeIndex]
-    if (!pos) return
-    this.driftCenterX = pos.x
-    this.driftCenterY = pos.y
-    const camera = this.cameras.main
-    const maxScrollX = Math.max(0, this.map.width - camera.width)
-    const maxScrollY = Math.max(0, this.map.height - camera.height)
-    camera.scrollX = Phaser.Math.Clamp(pos.x - camera.width / 2, 0, maxScrollX)
-    camera.scrollY = Phaser.Math.Clamp(pos.y - camera.height / 2, 0, maxScrollY)
-    JourneyScene.rememberCoordinates(camera)
-  }
-
-  private moveCameraToTheme(themeIndex: number): void {
-    const pos = THEME_CAMERA_POSITIONS[themeIndex]
-    if (!pos) return
-    this.driftCenterX = pos.x
-    this.driftCenterY = pos.y
-    const camera = this.cameras.main
-    const maxScrollX = Math.max(0, this.map.width - camera.width)
-    const maxScrollY = Math.max(0, this.map.height - camera.height)
-    const targetScrollX = Phaser.Math.Clamp(
-      pos.x - camera.width / 2,
-      0,
-      maxScrollX,
-    )
-    const targetScrollY = Phaser.Math.Clamp(
-      pos.y - camera.height / 2,
-      0,
-      maxScrollY,
-    )
-    this.tweens.killTweensOf(camera)
-    this.isTweeningCamera = true
-    this.tweens.add({
-      targets: camera,
-      scrollX: targetScrollX,
-      scrollY: targetScrollY,
-      duration: THEME_CAMERA_TWEEN_DURATION,
-      ease: 'Power2.Out',
-      onComplete: () => {
-        this.isTweeningCamera = false
-        JourneyScene.rememberCoordinates(camera)
-      },
-    })
   }
 
   private isMissionUnlocked(
@@ -837,7 +669,7 @@ export default class JourneyScene extends BaseScene {
         this.scene.start('HomeScene')
       },
       depth: 10,
-    }).setNoScroll()
+    })
   }
 
   private createOpeningButton(): void {
@@ -849,7 +681,7 @@ export default class JourneyScene extends BaseScene {
       f: () => {
         this.scene.start('OpeningScene')
       },
-    }).setNoScroll()
+    })
 
     new Buttons.Basic({
       within: this,
@@ -859,42 +691,7 @@ export default class JourneyScene extends BaseScene {
       f: () => {
         this.scene.start('TutorialMatchScene', { missionID: 0 })
       },
-    }).setNoScroll()
-  }
-
-  // Create a popup for the card specified in params
-  private createCardPopup(params): void {
-    this.scene.launch('MenuScene', {
-      menu: 'message',
-      title: 'Card Unlocked!',
-      s: params.txt,
-      card: params.card,
-    })
-
-    // Clear params
-    params.txt = ''
-    params.card = undefined
-  }
-
-  // Create a popup for the tip
-  private createTipPopup(params): void {
-    this.scene.launch('MenuScene', {
-      menu: 'message',
-      title: 'Tip',
-      s: params.txt,
-    })
-
-    // Clear params
-    params.txt = ''
-    params.card = undefined
-  }
-
-  private static rememberCoordinates(
-    camera: Phaser.Cameras.Scene2D.Camera,
-  ): void {
-    UserSettings._set('journeyCoordinates', {
-      x: camera.scrollX,
-      y: camera.scrollY,
     })
   }
+
 }

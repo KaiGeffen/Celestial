@@ -15,6 +15,7 @@ import MatchHistoryScene from './scene/matchHistoryScene'
 
 import OpeningScene from './scene/openingScene'
 import JourneyScene from './scene/journeyScene'
+import JourneyMapScene from './scene/journeyMapScene'
 import RaceScene from './scene/raceScene'
 
 import { Space } from './settings/settings'
@@ -65,8 +66,9 @@ const config: Phaser.Types.Core.GameConfig = {
     DeckEditorJourneyScene,
     MatchHistoryScene,
     StoreScene,
-    // Allowing old map based journey mode
+    // Journey mode: overlay scene above, panning map scene below
     JourneyScene,
+    JourneyMapScene,
     JourneyMatchScene,
     // Race mode
     RaceScene,

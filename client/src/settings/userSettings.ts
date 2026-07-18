@@ -1,6 +1,5 @@
 import Server from '../server'
 import Catalog from '@shared/state/catalog'
-import { Space } from './settings'
 import { Flags } from './flags'
 
 // User settings will first look to see if the user is logged in
@@ -86,12 +85,6 @@ export class UserSettings {
 
       // List of each mission by its id, and if the player has completed it
       completedMissions: [],
-
-      // Coordinates for the camera in journey mode
-      journeyCoordinates: {
-        x: 4650 - Space.windowWidth / 2,
-        y: 700 - Space.windowHeight / 2,
-      },
 
       // A list of all new user tooltips that have been seen
       tooltipsSeen: [],
