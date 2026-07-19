@@ -60,7 +60,15 @@ export class TypedWebSocket<
 
       const listener: (data: Received[T]) => void = this.listeners[message.type]
       if (listener) {
-        listener(message)
+        // Contain handler failures: a throwing or rejecting handler must not
+        // crash the process (unhandled rejections are fatal on modern Node)
+        try {
+          Promise.resolve(listener(message)).catch((e) =>
+            console.error(`Error in '${String(message.type)}' handler:`, e),
+          )
+        } catch (e) {
+          console.error(`Error in '${String(message.type)}' handler:`, e)
+        }
       }
     }
   }

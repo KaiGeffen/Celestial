@@ -45,7 +45,7 @@ import { journeyData } from '../../../shared/journey/journey'
 import { v5 as uuidv5 } from 'uuid'
 
 // An ongoing match
-class ActiveGame {
+interface ActiveGame {
   match: Match
   // Whether this is player 0 or 1 in the match
   playerNumber: 0 | 1
@@ -336,7 +336,7 @@ export default function createWebSocketServer() {
         activePlayers[uuid] = ws
         connectionTime = Date.now()
         username = result[0].username
-        // User the can be spectated field from the user's database entry
+        // Use the can-be-spectated field from the user's database entry
         spectateAllowedByUserId[uuid] = result[0].can_be_spectated
         // A fresh session starts out not spectating (clears any flag left by a
         // kicked connection, whose late close doesn't touch user-keyed state)
@@ -669,12 +669,15 @@ export default function createWebSocketServer() {
             }
 
             await db.transaction(async (tx) => {
+              // Lock the row so two rapid claims can't both read "unclaimed"
+              // and double-award the coins (same pattern as purchaseItem)
               const [playerData] = await tx
                 .select({
                   missiongoldclaimed: players.missiongoldclaimed,
                 })
                 .from(players)
                 .where(eq(players.id, id))
+                .for('update')
                 .limit(1)
 
               if (!playerData) return
@@ -860,7 +863,7 @@ export default function createWebSocketServer() {
               username,
               ' ',
               deck.cards
-                .map((cardId) => Catalog.getCardById(cardId).name)
+                .map((cardId) => Catalog.getCardById(cardId)?.name ?? '?')
                 .join(', '),
             )
 
@@ -886,7 +889,7 @@ export default function createWebSocketServer() {
               username,
               ' ',
               deck.cards
-                .map((cardId) => Catalog.getCardById(cardId).name)
+                .map((cardId) => Catalog.getCardById(cardId)?.name ?? '?')
                 .join(', '),
             )
 
@@ -938,11 +941,11 @@ export default function createWebSocketServer() {
                 username,
                 ' ',
                 data.deck.cards
-                  .map((cardId) => Catalog.getCardById(cardId).name)
+                  .map((cardId) => Catalog.getCardById(cardId)?.name ?? '?')
                   .join(', '),
                 '\n',
                 otherPlayer.deck.cards
-                  .map((cardId) => Catalog.getCardById(cardId).name)
+                  .map((cardId) => Catalog.getCardById(cardId)?.name ?? '?')
                   .join(', '),
               )
 

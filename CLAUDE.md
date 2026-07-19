@@ -43,10 +43,12 @@ it critically and judge its quality, don't run a mechanical checklist.
 
 | `client/src/scene/matchScene.ts` | 2026-07-19 | Full audit: dead ws field + ClientWS import removed, dead restart() methods deleted (here and journeyMatchScene — Play Again uses ScenePlugin restart), params typed via exported MatchSceneParams interface, three signalOpponent* methods collapsed to signalOpponentEvent(s), View.scene typed MatchScene, stale "delete it" comment fixed (states stay buffered for recap rewind), dead commented region lines removed |
 
+| `server/src/network/websocketServer.ts` | 2026-07-19 | Full audit. Fixed: claimMissionRewards now row-locks (double-claim coin race, same pattern as purchaseItem); deck-name logging no longer throws on invalid card ids; TypedWebSocket dispatch (shared) contains handler throws/rejections so a crafted message can't crash the server process; ActiveGame class→interface. Known/left: guest sign-in trusts uuid by design (provider-account gate holds), sendInitialUserData trusts inventory/missions (existing TODO), setCosmeticSet ownership unvalidated (existing TODO), initPvp queue race (existing TODO). Pre-existing server tsc errors in db/gameState.ts, db/garden.ts, db/updateMatchResult.ts (drizzle schema/type drift — not from this audit) |
+
 ### Next up (proposed order)
 
-1. `server/src/network/websocketServer.ts` — 1209 lines, biggest file in the
-   repo and high churn; server-side so audit separately from client passes
+(queue empty — client lib/utils/scenes/menus and matchRegions queue complete;
+server matches (match.ts, pvpMatch.ts) are the natural next candidates)
 
 Skipped on purpose: `client/src/loader/assetLists.ts` (highest churn but pure
 data lists — little structure to audit).
