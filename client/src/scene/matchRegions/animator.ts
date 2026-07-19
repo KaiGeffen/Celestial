@@ -43,7 +43,7 @@ export default class Animator {
     // Total Zone.Story insertions across both owners — used to correctly compute the
     // pre-insertion story length so animateStoryInsertShift applies the full shift once.
     // Cards played directly from hand (e.g. Sky Burial) have no animation entry, so we
-    // also compare story size against the previous state to catch unaminated insertions.
+    // also compare story size against the previous state to catch unanimated insertions.
 
     // How many cards entered the story from animations
     let storyCountDelta = 0
@@ -64,7 +64,7 @@ export default class Animator {
       storyCountDelta = cardsAdded - cardsRemoved
     }
 
-    // TODO what
+    // Whether the one-per-state story insert shift has run (see below)
     let storyInsertShiftDone = false
 
     for (let owner = 0; owner < 2; owner++) {
@@ -162,7 +162,7 @@ export default class Animator {
 
   private getStart(
     animation: Animation,
-    state,
+    state: GameModel,
     owner: number,
   ): [number, number] {
     switch (animation.from) {
@@ -205,7 +205,11 @@ export default class Animator {
     return [300, 300]
   }
 
-  private getEnd(animation: Animation, state, owner): [number, number] {
+  private getEnd(
+    animation: Animation,
+    state: GameModel,
+    owner: number,
+  ): [number, number] {
     switch (animation.to) {
       case Zone.Deck:
         if (owner === 0) {
@@ -251,12 +255,13 @@ export default class Animator {
     card: Card,
     start: [number, number] = [0, 0],
     cardback: number = 0,
+    shadow: boolean = true,
   ): CardImage {
     let cardImage = new CardImage(
       card || Catalog.cardback,
       this.container,
       false,
-      true,
+      shadow,
       cardback,
     )
 
@@ -292,33 +297,7 @@ export default class Animator {
         card = this.view.mulligan.cards[animation.index]
         break
 
-      case Zone.Deck:
-        if (owner === 0) {
-          card = null //// this.view.decks.cards[animation.index2]
-        } else {
-          card = null //this.view.decks.cards2[animation.index2]
-        }
-        break
-
-      case Zone.Discard:
-        if (owner === 0) {
-          card = null //this.view.discardPiles.cards[animation.index2]
-        } else {
-          card = null //this.view.discardPiles.cards2[animation.index2]
-        }
-        break
-
-      // // TODO
-      // break
-      // card = this.view.decks.cards
-
-      // case Zone.Discard:
-      // // TODO
-      // break
-
-      // case Zone.Gone:
-      // case Zone.Create:
-      // default:
+      // Other zones (deck, discard, gone) have no permanent card image
       default:
         break
     }
@@ -487,19 +466,20 @@ export default class Animator {
   }
 
   // Animate a card transforming into another card
-  private animateTransform(animation: Animation, i: number, owner): void {
+  private animateTransform(animation: Animation, i: number, owner: number): void {
     let newCard = this.getCard(animation, owner)
+    // Shadowless so only the new card's shadow shows beneath the crossfade
     let oldCard = this.createCard(
       animation.card,
       [0, 0],
       newCard?.cardback ?? 0,
+      false,
     )
       .show()
       .copyLocation(newCard)
 
     // Display the old card with the same scale as the new card
     oldCard.container.setScale(newCard.container.scale)
-    oldCard.imageShadow.setVisible(false)
 
     // Animate card scaling up and disappearing
     this.scene.tweens.add({
@@ -632,7 +612,6 @@ export default class Animator {
           default:
             return 'create'
         }
-        return 'draw'
       case Zone.Discard:
         return 'discard'
       // TODO Some other sound?
