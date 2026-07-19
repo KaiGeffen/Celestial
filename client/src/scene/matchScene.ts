@@ -26,16 +26,25 @@ import HistoryRegion from './matchRegions/historyRegion'
 import StatusRegion from './matchRegions/statusRegion'
 import SearchingRegion from './matchRegions/searchingRegion'
 
-// TODO Figure out
 import { server } from '../server'
-import { ClientWS } from '@shared/network/celestialTypedWebsocket'
 import logEvent from '../utils/analytics'
 
+export interface MatchSceneParams {
+  deck?: Deck
+  missionID?: number
+  missionCards?: number[]
+  isPvp?: boolean
+  password?: string
+  aiDeck?: Deck
+  gameStartState?: GameModel
+  enabledModes?: number[]
+  lastScene?: string
+}
+
 export class MatchScene extends BaseScene {
-  params: any
+  params: MatchSceneParams
 
   view: View
-  ws: ClientWS
   // Whether the match is paused (Awaiting user to click a button, for example)
   paused: boolean
 
@@ -48,17 +57,7 @@ export class MatchScene extends BaseScene {
   // Whether this match is a tutorial
   isTutorial = false
 
-  init(params: {
-    deck?: Deck
-    missionID?: number
-    missionCards?: number[]
-    isPvp?: boolean
-    password?: string
-    aiDeck?: Deck
-    gameStartState?: GameModel
-    enabledModes?: number[]
-    lastScene?: string
-  }) {
+  init(params: MatchSceneParams) {
     this.params = params
 
     // Set which scene to return to
@@ -149,14 +148,6 @@ export class MatchScene extends BaseScene {
     })
   }
 
-  restart(): void {
-    this.view = new View(
-      this,
-      this.params.deck?.cosmeticSet?.avatar ?? 0,
-      this.params.password,
-    )
-  }
-
   beforeExit(): void {
     this.view.beforeExit()
   }
@@ -239,32 +230,17 @@ export class MatchScene extends BaseScene {
     }
   }
 
-  private signalOpponentSurrendered(): void {
+  // Show the user a message about an opponent event (surrender, disconnect, etc)
+  private signalOpponentEvent(s: string): void {
     this.scene.launch('MenuScene', {
       menu: 'message',
       title: '',
-      s: 'Your opponent surrendered, you win!',
-    })
-  }
-
-  private signalOpponentDisconnect(): void {
-    this.scene.launch('MenuScene', {
-      menu: 'message',
-      title: '',
-      s: 'Your opponent disconnected, waiting for them to reconnect.',
-    })
-  }
-
-  private signalOpponentReconnected(): void {
-    this.scene.launch('MenuScene', {
-      menu: 'message',
-      title: '',
-      s: 'Your opponent has reconnected, resuming the game.',
+      s,
     })
   }
 
   // Set all of the callback functions for the regions in the view
-  private setCallbacks(view): void {
+  private setCallbacks(view: View): void {
     // Callbacks in this and spectator modes
     this.setCommonCallbacks(view)
 
@@ -419,7 +395,7 @@ export class MatchScene extends BaseScene {
   }
 
   // Try to display the next queued state TODO Recovery if we've been waiting too long
-  update(time, delta): void {
+  update(time: number, delta: number): void {
     super.update(time, delta)
 
     // Enable the searching region visual update
@@ -430,7 +406,7 @@ export class MatchScene extends BaseScene {
         this.queuedStates[this.currentVersion + 1],
       )
 
-      // If the state was just shown, delete it
+      // If the state was just shown, advance (states stay buffered for recap rewind)
       if (isDisplayed) {
         this.currentVersion++
       }
@@ -529,13 +505,17 @@ export class MatchScene extends BaseScene {
         this.signalError(`${username} began spectating.`)
       })
       .on('opponentSurrendered', () => {
-        this.signalOpponentSurrendered()
+        this.signalOpponentEvent('Your opponent surrendered, you win!')
       })
       .on('opponentDisconnected', () => {
-        this.signalOpponentDisconnect()
+        this.signalOpponentEvent(
+          'Your opponent disconnected, waiting for them to reconnect.',
+        )
       })
       .on('opponentReconnected', () => {
-        this.signalOpponentReconnected()
+        this.signalOpponentEvent(
+          'Your opponent has reconnected, resuming the game.',
+        )
       })
       .on('opponentEmote', (data) => {
         this.emote(0)
@@ -556,7 +536,7 @@ export class MatchScene extends BaseScene {
 
 // The View of MVC - What is presented to the user
 export class View {
-  scene: BaseScene
+  scene: MatchScene
 
   searching: Region
 
@@ -605,8 +585,6 @@ export class View {
     this.searching = new Regions.Searching().create(scene, avatarId, password)
 
     // Create each of the regions
-    // this.createOurHand()
-    // new HandRegion()//.create(scene)
     this.ourBoard = new Regions.OurBoard().create(scene)
     this.ourStacks = new Regions.OurStacks().create(
       scene,
@@ -625,7 +603,6 @@ export class View {
     this.winsChromeRegion = new Regions.WinsChrome().create(scene)
     this.wins = new Regions.Wins().create(scene)
     this.historyRegion = new Regions.History().create(scene)
-    // this.ourButtons = new Regions.OurButtons().create(scene)
 
     this.pass = new Regions.Pass().create(scene)
     this.scores = new Regions.RoundResult().create(scene)

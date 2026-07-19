@@ -10,9 +10,4 @@ export default class JourneyMatchScene extends MatchScene {
     super.create(params)
     this.view.results = new ResultsRegionJourney().create(this)
   }
-
-  restart(): void {
-    super.restart()
-    this.view.results = new ResultsRegionJourney().create(this)
-  }
 }

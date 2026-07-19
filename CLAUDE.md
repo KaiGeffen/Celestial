@@ -41,11 +41,11 @@ it critically and judge its quality, don't run a mechanical checklist.
 | `client/src/scene/matchRegions/matchResults.ts` | 2026-07-19 | Full audit: mid-file imports moved to top, dead footerButtons field removed, ResultsRegionTutorial.missionID is now a constructor param; unlock cardback now enabled via setOnClick in the scale-in tween's onComplete (internals-poking deleted, clicks genuinely gated until scale-in ends); scrollablePanel field renamed contentSizer |
 | `client/src/scene/matchRegions/animator.ts` | 2026-07-19 | Full audit: unreachable return in getSound removed, dead Deck/Discard husks in getCard collapsed to default, createCard gained a shadow param (transform no longer pokes imageShadow), missing state/owner types added, "TODO what" resolved. Shuffle slide distances named as visually-tuned constants (bottom deliberately uses cardHeight/2); stale bug-claim TODO in getCard Zone.Story removed — story.cards holds only unresolved acts, so index2 aligns |
 
+| `client/src/scene/matchScene.ts` | 2026-07-19 | Full audit: dead ws field + ClientWS import removed, dead restart() methods deleted (here and journeyMatchScene — Play Again uses ScenePlugin restart), params typed via exported MatchSceneParams interface, three signalOpponent* methods collapsed to signalOpponentEvent(s), View.scene typed MatchScene, stale "delete it" comment fixed (states stay buffered for recap rewind), dead commented region lines removed |
+
 ### Next up (proposed order)
 
-1. `client/src/scene/matchScene.ts` — 741 lines, hub that wires all match
-   regions together
-2. `server/src/network/websocketServer.ts` — 1209 lines, biggest file in the
+1. `server/src/network/websocketServer.ts` — 1209 lines, biggest file in the
    repo and high churn; server-side so audit separately from client passes
 
 Skipped on purpose: `client/src/loader/assetLists.ts` (highest churn but pure
