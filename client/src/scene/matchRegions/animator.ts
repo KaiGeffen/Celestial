@@ -13,6 +13,10 @@ import { SHRUNKEN_CARD_SCALE } from './matchRegionSettings'
 import { animateCardReveal } from '../../lib/cardReveal'
 import { StoryResolveBubbles } from './storyResolveBubbles'
 
+// Shuffle slide distances (visually tuned; the bottom one isn't tied to card width)
+const SHUFFLE_TOP_SLIDE_PX = Space.cardWidth / 4
+const SHUFFLE_BOTTOM_SLIDE_PX = Space.cardHeight / 2
+
 export default class Animator {
   scene: MatchScene
   view: View
@@ -287,7 +291,7 @@ export default class Animator {
         break
 
       case Zone.Story:
-        // TODO The local array has includes resolved cards, while the animation index doesn't, causing a bug
+        // story.cards holds only unresolved acts, matching index2's space
         card = this.view.story.cards[animation.index2]
         break
 
@@ -389,7 +393,7 @@ export default class Animator {
 
     this.scene.add.tween({
       targets: topCard.container,
-      x: start[0] + Space.cardWidth / 4,
+      x: start[0] + SHUFFLE_TOP_SLIDE_PX,
       delay: i * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
       duration: Time.match.recapTween / 4,
       yoyo: true,
@@ -405,7 +409,7 @@ export default class Animator {
 
     this.scene.add.tween({
       targets: bottomCard.container,
-      x: start[0] - Space.cardHeight / 2,
+      x: start[0] - SHUFFLE_BOTTOM_SLIDE_PX,
       delay: i * (Time.match.recapTween + Time.match.recapPauseBetweenTweens),
       duration: Time.match.recapTween / 4,
       yoyo: true,
