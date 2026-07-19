@@ -37,6 +37,9 @@ class PveMatch extends Match {
   async doSurrender(disconnectingWs: ServerWS) {
     if (this.game === null || this.game.model.winner !== null) return
 
+    // Vacate the leaver's seat so no final state reaches them
+    this.ws1 = null
+
     // AI wins by default
     this.game.setWinnerViaSurrender(1)
     await this.notifyState()

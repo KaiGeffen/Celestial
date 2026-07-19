@@ -72,8 +72,11 @@ class PvpMatch extends Match {
     // Skip if game is already over
     if (this.game === null || this.game.model.winner !== null) return
 
-    // Set the winner, notify players of new state
+    // Set the winner, and vacate the leaver's seat so no final state reaches them
     const winner = this.ws1 === disconnectingWs ? 1 : 0
+    if (winner === 1) this.ws1 = null
+    else this.ws2 = null
+
     this.game.setWinnerViaSurrender(winner)
     await this.notifyState()
 

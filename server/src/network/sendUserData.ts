@@ -7,7 +7,9 @@ import { cosmeticsTransactions } from '../db/schema'
 import { AchievementManager } from '../achievementManager'
 
 // Send the user their full data
-export default async function sendUserData(ws: ServerWS, id: string) {
+export default async function sendUserData(ws: ServerWS | null, id: string) {
+  if (!ws || !id) return
+
   // Get user's data
   const result = await db
     .select()
