@@ -28,6 +28,9 @@ import { AchievementManager } from '../achievementManager'
 import Garden from '../db/garden'
 import Catalog from '../../../shared/state/catalog'
 import allPurchaseables from '../../../shared/purchaseables/index'
+import playerOwnsCosmeticSet, {
+  sanitizedCosmeticSet,
+} from './cosmeticOwnership'
 
 import PveMatch from './match/pveMatch'
 import PveMatchMission from './match/pveMatchMission'
@@ -816,14 +819,18 @@ export default function createWebSocketServer() {
         .on(
           'setCosmeticSet',
           authed(async ({ value }) => {
+            if (!(await playerOwnsCosmeticSet(id, value))) {
+              // Client set to something they didn't own
+              ws.send({ type: 'signalError' })
+              await sendUserData(ws, id)
+              return
+            }
+
             // Keep the online-players broadcast cache in sync
             if (onlinePlayerDisplay[id]) {
               onlinePlayerDisplay[id].cosmeticSet = value
             }
 
-            // TODO Validate the selection is actually owned (cosmetics from
-            // cosmeticsTransactions, avatars/borders/cardbacks from unlock rules)
-            // before persisting. Currently trusts the client's chosen set.
             await db
               .update(players)
               .set({ cosmetic_set: JSON.stringify(value) })
@@ -837,6 +844,8 @@ export default function createWebSocketServer() {
             console.log('Mission:', missionID, 'for player: ', username)
 
             await surrenderActiveMatch()
+
+            deck.cosmeticSet = await sanitizedCosmeticSet(id, deck.cosmeticSet)
 
             // This might fail if the mission is invalid
             try {
@@ -869,6 +878,8 @@ export default function createWebSocketServer() {
 
             await surrenderActiveMatch()
 
+            deck.cosmeticSet = await sanitizedCosmeticSet(id, deck.cosmeticSet)
+
             activeGame.match = new PveMatch(ws, id, deck, aiDeck)
             activeGame.playerNumber = 0
 
@@ -895,6 +906,8 @@ export default function createWebSocketServer() {
 
             await surrenderActiveMatch()
 
+            deck.cosmeticSet = await sanitizedCosmeticSet(id, deck.cosmeticSet)
+
             activeGame.match = new PveSpecialMatch(
               ws,
               id,
@@ -916,6 +929,11 @@ export default function createWebSocketServer() {
           'initPvp',
           authed(async (data) => {
             await surrenderActiveMatch()
+
+            data.deck.cosmeticSet = await sanitizedCosmeticSet(
+              id,
+              data.deck.cosmeticSet,
+            )
 
             // Clean up stale entries first
             Object.keys(searchingPlayers).forEach((password) => {
