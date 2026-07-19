@@ -33,8 +33,15 @@ const OVERLAY_HEIGHT = 620
 const OVERLAY_TOP = 80
 
 const MISSION_TIP_FADE_DURATION = 200
+const MISSION_TIP_LINE_HEIGHT = 22
+const MISSION_TIP_MAX_LINES = 6
+const MISSION_TIP_BOX_HEIGHT =
+  Space.pad * 2 + MISSION_TIP_LINE_HEIGHT * MISSION_TIP_MAX_LINES
+
 /** Tip box width: from left pad to just left of the overlay panel (one extra pad) */
-const MISSION_TIP_BOX_WIDTH = Space.windowWidth - OVERLAY_WIDTH - Space.pad * 3
+function missionTipBoxWidth(viewportWidth: number): number {
+  return Math.max(1, viewportWidth - OVERLAY_WIDTH - Space.pad * 3)
+}
 
 /** Rex TextBox delay between characters (ms). 0 = full text at once. */
 const JOURNEY_TEXTBOX_TYPE_MS = 0
@@ -124,8 +131,6 @@ export default class JourneyScene extends BaseScene {
     const overlayBackground = this.add.image(0, 0, 'background-Light')
 
     this.overlayPanel = newScrollablePanel(this, {
-      x: Space.windowWidth - OVERLAY_WIDTH - 20,
-      y: OVERLAY_TOP,
       width: OVERLAY_WIDTH,
       height: OVERLAY_HEIGHT,
       scrollMode: 0,
@@ -133,6 +138,11 @@ export default class JourneyScene extends BaseScene {
       header: this.createOverlayHeader(themes),
       panel: { child: contentSizer },
       space: { header: 0 },
+      // Anchored to the right edge of the screen (origin is top-left)
+      anchor: {
+        x: `100%-${OVERLAY_WIDTH + Space.pad}`,
+        y: `0%+${OVERLAY_TOP}`,
+      },
     })
 
     const strokeBg = this.add
@@ -171,14 +181,10 @@ export default class JourneyScene extends BaseScene {
 
   private createMissionTipBox(): void {
     const padding = Space.pad
-    const lineHeight = 22
-    const maxLines = 6
-    const boxHeight = padding * 2 + lineHeight * maxLines
-    const boxWidth = MISSION_TIP_BOX_WIDTH
-    const x = Space.pad
-    const y = Space.windowHeight - boxHeight - Space.pad
+    const boxHeight = MISSION_TIP_BOX_HEIGHT
+    const boxWidth = missionTipBoxWidth(Space.windowWidth)
 
-    this.missionTipContainer = this.add.container(x, y)
+    this.missionTipContainer = this.add.container(0, 0)
 
     this.missionTipBg = this.add
       .rectangle(0, 0, boxWidth, boxHeight, 0x353f4e, 0.92)
@@ -217,6 +223,17 @@ export default class JourneyScene extends BaseScene {
       this.missionTipTextBox,
     ])
     this.missionTipContainer.setAlpha(0)
+
+    // Pin to the bottom-left; on resize, stretch to just left of the overlay
+    this.plugins.get('rexAnchor')['add'](this.missionTipContainer, {
+      x: `0%+${Space.pad}`,
+      y: `100%-${boxHeight + Space.pad}`,
+      onUpdateViewportCallback: (viewport: Phaser.Geom.Rectangle) => {
+        const width = missionTipBoxWidth(viewport.width)
+        this.missionTipBg.setSize(width, boxHeight)
+        txt.setWordWrapWidth(width - padding * 2)
+      },
+    })
   }
 
   private showMissionTip(text: string): void {
@@ -240,17 +257,23 @@ export default class JourneyScene extends BaseScene {
 
   private createMissionCardImage(): void {
     // Hidden (alpha 0) until a mission is hovered, mirroring the tip box.
-    const tipBoxHeight = Space.pad * 2 + 22 * 6
-    const tipBoxTop = Space.windowHeight - tipBoxHeight - Space.pad
-    const x = Space.pad + MISSION_TIP_BOX_WIDTH / 2
-    const y = tipBoxTop - Space.pad - Space.cardHeight / 2
+    const x = Space.pad + missionTipBoxWidth(Space.windowWidth) / 2
 
-    this.missionCardContainer = this.add.container(x, y).setAlpha(0)
+    this.missionCardContainer = this.add.container(x, 0).setAlpha(0)
     this.missionCardImage = new CardImage(
       Catalog.cardback,
       this.missionCardContainer,
       false,
     )
+
+    // Sits centered above the tip box; recenter when the window resizes
+    this.plugins.get('rexAnchor')['add'](this.missionCardContainer, {
+      y: `100%-${MISSION_TIP_BOX_HEIGHT + Space.pad * 2 + Space.cardHeight / 2}`,
+      onUpdateViewportCallback: (viewport: Phaser.Geom.Rectangle) => {
+        this.missionCardContainer.x =
+          Space.pad + missionTipBoxWidth(viewport.width) / 2
+      },
+    })
   }
 
   private showMissionCard(cardId?: number): void {
