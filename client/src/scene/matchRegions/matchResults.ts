@@ -22,6 +22,13 @@ import { server } from '../../server'
 import { CardImage } from '../../lib/cardImage'
 import Catalog from '@shared/state/catalog'
 import { animateCardReveal } from '../../lib/cardReveal'
+import { MatchScene } from '../matchScene'
+import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
+import { TUTORIAL_LENGTH } from '@shared/settings'
+import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
+import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
+import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 
 export default class MatchResultsRegion extends Region {
   // Whether the results have been seen already
@@ -30,8 +37,8 @@ export default class MatchResultsRegion extends Region {
   // Text saying if you won or lost (panel header)
   txtResult: BBCodeText
 
-  // Scrollable panel containing details about the results of each round
-  scrollablePanel: FixWidthSizer
+  // Content sizer inside `panel`, holding details about each round's results
+  contentSizer: FixWidthSizer
 
   // Avatar images for both players
   ourAvatar: Phaser.GameObjects.Image
@@ -43,9 +50,6 @@ export default class MatchResultsRegion extends Region {
 
   // The panel that shows results of the match
   panel: ScrollablePanel
-
-  /** Footer row from {@link createButtons} (Hide / Play Again / Exit); optional when subclasses replace buttons. */
-  protected footerButtons?: Phaser.GameObjects.Container
 
   WIDTH = 300
   HEIGHT = Space.windowHeight - (Space.buttonHeight + Space.pad * 3)
@@ -101,7 +105,7 @@ export default class MatchResultsRegion extends Region {
     }
   }
 
-  /** How gem reward for pvp */
+  /** Show the gem reward for a valid pvp match */
   private showGemReward(): void {
     const x = Space.windowWidth / 2
     const y = Space.windowHeight / 2
@@ -178,7 +182,6 @@ export default class MatchResultsRegion extends Region {
 
   protected createButtons() {
     const container = this.scene.add.container()
-    this.footerButtons = container
     this.container.add(container)
     this.scene.plugins.get('rexAnchor')['add'](container, {
       y: `50%-${Space.pad + Space.buttonHeight / 2}`,
@@ -287,7 +290,7 @@ export default class MatchResultsRegion extends Region {
       background: background,
       header: this.createHeader(),
       panel: {
-        child: this.createScrollablePanel(),
+        child: this.createContentSizer(),
       },
       anchor: {
         x: `50%`,
@@ -335,10 +338,10 @@ export default class MatchResultsRegion extends Region {
     return sizer
   }
 
-  private createScrollablePanel() {
-    this.scrollablePanel = this.scene.rexUI.add.fixWidthSizer()
+  private createContentSizer() {
+    this.contentSizer = this.scene.rexUI.add.fixWidthSizer()
 
-    return this.scrollablePanel
+    return this.contentSizer
   }
 
   private newMatchCallback(): () => void {
@@ -411,18 +414,10 @@ export default class MatchResultsRegion extends Region {
         .setDepth(Depth.results)
 
       sizer.add(txt)
-      this.scrollablePanel.add(sizer)
+      this.contentSizer.add(sizer)
     }
   }
 }
-
-import { MatchScene } from '../matchScene'
-import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
-import { TUTORIAL_LENGTH } from '@shared/settings'
-import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer'
-import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer'
-import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
-import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 
 /** Outer cell for an unlock card; holds the pair we tween after rex `layout()`. */
 type JourneyUnlockCardWrap = ContainerLite & {
@@ -447,6 +442,8 @@ export class ResultsRegionJourney extends MatchResultsRegion {
   private cardsRow: Sizer
   // Disabled until every cardback has been clicked / flipped.
   private btnContinue: Button
+  // How many unlock cards are still face-down
+  private unrevealedCount = 0
 
   override create(scene: MatchScene): this {
     super.create(scene)
@@ -578,7 +575,6 @@ export class ResultsRegionJourney extends MatchResultsRegion {
     if (this.unlockBuilt) return
     this.unlockBuilt = true
 
-    let unrevealedCount = 0
     for (const id of ids) {
       const card = Catalog.getCardById(id)
       if (!card) continue
@@ -598,9 +594,8 @@ export class ResultsRegionJourney extends MatchResultsRegion {
       const ci = new CardImage(card, cardContainer, true, true, 0)
         .setVisibleGlow()
         .hide()
-      // Clickable cardback overlay — pre-empts the helper's own cardback so the
-      // user clicks *this* one to trigger the flip. Interaction enabled after
-      // post-layout scale-in (see below).
+      // Cardback overlay the user clicks to flip — pre-empts the helper's own
+      // cardback. Made clickable (via setOnClick) once the scale-in finishes.
       const cardback = new CardImage(
         Catalog.cardback,
         cardContainer,
@@ -608,26 +603,10 @@ export class ResultsRegionJourney extends MatchResultsRegion {
         true,
         0,
       )
-      cardback.setOnClick(() => {
-        this.scene.playSound('inspire')
-        cardback.destroy()
-        animateCardReveal(
-          this.scene,
-          ci,
-          cardContainer,
-          0,
-          Time.match.matchResultsUnlockCardReveal,
-        )
-
-        unrevealedCount--
-        if (unrevealedCount === 0) {
-          this.btnContinue.enable()
-        }
-      })
 
       cardContainer.journeyUnlockPair = { ci, cardback }
       this.cardsRow.add(cardContainer)
-      unrevealedCount++
+      this.unrevealedCount++
     }
 
     // Re-flow now that cards are in, then re-apply depth so the late-added cards
@@ -660,16 +639,36 @@ export class ResultsRegionJourney extends MatchResultsRegion {
         duration: scaleInMs,
         ease: 'Cubic.easeOut',
         onComplete: () => {
-          cardback.imageSubject.setInteractive()
-          cardback.interactive = true
+          // setOnClick enables the cardback's input, so it only becomes
+          // clickable now that the scale-in has finished
+          cardback.setOnClick(() => this.flipUnlockCard(wrap))
         },
       })
     })
 
-    // Continue is gated on the player flipping every cardback (re-enabled in the
-    // click handler when `unrevealedCount` hits 0).
-    if (unrevealedCount > 0) {
+    // Continue is gated on the player flipping every cardback (re-enabled in
+    // flipUnlockCard when `unrevealedCount` hits 0).
+    if (this.unrevealedCount > 0) {
       this.btnContinue.disable()
+    }
+  }
+
+  /** Flip one unlock card: reveal the real card, enabling Continue once all are flipped. */
+  private flipUnlockCard(wrap: JourneyUnlockCardWrap): void {
+    const { ci, cardback } = wrap.journeyUnlockPair
+    this.scene.playSound('inspire')
+    cardback.destroy()
+    animateCardReveal(
+      this.scene,
+      ci,
+      wrap,
+      0,
+      Time.match.matchResultsUnlockCardReveal,
+    )
+
+    this.unrevealedCount--
+    if (this.unrevealedCount === 0) {
+      this.btnContinue.enable()
     }
   }
 
@@ -684,7 +683,10 @@ export class ResultsRegionJourney extends MatchResultsRegion {
 }
 
 export class ResultsRegionTutorial extends ResultsRegionJourney {
-  missionID: number
+  // The id of the next tutorial mission after this one
+  constructor(private missionID: number) {
+    super()
+  }
 
   protected createButtons() {
     const container = this.scene.add.container()

@@ -91,8 +91,9 @@ export default class TutorialMatchScene extends MatchScene {
       TUTORIAL_MISSION_CARDS[this.params.missionID ?? 0] ?? []
 
     // Replace the results screen with tutorial results
-    this.view.results = new ResultsRegionTutorial().create(this)
-    this.view.results['missionID'] = this.params.missionID + 1
+    this.view.results = new ResultsRegionTutorial(
+      this.params.missionID + 1,
+    ).create(this)
 
     // Must reset progress
     this.progress = -1
