@@ -1153,6 +1153,7 @@ export default function createWebSocketServer() {
         .on('surrender', async () => {
           await activeGame?.match?.doSurrender(ws)
           activeGame.match = null
+          activeGame.playerNumber = null
         })
         // TODO This is deprecated, remove if not using
         .on('emote', () => {
