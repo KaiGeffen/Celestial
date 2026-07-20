@@ -32,7 +32,6 @@ const DIRECTORIES = [
   'img/roundResult/Loss',
   'img/roundResult/Tie',
   'img/chrome',
-  'img/news',
   'sfx',
   'dialog',
   // TODO Remove - just doing this to convert to webp

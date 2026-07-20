@@ -384,21 +384,19 @@ export const assetLists = {
       "Left",
       "MatchHistoryTab",
       "Moon",
-      "Moon",
       "Network",
       "Nourish",
       "Options",
       "PlayButton",
       "PlayTab",
+      "Possibility",
       "ProfileTab",
       "QuestsTab",
       "Recap",
       "Right",
       "Share",
-      "Sight",
       "SmallX",
       "Social",
-      "Status",
       "StoreTab",
       "Sun",
       "ThumbHorizontal",
@@ -538,9 +536,6 @@ export const assetLists = {
       "thumbnailNameplate"
     ],
     "pixelArt": false
-  },
-  "news": {
-    "files": []
   },
   "sfx": {
     "files": [

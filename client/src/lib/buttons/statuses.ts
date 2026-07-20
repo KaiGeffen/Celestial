@@ -220,7 +220,7 @@ export class PossibilityButton extends KeywordButton {
           offsetX: 15,
         },
         icon: {
-          name: `Inspire`,
+          name: `Possibility`,
           interactive: true,
         },
         callbacks: {
