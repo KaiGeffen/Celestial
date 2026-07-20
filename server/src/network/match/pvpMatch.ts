@@ -72,6 +72,10 @@ class PvpMatch extends Match {
     // Skip if game is already over
     if (this.game === null || this.game.model.winner !== null) return
 
+    // A stale socket (e.g. kicked by a sign-in elsewhere) holds neither seat;
+    // ignore it rather than attributing the surrender to whoever's left
+    if (this.ws1 !== disconnectingWs && this.ws2 !== disconnectingWs) return
+
     // Set the winner, and vacate the leaver's seat so no final state reaches them
     const winner = this.ws1 === disconnectingWs ? 1 : 0
     if (winner === 1) this.ws1 = null
