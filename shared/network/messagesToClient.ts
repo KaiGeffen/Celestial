@@ -27,9 +27,12 @@ export default interface messagesToClient {
     other: AccountLinkSummary
   }
   // Outcome of a link attempt (Case A auto-link, or a confirmed merge).
+  // reconnect: the merge changed which account this socket authenticates as, so
+  // the client should reconnect with its (freshly issued) session token.
   accountLinkResult: {
     success: boolean
     error?: string
+    reconnect?: boolean
   }
   sendUserData: {
     inventory: string

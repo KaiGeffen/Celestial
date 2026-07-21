@@ -332,11 +332,23 @@ export default class Server {
         },
       )
       .on('accountLinkConflict', (data) => {
-        // Both identities already have accounts; the UI asks which to keep.
-        game.events.emit('accountLinkConflict', data)
+        // Both identities already have accounts; ask which one to keep.
+        game.scene.getAt(0).scene.launch('MenuScene', {
+          menu: 'linkAccountConflict',
+          current: data.current,
+          other: data.other,
+        })
       })
       .on('accountLinkResult', (data) => {
-        game.events.emit('accountLinkResult', data)
+        game.scene.getAt(0).scene.launch('MenuScene', {
+          menu: 'message',
+          title: data.success ? 'Account Linked' : 'Account Not Linked',
+          s: data.success
+            ? 'Your Google account is now linked.\nProgress on the Steam app and web app will be shared.'
+            : data.error || 'Could not link account.',
+        })
+        // A merge that changed our account id: reconnect so we bind the new id.
+        if (data.reconnect) this.reconnectWithSession(game)
       })
 
     server.ws.onerror = (event: Event) => {
@@ -466,6 +478,16 @@ export default class Server {
   // Resolve an accountLinkConflict by choosing which account survives.
   static confirmAccountLink(keepId: string): void {
     Server.send({ type: 'confirmAccountLink', keepId }, 'Confirming account link')
+  }
+
+  // Reconnect using the stored session token. Used after an account merge that
+  // changed which id this client authenticates as, so the fresh connection binds
+  // the survivor's id (its uuid comes from the new token at connect time).
+  static reconnectWithSession(game: Phaser.Game): void {
+    const token = localStorage.getItem(Url.session_token)
+    if (!token) return
+    if (server) server.close(code)
+    this.loginWithSession(token, game, () => {})
   }
 
   // Get the referral code

@@ -583,10 +583,21 @@ export default function createWebSocketServer() {
 
             // Case A: nobody owns this Google identity — attach it in place.
             if (!existing) {
-              await db
-                .update(players)
-                .set({ google_id: identity.sub, email: identity.email })
-                .where(eq(players.id, id))
+              try {
+                await db
+                  .update(players)
+                  .set({ google_id: identity.sub, email: identity.email })
+                  .where(eq(players.id, id))
+              } catch (e) {
+                // e.g. the email collides with another account's unique index
+                console.error('linkProvider (Case A):', e)
+                ws.send({
+                  type: 'accountLinkResult',
+                  success: false,
+                  error: 'Could not link account.',
+                })
+                return
+              }
               ws.send({ type: 'accountLinkResult', success: true })
               await sendUserData(ws, id)
               return
@@ -692,28 +703,43 @@ export default function createWebSocketServer() {
               return
             }
 
-            // If the survivor is a different account than this socket is signed
-            // in as, become the survivor: drop the tombstoned id's state and
-            // re-run sign-in (which reloads data and reconnects any match).
-            if (keepId !== id) {
-              const oldId = id
-              delete activePlayers[oldId]
-              delete spectateAllowedByUserId[oldId]
-              delete onlinePlayerDisplay[oldId]
-              spectatingUserIds.delete(oldId)
-              delete userActiveGameMap[oldId]
+            // Merge committed. Tear down the tombstoned loser's in-memory state,
+            // kicking its live connection if it's signed in on another socket.
+            const identityChanged = keepId !== id
+            try {
+              const loserWs = activePlayers[loserId]
+              if (loserWs && loserWs !== ws && loserWs.isOpen()) {
+                loserWs.close(INVALID_CLOSE_CODE, 'Account has been merged')
+              }
+              delete activePlayers[loserId]
+              delete spectateAllowedByUserId[loserId]
+              delete onlinePlayerDisplay[loserId]
+              spectatingUserIds.delete(loserId)
+              delete userActiveGameMap[loserId]
 
-              await handleSignInForUuid(keepId, {
-                provider: 'steam',
-                email: mergedEmail,
-              })
-              // Fresh session so the client's next reconnect targets the survivor
-              sendSession({ uuid: keepId, provider: 'steam', email: mergedEmail })
-            } else {
-              await sendUserData(ws, id)
+              if (identityChanged) {
+                // This socket is signed in as the now-tombstoned loser. Hand the
+                // client a fresh session for the survivor; it reconnects (below)
+                // so the new id is bound at connect time.
+                sendSession({
+                  uuid: keepId,
+                  provider: 'steam',
+                  email: mergedEmail,
+                })
+              } else {
+                await sendUserData(ws, id)
+              }
+            } catch (e) {
+              console.error('confirmAccountLink (post-merge):', e)
             }
 
-            ws.send({ type: 'accountLinkResult', success: true })
+            // The merge is committed, so the link succeeded regardless of the
+            // best-effort cleanup above.
+            ws.send({
+              type: 'accountLinkResult',
+              success: true,
+              reconnect: identityChanged,
+            })
           }),
         )
         // Client reports how long it took to load all game assets

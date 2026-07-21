@@ -1,5 +1,5 @@
 import 'phaser'
-import { Space, BBStyle } from '../../settings/settings'
+import { Space, Style, BBStyle } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import Buttons from '../../lib/buttons/buttons'
@@ -52,13 +52,12 @@ export default class LinkAccountConflictMenu extends Menu {
     })
 
     column
+      // Plain text (not BBCode) so markup in a username renders literally
       .add(
-        this.scene.add.rexBBCodeText(
-          0,
-          0,
-          `[b]${account.username}[/b]`,
-          BBStyle.basicStylized,
-        ),
+        this.scene.add.text(0, 0, account.username, {
+          ...Style.basicStylized,
+          fontStyle: 'bold',
+        }),
       )
       .add(
         this.scene.add.rexBBCodeText(

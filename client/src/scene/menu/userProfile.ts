@@ -17,7 +17,6 @@ import AvatarButton from '../../lib/buttons/avatar'
 import BaseScene from '../baseScene'
 import CosmeticsGridPanel from './cosmeticsGridPanel'
 import { CosmeticSet } from '@shared/types/cosmeticSet'
-import { AccountLinkSummary } from '@shared/network/messagesToClient'
 import { fitTextToMaxWidth } from '../../utils/textFit'
 
 export default class UserProfileMenu extends Menu {
@@ -223,44 +222,14 @@ export default class UserProfileMenu extends Menu {
     return container
   }
 
-  // Run the account-link flow and surface its outcome. The link's result
-  // arrives asynchronously via game events (a conflict needs a survivor choice;
-  // otherwise a plain success/failure).
+  // Kick off the account-link flow. The conflict prompt and the result message
+  // are driven by the socket handlers in Server (registered once per
+  // connection), so there are no per-attempt listeners to clean up here.
   private async onLinkGoogle(): Promise<void> {
-    const game = this.scene.game
-
     const started = await Server.linkGoogle()
     if (!started) {
       this.activeScene.signalError('Google sign-in was cancelled.')
-      return
     }
-
-    // Launching a menu shuts down whichever one is open, so these replace the
-    // profile (or each other) with no manual close needed.
-    const onConflict = (data: {
-      current: AccountLinkSummary
-      other: AccountLinkSummary
-    }) => {
-      this.activeScene.scene.launch('MenuScene', {
-        menu: 'linkAccountConflict',
-        current: data.current,
-        other: data.other,
-      })
-    }
-
-    const onResult = (data: { success: boolean; error?: string }) => {
-      game.events.off('accountLinkConflict', onConflict)
-      this.activeScene.scene.launch('MenuScene', {
-        menu: 'message',
-        title: data.success ? 'Account Linked' : 'Account Not Linked',
-        s: data.success
-          ? 'Your Google account is now linked.\nProgress on the Steam app and web app will be shared.'
-          : data.error || 'Could not link account.',
-      })
-    }
-
-    game.events.once('accountLinkConflict', onConflict)
-    game.events.once('accountLinkResult', onResult)
   }
 
   // Right column - scrollable grid of choices
