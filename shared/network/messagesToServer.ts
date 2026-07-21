@@ -20,6 +20,17 @@ export default interface messagesToServer {
   loginSteam: {
     ticket: string
   }
+  // Link a provider identity to the currently signed-in account. Today only
+  // Google is linkable this way (Steam tickets only exist inside Electron, where
+  // the user is already Steam-authed), so the credential is a Google ID token.
+  linkProvider: {
+    credential: string
+  }
+  // Resolve an accountLinkConflict: keepId is the account to survive; the other
+  // is tombstoned and its provider ids move to the survivor.
+  confirmAccountLink: {
+    keepId: string
+  }
   sendDecks: {
     decks: Deck[]
   }

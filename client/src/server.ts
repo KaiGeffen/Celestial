@@ -57,6 +57,7 @@ const LOGGED_OUT_USER_DATA: UserData = {
   },
   achievements: [],
   canBeSpectated: true,
+  accountAlreadyLinked: false,
 }
 
 export default class Server {
@@ -330,6 +331,13 @@ export default class Server {
           this.activePlayers = data.players
         },
       )
+      .on('accountLinkConflict', (data) => {
+        // Both identities already have accounts; the UI asks which to keep.
+        game.events.emit('accountLinkConflict', data)
+      })
+      .on('accountLinkResult', (data) => {
+        game.events.emit('accountLinkResult', data)
+      })
 
     server.ws.onerror = (event: Event) => {
       console.error(`WebSocket error: ${event}`)
@@ -438,6 +446,26 @@ export default class Server {
       { type: 'setCosmeticSet', value: cosmeticSet },
       'Setting cosmetic set',
     )
+  }
+
+  // Link a Google account to the signed-in (Steam) account. Runs the Electron
+  // OAuth flow and forwards the resulting token to the server. Returns false if
+  // no token was obtained (not Electron, or the user cancelled). The link's
+  // outcome arrives asynchronously via the accountLinkConflict/Result events.
+  static async linkGoogle(): Promise<boolean> {
+    const api = window.electronAPI
+    if (!api?.getGoogleAuthToken) return false
+
+    const credential = await api.getGoogleAuthToken()
+    if (!credential) return false
+
+    Server.send({ type: 'linkProvider', credential }, 'Linking Google')
+    return true
+  }
+
+  // Resolve an accountLinkConflict by choosing which account survives.
+  static confirmAccountLink(keepId: string): void {
+    Server.send({ type: 'confirmAccountLink', keepId }, 'Confirming account link')
   }
 
   // Get the referral code

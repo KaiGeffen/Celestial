@@ -1,6 +1,8 @@
 const { app, BrowserWindow, shell, ipcMain } = require('electron')
 const path = require('path')
 const http = require('http')
+const https = require('https')
+const crypto = require('crypto')
 const fs = require('fs')
 const steamworks = require('steamworks.js')
 const steamAppId = 4670650
@@ -164,6 +166,142 @@ ipcMain.handle('steam:getAuthSession', async () => {
     return await createSteamSessionTicketHex()
   } catch (e) {
     console.error('Failed to create Steam auth ticket:', e)
+    return null
+  }
+})
+
+// Google OAuth "installed app" (loopback + PKCE) flow. Opens the system browser
+// to Google's consent screen, catches the redirect on a throwaway localhost
+// server, exchanges the code, and returns the id_token for the server to verify.
+// Requires GOOGLE_DESKTOP_CLIENT_ID (and _SECRET, which Google issues for desktop
+// clients) in the environment.
+const GOOGLE_DESKTOP_CLIENT_ID = process.env.GOOGLE_DESKTOP_CLIENT_ID
+const GOOGLE_DESKTOP_CLIENT_SECRET = process.env.GOOGLE_DESKTOP_CLIENT_SECRET
+
+const b64url = (buf) =>
+  buf
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+
+function postForm(url, form) {
+  return new Promise((resolve, reject) => {
+    const body = new URLSearchParams(form).toString()
+    const req = https.request(
+      url,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Length': Buffer.byteLength(body),
+        },
+      },
+      (res) => {
+        let data = ''
+        res.on('data', (c) => (data += c))
+        res.on('end', () => {
+          try {
+            resolve(JSON.parse(data))
+          } catch (e) {
+            reject(new Error(`Token endpoint returned non-JSON: ${data}`))
+          }
+        })
+      },
+    )
+    req.on('error', reject)
+    req.end(body)
+  })
+}
+
+function runGoogleOAuth() {
+  return new Promise((resolve, reject) => {
+    if (!GOOGLE_DESKTOP_CLIENT_ID || !GOOGLE_DESKTOP_CLIENT_SECRET) {
+      reject(new Error('Google desktop OAuth client is not configured'))
+      return
+    }
+
+    const verifier = b64url(crypto.randomBytes(32))
+    const challenge = b64url(crypto.createHash('sha256').update(verifier).digest())
+    const state = b64url(crypto.randomBytes(16))
+
+    let settled = false
+    const finish = (fn, arg) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timer)
+      server.close()
+      fn(arg)
+    }
+
+    const server = http.createServer(async (req, res) => {
+      const url = new URL(req.url, 'http://127.0.0.1')
+      if (url.pathname !== '/') {
+        res.writeHead(404)
+        res.end()
+        return
+      }
+      res.writeHead(200, { 'Content-Type': 'text/html' })
+      res.end(
+        '<html><body style="font-family:sans-serif;text-align:center;padding-top:3em">You can close this window and return to Celestial.</body></html>',
+      )
+
+      if (url.searchParams.get('state') !== state) {
+        finish(reject, new Error('OAuth state mismatch'))
+        return
+      }
+      const code = url.searchParams.get('code')
+      if (!code) {
+        finish(reject, new Error(url.searchParams.get('error') || 'No auth code'))
+        return
+      }
+
+      try {
+        const redirectUri = `http://127.0.0.1:${server.address().port}`
+        const tokens = await postForm('https://oauth2.googleapis.com/token', {
+          code,
+          client_id: GOOGLE_DESKTOP_CLIENT_ID,
+          client_secret: GOOGLE_DESKTOP_CLIENT_SECRET,
+          redirect_uri: redirectUri,
+          grant_type: 'authorization_code',
+          code_verifier: verifier,
+        })
+        if (!tokens.id_token) {
+          finish(reject, new Error(tokens.error_description || 'No id_token'))
+          return
+        }
+        finish(resolve, tokens.id_token)
+      } catch (e) {
+        finish(reject, e)
+      }
+    })
+
+    const timer = setTimeout(
+      () => finish(reject, new Error('OAuth timed out')),
+      5 * 60 * 1000,
+    )
+
+    server.listen(0, '127.0.0.1', () => {
+      const redirectUri = `http://127.0.0.1:${server.address().port}`
+      const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth')
+      authUrl.searchParams.set('client_id', GOOGLE_DESKTOP_CLIENT_ID)
+      authUrl.searchParams.set('redirect_uri', redirectUri)
+      authUrl.searchParams.set('response_type', 'code')
+      authUrl.searchParams.set('scope', 'openid email profile')
+      authUrl.searchParams.set('code_challenge', challenge)
+      authUrl.searchParams.set('code_challenge_method', 'S256')
+      authUrl.searchParams.set('state', state)
+      shell.openExternal(authUrl.toString())
+    })
+    server.on('error', (e) => finish(reject, e))
+  })
+}
+
+ipcMain.handle('google:getAuthToken', async () => {
+  try {
+    return await runGoogleOAuth()
+  } catch (e) {
+    console.error('Google OAuth failed:', e.message)
     return null
   }
 })

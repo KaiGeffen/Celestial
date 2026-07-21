@@ -17,6 +17,7 @@ import AvatarButton from '../../lib/buttons/avatar'
 import BaseScene from '../baseScene'
 import CosmeticsGridPanel from './cosmeticsGridPanel'
 import { CosmeticSet } from '@shared/types/cosmeticSet'
+import { AccountLinkSummary } from '@shared/network/messagesToClient'
 import { fitTextToMaxWidth } from '../../utils/textFit'
 
 export default class UserProfileMenu extends Menu {
@@ -170,7 +171,7 @@ export default class UserProfileMenu extends Menu {
     this.sizer.add(sizer)
   }
 
-  private createLoginLogoutButtons(): ContainerLite {
+  private createLoginLogoutButtons() {
     const container = new ContainerLite(
       this.scene,
       0,
@@ -179,7 +180,36 @@ export default class UserProfileMenu extends Menu {
       Space.buttonHeight,
     )
 
-    const logoutButton = new Buttons.Basic({
+    // Steam (Electron) builds can't log out — the session is the Steam client.
+    // Offer linking a Google account instead, so progress is reachable on web.
+    if (Flags.isElectronBuild()) {
+      const linkButton = new Buttons.Basic({
+        within: container,
+        text: 'Google',
+        f: () => this.onLinkGoogle(),
+      })
+
+      // Once an account is already linked, linking again is refused
+      if (Server.getUserData().accountAlreadyLinked) {
+        linkButton.setText('Done')
+        linkButton.disable()
+      }
+
+      // Label above the button explaining the action
+      const label = this.scene.add.text(
+        0,
+        0,
+        'Link Account',
+        Style.basicStylized,
+      )
+
+      return this.scene.rexUI.add
+        .sizer({ orientation: 'vertical', space: { item: Space.padSmall } })
+        .add(label)
+        .add(container)
+    }
+
+    new Buttons.Basic({
       within: container,
       text: 'Logout',
       f: () => {
@@ -190,11 +220,47 @@ export default class UserProfileMenu extends Menu {
       },
     })
 
-    if (Flags.isElectronBuild()) {
-      logoutButton.disable()
+    return container
+  }
+
+  // Run the account-link flow and surface its outcome. The link's result
+  // arrives asynchronously via game events (a conflict needs a survivor choice;
+  // otherwise a plain success/failure).
+  private async onLinkGoogle(): Promise<void> {
+    const game = this.scene.game
+
+    const started = await Server.linkGoogle()
+    if (!started) {
+      this.activeScene.signalError('Google sign-in was cancelled.')
+      return
     }
 
-    return container
+    // Launching a menu shuts down whichever one is open, so these replace the
+    // profile (or each other) with no manual close needed.
+    const onConflict = (data: {
+      current: AccountLinkSummary
+      other: AccountLinkSummary
+    }) => {
+      this.activeScene.scene.launch('MenuScene', {
+        menu: 'linkAccountConflict',
+        current: data.current,
+        other: data.other,
+      })
+    }
+
+    const onResult = (data: { success: boolean; error?: string }) => {
+      game.events.off('accountLinkConflict', onConflict)
+      this.activeScene.scene.launch('MenuScene', {
+        menu: 'message',
+        title: data.success ? 'Account Linked' : 'Account Not Linked',
+        s: data.success
+          ? 'Your Google account is now linked.\nProgress on the Steam app and web app will be shared.'
+          : data.error || 'Could not link account.',
+      })
+    }
+
+    game.events.once('accountLinkConflict', onConflict)
+    game.events.once('accountLinkResult', onResult)
   }
 
   // Right column - scrollable grid of choices

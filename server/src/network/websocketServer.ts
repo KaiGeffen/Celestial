@@ -22,6 +22,7 @@ import {
 } from '../db/schema'
 import { and, eq, sql } from 'drizzle-orm'
 import { ServerWS } from '../../../shared/network/celestialTypedWebsocket'
+import { AccountLinkSummary } from '../../../shared/network/messagesToClient'
 import { Deck } from '../../../shared/types/deck'
 import { CosmeticSet } from '../../../shared/types/cosmeticSet'
 import { AchievementManager } from '../achievementManager'
@@ -155,6 +156,25 @@ async function resolveProviderAccount(
   return legacyId
 }
 
+// Columns needed to preview an account in the link "keep which?" dialog
+type LinkRow = {
+  id: string
+  username: string
+  coins: number
+  gems: number
+  decks: string[]
+}
+
+function summarizeAccount(row: LinkRow): AccountLinkSummary {
+  return {
+    id: row.id,
+    username: row.username,
+    coins: row.coins,
+    gems: row.gems,
+    deckCount: row.decks.length,
+  }
+}
+
 // Create the websocket server
 export default function createWebSocketServer() {
   const wss = new WebSocketServer({ port: USER_DATA_PORT })
@@ -274,6 +294,15 @@ export default function createWebSocketServer() {
       let googleId: string | null = null
       let steamId: string | null = null
 
+      // A pending account-link awaiting the user's survivor choice. Set when
+      // linkProvider finds a collision; consumed by confirmAccountLink.
+      let pendingLink: {
+        currentId: string
+        otherId: string
+        googleSub: string
+        email: string | null
+      } | null = null
+
       // When the session started
       let connectionTime: number | null = null
       let activeGame: ActiveGame = {
@@ -311,6 +340,7 @@ export default function createWebSocketServer() {
             username: players.username,
             can_be_spectated: players.can_be_spectated,
             cosmetic_set: players.cosmetic_set,
+            closed_at: players.closed_at,
           })
           .from(players)
           .where(eq(players.id, uuid))
@@ -318,6 +348,16 @@ export default function createWebSocketServer() {
 
         if (result.length === 0) {
           ws.send({ type: 'promptUserInit' })
+          return
+        }
+
+        // Tombstoned account (merged into a survivor). Its provider ids are
+        // cleared so a fresh login can't reach it, but a stale session token
+        // minted before the merge still could — reject it.
+        if (result[0].closed_at) {
+          id = null
+          ws.send({ type: 'invalidToken' })
+          ws.close(INVALID_CLOSE_CODE, 'Account has been merged')
           return
         }
 
@@ -472,6 +512,210 @@ export default function createWebSocketServer() {
           const accountId = await resolveProviderAccount('steam', steamId, null)
           await handleSignInForUuid(accountId, { provider: 'steam' })
         })
+        // Link a Google identity to the signed-in account. Case A (the Google
+        // identity is unused) attaches it in place. Case B (it already backs a
+        // populated account) needs the user to choose a survivor, so we reply
+        // with a conflict and finish in confirmAccountLink.
+        .on(
+          'linkProvider',
+          authed(async ({ credential }) => {
+            const identity = await verifyGoogleCredential(credential)
+            if (!identity) {
+              ws.send({
+                type: 'accountLinkResult',
+                success: false,
+                error: 'Invalid Google login.',
+              })
+              return
+            }
+
+            const [current] = await db
+              .select({
+                id: players.id,
+                username: players.username,
+                coins: players.coins,
+                gems: players.gems,
+                decks: players.decks,
+                google_id: players.google_id,
+              })
+              .from(players)
+              .where(eq(players.id, id))
+              .limit(1)
+            if (!current) return
+
+            // Switching an existing Google link isn't supported — unlink first.
+            if (current.google_id) {
+              ws.send({
+                type: 'accountLinkResult',
+                success: false,
+                error: 'This account already has a Google account linked.',
+              })
+              return
+            }
+
+            const summaryCols = {
+              id: players.id,
+              username: players.username,
+              coins: players.coins,
+              gems: players.gems,
+              decks: players.decks,
+            }
+
+            // Resolve any account already backed by this Google identity: first
+            // by the linked google_id, then (for legacy accounts not yet
+            // backfilled into google_id) by the derived id that
+            // resolveProviderAccount would key it under.
+            let [existing] = await db
+              .select(summaryCols)
+              .from(players)
+              .where(eq(players.google_id, identity.sub))
+              .limit(1)
+            if (!existing) {
+              const legacyId = uuidv5(identity.sub, UUID_NAMESPACE)
+              if (legacyId !== id) {
+                ;[existing] = await db
+                  .select(summaryCols)
+                  .from(players)
+                  .where(eq(players.id, legacyId))
+                  .limit(1)
+              }
+            }
+
+            // Case A: nobody owns this Google identity — attach it in place.
+            if (!existing) {
+              await db
+                .update(players)
+                .set({ google_id: identity.sub, email: identity.email })
+                .where(eq(players.id, id))
+              ws.send({ type: 'accountLinkResult', success: true })
+              await sendUserData(ws, id)
+              return
+            }
+
+            // Case B: the identity backs another account — user picks a survivor.
+            pendingLink = {
+              currentId: id,
+              otherId: existing.id,
+              googleSub: identity.sub,
+              email: identity.email,
+            }
+            ws.send({
+              type: 'accountLinkConflict',
+              current: summarizeAccount(current),
+              other: summarizeAccount(existing),
+            })
+          }),
+        )
+        // Resolve a pending link: keepId survives, the other is tombstoned and
+        // its provider ids move to the survivor. If the survivor isn't the
+        // account this socket is signed in as, re-sign-in as the survivor.
+        .on(
+          'confirmAccountLink',
+          authed(async ({ keepId }) => {
+            const pending = pendingLink
+            if (!pending) return
+            if (keepId !== pending.currentId && keepId !== pending.otherId) {
+              ws.send({
+                type: 'accountLinkResult',
+                success: false,
+                error: 'Invalid choice.',
+              })
+              return
+            }
+            const loserId =
+              keepId === pending.currentId ? pending.otherId : pending.currentId
+            pendingLink = null
+
+            let mergedEmail: string | null = null
+            try {
+              await db.transaction(async (tx) => {
+                const [survivor] = await tx
+                  .select({
+                    google_id: players.google_id,
+                    steam_id: players.steam_id,
+                    email: players.email,
+                    closed_at: players.closed_at,
+                  })
+                  .from(players)
+                  .where(eq(players.id, keepId))
+                  .for('update')
+                  .limit(1)
+                const [loser] = await tx
+                  .select({
+                    google_id: players.google_id,
+                    steam_id: players.steam_id,
+                    email: players.email,
+                    closed_at: players.closed_at,
+                  })
+                  .from(players)
+                  .where(eq(players.id, loserId))
+                  .for('update')
+                  .limit(1)
+                if (!survivor || !loser) throw new Error('account missing')
+                if (survivor.closed_at || loser.closed_at) {
+                  throw new Error('account already closed')
+                }
+
+                const mergedGoogle = survivor.google_id ?? loser.google_id
+                const mergedSteam = survivor.steam_id ?? loser.steam_id
+                mergedEmail = survivor.email ?? loser.email
+
+                // Free the loser's unique-indexed columns before the survivor
+                // claims them, and tombstone the row.
+                await tx
+                  .update(players)
+                  .set({
+                    google_id: null,
+                    steam_id: null,
+                    email: null,
+                    closed_at: new Date(),
+                    merged_into: keepId,
+                  })
+                  .where(eq(players.id, loserId))
+
+                await tx
+                  .update(players)
+                  .set({
+                    google_id: mergedGoogle,
+                    steam_id: mergedSteam,
+                    email: mergedEmail,
+                  })
+                  .where(eq(players.id, keepId))
+              })
+            } catch (e) {
+              console.error('confirmAccountLink:', e)
+              ws.send({
+                type: 'accountLinkResult',
+                success: false,
+                error: 'Could not link accounts.',
+              })
+              return
+            }
+
+            // If the survivor is a different account than this socket is signed
+            // in as, become the survivor: drop the tombstoned id's state and
+            // re-run sign-in (which reloads data and reconnects any match).
+            if (keepId !== id) {
+              const oldId = id
+              delete activePlayers[oldId]
+              delete spectateAllowedByUserId[oldId]
+              delete onlinePlayerDisplay[oldId]
+              spectatingUserIds.delete(oldId)
+              delete userActiveGameMap[oldId]
+
+              await handleSignInForUuid(keepId, {
+                provider: 'steam',
+                email: mergedEmail,
+              })
+              // Fresh session so the client's next reconnect targets the survivor
+              sendSession({ uuid: keepId, provider: 'steam', email: mergedEmail })
+            } else {
+              await sendUserData(ws, id)
+            }
+
+            ws.send({ type: 'accountLinkResult', success: true })
+          }),
+        )
         // Client reports how long it took to load all game assets
         .on('reportLoadTime', ({ ms }) => {
           db.insert(loadTimes)

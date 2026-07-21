@@ -16,6 +16,7 @@ export interface UserData {
   cosmeticSet: CosmeticSet
   achievements: Achievement[]
   canBeSpectated: boolean
+  accountAlreadyLinked: boolean
 }
 
 type Listener = (data: UserData | null) => void
@@ -65,6 +66,7 @@ class UserDataStore {
       cosmeticSet: data.cosmeticSet,
       achievements: data.achievements,
       canBeSpectated: data.canBeSpectated,
+      accountAlreadyLinked: data.accountAlreadyLinked,
     }
     this.emit()
   }

@@ -6,11 +6,15 @@ import { OAuth2Client } from 'google-auth-library'
  * env; falls back to the (public) production client ID. Read lazily so a value
  * from dotenv (loaded when db/db.ts is imported) is not missed.
  */
-function getClientId(): string {
-  return (
+function getClientIds(): string[] {
+  const web =
     process.env.GOOGLE_CLIENT_ID?.trim() ||
     '574352055172-n1nqdc2nvu3172levk2kl5jf7pbkp4ig.apps.googleusercontent.com'
-  )
+  // The Electron desktop OAuth client has its own id; tokens minted for it carry
+  // that audience. Verify accepts an array, so both the web (GIS) and desktop
+  // clients are trusted.
+  const desktop = process.env.GOOGLE_DESKTOP_CLIENT_ID?.trim()
+  return desktop ? [web, desktop] : [web]
 }
 
 const client = new OAuth2Client()
@@ -40,7 +44,7 @@ export async function verifyGoogleCredential(
   try {
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: getClientId(),
+      audience: getClientIds(),
     })
     const payload = ticket.getPayload()
     if (!payload?.sub) return null

@@ -3,6 +3,15 @@ import { CosmeticSet } from '../types/cosmeticSet'
 import { Achievement } from '../types/achievement'
 import GameModel from '../state/gameModel'
 
+// Snapshot of one account shown in the account-link "keep which?" dialog.
+export interface AccountLinkSummary {
+  id: string
+  username: string
+  coins: number
+  gems: number
+  deckCount: number
+}
+
 export default interface messagesToClient {
   promptUserInit: {}
   invalidToken: {}
@@ -10,6 +19,17 @@ export default interface messagesToClient {
   // stores it and reconnects with it instead of a short-lived Google token.
   sessionToken: {
     token: string
+  }
+  // Both provider identities already have populated accounts; the user must pick
+  // which one survives (the other is tombstoned). Summaries drive the dialog.
+  accountLinkConflict: {
+    current: AccountLinkSummary
+    other: AccountLinkSummary
+  }
+  // Outcome of a link attempt (Case A auto-link, or a confirmed merge).
+  accountLinkResult: {
+    success: boolean
+    error?: string
   }
   sendUserData: {
     inventory: string
@@ -28,6 +48,7 @@ export default interface messagesToClient {
     missionGoldClaimed: boolean[]
     journeyChoices: (number | null)[]
     canBeSpectated: boolean
+    accountAlreadyLinked: boolean
   }
   purchaseItemSuccess: {
     itemId: number

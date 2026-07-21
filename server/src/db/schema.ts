@@ -95,6 +95,13 @@ export const players = pgTable(
 
     // Referral
     ref: varchar('ref', { length: 255 }),
+
+    // Account linking: a tombstoned row (its progress discarded into a survivor
+    // when two provider identities were merged). closed_at set = unreachable;
+    // merged_into points at the surviving account. Provider ids/email are
+    // cleared on the loser so the survivor can claim them.
+    closed_at: timestamp('closed_at', { mode: 'date' }),
+    merged_into: uuid('merged_into'),
   },
   (table) => ({
     emailIdx: uniqueIndex('email_idx').on(table.email),

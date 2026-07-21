@@ -203,6 +203,7 @@ import RaceDeckSelectionMenu from './raceDeckSelection'
 import RaceCardUpgradeMenu from './raceCardUpgrade'
 import RaceSpecialModesMenu from './raceSpecialModes'
 import PlayMenu from './play'
+import LinkAccountConflictMenu from './linkAccountConflict'
 import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 
 const menus = {
@@ -223,6 +224,7 @@ const menus = {
   onlinePlayers: OnlinePlayersMenu,
   purchaseItem: PurchaseItemMenu,
   userProfile: UserProfileMenu,
+  linkAccountConflict: LinkAccountConflictMenu,
   achievements: AchievementsMenu,
   registerUsername: RegisterUsernameMenu,
 
