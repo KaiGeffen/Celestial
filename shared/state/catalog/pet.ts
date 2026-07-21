@@ -282,7 +282,7 @@ const sensualist = new Sensualist({
   id: 81,
   cost: 4,
   points: 4,
-  text: 'Costs 1 less for each of the following statuses you have: Nourish, Inspired, Sight.',
+  text: 'Costs 1 less for each of the following statuses you have:\nNourish, Inspired, Sight.',
 })
 
 class Doll extends Card {
