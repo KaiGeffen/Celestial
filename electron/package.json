@@ -19,7 +19,8 @@
     "files": [
       "main.js",
       "preload.js",
-      "icon.png"
+      "icon.png",
+      "secrets.js"
     ],
     "extraResources": [
       {

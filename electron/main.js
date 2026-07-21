@@ -7,6 +7,11 @@ const fs = require('fs')
 const steamworks = require('steamworks.js')
 const steamAppId = 4670650
 
+// Google "Desktop app" OAuth credentials, kept in electron/secrets.js
+// (gitignored) so they can be bundled into the packaged Steam build, which has
+// no shell to inject env vars.
+const secrets = require('./secrets')
+
 // Must be called before app is ready so the command-line switches are set in time
 steamworks.electronEnableSteamOverlay()
 
@@ -173,10 +178,8 @@ ipcMain.handle('steam:getAuthSession', async () => {
 // Google OAuth "installed app" (loopback + PKCE) flow. Opens the system browser
 // to Google's consent screen, catches the redirect on a throwaway localhost
 // server, exchanges the code, and returns the id_token for the server to verify.
-// Requires GOOGLE_DESKTOP_CLIENT_ID (and _SECRET, which Google issues for desktop
-// clients) in the environment.
-const GOOGLE_DESKTOP_CLIENT_ID = process.env.GOOGLE_DESKTOP_CLIENT_ID
-const GOOGLE_DESKTOP_CLIENT_SECRET = process.env.GOOGLE_DESKTOP_CLIENT_SECRET
+const GOOGLE_DESKTOP_CLIENT_ID = secrets.GOOGLE_DESKTOP_CLIENT_ID
+const GOOGLE_DESKTOP_CLIENT_SECRET = secrets.GOOGLE_DESKTOP_CLIENT_SECRET
 
 const b64url = (buf) =>
   buf
