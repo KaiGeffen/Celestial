@@ -20,7 +20,7 @@ import {
   cosmeticsTransactions,
   loadTimes,
 } from '../db/schema'
-import { and, eq, sql } from 'drizzle-orm'
+import { and, eq, isNull, sql } from 'drizzle-orm'
 import { ServerWS } from '../../../shared/network/celestialTypedWebsocket'
 import { AccountLinkSummary } from '../../../shared/network/messagesToClient'
 import { Deck } from '../../../shared/types/deck'
@@ -123,10 +123,12 @@ async function resolveProviderAccount(
 ): Promise<string> {
   const column = provider === 'google' ? players.google_id : players.steam_id
 
+  // Skip tombstoned rows: a merged account must never capture a login (nor get
+  // its provider id backfilled), so a fresh login lands on the survivor.
   const [byColumn] = await db
     .select({ id: players.id })
     .from(players)
-    .where(eq(column, providerId))
+    .where(and(eq(column, providerId), isNull(players.closed_at)))
     .limit(1)
   if (byColumn) return byColumn.id
 
@@ -135,7 +137,7 @@ async function resolveProviderAccount(
   const [byLegacy] = await db
     .select({ id: players.id })
     .from(players)
-    .where(eq(players.id, legacyId))
+    .where(and(eq(players.id, legacyId), isNull(players.closed_at)))
     .limit(1)
   if (byLegacy) {
     if (provider === 'google') {
@@ -510,6 +512,7 @@ export default function createWebSocketServer() {
           }
 
           const accountId = await resolveProviderAccount('steam', steamId, null)
+          console.log('Steam login — steamId:', steamId, 'accountId:', accountId)
           await handleSignInForUuid(accountId, { provider: 'steam' })
         })
         // Link a Google identity to the signed-in account. Case A (the Google
