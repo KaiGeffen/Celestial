@@ -463,6 +463,23 @@ const morpheus = new Morpheus({
   text: 'If you have at least 5 cards in hand, discard a card to Inspire 5.\nExhale 5: Draw a card.',
 })
 
+class Blessed extends Card {
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    if (super.exhale(1, game, player)) {
+      bonus += game.pile[player].filter((card) => card.cost >= 6).length
+    }
+
+    super.play(player, game, index, bonus)
+  }
+}
+const blessed = new Blessed({
+  name: 'Blessed',
+  id: 8023,
+  cost: 2,
+  points: 2,
+  text: 'Exhale 1: Worth +1 for each card with base cost 6 or more in your discard pile.',
+})
+
 export {
   stars,
   cosmos,
@@ -481,5 +498,5 @@ export {
   // NEW
   heavens,
   realms,
-  morpheus,
+  blessed,
 }
