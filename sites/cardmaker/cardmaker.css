@@ -5,6 +5,7 @@
   --parchment: #f5f2eb;
   --ink: #321a0f;
   --gold: #edaa24;
+  --gold-dark: #cf8f18; /* darker gold for button hover */
   --line: rgba(50, 26, 15, 0.35);
 }
 
@@ -73,8 +74,17 @@ body {
   background: transparent;
 }
 
+/* Unselected toggle: a faint gold wash on hover, not the filled-button darken */
+.source-toggle button:hover:not(:disabled):not(.selected) {
+  background: rgba(237, 170, 36, 0.18);
+}
+
 .source-toggle button.selected {
   background: var(--gold);
+}
+
+.source-toggle button.selected:hover:not(:disabled) {
+  background: var(--gold-dark);
 }
 
 #search-input {
@@ -256,10 +266,15 @@ button {
   background: var(--gold);
   color: var(--ink);
   cursor: pointer;
+  /* Only the background color animates. Avoid `filter`/`opacity` transitions:
+     they promote the button to its own compositing layer, which makes the
+     card's overlapping drop-shadow flicker/recomposite around it on hover. */
+  transition: background-color 0.12s ease;
 }
 
-button:hover {
-  filter: brightness(1.08);
+/* Simple, intuitive hover: the filled button deepens to a darker gold. */
+button:hover:not(:disabled) {
+  background: var(--gold-dark);
 }
 
 button:disabled {
@@ -343,17 +358,9 @@ button:disabled {
 .tilt-scene {
   perspective: 700px;
   aspect-ratio: 472 / 672;
-  /* Shadow + hover brightness live HERE, not on .tilt-card. A `filter` (or
-     `opacity`, `overflow`, `mask`…) on the element that carries
-     `transform-style: preserve-3d` forces it to flatten, which silently
-     cancels every child `translateZ` — the whole 3D effect disappears.
-     `.tilt-scene` only has `perspective`, so filtering it is safe. */
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.3));
-  transition: filter 0.12s ease;
-}
-
-.tilt-scene:hover {
-  filter: brightness(1.06) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.35));
+  /* No shadow here: a static box-shadow on the scene doesn't rotate with the
+     card, so tilting reveals its rounded-rectangle shape peeking out behind.
+     The card art already has its own edges, so it reads fine unadorned. */
 }
 
 .tilt-card {
