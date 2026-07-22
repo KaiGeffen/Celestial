@@ -126,12 +126,11 @@ ${GENERATED_MARKER}
   </head>
   <body>
     <header class="site-header">
-      <a href="https://celestialdecks.gg">
-        <img src="../../about/assets/logo.svg" alt="Celestial" class="logo" />
-      </a>
       <h1>${escapeHtml(card.name)}</h1>
       <nav class="page-nav">
-        <a href="../search/">← Search</a> · <a href="../">Card Maker</a>
+        <a href="../">Card Maker</a>
+        <a href="../search/">Card Search</a>
+        <a href="https://celestialdecks.gg">Play the Game</a>
       </nav>
     </header>
 
@@ -140,9 +139,7 @@ ${GENERATED_MARKER}
         <canvas id="card-canvas" width="472" height="672"></canvas>
         <div id="reminders" class="reminders" hidden></div>
       </div>
-      <figure id="ref-card" class="ref-card" hidden>
-        <a id="ref-link"><canvas id="ref-canvas" width="472" height="672"></canvas></a>
-      </figure>
+      <div id="ref-cards" class="ref-cards" hidden></div>
     </main>
 
     <footer class="site-footer">

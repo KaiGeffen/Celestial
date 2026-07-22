@@ -7,8 +7,8 @@
 import {
   loadGameData,
   renderCard,
-  realCardFields,
-  findReferencedCard,
+  findReferencedCards,
+  renderReferencedCards,
   keywordReminders,
 } from '../cardRenderer.js'
 
@@ -59,18 +59,14 @@ async function init() {
     credit.hidden = false
   }
 
-  // Referenced game card, linked through to its own page
-  let refCard = findReferencedCard(card.text)
-  if (refCard && refCard.name === card.name) refCard = null
-  const figure = $('ref-card')
-  figure.hidden = refCard === null
-  if (refCard) {
-    renderCard($('ref-canvas'), realCardFields(refCard))
-    $('ref-link').href = `../${slugify(refCard.name)}/`
-  }
+  // Referenced game cards, each linked through to its own page
+  const refCards = findReferencedCards(card.text).filter(
+    (c) => c.name !== card.name,
+  )
+  renderReferencedCards($('ref-cards'), refCards, (c) => `../${slugify(c.name)}/`)
 
   // Keyword reminders
-  const reminders = keywordReminders(card.text, refCard)
+  const reminders = keywordReminders(card.text, refCards)
   const el = $('reminders')
   el.hidden = reminders.length === 0
   el.innerHTML = reminders.map((r) => `<p>${r}</p>`).join('')

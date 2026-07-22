@@ -116,13 +116,40 @@ const inRanges = (ranges, idx) => ranges.some(([a, b]) => idx >= a && idx < b)
 
 // ------------------------------------------- keyword reminders / references
 
-/** First real card (or token) referenced in the text, or null (like the game's hint). */
-export function findReferencedCard(text) {
+/** Every real card (or token) referenced in the text, in catalog order. */
+export function findReferencedCards(text) {
+  const found = []
   for (const card of gameData.cards) {
     if (isKeywordName(card.name)) continue
-    if (new RegExp(`\\b${escapeRegex(card.name)}\\b`).test(text)) return card
+    if (new RegExp(`\\b${escapeRegex(card.name)}\\b`).test(text)) found.push(card)
   }
-  return null
+  return found
+}
+
+/**
+ * Render each referenced card into `container`, stacked vertically. When
+ * `hrefFor` is given each card is wrapped in a link to that URL (the card
+ * pages); without it the cards are plain previews (the maker). The container
+ * is hidden when the list is empty.
+ */
+export function renderReferencedCards(container, cards, hrefFor = null) {
+  container.innerHTML = ''
+  container.hidden = cards.length === 0
+  for (const card of cards) {
+    const canvas = document.createElement('canvas')
+    canvas.width = CANVAS_W
+    canvas.height = CANVAS_H
+    renderCard(canvas, realCardFields(card))
+
+    if (hrefFor) {
+      const link = document.createElement('a')
+      link.href = hrefFor(card)
+      link.appendChild(canvas)
+      container.appendChild(link)
+    } else {
+      container.appendChild(canvas)
+    }
+  }
 }
 
 /** Turn the keyword's BBCode reminder (trusted, from shared/) into HTML. */
@@ -134,11 +161,11 @@ export function bbToHtml(s) {
 
 /**
  * Reminder lines for each keyword in the text — including, like the game's
- * Catalog.getReferencedKeywords, keywords in the referenced card's text.
+ * Catalog.getReferencedKeywords, keywords in the referenced cards' text.
  * X is substituted with the written value when present.
  */
-export function keywordReminders(text, refCard) {
-  const fullText = text + (refCard ? ' ' + refCard.text : '')
+export function keywordReminders(text, refCards = []) {
+  const fullText = text + refCards.map((c) => ' ' + c.text).join('')
   const reminders = []
   for (const keyword of gameData.keywords) {
     const match = new RegExp(`\\b${keyword.name}[ ]*(-?\\d+)?\\b`).exec(

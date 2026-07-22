@@ -2,16 +2,14 @@
 // Rendering lives in cardRenderer.js (shared with the search page).
 
 import {
-  CANVAS_W,
-  CANVAS_H,
   gameData,
   loadGameData,
   themeLayer,
   subjectSrc,
   defaultSubjectIndex,
-  subjectIndexByName,
   renderCard,
-  findReferencedCard,
+  findReferencedCards,
+  renderReferencedCards,
   keywordReminders,
 } from './cardRenderer.js'
 
@@ -61,20 +59,12 @@ function rerender() {
   updateHints()
 }
 
-/** Keyword reminders + referenced-card preview below the card (like the game's hint). */
+/** Keyword reminders + referenced-card previews below the card (like the game's hint). */
 function updateHints() {
-  const refCard = findReferencedCard(state.text)
+  const refCards = findReferencedCards(state.text)
+  renderReferencedCards($('ref-cards'), refCards)
 
-  const figure = $('ref-card')
-  figure.hidden = refCard === null
-  if (refCard) {
-    renderCard($('ref-canvas'), {
-      ...refCard,
-      subject: subjectIndexByName(refCard.name),
-    })
-  }
-
-  const reminders = keywordReminders(state.text, refCard)
+  const reminders = keywordReminders(state.text, refCards)
   const el = $('reminders')
   el.hidden = reminders.length === 0
   el.innerHTML = reminders.map((r) => `<p>${r}</p>`).join('')
@@ -199,72 +189,9 @@ async function publishCard() {
     const { id } = await res.json()
     const link = `${location.origin}/cardmaker/community/?id=${id}`
     result.innerHTML = `Published! <a href="${link}">View your card →</a>`
-    loadGallery(true)
   } catch (e) {
     result.textContent = 'Publishing is not available right now.'
   }
-}
-
-// ----------------------------------------------------------------- gallery
-
-let oldestSeenId = null
-
-async function loadGallery(reset = false) {
-  const grid = $('gallery-grid')
-  const status = $('gallery-status')
-  const loadMore = $('btn-load-more')
-  if (reset) {
-    grid.innerHTML = ''
-    oldestSeenId = null
-  }
-
-  try {
-    const params = new URLSearchParams({ limit: '20' })
-    if (oldestSeenId !== null) params.set('before', oldestSeenId)
-    const res = await fetch(`${API_BASE}/cards?${params}`)
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    const cards = await res.json()
-
-    for (const card of cards) {
-      grid.appendChild(galleryEntry(card))
-      oldestSeenId = card.id
-    }
-    status.textContent = grid.childElementCount === 0 ? 'No cards yet.' : ''
-    loadMore.hidden = cards.length < 20
-  } catch (e) {
-    status.textContent = 'The gallery is not available right now.'
-    loadMore.hidden = true
-  }
-}
-
-// A gallery card links to its read-only community page (published cards can't
-// be edited), matching how game cards link to their own pages. Only the card
-// itself is the link; the creator credit sits below it, outside the hit area.
-function galleryEntry(card) {
-  const item = document.createElement('div')
-  item.className = 'gallery-item'
-
-  const link = document.createElement('a')
-  link.className = 'gallery-card'
-  link.href = `community/?id=${card.id}`
-  link.title = 'Open this card'
-
-  // Half-resolution canvas: displayed small, and far lighter in memory
-  const canvas = document.createElement('canvas')
-  canvas.width = CANVAS_W / 2
-  canvas.height = CANVAS_H / 2
-  renderCard(canvas, card)
-
-  link.appendChild(canvas)
-  item.appendChild(link)
-
-  if (card.creator) {
-    const credit = document.createElement('span')
-    credit.className = 'credit'
-    credit.textContent = `by ${card.creator}`
-    item.appendChild(credit)
-  }
-  return item
 }
 
 // -------------------------------------------------------------------- init
@@ -297,13 +224,10 @@ async function init() {
     $('btn-copy').hidden = true
   }
   $('btn-publish').addEventListener('click', publishCard)
-  $('btn-load-more').addEventListener('click', () => loadGallery(false))
 
   writeStateIntoFields()
   readFieldsIntoState()
   rerender()
-
-  loadGallery(true)
 }
 
 init()

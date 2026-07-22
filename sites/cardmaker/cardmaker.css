@@ -25,6 +25,7 @@ body {
   gap: 16px;
   padding: 12px 24px;
   border-bottom: 2px solid var(--line);
+  flex-wrap: wrap;
 }
 
 .site-header .logo {
@@ -39,6 +40,14 @@ body {
 .page-nav {
   margin-left: auto;
   font-weight: bold;
+  display: flex;
+  gap: 16px;
+}
+
+/* The current page's own entry stays in the bar but isn't a link (plain ink,
+   not gold), so the three destinations are always visible and consistent. */
+.page-nav [aria-current='page'] {
+  color: var(--ink);
 }
 
 /* Search page */
@@ -127,6 +136,18 @@ body {
   border: 1px solid var(--line);
   background: #fff;
   color: var(--ink);
+}
+
+/* No spinner arrows on the cost/points number inputs */
+.form-pane input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.form-pane input[type='number']::-webkit-inner-spin-button,
+.form-pane input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .stat-row {
@@ -275,15 +296,22 @@ button:disabled {
   display: none;
 }
 
-/* Referenced card preview */
-.ref-card {
-  margin: 0;
-  text-align: center;
+/* Referenced card previews — one or more, stacked vertically */
+.ref-cards {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
 }
 
-.ref-card canvas {
+.ref-cards[hidden] {
+  display: none;
+}
+
+.ref-cards canvas {
   width: 236px; /* half size */
   height: auto;
+  display: block;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
 }
 

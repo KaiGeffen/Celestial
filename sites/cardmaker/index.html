@@ -13,11 +13,12 @@
   </head>
   <body>
     <header class="site-header">
-      <a href="https://celestialdecks.gg">
-        <img src="../about/assets/logo.svg" alt="Celestial" class="logo" />
-      </a>
       <h1>Card Maker</h1>
-      <nav class="page-nav"><a href="search/">Search cards →</a></nav>
+      <nav class="page-nav">
+        <span aria-current="page">Card Maker</span>
+        <a href="search/">Card Search</a>
+        <a href="https://celestialdecks.gg">Play the Game</a>
+      </nav>
     </header>
 
     <main class="maker">
@@ -62,7 +63,7 @@
         </fieldset>
 
         <label>
-          Creator <span class="optional">(optional, shown in gallery)</span>
+          Creator <span class="optional">(optional, shown publicly)</span>
           <input id="field-creator" type="text" maxlength="20" />
         </label>
       </section>
@@ -80,20 +81,10 @@
         <!-- Keyword reminders, like the game's hint text -->
         <div id="reminders" class="reminders"></div>
 
-        <!-- Referenced card, like the game's hint shows it -->
-        <figure id="ref-card" class="ref-card" hidden>
-          <canvas id="ref-canvas" width="472" height="672"></canvas>
-        </figure>
+        <!-- Referenced cards, like the game's hint shows them -->
+        <div id="ref-cards" class="ref-cards" hidden></div>
       </section>
     </main>
-
-    <!-- Gallery -->
-    <section class="gallery">
-      <h2>Recent cards</h2>
-      <div id="gallery-grid" class="gallery-grid"></div>
-      <button id="btn-load-more" type="button" hidden>Load more</button>
-      <p id="gallery-status" class="gallery-status"></p>
-    </section>
 
     <footer class="site-footer">
       <p>
