@@ -3,13 +3,11 @@
 // cardmaker API).
 
 import {
-  CANVAS_W,
-  CANVAS_H,
   gameData,
   loadGameData,
   escapeRegex,
   realCardFields,
-  renderCard,
+  createTiltCard,
 } from '../cardRenderer.js'
 
 const API_BASE = '/cardmaker/api'
@@ -161,13 +159,8 @@ function resultEntry(fields, { credit = '', href = '#' } = {}) {
   link.className = 'gallery-card'
   link.title = 'Open this card'
 
-  // Half-resolution canvas: displayed small, and far lighter in memory
-  const canvas = document.createElement('canvas')
-  canvas.width = CANVAS_W / 2
-  canvas.height = CANVAS_H / 2
-  renderCard(canvas, fields)
-
-  link.appendChild(canvas)
+  // Half-resolution layers: displayed small, and far lighter in memory
+  link.appendChild(createTiltCard(fields, { width: '100%', half: true }))
   item.appendChild(link)
   if (credit) {
     const span = document.createElement('span')

@@ -136,7 +136,10 @@ ${GENERATED_MARKER}
 
     <main class="card-page">
       <div class="card-column">
-        <canvas id="card-canvas" width="472" height="672"></canvas>
+        <div id="card-mount"></div>
+        <div class="card-actions">
+          <button id="btn-download" type="button">Download</button>
+        </div>
         <div id="reminders" class="reminders" hidden></div>
       </div>
       <div id="ref-cards" class="ref-cards" hidden></div>

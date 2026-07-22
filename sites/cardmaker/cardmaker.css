@@ -243,12 +243,6 @@ legend {
   gap: 14px;
 }
 
-#card-canvas {
-  width: min(354px, 90vw); /* displayed at 3/4; exports at full 472x672 */
-  height: auto;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
-}
-
 .card-actions {
   display: flex;
   gap: 10px;
@@ -308,13 +302,6 @@ button:disabled {
   display: none;
 }
 
-.ref-cards canvas {
-  width: 236px; /* half size */
-  height: auto;
-  display: block;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
-}
-
 /* Gallery */
 .gallery {
   padding: 24px;
@@ -348,13 +335,51 @@ button:disabled {
   width: 100%;
   display: block;
   text-decoration: none;
+}
+
+/* 3D tilt card (see createTiltCard / attachTilt): three stacked layers at
+   increasing depth. On hover the card angles toward the cursor and the
+   subject plane parallaxes against the frame, so it reads as real 3D. */
+.tilt-scene {
+  perspective: 700px;
+  aspect-ratio: 472 / 672;
+  /* Shadow + hover brightness live HERE, not on .tilt-card. A `filter` (or
+     `opacity`, `overflow`, `mask`…) on the element that carries
+     `transform-style: preserve-3d` forces it to flatten, which silently
+     cancels every child `translateZ` — the whole 3D effect disappears.
+     `.tilt-scene` only has `perspective`, so filtering it is safe. */
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.3));
   transition: filter 0.12s ease;
 }
 
-/* Same hover for every gallery card — game (anchor) and community (anchor)
-   alike — so they read identically. */
-.gallery-card:hover {
-  filter: brightness(1.08);
+.tilt-scene:hover {
+  filter: brightness(1.06) drop-shadow(0 10px 20px rgba(0, 0, 0, 0.35));
+}
+
+.tilt-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.12s ease;
+}
+
+.tilt-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Depth of the subject and frame planes. Each is counter-scaled so all three
+   still line up at rest (the perspective magnifies nearer planes; the scale
+   cancels that), then they separate visibly as the card rotates. */
+.tilt-subject {
+  transform: translateZ(18px) scale(0.97);
+}
+
+.tilt-frame {
+  transform: translateZ(20px) scale(0.969);
 }
 
 /* Per-card page (/cardmaker/{slug}/): card with its keyword reminders below
@@ -366,12 +391,6 @@ button:disabled {
   gap: 32px;
   padding: 24px;
   flex-wrap: wrap;
-}
-
-.card-page #card-canvas {
-  width: min(354px, 90vw);
-  height: auto;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
 }
 
 .card-column {

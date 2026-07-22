@@ -5,7 +5,8 @@
 // NOTE This file lives at the cardmaker root; card pages load it as ../cardPage.js
 import {
   loadGameData,
-  renderCard,
+  createTiltCard,
+  downloadCardPng,
   realCardFields,
   findReferencedCards,
   renderReferencedCards,
@@ -23,7 +24,14 @@ async function init() {
   await loadGameData()
 
   const card = JSON.parse(document.getElementById('card-data').textContent)
-  renderCard(document.getElementById('card-canvas'), realCardFields(card))
+  const fields = realCardFields(card)
+  document
+    .getElementById('card-mount')
+    .appendChild(createTiltCard(fields, { width: 'min(354px, 90vw)' }))
+
+  document
+    .getElementById('btn-download')
+    .addEventListener('click', () => downloadCardPng(fields, card.name))
 
   // Referenced cards, each linked through to its own page
   const refCards = findReferencedCards(card.text).filter(

@@ -6,7 +6,8 @@
 
 import {
   loadGameData,
-  renderCard,
+  createTiltCard,
+  downloadCardPng,
   findReferencedCards,
   renderReferencedCards,
   keywordReminders,
@@ -51,7 +52,9 @@ async function init() {
   $('card-title').textContent = card.name
 
   // Community cards already carry a subject index, so render their fields directly
-  renderCard($('card-canvas'), card)
+  $('card-mount').appendChild(createTiltCard(card, { width: 'min(354px, 90vw)' }))
+
+  $('btn-download').addEventListener('click', () => downloadCardPng(card, card.name))
 
   if (card.creator) {
     const credit = $('credit')

@@ -2,12 +2,17 @@
 // Rendering lives in cardRenderer.js (shared with the search page).
 
 import {
+  CANVAS_W,
+  CANVAS_H,
   gameData,
   loadGameData,
   themeLayer,
   subjectSrc,
   defaultSubjectIndex,
   renderCard,
+  createTiltCard,
+  redrawTiltCard,
+  downloadCardPng,
   findReferencedCards,
   renderReferencedCards,
   keywordReminders,
@@ -31,7 +36,10 @@ const state = { ...DEFAULTS }
 // ------------------------------------------------------------------- form
 
 const $ = (id) => document.getElementById(id)
-const mainCanvas = () => $('card-canvas')
+
+// The live preview is a layered 3D tilt card (created once in init); rerender
+// redraws its layers in place.
+let previewCard = null
 
 function readFieldsIntoState() {
   state.name = $('field-name').value
@@ -55,7 +63,7 @@ const clampInt = (v, min, max) =>
   Math.max(min, Math.min(max, parseInt(v, 10) || 0))
 
 function rerender() {
-  renderCard(mainCanvas(), state)
+  if (previewCard) redrawTiltCard(previewCard, state)
   updateHints()
 }
 
@@ -152,18 +160,16 @@ function updateSubjectSelection() {
 
 // -------------------------------------------------------- export / publish
 
-function downloadCard() {
-  mainCanvas().toBlob((blob) => {
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `${state.name || 'card'}.png`
-    a.click()
-    URL.revokeObjectURL(a.href)
-  }, 'image/png')
-}
+// The preview is layered for the 3D effect, so export renders a fresh flat
+// composite at full 472x672 (identical pixels, no tilt).
+const downloadCard = () => downloadCardPng(state, state.name)
 
 async function copyCard() {
-  const blob = await new Promise((r) => mainCanvas().toBlob(r, 'image/png'))
+  const canvas = document.createElement('canvas')
+  canvas.width = CANVAS_W
+  canvas.height = CANVAS_H
+  await renderCard(canvas, state)
+  const blob = await new Promise((r) => canvas.toBlob(r, 'image/png'))
   await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
 }
 
@@ -202,6 +208,10 @@ async function init() {
   // Default subject: Dove, the game's own fallback art
   DEFAULTS.subject = defaultSubjectIndex()
   state.subject = DEFAULTS.subject
+
+  // Live preview: a single layered 3D tilt card, redrawn in place on edits
+  previewCard = createTiltCard(state, { width: 'min(354px, 90vw)' })
+  $('card-mount').appendChild(previewCard)
 
   buildThemePicker()
   buildSubjectPicker()
