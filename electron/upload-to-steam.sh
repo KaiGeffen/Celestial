@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+# app_build_4670650.vdf has SetLive "dev-1", so each upload auto-publishes to the
+# "dev-1" beta branch (opt in via Steam > Celestial > Properties > Betas). The
+# public "default" branch can't be SetLive from the vdf — publish that via the
+# partner site (SteamPipe > Builds) when going live.
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STEAM_APP_ID="$(node -p "require('$SCRIPT_DIR/../shared/steam.json').steamAppId")"
 
