@@ -148,10 +148,18 @@ const slugify = (name) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
 
-function resultEntry(fields, { credit = '', onClick = null, href = null } = {}) {
-  const wrap = document.createElement(href ? 'a' : onClick ? 'button' : 'div')
-  if (href) wrap.href = href
-  wrap.className = 'gallery-card'
+// Every result links to a card page (game cards to their generated page,
+// community cards to the read-only community view), so they look and behave
+// identically — hover, click, and open-in-place.
+function resultEntry(fields, { credit = '', href = '#' } = {}) {
+  const item = document.createElement('div')
+  item.className = 'gallery-item'
+
+  // Only the card is a link (the hit area), so the credit below stays outside
+  const link = document.createElement('a')
+  link.href = href
+  link.className = 'gallery-card'
+  link.title = 'Open this card'
 
   // Half-resolution canvas: displayed small, and far lighter in memory
   const canvas = document.createElement('canvas')
@@ -159,18 +167,15 @@ function resultEntry(fields, { credit = '', onClick = null, href = null } = {}) 
   canvas.height = CANVAS_H / 2
   renderCard(canvas, fields)
 
-  wrap.appendChild(canvas)
+  link.appendChild(canvas)
+  item.appendChild(link)
   if (credit) {
     const span = document.createElement('span')
     span.className = 'credit'
     span.textContent = credit
-    wrap.appendChild(span)
+    item.appendChild(span)
   }
-  if (onClick) {
-    wrap.title = 'Open this card in the maker'
-    wrap.addEventListener('click', onClick)
-  }
-  return wrap
+  return item
 }
 
 // ---------------------------------------------------------------- search
@@ -207,7 +212,7 @@ async function runSearch() {
         results.appendChild(
           resultEntry(card, {
             credit: card.creator ? `by ${card.creator}` : '',
-            onClick: () => (location.href = `../?id=${card.id}`),
+            href: `../community/?id=${card.id}`,
           }),
         )
       }

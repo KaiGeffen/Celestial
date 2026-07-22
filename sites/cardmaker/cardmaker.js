@@ -37,8 +37,8 @@ const mainCanvas = () => $('card-canvas')
 
 function readFieldsIntoState() {
   state.name = $('field-name').value
-  state.cost = clampInt($('field-cost').value, 0, 9)
-  state.points = clampInt($('field-points').value, 0, 9)
+  state.cost = clampInt($('field-cost').value, -99, 99)
+  state.points = clampInt($('field-points').value, -99, 99)
   state.text = $('field-text').value
   state.creator = $('field-creator').value
 }
@@ -197,8 +197,8 @@ async function publishCard() {
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const { id } = await res.json()
-    const link = `${location.origin}/cardmaker/?id=${id}`
-    result.textContent = `Published! ${link}`
+    const link = `${location.origin}/cardmaker/community/?id=${id}`
+    result.innerHTML = `Published! <a href="${link}">View your card →</a>`
     loadGallery(true)
   } catch (e) {
     result.textContent = 'Publishing is not available right now.'
@@ -237,10 +237,17 @@ async function loadGallery(reset = false) {
   }
 }
 
+// A gallery card links to its read-only community page (published cards can't
+// be edited), matching how game cards link to their own pages. Only the card
+// itself is the link; the creator credit sits below it, outside the hit area.
 function galleryEntry(card) {
-  const btn = document.createElement('button')
-  btn.className = 'gallery-card'
-  btn.title = 'Open this card in the maker'
+  const item = document.createElement('div')
+  item.className = 'gallery-item'
+
+  const link = document.createElement('a')
+  link.className = 'gallery-card'
+  link.href = `community/?id=${card.id}`
+  link.title = 'Open this card'
 
   // Half-resolution canvas: displayed small, and far lighter in memory
   const canvas = document.createElement('canvas')
@@ -248,41 +255,16 @@ function galleryEntry(card) {
   canvas.height = CANVAS_H / 2
   renderCard(canvas, card)
 
-  const credit = document.createElement('span')
-  credit.className = 'credit'
-  credit.textContent = card.creator ? `by ${card.creator}` : ''
+  link.appendChild(canvas)
+  item.appendChild(link)
 
-  btn.append(canvas, credit)
-  btn.addEventListener('click', () => {
-    loadCardIntoMaker(card)
-    history.replaceState(null, '', `?id=${card.id}`)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  })
-  return btn
-}
-
-function loadCardIntoMaker(card) {
-  state.name = card.name
-  state.cost = card.cost
-  state.points = card.points
-  state.text = card.text
-  state.theme = card.theme
-  state.subject = card.subject
-  state.creator = card.creator || ''
-  writeStateIntoFields()
-  rerender()
-}
-
-async function loadDeepLink() {
-  const id = new URLSearchParams(location.search).get('id')
-  if (!id) return
-  try {
-    const res = await fetch(`${API_BASE}/cards/${encodeURIComponent(id)}`)
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    loadCardIntoMaker(await res.json())
-  } catch (e) {
-    // Deep link target missing or API down; fall through to the default card
+  if (card.creator) {
+    const credit = document.createElement('span')
+    credit.className = 'credit'
+    credit.textContent = `by ${card.creator}`
+    item.appendChild(credit)
   }
+  return item
 }
 
 // -------------------------------------------------------------------- init
@@ -321,7 +303,6 @@ async function init() {
   readFieldsIntoState()
   rerender()
 
-  loadDeepLink()
   loadGallery(true)
 }
 

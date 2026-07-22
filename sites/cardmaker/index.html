@@ -31,22 +31,17 @@
         <div class="stat-row">
           <label>
             Cost
-            <input id="field-cost" type="number" min="0" max="9" value="1" />
+            <input id="field-cost" type="number" min="-99" max="99" value="1" />
           </label>
           <label>
             Points
-            <input id="field-points" type="number" min="0" max="9" value="1" />
+            <input id="field-points" type="number" min="-99" max="99" value="1" />
           </label>
         </div>
 
         <label>
           Text
-          <textarea
-            id="field-text"
-            maxlength="200"
-            rows="4"
-            placeholder="When this resolves, Nourish 2."
-          ></textarea>
+          <textarea id="field-text" maxlength="200" rows="4"></textarea>
         </label>
 
         <fieldset class="theme-picker" id="theme-picker">

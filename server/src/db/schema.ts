@@ -268,3 +268,29 @@ export const matches = pgTable(
     timeIdx: index('matches_time_idx').on(table.time),
   }),
 )
+
+/**
+ * Fan-made cards from the Card Maker site (sites/cardmaker). Owned entirely by
+ * that feature — no FK into game tables. Rows are fields-only (a few hundred
+ * bytes); clients render the image from these. Lengths are capped here and
+ * re-validated in cardmakerServer.ts.
+ */
+export const customCards = pgTable(
+  'custom_cards',
+  {
+    id: serial('id').primaryKey(),
+    name: varchar('name', { length: 24 }).notNull(),
+    cost: integer('cost').notNull(),
+    points: integer('points').notNull(),
+    text: varchar('text', { length: 200 }).notNull(),
+    theme: integer('theme').notNull(),
+    subject: integer('subject').notNull(), // index of the art-subject
+    creator: varchar('creator', { length: 20 }), // optional
+    created_at: timestamp('created_at').notNull().defaultNow(),
+    hidden: boolean('hidden').notNull().default(false), // moderation kill switch
+  },
+  (table) => ({
+    // Gallery pages newest-first, skipping hidden cards
+    createdIdx: index('custom_cards_created_idx').on(table.created_at),
+  }),
+)

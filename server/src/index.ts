@@ -3,6 +3,7 @@ import createLeaderboardServer from './network/leaderboardServer'
 import createMatchHistoryServer from './network/matchHistoryServer'
 import createUsernameAvailabilityServer from './network/usernameAvailabilityServer'
 import createReferralCountServer from './network/referralCountServer'
+import createCardmakerServer from './network/cardmakerServer'
 
 console.log('Starting server')
 
@@ -19,3 +20,4 @@ createLeaderboardServer()
 createMatchHistoryServer()
 createUsernameAvailabilityServer()
 createReferralCountServer()
+createCardmakerServer()

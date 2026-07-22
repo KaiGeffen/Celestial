@@ -35,3 +35,4 @@ drizzle/
 sites/cardmaker/assets/
 sites/cardmaker/*/
 !sites/cardmaker/search/
+!sites/cardmaker/community/

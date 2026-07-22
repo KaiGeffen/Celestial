@@ -94,8 +94,8 @@ Single page, two panes (stacked on mobile), plus a gallery section below.
 
 - **Name** — text, max ~24 chars (auto-shrink to fit the nameplate like the
   game does, then hard-cap).
-- **Cost** — integer 0–9.
-- **Points** — integer 0–9.
+- **Cost** — integer −99–99 (may be negative).
+- **Points** — integer −99–99 (may be negative).
 - **Rules text** — textarea, max ~200 chars, wrapped into the text box, with
   gold keyword/reference highlighting per above.
 - **Theme** — 9 swatches (themes 0–8), showing each frame's palette.
@@ -112,7 +112,8 @@ Single page, two panes (stacked on mobile), plus a gallery section below.
 - **Copy** — copies the PNG to the clipboard (feature-detected; hidden where
   unsupported).
 - **Publish** — saves the card's fields to the gallery (see API below) and
-  shows the permalink (`/cardmaker/?id={id}`) with a copy button.
+  shows a link to the card's page (`/cardmaker/community/?id={id}`). Published
+  cards are immutable — there is no post-publish editing.
 - **Keyword reminders** — every keyword in the rules text shows its reminder
   line (from `shared/state/keyword.ts`) below the card, X substituted with
   the written value, on a dark backing like the game's hint popups. Like the
@@ -126,9 +127,11 @@ Single page, two panes (stacked on mobile), plus a gallery section below.
 - Below the maker: a grid of recently published cards, newest first,
   paginated ("Load more"). Cards are **rendered client-side from their
   fields** — the list endpoint returns everything needed, no image hosting.
-- Clicking a gallery card opens its permalink view: the card large, plus a
-  **Remix** button that loads its fields into the maker.
-- Opening `/cardmaker/?id={id}` deep-links to that card.
+- Clicking a gallery card opens its read-only card page
+  (`/cardmaker/community/?id={id}`): the card large, with keyword reminders and
+  any referenced card, exactly like the game card pages. Published cards can't
+  be edited, so gallery cards behave identically to game cards — they open a
+  page, not the maker.
 
 **Search page** (`/cardmaker/search/`)
 
@@ -140,7 +143,8 @@ Single page, two panes (stacked on mobile), plus a gallery section below.
     deck-specific `present`). Free text also searches referenced keywords'
     reminder text and referenced cards' text, like the game.
   - **Community cards** — published custom cards, searched via the API
-    (`q` param). Clicking one opens it in the maker (`../?id={id}`).
+    (`q` param). Clicking one opens its read-only card page
+    (`../community/?id={id}`), like a game card.
 - Results render on half-resolution canvases via the shared renderer.
 
 **Page dressing**

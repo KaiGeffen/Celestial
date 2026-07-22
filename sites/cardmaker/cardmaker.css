@@ -86,7 +86,7 @@ body {
 }
 
 /* Search results show cards at half card size (bigger than the maker gallery) */
-.search-page .gallery-card {
+.search-page .gallery-item {
   width: 236px; /* 472 * 0.5 */
 }
 
@@ -301,14 +301,32 @@ button:disabled {
   justify-content: center;
 }
 
+/* One grid slot: the card link plus (optionally) the creator credit below it.
+   The credit lives here, outside the link, so the clickable hit area is just
+   the card — same as game cards. */
+.gallery-item {
+  width: 177px; /* 472 * 0.375 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
 .gallery-card {
   border: none;
   background: none;
   padding: 0;
   cursor: pointer;
-  width: 177px; /* 472 * 0.375 */
-  display: inline-block;
+  width: 100%;
+  display: block;
   text-decoration: none;
+  transition: filter 0.12s ease;
+}
+
+/* Same hover for every gallery card — game (anchor) and community (anchor)
+   alike — so they read identically. */
+.gallery-card:hover {
+  filter: brightness(1.08);
 }
 
 /* Per-card page (/cardmaker/{slug}/): card with its keyword reminders below
@@ -339,15 +357,34 @@ button:disabled {
 .gallery-card canvas {
   width: 100%;
   height: auto;
+  display: block;
 }
 
-.gallery-card .credit {
+.gallery-item .credit {
   font-size: 12px;
   opacity: 0.75;
+  /* Plain text, not gold — it's static, and it's outside the card link */
+  color: var(--ink);
 }
 
 .gallery-status {
   opacity: 0.75;
+}
+
+/* Community card page: creator credit under the card, and centered status */
+.page-credit {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.75;
+}
+
+.page-status {
+  text-align: center;
+}
+
+.page-status[hidden],
+.page-credit[hidden] {
+  display: none;
 }
 
 .site-footer {
