@@ -45,7 +45,7 @@ export default class TheirBoardRegion extends Region {
 
     // Their hand
     const handN = state.hand[1].length
-    const opponentCardback = 5 //state.cosmeticSets[1]?.cardback ?? 0
+    const opponentCardback = state.cosmeticSets[1]?.cardback ?? 0
     this.cards = []
     for (let i = 0; i < handN; i++) {
       const card = new CardImage(

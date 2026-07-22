@@ -670,7 +670,11 @@ export default function createWebSocketServer() {
                   throw new Error('account already closed')
                 }
 
-                const mergedGoogle = survivor.google_id ?? loser.google_id
+                // Fall back to the verified subject: a legacy loser row has a
+                // null google_id (only its derived id encodes the sub), so
+                // pending.googleSub is the only reliable source of the identity.
+                const mergedGoogle =
+                  survivor.google_id ?? loser.google_id ?? pending.googleSub
                 const mergedSteam = survivor.steam_id ?? loser.steam_id
                 mergedEmail = survivor.email ?? loser.email
 
