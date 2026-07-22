@@ -113,6 +113,23 @@ function createWindow() {
 
   win.loadURL(`http://localhost:${PORT}/index.html`)
 
+  // Fullscreen windows (esp. launched via Steam) can open unfocused and swallow
+  // input until the app is manually activated. Force it frontmost once ready.
+  const forceForeground = () => {
+    if (process.platform === 'darwin') app.focus({ steal: true })
+    win.show()
+    win.moveTop()
+    win.focus()
+    // Flipping always-on-top nudges the WM to promote the window to key
+    win.setAlwaysOnTop(true)
+    win.setAlwaysOnTop(false)
+  }
+  win.once('ready-to-show', () => {
+    forceForeground()
+    // Steam can re-grab focus right after launch; retry once shortly after
+    setTimeout(forceForeground, 500)
+  })
+
   // Open external links in the system browser instead of a new Electron window
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
