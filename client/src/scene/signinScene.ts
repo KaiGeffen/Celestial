@@ -54,13 +54,16 @@ export class SigninScene extends Phaser.Scene {
 
     // Electron + Steam login path
     if (Flags.isElectronBuild()) {
-      Server.loginSteam(this.game, () => this.onOptionClick()).catch((e) => {
-        // If login fails, tell the user
-        const loadingEl = document.getElementById('loading-text')
-        if (loadingEl) loadingEl.textContent = 'Steam login failed'
-
-        console.error('Steam login failed:', e)
-      })
+      // Auto sign-in from the Steam session; show the login button if there's
+      // none or it fails.
+      Server.loginSteam(this.game, () => this.onOptionClick())
+        .then((started) => {
+          if (!started) this.showSteamLoginButton()
+        })
+        .catch((e) => {
+          console.error('Steam login failed:', e)
+          this.showSteamLoginButton()
+        })
     } else {
       const sessionToken = localStorage.getItem(Url.session_token)
 
@@ -125,9 +128,11 @@ export class SigninScene extends Phaser.Scene {
         depth: -1,
       })
 
+      // Tucked in the bottom-right corner, clear of the centered Loading text
+      // and the login button
       this.plugins.get('rexAnchor')['add'](quitButtonContainer, {
-        x: `50%`,
-        y: `100%-${Space.pad * 2 + Space.buttonHeight * 1.5}`,
+        x: `100%-${Space.pad + Space.buttonWidth / 2}`,
+        y: `100%-${Space.pad + Space.buttonHeight / 2}`,
       })
       return
     }
@@ -180,10 +185,19 @@ export class SigninScene extends Phaser.Scene {
       depth: -1,
     })
 
+    // Hidden unless the Steam auto-login fails
+    this.steamLoginButton.setVisible(false)
+
     this.plugins.get('rexAnchor')['add'](container, {
       x: `50%`,
       y: `100%-${Space.pad + Space.buttonHeight / 2}`,
     })
+  }
+
+  // Show the login button and hide the loading text
+  private showSteamLoginButton(): void {
+    this.steamLoginButton?.setVisible(true)
+    this.removeLoadingText()
   }
 
   private onOptionClick(): void {
