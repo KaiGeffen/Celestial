@@ -1,13 +1,7 @@
 import 'phaser'
 import { CardImage } from '../../lib/cardImage'
 import GameModel from '@shared/state/gameModel'
-import {
-  Space,
-  Style,
-  Depth,
-  Time,
-  Color,
-} from '../../settings/settings'
+import { Space, Style, Depth, Time, Color } from '../../settings/settings'
 import { MatchScene } from '../matchScene'
 import Region from './baseRegion'
 import CardLocation from './cardLocation'
@@ -62,7 +56,7 @@ export default class StoryRegion extends Region {
       let card = this.addCard(
         act.card,
         CardLocation.story(state, resolvedI, this.container, act.owner),
-        state.cosmeticSets[act.owner].cardback ?? 0,
+        5, //state.cosmeticSets[act.owner].cardback ?? 0,
       )
       // .setOnClick(this.callback(resolvedI))
 
@@ -85,7 +79,7 @@ export default class StoryRegion extends Region {
       let card = this.addCard(
         act.card,
         CardLocation.story(state, resolvedI + i, this.container, act.owner),
-        state.cosmeticSets[act.owner].cardback ?? 0,
+        5, //state.cosmeticSets[act.owner].cardback ?? 0,
       ).moveToTopOnHover()
 
       // Apply glow based on various conditions

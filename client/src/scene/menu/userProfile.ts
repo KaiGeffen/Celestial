@@ -189,7 +189,7 @@ export default class UserProfileMenu extends Menu {
       })
 
       // Once an account is already linked, linking again is refused
-      if (Server.getUserData().accountAlreadyLinked) {
+      if (Server.getUserData().accountHasGoogleIdentity) {
         linkButton.setText('Done')
         linkButton.disable()
       }

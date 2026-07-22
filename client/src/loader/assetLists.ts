@@ -58,6 +58,7 @@ export const assetLists = {
       "Astrology",
       "Blossom",
       "City",
+      "City",
       "Default",
       "Hill",
       "Lotus"

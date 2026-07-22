@@ -62,7 +62,7 @@ export default async function sendUserData(ws: ServerWS | null, id: string) {
     ),
     journeyChoices: data.journey_choices,
     canBeSpectated: data.can_be_spectated,
-    accountAlreadyLinked: data.google_id != null,
+    accountHasGoogleIdentity: data.google_id != null,
   })
 
   // Update last active time

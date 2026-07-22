@@ -51,7 +51,7 @@ export default interface messagesToClient {
     missionGoldClaimed: boolean[]
     journeyChoices: (number | null)[]
     canBeSpectated: boolean
-    accountAlreadyLinked: boolean
+    accountHasGoogleIdentity: boolean
   }
   purchaseItemSuccess: {
     itemId: number

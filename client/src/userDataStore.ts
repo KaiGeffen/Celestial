@@ -16,7 +16,7 @@ export interface UserData {
   cosmeticSet: CosmeticSet
   achievements: Achievement[]
   canBeSpectated: boolean
-  accountAlreadyLinked: boolean
+  accountHasGoogleIdentity: boolean
 }
 
 type Listener = (data: UserData | null) => void
@@ -66,7 +66,7 @@ class UserDataStore {
       cosmeticSet: data.cosmeticSet,
       achievements: data.achievements,
       canBeSpectated: data.canBeSpectated,
-      accountAlreadyLinked: data.accountAlreadyLinked,
+      accountHasGoogleIdentity: data.accountHasGoogleIdentity,
     }
     this.emit()
   }

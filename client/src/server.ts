@@ -57,7 +57,7 @@ const LOGGED_OUT_USER_DATA: UserData = {
   },
   achievements: [],
   canBeSpectated: true,
-  accountAlreadyLinked: false,
+  accountHasGoogleIdentity: false,
 }
 
 export default class Server {
