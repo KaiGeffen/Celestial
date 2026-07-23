@@ -62,11 +62,11 @@ class ServerController {
       return false
     }
 
-    // Update the player's in-game timer
-    this.updatePlayerTimer(player, true)
-
     // Do action: Pass or play a card
     if (choice === MechanicsSettings.PASS) {
+      // Charge think-time and grant the per-move recoup for this committed move
+      this.updatePlayerTimer(player, true)
+
       // NOTE Animations cleared here to capture any from pass() call
       this.model.animations = [[], []]
 
@@ -84,23 +84,27 @@ class ServerController {
 
       return true
     } else {
-      if (this.attemptPlay(player, choice)) {
-        this.model.passes = 0
-        this.model.lastPlayerWhoPlayed = player
-
-        // Normally switch priority, or spend Retain status
-        if (this.model.status[player].retain > 0) {
-          this.model.status[player].retain -= 1
-        } else {
-          this.model.switchPriority()
-        }
-
-        // Input was successful
-        return true
-      } else {
-        // Input was unsuccessful
+      // Reject an invalid play without touching the clock, so spammed invalid
+      // inputs can't farm the timer recoup (versionNo is unchanged on failure)
+      if (!this.attemptPlay(player, choice)) {
         return false
       }
+
+      // Charge think-time and grant the per-move recoup for this committed move
+      this.updatePlayerTimer(player, true)
+
+      this.model.passes = 0
+      this.model.lastPlayerWhoPlayed = player
+
+      // Normally switch priority, or spend Retain status
+      if (this.model.status[player].retain > 0) {
+        this.model.status[player].retain -= 1
+      } else {
+        this.model.switchPriority()
+      }
+
+      // Input was successful
+      return true
     }
   }
 

@@ -34,6 +34,9 @@ class PveSpecialMatch extends PveMatch {
 
     // Start the game
     this.game = new SpecialController(enabledModes)
+    // SpecialController.startGame deliberately takes fewer args than the base;
+    // this special mode isn't wired into the game, so leave the mismatch.
+    // @ts-ignore
     this.game.startGame(
       deck1Cards,
       deck2Cards,

@@ -49,15 +49,17 @@ it critically and judge its quality, don't run a mechanical checklist.
 
 | `server/src/db/updateMatchResult.ts` + `garden.ts` (with schema.ts) | 2026-07-23 | Full audit of the reward/currency layer. Fixed: Garden.harvest had no row lock — the harvestGarden handler + bare read-modify-write let two rapid harvests of the same plot both read the plant as ready and each add their own random gold/gem (additive sql) while removing the plant once = currency duplication; now wrapped in db.transaction with `.for('update')` (same pattern as claimMissionRewards). plantSeed given the same row-locked transaction (was racy on the MAX_PLANTS check + array clobber). insertMatchHistory winnerData/loserData now typed (MatchPlayerData). Stale plantSeed comment fixed. Kai's calls: kept `|| wasPlayerWin` seed gate (needed for surrenders / can't-happen-yet in pve but keep); did NOT fix null-garden legacy-row crash (schema column nullable, no default → `[...player.garden]` throws for pre-column rows). Not fixed (design Q, left for Kai): ELO + pvp_wins_month/lifetime update on every completed match regardless of matchQualifiesForRewards, so colliding accounts can farm leaderboard/achievement 9 via sub-3-round surrenders (only gems/seeds are gated). Also noted: markMissionsComplete + updateJourneyProgress do unlocked bitstring read-modify-write (same race class, low frequency). Pre-existing db/ drizzle insert/update tsc collapse remains (baseline 15 errors, unchanged) |
 
+| `server/src/gameController.ts` + `gameControllerSpecial.ts` + `tutorialController.ts` | 2026-07-23 | Game-logic pass. Fixed (gameController): PvP timer exploit — onPlayerInput granted TIMER_RECOUP (+12s) via updatePlayerTimer *before* validating the play, and versionNo is unchanged on failure, so spamming an invalid playCard (unaffordable / out-of-range index) farmed the clock indefinitely; timer update now happens only on committed moves (inside the pass branch and after a successful attemptPlay), invalid plays are true no-ops. Fixed (tutorialController): cosmetic sets now include cardback: 0. SpecialController: startGame override intentionally takes fewer args than base (special mode isn't wired into the game and may never be) — suppressed the resulting call-site type error in pveSpecialMatch with `// @ts-ignore` per Kai, so server tsc baseline drops 15→14. Not fixed (noted, low sev): tutorialController's `num` from client is unbounded (out-of-range → startGame(undefined) throws, contained by dispatch try/catch) and its no-arg default player/ai decks are dead (both call sites always pass num). Intentional tutorial scaffolding left as-is (wins[0]=2, mulligansComplete, doUpkeep forcing priority=0) |
+
 ### Next up (proposed order)
 
 (client lib/utils/scenes/menus and matchRegions queue complete; server match
-subsystem + reward/currency db layer audited 2026-07-23. Natural next
-candidates: gameController.ts / gameControllerSpecial.ts / tutorialController.ts
-as a game-logic pass; remaining db files (gameState.ts, analytics.ts); or the
-network/ auth + server helpers (googleAuth, steamAuth, sessionToken,
-sendUserData). Open design Q flagged in the updateMatchResult row re: gating
-ELO/win-counts on matchQualifiesForRewards)
+subsystem + reward/currency db layer + game-logic controllers audited
+2026-07-23. Natural next candidates: remaining db files (gameState.ts,
+analytics.ts); the network/ auth + server helpers (googleAuth, steamAuth,
+sessionToken, sendUserData, cosmeticOwnership); or ai.ts. Open design Q still
+flagged in the updateMatchResult row re: gating ELO/win-counts on
+matchQualifiesForRewards)
 
 Skipped on purpose: `client/src/loader/assetLists.ts` (highest churn but pure
 data lists — little structure to audit).

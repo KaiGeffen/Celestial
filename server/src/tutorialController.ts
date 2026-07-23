@@ -161,8 +161,8 @@ class TutorialController extends ServerController {
     this.startGame(
       player_deck,
       ai_deck,
-      { avatar: 0, border: 0 },
-      { avatar: 0, border: 0 },
+      { avatar: 0, border: 0, cardback: 0 },
+      { avatar: 0, border: 0, cardback: 0 },
       'Jules',
       'Umbra',
       'New Friend',
