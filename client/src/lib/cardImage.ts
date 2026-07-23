@@ -398,7 +398,7 @@ export class CardImage {
     // Cost
     this.txtCost = this.scene.add
       .rexBBCodeText(
-        -Space.cardWidth / 2 + 27,
+        -Space.cardWidth / 2 + 27.5,
         -Space.cardHeight / 2 + 58,
         `[stroke=${STAT_STROKE}]${this.card.cost}[/stroke]`,
         BBStyle.cardCost,
@@ -421,7 +421,7 @@ export class CardImage {
     // Points
     this.txtPoints = this.scene.add
       .rexBBCodeText(
-        -Space.cardWidth / 2 + 27,
+        -Space.cardWidth / 2 + 27.5,
         -Space.cardHeight / 2 + 102,
         `[stroke=${STAT_STROKE}]${this.card.points}[/stroke]`,
         BBStyle.cardPoints,

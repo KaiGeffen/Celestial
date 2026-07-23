@@ -49,6 +49,16 @@
   src: url('assets/fonts/Mulish.otf') format('opentype');
 }
 
+@font-face {
+  font-family: 'Helgoland';
+  src: url('assets/fonts/Helgoland.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'LTInternet';
+  src: url('assets/fonts/LTInternet.ttf') format('truetype');
+}
+
 body,
 html {
   height: 100%;

@@ -2,8 +2,10 @@
 import 'phaser'
 import { Space, Color, Flags } from './settings'
 
-// TODO Deprecate
-const cardFont = 'Cinzel'
+// Fonts for different parts of the cards
+const cardTitle = 'Helgoland'
+const cardStats = 'Helgoland'
+const cardText = 'LTInternet'
 
 // The only fonts used
 const primaryFont = 'Typey McTypeface'
@@ -129,7 +131,7 @@ const StyleGeneral: StyleDict = {
 // Used on cards
 const StyleCards: StyleDict = {
   cardTitle: {
-    fontFamily: cardFont,
+    fontFamily: cardTitle,
     fontSize: '20px',
     color: Color.cardText,
     stroke: '#000000',
@@ -247,7 +249,7 @@ const StyleJourney: StyleDict = {
   },
   // Journey scene overlay header / navigation arrows
   journeyOverlay: {
-    fontFamily: cardFont,
+    fontFamily: primaryFont,
     fontSize: size.large,
     color: Color.whiteS,
     stroke: Color.goldS,
@@ -315,8 +317,8 @@ export const BBStyle: Record<string, any> = {
   },
   // The textbox for the card
   cardText: {
-    fontFamily: cardFont,
-    fontSize: '16px',
+    fontFamily: cardText,
+    fontSize: '17px',
     color: Color.whiteS,
     strokeThickness: 1,
     wrap: {
@@ -418,14 +420,14 @@ export const BBStyle: Record<string, any> = {
     valign: 'center',
   },
   cardCost: {
-    fontFamily: cardFont,
+    fontFamily: cardStats,
     fontSize: size.standard,
     color: Color.cardCost,
     stroke: '#000000',
     strokeThickness: 1,
   },
   cardPoints: {
-    fontFamily: cardFont,
+    fontFamily: cardStats,
     fontSize: size.standard,
     color: Color.cardPoints,
     stroke: '#000000',
@@ -436,7 +438,7 @@ export const BBStyle: Record<string, any> = {
     halign: 'center',
   },
   storyResolveBubble: {
-    fontFamily: cardFont,
+    fontFamily: cardStats,
     fontSize: size.standard,
     color: Color.cardCost,
     strokeThickness: 1,
