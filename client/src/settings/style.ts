@@ -135,7 +135,7 @@ const StyleCards: StyleDict = {
     fontSize: '20px',
     color: Color.cardText,
     stroke: '#000000',
-    strokeThickness: 1,
+    strokeThickness: 2,
   },
 }
 
@@ -320,7 +320,7 @@ export const BBStyle: Record<string, any> = {
     fontFamily: cardText,
     fontSize: '17px',
     color: Color.whiteS,
-    strokeThickness: 1,
+    strokeThickness: 1.3,
     wrap: {
       mode: 'word',
       width: 224,
@@ -424,14 +424,14 @@ export const BBStyle: Record<string, any> = {
     fontSize: size.standard,
     color: Color.cardCost,
     stroke: '#000000',
-    strokeThickness: 1,
+    strokeThickness: 2,
   },
   cardPoints: {
     fontFamily: cardStats,
     fontSize: size.standard,
     color: Color.cardPoints,
     stroke: '#000000',
-    strokeThickness: 1,
+    strokeThickness: 2,
   },
   deckBuilderTitle: {
     ...Style.header,

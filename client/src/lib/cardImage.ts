@@ -399,7 +399,7 @@ export class CardImage {
     this.txtCost = this.scene.add
       .rexBBCodeText(
         -Space.cardWidth / 2 + 27.5,
-        -Space.cardHeight / 2 + 58,
+        -Space.cardHeight / 2 + 60,
         `[stroke=${STAT_STROKE}]${this.card.cost}[/stroke]`,
         BBStyle.cardCost,
       )
@@ -422,7 +422,7 @@ export class CardImage {
     this.txtPoints = this.scene.add
       .rexBBCodeText(
         -Space.cardWidth / 2 + 27.5,
-        -Space.cardHeight / 2 + 102,
+        -Space.cardHeight / 2 + 103,
         `[stroke=${STAT_STROKE}]${this.card.points}[/stroke]`,
         BBStyle.cardPoints,
       )
@@ -524,7 +524,7 @@ export class CardImage {
     const displayName = this.card.name + upgradeSuffix
 
     this.txtTitle = this.scene.add
-      .text(0, 18 - Space.cardHeight / 2, displayName, Style.cardTitle)
+      .text(0, 20 - Space.cardHeight / 2, displayName, Style.cardTitle)
       .setOrigin(0.5)
 
     this.container.add(this.txtTitle)
