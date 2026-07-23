@@ -873,14 +873,6 @@
       "token": true
     },
     {
-      "name": "Condemnation",
-      "cost": 9,
-      "points": -3,
-      "text": "Visible\nWhen this is shuffled, add it to the story.",
-      "theme": 0,
-      "token": true
-    },
-    {
       "name": "Heirloom",
       "cost": 0,
       "points": 4,
@@ -902,14 +894,6 @@
       "points": 0,
       "text": "Fleeting\nWorth +2 for each Prey in your opponent's discard pile.",
       "theme": 5,
-      "token": true
-    },
-    {
-      "name": "Race",
-      "cost": 0,
-      "points": 1,
-      "text": "Fleeting\nDiscard each Race later in the story.",
-      "theme": 1,
       "token": true
     },
     {

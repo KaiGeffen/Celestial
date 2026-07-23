@@ -50,10 +50,12 @@ const cardData = (c: any, token: boolean) => ({
   theme: c.theme ?? 0,
   ...(token ? { token: true } : {}),
 })
+// Tokens with an id above this are excluded from the card maker
+const MAX_TOKEN_ID = 2000
 const cards = [
   ...Catalog.collectibleCards.map((c) => cardData(c, false)),
   ...Catalog.allCards
-    .filter((c) => !collectibleIds.has(c.id))
+    .filter((c) => !collectibleIds.has(c.id) && c.id <= MAX_TOKEN_ID)
     .map((c) => cardData(c, true)),
 ]
 const subjects = fs

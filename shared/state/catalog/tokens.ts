@@ -102,6 +102,7 @@ const wound = new Wound({
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nWhen this is discarded, add it next in the story Revealed.',
   theme: 2,
+  beta: true,
 })
 
 const heirloom = new Card({
@@ -121,7 +122,7 @@ class Condemnation extends Card {
 }
 const condemnation = new Condemnation({
   name: 'Condemnation',
-  id: 1007,
+  id: 11007,
   cost: 9,
   points: -3,
   qualities: [Quality.VISIBLE],
@@ -181,11 +182,12 @@ class Race extends Card {
 }
 const race = new Race({
   name: 'Race',
-  id: 1010,
+  id: 11010,
   points: 1,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nDiscard each Race later in the story.',
   theme: 1,
+  beta: true,
 })
 
 export {
