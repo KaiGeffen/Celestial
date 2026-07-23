@@ -477,7 +477,8 @@ const blessed = new Blessed({
   id: 8023,
   cost: 2,
   points: 2,
-  text: 'Exhale 1: Worth +1 for each card with base cost 6 or more in your discard pile.',
+  qualities: [Quality.FLEETING],
+  text: 'Fleeting\nExhale 1: Worth +1 for each card with base cost 6 or more in your discard pile.',
 })
 
 export {

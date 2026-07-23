@@ -5,7 +5,7 @@ import { Deck } from '../../../../shared/types/deck'
 import { MechanicsSettings } from '../../../../shared/settings'
 import { AchievementManager } from '../../achievementManager'
 
-const MATCH_TIMER_ENABLED = false
+const MATCH_TIMER_ENABLED = true
 
 class PvpMatch extends Match {
   timerCheckInterval: NodeJS.Timeout | null = null
