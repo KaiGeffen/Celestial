@@ -47,12 +47,17 @@ it critically and judge its quality, don't run a mechanical checklist.
 
 | `server/src/network/match/*` (match subsystem: match, pvpMatch, pveMatch, pveMatchMission, pveSpecialMatch, tutorialMatch) | 2026-07-23 | Full audit read incl. gameController + achievementManager + shared recentModels/timer plumbing. Fixed 3 bugs: (1) recap-slice achievements were cross-awarded — recentModels[p] is player p's perspective (reverseAttributes flips per-player lists so the viewer's visible info sits at index 0), but the loop fed both perspective models through onStateUpdate(uuid1,uuid2,…), so a player got achievements the *opponent* earned (and legit recap unlocks in the hidden opp slot were missed); now uuid1←recentModels[0]@0, uuid2←recentModels[1]@0 via new public AchievementManager.onStateUpdateForPlayer (null-guarded for PvE's absent uuid2); (2) achievement processing is now awaited before the end-game updateDatabases/sendUserData so achievement gold shows immediately (was fire-and-forget); (3) tutorialMatch.doAction now awaits super so logTutorialProgress records the post-action versionNo. Considered & dismissed: recap timer refund credits only the priority player — correct, they're the one on the clock. Cleanups applied: removed dead imports (getCardWithVersion in match.ts, ServerController in pveSpecialMatch.ts); dropped the redundant self-merged `interface Match` and gave the class honest field declarations (ws1/ws2/uuid2 nullable, game: ServerController | null = null, so the `=== null` guards throughout are now type-accurate); isOver() now returns a real boolean (`this.game !== null && …`). Pre-existing pveSpecialMatch.ts ctor arity tsc error remains (not from this audit) |
 
+| `server/src/db/updateMatchResult.ts` + `garden.ts` (with schema.ts) | 2026-07-23 | Full audit of the reward/currency layer. Fixed: Garden.harvest had no row lock — the harvestGarden handler + bare read-modify-write let two rapid harvests of the same plot both read the plant as ready and each add their own random gold/gem (additive sql) while removing the plant once = currency duplication; now wrapped in db.transaction with `.for('update')` (same pattern as claimMissionRewards). plantSeed given the same row-locked transaction (was racy on the MAX_PLANTS check + array clobber). insertMatchHistory winnerData/loserData now typed (MatchPlayerData). Stale plantSeed comment fixed. Kai's calls: kept `|| wasPlayerWin` seed gate (needed for surrenders / can't-happen-yet in pve but keep); did NOT fix null-garden legacy-row crash (schema column nullable, no default → `[...player.garden]` throws for pre-column rows). Not fixed (design Q, left for Kai): ELO + pvp_wins_month/lifetime update on every completed match regardless of matchQualifiesForRewards, so colliding accounts can farm leaderboard/achievement 9 via sub-3-round surrenders (only gems/seeds are gated). Also noted: markMissionsComplete + updateJourneyProgress do unlocked bitstring read-modify-write (same race class, low frequency). Pre-existing db/ drizzle insert/update tsc collapse remains (baseline 15 errors, unchanged) |
+
 ### Next up (proposed order)
 
 (client lib/utils/scenes/menus and matchRegions queue complete; server match
-subsystem audited 2026-07-23. Natural next candidates: server db layer
-(updateMatchResult.ts, schema.ts, garden.ts) and gameController.ts /
-gameControllerSpecial.ts / tutorialController.ts as a game-logic pass)
+subsystem + reward/currency db layer audited 2026-07-23. Natural next
+candidates: gameController.ts / gameControllerSpecial.ts / tutorialController.ts
+as a game-logic pass; remaining db files (gameState.ts, analytics.ts); or the
+network/ auth + server helpers (googleAuth, steamAuth, sessionToken,
+sendUserData). Open design Q flagged in the updateMatchResult row re: gating
+ELO/win-counts on matchQualifiesForRewards)
 
 Skipped on purpose: `client/src/loader/assetLists.ts` (highest churn but pure
 data lists — little structure to audit).
