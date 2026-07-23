@@ -47,7 +47,7 @@ class TutorialMatch extends PveMatch {
   }
 
   async doAction(player: number, action: number, versionNo: number) {
-    super.doAction(player, action, versionNo)
+    await super.doAction(player, action, versionNo)
 
     // Logging analytics that they got there
     logTutorialProgress(

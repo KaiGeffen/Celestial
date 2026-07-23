@@ -45,10 +45,14 @@ it critically and judge its quality, don't run a mechanical checklist.
 
 | `server/src/network/websocketServer.ts` | 2026-07-19 | Full audit. Fixed: claimMissionRewards now row-locks (double-claim coin race, same pattern as purchaseItem); deck-name logging no longer throws on invalid card ids; TypedWebSocket dispatch (shared) contains handler throws/rejections so a crafted message can't crash the server process; ActiveGame class→interface. Known/left: guest sign-in trusts uuid by design (provider-account gate holds), sendInitialUserData trusts inventory/missions (existing TODO), setCosmeticSet ownership unvalidated (existing TODO), initPvp queue race (existing TODO). Pre-existing server tsc errors throughout db/ + websocketServer (drizzle insert/update types collapse — likely the old TypeScript version, drizzle needs a newer one) and pveSpecialMatch.ts ctor arity — none from this audit |
 
+| `server/src/network/match/*` (match subsystem: match, pvpMatch, pveMatch, pveMatchMission, pveSpecialMatch, tutorialMatch) | 2026-07-23 | Full audit read incl. gameController + achievementManager + shared recentModels/timer plumbing. Fixed 3 bugs: (1) recap-slice achievements were cross-awarded — recentModels[p] is player p's perspective (reverseAttributes flips per-player lists so the viewer's visible info sits at index 0), but the loop fed both perspective models through onStateUpdate(uuid1,uuid2,…), so a player got achievements the *opponent* earned (and legit recap unlocks in the hidden opp slot were missed); now uuid1←recentModels[0]@0, uuid2←recentModels[1]@0 via new public AchievementManager.onStateUpdateForPlayer (null-guarded for PvE's absent uuid2); (2) achievement processing is now awaited before the end-game updateDatabases/sendUserData so achievement gold shows immediately (was fire-and-forget); (3) tutorialMatch.doAction now awaits super so logTutorialProgress records the post-action versionNo. Considered & dismissed: recap timer refund credits only the priority player — correct, they're the one on the clock. Cleanups applied: removed dead imports (getCardWithVersion in match.ts, ServerController in pveSpecialMatch.ts); dropped the redundant self-merged `interface Match` and gave the class honest field declarations (ws1/ws2/uuid2 nullable, game: ServerController | null = null, so the `=== null` guards throughout are now type-accurate); isOver() now returns a real boolean (`this.game !== null && …`). Pre-existing pveSpecialMatch.ts ctor arity tsc error remains (not from this audit) |
+
 ### Next up (proposed order)
 
-(queue empty — client lib/utils/scenes/menus and matchRegions queue complete;
-server matches (match.ts, pvpMatch.ts) are the natural next candidates)
+(client lib/utils/scenes/menus and matchRegions queue complete; server match
+subsystem audited 2026-07-23. Natural next candidates: server db layer
+(updateMatchResult.ts, schema.ts, garden.ts) and gameController.ts /
+gameControllerSpecial.ts / tutorialController.ts as a game-logic pass)
 
 Skipped on purpose: `client/src/loader/assetLists.ts` (highest churn but pure
 data lists — little structure to audit).

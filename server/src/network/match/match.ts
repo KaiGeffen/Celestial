@@ -10,25 +10,22 @@ import Catalog from '../../../../shared/state/catalog'
 import { AchievementManager } from '../../achievementManager'
 import { randomUUID } from 'crypto'
 import sendUserData from '../sendUserData'
-import { getCardWithVersion } from '../../../../shared/state/cardUpgrades'
 
 // TODO Timer logic for disconnects
 
-interface Match {
+class Match {
   gameId: string
   ws1: ServerWS | null
-  ws2: ServerWS | null
+  ws2: ServerWS | null = null
 
   uuid1: string
-  uuid2: string | null
+  uuid2: string | null = null
 
   deck1: Deck
   deck2: Deck
 
-  game: ServerController
-}
+  game: ServerController | null = null
 
-class Match implements Match {
   constructor(ws1: ServerWS, uuid1: string, deck1: Deck, deck2: Deck) {
     // Generate unique game ID
     this.gameId = randomUUID()
@@ -101,13 +98,24 @@ class Match implements Match {
   async notifyState() {
     if (this.game === null) return
 
-    // Handle achievements for current state and each slice of the recap
-    AchievementManager.onStateUpdate(this.uuid1, this.uuid2, this.game.model)
-    ;[0, 1].forEach((player) => {
-      this.game.model.recentModels[player].forEach(async (model) => {
-        await AchievementManager.onStateUpdate(this.uuid1, this.uuid2, model)
-      })
-    })
+    // Handle achievements for the current state and each slice of the recap.
+    // recentModels[p] is player p's own perspective — reverseAttributes puts
+    // that player's visible info at index 0 — so each player's recap slices
+    // must be checked against their own view at index 0, never the opponent's.
+    // Awaited so any achievement gold is granted before the end-game sendUserData.
+    await AchievementManager.onStateUpdate(
+      this.uuid1,
+      this.uuid2,
+      this.game.model,
+    )
+    await Promise.all([
+      ...this.game.model.recentModels[0].map((model) =>
+        AchievementManager.onStateUpdateForPlayer(this.uuid1, model, 0),
+      ),
+      ...this.game.model.recentModels[1].map((model) =>
+        AchievementManager.onStateUpdateForPlayer(this.uuid2, model, 0),
+      ),
+    ])
 
     /*
       Send each state since last input
@@ -219,7 +227,7 @@ class Match implements Match {
 
   // Whether the match is over
   isOver(): boolean {
-    return this.game && this.game.model.winner !== null
+    return this.game !== null && this.game.model.winner !== null
   }
 
   isPvp(): boolean {

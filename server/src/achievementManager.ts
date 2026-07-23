@@ -113,11 +113,16 @@ export class AchievementManager {
     }
   }
 
-  private static async onStateUpdateForPlayer(
+  // Evaluate per-state achievements for one player against the given model.
+  // The model must be one where this player's info sits at `player` (e.g. their
+  // own perspective model, where their visible data is at index 0).
+  static async onStateUpdateForPlayer(
     playerId: string,
     game: GameModel,
     player: number,
   ) {
+    if (!playerId) return
+
     // 13: Have a discard pile containing 15 or more cards
     if (game.pile[player].length >= 15) {
       await this.unlock(playerId, 13)

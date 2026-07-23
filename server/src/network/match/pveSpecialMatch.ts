@@ -5,7 +5,6 @@ import { Deck } from '../../../../shared/types/deck'
 import { getCardWithVersion } from '../../../../shared/state/cardUpgrades'
 import Catalog from '../../../../shared/state/catalog'
 import Card from '../../../../shared/state/card'
-import { ServerController } from '../../gameController'
 
 class PveSpecialMatch extends PveMatch {
   constructor(
