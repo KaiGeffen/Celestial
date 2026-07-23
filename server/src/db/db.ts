@@ -7,6 +7,7 @@ import type {
   achievements,
   approvedRefs,
   missionStats,
+  customCards,
 } from './schema'
 import * as dotenv from 'dotenv'
 
@@ -18,6 +19,7 @@ type Schema = {
   achievements: typeof achievements
   approvedRefs: typeof approvedRefs
   missionStats: typeof missionStats
+  customCards: typeof customCards
 }
 
 if (!process.env.DATABASE_URL) {

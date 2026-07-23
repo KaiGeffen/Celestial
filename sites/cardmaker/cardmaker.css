@@ -1,0 +1,466 @@
+/* Card Maker — palette mirrors the game: parchment #F5F2EB, ink #321A0F,
+   gold #EDAA24 (reserved for interactive elements). */
+
+:root {
+  --parchment: #f5f2eb;
+  --ink: #321a0f;
+  --gold: #edaa24;
+  --gold-dark: #cf8f18; /* darker gold for button hover */
+  --line: rgba(50, 26, 15, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  border-bottom: 2px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.site-header .logo {
+  height: 44px;
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.page-nav {
+  margin-left: auto;
+  font-weight: bold;
+  display: flex;
+  gap: 16px;
+}
+
+/* The current page's own entry stays in the bar but isn't a link (plain ink,
+   not gold), so the three destinations are always visible and consistent. */
+.page-nav [aria-current='page'] {
+  color: var(--ink);
+}
+
+/* Search page */
+.search-page {
+  padding: 24px;
+}
+
+.search-controls {
+  max-width: 640px;
+  margin: 0 auto 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.source-toggle {
+  display: flex;
+  gap: 0;
+}
+
+.source-toggle button {
+  flex: 1;
+  background: transparent;
+}
+
+/* Unselected toggle: a faint gold wash on hover, not the filled-button darken */
+.source-toggle button:hover:not(:disabled):not(.selected) {
+  background: rgba(237, 170, 36, 0.18);
+}
+
+.source-toggle button.selected {
+  background: var(--gold);
+}
+
+.source-toggle button.selected:hover:not(:disabled) {
+  background: var(--gold-dark);
+}
+
+#search-input {
+  font: inherit;
+  padding: 10px;
+  border: 1px solid var(--line);
+}
+
+.search-help {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.search-help code {
+  background: rgba(50, 26, 15, 0.08);
+  padding: 1px 4px;
+}
+
+/* Search results show cards at half card size (bigger than the maker gallery) */
+.search-page .gallery-item {
+  width: 236px; /* 472 * 0.5 */
+}
+
+/* Maker: form + card, side by side */
+.maker {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px;
+  flex-wrap: wrap;
+}
+
+.form-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(420px, 100%);
+}
+
+.form-pane label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-weight: bold;
+}
+
+.form-pane .optional {
+  font-weight: normal;
+  opacity: 0.7;
+  font-size: 0.85em;
+}
+
+.form-pane input,
+.form-pane textarea {
+  font: inherit;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+}
+
+/* No spinner arrows on the cost/points number inputs */
+.form-pane input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.form-pane input[type='number']::-webkit-inner-spin-button,
+.form-pane input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.stat-row {
+  display: flex;
+  gap: 14px;
+}
+
+.stat-row label {
+  flex: 1;
+}
+
+fieldset {
+  border: 1px solid var(--line);
+  padding: 10px;
+  margin: 0;
+}
+
+legend {
+  font-weight: bold;
+  padding: 0 6px;
+}
+
+/* Theme swatches */
+.theme-picker {
+  display: block;
+}
+
+.theme-swatches {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.theme-swatch {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--line);
+  border-radius: 0;
+  padding: 0;
+  cursor: pointer;
+  background-size: 400%;
+  background-position: center;
+}
+
+.theme-swatch.selected {
+  border-color: var(--gold);
+  outline: 2px solid var(--gold);
+}
+
+/* Subject picker */
+.subject-picker input[type='search'] {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.subject-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.subject-thumb {
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  background: none;
+}
+
+.subject-thumb img {
+  width: 100%;
+  display: block;
+}
+
+.subject-thumb.selected {
+  border-color: var(--gold);
+}
+
+.subject-thumb .thumb-name {
+  font-size: 10px;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Card pane */
+.card-pane {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  font: inherit;
+  font-weight: bold;
+  padding: 8px 18px;
+  border: 2px solid var(--ink);
+  background: var(--gold);
+  color: var(--ink);
+  cursor: pointer;
+  /* Only the background color animates. Avoid `filter`/`opacity` transitions:
+     they promote the button to its own compositing layer, which makes the
+     card's overlapping drop-shadow flicker/recomposite around it on hover. */
+  transition: background-color 0.12s ease;
+}
+
+/* Simple, intuitive hover: the filled button deepens to a darker gold. */
+button:hover:not(:disabled) {
+  background: var(--gold-dark);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.publish-result {
+  max-width: 340px;
+  word-break: break-all;
+  text-align: center;
+}
+
+/* Keyword reminders — dark backing like the game's hint popups */
+.reminders {
+  max-width: 354px;
+  background: rgba(10, 6, 4, 0.88);
+  color: var(--parchment);
+  padding: 10px 14px;
+  font-size: 15px;
+}
+
+.reminders p {
+  margin: 6px 0;
+}
+
+.reminders[hidden] {
+  display: none;
+}
+
+/* Referenced card previews — one or more, stacked vertically */
+.ref-cards {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.ref-cards[hidden] {
+  display: none;
+}
+
+/* Gallery */
+.gallery {
+  padding: 24px;
+  border-top: 2px solid var(--line);
+  text-align: center;
+}
+
+.gallery-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
+}
+
+/* One grid slot: the card link plus (optionally) the creator credit below it.
+   The credit lives here, outside the link, so the clickable hit area is just
+   the card — same as game cards. */
+.gallery-item {
+  width: 177px; /* 472 * 0.375 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.gallery-card {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+  display: block;
+  text-decoration: none;
+}
+
+/* 3D tilt card (see createTiltCard / attachTilt): three stacked layers at
+   increasing depth. On hover the card angles toward the cursor and the
+   subject plane parallaxes against the frame, so it reads as real 3D. */
+.tilt-scene {
+  perspective: 700px;
+  aspect-ratio: 472 / 672;
+  /* No shadow here: a static box-shadow on the scene doesn't rotate with the
+     card, so tilting reveals its rounded-rectangle shape peeking out behind.
+     The card art already has its own edges, so it reads fine unadorned. */
+}
+
+.tilt-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.12s ease;
+}
+
+.tilt-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Depth of the subject and frame planes. Each is counter-scaled so all three
+   still line up at rest (the perspective magnifies nearer planes; the scale
+   cancels that), then they separate visibly as the card rotates. */
+.tilt-subject {
+  transform: translateZ(18px) scale(0.97);
+}
+
+.tilt-frame {
+  transform: translateZ(20px) scale(0.969);
+}
+
+/* Per-card page (/cardmaker/{slug}/): card with its keyword reminders below
+   on the left, referenced card on the right; stacks on narrow screens */
+.card-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 32px;
+  padding: 24px;
+  flex-wrap: wrap;
+}
+
+.card-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  max-width: 354px;
+}
+
+.gallery-card canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.gallery-item .credit {
+  font-size: 12px;
+  opacity: 0.75;
+  /* Plain text, not gold — it's static, and it's outside the card link */
+  color: var(--ink);
+}
+
+.gallery-status {
+  opacity: 0.75;
+}
+
+/* Community card page: creator credit under the card, and centered status */
+.page-credit {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.75;
+}
+
+.page-status {
+  text-align: center;
+}
+
+.page-status[hidden],
+.page-credit[hidden] {
+  display: none;
+}
+
+.site-footer {
+  padding: 18px 24px;
+  border-top: 2px solid var(--line);
+  text-align: center;
+  font-size: 14px;
+}
+
+a {
+  color: var(--gold);
+}
+
+@media (max-width: 860px) {
+  .maker {
+    flex-direction: column;
+    align-items: center;
+  }
+  .form-pane {
+    order: 2;
+  }
+  .card-pane {
+    order: 1;
+  }
+}

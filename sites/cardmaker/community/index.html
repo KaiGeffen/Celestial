@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Custom Card — Celestial</title>
+    <meta name="description" content="A community-made Celestial card." />
+    <link rel="icon" type="image/svg+xml" href="../../about/assets/favicon.svg" />
+    <link rel="stylesheet" href="../cardmaker.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1 id="card-title">Custom Card</h1>
+      <nav class="page-nav">
+        <a href="../">Card Maker</a>
+        <a href="../search/">Card Search</a>
+        <a href="https://celestialdecks.gg">Play the Game</a>
+      </nav>
+    </header>
+
+    <main class="card-page">
+      <div class="card-column">
+        <div id="card-mount"></div>
+        <div class="card-actions">
+          <button id="btn-download" type="button">Download</button>
+        </div>
+        <p id="credit" class="page-credit" hidden></p>
+        <div id="reminders" class="reminders" hidden></div>
+      </div>
+      <div id="ref-cards" class="ref-cards" hidden></div>
+    </main>
+
+    <p id="status" class="gallery-status page-status"></p>
+
+    <footer class="site-footer">
+      <p>
+        Made with Celestial's card frame —
+        <a href="https://celestialdecks.gg">play the game</a> ·
+        <a href="https://discord.gg/UXWswspB8S">Discord</a> (report a card
+        there)
+      </p>
+    </footer>
+
+    <script type="module" src="communityCard.js"></script>
+  </body>
+</html>

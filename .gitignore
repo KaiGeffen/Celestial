@@ -27,3 +27,12 @@ electron/steam_appid.txt
 
 # Drizzle-kit files #
 drizzle/
+
+# Cardmaker generated content (assets + per-card pages) — created from
+# client/ + shared/ by generateAssets.ts. Every directory under cardmaker/
+# is generated EXCEPT the negated source dirs; when adding a new source
+# directory there, negate it here too. #
+sites/cardmaker/assets/
+sites/cardmaker/*/
+!sites/cardmaker/search/
+!sites/cardmaker/community/
