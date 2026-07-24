@@ -159,7 +159,13 @@ function tokenCondition(token: SearchToken): SQL {
   } else if (token.field === 'text') {
     cond = ilike(customCards.text, likePattern(token.text))
   } else {
-    cond = ilike(customCards.search_blob, likePattern(token.text.toLowerCase()))
+    // Free text matches the blob (card + referenced text, game parity) and the
+    // creator name — the latter kept out of the blob so it stays community-only.
+    const like = likePattern(token.text.toLowerCase())
+    cond = or(
+      ilike(customCards.search_blob, like),
+      ilike(customCards.creator, like),
+    )!
   }
   return token.negated ? not(cond) : cond
 }

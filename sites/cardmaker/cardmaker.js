@@ -77,6 +77,19 @@ const clampInt = (v, min, max) =>
 function rerender() {
   if (previewCard) redrawTiltCard(previewCard, state)
   updateHints()
+  resetPublishButton()
+}
+
+// After a successful publish the button locks as "Published" so the same card
+// can't be spam-published; any edit (which calls rerender) unlocks it so the
+// new version can be published.
+function resetPublishButton() {
+  const btn = $('btn-publish')
+  if (btn.dataset.published) {
+    btn.disabled = false
+    btn.textContent = 'Publish'
+    delete btn.dataset.published
+  }
 }
 
 /** Keyword reminders + referenced-card previews below the card (like the game's hint). */
@@ -186,9 +199,24 @@ async function copyCard() {
 }
 
 async function publishCard() {
+  const btn = $('btn-publish')
   const result = $('publish-result')
-  result.hidden = false
-  result.textContent = 'Publishing…'
+  // Disable immediately so a double-click can't fire two publishes in flight.
+  btn.disabled = true
+
+  // Only show "Publishing…" if the request is actually slow. A fast response
+  // (e.g. an immediate rate-limit rejection) cancels it, so the final message
+  // appears directly instead of flickering behind an intermediate one.
+  const pending = setTimeout(() => {
+    result.hidden = false
+    result.textContent = 'Publishing…'
+  }, 300)
+  const show = (html) => {
+    clearTimeout(pending)
+    result.hidden = false
+    result.innerHTML = html
+  }
+
   try {
     const res = await fetch(`${API_BASE}/cards`, {
       method: 'POST',
@@ -203,13 +231,36 @@ async function publishCard() {
         creator: state.creator,
       }),
     })
+    if (res.status === 429) {
+      const { retryAfter } = await res.json().catch(() => ({}))
+      // Two lines so the wait time stays on its own line rather than wrapping mid-phrase.
+      show(
+        `You've hit the publish limit.<br>` +
+          `You can publish again in ${formatWait(retryAfter)}.`,
+      )
+      btn.disabled = false
+      return
+    }
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const { id } = await res.json()
     const link = `${location.origin}/cardmaker/community/?id=${id}`
-    result.innerHTML = `Published! <a href="${link}">View your card →</a>`
+    show(`Published! <a href="${link}">View your card →</a>`)
+    // Lock it as published until the card is edited (see resetPublishButton).
+    btn.textContent = 'Published'
+    btn.dataset.published = '1'
   } catch (e) {
-    result.textContent = 'Publishing is not available right now.'
+    show('Publishing is not available right now.')
+    btn.disabled = false // let them retry
   }
+}
+
+// Human-friendly wait time from a seconds count (rounded up, coarse on purpose).
+function formatWait(seconds) {
+  if (!seconds || seconds < 60) return 'a moment'
+  const mins = Math.ceil(seconds / 60)
+  if (mins < 60) return `${mins} minute${mins === 1 ? '' : 's'}`
+  const hours = Math.ceil(mins / 60)
+  return `${hours} hour${hours === 1 ? '' : 's'}`
 }
 
 // -------------------------------------------------------------------- init

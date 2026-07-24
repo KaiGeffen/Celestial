@@ -237,16 +237,22 @@ async function runCommunitySearch() {
   const seq = ++searchSeq
   $('results').innerHTML = ''
   $('load-more').hidden = true
-  $('search-status').textContent = 'Searching…'
   communityBefore = null
   communityShown = 0
   communityTotal = 0
+  // Only show "Searching…" if the request is slow, so a fast response replaces
+  // the previous results directly instead of flickering through it.
+  const pending = setTimeout(() => {
+    if (seq === searchSeq) $('search-status').textContent = 'Searching…'
+  }, 300)
   try {
     await fetchCommunityPage(query, null, seq)
   } catch (e) {
     if (seq === searchSeq) {
       $('search-status').textContent = 'Community search is not available right now.'
     }
+  } finally {
+    clearTimeout(pending)
   }
 }
 

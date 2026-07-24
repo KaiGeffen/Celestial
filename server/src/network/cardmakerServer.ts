@@ -24,7 +24,7 @@ const THEME_MIN = 0
 const THEME_MAX = 8
 
 // Publish rate limit per IP.
-const RATE_LIMIT = 20
+const RATE_LIMIT = 10
 const RATE_WINDOW_MS = 60 * 60 * 1000 // 1 hour
 
 // The subject index is an offset into the append-only curated list in the card
@@ -121,18 +121,20 @@ function validate(body: any): { fields?: CardFields; error?: string } {
 // Simple in-memory sliding-window limiter (single process, matches this
 // server's scale). Maps client IP -> recent publish timestamps.
 const publishTimes = new Map<string, number[]>()
-function rateLimited(ip: string): boolean {
+// Returns 0 when a publish is allowed (and records it), otherwise the number of
+// seconds until the oldest publish in the window ages out and one frees up.
+function rateLimited(ip: string): number {
   const now = Date.now()
   const recent = (publishTimes.get(ip) ?? []).filter(
     (t) => now - t < RATE_WINDOW_MS,
   )
   if (recent.length >= RATE_LIMIT) {
     publishTimes.set(ip, recent)
-    return true
+    return Math.max(1, Math.ceil((recent[0] + RATE_WINDOW_MS - now) / 1000))
   }
   recent.push(now)
   publishTimes.set(ip, recent)
-  return false
+  return 0
 }
 
 // Shape a DB row into the public card fields the client renders from.
@@ -160,10 +162,14 @@ export default function createCardmakerServer() {
   // POST /cardmaker/api/cards — publish a card, returns { id }
   app.post('/cardmaker/api/cards', async (req, res) => {
     const ip = req.ip || 'unknown'
-    if (rateLimited(ip)) {
-      return res
-        .status(429)
-        .json({ error: 'Rate limit reached. Try again later.' })
+    const retryAfter = rateLimited(ip)
+    if (retryAfter > 0) {
+      res.set('Retry-After', String(retryAfter))
+      return res.status(429).json({
+        error: 'Rate limit reached.',
+        limit: RATE_LIMIT,
+        retryAfter, // seconds until a publish frees up
+      })
     }
 
     const { fields, error } = validate(req.body)
