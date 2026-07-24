@@ -19,6 +19,18 @@ import {
 } from './cardRenderer.js'
 
 const THEME_COUNT = 9
+// Theme names, in frame order (0-8), shown on swatch hover
+const THEME_NAMES = [
+  'Sky',
+  'Ashes',
+  'Shadows',
+  'Pet',
+  'Birth',
+  'Vision',
+  'Stars',
+  'Water',
+  'Special',
+]
 const API_BASE = '/cardmaker/api'
 
 const DEFAULTS = {
@@ -93,7 +105,7 @@ function buildThemePicker() {
     swatch.type = 'button'
     swatch.className = 'theme-swatch'
     swatch.dataset.theme = i
-    swatch.title = `Theme ${i}`
+    swatch.title = THEME_NAMES[i] ?? `Theme ${i}`
     swatch.style.backgroundImage = `url(${themeLayer('background', i)})`
     swatch.addEventListener('click', () => {
       state.theme = i

@@ -1,6 +1,6 @@
-// Card Search — searches the game's real cards (client-side, using the deck
-// editor's search syntax) or the community's published custom cards (via the
-// cardmaker API).
+// Card Search — searches the game's real cards or the community's published
+// custom cards (fetched from the cardmaker API). Both use the same client-side
+// query syntax, ported from the game's deck editor (parseSearchQuery below).
 
 import {
   gameData,
@@ -173,14 +173,40 @@ function resultEntry(fields, { credit = '', href = '#' } = {}) {
 
 // ---------------------------------------------------------------- search
 
+// Community cards are filtered client-side with the exact same query syntax as
+// game cards, so both searches behave identically. That means we need the whole
+// visible set in memory: fetch every newest-first page (via the `before`
+// cursor) once, then cache it. The list is small JSON — gallery art is a
+// separate lazy-loaded request per card — so pulling all of it is cheap.
+const COMMUNITY_PAGE = 50
+let communityCards = null // null until first fetched; array once loaded
+
+async function loadCommunityCards() {
+  if (communityCards) return communityCards
+  const all = []
+  let before = null
+  for (;;) {
+    const params = new URLSearchParams({ limit: String(COMMUNITY_PAGE) })
+    if (before !== null) params.set('before', String(before))
+    const res = await fetch(`${API_BASE}/cards?${params}`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const page = await res.json()
+    all.push(...page)
+    if (page.length < COMMUNITY_PAGE) break
+    before = page[page.length - 1].id
+  }
+  communityCards = all
+  return communityCards
+}
+
 async function runSearch() {
   const query = $('search-input').value
   const results = $('results')
   const status = $('search-status')
-  results.innerHTML = ''
+  const tokens = parseSearchQuery(query)
 
   if (source === 'game') {
-    const tokens = parseSearchQuery(query)
+    results.innerHTML = ''
     const matches = gameData.cards.filter((c) => cardPassesFilters(c, tokens))
     for (const card of matches) {
       results.appendChild(
@@ -194,25 +220,30 @@ async function runSearch() {
         ? 'No cards match.'
         : `${matches.length} of ${gameData.cards.length} cards`
   } else {
-    status.textContent = 'Searching…'
+    let cards
     try {
-      const params = new URLSearchParams({ limit: '50' })
-      if (query.trim()) params.set('q', query.trim())
-      const res = await fetch(`${API_BASE}/cards?${params}`)
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const cards = await res.json()
-      for (const card of cards) {
-        results.appendChild(
-          resultEntry(card, {
-            credit: card.creator ? `by ${card.creator}` : '',
-            href: `../community/?id=${card.id}`,
-          }),
-        )
-      }
-      status.textContent = cards.length === 0 ? 'No cards match.' : ''
+      cards = await loadCommunityCards()
     } catch (e) {
+      results.innerHTML = ''
       status.textContent = 'Community search is not available right now.'
+      return
     }
+    // A slower fetch may finish after the user switched back to game cards.
+    if (source !== 'community') return
+    results.innerHTML = ''
+    const matches = cards.filter((c) => cardPassesFilters(c, tokens))
+    for (const card of matches) {
+      results.appendChild(
+        resultEntry(card, {
+          credit: card.creator ? `by ${card.creator}` : '',
+          href: `../community/?id=${card.id}`,
+        }),
+      )
+    }
+    status.textContent =
+      matches.length === 0
+        ? 'No cards match.'
+        : `${matches.length} of ${cards.length} cards`
   }
 }
 
@@ -220,8 +251,11 @@ function setSource(next) {
   source = next
   $('tab-game').classList.toggle('selected', source === 'game')
   $('tab-community').classList.toggle('selected', source === 'community')
-  // The syntax help only applies to the game-card search
-  $('search-help').hidden = source !== 'game'
+  // Community cards use the same query syntax, so the first community search
+  // may need to fetch the set — show a hint while it loads.
+  if (source === 'community' && !communityCards) {
+    $('search-status').textContent = 'Loading community cards…'
+  }
   runSearch()
 }
 
