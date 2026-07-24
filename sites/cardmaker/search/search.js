@@ -173,77 +173,100 @@ function resultEntry(fields, { credit = '', href = '#' } = {}) {
 
 // ---------------------------------------------------------------- search
 
-// Community cards are filtered client-side with the exact same query syntax as
-// game cards, so both searches behave identically. That means we need the whole
-// visible set in memory: fetch every newest-first page (via the `before`
-// cursor) once, then cache it. The list is small JSON — gallery art is a
-// separate lazy-loaded request per card — so pulling all of it is cheap.
-const COMMUNITY_PAGE = 50
-let communityCards = null // null until first fetched; array once loaded
+const renderGameCard = (card) =>
+  resultEntry(realCardFields(card), { href: `../${slugify(card.name)}/` })
 
-async function loadCommunityCards() {
-  if (communityCards) return communityCards
-  const all = []
-  let before = null
-  for (;;) {
-    const params = new URLSearchParams({ limit: String(COMMUNITY_PAGE) })
-    if (before !== null) params.set('before', String(before))
-    const res = await fetch(`${API_BASE}/cards?${params}`)
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    const page = await res.json()
-    all.push(...page)
-    if (page.length < COMMUNITY_PAGE) break
-    before = page[page.length - 1].id
-  }
-  communityCards = all
-  return communityCards
+const renderCommunityCard = (card) =>
+  resultEntry(card, {
+    credit: card.creator ? `by ${card.creator}` : '',
+    href: `../community/?id=${card.id}`,
+  })
+
+// Game cards are a fixed ~120-card catalog shipped in gameData.json, so they're
+// filtered client-side with the same parser the game uses.
+function runGameSearch() {
+  const results = $('results')
+  const tokens = parseSearchQuery($('search-input').value)
+  const matches = gameData.cards.filter((c) => cardPassesFilters(c, tokens))
+  results.innerHTML = ''
+  for (const card of matches) results.appendChild(renderGameCard(card))
+  $('search-status').textContent =
+    matches.length === 0
+      ? 'No cards match.'
+      : `${matches.length} of ${gameData.cards.length} cards`
 }
 
-async function runSearch() {
-  const query = $('search-input').value
-  const results = $('results')
-  const status = $('search-status')
-  const tokens = parseSearchQuery(query)
+// Community cards can number in the thousands, so search runs server-side (same
+// syntax; see cardmakerSearch.ts) and pages in. Each query is one request; the
+// "Load more" button fetches the next keyset page. `searchSeq` guards against
+// out-of-order responses when the user types quickly.
+const COMMUNITY_PAGE = 30
+let communityBefore = null // keyset cursor: id to page before, or null for page 1
+let communityTotal = 0
+let communityShown = 0
+let searchSeq = 0
 
+async function fetchCommunityPage(query, before, seq) {
+  const params = new URLSearchParams({ limit: String(COMMUNITY_PAGE) })
+  if (query.trim()) params.set('q', query.trim())
+  if (before !== null) params.set('before', String(before))
+  const res = await fetch(`${API_BASE}/cards?${params}`)
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  const data = await res.json()
+
+  // A stale response (superseded query, or tab switched away) is discarded.
+  if (seq !== searchSeq || source !== 'community') return
+
+  const results = $('results')
+  for (const card of data.cards) results.appendChild(renderCommunityCard(card))
+  communityShown += data.cards.length
+  communityTotal = data.total
+  if (data.cards.length > 0) {
+    communityBefore = data.cards[data.cards.length - 1].id
+  }
+
+  $('search-status').textContent =
+    communityTotal === 0
+      ? 'No cards match.'
+      : `Showing ${communityShown} of ${communityTotal}`
+  $('load-more').hidden = communityShown >= communityTotal
+}
+
+async function runCommunitySearch() {
+  const query = $('search-input').value
+  const seq = ++searchSeq
+  $('results').innerHTML = ''
+  $('load-more').hidden = true
+  $('search-status').textContent = 'Searching…'
+  communityBefore = null
+  communityShown = 0
+  communityTotal = 0
+  try {
+    await fetchCommunityPage(query, null, seq)
+  } catch (e) {
+    if (seq === searchSeq) {
+      $('search-status').textContent = 'Community search is not available right now.'
+    }
+  }
+}
+
+async function loadMoreCommunity() {
+  const btn = $('load-more')
+  btn.disabled = true
+  try {
+    await fetchCommunityPage($('search-input').value, communityBefore, searchSeq)
+  } catch (e) {
+    /* leave the button for a retry */
+  }
+  btn.disabled = false
+}
+
+function runSearch() {
   if (source === 'game') {
-    results.innerHTML = ''
-    const matches = gameData.cards.filter((c) => cardPassesFilters(c, tokens))
-    for (const card of matches) {
-      results.appendChild(
-        resultEntry(realCardFields(card), {
-          href: `../${slugify(card.name)}/`,
-        }),
-      )
-    }
-    status.textContent =
-      matches.length === 0
-        ? 'No cards match.'
-        : `${matches.length} of ${gameData.cards.length} cards`
+    $('load-more').hidden = true
+    runGameSearch()
   } else {
-    let cards
-    try {
-      cards = await loadCommunityCards()
-    } catch (e) {
-      results.innerHTML = ''
-      status.textContent = 'Community search is not available right now.'
-      return
-    }
-    // A slower fetch may finish after the user switched back to game cards.
-    if (source !== 'community') return
-    results.innerHTML = ''
-    const matches = cards.filter((c) => cardPassesFilters(c, tokens))
-    for (const card of matches) {
-      results.appendChild(
-        resultEntry(card, {
-          credit: card.creator ? `by ${card.creator}` : '',
-          href: `../community/?id=${card.id}`,
-        }),
-      )
-    }
-    status.textContent =
-      matches.length === 0
-        ? 'No cards match.'
-        : `${matches.length} of ${cards.length} cards`
+    runCommunitySearch()
   }
 }
 
@@ -251,11 +274,6 @@ function setSource(next) {
   source = next
   $('tab-game').classList.toggle('selected', source === 'game')
   $('tab-community').classList.toggle('selected', source === 'community')
-  // Community cards use the same query syntax, so the first community search
-  // may need to fetch the set — show a hint while it loads.
-  if (source === 'community' && !communityCards) {
-    $('search-status').textContent = 'Loading community cards…'
-  }
   runSearch()
 }
 
@@ -268,6 +286,7 @@ async function init() {
 
   $('tab-game').addEventListener('click', () => setSource('game'))
   $('tab-community').addEventListener('click', () => setSource('community'))
+  $('load-more').addEventListener('click', loadMoreCommunity)
   $('search-input').addEventListener('input', () => {
     clearTimeout(debounceTimer)
     debounceTimer = setTimeout(runSearch, 150)

@@ -94,8 +94,10 @@ or asset change in `client/`/`shared/`.
   Then open http://localhost:5561/cardmaker/ .
 
   Requires `DATABASE_URL` in `server/.env` and the `customCards` table
-  (`npm run migrate --prefix server` if it's missing). With the DB/API down the
-  maker still loads at 5561, but the gallery/publish return nothing.
+  (`npm run migrate --prefix server` if it's missing). New publishes populate
+  `search_blob` automatically; a fresh table needs nothing extra. With the
+  DB/API down the maker still loads at 5561, but the gallery/publish return
+  nothing.
 
 > **Which port?** Static servers (4950) can't answer `/cardmaker/api`, so use
 > **5561** whenever you're testing publish/gallery/search. The per-card game

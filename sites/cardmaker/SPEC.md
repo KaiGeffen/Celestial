@@ -174,15 +174,35 @@ hundred **bytes**, not kilobytes — storage is a non-issue.
     creator     text        -- optional, length-capped
     created_at  timestamptz default now()
     hidden      bool default false   -- moderation kill switch
+    search_blob text default ''      -- precomputed lowercase search text
   ```
+
+  `search_blob` is the card's fields plus the reminder text of any keyword it
+  names and the text of any card it references (same expansion as the game's
+  free-text search), computed at publish time (`buildSearchBlob`). Free-text
+  search `ILIKE`s it, so community search matches the game's syntax without
+  scanning the catalog per query. A GIN trigram index keeps that fast at scale:
+
+  ```sql
+  CREATE EXTENSION IF NOT EXISTS pg_trgm;
+  CREATE INDEX custom_cards_search_blob_trgm
+    ON custom_cards USING gin (search_blob gin_trgm_ops);
+  ```
+
+  If the game's card/keyword text changes, re-run `buildSearchBlob` over the
+  existing rows to refresh their blobs.
 
 - **API** (JSON; no auth):
   - `POST /cardmaker/api/cards` — body: the fields. Server re-validates every
     cap (name/text/creator length, cost/points range, theme range, subject
     range). Returns `{ id }`.
-  - `GET /cardmaker/api/cards?before={id}&limit=20&q={query}` — newest-first
-    page of full card fields (enough to render each card client-side).
-    Optional `q` filters by name/text/creator substring (for the search page).
+  - `GET /cardmaker/api/cards?before={id}&limit={n}&q={query}` — returns
+    `{ cards, total }`: a newest-first page of full card fields (enough to
+    render each card client-side) plus the total match count. `before` is a
+    keyset cursor (the previous page's last id) for paging. Optional `q` uses
+    the same query syntax as game-card search — `name:`/`text:`/`cost:`/
+    `points:`, ranges, quoted phrases, `!` to negate, and free text over the
+    card and its referenced keyword/card text (see `cardmakerSearch.ts`).
   - `GET /cardmaker/api/cards/{id}` — one card's fields.
 
 - **Where the API lives:** the game server (it already has Express, Drizzle,

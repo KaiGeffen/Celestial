@@ -491,6 +491,15 @@ button:disabled {
   opacity: 0.75;
 }
 
+.load-more-row {
+  text-align: center;
+  padding: 8px 0 24px;
+}
+
+#load-more[hidden] {
+  display: none;
+}
+
 /* Community card page: creator credit under the card, and centered status */
 .page-credit {
   margin: 0;

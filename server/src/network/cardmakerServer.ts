@@ -2,11 +2,12 @@ import express from 'express'
 import cors from 'cors'
 import * as fs from 'fs'
 import * as path from 'path'
-import { and, desc, eq, ilike, lt, or } from 'drizzle-orm'
+import { and, count, desc, eq, lt } from 'drizzle-orm'
 
 import { CARDMAKER_PORT } from '../../../shared/network/settings'
 import { db } from '../db/db'
 import { customCards } from '../db/schema'
+import { buildSearchBlob, searchConditions } from './cardmakerSearch'
 
 // --- Field caps (must stay in sync with the DB varchar lengths in schema.ts
 //     and the UI caps in sites/cardmaker) ---
@@ -171,9 +172,10 @@ export default function createCardmakerServer() {
     }
 
     try {
+      const values = { ...fields!, search_blob: buildSearchBlob(fields!) }
       const [row] = await db
         .insert(customCards)
-        .values(fields!)
+        .values(values)
         .returning({ id: customCards.id })
       res.json({ id: row.id })
     } catch (e) {
@@ -183,38 +185,39 @@ export default function createCardmakerServer() {
   })
 
   // GET /cardmaker/api/cards?before={id}&limit={n}&q={query}
-  // Newest-first page of visible cards.
+  // Newest-first page of visible cards matching the query, plus the total match
+  // count. `q` uses the same syntax as game-card search (see cardmakerSearch).
+  // `before` is a keyset cursor (the last id of the previous page) for paging.
   app.get('/cardmaker/api/cards', async (req, res) => {
     const limit = Math.min(
       Math.max(parseInt(String(req.query.limit ?? '20'), 10) || 20, 1),
       50,
     )
     const before = parseInt(String(req.query.before ?? ''), 10)
-    const q = typeof req.query.q === 'string' ? req.query.q.trim() : ''
+    const q = typeof req.query.q === 'string' ? req.query.q : ''
 
-    const filters = [eq(customCards.hidden, false)]
+    // The query filters (blind to pagination) back both the count and the page;
+    // `before` narrows only the page, so the total stays stable as you page.
+    const queryFilters = [eq(customCards.hidden, false), ...searchConditions(q)]
+    const pageFilters = [...queryFilters]
     if (Number.isInteger(before)) {
-      filters.push(lt(customCards.id, before))
-    }
-    if (q) {
-      const like = `%${q}%`
-      filters.push(
-        or(
-          ilike(customCards.name, like),
-          ilike(customCards.text, like),
-          ilike(customCards.creator, like),
-        )!,
-      )
+      pageFilters.push(lt(customCards.id, before))
     }
 
     try {
-      const rows = await db
-        .select()
-        .from(customCards)
-        .where(and(...filters))
-        .orderBy(desc(customCards.id))
-        .limit(limit)
-      res.json(rows.map(toPublicCard))
+      const [rows, [{ total }]] = await Promise.all([
+        db
+          .select()
+          .from(customCards)
+          .where(and(...pageFilters))
+          .orderBy(desc(customCards.id))
+          .limit(limit),
+        db
+          .select({ total: count() })
+          .from(customCards)
+          .where(and(...queryFilters)),
+      ])
+      res.json({ cards: rows.map(toPublicCard), total })
     } catch (e) {
       console.error('Error listing custom cards:', e)
       res.status(500).json({ error: 'Failed to list cards' })

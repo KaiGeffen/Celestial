@@ -10,6 +10,7 @@ import {
   index,
   serial,
   boolean,
+  text,
 } from 'drizzle-orm/pg-core'
 
 /*
@@ -295,6 +296,10 @@ export const customCards = pgTable(
     creator: varchar('creator', { length: 20 }), // optional
     created_at: timestamp('created_at').notNull().defaultNow(),
     hidden: boolean('hidden').notNull().default(false), // moderation kill switch
+    // Precomputed lowercase search text (card fields + referenced keyword/card
+    // text) for free-text search — see buildSearchBlob. Populated on publish;
+    // backfill.ts fills existing rows and adds a trigram index for fast ILIKE.
+    search_blob: text('search_blob').notNull().default(''),
   },
   (table) => ({
     // Gallery pages newest-first, skipping hidden cards
