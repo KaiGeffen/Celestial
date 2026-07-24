@@ -3,14 +3,20 @@
    interactive elements; #00629E / #17493D are accents used sparingly. */
 
 :root {
+  /* Raw brand colors */
   --parchment: #fff8eb;
   --ink: #161616;
   --gold: #edaa24;
   --gold-dark: #cf8f18; /* darker gold for button hover */
-  --line: rgba(22, 22, 22, 0.35);
-  /* Accent colors — flat use kept sparing */
   --accent-blue: #00629e;
   --accent-green: #17493d;
+
+  /* Night mode: deep-maroon dark backgrounds, cream text */
+  --bg: #150c10; /* plum-black page */
+  --header: #511030; /* deep maroon header/surface, lifted from the bg */
+  --text: #fff8eb;
+  --input-bg: #241017; /* dark plum-tinted field fill */
+  --line: rgba(245, 242, 235, 0.18);
   /* UI fonts, matching the game (client/src/settings/style.ts): primaryFont
      for headers, secondaryFont for buttons, sansFont for body text. */
   --font-primary: 'Typey McTypeface', 'Times New Roman', serif;
@@ -61,8 +67,8 @@
 
 body {
   margin: 0;
-  background: var(--parchment);
-  color: var(--ink);
+  background: var(--bg);
+  color: var(--text);
   font-family: var(--font-sans);
 }
 
@@ -77,6 +83,7 @@ legend {
   align-items: center;
   gap: 16px;
   padding: 12px 24px;
+  background: var(--header);
   border-bottom: 2px solid var(--line);
   flex-wrap: wrap;
 }
@@ -97,10 +104,10 @@ legend {
   gap: 16px;
 }
 
-/* The current page's own entry stays in the bar but isn't a link (plain ink,
+/* The current page's own entry stays in the bar but isn't a link (plain cream,
    not gold), so the three destinations are always visible and consistent. */
 .page-nav [aria-current='page'] {
-  color: var(--ink);
+  color: var(--text);
 }
 
 /* Search page */
@@ -124,6 +131,7 @@ legend {
 .source-toggle button {
   flex: 1;
   background: transparent;
+  color: var(--text);
 }
 
 /* Unselected toggle: a faint gold wash on hover, not the filled-button darken */
@@ -133,6 +141,7 @@ legend {
 
 .source-toggle button.selected {
   background: var(--gold);
+  color: var(--ink);
 }
 
 .source-toggle button.selected:hover:not(:disabled) {
@@ -143,6 +152,8 @@ legend {
   font: inherit;
   padding: 10px;
   border: 1px solid var(--line);
+  background: var(--input-bg);
+  color: var(--text);
 }
 
 .search-help {
@@ -152,7 +163,7 @@ legend {
 }
 
 .search-help code {
-  background: rgba(22, 22, 22, 0.08);
+  background: rgba(245, 242, 235, 0.1);
   padding: 1px 4px;
 }
 
@@ -196,8 +207,8 @@ legend {
   font: inherit;
   padding: 8px;
   border: 1px solid var(--line);
-  background: #fff;
-  color: var(--ink);
+  background: var(--input-bg);
+  color: var(--text);
 }
 
 /* No spinner arrows on the cost/points number inputs */
@@ -278,6 +289,7 @@ legend {
   padding: 0;
   cursor: pointer;
   background: none;
+  color: var(--text);
 }
 
 .subject-thumb img {
@@ -341,10 +353,11 @@ button:disabled {
   text-align: center;
 }
 
-/* Keyword reminders — off-black backing like the game's hint popups, cream text */
+/* Keyword reminders — a lifted dark panel with a hairline, cream text */
 .reminders {
   max-width: 354px;
-  background: rgba(22, 22, 22, 0.9);
+  background: var(--header);
+  border: 1px solid var(--line);
   color: var(--parchment);
   padding: 10px 14px;
   font-size: 15px;
@@ -471,7 +484,7 @@ button:disabled {
   font-size: 12px;
   opacity: 0.75;
   /* Plain text, not gold — it's static, and it's outside the card link */
-  color: var(--ink);
+  color: var(--text);
 }
 
 .gallery-status {
