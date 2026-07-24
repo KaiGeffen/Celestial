@@ -9,6 +9,19 @@
   --line: rgba(50, 26, 15, 0.35);
 }
 
+/* Card fonts, copied from the game by generateAssets.ts. url() is relative to
+   this stylesheet, so it resolves for pages in subdirs (search/, {slug}/) too. */
+@font-face {
+  font-family: 'Helgoland';
+  src: url('assets/fonts/Helgoland.otf') format('opentype');
+  font-display: block;
+}
+@font-face {
+  font-family: 'LTInternet';
+  src: url('assets/fonts/LTInternet.ttf') format('truetype');
+  font-display: block;
+}
+
 * {
   box-sizing: border-box;
 }

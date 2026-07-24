@@ -31,6 +31,18 @@ fs.cpSync(path.join(gameCardAssets, 'subject'), subjectsDest, {
   recursive: true,
 })
 
+// --- Card fonts (Helgoland = title/stats, LTInternet = rules text) ---
+// Copied from the game so the maker's canvas renders in the same faces.
+const fontsDest = path.join(outDir, 'fonts')
+fs.rmSync(fontsDest, { recursive: true, force: true })
+fs.mkdirSync(fontsDest, { recursive: true })
+for (const file of ['Helgoland.otf', 'LTInternet.ttf']) {
+  fs.cpSync(
+    path.join(repoRoot, 'client/assets/fonts', file),
+    path.join(fontsDest, file),
+  )
+}
+
 // --- Card / keyword data ---
 const keywords = Keywords.getAll().map((k) => ({
   name: k.name,

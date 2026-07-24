@@ -18,7 +18,12 @@ const COLOR_WHITE = '#F5F2EB' // whiteS: title, cost, points, rules text
 const COLOR_GOLD_TEXT = '#FABD5D' // keywords + card references in rules text
 const COLOR_STROKE = '#000000'
 
-const CARD_FONT = "'Times New Roman', Times, serif"
+// Card fonts mirror the game (client/src/settings/style.ts): Helgoland for the
+// title and stats (cost/points), LTInternet for the rules text. Declared via
+// @font-face in cardmaker.css and awaited in loadGameData — canvas draws don't
+// trigger font loading, so drawing before they load would silently fall back.
+const TITLE_STATS_FONT = "Helgoland, 'Times New Roman', serif"
+const TEXT_FONT = "LTInternet, 'Times New Roman', serif"
 
 // ------------------------------------------------------------------- data
 
@@ -36,7 +41,22 @@ export async function loadGameData() {
   gameData = await (await fetch(assetUrl('gameData.json'))).json()
   doveIndex = Math.max(0, gameData.subjects.indexOf('Dove'))
   buildGoldPatterns()
+  await loadCardFonts()
   return gameData
+}
+
+// Canvas draws don't trigger @font-face loading, so make sure the card fonts are
+// ready before any render. Non-fatal: on failure the serif fallback is used.
+async function loadCardFonts() {
+  if (typeof document === 'undefined' || !document.fonts) return
+  try {
+    await Promise.all([
+      document.fonts.load('24px Helgoland'),
+      document.fonts.load('16px LTInternet'),
+    ])
+  } catch {
+    /* fall back to the serif in the font strings */
+  }
 }
 
 export const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -307,16 +327,16 @@ function drawCardText(ctx, fields) {
   ctx.textBaseline = 'middle'
 
   // Title: game places it 18px (display) from the top, card font 20px
-  ctx.font = `${Math.round(20 * SCALE_Y)}px ${CARD_FONT}`
+  ctx.font = `${Math.round(20 * SCALE_Y)}px ${TITLE_STATS_FONT}`
   drawTextWithStroke(ctx, fields.name, CANVAS_W / 2, 18 * SCALE_Y, COLOR_WHITE)
 
   // Cost / points: 27px from left edge, 58 / 102 from top (display units)
-  ctx.font = `${Math.round(24 * SCALE_Y)}px ${CARD_FONT}`
+  ctx.font = `${Math.round(24 * SCALE_Y)}px ${TITLE_STATS_FONT}`
   drawTextWithStroke(ctx, String(fields.cost), 27 * SCALE_X, 58 * SCALE_Y, COLOR_WHITE)
   drawTextWithStroke(ctx, String(fields.points), 27 * SCALE_X, 102 * SCALE_Y, COLOR_WHITE)
 
   // Rules text: centered block whose center sits 40px (display) above the bottom
-  ctx.font = `${Math.round(16 * SCALE_Y)}px ${CARD_FONT}`
+  ctx.font = `${Math.round(16 * SCALE_Y)}px ${TEXT_FONT}`
   const maxWidth = 224 * SCALE_X
   const lineHeight = 18 * SCALE_Y
   const lines = layoutRulesText(ctx, fields.text, maxWidth)
