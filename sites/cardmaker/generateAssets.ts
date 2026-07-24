@@ -31,12 +31,21 @@ fs.cpSync(path.join(gameCardAssets, 'subject'), subjectsDest, {
   recursive: true,
 })
 
-// --- Card fonts (Helgoland = title/stats, LTInternet = rules text) ---
-// Copied from the game so the maker's canvas renders in the same faces.
+// --- Fonts, copied from the game so the maker matches it ---
+// Cards: Helgoland (title/stats) + LTInternet (rules text).
+// UI chrome: Typey McTypeface (headers), Berylium (buttons), Mulish (body).
 const fontsDest = path.join(outDir, 'fonts')
 fs.rmSync(fontsDest, { recursive: true, force: true })
 fs.mkdirSync(fontsDest, { recursive: true })
-for (const file of ['Helgoland.otf', 'LTInternet.ttf']) {
+const fontFiles = [
+  'Helgoland.otf',
+  'LTInternet.ttf',
+  'Typey.otf',
+  'Berylium.otf',
+  'Berylium-Bold.otf',
+  'Mulish.otf',
+]
+for (const file of fontFiles) {
   fs.cpSync(
     path.join(repoRoot, 'client/assets/fonts', file),
     path.join(fontsDest, file),

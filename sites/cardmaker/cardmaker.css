@@ -1,12 +1,21 @@
-/* Card Maker — palette mirrors the game: parchment #F5F2EB, ink #321A0F,
-   gold #EDAA24 (reserved for interactive elements). */
+/* Card Maker — brand palette (see brand guide). Cream #FFF8EB and off-black
+   #161616 (never true black) carry the UI; gold #EDAA24 is reserved for
+   interactive elements; #00629E / #17493D are accents used sparingly. */
 
 :root {
-  --parchment: #f5f2eb;
-  --ink: #321a0f;
+  --parchment: #fff8eb;
+  --ink: #161616;
   --gold: #edaa24;
   --gold-dark: #cf8f18; /* darker gold for button hover */
-  --line: rgba(50, 26, 15, 0.35);
+  --line: rgba(22, 22, 22, 0.35);
+  /* Accent colors — flat use kept sparing */
+  --accent-blue: #00629e;
+  --accent-green: #17493d;
+  /* UI fonts, matching the game (client/src/settings/style.ts): primaryFont
+     for headers, secondaryFont for buttons, sansFont for body text. */
+  --font-primary: 'Typey McTypeface', 'Times New Roman', serif;
+  --font-secondary: 'Berylium', Georgia, serif;
+  --font-sans: 'Mulish', system-ui, sans-serif;
 }
 
 /* Card fonts, copied from the game by generateAssets.ts. url() is relative to
@@ -22,6 +31,30 @@
   font-display: block;
 }
 
+/* UI fonts (swap: show fallback immediately, then the real face) */
+@font-face {
+  font-family: 'Typey McTypeface';
+  src: url('assets/fonts/Typey.otf') format('opentype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Berylium';
+  src: url('assets/fonts/Berylium.otf') format('opentype');
+  font-weight: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Berylium';
+  src: url('assets/fonts/Berylium-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Mulish';
+  src: url('assets/fonts/Mulish.otf') format('opentype');
+  font-display: swap;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -30,7 +63,13 @@ body {
   margin: 0;
   background: var(--parchment);
   color: var(--ink);
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--font-sans);
+}
+
+/* Headers use the game's primary display font */
+h1,
+legend {
+  font-family: var(--font-primary);
 }
 
 .site-header {
@@ -113,7 +152,7 @@ body {
 }
 
 .search-help code {
-  background: rgba(50, 26, 15, 0.08);
+  background: rgba(22, 22, 22, 0.08);
   padding: 1px 4px;
 }
 
@@ -273,6 +312,7 @@ legend {
 
 button {
   font: inherit;
+  font-family: var(--font-secondary);
   font-weight: bold;
   padding: 8px 18px;
   border: 2px solid var(--ink);
@@ -301,10 +341,10 @@ button:disabled {
   text-align: center;
 }
 
-/* Keyword reminders — dark backing like the game's hint popups */
+/* Keyword reminders — off-black backing like the game's hint popups, cream text */
 .reminders {
   max-width: 354px;
-  background: rgba(10, 6, 4, 0.88);
+  background: rgba(22, 22, 22, 0.9);
   color: var(--parchment);
   padding: 10px 14px;
   font-size: 15px;
@@ -463,6 +503,13 @@ button:disabled {
 
 a {
   color: var(--gold);
+}
+
+/* Keyboard focus ring — a sparing flat use of the blue accent, kept distinct
+   from gold (which signals hover/interaction). */
+:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
 }
 
 @media (max-width: 860px) {

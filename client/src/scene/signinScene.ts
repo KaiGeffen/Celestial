@@ -290,7 +290,7 @@ export class PreloadScene extends SigninScene {
     // Ensure that audio plays even when tab loses focus
     this.sound.pauseOnBlur = false
 
-    this.sound.volume = UserSettings._get('volume') * 5
+    this.sound.volume = UserSettings._get('volume') * 4
 
     // Load the assets used in this scene
     Loader.preload(this)
