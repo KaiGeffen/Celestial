@@ -24,7 +24,7 @@ class Paramountcy extends Card {
         // Don't add copies of paramountcy, and don't count them
         if (card.id === this.id) {
           paramountcyCount++
-          amt--
+          amt++
         } else {
           game.moveBetweenZones(Zone.Discard, Zone.Story, player, targetIndex, {
             toIndex: i - paramountcyCount,
