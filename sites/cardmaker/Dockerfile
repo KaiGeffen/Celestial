@@ -11,6 +11,7 @@ FROM node:18 AS gamedata
 WORKDIR /build
 COPY shared shared
 COPY client/assets/img/card client/assets/img/card
+COPY client/assets/fonts client/assets/fonts
 COPY sites/cardmaker/generateAssets.ts sites/cardmaker/generateAssets.ts
 
 RUN npx -y tsx sites/cardmaker/generateAssets.ts
