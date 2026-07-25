@@ -1205,14 +1205,10 @@ export default function createWebSocketServer() {
         .on(
           'initPvp',
           authed(async (data) => {
-            await surrenderActiveMatch()
-
-            data.deck.cosmeticSet = await sanitizedCosmeticSet(
-              id,
-              data.deck.cosmeticSet,
-            )
-
-            // Clean up stale entries first
+            // Clean up stale entries, then claim any waiting opponent for this
+            // password immediately (all synchronous, before the awaits below)
+            // so a second, overlapping initPvp for this same password can't
+            // also see and match into them.
             Object.keys(searchingPlayers).forEach((password) => {
               // Ensure we never queue into ourself
               const isSelf = searchingPlayers[password].id === id
@@ -1225,11 +1221,20 @@ export default function createWebSocketServer() {
               }
             })
 
+            const otherPlayer: WaitingPlayer = searchingPlayers[data.password]
+            if (otherPlayer) delete searchingPlayers[data.password]
+
+            await surrenderActiveMatch()
+
+            data.deck.cosmeticSet = await sanitizedCosmeticSet(
+              id,
+              data.deck.cosmeticSet,
+            )
+
             // Analytics
             logFunnelEvent(id, 'play_mode', 'pvp_queued_up')
 
             // Start the game with another player
-            const otherPlayer: WaitingPlayer = searchingPlayers[data.password]
             if (otherPlayer) {
               console.log(
                 'PVP:',
@@ -1265,9 +1270,6 @@ export default function createWebSocketServer() {
               // and their close handler deleted their entry, reconnecting
               // could otherwise never find this match
               userActiveGameMap[otherPlayer.id] = otherPlayer.activeGame
-
-              // TODO Maybe just delete the last one? Somehow don't lose to race conditions
-              delete searchingPlayers[data.password]
 
               // If Discord was notified that this player was searching, follow up that a match was found
               if (otherPlayer.notifiedDiscord) {
