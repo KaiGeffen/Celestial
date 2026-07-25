@@ -142,7 +142,7 @@ ${GENERATED_MARKER}
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${escapeHtml(card.name)} — Celestial</title>
+    <title>${escapeHtml(card.name)} - Celestial Decks</title>
     <meta name="description" content="${description}" />
     <link rel="icon" type="image/svg+xml" href="../../about/assets/favicon.svg" />
     <link rel="stylesheet" href="../cardmaker.css" />
