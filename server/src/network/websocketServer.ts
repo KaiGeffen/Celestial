@@ -252,7 +252,8 @@ export default function createWebSocketServer() {
     if (!webhookUrl) return
 
     const now = Date.now()
-    Object.values(searchingPlayers).forEach((player) => {
+    Object.entries(searchingPlayers).forEach(([password, player]) => {
+      if (password !== '') return
       if (player.notifiedDiscord) return
       if (now - player.queuedAt < LONG_SEARCH_NOTIFY_MS) return
 
