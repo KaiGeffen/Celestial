@@ -1206,6 +1206,8 @@ export default function createWebSocketServer() {
         .on(
           'initPvp',
           authed(async (data) => {
+            data.password = data.password.trim()
+
             // Clean up stale entries, then claim any waiting opponent for this
             // password immediately (all synchronous, before the awaits below)
             // so a second, overlapping initPvp for this same password can't
@@ -1323,8 +1325,9 @@ export default function createWebSocketServer() {
         .on(
           'cancelQueue',
           authed(({ password }) => {
-            if (searchingPlayers[password]?.ws === ws) {
-              delete searchingPlayers[password]
+            const trimmedPassword = password.trim()
+            if (searchingPlayers[trimmedPassword]?.ws === ws) {
+              delete searchingPlayers[trimmedPassword]
             }
           }),
         )

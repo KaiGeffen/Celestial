@@ -32,7 +32,7 @@ export default class SearchingRegion extends Region {
 
   create(scene: MatchScene, avatarId: number, password: string): Region {
     this.scene = scene
-    this.password = password
+    this.password = password.trim()
 
     this.container = scene.add.container().setDepth(Depth.searching)
     this.scene.plugins.get('rexAnchor')['add'](this.container, {
