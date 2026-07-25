@@ -173,6 +173,9 @@ class ServerController {
   }
 
   doMulligan(player: number, mulligans: Mulligan): void {
+    // Check if mulligan happened already
+    if (this.model.mulligansComplete[player]) return
+
     this.model.versionIncrClearAnimations()
 
     // Update the time of last played card only if mulligans are now complete (And player with priority is now on the clock)
