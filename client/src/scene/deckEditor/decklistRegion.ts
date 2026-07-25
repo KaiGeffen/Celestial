@@ -178,7 +178,12 @@ export class DecklistRegion {
       .add(leftCol)
       .add(rightCol)
 
-    return sizer
+    // Depth beats decklist cutouts regardless of creation order: cutouts made
+    // after this footer exists (e.g. a full setDeck() reset) are otherwise
+    // appended later in the display list and rank above it, so their
+    // mask-hidden-but-still-interactive hit areas swallow clicks meant for
+    // this bg. Same fix as filterRegion.sizer.setDepth(1) in deckEditorScene.
+    return sizer.setDepth(1)
   }
 }
 
@@ -223,7 +228,10 @@ export class StandardDecklistRegion extends DecklistRegion {
       cardCount: initialCount,
     })
 
-    return sizer
+    // Same depth fix as the footer below: keeps this interactive bg above
+    // decklist cutouts that are recreated (and thus re-inserted later in the
+    // display list) after this header already exists.
+    return sizer.setDepth(1)
   }
 
   override syncThumbnail(args: {
@@ -335,6 +343,7 @@ export class JourneyDecklistRegion extends DecklistRegion {
       })
       .addBackground(bg)
       .add(playBtn)
+      .setDepth(1) // see DecklistRegion.createFooter for why
   }
 
   /** Full deck for starting a match: required mission cards plus chosen cards. */
