@@ -11,7 +11,7 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
     subheader: 'Tournament',
     body: `Our 13th tournament has concluded!
 
-Big thank you to the tournament organizers at Fate Leageu, and everyone who played (Check your inventory for the new cardback!)
+Big thank you to the tournament organizers at Fate League, and everyone who played (Check your inventory for the new cardback!)
 
 Huge congrats to the top 4 players:
 Rain, SubNova, ElineX, and Sespiny!`,
@@ -34,8 +34,7 @@ Secure your spot in the top 10 by midnight EST on July 31st for the next cardbac
   },
   {
     subheader: '???',
-    body: `
-Something.... approaches...?
+    body: `Something.... approaches...?
 
 I hear... [area=_Voices][stroke=${Color.goldS}]Voices[/stroke][/area]...
 
