@@ -47,6 +47,9 @@ class Match {
   // How many times each player has timed out in a row
   private countTimeouts: [number, number] = [0, 0]
 
+  // Whether match results have been recorded
+  private resultRecorded = false
+
   addSpectator(ws: ServerWS, playerPerspective: 0 | 1): void {
     this.spectators[playerPerspective].add(ws)
 
@@ -150,8 +153,10 @@ class Match {
       }),
     )
 
-    // Handle database and achievement updates as game ends
-    if (this.game.model.winner !== null) {
+    // Handle database and achievement updates as game ends, exactly once
+    if (this.game.model.winner !== null && !this.resultRecorded) {
+      this.resultRecorded = true
+
       await this.updateDatabases()
 
       // Update achievements
