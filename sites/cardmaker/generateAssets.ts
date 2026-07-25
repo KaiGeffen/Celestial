@@ -170,8 +170,11 @@ ${GENERATED_MARKER}
 
     <footer class="site-footer">
       <p>
-        <a href="https://celestialdecks.gg">Play Celestial</a> ·
-        <a href="https://discord.gg/UXWswspB8S">Discord</a>
+        <a href="https://store.steampowered.com/app/3810590/Celestial_Decks/"
+          >Wishlist on Steam</a
+        >
+        · <a href="https://celestialdecks.gg">Play online</a> ·
+        <a href="https://discord.gg/UXWswspB8S">Join the Discord</a>
       </p>
     </footer>
 
