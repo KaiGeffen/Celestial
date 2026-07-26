@@ -2,8 +2,13 @@
 // sites/cardmaker/community/index.html's body (kept as the static fallback
 // for local dev without the backend) but fills in real per-card
 // og:title/og:description/og:image, so link previews (Discord, iMessage, …)
-// show the actual card instead of one generic blurb. communityCard.js still
+// show the actual card instead of one generic blurb. viewCard.js still
 // hydrates the page normally afterward — see cardmakerServer.ts.
+//
+// The script is named viewCard.js, not communityCard.js, because nginx's
+// /cardmaker/community location is a raw string-prefix match — a filename
+// starting with "community" would collide with it and get misrouted to the
+// backend (which 404s it), corrupting the module load.
 
 function escapeHtml(s: string): string {
   return s
@@ -86,7 +91,7 @@ export function buildCommunityHtml(
       </p>
     </footer>
 
-    <script type="module" src="../communityCard.js"></script>
+    <script type="module" src="../viewCard.js"></script>
   </body>
 </html>
 `

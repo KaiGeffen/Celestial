@@ -291,7 +291,7 @@ export default function createCardmakerServer() {
   // under /cardmaker/ stays static; this route needs its own NPM custom
   // location pointing at the backend — see sites/README.md.
   app.get('/cardmaker/community', async (req, res) => {
-    // Relative asset paths in the rendered page (../communityCard.js, etc.)
+    // Relative asset paths in the rendered page (../viewCard.js, etc.)
     // only resolve correctly with a trailing slash — nginx did this
     // automatically for the old static file; this route has to do it itself.
     if (req.path === '/cardmaker/community') {
