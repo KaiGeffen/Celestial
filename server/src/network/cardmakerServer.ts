@@ -8,6 +8,8 @@ import { CARDMAKER_PORT } from '../../../shared/network/settings'
 import { db } from '../db/db'
 import { customCards } from '../db/schema'
 import { buildSearchBlob, searchConditions } from './cardmakerSearch'
+import { renderCardImage } from './cardmakerImage'
+import { buildCommunityHtml } from './cardmakerCommunityPage'
 
 // --- Field caps (must stay in sync with the DB varchar lengths in schema.ts
 //     and the UI caps in sites/cardmaker) ---
@@ -137,6 +139,18 @@ function rateLimited(ip: string): number {
   return 0
 }
 
+// Shared by every route that looks up one card by id: not-hidden only, and
+// null for a missing/invalid id rather than throwing.
+async function getVisibleCard(id: number) {
+  if (!Number.isInteger(id)) return null
+  const [row] = await db
+    .select()
+    .from(customCards)
+    .where(and(eq(customCards.id, id), eq(customCards.hidden, false)))
+    .limit(1)
+  return row ?? null
+}
+
 // Shape a DB row into the public card fields the client renders from.
 function toPublicCard(row: typeof customCards.$inferSelect) {
   return {
@@ -237,11 +251,7 @@ export default function createCardmakerServer() {
       return res.status(400).json({ error: 'Invalid id' })
     }
     try {
-      const [row] = await db
-        .select()
-        .from(customCards)
-        .where(and(eq(customCards.id, id), eq(customCards.hidden, false)))
-        .limit(1)
+      const row = await getVisibleCard(id)
       if (!row) {
         return res.status(404).json({ error: 'Card not found' })
       }
@@ -250,6 +260,52 @@ export default function createCardmakerServer() {
       console.error('Error fetching custom card:', e)
       res.status(500).json({ error: 'Failed to fetch card' })
     }
+  })
+
+  // GET /cardmaker/api/cards/{id}/image.png — server-rendered card art, used
+  // as the og:image for the community page preview (see cardmakerImage.ts)
+  app.get('/cardmaker/api/cards/:id/image.png', async (req, res) => {
+    const id = parseInt(req.params.id, 10)
+    if (!Number.isInteger(id)) {
+      return res.status(400).end()
+    }
+    try {
+      const row = await getVisibleCard(id)
+      if (!row) {
+        return res.status(404).end()
+      }
+      const png = await renderCardImage(row)
+      res.set('Content-Type', 'image/png')
+      res.set('Cache-Control', 'public, max-age=86400, immutable')
+      res.send(png)
+    } catch (e) {
+      console.error('Error rendering custom card image:', e)
+      res.status(500).end()
+    }
+  })
+
+  // GET /cardmaker/community — server-rendered HTML shell with per-card
+  // og:title/og:description/og:image, so shared links preview the actual
+  // card instead of one generic blurb (link-preview bots don't run JS, so
+  // the static file's fixed meta tags can't vary by ?id=). Everything else
+  // under /cardmaker/ stays static; this route needs its own NPM custom
+  // location pointing at the backend — see sites/README.md.
+  app.get('/cardmaker/community', async (req, res) => {
+    // Relative asset paths in the rendered page (../communityCard.js, etc.)
+    // only resolve correctly with a trailing slash — nginx did this
+    // automatically for the old static file; this route has to do it itself.
+    if (req.path === '/cardmaker/community') {
+      return res.redirect(
+        301,
+        req.originalUrl.replace('/cardmaker/community', '/cardmaker/community/'),
+      )
+    }
+    const rawId = typeof req.query.id === 'string' ? req.query.id : ''
+    const id = parseInt(rawId, 10)
+    const row = await getVisibleCard(id)
+    const origin = `${req.protocol}://${req.get('host')}`
+    res.set('Content-Type', 'text/html; charset=utf-8')
+    res.send(buildCommunityHtml(row, origin, rawId))
   })
 
   // Local-dev convenience: also serve the static card maker site from this

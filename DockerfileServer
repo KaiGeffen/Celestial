@@ -1,5 +1,11 @@
 FROM node:18
 
+# fontconfig: so libvips/librsvg (via sharp) can find the card fonts by family
+# name when rendering the card maker's server-side og:image SVG text layer
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends fontconfig \
+  && rm -rf /var/lib/apt/lists/*
+
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
 
 WORKDIR /home/node/app
@@ -14,6 +20,17 @@ RUN npm install
 # Copy server source + shared (imported via ../../shared, bundled by webpack)
 COPY --chown=node:node ./server /home/node/app/server
 COPY --chown=node:node ./shared /home/node/app/shared
+
+# Card art + fonts, used by cardmakerImage.ts to render the community card
+# og:image server-side (must match the client's cardRenderer.js layer stack)
+COPY --chown=node:node ./client/assets/img/card /home/node/app/client/assets/img/card
+COPY --chown=node:node ./client/assets/fonts/Helgoland.otf ./client/assets/fonts/LTInternet.ttf /home/node/app/client/assets/fonts/
+
+USER root
+RUN mkdir -p /usr/share/fonts/truetype/celestial \
+  && cp /home/node/app/client/assets/fonts/Helgoland.otf /home/node/app/client/assets/fonts/LTInternet.ttf /usr/share/fonts/truetype/celestial/ \
+  && fc-cache -f
+USER node
 
 # Build in the image (webpack bundles src + shared into dist/index.js)
 RUN npm run build

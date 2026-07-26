@@ -11,7 +11,7 @@ import {
   findReferencedCards,
   renderReferencedCards,
   keywordReminders,
-} from '../cardRenderer.js'
+} from './cardRenderer.js'
 
 const API_BASE = '/cardmaker/api'
 
@@ -48,7 +48,7 @@ async function init() {
     return
   }
 
-  document.title = `${card.name} — Celestial`
+  document.title = `${card.name} — Celestial Decks`
   $('card-title').textContent = card.name
 
   // Community cards already carry a subject index, so render their fields directly

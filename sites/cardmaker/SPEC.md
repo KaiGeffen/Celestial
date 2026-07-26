@@ -257,8 +257,13 @@ sites/cardmaker/
 - Served at **`/cardmaker/`** on the main domain: compose service `cardmaker`
   (image tag `cardmaker`, on `net`, no published ports) + NPM custom
   locations:
-  - `/cardmaker     → http://cardmaker:80`
-  - `/cardmaker/api → backend` (the game server)
+  - `/cardmaker           → http://cardmaker:80`
+  - `/cardmaker/api       → backend` (the game server)
+  - `/cardmaker/community → backend` (server-rendered per-card og:title/
+    og:description/og:image so shared links preview the actual card — see
+    cardmakerCommunityPage.ts + cardmakerImage.ts. Must be routed to the
+    backend ahead of the plain `/cardmaker` location, since link-preview bots
+    don't run the JS that would otherwise fetch the card client-side.)
 - Deploy order rule from `sites/README.md` applies: container up → NPM routes
   verified → done.
 - Add `/cardmaker/` to the sitemap (served from `client/`).
