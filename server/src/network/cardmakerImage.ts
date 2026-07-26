@@ -237,13 +237,13 @@ function renderRulesLines(
 function buildTextSvg(card: CardFields): string {
   const titleFontSize = Math.round(20 * SCALE_Y)
   const statFontSize = Math.round(24 * SCALE_Y)
-  const rulesFontSize = Math.round(16 * SCALE_Y)
+  const rulesFontSize = Math.round(17 * SCALE_Y)
   const maxWidth = 224 * SCALE_X
   const lineHeight = 18 * SCALE_Y
 
-  const statX = 27 * SCALE_X
-  const costY = 58 * SCALE_Y
-  const pointsY = 102 * SCALE_Y
+  const statX = 27.5 * SCALE_X
+  const costY = 60 * SCALE_Y
+  const pointsY = 103 * SCALE_Y
 
   const rulesLines = layoutRulesText(card.text, rulesFontSize, maxWidth)
   const blockCenterY = CANVAS_H - 40 * SCALE_Y
@@ -251,7 +251,7 @@ function buildTextSvg(card: CardFields): string {
   const rulesEls = renderRulesLines(rulesLines, rulesFontSize, firstLineY, lineHeight)
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${CANVAS_W}" height="${CANVAS_H}">
-    ${textEl(CANVAS_W / 2, 18 * SCALE_Y, titleFontSize, "'Helgoland', serif", card.name)}
+    ${textEl(CANVAS_W / 2, 20 * SCALE_Y, titleFontSize, "'Helgoland', serif", card.name)}
     ${textEl(statX, costY, statFontSize, "'Helgoland', serif", String(card.cost))}
     ${textEl(statX, pointsY, statFontSize, "'Helgoland', serif", String(card.points))}
     ${rulesEls}
