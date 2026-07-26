@@ -14,13 +14,15 @@ COPY client/assets/img/card client/assets/img/card
 COPY client/assets/fonts client/assets/fonts
 COPY sites/cardmaker/generateAssets.ts sites/cardmaker/generateAssets.ts
 
-RUN npx -y tsx sites/cardmaker/generateAssets.ts
+RUN npx -y tsx sites/cardmaker/generateAssets.ts && rm sites/cardmaker/generateAssets.ts
 
 # Stage 2: static site on nginx, served at /cardmaker/ via NPM custom location
 FROM nginx:alpine
 
 COPY sites/cardmaker /usr/share/nginx/html/cardmaker
-COPY --from=gamedata /build/sites/cardmaker/assets /usr/share/nginx/html/cardmaker/assets
+# assets/ and the generated per-card page directories (e.g. rooster/) both
+# live under this same stage-1 dir — one copy picks up both.
+COPY --from=gamedata /build/sites/cardmaker /usr/share/nginx/html/cardmaker
 
 COPY sites/cardmaker/nginx.conf /etc/nginx/conf.d/default.conf
 
