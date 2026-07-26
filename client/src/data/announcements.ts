@@ -35,11 +35,8 @@ Secure your spot in the top 10 by midnight EST on July 31st for the next cardbac
   {
     subheader: '???',
     body: `Something.... approaches...?
-
 I hear... [area=_Voices][stroke=${Color.goldS}]Voices[/stroke][/area]...
-
 Outside the walls... Howling...
-
 [area=_Abandoned][stroke=${Color.goldS}]Abandoned[/stroke][/area]...`,
 
     // [area=_Paramountcy][stroke=${Color.goldS}]Paramountcy[/stroke][/area] cards added 4 → 3
