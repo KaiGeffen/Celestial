@@ -241,11 +241,9 @@ function buildTextSvg(card: CardFields): string {
   const maxWidth = 224 * SCALE_X
   const lineHeight = 18 * SCALE_Y
 
-  // Cost / points: centered at fixed canvas coordinates (measured directly
-  // against the 472x672 render, not derived from display-unit scaling)
-  const statX = 54
-  const costY = 116
-  const pointsY = 204
+  const statX = 27 * SCALE_X
+  const costY = 60.5 * SCALE_Y
+  const pointsY = 103.5 * SCALE_Y
 
   const rulesLines = layoutRulesText(card.text, rulesFontSize, maxWidth)
   const blockCenterY = CANVAS_H - 40 * SCALE_Y

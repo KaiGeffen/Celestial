@@ -330,11 +330,10 @@ function drawCardText(ctx, fields) {
   ctx.font = `${Math.round(20 * SCALE_Y)}px ${TITLE_STATS_FONT}`
   drawTextWithStroke(ctx, fields.name, CANVAS_W / 2, 20 * SCALE_Y, COLOR_WHITE)
 
-  // Cost / points: centered at fixed canvas coordinates (measured directly
-  // against the 472x672 render, not derived from display-unit scaling)
+  // Cost / points: 27px from left edge, 60.5 / 103.5 from top (display units)
   ctx.font = `${Math.round(24 * SCALE_Y)}px ${TITLE_STATS_FONT}`
-  drawTextWithStroke(ctx, String(fields.cost), 54, 116, COLOR_WHITE)
-  drawTextWithStroke(ctx, String(fields.points), 54, 204, COLOR_WHITE)
+  drawTextWithStroke(ctx, String(fields.cost), 27 * SCALE_X, 60.5 * SCALE_Y, COLOR_WHITE)
+  drawTextWithStroke(ctx, String(fields.points), 27 * SCALE_X, 103.5 * SCALE_Y, COLOR_WHITE)
 
   // Rules text: centered block whose center sits 40px (display) above the bottom
   ctx.font = `${Math.round(17 * SCALE_Y)}px ${TEXT_FONT}`
