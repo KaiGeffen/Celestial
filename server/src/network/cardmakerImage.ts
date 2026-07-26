@@ -54,6 +54,23 @@ function getRulesFont(): opentype.Font {
   return rulesFont
 }
 
+let titleStatsFont: opentype.Font | null = null
+function getTitleStatsFont(): opentype.Font {
+  if (!titleStatsFont) {
+    titleStatsFont = opentype.parse(fs.readFileSync(path.join(fontsDir, 'Helgoland.otf')))
+  }
+  return titleStatsFont
+}
+
+// librsvg (bundled in sharp) doesn't reliably honor dominant-baseline, so
+// text renders at the default alphabetic baseline instead of centered —
+// compute the baseline y that visually centers text at `centerY` ourselves,
+// mirroring what canvas's textBaseline='middle' does in cardRenderer.js.
+function centerBaselineY(font: opentype.Font, fontSize: number, centerY: number): number {
+  const scale = fontSize / font.unitsPerEm
+  return centerY + ((font.ascender + font.descender) * scale) / 2
+}
+
 function escapeXml(s: string): string {
   return s
     .replace(/&/g, '&amp;')
@@ -173,14 +190,18 @@ async function loadSubjectLayer(subjectIndex: number): Promise<Buffer> {
   return sharp(file).resize(CANVAS_W, CANVAS_H, { fit: 'fill' }).toBuffer()
 }
 
+// `centerY` is where the text should visually center; the baseline passed to
+// SVG is computed from real font metrics (see centerBaselineY) since
+// dominant-baseline isn't reliably honored by librsvg.
 function textEl(
   x: number,
-  y: number,
+  centerY: number,
   size: number,
   family: string,
   content: string,
 ): string {
-  return `<text x="${x}" y="${y}" font-family="${family}" font-size="${size}" fill="${COLOR_WHITE}" stroke="${COLOR_STROKE}" stroke-width="3" stroke-linejoin="round" paint-order="stroke" text-anchor="middle" dominant-baseline="central">${escapeXml(content)}</text>`
+  const y = centerBaselineY(getTitleStatsFont(), size, centerY)
+  return `<text x="${x}" y="${y}" font-family="${family}" font-size="${size}" fill="${COLOR_WHITE}" stroke="${COLOR_STROKE}" stroke-width="3" stroke-linejoin="round" paint-order="stroke" text-anchor="middle">${escapeXml(content)}</text>`
 }
 
 // One <text> per line with a <tspan> per run so each word can carry its own
@@ -194,7 +215,7 @@ function renderRulesLines(
   const font = getRulesFont()
   return lines
     .map((runs, i) => {
-      const y = firstLineY + i * lineHeight
+      const y = centerBaselineY(font, fontSize, firstLineY + i * lineHeight)
       const lineText = runs.map((r) => r.text).join(' ')
       const totalWidth = font.getAdvanceWidth(lineText, fontSize)
       let x = CANVAS_W / 2 - totalWidth / 2
@@ -208,7 +229,7 @@ function renderRulesLines(
         })
         .join('')
 
-      return `<text font-family="'LTInternet', serif" font-size="${fontSize}" stroke="${COLOR_STROKE}" stroke-width="3" stroke-linejoin="round" paint-order="stroke" dominant-baseline="central">${tspans}</text>`
+      return `<text font-family="'LTInternet', serif" font-size="${fontSize}" stroke="${COLOR_STROKE}" stroke-width="3" stroke-linejoin="round" paint-order="stroke">${tspans}</text>`
     })
     .join('')
 }
