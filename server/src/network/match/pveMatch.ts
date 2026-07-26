@@ -43,9 +43,6 @@ class PveMatch extends Match {
     // AI wins by default
     this.game.setWinnerViaSurrender(1)
     await this.notifyState()
-
-    // NOTE Game is null to prevent doExit from being called again
-    this.game = null
   }
 
   // TODO Handle disconnect separately
