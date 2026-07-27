@@ -25,8 +25,6 @@ import initializeErrorHandler, {
   hasWebGL,
   showWebGLUnsupportedMessage,
 } from './loader/errorHandler'
-import initializeAnalytics from './loader/analyticsLoader'
-
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js'
 import RoundRectanglePlugin from 'phaser3-rex-plugins/plugins/roundrectangle-plugin.js'
 import InputTextPlugin from 'phaser3-rex-plugins/plugins/inputtext-plugin.js'
@@ -134,7 +132,6 @@ export class CelestialGame extends Phaser.Game {
 window.onload = () => {
   // Do any HTML initialization here
   initializeErrorHandler()
-  initializeAnalytics()
   initializeSplashScreen()
 
   // Show message to user if WebGL is missing
