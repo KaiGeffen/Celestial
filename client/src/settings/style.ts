@@ -81,11 +81,11 @@ const StyleGeneral: StyleDict = {
 
   // Count of a card in the deck
   cutoutCardCount: {
-    fontFamily: sansFont,
+    fontFamily: cardStats,
     fontSize: size.standard,
     color: Color.cardCount,
     stroke: '#0009',
-    strokeThickness: 3,
+    strokeThickness: 2,
   },
 
   // Any place where header text appears over a dark background
