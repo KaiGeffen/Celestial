@@ -513,7 +513,12 @@ export default function createWebSocketServer() {
           }
 
           const accountId = await resolveProviderAccount('steam', steamId, null)
-          console.log('Steam login — steamId:', steamId, 'accountId:', accountId)
+          console.log(
+            'Steam login — steamId:',
+            steamId,
+            'accountId:',
+            accountId,
+          )
           await handleSignInForUuid(accountId, { provider: 'steam' })
         })
         // Link a Google identity to the signed-in account. Case A (the Google
@@ -1325,7 +1330,7 @@ export default function createWebSocketServer() {
         .on(
           'cancelQueue',
           authed(({ password }) => {
-            const trimmedPassword = password.trim()
+            const trimmedPassword = (password ?? '').trim()
             if (searchingPlayers[trimmedPassword]?.ws === ws) {
               delete searchingPlayers[trimmedPassword]
             }
