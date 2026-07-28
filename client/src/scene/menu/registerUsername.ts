@@ -2,17 +2,13 @@ import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Buttons from '../../lib/buttons/buttons'
 import { Space, Style, Url } from '../../settings/settings'
-import { Flags } from '../../settings/flags'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import Server from '../../server'
 import Button from '../../lib/buttons/button'
 import { openDiscord } from '../../utils/externalLinks'
 import logEvent from '../../utils/analytics'
-import {
-  URL,
-  USERNAME_AVAILABILITY_PORT,
-} from '@shared/network/settings'
+import { USERNAME_AVAILABILITY_PORT } from '@shared/network/settings'
 
 const width = 700
 
@@ -36,9 +32,10 @@ export class RegisterUsernameMenu extends Menu {
 
   private async checkUsername(username: string) {
     try {
-      const url = Flags.local
-        ? `http://${URL}:${USERNAME_AVAILABILITY_PORT}/check_username_availability/${username}`
-        : `https://${Url.apiHost}/check_username_availability/${username}`
+      const url = Url.serviceUrl(
+        USERNAME_AVAILABILITY_PORT,
+        `/check_username_availability/${username}`,
+      )
 
       const response = await fetch(url)
 

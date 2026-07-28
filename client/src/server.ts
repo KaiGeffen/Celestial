@@ -5,11 +5,7 @@ import 'phaser'
 import { Flags, Url, UserSettings } from './settings/settings'
 import BaseScene from './scene/baseScene'
 import { TypedWebSocket } from '@shared/network/typedWebSocket'
-import {
-  URL,
-  USER_DATA_PORT,
-  UUID_NAMESPACE,
-} from '@shared/network/settings'
+import { USER_DATA_PORT, UUID_NAMESPACE } from '@shared/network/settings'
 import type { GoogleJwtPayload } from './types/google'
 import jwt_decode from 'jwt-decode'
 import { ClientWS } from '@shared/network/celestialTypedWebsocket'
@@ -659,9 +655,7 @@ export default class Server {
 
   // Get a websocket right for the current environment
   private static getSocket(): ClientWS {
-    const path = Flags.local
-      ? `ws://${URL}:${USER_DATA_PORT}`
-      : `wss://${Url.apiHost}/user_data_ws`
+    const path = Url.serviceUrl(USER_DATA_PORT, '/user_data_ws', true)
     return new TypedWebSocket(path)
   }
 }

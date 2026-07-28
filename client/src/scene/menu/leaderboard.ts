@@ -6,7 +6,6 @@ import Server from '../../server'
 import { CosmeticSet } from '@shared/types/cosmeticSet'
 import Buttons from '../../lib/buttons/buttons'
 import Button from '../../lib/buttons/button'
-import { Flags } from '../../settings/flags'
 import { LEADERBOARD_PORT } from '@shared/network/settings'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
@@ -68,9 +67,7 @@ export default class LeaderboardMenu extends Menu {
     try {
       const userData = Server.getUserData()
       const response = await fetch(
-        Flags.local
-          ? `http://localhost:${LEADERBOARD_PORT}/leaderboard/${userData.uuid}`
-          : `https://${Url.apiHost}/leaderboard/${userData.uuid}`,
+        Url.serviceUrl(LEADERBOARD_PORT, `/leaderboard/${userData.uuid}`),
       )
       if (!response.ok) {
         throw new Error('Failed to fetch leaderboard data')

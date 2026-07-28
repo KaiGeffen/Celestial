@@ -19,8 +19,12 @@ COPY --chown=node:node ./shared /home/node/app/shared
 
 # Build in the image, not at container start: the asset cache-busting version
 # is minted at build time, so building on start would bust every player's
-# cache on every container restart, not just on real deploys
-RUN npm run build:prod
+# cache on every container restart, not just on real deploys.
+# BUILD_SCRIPT picks the deploy target baked into the bundle (see
+# client/webpack.config.js's __DEPLOY_ENV__) — override with
+# `--build-arg BUILD_SCRIPT=build:staging` for a staging image.
+ARG BUILD_SCRIPT=build:prod
+RUN npm run ${BUILD_SCRIPT}
 
 EXPOSE 8083
 
