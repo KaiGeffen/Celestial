@@ -83,7 +83,12 @@ module.exports = (env, argv) => {
         __DEPLOY_ENV__: JSON.stringify(env?.deployEnv ?? 'production'),
       }),
       new HtmlWebpackPlugin({
-        title: isProd ? 'Celestial Decks' : 'LOCAL',
+        title:
+          env?.deployEnv === 'staging'
+            ? 'STAGING'
+            : isProd
+              ? 'Celestial Decks'
+              : 'LOCAL',
         template: 'template.html',
         filename: '../index.html',
         scriptLoading: 'defer',

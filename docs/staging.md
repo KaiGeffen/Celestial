@@ -76,8 +76,10 @@ prod's compose file sets them directly in `backend`'s `environment:` block
   generate with `openssl rand -hex 32`
 - `STEAM_WEB_API_KEY` → optional; Steam login just no-ops without it
 - `GOOGLE_CLIENT_ID` / `GOOGLE_DESKTOP_CLIENT_ID` → prod's public client ids
-  are pre-filled in the template (safe to reuse — Google verifies the ID
-  token's audience, not an origin allowlist)
+  are pre-filled in the template, safe to reuse server-side (Google verifies
+  the ID token's audience here, not an origin) — but reusing them means the
+  staging domain also needs adding to that Client ID's authorized origins,
+  see Part 4
 - `DISCORD_WEBHOOK_URL` → a **separate** webhook, pointed at a private
   channel — not prod's, so staging test matches don't ping the real
   matchmaking-helper channel
@@ -180,7 +182,7 @@ name-matching to get wrong.
       - net
 
   frontend-staging:
-    image: client:staging
+    image: staging:client
     restart: always
     environment:
       TZ: America/New_York
@@ -188,7 +190,7 @@ name-matching to get wrong.
       - net
 
   backend-staging:
-    image: server:staging
+    image: staging:server
     stdin_open: true
     tty: true
     environment:
@@ -210,7 +212,7 @@ than left as `OMIT`.
 
 Notes:
 - Both `frontend-staging` and `backend-staging` need their own image tags
-  (`client:staging` / `server:staging`), built from whatever's currently
+  (`staging:client` / `staging:server`), built from whatever's currently
   checked out on the `staging` branch — reusing prod's `client`/`server`
   images would mean testing old code with new config, which tests nothing.
   Rebuild both every time `staging` has new commits you want to test.
@@ -228,8 +230,8 @@ command is unaffected. `DockerfileServer` needs no equivalent arg (no
 build-time environment branching), just a distinct tag:
 
 ```
-docker build -f DockerfileClient --build-arg BUILD_SCRIPT=build:staging -t client:staging .
-docker build -f DockerfileServer -t server:staging .
+docker build -f DockerfileClient --build-arg BUILD_SCRIPT=build:staging -t staging:client .
+docker build -f DockerfileServer -t staging:server .
 ```
 
 **3. Bring up the new services and migrate.**
@@ -256,19 +258,25 @@ something expressible in the compose file or this repo.
 
 ## Part 4 — Auth providers and staging domains
 
-- **Google Sign-In**: the server verifies the ID token's audience against
-  `GOOGLE_CLIENT_ID` ([googleAuth.ts](../server/src/network/googleAuth.ts)) —
-  that's identity verification, not an origin-scoped permission grant, so no
-  Google Cloud Console allowlist change is needed for staging.
-- **Steam**: ticket verification isn't origin-locked either — should work
-  unmodified.
-- Smoke-test both anyway once staging is up.
+- **Google Sign-In**: two separate checks, easy to conflate (learned this the
+  hard way — see 2026-07-28 below). The server verifies the ID token's
+  audience against `GOOGLE_CLIENT_ID`
+  ([googleAuth.ts](../server/src/network/googleAuth.ts)) — that part really is
+  identity verification, no origin involved. But the client uses Google
+  Identity Services (`google.accounts.id.initialize` in
+  [signinScene.ts](../client/src/scene/signinScene.ts)), which separately
+  requires the page's origin to be listed under that OAuth Client ID's
+  **Authorized JavaScript origins** in Google Cloud Console *before* it'll
+  even issue a token — this one DOES need `https://staging.celestialdecks.gg`
+  added there, or sign-in fails client-side with `Error 400: origin_mismatch`.
+- **Steam**: ticket verification isn't origin-locked — should work unmodified.
+- Smoke-test both once staging is up.
 
 ## Deploy workflow once this exists
 
 1. `git pull` on the `staging` checkout, then rebuild both images:
-   `docker build -f DockerfileClient --build-arg BUILD_SCRIPT=build:staging -t client:staging .`
-   and `docker build -f DockerfileServer -t server:staging .`
+   `docker build -f DockerfileClient --build-arg BUILD_SCRIPT=build:staging -t staging:client .`
+   and `docker build -f DockerfileServer -t staging:server .`
 2. `docker compose up -d backend-staging frontend-staging` (only recreates
    what changed; `postgres-staging` keeps running).
 3. Smoke-test at `https://staging.celestialdecks.gg` (sign-in, a PvE match, a
