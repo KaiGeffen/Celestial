@@ -33,9 +33,6 @@ function getHint(
 
   let s = keyword.text
 
-  // Remove the first X (In image data)
-  s = s.replace(' X', '')
-
   // Get the value from the given status button
   const value = btn.getText()
   s = s.split(/\bX\b/).join(value)
