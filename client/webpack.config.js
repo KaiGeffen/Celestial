@@ -5,6 +5,7 @@ const TerserPlugin = require('terser-webpack-plugin')
 
 module.exports = (env, argv) => {
   const isProd = argv.mode === 'production'
+  const isStaging = env?.deployEnv === 'staging'
 
   const config = {
     entry: './src/app.ts',
@@ -80,15 +81,10 @@ module.exports = (env, argv) => {
         __BUILD_VERSION__: JSON.stringify(
           isProd ? Date.now().toString(36) : 'dev',
         ),
-        __DEPLOY_ENV__: JSON.stringify(env?.deployEnv ?? 'production'),
+        __DEPLOY_ENV__: JSON.stringify(isStaging ? 'staging' : 'production'),
       }),
       new HtmlWebpackPlugin({
-        title:
-          env?.deployEnv === 'staging'
-            ? 'STAGING'
-            : isProd
-              ? 'Celestial Decks'
-              : 'LOCAL',
+        title: isStaging ? 'STAGING' : isProd ? 'Celestial Decks' : 'LOCAL',
         template: 'template.html',
         filename: '../index.html',
         scriptLoading: 'defer',

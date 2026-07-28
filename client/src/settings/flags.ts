@@ -8,7 +8,8 @@ export const Flags = {
 
   // Built via `npm run build:staging`, pointed at staging.celestialdecks.gg
   // instead of the production domain
-  staging: typeof __DEPLOY_ENV__ !== 'undefined' && __DEPLOY_ENV__ === 'staging',
+  staging:
+    typeof __DEPLOY_ENV__ !== 'undefined' && __DEPLOY_ENV__ === 'staging',
 
   // Is client connected to the internet
   online: navigator.onLine,

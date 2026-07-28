@@ -473,7 +473,10 @@ export default class Server {
 
   // Resolve an accountLinkConflict by choosing which account survives.
   static confirmAccountLink(keepId: string): void {
-    Server.send({ type: 'confirmAccountLink', keepId }, 'Confirming account link')
+    Server.send(
+      { type: 'confirmAccountLink', keepId },
+      'Confirming account link',
+    )
   }
 
   // Reconnect using the stored session token. Used after an account merge that
@@ -655,7 +658,7 @@ export default class Server {
 
   // Get a websocket right for the current environment
   private static getSocket(): ClientWS {
-    const path = Url.serviceUrl(USER_DATA_PORT, '/user_data_ws', true)
+    const path = Url.serviceUrl(USER_DATA_PORT, '/user_data_ws', { ws: true })
     return new TypedWebSocket(path)
   }
 }

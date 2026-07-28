@@ -241,9 +241,12 @@ docker compose up -d postgres-staging backend-staging frontend-staging
 docker compose exec backend-staging npm run migrate
 ```
 
-(`drizzle-kit push:pg`, run once against the fresh staging DB — the `server`
+(`drizzle-kit push`, run once against the fresh staging DB — the `server`
 image already has `drizzle-kit` and `DATABASE_URL` is already in its
-environment, so this runs from inside the container, no separate host setup.)
+environment, so this runs from inside the container, no separate host setup.
+`server/package.json`'s `migrate` script used to run the deprecated
+`push:pg` alias, which silently no-ops on drizzle-kit 0.30.x — fixed
+2026-07-28.)
 
 **4. DNS** — `staging.celestialdecks.gg` A/CNAME → the VPS's existing IP.
 
@@ -283,14 +286,10 @@ something expressible in the compose file or this repo.
    PvP queue/cancel, leaderboard/match-history pages) before shipping the
    same change to prod.
 
-## Still open
+## Status
 
-- VPS access — Part 3's `docker compose`/build commands, DNS record, and NPM
-  proxy-host setup need to be run by whoever has shell + NPM UI access to the
-  box (or handed to me with that access).
-- Real secret values for `backend-staging`'s `environment:` block
-  (`DATABASE_URL`'s password, `SESSION_SECRET`, `STEAM_WEB_API_KEY`) still
-  need to be generated/filled in directly in the VPS's compose file — not
-  something to commit even as a draft.
-- Decide whether staging gets its own Google OAuth client / Steam app, or
-  reuses prod's (current recommendation: reuse, see Part 4).
+Live and running smoothly as of 2026-07-28: DNS, the compose services, both
+images, migrations, and the NPM proxy host are all set up per Part 3, and
+Google Sign-In works at `https://staging.celestialdecks.gg` after adding it
+to the OAuth Client ID's Authorized JavaScript origins (Part 4) — reusing
+prod's client id/app, no separate ones needed.
