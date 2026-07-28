@@ -1,5 +1,5 @@
 import 'phaser'
-import { Style, Space, Flags } from '../settings/settings'
+import { Style, Space, Flags, Url } from '../settings/settings'
 import { BaseSceneWithHeader } from './baseScene'
 import Server from '../server'
 import Buttons from '../lib/buttons/buttons'
@@ -139,7 +139,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
       const response = await fetch(
         Flags.local
           ? `http://localhost:${MATCH_HISTORY_PORT}/match_history/${uuid}`
-          : `https://celestialdecks.gg/match_history/${uuid}`,
+          : `https://${Url.apiHost}/match_history/${uuid}`,
       )
       if (!response.ok) {
         throw new Error('Failed to fetch match history data')

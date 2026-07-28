@@ -3,7 +3,7 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 
-module.exports = (_, argv) => {
+module.exports = (env, argv) => {
   const isProd = argv.mode === 'production'
 
   const config = {
@@ -80,6 +80,7 @@ module.exports = (_, argv) => {
         __BUILD_VERSION__: JSON.stringify(
           isProd ? Date.now().toString(36) : 'dev',
         ),
+        __DEPLOY_ENV__: JSON.stringify(env?.deployEnv ?? 'production'),
       }),
       new HtmlWebpackPlugin({
         title: isProd ? 'Celestial Decks' : 'LOCAL',

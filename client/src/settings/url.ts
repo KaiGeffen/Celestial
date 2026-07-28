@@ -1,4 +1,5 @@
 import { STEAM_STORE_URL } from '@shared/steam'
+import { Flags } from './flags'
 
 // Settings relating to various urls
 export const Url = {
@@ -6,6 +7,9 @@ export const Url = {
   // Links to the introductions channel
   discord: 'https://discord.gg/HGhgTXEpKt',
   steamStore: STEAM_STORE_URL,
+  // Non-local deploy target: staging.celestialdecks.gg for `build:staging`,
+  // celestialdecks.gg otherwise
+  apiHost: Flags.staging ? 'staging.celestialdecks.gg' : 'celestialdecks.gg',
   nextfest: 'https://store.steampowered.com/sale/nextfest',
   feedback: 'https://forms.gle/xq9Dnx5mtbSkX6Zs9',
   oauth:

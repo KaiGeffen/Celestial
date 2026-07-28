@@ -661,7 +661,7 @@ export default class Server {
   private static getSocket(): ClientWS {
     const path = Flags.local
       ? `ws://${URL}:${USER_DATA_PORT}`
-      : `wss://celestialdecks.gg/user_data_ws`
+      : `wss://${Url.apiHost}/user_data_ws`
     return new TypedWebSocket(path)
   }
 }

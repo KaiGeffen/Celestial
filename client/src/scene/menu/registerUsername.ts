@@ -38,7 +38,7 @@ export class RegisterUsernameMenu extends Menu {
     try {
       const url = Flags.local
         ? `http://${URL}:${USERNAME_AVAILABILITY_PORT}/check_username_availability/${username}`
-        : `https://celestialdecks.gg/check_username_availability/${username}`
+        : `https://${Url.apiHost}/check_username_availability/${username}`
 
       const response = await fetch(url)
 

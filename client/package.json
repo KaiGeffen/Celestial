@@ -7,6 +7,7 @@
     "generate-assets": "npx ts-node src/loader/generate-asset-lists.ts",
     "build": "webpack",
     "build:prod": "webpack --mode production",
+    "build:staging": "webpack --mode production --env deployEnv=staging",
     "start": "npm run build:prod && node prodServer.cjs",
     "dev": "webpack --watch & live-server --port=4949"
   },

@@ -1,5 +1,5 @@
 import 'phaser'
-import { Color, Space, Style } from '../../settings/settings'
+import { Color, Space, Style, Url } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import Server from '../../server'
@@ -70,7 +70,7 @@ export default class LeaderboardMenu extends Menu {
       const response = await fetch(
         Flags.local
           ? `http://localhost:${LEADERBOARD_PORT}/leaderboard/${userData.uuid}`
-          : `https://celestialdecks.gg/leaderboard/${userData.uuid}`,
+          : `https://${Url.apiHost}/leaderboard/${userData.uuid}`,
       )
       if (!response.ok) {
         throw new Error('Failed to fetch leaderboard data')

@@ -1,6 +1,14 @@
+// Injected by webpack DefinePlugin; 'staging' for `npm run build:staging`,
+// 'production' otherwise (including plain dev builds).
+declare const __DEPLOY_ENV__: string
+
 export const Flags = {
   // Running a local instance instead of on the server
   local: location.port === '4949',
+
+  // Built via `npm run build:staging`, pointed at staging.celestialdecks.gg
+  // instead of the production domain
+  staging: typeof __DEPLOY_ENV__ !== 'undefined' && __DEPLOY_ENV__ === 'staging',
 
   // Is client connected to the internet
   online: navigator.onLine,
