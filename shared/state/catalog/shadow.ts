@@ -413,7 +413,7 @@ class Mire extends Card {
 const mire = new Mire({
   name: 'Mire',
   id: 3043,
-  cost: 5,
+  cost: 6,
   points: 4,
   qualities: [Quality.FLEETING],
   text: 'Fleeting\nAt the end of this round, create a Revealed copy of this with -1 point.',

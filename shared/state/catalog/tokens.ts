@@ -164,7 +164,7 @@ const ice = new Ice({
   theme: 7,
 })
 
-class Race extends Card {
+class SiezeTheMoment extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -172,7 +172,7 @@ class Race extends Card {
       const cardId = game.story.acts[i].card.id
 
       // Don't increment the index if we discard a card
-      if (cardId === race.id) {
+      if (cardId === siezeTheMoment.id) {
         game.removeAct(i)
       } else {
         i++
@@ -180,12 +180,12 @@ class Race extends Card {
     }
   }
 }
-const race = new Race({
-  name: 'Race',
+const siezeTheMoment = new SiezeTheMoment({
+  name: 'Sieze the Moment',
   id: 11010,
-  points: 1,
+  points: 2,
   qualities: [Quality.FLEETING],
-  text: 'Fleeting\nDiscard each Race later in the story.',
+  text: 'Fleeting\nDiscard each Sieze the Moment later in the story.',
   theme: 1,
   beta: true,
 })
@@ -199,5 +199,5 @@ export {
   heirloom,
   condemnation,
   ice,
-  race,
+  siezeTheMoment,
 }

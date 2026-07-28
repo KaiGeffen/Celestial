@@ -342,9 +342,20 @@ class Interbeing extends Card {
 const interbeing = new Interbeing({
   name: 'Interbeing',
   id: 7046,
-  cost: 2,
-  points: 2,
+  cost: 3,
+  points: 3,
   text: 'Morning: If a card would be created this round, create an Interbeing instead.',
+})
+
+class Changes extends Card {
+  // TODO
+}
+const changes = new Interbeing({
+  name: 'Changes',
+  id: 7047,
+  cost: 1,
+  points: 1,
+  text: 'Switch each of your cards later in the story with a card from your hand with the same cost, if any.',
 })
 
 export {
@@ -362,7 +373,7 @@ export {
   justLikeDad,
   hug,
   // NEW
-  lifeShared,
+  changes,
   beginnersMind,
   interbeing,
 }

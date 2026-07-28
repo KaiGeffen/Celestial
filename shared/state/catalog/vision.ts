@@ -244,7 +244,7 @@ class SuddenInsight extends Card {
     super.play(player, game, index, bonus)
 
     if (super.exhale(1, game, player)) {
-      super.inspire(1, game, player)
+      super.inspire(2, game, player)
     }
   }
 }
@@ -253,7 +253,7 @@ const suddenInsight = new SuddenInsight({
   id: 6001,
   cost: 4,
   points: 4,
-  text: 'When drawn, gain Sight 3.\nExhale 1: Inspire 1',
+  text: 'When drawn, gain Sight 3.\nExhale 1: Inspire 2',
 })
 
 class Realms extends Card {
@@ -333,7 +333,7 @@ const hermit = new Hermit({
   text: 'When played, gain 2 breath.\nWhen a card is played while this is in the story, discard this and gain 2 breath.',
 })
 
-class Coopy extends Card {
+class TheFool extends Card {
   onPlay(player: number, game: GameModel) {
     // If both players don't have a card in hand, return
     if (game.hand[player].length === 0 || game.hand[player ^ 1].length === 0) {
@@ -354,8 +354,8 @@ class Coopy extends Card {
     )
   }
 }
-const coopy = new Coopy({
-  name: 'Coopy',
+const theFool = new TheFool({
+  name: 'The Fool',
   id: 4089,
   cost: 1,
   points: 1,
@@ -378,5 +378,5 @@ export {
   beggingBowl,
   // NEW CARDS
   suddenInsight,
-  coopy,
+  theFool,
 }
