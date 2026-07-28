@@ -4,7 +4,7 @@
     "start": "node dist/index.js",
     "dev": "webpack --watch & nodemon --quiet dist/index.js",
     "dev:force-win": "webpack --watch & nodemon --quiet dist/index.js --force-win",
-    "migrate": "drizzle-kit push:pg"
+    "migrate": "drizzle-kit push"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -23,7 +23,6 @@
     "bufferutil": "^4.0.9",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "drizzle-kit": "^0.20.6",
     "drizzle-orm": "^0.41.0",
     "elo-rank": "^1.0.4",
     "express": "^4.21.2",

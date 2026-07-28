@@ -78,8 +78,9 @@ prod's compose file sets them directly in `backend`'s `environment:` block
 - `GOOGLE_CLIENT_ID` / `GOOGLE_DESKTOP_CLIENT_ID` → prod's public client ids
   are pre-filled in the template (safe to reuse — Google verifies the ID
   token's audience, not an origin allowlist)
-- `DISCORD_WEBHOOK_URL` → left commented out, so staging test matches don't
-  ping the real Discord matchmaking-helper channel
+- `DISCORD_WEBHOOK_URL` → a **separate** webhook, pointed at a private
+  channel — not prod's, so staging test matches don't ping the real
+  matchmaking-helper channel
 
 ## Part 3 — Infra on the VPS
 
@@ -173,6 +174,7 @@ name-matching to get wrong.
       - ./db-staging:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: OMIT
+      POSTGRES_DB: celestial
       TZ: America/New_York
     networks:
       - net
@@ -186,14 +188,15 @@ name-matching to get wrong.
       - net
 
   backend-staging:
-    image: server
+    image: server:staging
     stdin_open: true
     tty: true
     environment:
       TZ: America/New_York
-      DATABASE_URL: postgresql://postgres:OMIT@postgres-staging:5432/postgres
+      DATABASE_URL: postgresql://postgres:OMIT@postgres-staging:5432/celestial
       STEAM_WEB_API_KEY: OMIT
       SESSION_SECRET: OMIT
+      DISCORD_WEBHOOK_URL: OMIT
       GOOGLE_CLIENT_ID: 574352055172-n1nqdc2nvu3172levk2kl5jf7pbkp4ig.apps.googleusercontent.com
       GOOGLE_DESKTOP_CLIENT_ID: 574352055172-cq9d4snqbsub9v6rh2v4pa8v9ap9g26c.apps.googleusercontent.com
     restart: always
@@ -206,24 +209,27 @@ prod uses (not secrets — see Part 4) so they're filled in directly rather
 than left as `OMIT`.
 
 Notes:
-- `frontend-staging` needs its own image tag (`client:staging`) built with
-  the new `BUILD_SCRIPT` arg (see below) — the bundle bakes in its API host
-  at build time, so it can't share prod's `client` image.
-- `backend-staging` reuses the plain `server` image as-is — no rebuild, since
-  the server has no environment-specific code, only environment-specific
-  config.
-- `DISCORD_WEBHOOK_URL` and the `STRIPE_*` vars are deliberately omitted —
-  staging test matches shouldn't ping the real Discord channel, and nothing
-  server-side currently reads the Stripe keys.
+- Both `frontend-staging` and `backend-staging` need their own image tags
+  (`client:staging` / `server:staging`), built from whatever's currently
+  checked out on the `staging` branch — reusing prod's `client`/`server`
+  images would mean testing old code with new config, which tests nothing.
+  Rebuild both every time `staging` has new commits you want to test.
+- `DISCORD_WEBHOOK_URL` is a **separate** webhook pointed at a private
+  channel, not prod's — staging test matches still ping Discord, just not
+  the real matchmaking-helper channel. The `STRIPE_*` vars are omitted
+  entirely; nothing server-side currently reads them.
 - `postgres-staging` uses its own bind mount (`./db-staging`), so it's a
   fully separate Postgres instance/data directory from prod's `./db`.
 
-**2. Build the staging client image.** [DockerfileClient](../DockerfileClient)
-now takes a `BUILD_SCRIPT` build arg (done, 2026-07-28) — defaults to
-`build:prod` so prod's existing build command is unaffected:
+**2. Build the staging images**, from the `staging` branch checkout.
+[DockerfileClient](../DockerfileClient) now takes a `BUILD_SCRIPT` build arg
+(done, 2026-07-28) — defaults to `build:prod` so prod's existing build
+command is unaffected. `DockerfileServer` needs no equivalent arg (no
+build-time environment branching), just a distinct tag:
 
 ```
 docker build -f DockerfileClient --build-arg BUILD_SCRIPT=build:staging -t client:staging .
+docker build -f DockerfileServer -t server:staging .
 ```
 
 **3. Bring up the new services and migrate.**
@@ -260,8 +266,9 @@ something expressible in the compose file or this repo.
 
 ## Deploy workflow once this exists
 
-1. `docker build -f DockerfileClient --build-arg BUILD_SCRIPT=build:staging -t client:staging .`
-   (server needs no rebuild — same `server` image as prod).
+1. `git pull` on the `staging` checkout, then rebuild both images:
+   `docker build -f DockerfileClient --build-arg BUILD_SCRIPT=build:staging -t client:staging .`
+   and `docker build -f DockerfileServer -t server:staging .`
 2. `docker compose up -d backend-staging frontend-staging` (only recreates
    what changed; `postgres-staging` keeps running).
 3. Smoke-test at `https://staging.celestialdecks.gg` (sign-in, a PvE match, a
