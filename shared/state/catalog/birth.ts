@@ -348,9 +348,33 @@ const interbeing = new Interbeing({
 })
 
 class Changes extends Card {
-  // TODO
+  play(player: number, game: GameModel, index: number, bonus: number) {
+    super.play(player, game, index, bonus)
+
+    // Track which cards in the hand have been swapped with, and don't swap a second time with them
+    const usedHandIndexes = new Set<number>()
+
+    // Iterate through each act from left to right
+    for (const act of game.story.acts) {
+      if (act.owner === player) {
+        const storyCard = act.card
+        const handIndex = game.hand[player].findIndex(
+          (card, i) => !usedHandIndexes.has(i) && card.cost === storyCard.cost,
+        )
+
+        // If a valid target in hand, do the swap
+        if (handIndex !== -1) {
+          act.card = game.hand[player][handIndex]
+          game.hand[player][handIndex] = storyCard
+
+          // Add to list of swapped hand spots
+          usedHandIndexes.add(handIndex)
+        }
+      }
+    }
+  }
 }
-const changes = new Interbeing({
+const changes = new Changes({
   name: 'Changes',
   id: 7047,
   cost: 1,
