@@ -372,7 +372,11 @@ export class BaseSceneWithHeader extends BaseScene {
 
   private createHeader(title: string): void {
     // Background
-    const background = this.add.image(0, 0, 'chrome-header').setOrigin(0, 0)
+    const background = this.add
+      .image(0, 0, 'chrome-header')
+      .setOrigin(0, 0)
+      .setDepth(1)
+      .setInteractive()
     this.addShadow(background, -90)
     this.plugins.get('rexAnchor')['add'](background, {
       width: `100%`,
@@ -393,7 +397,7 @@ export class BaseSceneWithHeader extends BaseScene {
       x: Space.pad + Space.buttonWidth / 2,
       y: Space.padSmall + Space.buttonHeight / 2,
       f: () => this.scene.start('HomeScene'),
-    })
+    }).setDepth(1)
   }
 }
 

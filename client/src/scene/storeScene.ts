@@ -10,9 +10,7 @@ import newScrollablePanel from '../lib/scrollablePanel'
 import Card from '@shared/state/card'
 import { UserSettings } from '../settings/userSettings'
 import Button from '../lib/buttons/button'
-import allPurchaseables, {
-  Purchaseable,
-} from '@shared/purchaseables/index'
+import allPurchaseables, { Purchaseable } from '@shared/purchaseables/index'
 import { getCosmeticImageKey } from '../utils/cosmetics'
 import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext'
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel'
@@ -93,7 +91,7 @@ export default class StoreScene extends BaseSceneWithHeader {
         this.btnTab.setText(this.currentTab === 'cards' ? 'Cosmetics' : 'Cards')
         this.createStoreItems()
       },
-    })
+    }).setDepth(1)
   }
 
   private createBackground(): void {
