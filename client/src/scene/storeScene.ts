@@ -52,10 +52,14 @@ export default class StoreScene extends BaseSceneWithHeader {
         0.3,
       )
       .setOrigin(1, 0.5)
+      .setDepth(1)
+
+    // Text
     this.userStatsDisplay = this.add
       .rexBBCodeText(0, this.headerHeight / 2, '', BBStyle.currency)
       .setAlign('right')
       .setOrigin(1, 0.5)
+      .setDepth(1)
       .setPadding(Space.padSmall)
 
     // Anchor the user stats display to the right

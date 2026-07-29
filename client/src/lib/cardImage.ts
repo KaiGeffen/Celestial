@@ -145,6 +145,9 @@ export class CardImage {
     // Make the card clickable via its subject image (an exact card-sized hit
     // area), even if it was constructed non-interactive
     this.imageSubject.setInteractive()
+    this.txtCost.setInteractive()
+    this.txtPoints.setInteractive()
+    this.txtText.setInteractive()
     this.interactive = true
 
     return this

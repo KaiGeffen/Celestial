@@ -83,7 +83,7 @@ export default class PurchaseItemMenu extends Menu {
         Space.cardWidth,
         Space.cardHeight,
       )
-      new CardImage(this.card, cardImageContainer, false, false)
+      new CardImage(this.card, cardImageContainer, true, false)
 
       // Add the content sizer to the menu
       this.sizer.add(cardImageContainer)
