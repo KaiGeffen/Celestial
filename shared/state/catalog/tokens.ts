@@ -112,23 +112,6 @@ const heirloom = new Card({
   theme: 4,
 })
 
-class Condemnation extends Card {
-  onShuffle(player: number, game: GameModel, index: number) {
-    super.onShuffle(player, game, index)
-
-    game.deck[player].splice(index, 1)
-    game.story.addAct(this, player, 0)
-  }
-}
-const condemnation = new Condemnation({
-  name: 'Condemnation',
-  id: 11007,
-  cost: 9,
-  points: -3,
-  qualities: [Quality.VISIBLE],
-  text: 'Visible\nWhen this is shuffled, add it to the story.',
-})
-
 class Ice extends Card {
   onDraw(player: number, game: GameModel): boolean {
     // Remove from hand
@@ -162,6 +145,24 @@ const ice = new Ice({
   points: 1,
   text: 'When drawn, add this to the story Revealed.',
   theme: 7,
+})
+
+// BETA
+class Condemnation extends Card {
+  onShuffle(player: number, game: GameModel, index: number) {
+    super.onShuffle(player, game, index)
+
+    game.deck[player].splice(index, 1)
+    game.story.addAct(this, player, 0)
+  }
+}
+const condemnation = new Condemnation({
+  name: 'Condemnation',
+  id: 11007,
+  cost: 9,
+  points: -3,
+  qualities: [Quality.VISIBLE],
+  text: 'Visible\nWhen this is shuffled, add it to the story.',
 })
 
 class SiezeTheMoment extends Card {

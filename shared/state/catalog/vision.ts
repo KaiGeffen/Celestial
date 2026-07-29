@@ -250,7 +250,7 @@ class SuddenInsight extends Card {
 }
 const suddenInsight = new SuddenInsight({
   name: 'Sudden Insight',
-  id: 6001,
+  id: 116,
   cost: 4,
   points: 4,
   text: 'When drawn, gain Sight 3.\nExhale 1: Inspire 2',

@@ -278,7 +278,7 @@ class Rime extends Card {
 }
 const rime = new Rime({
   name: 'Rime',
-  id: 7036,
+  id: 117,
   cost: 4,
   points: 5,
   text: 'Create 2 copies of Ice on the bottom of your deck.',

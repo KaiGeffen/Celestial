@@ -326,7 +326,7 @@ class Voices extends Card {
 }
 const voices = new Voices({
   name: 'Voices',
-  id: 3483,
+  id: 114,
   cost: 1,
   points: 1,
   text: 'Exhale 1: Your opponent adds a card from their hand to the story.\nExhale 2: You do the same after their card.',
@@ -397,7 +397,7 @@ class Abandoned extends Card {
 }
 const abandoned = new Abandoned({
   name: 'Abandoned',
-  id: 3042,
+  id: 115,
   cost: 3,
   points: 3,
   text: 'When discarded, add this to the story Revealed and create a Wound in hand.',

@@ -440,7 +440,7 @@ class Moloch extends Card {
 }
 const moloch = new Moloch({
   name: 'Moloch',
-  id: 2050,
+  id: 113,
   cost: 2,
   points: 2,
   text: 'Create an Ashes in your discard pile.\nMorning: Return this to hand. Discard a card.',
@@ -544,7 +544,7 @@ class Moth extends Card {
 }
 const moth = new Moth({
   name: 'Moth',
-  id: 2085,
+  id: 113,
   cost: 1,
   points: 1,
   text: 'When you resolve a card that costs 7 or more, move this card from your discard pile to the story.',
