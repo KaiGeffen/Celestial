@@ -11,13 +11,8 @@ export const Flags = {
   staging:
     typeof __DEPLOY_ENV__ !== 'undefined' && __DEPLOY_ENV__ === 'staging',
 
-  // Is client connected to the internet
-  online: navigator.onLine,
-
   // Include cards still in development
-  devCardsEnabled:
-    new URLSearchParams(window.location.search).has('dev') ||
-    location.port === '4949',
+  devCardsEnabled: location.port === '4949',
 
   // Allow network toggle for debugging
   networkToggle: new URLSearchParams(window.location.search).has(

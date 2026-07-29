@@ -1,5 +1,5 @@
 import 'phaser'
-import { Ease, Flags, Time } from '../../settings/settings'
+import { Ease, Time } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
@@ -29,15 +29,6 @@ export const MATCH_TILE_PATTERN_SCALE = 1
  * Tweak to taste: `SCREEN` / `ADD` often read well over day+night; `MULTIPLY` darkens the stack.
  */
 export const MATCH_TILE_BLEND_MODE: number = Phaser.BlendModes.NORMAL
-
-/** Set `?matchTileDebug` on the URL or run on local dev port to log TileSprite sizing. */
-function matchTileDebugEnabled(): boolean {
-  return (
-    Flags.local ||
-    (typeof window !== 'undefined' &&
-      new URLSearchParams(window.location.search).has('matchTileDebug'))
-  )
-}
 
 type RexAnchorWithOffset = {
   offsetX: number
@@ -70,40 +61,10 @@ function fitMatchTileFullscreen(
   viewportWidth: number,
   viewportHeight: number,
 ): void {
-  const tex = tile.scene.textures.get(tile.texture.key)
-  const frame = tex.get()
-  const source = tex.getSourceImage() as {
-    width: number
-    height: number
-  }
-
   tile.setScale(1)
   tile.setSize(viewportWidth, viewportHeight)
   tile.setTileScale(MATCH_TILE_PATTERN_SCALE, MATCH_TILE_PATTERN_SCALE)
   syncMatchTileVisibility(tile)
-
-  if (matchTileDebugEnabled()) {
-    // eslint-disable-next-line no-console
-    console.info('[BackgroundRegion matchTile]', {
-      textureKey: tile.texture.key,
-      viewport: { w: viewportWidth, h: viewportHeight },
-      sourceImg: { w: source.width, h: source.height },
-      frame: {
-        cutW: frame.cutWidth,
-        cutH: frame.cutHeight,
-        w: frame.width,
-        h: frame.height,
-      },
-      tileComputed: {
-        width: tile.width,
-        height: tile.height,
-        scaleX: tile.scaleX,
-        scaleY: tile.scaleY,
-        displayWidth: tile.displayWidth,
-        displayHeight: tile.displayHeight,
-      },
-    })
-  }
 }
 
 /** Show/hide the tile layer only; animated alpha runs in {@link BackgroundRegion.update}. */
