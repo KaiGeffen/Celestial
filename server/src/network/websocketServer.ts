@@ -866,7 +866,9 @@ export default function createWebSocketServer() {
                 lastactive: new Date().toISOString(),
                 garden: [],
                 gems: 0,
-                coins: 0,
+                // Staging is for testing, not real progression — give new accounts
+                // a pile of coins so cards/purchases can be tested without grinding
+                coins: process.env.STAGING === 'true' ? 1_000_000 : 0,
                 cosmetic_set: JSON.stringify({
                   avatar: 0,
                   border: 0,

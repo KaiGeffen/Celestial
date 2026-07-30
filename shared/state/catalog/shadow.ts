@@ -226,7 +226,8 @@ class LostInShadow extends Card {
     if (
       !game.story.acts.some((act) => act.owner === player && act.card.cost >= 6)
     ) {
-      game.discard(player, 10)
+      const amt = game.hand[player].length
+      game.discard(player, amt)
     }
   }
 }
