@@ -117,7 +117,7 @@ const boa = new Boa({
   name: 'Boa',
   id: 57,
   cost: 6,
-  points: 6,
+  points: 7,
   text: 'If this is nourished, your opponent discards a card and you draw a card.',
   story: 'I reach I win I have it.\nIt is all mine now!\nCan I make it me?',
 })

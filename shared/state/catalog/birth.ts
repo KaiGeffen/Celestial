@@ -66,7 +66,7 @@ class TheFuture extends Card {
 const theFuture = new TheFuture({
   name: 'The Future',
   id: 22,
-  cost: 8,
+  cost: 9,
   points: 5,
   text: 'Draw a card.\nCosts X less, where X is the total point value of each Child in your hand.',
 })

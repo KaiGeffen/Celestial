@@ -71,13 +71,8 @@ const ecology = new Ecology({
 })
 
 class Sun extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
-    this.inspire(1, game, player)
-  }
-
   onMorning(player: number, game: GameModel, index: number) {
-    super.inspired(2, game, player)
+    super.inspired(3, game, player)
     return true
   }
 }
@@ -86,7 +81,7 @@ const sun = new Sun({
   id: 56,
   cost: 8,
   points: 8,
-  text: 'Inspire 1\nMorning: Inspired 2',
+  text: 'Morning: Inspired 3',
   story: 'I raise my head over the horizon\nI begin\nJust like you',
 })
 
