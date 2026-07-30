@@ -544,7 +544,7 @@ class Moth extends Card {
 }
 const moth = new Moth({
   name: 'Moth',
-  id: 113,
+  id: 118,
   cost: 1,
   points: 1,
   text: 'When you resolve a card that costs 7 or more, move this card from your discard pile to the story.',
