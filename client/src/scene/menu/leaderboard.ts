@@ -34,12 +34,17 @@ interface LeaderboardResponse {
 
 type LeaderboardMode = 'current' | 'allTime'
 
+// PvP wins in the current month needed to unlock that month's cardback
+const CARDBACK_WIN_GOAL = 10
+
 export default class LeaderboardMenu extends Menu {
   private monthData: LeaderboardEntry[] = []
   private allTimeData: LeaderboardEntry[] = []
   private scrollablePanel: ScrollablePanel
   private mode: LeaderboardMode = 'current'
   private modeToggleButton: Button
+  // Row below the scrollable list, current-month mode only
+  private progressRow: any = null
 
   constructor(scene: MenuScene, params) {
     super(scene, width, params)
@@ -118,10 +123,56 @@ export default class LeaderboardMenu extends Menu {
       .add(lossesText, { proportion: 1 })
       .add(eloText, { proportion: 1 })
 
-    // Create scrollable panel for all player rows
+    this.sizer.add(headerSizer)
+    this.rebuildScrollArea()
+
+    this.createModeToggle()
+  }
+
+  private getUserMonthWins(): number {
+    const userData = Server.getUserData()
+    const entry = this.monthData.find((e) => e.username === userData.username)
+    return entry?.wins ?? 0
+  }
+
+  private getMonthProgressMessage(): string {
+    const wins = this.getUserMonthWins()
+
+    if (wins >= CARDBACK_WIN_GOAL) {
+      const nextMonthName = new Date(
+        new Date().getFullYear(),
+        new Date().getMonth() + 1,
+        1,
+      ).toLocaleString('default', { month: 'long' })
+      return `Win the most pvp games by the end of the month to help us design ${nextMonthName}'s cardback!`
+    }
+
+    const remaining = CARDBACK_WIN_GOAL - wins
+    return `Win ${remaining} more game${remaining === 1 ? '' : 's'} to unlock this month's cardback once it's released!`
+  }
+
+  // (Re)builds the scrollable player list and, in current-month mode, the
+  // progress row below it. The scrollable is shortened by exactly the
+  // progress row's height in that mode, so the menu's total height — and the
+  // mode-toggle button's position — stays the same in both modes.
+  private rebuildScrollArea(): void {
+    if (this.scrollablePanel) {
+      this.sizer.remove(this.scrollablePanel, true)
+    }
+    if (this.progressRow) {
+      this.sizer.remove(this.progressRow, true)
+      this.progressRow = null
+    }
+
+    const showProgress = this.mode === 'current'
+    const progressText = this.scene.add
+      .text(0, 0, this.getMonthProgressMessage(), Style.basicStylized)
+      .setWordWrapWidth(width - Space.pad * 2)
+      .setAlign('center')
+
     this.scrollablePanel = this.scene.rexUI.add.scrollablePanel({
       width: width,
-      height: height,
+      height: showProgress ? height - progressText.height : height,
       scrollMode: 0,
       panel: {
         child: this.createPlayerRows(),
@@ -131,14 +182,19 @@ export default class LeaderboardMenu extends Menu {
         speed: 0.5,
       },
     })
+    this.sizer.add(this.scrollablePanel)
 
-    this.sizer.add(headerSizer).add(this.scrollablePanel)
+    if (showProgress) {
+      this.progressRow = this.scene.rexUI.add.sizer({ width })
+      this.progressRow.addSpace().add(progressText).addSpace()
+      this.sizer.add(this.progressRow)
+    } else {
+      progressText.destroy()
+    }
 
     // After layout, scroll to user's position if they're in the list
     this.scrollablePanel.layout()
     this.scrollToUserPosition()
-
-    this.createModeToggle()
   }
 
   // Toggle between showing this month's and lifetime W/L numbers
@@ -170,13 +226,8 @@ export default class LeaderboardMenu extends Menu {
     this.mode = this.mode === 'current' ? 'allTime' : 'current'
     this.modeToggleButton.setText(this.getModeToggleLabel())
 
-    // Lists differ in membership AND order, so rebuild the panel's rows
-    const innerSizer = this.scrollablePanel.getElement('panel') as any
-    innerSizer.removeAll(true)
-    this.activeList().forEach((entry) => innerSizer.add(this.createRow(entry)))
-    this.scrollablePanel.layout()
-    this.scrollablePanel.t = 0
-    this.scrollToUserPosition()
+    this.rebuildScrollArea()
+    this.layout()
   }
 
   private activeList(): LeaderboardEntry[] {
@@ -207,7 +258,6 @@ export default class LeaderboardMenu extends Menu {
     let entriesSizer = this.scene.rexUI.add.sizer({
       orientation: 'vertical',
       width: width,
-      height: height,
     })
 
     this.activeList().forEach((entry) => {
