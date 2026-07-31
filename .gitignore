@@ -8,7 +8,7 @@
 node_modules/
 
 # Scripts #
-scripts/
+/scripts/
 
 # dist #
 dist/
