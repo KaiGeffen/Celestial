@@ -398,7 +398,7 @@ class Abandoned extends Card {
 }
 const abandoned = new Abandoned({
   name: 'Abandoned',
-  id: 115,
+  id: 10115,
   cost: 3,
   points: 3,
   text: 'When discarded, add this to the story Revealed and create a Wound in hand.',
