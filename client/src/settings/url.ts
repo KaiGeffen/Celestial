@@ -37,5 +37,5 @@ export const Url = {
   session_token: 'session_token_v1',
   privacyPolicy: 'https://celestialdecks.gg/privacy/',
   tournament:
-    'https://fateleague.com/tournaments/summer-season-celestial-decks-july',
+    'https://fateleague.com/tournaments/summer-season-celestial-decks-august',
 }

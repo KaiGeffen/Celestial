@@ -8,17 +8,17 @@ const ANNOUNCEMENT_PAIRS: { subheader: string; body: string }[] = [
   //   body: `Our [area=_link_steam][stroke=${Color.goldS}]Steam page[/stroke][/area] is up! We'd love if you could wishlist, and look forward to the demo release at [area=_link_nextfest][stroke=${Color.goldS}]Steam Next Fest[/stroke][/area] in October.`,
   // },
   {
-    subheader: 'Tournament',
-    body: `Our 13th tournament has concluded!
+    subheader: 'Ranked',
+    body: `This 3rd ranked season will be a bit different.
 
-Big thank you to the tournament organizers at Fate League, and everyone who played (Check your inventory for the new cardback!)
+The player who wins the most PvP games throughout the season will get to design the next cardback.
 
-Huge congrats to the top 4 players:
-Rain, SubNova, ElineX, and Sespiny!`,
-    //     body: `Our next tournament will kick off July 25th at 1 PM EST.
-    // [area=_link_tournament][stroke=${Color.goldS}]Register here![/stroke][/area]
+Each player who wins 10 PvP games throughout the season will receive that cardback once it's ready.
 
-    // 250$ prize pool split as follows: $100 for 1st, $75 for 2nd, $50 for 3rd, and $25 consolation prize for a random non-placing participant. All attendees will receive an all-new cardback.`,
+Competing for the top spot on the leaderboard is still encouraged, but the prizes for those placements will just be [img=gem] rewards.
+
+In addition, this month's tournament is coming up on August 22nd at 1PM ET, features a 250$ prize pool, as well as a new cardback for all participants.
+[area=_link_tournament][stroke=${Color.goldS}]Register here![/stroke][/area]`,
   },
   // {
   //   subheader: 'Currencies & Cosmetics',
@@ -26,15 +26,18 @@ Rain, SubNova, ElineX, and Sespiny!`,
 
   //   Earn 1[img=gem] for each PvP match played, plus a small chance to get 3-5[img=gem] from each plant in your garden. These shiny rewards can be traded for new cosmetic items in the Store under the Cosmetics tab.`,
   // },
-  {
-    subheader: 'Ranked',
-    body: `Our second ranked season is nearly finished!
+  //   {
+  //     subheader: 'Ranked',
+  //     body: `Our second ranked season is nearly finished!
 
-Secure your spot in the top 10 by midnight EST on July 31st for the next cardback, and for the #1 player, the chance to help design that cardback!`,
-  },
+  // Secure your spot in the top 10 by midnight EST on July 31st for the next cardback, and for the #1 player, the chance to help design that cardback!`,
+  //   },
   {
     subheader: 'Cards',
-    body: `[area=_Boa][stroke=${Color.goldS}]Boa[/stroke][/area] points 6 → 7
+    body: `New cards: [area=_Voices][stroke=${Color.goldS}]Voices[/stroke][/area], [area=_Moloch][stroke=${Color.goldS}]Moloch[/stroke][/area], [area=_Sudden Insight][stroke=${Color.goldS}]Sudden Insight[/stroke][/area], and [area=_Iceberg][stroke=${Color.goldS}]Iceberg[/stroke][/area]
+
+[area=_Siren][stroke=${Color.goldS}]Siren[/stroke][/area] New art + name
+[area=_Boa][stroke=${Color.goldS}]Boa[/stroke][/area] points 6 → 7
 [area=_The Future][stroke=${Color.goldS}]The Future[/stroke][/area] cost 8 → 9
 [area=_Sun][stroke=${Color.goldS}]Sun[/stroke][/area] Inspire 1 → 0, Inspired 2 → 3`,
   },
