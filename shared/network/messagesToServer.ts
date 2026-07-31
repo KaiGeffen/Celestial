@@ -50,6 +50,9 @@ export default interface messagesToServer {
   purchaseItem: {
     id: number
   }
+  redeemCode: {
+    code: string
+  }
   setCosmeticSet: {
     value: CosmeticSet
   }

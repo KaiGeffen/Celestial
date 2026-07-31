@@ -57,6 +57,13 @@ export default interface messagesToClient {
     itemId: number
     balance: number
   }
+  redeemCodeResult: {
+    success: boolean
+    error?: string
+    amountGems?: number
+    amountCoins?: number
+    itemId?: number
+  }
   harvestGardenResult: {
     success: boolean
     newGarden?: Date[]

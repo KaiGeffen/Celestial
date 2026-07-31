@@ -4,7 +4,8 @@
     "start": "node dist/index.js",
     "dev": "webpack --watch & nodemon --quiet dist/index.js",
     "dev:force-win": "webpack --watch & nodemon --quiet dist/index.js --force-win",
-    "migrate": "drizzle-kit push"
+    "migrate": "drizzle-kit push",
+    "redeem-codes": "tsx src/scripts/generateRedeemCodes.ts"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

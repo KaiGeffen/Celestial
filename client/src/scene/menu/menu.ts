@@ -195,6 +195,7 @@ import LeaderboardMenu from './leaderboard'
 import OnlinePlayersMenu from './onlinePlayers'
 import { RegisterUsernameMenu } from './registerUsername'
 import PurchaseItemMenu from './purchaseItem'
+import RedeemCodeMenu from './redeemCode'
 import UserProfileMenu from './userProfile'
 import AchievementsMenu from './achievements'
 import RaceCardChoiceMenu from './raceCardChoice'
@@ -223,6 +224,7 @@ const menus = {
   leaderboard: LeaderboardMenu,
   onlinePlayers: OnlinePlayersMenu,
   purchaseItem: PurchaseItemMenu,
+  redeemCode: RedeemCodeMenu,
   userProfile: UserProfileMenu,
   linkAccountConflict: LinkAccountConflictMenu,
   achievements: AchievementsMenu,

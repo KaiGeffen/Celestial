@@ -19,6 +19,7 @@ import {
   approvedRefs,
   cosmeticsTransactions,
   loadTimes,
+  redeemCodes,
 } from '../db/schema'
 import { and, eq, isNull, sql } from 'drizzle-orm'
 import { ServerWS } from '../../../shared/network/celestialTypedWebsocket'
@@ -1099,6 +1100,103 @@ export default function createWebSocketServer() {
 
             // Send updated user data
             await sendUserData(ws, id)
+          }),
+        )
+        // Redeem a single-use code for currency and/or an item
+        .on(
+          'redeemCode',
+          authed(async ({ code }) => {
+            const trimmed = code.trim().toUpperCase()
+
+            const result = await db.transaction(async (tx) => {
+              // Lock the code row so two rapid redeems of the same code can't
+              // both read it as unredeemed and double-grant (same pattern as
+              // claimMissionRewards)
+              const [row] = await tx
+                .select()
+                .from(redeemCodes)
+                .where(eq(redeemCodes.code, trimmed))
+                .for('update')
+                .limit(1)
+
+              if (!row) {
+                return { success: false, error: 'Invalid code.' }
+              }
+              if (row.redeemed_at) {
+                return { success: false, error: 'Code already redeemed.' }
+              }
+
+              await tx
+                .update(redeemCodes)
+                .set({ redeemed_at: new Date(), redeemed_by: id })
+                .where(eq(redeemCodes.code, trimmed))
+
+              if (row.amount_gems || row.amount_coins) {
+                await tx
+                  .update(players)
+                  .set({
+                    gems: sql`${players.gems} + ${row.amount_gems}`,
+                    coins: sql`${players.coins} + ${row.amount_coins}`,
+                  })
+                  .where(eq(players.id, id))
+              }
+
+              // Same id-space / ownership-granting as purchaseItem: a
+              // Purchaseable id (cosmetic) or a Catalog card id
+              if (row.item_id !== null) {
+                const cosmeticItem = allPurchaseables.find(
+                  (p) => p.id === row.item_id,
+                )
+                if (cosmeticItem) {
+                  const existing = await tx
+                    .select({ item_id: cosmeticsTransactions.item_id })
+                    .from(cosmeticsTransactions)
+                    .where(
+                      and(
+                        eq(cosmeticsTransactions.player_id, id),
+                        eq(cosmeticsTransactions.item_id, row.item_id),
+                      ),
+                    )
+                  if (existing.length === 0) {
+                    await tx.insert(cosmeticsTransactions).values({
+                      player_id: id,
+                      item_id: row.item_id,
+                      transaction_type: 'reward',
+                    })
+                  }
+                } else if (Catalog.getCardById(row.item_id)) {
+                  const [playerRow] = await tx
+                    .select({ card_inventory: players.card_inventory })
+                    .from(players)
+                    .where(eq(players.id, id))
+                    .limit(1)
+                  if (playerRow && playerRow.card_inventory[row.item_id] !== '1') {
+                    const padded = playerRow.card_inventory.padEnd(
+                      row.item_id + 1,
+                      '0',
+                    )
+                    const newInventoryBitString =
+                      padded.slice(0, row.item_id) +
+                      '1' +
+                      padded.slice(row.item_id + 1)
+                    await tx
+                      .update(players)
+                      .set({ card_inventory: newInventoryBitString })
+                      .where(eq(players.id, id))
+                  }
+                }
+              }
+
+              return {
+                success: true,
+                amountGems: row.amount_gems,
+                amountCoins: row.amount_coins,
+                itemId: row.item_id ?? undefined,
+              }
+            })
+
+            ws.send({ type: 'redeemCodeResult', ...result })
+            if (result.success) await sendUserData(ws, id)
           }),
         )
         .on(

@@ -29,6 +29,7 @@ export default class StoreScene extends BaseSceneWithHeader {
     this.createBackground()
     super.create({ title: 'Store' })
     this.createTabButton()
+    this.createRedeemCodeButton()
     this.createUserStatsDisplay()
 
     // Currency and item ownership reflect account data and refresh on any change
@@ -95,6 +96,19 @@ export default class StoreScene extends BaseSceneWithHeader {
         this.btnTab.setText(this.currentTab === 'cards' ? 'Cosmetics' : 'Cards')
         this.createStoreItems()
       },
+    }).setDepth(1)
+  }
+
+  private createRedeemCodeButton(): void {
+    const x = Space.pad * 3 + Space.buttonWidth * 2 + Space.buttonWidth / 2
+    const y = Space.padSmall + Space.buttonHeight / 2
+
+    new Buttons.Basic({
+      within: this,
+      text: 'Redeem',
+      x,
+      y,
+      f: () => this.scene.launch('MenuScene', { menu: 'redeemCode' }),
     }).setDepth(1)
   }
 

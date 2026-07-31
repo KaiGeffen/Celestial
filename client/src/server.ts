@@ -316,6 +316,9 @@ export default class Server {
           })
         },
       )
+      .on('redeemCodeResult', (data: messagesToClient['redeemCodeResult']) => {
+        game.events.emit('redeemCodeResult', data)
+      })
       .on('promptReconnect', (data) => {
         // Store reconnect data for PreloadScene to handle after assets load
         this.pendingReconnect = { state: data.state, isPvp: data.isPvp }
@@ -436,6 +439,10 @@ export default class Server {
 
   static purchaseItem(id: number): void {
     Server.send({ type: 'purchaseItem', id }, 'Purchasing item')
+  }
+
+  static redeemCode(code: string): void {
+    Server.send({ type: 'redeemCode', code }, 'Redeeming code')
   }
 
   static claimMissionRewards(missionId: number): void {

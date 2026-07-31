@@ -115,6 +115,22 @@ export const approvedRefs = pgTable('approved_refs', {
   code: varchar('code', { length: 255 }).primaryKey(),
 })
 
+/**
+ * Single-use redeemable codes. Redeeming grants currency (gems/coins), an
+ * item (a Catalog card id or a Purchaseable id — same id-space `purchaseItem`
+ * already dispatches on), or both. redeemed_at/redeemed_by are set together,
+ * atomically, when a code is claimed; a code with redeemed_at set is dead.
+ */
+export const redeemCodes = pgTable('redeem_codes', {
+  code: varchar('code', { length: 32 }).primaryKey(),
+  created_at: timestamp('created_at').notNull().defaultNow(),
+  redeemed_at: timestamp('redeemed_at'),
+  redeemed_by: uuid('redeemed_by').references(() => players.id),
+  amount_gems: integer('amount_gems').notNull().default(0),
+  amount_coins: integer('amount_coins').notNull().default(0),
+  item_id: integer('item_id'),
+})
+
 export const matchHistory = pgTable(
   'match_history',
   {
