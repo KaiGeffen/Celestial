@@ -396,7 +396,7 @@ class Emergence extends Card {
 }
 const emergence = new Emergence({
   name: 'Emergence',
-  id: 1071,
+  id: 119,
   qualities: [Quality.VISIBLE],
   text: 'Visible\nExhale 2: Worth +2.\nExhale 1: Worth +1.',
 })
