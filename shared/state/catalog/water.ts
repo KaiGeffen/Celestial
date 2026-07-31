@@ -80,7 +80,7 @@ const drown = new Drown({
   text: 'Discard the top three cards of your deck.',
 })
 
-class Iceberg extends Card {
+class Siren extends Card {
   getCost(player: number, game: GameModel) {
     return Math.max(0, this.cost - game.amtPasses[player])
   }
@@ -90,8 +90,8 @@ class Iceberg extends Card {
     game.draw(player, 2)
   }
 }
-const iceberg = new Iceberg({
-  name: 'Iceberg',
+const siren = new Siren({
+  name: 'Siren',
   id: 54,
   cost: 4,
   points: 2,
@@ -267,7 +267,7 @@ const crabs = new Crabs({
   text: 'When you win this round, discard a card.\nWhen you lose this round, draw a card.',
 })
 
-class Rime extends Card {
+class Iceberg extends Card {
   play(player: number, game: GameModel, index: number, bonus: number) {
     super.play(player, game, index, bonus)
 
@@ -276,8 +276,8 @@ class Rime extends Card {
     }
   }
 }
-const rime = new Rime({
-  name: 'Rime',
+const iceberg = new Iceberg({
+  name: 'Iceberg',
   id: 117,
   cost: 4,
   points: 5,
@@ -335,7 +335,7 @@ export {
   excess,
   fishingBoat,
   drown,
-  iceberg,
+  siren,
   dew,
   gentleRain,
   refresh,
@@ -346,6 +346,6 @@ export {
   overflow,
   liquidity,
   // NEW
-  rime,
+  iceberg,
   leviathan,
 }
