@@ -12,7 +12,13 @@ import { CardImage } from '../../lib/cardImage'
 import { getCosmeticImageKey } from '../../utils/cosmetics'
 import messagesToClient from '@shared/network/messagesToClient'
 
-const width = 420
+const width = 500
+
+// Cards top out below 1000; ids at/above that are cosmetics (borders start
+// at 1001, cardbacks at 2001) — see allPurchaseables
+function getRedeemedCard(itemId: number) {
+  return itemId < 1000 ? Catalog.getCardById(itemId) : undefined
+}
 
 export default class RedeemCodeMenu extends Menu {
   private input: any
@@ -122,32 +128,36 @@ export default class RedeemCodeMenu extends Menu {
     this.rewardSizer.clear(true)
 
     if (itemId !== undefined) {
-      const imageContainer = new ContainerLite(
-        this.scene,
-        0,
-        0,
-        Space.cardWidth,
-        Space.cardHeight,
-      )
+      const card = getRedeemedCard(itemId)
+      const cosmeticItem = card
+        ? undefined
+        : allPurchaseables.find((p) => p.id === itemId)
 
-      const card = Catalog.getCardById(itemId)
-      if (card) {
-        this.currentCardImage = new CardImage(card, imageContainer, true, false)
-      } else {
-        const cosmeticItem = allPurchaseables.find((p) => p.id === itemId)
-        if (cosmeticItem) {
+      if (card || cosmeticItem) {
+        // Borders are a ring, not card-shaped — sizing the slot to full card
+        // dimensions would stretch them and leave a lot of empty space
+        const isBorder = cosmeticItem?.type === 'border'
+        const w = isBorder ? Space.avatarSize : Space.cardWidth
+        const h = isBorder ? Space.avatarSize : Space.cardHeight
+
+        const imageContainer = new ContainerLite(this.scene, 0, 0, w, h)
+
+        if (card) {
+          this.currentCardImage = new CardImage(
+            card,
+            imageContainer,
+            true,
+            false,
+          )
+        } else {
           const image = this.scene.add
-            .image(
-              Space.cardWidth / 2,
-              Space.cardHeight / 2,
-              getCosmeticImageKey(cosmeticItem),
-            )
-            .setDisplaySize(Space.cardWidth, Space.cardHeight)
+            .image(0, 0, getCosmeticImageKey(cosmeticItem))
+            .setDisplaySize(w, h)
           imageContainer.add(image)
         }
-      }
 
-      this.rewardSizer.add(imageContainer, { align: 'center' })
+        this.rewardSizer.add(imageContainer, { align: 'center' })
+      }
     }
 
     const txtStatus = this.scene.add
@@ -181,7 +191,7 @@ export default class RedeemCodeMenu extends Menu {
     const lines: string[] = []
     if (currencyParts.length > 0) lines.push(currencyParts.join(' '))
     if (data.itemId !== undefined) {
-      const card = Catalog.getCardById(data.itemId)
+      const card = getRedeemedCard(data.itemId)
       lines.push(card ? `Unlocked: ${card.name}` : 'Unlocked new item')
     }
     this.renderReward(lines.join('\n') || 'Code redeemed!', data.itemId)
