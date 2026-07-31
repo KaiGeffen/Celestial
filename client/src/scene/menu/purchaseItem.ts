@@ -72,7 +72,7 @@ export default class PurchaseItemMenu extends Menu {
 
   private createContent(): void {
     this.createHeader(
-      `Purchase ${this.currencyIcon}${this.cost.toLocaleString()}`,
+      `Purchase (${this.cost.toLocaleString()} ${this.currencyIcon})`,
     )
 
     if (this.card) {
