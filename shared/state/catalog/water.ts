@@ -279,9 +279,10 @@ class Iceberg extends Card {
 const iceberg = new Iceberg({
   name: 'Iceberg',
   id: 117,
+  qualities: [Quality.FLEETING],
   cost: 4,
   points: 5,
-  text: 'Create 2 copies of Ice on the bottom of your deck.',
+  text: 'Fleeting\nCreate 2 copies of Ice on the bottom of your deck.',
 })
 
 class Liquidity extends RefreshCard {

@@ -117,8 +117,9 @@ class Ice extends Card {
     // Remove from hand
     game.hand[player].splice(game.hand[player].length - 1, 1)
 
-    // Move to the beginning of the (unresolved) story
-    const index2 = 0
+    // Night (the story resolving) sends it to the start; day (the play
+    // phase, before both players pass) sends it to the end
+    const index2 = game.isRecap ? 0 : game.story.acts.length
     game.story.addAct(this, player, index2, true)
 
     // TODO Add animation

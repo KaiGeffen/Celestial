@@ -34,6 +34,10 @@ class Story {
     this.roundEndedForced = false
     this.bubbleSkipBeforeResolvedIndex = 0
 
+    // The story only plays (resolves) here — night, as opposed to the day
+    // (play phase) before both players pass
+    game.isRecap = true
+
     // Add a model at the start
     game.versionIncrClearAnimations()
     addRecentModels(game)
@@ -93,6 +97,8 @@ class Story {
     for (const [callback, player] of roundEndEffects) {
       callback(player, game)
     }
+
+    game.isRecap = false
   }
 
   // Save the final state of the story resolving, and clear resolved acts
