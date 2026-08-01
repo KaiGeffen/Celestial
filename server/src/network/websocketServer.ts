@@ -1126,6 +1126,27 @@ export default function createWebSocketServer() {
                 return { success: false, error: 'Code already redeemed.' }
               }
 
+              // Resolve the item (if any) before touching anything, so a
+              // misconfigured code (e.g. a typo'd --item id) fails cleanly
+              // instead of being marked redeemed while granting nothing
+              const cosmeticItem =
+                row.item_id !== null
+                  ? allPurchaseables.find((p) => p.id === row.item_id)
+                  : undefined
+              const card =
+                row.item_id !== null && !cosmeticItem
+                  ? Catalog.getCardById(row.item_id)
+                  : undefined
+              if (row.item_id !== null && !cosmeticItem && !card) {
+                console.error(
+                  `redeemCode: code ${trimmed} has unresolvable item_id ${row.item_id}`,
+                )
+                return {
+                  success: false,
+                  error: 'This code is misconfigured. Contact support.',
+                }
+              }
+
               await tx
                 .update(redeemCodes)
                 .set({ redeemed_at: new Date(), redeemed_by: id })
@@ -1144,9 +1165,6 @@ export default function createWebSocketServer() {
               // Same id-space / ownership-granting as purchaseItem: a
               // Purchaseable id (cosmetic) or a Catalog card id
               if (row.item_id !== null) {
-                const cosmeticItem = allPurchaseables.find(
-                  (p) => p.id === row.item_id,
-                )
                 if (cosmeticItem) {
                   const existing = await tx
                     .select({ item_id: cosmeticsTransactions.item_id })
@@ -1164,7 +1182,7 @@ export default function createWebSocketServer() {
                       transaction_type: 'reward',
                     })
                   }
-                } else if (Catalog.getCardById(row.item_id)) {
+                } else if (card) {
                   const [playerRow] = await tx
                     .select({ card_inventory: players.card_inventory })
                     .from(players)
