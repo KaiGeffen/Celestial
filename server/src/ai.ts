@@ -55,7 +55,7 @@ function wantDryRound(model: GameModel): boolean {
   const weDraw = Math.min(
     2,
     6 - model.hand[0].length,
-    model.deck.length + model.pile[0].length,
+    model.deck[0].length + model.pile[0].length,
   )
   result += 2 * weDraw
   const theyDraw = Math.min(
