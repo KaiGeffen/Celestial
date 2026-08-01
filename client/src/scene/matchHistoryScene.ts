@@ -88,7 +88,7 @@ export default class MatchHistoryScene extends BaseSceneWithHeader {
         this.matchTypeBtn.setText(this.matchTypeFilter.toUpperCase())
         this.filterAndRefreshContent()
       },
-    })
+    }).setDepth(1)
   }
 
   /** Win/loss row backgrounds: 20% alpha on the left → 0 on the right. */
