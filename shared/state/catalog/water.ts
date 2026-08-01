@@ -310,7 +310,7 @@ class Leviathan extends Card {
     super.play(player, game, index, bonus)
 
     const newVersion = this.copy()
-    newVersion.points = 3
+    newVersion.points = 4
 
     return newVersion
   }

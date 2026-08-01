@@ -97,17 +97,6 @@ class Arsonist extends Card {
       game.create(Zone.Discard, player, ashes)
     }
   }
-
-  onPlay(player: number, game: GameModel) {
-    if (this.upgradeVersion === 2) {
-      for (let i = 0; i < game.hand[player].length; i++) {
-        const card = game.hand[player][i]
-        if (card.cost < 4) {
-          game.hand[player][i] = arsonist
-        }
-      }
-    }
-  }
 }
 const arsonist = new Arsonist({
   name: 'Arsonist',
@@ -517,24 +506,6 @@ const prometheus = new Prometheus({
   text: 'Inspire 2.\nCreate a Condemnation in your discard pile.',
 })
 
-class SuddenDraw extends Card {
-  play(player: number, game: GameModel, index: number, bonus: number) {
-    super.play(player, game, index, bonus)
-
-    game.discard(player, 2)
-  }
-
-  onPlay(player: number, game: GameModel) {
-    game.draw(player, 2)
-  }
-}
-const suddenDraw = new Prometheus({
-  name: 'Sudden Draw',
-  id: 2075,
-  cost: 1,
-  text: 'When played, draw 2 cards.\nDiscard 2 cards.',
-})
-
 class Moth extends Card {
   onBigResolve(player: number, game: GameModel, index: number) {
     game.moveBetweenZones(Zone.Discard, Zone.Story, player, index, {
@@ -607,7 +578,6 @@ export {
   // momentum,
   // finale,
   // prometheus,
-  // suddenDraw,
   moth,
   // judgement,
   rightNow,
