@@ -81,7 +81,7 @@ const StyleGeneral: StyleDict = {
 
   // Count of a card in the deck
   cutoutCardCount: {
-    fontFamily: cardStats,
+    fontFamily: sansFont,
     fontSize: size.standard,
     color: Color.cardCount,
     stroke: '#0009',
