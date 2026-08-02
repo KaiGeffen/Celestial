@@ -8,6 +8,6 @@ export default function ensureMusic(scene: Phaser.Scene) {
     )
     music.play()
     music.volume =
-      (UserSettings._get('musicVolume') * UserSettings._get('volume')) / 4
+      (UserSettings._get('musicVolume') * UserSettings._get('volume')) / 2
   }
 }

@@ -182,6 +182,10 @@ export default class GameModel {
     copy.amtPasses = [...this.amtPasses]
     copy.amtDrawn = [...this.amtDrawn]
     copy.exhaleCountLastRound = [...this.exhaleCountLastRound]
+    copy.endingBreath = [...this.endingBreath]
+    copy.amtCardsPlayedLastRound = [...this.amtCardsPlayedLastRound]
+    copy.amtCardsPlayedThisRound = [...this.amtCardsPlayedThisRound]
+    copy.replacementCreateCardThisRound = this.replacementCreateCardThisRound
     // Unnecessary since a new own gets init above, but left in for clarity
     // copy.usernames = [...this.usernames]
     // copy.avatars = [...this.avatars]

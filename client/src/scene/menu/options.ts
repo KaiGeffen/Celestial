@@ -262,7 +262,7 @@ export default class OptionsMenu extends Menu {
           UserSettings._get('volume'),
           (value) => {
             UserSettings._set('volume', value)
-            this.scene.sound.volume = value / 4
+            this.scene.sound.volume = value / 2
 
             // Ensure that all other audio is playing, since this may have transitioned from 0 volume
             music.volume = (value * UserSettings._get('musicVolume')) / 4
@@ -280,7 +280,7 @@ export default class OptionsMenu extends Menu {
           (value) => {
             UserSettings._set('musicVolume', value)
 
-            music.volume = (value * UserSettings._get('volume')) / 4
+            music.volume = (value * UserSettings._get('volume')) / 2
             music.play()
           },
         ),
@@ -294,7 +294,7 @@ export default class OptionsMenu extends Menu {
           (value) => {
             UserSettings._set('dialogVolume', value)
 
-            dialogAudio.volume = (value * UserSettings._get('volume')) / 4
+            dialogAudio.volume = (value * UserSettings._get('volume')) / 2
           },
         ),
         { expand: true },
