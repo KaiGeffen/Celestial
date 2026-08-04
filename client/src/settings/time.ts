@@ -23,6 +23,8 @@ export const MatchTiming = {
 
   /** How long for a card to sink in the water */
   cardSink: 800,
+  /** How long a click ripple on the water takes to grow and fade out */
+  waterRipple: 700,
 
   /** Base duration for anything to happen in the recap (Card flips, discard, etc.) */
   recapTween: 400,

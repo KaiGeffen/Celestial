@@ -30,6 +30,12 @@ export const MATCH_TILE_PATTERN_SCALE = 1
  */
 export const MATCH_TILE_BLEND_MODE: number = Phaser.BlendModes.NORMAL
 
+/** Ripple ring's starting/ending radius (px) when the water is clicked. */
+const RIPPLE_START_RADIUS = 6
+const RIPPLE_END_RADIUS = 80
+/** Ripple ring's starting stroke alpha (fades to 0). */
+const RIPPLE_START_ALPHA = 0.5
+
 type RexAnchorWithOffset = {
   offsetX: number
   setOffset: (x: number, y: number) => void
@@ -136,7 +142,13 @@ export default class BackgroundRegion extends Region {
     this.scene = scene
     this.container = scene.add.container().setDepth(-1)
 
-    this.matchDay = scene.add.image(0, 0, 'background-matchDay').setOrigin(0)
+    this.matchDay = scene.add
+      .image(0, 0, 'background-matchDay')
+      .setOrigin(0)
+      .setInteractive()
+      .on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+        this.createRipple(pointer.x, pointer.y)
+      })
 
     this.waterNight = scene.add
       .image(0, 0, 'background-matchNight')
@@ -151,15 +163,18 @@ export default class BackgroundRegion extends Region {
       .setBlendMode(MATCH_TILE_BLEND_MODE)
     syncMatchTileVisibility(this.matchTile)
 
+    // Pixel-perfect: these are mostly transparent (curved parchment frame), so a plain
+    // rectangular hit area would swallow clicks meant for the water showing through
     this.matchTop = scene.add
       .image(0, 0, 'background-matchTop')
       .setOrigin(0.5, 1)
-      .setInteractive()
+      .setDepth(1)
+      .setInteractive(scene.input.makePixelPerfect())
 
     this.matchBottom = scene.add
       .image(0, 0, 'background-matchBottom')
       .setOrigin(0.5, 0)
-      .setInteractive()
+      .setInteractive(scene.input.makePixelPerfect())
 
     this.container.add(this.matchDay)
     this.container.add(this.waterNight)
@@ -239,6 +254,28 @@ export default class BackgroundRegion extends Region {
     const dt = delta / 1000
     this.matchTile.tilePositionX += MATCH_TILE_DRIFT_X_PX_PER_SEC * dt
     this.matchTile.tilePositionY += MATCH_TILE_DRIFT_Y_PX_PER_SEC * dt
+  }
+
+  /** Small ring that grows and fades out quickly, centered where the water was clicked. */
+  private createRipple(x: number, y: number): void {
+    const ripple = this.scene.add
+      .circle(x, y, RIPPLE_START_RADIUS)
+      .setStrokeStyle(2, 0xffffff)
+      .setAlpha(RIPPLE_START_ALPHA)
+      .setDepth(0)
+    // Insert below the top/bottom frames (which sit at the end of the list) so the
+    // ripple doesn't paint over their art, but above the water/tile beneath it
+    this.container.addAt(ripple, this.container.list.indexOf(this.matchTop))
+
+    this.scene.tweens.add({
+      targets: ripple,
+      radius: RIPPLE_END_RADIUS,
+      alpha: 0,
+      duration: Time.match.waterRipple,
+      ease: Ease.ripple,
+      onStart: () => this.scene.playSound('splash'),
+      onComplete: () => ripple.destroy(),
+    })
   }
 
   /** Tween tint on top/bottom match chrome and night layer for recap (`matchTile` unchanged). */

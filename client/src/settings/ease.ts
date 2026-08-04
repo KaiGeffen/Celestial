@@ -15,4 +15,7 @@ export const Ease: Record<string, string> = {
 
   // Cards falling on the title scene
   cardFall: 'Quart.easeIn',
+
+  // Water ripple growing outward from a click
+  ripple: 'Sine.Out',
 }

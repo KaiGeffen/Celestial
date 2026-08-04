@@ -120,7 +120,6 @@ export const assetLists = {
       "Ecology",
       "Emergence",
       "Enlightenment",
-      "Enlightment",
       "Excess",
       "Fates",
       "Firebug",
@@ -577,6 +576,7 @@ export const assetLists = {
       "resolve 4",
       "resolve 5",
       "shuffle",
+      "splash",
       "tie",
       "win"
     ]
