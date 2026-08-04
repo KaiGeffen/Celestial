@@ -44,14 +44,7 @@ export default class StoreScene extends BaseSceneWithHeader {
 
   private createUserStatsDisplay(): void {
     const bg = this.add
-      .rectangle(
-        0,
-        this.headerHeight / 2,
-        120,
-        55,
-        Color.currencyBackground,
-        0.3,
-      )
+      .rectangle(0, this.headerHeight / 2, 120, 55, Color.textBackground, 0.3)
       .setOrigin(1, 0.5)
       .setDepth(1)
 

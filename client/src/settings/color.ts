@@ -66,6 +66,7 @@ export const Color: Record<string, any> = {
   border: CoreColors.brown,
   outline: CoreColors.gold,
   darken: CoreColors.darken,
+  textBackground: CoreColors.backgroundLight,
 
   // Backgrounds
   backgroundDark: CoreColors.backgroundDark,
@@ -96,9 +97,6 @@ export const Color: Record<string, any> = {
   // Hint text fill and background (What shows when you hover something that has an explanation)
   hintFill: CoreColors.white,
   hintBackground: CoreColors.greyA,
-
-  // Store
-  currencyBackground: CoreColors.backgroundLight,
 
   // Card Image
   cardGreyed: CoreColors.lightGrey,

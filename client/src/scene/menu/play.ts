@@ -7,6 +7,7 @@ import {
   Space,
   Style,
   BBStyle,
+  Color,
   UserSettings,
 } from '../../settings/settings'
 import Menu from './menu'
@@ -275,7 +276,7 @@ export default class PlayMenu extends Menu {
   // scrollable around it) since setDeck() already tears down/recreates its
   // cutouts on every switch anyway — nothing worth preserving across calls.
   private rebuildDeckAndExplainer(): void {
-    const starterDeck = findMatchingStarterDeck(this.deck.cards ?? [])
+    const starterDeck = findMatchingStarterDeck(this.deck.name)
     const explainerHeight = starterDeck
       ? this.measureExplainerHeight(starterDeck.explainer)
       : 0
@@ -327,10 +328,7 @@ export default class PlayMenu extends Menu {
     txt.destroy()
 
     // + Space.padSmall for the sizer's own top padding (see createExplainerSizer)
-    return Math.min(
-      bodyHeight + Space.padSmall,
-      PlayMenu.MAX_EXPLAINER_HEIGHT,
-    )
+    return Math.min(bodyHeight + Space.padSmall, PlayMenu.MAX_EXPLAINER_HEIGHT)
   }
 
   private createExplainerSizer(
@@ -343,6 +341,17 @@ export default class PlayMenu extends Menu {
       height,
       space: { top: Space.padSmall },
     })
+
+    sizer.addBackground(
+      this.scene.add.rectangle(
+        0,
+        0,
+        deckPanelWidth,
+        height,
+        Color.textBackground,
+        0.5,
+      ),
+    )
 
     const body = this.scene.add
       .text(0, 0, explainerText, Style.basicStylized)

@@ -1,7 +1,7 @@
 import { Deck } from '@shared/types/deck'
 
 export interface StarterDeck extends Deck {
-  // Shown in the Play menu when the equipped deck's cards exactly match this one
+  // Shown in the Play menu when the equipped deck's name matches this one
   explainer: string
 }
 
@@ -67,17 +67,7 @@ const starterDecks: StarterDeck[] = [
 
 export default starterDecks
 
-// Whether two card-id lists contain exactly the same cards (order-independent)
-function sameCards(a: number[], b: number[]): boolean {
-  if (a.length !== b.length) return false
-  const sortedA = [...a].sort((x, y) => x - y)
-  const sortedB = [...b].sort((x, y) => x - y)
-  return sortedA.every((id, i) => id === sortedB[i])
-}
-
-// The starter deck whose cards exactly match the given list, if any
-export function findMatchingStarterDeck(
-  cardIds: number[],
-): StarterDeck | undefined {
-  return starterDecks.find((deck) => sameCards(deck.cards, cardIds))
+// The starter deck with the given name, if any
+export function findMatchingStarterDeck(name: string): StarterDeck | undefined {
+  return starterDecks.find((deck) => deck.name === name)
 }
