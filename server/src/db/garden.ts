@@ -4,8 +4,58 @@ import { eq, sql } from 'drizzle-orm'
 import { GardenSettings } from '../../../shared/settings'
 import REWARD_AMOUNTS from '../../../shared/config/rewardAmounts'
 
+// The transaction handle passed to db.transaction callbacks (same query API as db).
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0]
+
 export default class Garden {
-  // Plant a seed in an open plot in given player's garden
+  /** Index of the first plant ready to harvest, or -1. */
+  private static findReadyPlotIndex(gardenState: Date[]): number {
+    const now = new Date()
+    for (let i = 0; i < gardenState.length; i++) {
+      const plantedTime = gardenState[i]
+      const hoursElapsed =
+        (now.getTime() - plantedTime.getTime()) / (1000 * 60 * 60)
+      if (hoursElapsed >= GardenSettings.GROWTH_TIME_HOURS) return i
+    }
+    return -1
+  }
+
+  // Removes the plant at plotNumber from gardenState (in place) and credits its
+  // reward, using the caller's already-locked transaction. Caller is responsible
+  // for persisting the resulting gardenState.
+  private static async harvestPlot(
+    tx: Tx,
+    playerId: string,
+    gardenState: Date[],
+    plotNumber: number,
+  ): Promise<{ goldReward: number; gemReward: number }> {
+    gardenState.splice(plotNumber, 1)
+
+    const goldReward =
+      Math.floor(Math.random() * REWARD_AMOUNTS.harvestVariance) +
+      REWARD_AMOUNTS.harvestConstant
+
+    let gemReward = 0
+    if (Math.random() < REWARD_AMOUNTS.gemChance) {
+      gemReward =
+        Math.floor(Math.random() * REWARD_AMOUNTS.gemVariance) +
+        REWARD_AMOUNTS.gemAmount
+    }
+
+    await tx
+      .update(players)
+      .set({
+        coins: sql`${players.coins} + ${goldReward}`,
+        gems: sql`${players.gems} + ${gemReward}`,
+      })
+      .where(eq(players.id, playerId))
+
+    return { goldReward, gemReward }
+  }
+
+  // Plant a seed in an open plot in given player's garden. If the garden is
+  // full, harvest whatever's ready first to make room, same as a manual
+  // harvest would — a match ending shouldn't waste the seed it earned.
   static async plantSeed(playerId: string): Promise<boolean> {
     return await db.transaction(async (tx) => {
       // Lock the row so concurrent plants can't both read the same garden and clobber each other
@@ -20,9 +70,11 @@ export default class Garden {
 
       const gardenState = [...player.garden]
 
-      // Don't plant if the garden is full
       if (gardenState.length >= GardenSettings.MAX_PLANTS) {
-        return false
+        const readyIndex = Garden.findReadyPlotIndex(gardenState)
+        // Garden's full and nothing's ready yet — nowhere to put the new seed
+        if (readyIndex === -1) return false
+        await Garden.harvestPlot(tx, playerId, gardenState, readyIndex)
       }
 
       // Add a new seed planted now
@@ -82,29 +134,17 @@ export default class Garden {
         return { success: false }
       }
 
-      // Remove the plant at the specified plot
-      gardenState.splice(plotNumber, 1)
+      const { goldReward, gemReward } = await Garden.harvestPlot(
+        tx,
+        playerId,
+        gardenState,
+        plotNumber,
+      )
 
-      // Get random gold and gem rewards
-      const goldReward =
-        Math.floor(Math.random() * REWARD_AMOUNTS.harvestVariance) +
-        REWARD_AMOUNTS.harvestConstant
-
-      let gemReward = 0
-      if (Math.random() < REWARD_AMOUNTS.gemChance) {
-        gemReward =
-          Math.floor(Math.random() * REWARD_AMOUNTS.gemVariance) +
-          REWARD_AMOUNTS.gemAmount
-      }
-
-      // Update the database with new garden state and add currency amounts
+      // Persist the updated garden (harvestPlot already credited the currency)
       await tx
         .update(players)
-        .set({
-          garden: gardenState,
-          coins: sql`${players.coins} + ${goldReward}`,
-          gems: sql`${players.gems} + ${gemReward}`,
-        })
+        .set({ garden: gardenState })
         .where(eq(players.id, playerId))
 
       return {
