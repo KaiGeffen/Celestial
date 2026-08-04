@@ -8,7 +8,23 @@ import { achievementsMeta } from '../../shared/achievementsData'
 
 const REFERRAL_ACHIEVEMENT_ID = 2000
 
+// The transaction handle passed to db.transaction callbacks (same query API as db).
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0]
+
 export class AchievementManager {
+  // Credit gold to a player; pass a transaction handle if the caller's
+  // already in one, so the credit commits/rolls back atomically with it
+  private static async awardGold(
+    executor: Tx | typeof db,
+    playerId: string,
+    amount: number,
+  ) {
+    await executor
+      .update(players)
+      .set({ coins: sql`${players.coins} + ${amount}` })
+      .where(eq(players.id, playerId))
+  }
+
   // Get all of the achievements for player
   static async getAchievements(playerId: string): Promise<Achievement[]> {
     const result = await db
@@ -213,12 +229,7 @@ export class AchievementManager {
       // We successfully inserted the achievement, so award gold reward if applicable
       const meta = achievementsMeta[achievementId]
       if (meta?.goldReward) {
-        await tx
-          .update(players)
-          .set({
-            coins: sql`${players.coins} + ${meta.goldReward}`,
-          })
-          .where(eq(players.id, playerId))
+        await this.awardGold(tx, playerId, meta.goldReward)
       }
 
       return true
@@ -276,12 +287,7 @@ export class AchievementManager {
       // Award gold reward if the achievement has one
       const meta = achievementsMeta[achievementId]
       if (meta?.goldReward) {
-        await db
-          .update(players)
-          .set({
-            coins: sql`${players.coins} + ${meta.goldReward}`,
-          })
-          .where(eq(players.id, playerId))
+        await this.awardGold(db, playerId, meta.goldReward)
       }
     }
   }
@@ -334,12 +340,7 @@ export class AchievementManager {
         currentProgress < threshold &&
         meta?.goldReward
       ) {
-        await tx
-          .update(players)
-          .set({
-            coins: sql`${players.coins} + ${meta.goldReward}`,
-          })
-          .where(eq(players.id, playerId))
+        await this.awardGold(tx, playerId, meta.goldReward)
       }
     })
   }
