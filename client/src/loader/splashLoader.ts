@@ -42,6 +42,7 @@ export default function initializeSplashScreen(): void {
 
     // Fallback: transition after 5 seconds regardless
     setTimeout(() => {
+      clearInterval(checkGameReady)
       const splash = document.getElementById('splash-screen')
       if (splash) {
         splash.style.display = 'none'
