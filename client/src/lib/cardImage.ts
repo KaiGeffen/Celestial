@@ -142,12 +142,12 @@ export class CardImage {
   setOnClick(f: () => void): this {
     this.clickCallback = f
 
-    // Make the card clickable via its subject image (an exact card-sized hit
-    // area), even if it was constructed non-interactive
+    // Make the card clickable and hoverable (subject, stats, and text all
+    // become interactive), even if it was constructed non-interactive
     this.imageSubject.setInteractive()
     this.txtCost.setInteractive()
     this.txtPoints.setInteractive()
-    this.txtText.setInteractive()
+    this.clampTextHitArea()
     this.interactive = true
 
     return this
@@ -515,10 +515,28 @@ export class CardImage {
 
     // Text responds to hover/click only on interactive cards
     if (this.interactive) {
-      this.txtText.setInteractive()
+      this.clampTextHitArea()
     }
 
     this.container.add(this.txtText)
+  }
+
+  // Word wrap only clamps width; long rules text can wrap to enough lines
+  // that the default (auto-sized) hit area grows past the card's bottom
+  // edge, stealing clicks from whatever's below in a packed grid. Clamp the
+  // hit area's height so it can't extend past the card, however tall the
+  // wrapped text gets.
+  private clampTextHitArea(): void {
+    const maxHeight = 2 * (Space.cardHeight / 2 - this.txtText.y)
+    this.txtText.setInteractive(
+      new Phaser.Geom.Rectangle(
+        0,
+        0,
+        Space.cardWidth,
+        Math.min(this.txtText.height, maxHeight),
+      ),
+      Phaser.Geom.Rectangle.Contains,
+    )
   }
 
   private createTitle(): void {

@@ -243,8 +243,7 @@ export default class StoreScene extends BaseSceneWithHeader {
       Space.cardWidth,
       Space.cardHeight,
     )
-    // Non-interactive keeps the text elements inert (their hit regions can
-    // extend beyond card bounds); setOnClick makes just the subject clickable
+    // Constructed non-interactive; setOnClick below makes it fully clickable/hoverable
     const cardImage = new CardImage(card, cardImageContainer, false, false)
 
     cardImage.setOnClick(() => {

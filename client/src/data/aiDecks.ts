@@ -159,7 +159,7 @@ const hardDecks: Deck[] = [
   },
 ]
 
-/** Difficulty from PvE wins: 0–4 easy, 5–14 medium, 15+ hard */
+/** Difficulty from PvE wins: 0–9 easy, 10–19 medium, 20+ hard */
 function difficultyFromPveWins(pveWins: number): 0 | 1 | 2 {
   if (pveWins < 10) return 0
   if (pveWins < 20) return 1
