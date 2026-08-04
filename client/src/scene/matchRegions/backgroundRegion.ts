@@ -44,7 +44,15 @@ const RIPPLE_OUTER_ALPHA = 0.4
 const RIPPLE_WOBBLE_RATIO = 0.025
 /** Random number of wobble lobes per ring, in [MIN, MIN + RANGE). */
 const RIPPLE_WOBBLE_LOBES_MIN = 7
-const RIPPLE_WOBBLE_LOBES_RANGE = 3
+const RIPPLE_WOBBLE_LOBES_RANGE = 6
+
+/** Stroke width wobbles around the ring (base ± amplitude, sinusoidal) so the line itself looks uneven, not just the outline. */
+const RIPPLE_STROKE_WIDTH_BASE = 2
+const RIPPLE_STROKE_WIDTH_AMPLITUDE = 1.4
+const RIPPLE_STROKE_WIDTH_MIN = 0.5
+/** Random number of width-wobble lobes per ring, in [MIN, MIN + RANGE). */
+const RIPPLE_STROKE_WIDTH_LOBES_MIN = 4
+const RIPPLE_STROKE_WIDTH_LOBES_RANGE = 3
 
 type RexAnchorWithOffset = {
   offsetX: number
@@ -269,11 +277,16 @@ export default class BackgroundRegion extends Region {
   /** Pair of rings that grow and fade out quickly, centered where the water was clicked. */
   private createRipple(x: number, y: number): void {
     // Shared so both rings wobble in lockstep — the darker ring should trace the same
-    // wavy shoreline as the first, just offset outward, not wobble independently
+    // wavy shoreline as the first (same radius bulges, same thick/thin spots), just
+    // offset outward, not wobble independently
     const lobes =
       RIPPLE_WOBBLE_LOBES_MIN +
       Math.floor(Math.random() * RIPPLE_WOBBLE_LOBES_RANGE)
     const phase = Math.random() * Math.PI * 2
+    const widthLobes =
+      RIPPLE_STROKE_WIDTH_LOBES_MIN +
+      Math.floor(Math.random() * RIPPLE_STROKE_WIDTH_LOBES_RANGE)
+    const widthPhase = Math.random() * Math.PI * 2
 
     this.spawnRippleRing(
       x,
@@ -284,6 +297,8 @@ export default class BackgroundRegion extends Region {
       RIPPLE_START_ALPHA,
       lobes,
       phase,
+      widthLobes,
+      widthPhase,
     )
     // Darker ring trailing just outside the first, for a bit of depth
     this.spawnRippleRing(
@@ -295,11 +310,18 @@ export default class BackgroundRegion extends Region {
       RIPPLE_OUTER_ALPHA,
       lobes,
       phase,
+      widthLobes,
+      widthPhase,
     )
     this.scene.playSound('splash')
   }
 
-  /** Draws `steps` points around the ring, offsetting the radius with a sine wave so it reads as wavy water rather than a perfect circle. */
+  /**
+   * Draws the ring as short segments rather than one continuous stroke: the radius wobbles
+   * with one sine wave (so it isn't a perfect circle) and the stroke width wobbles with a
+   * second, independent sine wave (so the line itself reads as an uneven ripple, not a
+   * uniform outline).
+   */
   private drawWavyRing(
     graphics: Phaser.GameObjects.Graphics,
     radius: number,
@@ -307,23 +329,34 @@ export default class BackgroundRegion extends Region {
     alpha: number,
     lobes: number,
     phase: number,
+    widthLobes: number,
+    widthPhase: number,
   ): void {
     const wobble = radius * RIPPLE_WOBBLE_RATIO
     const steps = 48
 
-    graphics.clear()
-    graphics.lineStyle(2, color, alpha)
-    graphics.beginPath()
+    const points: { x: number; y: number }[] = []
     for (let i = 0; i <= steps; i++) {
       const angle = (i / steps) * Math.PI * 2
       const r = radius + Math.sin(angle * lobes + phase) * wobble
-      const px = Math.cos(angle) * r
-      const py = Math.sin(angle) * r
-      if (i === 0) graphics.moveTo(px, py)
-      else graphics.lineTo(px, py)
+      points.push({ x: Math.cos(angle) * r, y: Math.sin(angle) * r })
     }
-    graphics.closePath()
-    graphics.strokePath()
+
+    graphics.clear()
+    for (let i = 0; i < steps; i++) {
+      const angle = (i / steps) * Math.PI * 2
+      const width = Math.max(
+        RIPPLE_STROKE_WIDTH_MIN,
+        RIPPLE_STROKE_WIDTH_BASE +
+          Math.sin(angle * widthLobes + widthPhase) *
+            RIPPLE_STROKE_WIDTH_AMPLITUDE,
+      )
+      graphics.lineStyle(width, color, alpha)
+      graphics.beginPath()
+      graphics.moveTo(points[i].x, points[i].y)
+      graphics.lineTo(points[i + 1].x, points[i + 1].y)
+      graphics.strokePath()
+    }
   }
 
   private spawnRippleRing(
@@ -335,6 +368,8 @@ export default class BackgroundRegion extends Region {
     startAlpha: number,
     lobes: number,
     phase: number,
+    widthLobes: number,
+    widthPhase: number,
   ): void {
     const graphics = this.scene.add.graphics({ x, y }).setDepth(0)
     // Insert below the top/bottom frames (which sit at the end of the list) so the
@@ -342,7 +377,18 @@ export default class BackgroundRegion extends Region {
     this.container.addAt(graphics, this.container.list.indexOf(this.matchTop))
 
     const state = { radius: startRadius, alpha: startAlpha }
-    this.drawWavyRing(graphics, state.radius, color, state.alpha, lobes, phase)
+    const redraw = () =>
+      this.drawWavyRing(
+        graphics,
+        state.radius,
+        color,
+        state.alpha,
+        lobes,
+        phase,
+        widthLobes,
+        widthPhase,
+      )
+    redraw()
 
     this.scene.tweens.add({
       targets: state,
@@ -350,15 +396,7 @@ export default class BackgroundRegion extends Region {
       alpha: 0,
       duration: Time.match.waterRipple,
       ease: Ease.ripple,
-      onUpdate: () =>
-        this.drawWavyRing(
-          graphics,
-          state.radius,
-          color,
-          state.alpha,
-          lobes,
-          phase,
-        ),
+      onUpdate: redraw,
       onComplete: () => graphics.destroy(),
     })
   }
