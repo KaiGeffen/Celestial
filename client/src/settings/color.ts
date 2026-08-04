@@ -100,7 +100,6 @@ export const Color: Record<string, any> = {
   // Store
   currencyBackground: CoreColors.backgroundLight,
 
-  // TODO Refactor dynamic card displays, remove the background color
   // Card Image
   cardGreyed: CoreColors.lightGrey,
   // The color of either stat if it has been changed
@@ -108,7 +107,6 @@ export const Color: Record<string, any> = {
   cardCost: CoreColors.whiteS, //'#B9F2FF',
   cardPoints: CoreColors.goldS,
   cardStatChanged: '#00aa00',
-  cardTextBackground: 0x000000,
 
   // Charts
   radar: CoreColors.goldS,
@@ -135,10 +133,6 @@ export const Color: Record<string, any> = {
   tutorialBackground: '#aace',
   // A translucent background that draws attention to one element on the screen
   focusBackground: CoreColors.grey,
-
-  // TODO Organize
-  username: CoreColors.blackS,
-  todoSubtext: CoreColors.blackS,
 
   // Progress bar
   progressBar: 0x4e342e,
