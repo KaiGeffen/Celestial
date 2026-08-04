@@ -172,7 +172,9 @@ export default class LeaderboardMenu extends Menu {
 
     this.scrollablePanel = this.scene.rexUI.add.scrollablePanel({
       width: width,
-      height: showProgress ? height - progressText.height : height,
+      height: showProgress
+        ? height - progressText.height - Space.padSmall * 2
+        : height,
       scrollMode: 0,
       panel: {
         child: this.createPlayerRows(),
@@ -185,7 +187,10 @@ export default class LeaderboardMenu extends Menu {
     this.sizer.add(this.scrollablePanel)
 
     if (showProgress) {
-      this.progressRow = this.scene.rexUI.add.sizer({ width })
+      this.progressRow = this.scene.rexUI.add.sizer({
+        width,
+        space: { top: Space.padSmall, bottom: Space.padSmall },
+      })
       this.progressRow.addSpace().add(progressText).addSpace()
       this.sizer.add(this.progressRow)
     } else {
