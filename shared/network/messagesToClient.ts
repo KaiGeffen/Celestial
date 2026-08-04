@@ -53,10 +53,6 @@ export default interface messagesToClient {
     canBeSpectated: boolean
     accountHasGoogleIdentity: boolean
   }
-  purchaseItemSuccess: {
-    itemId: number
-    balance: number
-  }
   redeemCodeResult: {
     success: boolean
     error?: string

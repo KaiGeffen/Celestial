@@ -104,7 +104,6 @@ export default interface messagesToServer {
     versionNo: number
   }
   surrender: {}
-  disconnect: {}
   emote: {}
   // Other
   spectatePlayer: {

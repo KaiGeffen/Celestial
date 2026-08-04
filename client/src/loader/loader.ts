@@ -44,9 +44,6 @@ export default class Loader {
     // Load all audio
     Loader.loadAudio(scene)
 
-    // Load the videos
-    Loader.loadVideos(scene)
-
     // Load all assets from each directory
     Object.entries(assetLists as unknown as Record<string, AssetInfo>).forEach(
       ([directory, info]) => {
@@ -128,11 +125,6 @@ export default class Loader {
     audioAssets.forEach((name) => {
       scene.load.audio(name, versioned(`sfx/${name}.opus`))
     })
-  }
-
-  // Loads all video textures
-  private static loadVideos(scene: Phaser.Scene): void {
-    // scene.load.video('priorityHighlight', 'priority.mp4')
   }
 
   // Load tutorial cutscenes

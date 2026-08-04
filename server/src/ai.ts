@@ -2,8 +2,6 @@ import { MechanicsSettings } from '../../shared/settings'
 import { Quality } from '../../shared/state/quality'
 import GameModel from '../../shared/state/gameModel'
 
-const TIME_PAUSE = 0
-
 function getPowerset<T>(arr: T[]): T[][] {
   const result: T[][] = [[]]
   for (const value of arr) {
@@ -106,9 +104,6 @@ function rateTurn(turn: number[], model: GameModel): number {
 }
 
 function getAIAction(model: GameModel): number {
-  // Pause for the set amount of time
-  setTimeout(() => {}, TIME_PAUSE)
-
   // Determine the difference in points
   const pointDifference = predictPointDifference(model)
 

@@ -55,9 +55,7 @@ const NON_PIXEL_ART_DIRS = [
   'card/effects',
   'chrome',
   'icon',
-  'cardback',
   'tutorial',
-  'roundResult/win',
 ]
 
 function getDirectoryKey(dir: string): string {
