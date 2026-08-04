@@ -294,51 +294,54 @@ export class AchievementManager {
     // Init the achievement if it doesn't exist
     const wasNew = await this.unlock(playerId, achievementId)
 
-    // Get current progress before incrementing
-    const current = await db
-      .select()
-      .from(achievements)
-      .where(
-        and(
-          eq(achievements.player_id, playerId),
-          eq(achievements.achievement_id, achievementId),
-        ),
-      )
-      .limit(1)
+    await db.transaction(async (tx) => {
+      // Lock the row so concurrent calls can't double-award on threshold cross
+      const current = await tx
+        .select()
+        .from(achievements)
+        .where(
+          and(
+            eq(achievements.player_id, playerId),
+            eq(achievements.achievement_id, achievementId),
+          ),
+        )
+        .for('update')
+        .limit(1)
 
-    if (current.length === 0) return
+      if (current.length === 0) return
 
-    const currentProgress = current[0].progress
-    const meta = achievementsMeta[achievementId]
-    const threshold = meta?.progress
+      const currentProgress = current[0].progress
+      const meta = achievementsMeta[achievementId]
+      const threshold = meta?.progress
 
-    // Increment progress
-    await db
-      .update(achievements)
-      .set({ progress: sql`progress + 1` })
-      .where(
-        and(
-          eq(achievements.player_id, playerId),
-          eq(achievements.achievement_id, achievementId),
-        ),
-      )
+      // Increment progress
+      await tx
+        .update(achievements)
+        .set({ progress: sql`progress + 1` })
+        .where(
+          and(
+            eq(achievements.player_id, playerId),
+            eq(achievements.achievement_id, achievementId),
+          ),
+        )
 
-    // If this increment completed the achievement (progress reached threshold) and it wasn't just unlocked,
-    // award gold reward
-    if (
-      !wasNew &&
-      threshold &&
-      currentProgress + 1 >= threshold &&
-      currentProgress < threshold &&
-      meta?.goldReward
-    ) {
-      await db
-        .update(players)
-        .set({
-          coins: sql`${players.coins} + ${meta.goldReward}`,
-        })
-        .where(eq(players.id, playerId))
-    }
+      // If this increment completed the achievement (progress reached threshold) and it wasn't just unlocked,
+      // award gold reward
+      if (
+        !wasNew &&
+        threshold &&
+        currentProgress + 1 >= threshold &&
+        currentProgress < threshold &&
+        meta?.goldReward
+      ) {
+        await tx
+          .update(players)
+          .set({
+            coins: sql`${players.coins} + ${meta.goldReward}`,
+          })
+          .where(eq(players.id, playerId))
+      }
+    })
   }
 
   // ...add more methods as needed (mark as seen, get all achievements, etc.)
