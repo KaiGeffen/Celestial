@@ -1,5 +1,5 @@
 import 'phaser'
-import { Ease, Time } from '../../settings/settings'
+import { Color, Ease, Time } from '../../settings/settings'
 import Region from './baseRegion'
 import { MatchScene } from '../matchScene'
 
@@ -34,7 +34,11 @@ export const MATCH_TILE_BLEND_MODE: number = Phaser.BlendModes.NORMAL
 const RIPPLE_START_RADIUS = 6
 const RIPPLE_END_RADIUS = 80
 /** Ripple ring's starting stroke alpha (fades to 0). */
-const RIPPLE_START_ALPHA = 0.5
+const RIPPLE_START_ALPHA = 1
+
+/** Second, darker ring trailing just outside the first ring (same timing, offset radius). */
+const RIPPLE_OUTER_RADIUS_OFFSET = 3
+const RIPPLE_OUTER_ALPHA = 0.3
 
 type RexAnchorWithOffset = {
   offsetX: number
@@ -256,12 +260,40 @@ export default class BackgroundRegion extends Region {
     this.matchTile.tilePositionY += MATCH_TILE_DRIFT_Y_PX_PER_SEC * dt
   }
 
-  /** Small ring that grows and fades out quickly, centered where the water was clicked. */
+  /** Pair of rings that grow and fade out quickly, centered where the water was clicked. */
   private createRipple(x: number, y: number): void {
+    this.spawnRippleRing(
+      x,
+      y,
+      RIPPLE_START_RADIUS,
+      RIPPLE_END_RADIUS,
+      0xffffff,
+      RIPPLE_START_ALPHA,
+    )
+    // Darker ring trailing just outside the first, for a bit of depth
+    this.spawnRippleRing(
+      x,
+      y,
+      RIPPLE_START_RADIUS + RIPPLE_OUTER_RADIUS_OFFSET,
+      RIPPLE_END_RADIUS + RIPPLE_OUTER_RADIUS_OFFSET,
+      Color.darkUmber,
+      RIPPLE_OUTER_ALPHA,
+    )
+    this.scene.playSound('splash')
+  }
+
+  private spawnRippleRing(
+    x: number,
+    y: number,
+    startRadius: number,
+    endRadius: number,
+    color: number,
+    startAlpha: number,
+  ): void {
     const ripple = this.scene.add
-      .circle(x, y, RIPPLE_START_RADIUS)
-      .setStrokeStyle(2, 0xffffff)
-      .setAlpha(RIPPLE_START_ALPHA)
+      .circle(x, y, startRadius)
+      .setStrokeStyle(2, color)
+      .setAlpha(startAlpha)
       .setDepth(0)
     // Insert below the top/bottom frames (which sit at the end of the list) so the
     // ripple doesn't paint over their art, but above the water/tile beneath it
@@ -269,11 +301,10 @@ export default class BackgroundRegion extends Region {
 
     this.scene.tweens.add({
       targets: ripple,
-      radius: RIPPLE_END_RADIUS,
+      radius: endRadius,
       alpha: 0,
       duration: Time.match.waterRipple,
       ease: Ease.ripple,
-      onStart: () => this.scene.playSound('splash'),
       onComplete: () => ripple.destroy(),
     })
   }
