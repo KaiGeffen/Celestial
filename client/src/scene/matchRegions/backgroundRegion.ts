@@ -390,7 +390,7 @@ export default class BackgroundRegion extends Region {
       )
     redraw()
 
-    this.scene.tweens.add({
+    const tween = this.scene.tweens.add({
       targets: state,
       radius: endRadius,
       alpha: 0,
@@ -399,6 +399,8 @@ export default class BackgroundRegion extends Region {
       onUpdate: redraw,
       onComplete: () => graphics.destroy(),
     })
+    // Purely decorative — shouldn't hold up the next queued game state
+    this.scene.registerNonBlockingTween(tween)
   }
 
   /** Tween tint on top/bottom match chrome and night layer for recap (`matchTile` unchanged). */

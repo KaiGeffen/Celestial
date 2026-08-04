@@ -57,6 +57,10 @@ export class MatchScene extends BaseScene {
   // Whether this match is a tutorial
   isTutorial = false
 
+  // Tweens registered here (e.g. decorative effects like the water ripple) don't gate
+  // the next queued state from displaying, unlike ordinary tweens (see displayState)
+  private nonBlockingTweens = new Set<Phaser.Tweens.Tween>()
+
   init(params: MatchSceneParams) {
     this.params = params
 
@@ -68,6 +72,7 @@ export class MatchScene extends BaseScene {
     // Reset variables
     this.queuedStates = {}
     this.currentVersion = this.maxVersion = -1
+    this.nonBlockingTweens.clear()
 
     // Register each hook for a message from the server
     this.registerMatchServerHooks()
@@ -173,6 +178,15 @@ export class MatchScene extends BaseScene {
     for (let i = list.length - 1; i >= 0; i--) {
       list[i].complete()
     }
+  }
+
+  /**
+   * Mark a tween as decorative (e.g. the water ripple) so it doesn't gate the next
+   * queued state from displaying, the way an actual game-state animation tween does.
+   */
+  registerNonBlockingTween(tween: Phaser.Tweens.Tween): void {
+    this.nonBlockingTweens.add(tween)
+    tween.once('complete', () => this.nonBlockingTweens.delete(tween))
   }
 
   /**
@@ -418,8 +432,10 @@ export class MatchScene extends BaseScene {
 
   // Display the given game state, returns false if the state isn't shown immediately
   protected displayState(state: GameModel): boolean {
-    // If any tweens are playing, don't display yet
-    let anyTweenPlaying = this.tweens.getTweens().length > 0
+    // If any tweens are playing, don't display yet (decorative tweens excepted — see registerNonBlockingTween)
+    let anyTweenPlaying = this.tweens
+      .getTweens()
+      .some((tween) => !this.nonBlockingTweens.has(tween))
     if (anyTweenPlaying) {
       return false
     }
