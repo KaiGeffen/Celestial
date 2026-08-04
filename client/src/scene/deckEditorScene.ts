@@ -274,7 +274,7 @@ export default class DeckEditorScene extends BaseScene {
   private openStylesMenu(): void {
     this.scene.launch('MenuScene', {
       menu: 'alterDeckCosmetics',
-      // When confirming, set the values for this scene with the new selected values
+      // Called live as the menu's fields change, so apply each update directly
       callback: (
         name: string,
         cosmeticSet: CosmeticSet,
@@ -283,10 +283,16 @@ export default class DeckEditorScene extends BaseScene {
         this.deckName = name
         this.cosmeticSet = cosmeticSet
 
-        // TODO If copy/paste is removed, this is no longer needed
-        if (deckCode && deckCode.length > 0) {
-          const cards = Catalog.getCardListByIds(deckCode)
-          this.setDeck(cards)
+        // deckCode is a static snapshot from when the menu opened (TODO If
+        // copy/paste is removed, this param is no longer needed); only apply
+        // it if it actually differs from the current deck
+        const currentCode = this.getDeckCode()
+        const deckCodeChanged =
+          deckCode &&
+          (deckCode.length !== currentCode.length ||
+            deckCode.some((id, i) => id !== currentCode[i]))
+        if (deckCodeChanged) {
+          this.setDeck(Catalog.getCardListByIds(deckCode))
         }
 
         // Ensure the thumbnail is updated

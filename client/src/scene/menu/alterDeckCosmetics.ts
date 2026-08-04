@@ -1,7 +1,6 @@
 import 'phaser'
 import ContainerLite from 'phaser3-rex-plugins/plugins/containerlite.js'
 import Buttons from '../../lib/buttons/buttons'
-import Button from '../../lib/buttons/button'
 import { Color, Space, Style } from '../../settings/settings'
 import Menu from './menu'
 import MenuScene from '../menuScene'
@@ -19,13 +18,17 @@ export default class AlterDeckCosmeticsMenu extends Menu {
   selectedCardback: number
   deckCode: number[] = []
 
-  btnConfirm: Button
-
   private currentTab: string = 'Icon'
   private deckThumbnail: DeckThumbnail
   // Scrollable wrapping grid showing the current tab's items
   private cosmeticsPanel: CosmeticsGridPanel
   private nameInput: any
+  // Called with the latest name/cosmeticSet/deckCode on every change
+  private callback: (
+    name: string,
+    cosmeticSet: CosmeticSet,
+    deckCode: number[],
+  ) => void
 
   constructor(scene: MenuScene, params) {
     super(scene, width)
@@ -40,10 +43,16 @@ export default class AlterDeckCosmeticsMenu extends Menu {
       Server.getUserData().cosmeticSet?.cardback ??
       0
     this.deckCode = params.deckCode ?? []
+    this.callback = params.callback
 
-    this.createContent(params.callback)
+    this.createContent()
     this.layout()
     this.createNameInput()
+  }
+
+  // Push the current name/cosmeticSet/deckCode to the deck editor
+  private pushChange(): void {
+    this.callback(this.name, this.currentCosmeticSet(), this.deckCode)
   }
 
   private currentCosmeticSet(): CosmeticSet {
@@ -54,25 +63,13 @@ export default class AlterDeckCosmeticsMenu extends Menu {
     }
   }
 
-  private createContent(
-    callback: (
-      name: string,
-      cosmeticSet: CosmeticSet,
-      deckCode: number[],
-    ) => void,
-  ) {
+  private createContent() {
     this.createHeader('Cosmetics')
-    this.createLeftColumn(callback)
+    this.createLeftColumn()
     this.createRightColumn()
   }
 
-  private createLeftColumn(
-    callback: (
-      name: string,
-      cosmeticSet: CosmeticSet,
-      deckCode: number[],
-    ) => void,
-  ) {
+  private createLeftColumn() {
     const sizer = this.scene.rexUI.add.sizer({
       orientation: 'vertical',
       space: {
@@ -144,36 +141,6 @@ export default class AlterDeckCosmeticsMenu extends Menu {
       sizer.add(container)
     })
 
-    // Divider
-    sizer.add(
-      this.scene.add.rectangle(
-        0,
-        0,
-        Space.buttonWidth,
-        3,
-        Color.backgroundDark,
-      ),
-    )
-
-    // Confirm button
-    const confirmContainer = new ContainerLite(
-      this.scene,
-      0,
-      0,
-      Space.buttonWidth,
-      Space.buttonHeight,
-    )
-    this.btnConfirm = new Buttons.Basic({
-      within: confirmContainer,
-      text: 'Update',
-      f: () => {
-        callback(this.name, this.currentCosmeticSet(), this.deckCode)
-        this.scene.scene.stop()
-      },
-      returnHotkey: true,
-    })
-    sizer.add(confirmContainer)
-
     this.sizer.add(sizer)
   }
 
@@ -192,6 +159,7 @@ export default class AlterDeckCosmeticsMenu extends Menu {
         this.deckThumbnail.updateDisplay({
           cosmeticSet: this.currentCosmeticSet(),
         })
+        this.pushChange()
       })
     } else if (this.currentTab === 'Border') {
       this.cosmeticsPanel.showBorders(this.selectedAvatar, (border) => {
@@ -199,6 +167,7 @@ export default class AlterDeckCosmeticsMenu extends Menu {
         this.deckThumbnail.updateDisplay({
           cosmeticSet: this.currentCosmeticSet(),
         })
+        this.pushChange()
       })
     } else {
       this.cosmeticsPanel.showCardbacks(this.selectedCardback, (cardback) => {
@@ -206,6 +175,7 @@ export default class AlterDeckCosmeticsMenu extends Menu {
         this.deckThumbnail.updateDisplay({
           cosmeticSet: this.currentCosmeticSet(),
         })
+        this.pushChange()
       })
     }
   }
@@ -231,6 +201,7 @@ export default class AlterDeckCosmeticsMenu extends Menu {
 
     this.nameInput.on('textchange', () => {
       this.name = this.nameInput.text.trim()
+      this.pushChange()
     })
 
     this.scene.plugins.get('rexAnchor')['add'](this.nameInput, {
