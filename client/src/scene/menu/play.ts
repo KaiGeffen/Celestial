@@ -12,6 +12,7 @@ import {
 import Menu from './menu'
 import MenuScene from '../menuScene'
 import getRandomAiDeck from '../../data/aiDecks'
+import { findMatchingStarterDeck } from '../../data/starterDecks'
 import { Deck } from '@shared/types/deck'
 import logEvent from '../../utils/analytics'
 import { server } from '../../server'
@@ -43,6 +44,10 @@ export default class PlayMenu extends Menu {
   btnPrevDeck: Button
   btnNextDeck: Button
   scrollableDeck: ScrollablePanel
+  private deckPanelSizer: RexUIPlugin.FixWidthSizer
+
+  // Explains the equipped deck, only present (and only takes up space) when it's a starter deck
+  private explainerSizer: RexUIPlugin.Sizer | null = null
 
   private activeScene: Phaser.Scene
 
@@ -121,12 +126,8 @@ export default class PlayMenu extends Menu {
     // Update deck name
     this.txtDeckName.setText(this.deck.name || '')
 
-    // Update decklist
-    this.decklist.setDeck(this.getDeckCards())
-    if (this.scrollableDeck) {
-      this.scrollableDeck.layout()
-      this.scrollableDeck.t = 0
-    }
+    // Rebuilds the decklist, scrollable, and explainer at the right heights for this deck
+    this.rebuildDeckAndExplainer()
 
     // Update validation message
     const deckSize = this.deck.cards ? this.deck.cards.length : 0
@@ -151,6 +152,8 @@ export default class PlayMenu extends Menu {
 
     // Update PWD button (depends on both password and deck validity)
     this.updatePwdButton()
+
+    this.layout()
   }
 
   private reskinInputText(): void {
@@ -253,25 +256,102 @@ export default class PlayMenu extends Menu {
 
     panelSizer.add(deckNameSizer).addNewLine()
 
-    // Decklist
-    this.decklist = new Decklist(this.scene as any, () => () => {})
+    this.deckPanelSizer = panelSizer
+    this.rebuildDeckAndExplainer()
 
+    return panelSizer
+  }
+
+  // Full height of the decklist scrollable when there's no explainer taking up room below it
+  private static readonly DECKLIST_HEIGHT = 500
+
+  // Cap on the explainer's height, in case some deck's explainer text grows very long
+  private static readonly MAX_EXPLAINER_HEIGHT = 250
+
+  // (Re)builds the decklist, its scrollable, and the explainer (if the equipped
+  // deck is a starter deck) at complementary heights, so together they always
+  // sum to DECKLIST_HEIGHT — full height with no explainer, shorter with one
+  // below it. Rebuilds the decklist itself too (not just resizing the
+  // scrollable around it) since setDeck() already tears down/recreates its
+  // cutouts on every switch anyway — nothing worth preserving across calls.
+  private rebuildDeckAndExplainer(): void {
+    const starterDeck = findMatchingStarterDeck(this.deck.cards ?? [])
+    const explainerHeight = starterDeck
+      ? this.measureExplainerHeight(starterDeck.explainer)
+      : 0
+    // deckPanelSizer's own "line" spacing adds one more gap between rows when
+    // the explainer row exists (3 rows) than when it doesn't (2) — fold that
+    // into the decklist's height budget too, so the total stays constant
+    const explainerFootprint = starterDeck
+      ? explainerHeight + Space.padSmall
+      : 0
+
+    if (this.scrollableDeck) {
+      this.deckPanelSizer.remove(this.scrollableDeck, true)
+    }
+    if (this.explainerSizer) {
+      this.deckPanelSizer.remove(this.explainerSizer, true)
+      this.explainerSizer = null
+    }
+
+    this.decklist = new Decklist(this.scene as any, () => () => {})
     const deckCards = this.getDeckCards()
     if (deckCards.length > 0) {
       this.decklist.setDeck(deckCards)
     }
 
     this.scrollableDeck = newScrollablePanel(this.scene, {
-      height: 500,
+      height: PlayMenu.DECKLIST_HEIGHT - explainerFootprint,
       panel: {
         child: this.decklist.sizer,
       },
       scrollMode: 'y',
     }).layout()
+    this.deckPanelSizer.add(this.scrollableDeck)
 
-    panelSizer.add(this.scrollableDeck)
+    if (starterDeck) {
+      this.explainerSizer = this.createExplainerSizer(
+        explainerHeight,
+        starterDeck.explainer,
+      )
+      this.deckPanelSizer.add(this.explainerSizer)
+    }
+  }
 
-    return panelSizer
+  // Height needed for the given explainer text, capped at MAX_EXPLAINER_HEIGHT
+  private measureExplainerHeight(explainerText: string): number {
+    const txt = this.scene.add
+      .text(0, 0, explainerText, Style.basicStylized)
+      .setWordWrapWidth(deckPanelWidth - Space.pad * 2)
+    const bodyHeight = txt.height
+    txt.destroy()
+
+    // + Space.padSmall for the sizer's own top padding (see createExplainerSizer)
+    return Math.min(
+      bodyHeight + Space.padSmall,
+      PlayMenu.MAX_EXPLAINER_HEIGHT,
+    )
+  }
+
+  private createExplainerSizer(
+    height: number,
+    explainerText: string,
+  ): RexUIPlugin.Sizer {
+    const sizer = this.scene.rexUI.add.sizer({
+      orientation: 'vertical',
+      width: deckPanelWidth,
+      height,
+      space: { top: Space.padSmall },
+    })
+
+    const body = this.scene.add
+      .text(0, 0, explainerText, Style.basicStylized)
+      .setWordWrapWidth(deckPanelWidth - Space.pad * 2)
+      .setAlign('center')
+      .setOrigin(0.5)
+
+    sizer.add(body)
+    return sizer
   }
 
   private createPlayPanel(): any {
