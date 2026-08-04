@@ -27,7 +27,7 @@
     "deck": [0, 4, 4, 4, 4, 65, 65, 7, 36, 36, 36],
     "opponent": [5, 5, 5, 5, 5, 86, 86, 86, 11, 11, 12, 12, 14, 14, 14],
     "cards": [36],
-    "tip": "Vulture gives you Nourish when it's played instead of when it resolves.\n\nThis means if your points are set to 0 earlier in the round, Vulture can be worth 5 points."
+    "tip": "Vulture gives you Nourish when it's played instead (Day) of when it resolves (Night).\n\nThis means the first card in the story will be worth 2 less points, which can be great if that card is something like Hurricane that sets your points to 0."
   },
   {
     "name": "Hit the Ground",
