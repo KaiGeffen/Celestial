@@ -139,12 +139,10 @@ export default class LeaderboardMenu extends Menu {
     const wins = this.getUserMonthWins()
 
     if (wins >= CARDBACK_WIN_GOAL) {
-      const nextMonthName = new Date(
-        new Date().getFullYear(),
-        new Date().getMonth() + 1,
-        1,
-      ).toLocaleString('default', { month: 'long' })
-      return `Win the most pvp games by the end of the month to help us design ${nextMonthName}'s cardback!`
+      const monthName = new Date().toLocaleString('default', {
+        month: 'long',
+      })
+      return `Win the most pvp games by the end of the month to help us design ${monthName}'s cardback!`
     }
 
     const remaining = CARDBACK_WIN_GOAL - wins
