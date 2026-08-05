@@ -141,6 +141,35 @@ export default class AlterDeckCosmeticsMenu extends Menu {
       sizer.add(container)
     })
 
+    // Divider
+    sizer.add(
+      this.scene.add.rectangle(
+        0,
+        0,
+        Space.buttonWidth,
+        3,
+        Color.backgroundDark,
+      ),
+    )
+
+    // Every change already pushes live, so this just closes the menu
+    const doneContainer = new ContainerLite(
+      this.scene,
+      0,
+      0,
+      Space.buttonWidth,
+      Space.buttonHeight,
+    )
+    new Buttons.Basic({
+      within: doneContainer,
+      text: 'Done',
+      f: () => {
+        this.scene.scene.stop()
+      },
+      returnHotkey: true,
+    })
+    sizer.add(doneContainer)
+
     this.sizer.add(sizer)
   }
 
