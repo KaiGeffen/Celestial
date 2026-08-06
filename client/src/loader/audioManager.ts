@@ -11,7 +11,7 @@ export default function ensureMusic(scene: Phaser.Scene) {
       document.getElementById('music')
     )
     music.volume =
-      (UserSettings._get('musicVolume') * UserSettings._get('volume')) / 2
+      UserSettings._get('musicVolume') * UserSettings._get('volume')
 
     music.play().catch(() => {
       const retry = () => {
