@@ -57,7 +57,12 @@ const LOGGED_OUT_USER_DATA: UserData = {
 }
 
 export default class Server {
-  static pendingReconnect: { state: GameModel; isPvp: boolean } | null = null
+  static pendingReconnect: {
+    state: GameModel
+    isPvp: boolean
+    deck: Deck
+    aiDeck?: Deck
+  } | null = null
   static activePlayers: {
     uuid: string
     username: string
@@ -321,7 +326,12 @@ export default class Server {
       })
       .on('promptReconnect', (data) => {
         // Store reconnect data for PreloadScene to handle after assets load
-        this.pendingReconnect = { state: data.state, isPvp: data.isPvp }
+        this.pendingReconnect = {
+          state: data.state,
+          isPvp: data.isPvp,
+          deck: data.deck,
+          aiDeck: data.aiDeck,
+        }
       })
       .on(
         'broadcastOnlinePlayersList',
@@ -414,8 +424,8 @@ export default class Server {
     Server.pendingReconnect = null
     scene.scene.start('StandardMatchScene', {
       isPvp: reconnect.isPvp,
-      deck: [],
-      aiDeck: [],
+      deck: reconnect.deck,
+      aiDeck: reconnect.aiDeck,
       gameStartState: reconnect.state,
     })
     return true

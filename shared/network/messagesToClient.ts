@@ -70,6 +70,9 @@ export default interface messagesToClient {
   promptReconnect: {
     state: GameModel
     isPvp: boolean
+    deck: Deck
+    // PvE opponent's deck; omitted for PvP to avoid leaking it on reconnect
+    aiDeck?: Deck
   }
   // MATCH RELEVANT
   transmitState: {

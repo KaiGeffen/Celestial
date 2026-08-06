@@ -81,6 +81,9 @@ export class MatchScene extends BaseScene {
     if (this.params.gameStartState) {
       this.currentVersion = this.params.gameStartState.versionNo - 1
       this.queueState(this.params.gameStartState)
+
+      // NOTE Must be set so that Play Again doesnt use this on scene restart
+      this.params.gameStartState = undefined
     } else if (this.isTutorial) {
       logEvent(`Start tutorial ${params.missionID + 1}`)
 
