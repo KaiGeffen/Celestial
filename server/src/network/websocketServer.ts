@@ -48,6 +48,7 @@ import PveSpecialMatch from './match/pveSpecialMatch'
 import REWARD_AMOUNTS from '../../../shared/config/rewardAmounts'
 import { journeyData } from '../../../shared/journey/journey'
 import { v5 as uuidv5 } from 'uuid'
+import getRandomAiDeck from '../aiDecks'
 
 // An ongoing match
 interface ActiveGame {
@@ -176,6 +177,16 @@ function summarizeAccount(row: LinkRow): AccountLinkSummary {
     gems: row.gems,
     deckCount: row.decks.length,
   }
+}
+
+// PvE opponent deck: random, picked by the player's difficulty tier
+async function resolveAiDeck(playerId: string): Promise<Deck> {
+  const [row] = await db
+    .select({ pve_wins: players.pve_wins })
+    .from(players)
+    .where(eq(players.id, playerId))
+    .limit(1)
+  return getRandomAiDeck(row?.pve_wins ?? 0)
 }
 
 // Create the websocket server
@@ -1267,7 +1278,7 @@ export default function createWebSocketServer() {
         )
         .on(
           'initPve',
-          authed(async ({ aiDeck, deck }) => {
+          authed(async ({ deck }) => {
             console.log(
               'PvE:',
               username,
@@ -1280,6 +1291,7 @@ export default function createWebSocketServer() {
             await surrenderActiveMatch()
 
             deck.cosmeticSet = await sanitizedCosmeticSet(id, deck.cosmeticSet)
+            const aiDeck = await resolveAiDeck(id)
 
             activeGame.match = new PveMatch(ws, id, deck, aiDeck)
             activeGame.playerNumber = 0

@@ -114,7 +114,6 @@ export class MatchScene extends BaseScene {
       } else {
         server.send({
           type: 'initPve',
-          aiDeck: params.aiDeck,
           deck: params.deck,
         })
       }

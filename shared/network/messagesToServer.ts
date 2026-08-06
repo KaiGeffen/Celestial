@@ -74,7 +74,6 @@ export default interface messagesToServer {
     deck: Deck
   }
   initPve: {
-    aiDeck: Deck
     deck: Deck
   }
   initMission: {

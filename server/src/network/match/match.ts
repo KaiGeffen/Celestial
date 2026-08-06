@@ -268,12 +268,6 @@ class Match {
       state: getClientGameModel(this.game.model, playerNumber, false),
       isPvp: this.isPvp(),
       deck: playerNumber === 0 ? this.deck1 : this.deck2,
-      // aiDeck omitted for PvP so reconnect can't leak the opponent's decklist
-      aiDeck: this.isPvp()
-        ? undefined
-        : playerNumber === 0
-          ? this.deck2
-          : this.deck1,
     })
 
     // Send opp a message that their opp is back

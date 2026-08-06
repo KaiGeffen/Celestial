@@ -61,7 +61,6 @@ export default class Server {
     state: GameModel
     isPvp: boolean
     deck: Deck
-    aiDeck?: Deck
   } | null = null
   static activePlayers: {
     uuid: string
@@ -330,7 +329,6 @@ export default class Server {
           state: data.state,
           isPvp: data.isPvp,
           deck: data.deck,
-          aiDeck: data.aiDeck,
         }
       })
       .on(
@@ -425,7 +423,6 @@ export default class Server {
     scene.scene.start('StandardMatchScene', {
       isPvp: reconnect.isPvp,
       deck: reconnect.deck,
-      aiDeck: reconnect.aiDeck,
       gameStartState: reconnect.state,
     })
     return true
