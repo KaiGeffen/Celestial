@@ -664,6 +664,8 @@ button:disabled {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--gold);
+  cursor: default;
 }
 
 /* Cost/points badges, echoing the card's own stat shapes (diamond cost,
@@ -722,6 +724,25 @@ button:disabled {
 }
 
 .decklist-empty[hidden] {
+  display: none;
+}
+
+/* Hover preview of the full card, shown next to whichever deck-list name is
+   hovered (see showPreview in deckbuilder.js) */
+.decklist-preview {
+  position: fixed;
+  pointer-events: none;
+  z-index: 60;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.6));
+}
+
+.decklist-preview canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.decklist-preview[hidden] {
   display: none;
 }
 

@@ -6,6 +6,9 @@ import {
   loadGameData,
   realCardFields,
   createTiltCard,
+  renderCard,
+  CANVAS_W,
+  CANVAS_H,
 } from '../cardRenderer.js'
 import { parseSearchQuery, cardPassesFilters } from '../cardSearch.js'
 
@@ -102,10 +105,40 @@ function flashLabel(btn, text, restoreLabel) {
 const COPY_LABEL = 'Copy Deck Code'
 const IMPORT_LABEL = 'Import'
 
+// Older/insecure-context fallback for browsers without the async Clipboard
+// API (e.g. iOS Safari over plain HTTP on a LAN IP, not localhost/HTTPS) —
+// execCommand('copy') has no such restriction, just deprecated.
+function legacyCopy(text) {
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.style.position = 'fixed'
+  textarea.style.opacity = '0'
+  document.body.appendChild(textarea)
+  textarea.focus()
+  textarea.select()
+  let ok = false
+  try {
+    ok = document.execCommand('copy')
+  } catch {
+    ok = false
+  }
+  document.body.removeChild(textarea)
+  return ok
+}
+
 async function copyDeckCode() {
   const code = encodeDeckCode(deckToIds())
-  await navigator.clipboard.writeText(code)
-  flashLabel($('btn-copy-code'), 'Copied!', COPY_LABEL)
+  let ok = true
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    try {
+      await navigator.clipboard.writeText(code)
+    } catch {
+      ok = legacyCopy(code)
+    }
+  } else {
+    ok = legacyCopy(code)
+  }
+  flashLabel($('btn-copy-code'), ok ? 'Copied!' : 'Copy failed', COPY_LABEL)
 }
 
 // Replaces the whole deck, like the game's paste-to-import (setDeck). Tokens
@@ -162,6 +195,51 @@ function spawnGhost(button) {
 
   document.body.appendChild(ghost)
   ghost.addEventListener('animationend', () => ghost.remove())
+}
+
+// Hover preview: shows the full card next to whichever deck-list name is
+// hovered, like the game's Cutout hint. One shared floating element, moved
+// and redrawn per-hover rather than built fresh each time.
+const PREVIEW_WIDTH = 200
+let previewEl = null
+let previewCanvas = null
+
+function ensurePreview() {
+  if (previewEl) return
+  previewEl = document.createElement('div')
+  previewEl.className = 'decklist-preview'
+  previewEl.hidden = true
+  previewCanvas = document.createElement('canvas')
+  previewCanvas.width = CANVAS_W
+  previewCanvas.height = CANVAS_H
+  previewEl.appendChild(previewCanvas)
+  document.body.appendChild(previewEl)
+}
+
+function showPreview(anchorEl, card) {
+  ensurePreview()
+  renderCard(previewCanvas, realCardFields(card))
+
+  const rect = anchorEl.getBoundingClientRect()
+  const previewHeight = (PREVIEW_WIDTH * CANVAS_H) / CANVAS_W
+  const gap = 12
+
+  // Prefer showing to the left of the name (the deck panel usually sits on
+  // the right); fall back to the right if there's no room.
+  let left = rect.left - PREVIEW_WIDTH - gap
+  if (left < 8) left = rect.right + gap
+
+  const maxTop = window.innerHeight - previewHeight - 8
+  const top = Math.min(Math.max(rect.top, 8), Math.max(8, maxTop))
+
+  previewEl.style.left = `${left}px`
+  previewEl.style.top = `${top}px`
+  previewEl.style.width = `${PREVIEW_WIDTH}px`
+  previewEl.hidden = false
+}
+
+function hidePreview() {
+  if (previewEl) previewEl.hidden = true
 }
 
 function addCard(name) {
@@ -239,6 +317,8 @@ function decklistEntry(name, count) {
   const nameSpan = document.createElement('span')
   nameSpan.className = 'decklist-name'
   nameSpan.textContent = name
+  nameSpan.addEventListener('mouseenter', () => showPreview(nameSpan, card))
+  nameSpan.addEventListener('mouseleave', hidePreview)
 
   left.append(stats, nameSpan)
 
@@ -267,6 +347,10 @@ function decklistEntry(name, count) {
 }
 
 function renderDecklist() {
+  // The list is rebuilt wholesale below, which can orphan a hovered name
+  // (removing it without a mouseleave), so the preview is force-hidden.
+  hidePreview()
+
   const entries = [...deck.entries()].sort(([a], [b]) =>
     byCostThenName(cardByName.get(a), cardByName.get(b)),
   )
@@ -291,11 +375,7 @@ async function init() {
   renderDecklist()
   setupJumpButton()
 
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    $('btn-copy-code').addEventListener('click', copyDeckCode)
-  } else {
-    $('btn-copy-code').hidden = true
-  }
+  $('btn-copy-code').addEventListener('click', copyDeckCode)
   $('btn-import-code').addEventListener('click', importDeckCode)
   $('deck-code-input').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') importDeckCode()
