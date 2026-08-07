@@ -95,10 +95,19 @@ function showCodeStatus(text) {
   }, 2500)
 }
 
+const COPY_LABEL = 'Copy Deck Code'
+let copyResetTimer = null
+
 async function copyDeckCode() {
   const code = encodeDeckCode(deckToIds())
   await navigator.clipboard.writeText(code)
-  showCodeStatus('Copied!')
+
+  const btn = $('btn-copy-code')
+  clearTimeout(copyResetTimer)
+  btn.textContent = 'Copied!'
+  copyResetTimer = setTimeout(() => {
+    btn.textContent = COPY_LABEL
+  }, 1500)
 }
 
 // Replaces the whole deck, like the game's paste-to-import (setDeck). Tokens
@@ -121,9 +130,44 @@ function importDeckCode() {
   showCodeStatus('Deck imported.')
 }
 
+// Restart a CSS animation by re-adding its class (forcing a reflow in between
+// so re-adding the same class actually replays it, e.g. clicking a card twice fast).
+function restartAnimation(el, className) {
+  el.classList.remove(className)
+  void el.offsetWidth
+  el.classList.add(className)
+}
+
+// Click feedback: a faded duplicate of the clicked card rises and fades out
+// above it, like it's being lifted into a pile. cloneNode doesn't copy canvas
+// pixels, so each layer's content is copied over manually via drawImage.
+function spawnGhost(button) {
+  const scene = button.querySelector('.tilt-scene')
+  if (!scene) return
+  const rect = scene.getBoundingClientRect()
+
+  const ghost = scene.cloneNode(true)
+  ghost.classList.add('catalog-ghost')
+  ghost.setAttribute('aria-hidden', 'true')
+  ghost.style.left = `${rect.left}px`
+  ghost.style.top = `${rect.top}px`
+  ghost.style.width = `${rect.width}px`
+  ghost.style.height = `${rect.height}px`
+
+  const sourceCanvases = scene.querySelectorAll('canvas')
+  const ghostCanvases = ghost.querySelectorAll('canvas')
+  sourceCanvases.forEach((source, i) => {
+    ghostCanvases[i].getContext('2d').drawImage(source, 0, 0)
+  })
+
+  document.body.appendChild(ghost)
+  ghost.addEventListener('animationend', () => ghost.remove())
+}
+
 function addCard(name) {
   deck.set(name, (deck.get(name) || 0) + 1)
   renderDecklist()
+  restartAnimation($('deck-count'), 'flash')
 }
 
 function removeCard(name) {
@@ -150,7 +194,10 @@ function renderCatalog() {
     button.appendChild(
       createTiltCard(realCardFields(card), { width: '100%', half: true }),
     )
-    button.addEventListener('click', () => addCard(card.name))
+    button.addEventListener('click', () => {
+      spawnGhost(button)
+      addCard(card.name)
+    })
 
     item.appendChild(button)
     grid.appendChild(item)
@@ -162,10 +209,10 @@ function renderCatalog() {
 
 function decklistEntry(name, count) {
   const li = document.createElement('li')
-  const button = document.createElement('button')
-  button.type = 'button'
-  button.className = 'decklist-entry'
-  button.title = `Remove ${name} from your deck`
+  li.className = 'decklist-row'
+
+  const info = document.createElement('div')
+  info.className = 'decklist-entry'
 
   const nameSpan = document.createElement('span')
   nameSpan.className = 'decklist-name'
@@ -175,9 +222,23 @@ function decklistEntry(name, count) {
   countSpan.className = 'decklist-count'
   countSpan.textContent = `×${count}`
 
-  button.append(nameSpan, countSpan)
-  button.addEventListener('click', () => removeCard(name))
-  li.appendChild(button)
+  info.append(nameSpan, countSpan)
+
+  const minusButton = document.createElement('button')
+  minusButton.type = 'button'
+  minusButton.className = 'decklist-minus'
+  minusButton.textContent = '−'
+  minusButton.setAttribute('aria-label', `Remove one ${name}`)
+  minusButton.addEventListener('click', () => removeCard(name))
+
+  const plusButton = document.createElement('button')
+  plusButton.type = 'button'
+  plusButton.className = 'decklist-plus'
+  plusButton.textContent = '+'
+  plusButton.setAttribute('aria-label', `Add another ${name}`)
+  plusButton.addEventListener('click', () => addCard(name))
+
+  li.append(info, minusButton, plusButton)
   return li
 }
 

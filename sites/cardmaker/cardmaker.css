@@ -74,6 +74,10 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
+  /* Disables double-tap-to-zoom (and the old 300ms tap delay) on iOS/mobile
+     Safari — cards get double-clicked a lot on this site. Pinch-to-zoom still
+     works, since that's only removed by user-scalable=no, which we don't set. */
+  touch-action: manipulation;
 }
 
 /* Headers use the game's primary display font */
@@ -556,6 +560,26 @@ button:disabled {
   background: none;
 }
 
+/* Click feedback: a faded duplicate of the clicked card (built in JS —
+   spawnGhost) rises and fades out in place, over everything else. */
+.catalog-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 50;
+  animation: catalog-ghost-rise 600ms ease-out forwards;
+}
+
+@keyframes catalog-ghost-rise {
+  0% {
+    transform: translateY(0);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateY(-70px);
+    opacity: 0;
+  }
+}
+
 .decklist-panel {
   width: min(300px, 100%);
   flex-shrink: 0;
@@ -581,6 +605,23 @@ button:disabled {
   opacity: 0.8;
 }
 
+/* Flashes on every deck change, restarted from JS by re-adding the class —
+   always visible regardless of scroll position, unlike the catalog card pop */
+#deck-count.flash {
+  animation: deck-count-flash 500ms ease;
+}
+
+@keyframes deck-count-flash {
+  0% {
+    color: var(--gold);
+    opacity: 1;
+  }
+  100% {
+    color: var(--text);
+    opacity: 0.8;
+  }
+}
+
 .decklist {
   list-style: none;
   margin: 0;
@@ -590,8 +631,14 @@ button:disabled {
   gap: 4px;
 }
 
+.decklist-row {
+  display: flex;
+  gap: 6px;
+}
+
 .decklist-entry {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   display: flex;
   justify-content: space-between;
   gap: 8px;
@@ -605,14 +652,18 @@ button:disabled {
   text-align: left;
 }
 
-.decklist-entry:hover {
-  border-color: var(--gold);
-  background: var(--input-bg);
-}
-
 .decklist-count {
   font-weight: bold;
   color: var(--gold);
+}
+
+.decklist-plus,
+.decklist-minus {
+  flex-shrink: 0;
+  width: 30px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
 }
 
 .decklist-empty {
