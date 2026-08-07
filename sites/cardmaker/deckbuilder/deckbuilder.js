@@ -84,30 +84,28 @@ function setupJumpButton() {
   })
 }
 
-let statusTimer = null
-function showCodeStatus(text) {
-  const el = $('code-status')
-  clearTimeout(statusTimer)
-  el.textContent = text
-  el.hidden = false
-  statusTimer = setTimeout(() => {
-    el.hidden = true
-  }, 2500)
+// Briefly swaps a button's label to `text`, then reverts to `restoreLabel`.
+// Timers are tracked per-button so the copy and import buttons don't clobber
+// each other's revert if both are clicked in quick succession.
+const labelResetTimers = new WeakMap()
+function flashLabel(btn, text, restoreLabel) {
+  clearTimeout(labelResetTimers.get(btn))
+  btn.textContent = text
+  labelResetTimers.set(
+    btn,
+    setTimeout(() => {
+      btn.textContent = restoreLabel
+    }, 1500),
+  )
 }
 
 const COPY_LABEL = 'Copy Deck Code'
-let copyResetTimer = null
+const IMPORT_LABEL = 'Import'
 
 async function copyDeckCode() {
   const code = encodeDeckCode(deckToIds())
   await navigator.clipboard.writeText(code)
-
-  const btn = $('btn-copy-code')
-  clearTimeout(copyResetTimer)
-  btn.textContent = 'Copied!'
-  copyResetTimer = setTimeout(() => {
-    btn.textContent = COPY_LABEL
-  }, 1500)
+  flashLabel($('btn-copy-code'), 'Copied!', COPY_LABEL)
 }
 
 // Replaces the whole deck, like the game's paste-to-import (setDeck). Tokens
@@ -115,8 +113,10 @@ async function copyDeckCode() {
 function importDeckCode() {
   const input = $('deck-code-input')
   const ids = decodeDeckCode(input.value.trim())
+  const btn = $('btn-import-code')
+
   if (!ids) {
-    showCodeStatus('Invalid deck code.')
+    flashLabel(btn, 'Invalid', IMPORT_LABEL)
     return
   }
 
@@ -127,7 +127,7 @@ function importDeckCode() {
     deck.set(card.name, (deck.get(card.name) || 0) + 1)
   }
   renderDecklist()
-  showCodeStatus('Deck imported.')
+  flashLabel(btn, 'Imported', IMPORT_LABEL)
 }
 
 // Restart a CSS animation by re-adding its class (forcing a reflow in between
@@ -208,21 +208,45 @@ function renderCatalog() {
 }
 
 function decklistEntry(name, count) {
+  const card = cardByName.get(name)
+
   const li = document.createElement('li')
   li.className = 'decklist-row'
 
   const info = document.createElement('div')
   info.className = 'decklist-entry'
 
+  const left = document.createElement('div')
+  left.className = 'decklist-left'
+
+  const stats = document.createElement('span')
+  stats.className = 'decklist-stats'
+
+  const costSpan = document.createElement('span')
+  costSpan.className = 'decklist-cost'
+  costSpan.setAttribute('aria-label', `Cost ${card.cost}`)
+  const costValue = document.createElement('span')
+  costValue.textContent = card.cost
+  costSpan.appendChild(costValue)
+
+  const pointsSpan = document.createElement('span')
+  pointsSpan.className = 'decklist-points'
+  pointsSpan.textContent = card.points
+  pointsSpan.setAttribute('aria-label', `${card.points} points`)
+
+  stats.append(costSpan, pointsSpan)
+
   const nameSpan = document.createElement('span')
   nameSpan.className = 'decklist-name'
   nameSpan.textContent = name
+
+  left.append(stats, nameSpan)
 
   const countSpan = document.createElement('span')
   countSpan.className = 'decklist-count'
   countSpan.textContent = `×${count}`
 
-  info.append(nameSpan, countSpan)
+  info.append(left, countSpan)
 
   const minusButton = document.createElement('button')
   minusButton.type = 'button'

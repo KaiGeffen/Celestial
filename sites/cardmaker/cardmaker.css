@@ -581,7 +581,7 @@ button:disabled {
 }
 
 .decklist-panel {
-  width: min(300px, 100%);
+  width: min(360px, 100%);
   flex-shrink: 0;
   background: var(--header);
   border: 1px solid var(--line);
@@ -641,6 +641,7 @@ button:disabled {
   min-width: 0;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 8px;
   background: var(--input-bg);
   border: 1px solid var(--line);
@@ -650,6 +651,55 @@ button:disabled {
   font-weight: normal;
   color: var(--text);
   text-align: left;
+}
+
+.decklist-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.decklist-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Cost/points badges, echoing the card's own stat shapes (diamond cost,
+   round points — see the tilt card rendering) so no label text is needed. */
+.decklist-stats {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.decklist-cost,
+.decklist-points {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  background: var(--ink);
+  border: 1px solid #8a8a8a;
+  color: var(--parchment);
+  font-family: 'Helgoland', var(--font-primary);
+  font-size: 11px;
+}
+
+.decklist-cost {
+  transform: rotate(45deg);
+}
+
+.decklist-cost span {
+  transform: rotate(-45deg);
+}
+
+.decklist-points {
+  border-radius: 50%;
 }
 
 .decklist-count {
@@ -690,6 +740,13 @@ button:disabled {
   margin-top: 8px;
 }
 
+/* Fixed width so swapping the label to "Imported"/"Invalid" doesn't reflow
+   the row (see flashLabel in deckbuilder.js) */
+.deck-code-import button {
+  flex-shrink: 0;
+  width: 92px;
+}
+
 .deck-code-import input {
   flex: 1;
   min-width: 0;
@@ -698,16 +755,6 @@ button:disabled {
   border: 1px solid var(--line);
   background: var(--input-bg);
   color: var(--text);
-}
-
-.code-status {
-  margin: 8px 0 0;
-  font-size: 13px;
-  opacity: 0.85;
-}
-
-.code-status[hidden] {
-  display: none;
 }
 
 /* Floating jump button between the catalog and the deck list — only useful
