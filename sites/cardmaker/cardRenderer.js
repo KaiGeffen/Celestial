@@ -28,7 +28,7 @@ const TEXT_FONT = "LTInternet, 'Times New Roman', serif"
 // ------------------------------------------------------------------- data
 
 // keywords: [{ name, text, hasX }], cards: [{ name, cost, points, text, theme }]
-export let gameData = { keywords: [], cards: [], subjects: [] }
+export let gameData = { keywords: [], cards: [], subjects: [], deckSize: 0 }
 
 let goldPatterns = []
 let doveIndex = 0

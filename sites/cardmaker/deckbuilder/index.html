@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Celestial Decks - Deck Builder</title>
+    <meta
+      name="description"
+      content="Build your own Celestial Decks deck from the full card catalog."
+    />
+    <link rel="icon" type="image/svg+xml" href="../../about/assets/favicon.svg" />
+    <link rel="stylesheet" href="../cardmaker.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>Deck Builder</h1>
+      <nav class="page-nav">
+        <a href="../">Card Maker</a>
+        <a href="../search/">Card Search</a>
+        <span aria-current="page">Deck Builder</span>
+        <a href="https://celestialdecks.gg">Play the Game</a>
+      </nav>
+    </header>
+
+    <main class="deckbuilder-page">
+      <div class="catalog-column" id="catalog-column">
+        <div class="search-controls">
+          <input
+            id="search-input"
+            type="search"
+            placeholder="Search cards"
+          />
+          <p class="search-help" id="search-help">
+            Supports <code>name:</code>, <code>text:</code>,
+            <code>cost:2</code>, <code>cost:3+</code>,
+            <code>points:1-3</code>, quoted phrases, and <code>!</code> to
+            negate.
+          </p>
+        </div>
+        <div id="catalog" class="gallery-grid"></div>
+        <p id="search-status" class="gallery-status"></p>
+      </div>
+
+      <aside class="decklist-panel" id="decklist-panel">
+        <h2>Your Deck <span id="deck-count"></span></h2>
+        <ul id="decklist" class="decklist"></ul>
+        <p id="decklist-empty" class="decklist-empty">
+          Click a card to add it to your deck.
+        </p>
+
+        <div class="deck-code-row">
+          <button id="btn-copy-code" type="button">Copy Deck Code</button>
+        </div>
+        <div class="deck-code-import">
+          <input
+            id="deck-code-input"
+            type="text"
+            placeholder="Paste deck code"
+          />
+          <button id="btn-import-code" type="button">Import</button>
+        </div>
+        <p id="code-status" class="code-status" hidden></p>
+      </aside>
+    </main>
+
+    <button
+      id="jump-btn"
+      class="jump-fab"
+      type="button"
+      aria-label="Jump to your deck"
+    >
+      ▼
+    </button>
+
+    <footer class="site-footer">
+      <p>
+        <a href="https://store.steampowered.com/app/3810590/Celestial_Decks/"
+          >Wishlist on Steam</a
+        >
+        · <a href="https://celestialdecks.gg">Play online</a> ·
+        <a href="https://discord.gg/UXWswspB8S">Join the Discord</a>
+      </p>
+    </footer>
+
+    <script type="module" src="deckbuilder.js"></script>
+  </body>
+</html>
