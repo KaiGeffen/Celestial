@@ -269,7 +269,7 @@ export const missionStats = pgTable('mission_stats', {
 })
 
 /**
- * Fan-made cards from the Card Maker site (sites/cardmaker). Owned entirely by
+ * Fan-made cards from the Card Maker site (sites/cards). Owned entirely by
  * that feature — no FK into game tables. Rows are fields-only (a few hundred
  * bytes); clients render the image from these. Lengths are capped here and
  * re-validated in cardmakerServer.ts.

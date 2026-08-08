@@ -1,12 +1,12 @@
-// Server-rendered HTML shell for /cardmaker/community — mirrors
-// sites/cardmaker/community/index.html's body (kept as the static fallback
+// Server-rendered HTML shell for /cards/community — mirrors
+// sites/cards/community/index.html's body (kept as the static fallback
 // for local dev without the backend) but fills in real per-card
 // og:title/og:description/og:image, so link previews (Discord, iMessage, …)
 // show the actual card instead of one generic blurb. viewCard.js still
 // hydrates the page normally afterward — see cardmakerServer.ts.
 //
 // The script is named viewCard.js, not communityCard.js, because nginx's
-// /cardmaker/community location is a raw string-prefix match — a filename
+// /cards/community location is a raw string-prefix match — a filename
 // starting with "community" would collide with it and get misrouted to the
 // backend (which 404s it), corrupting the module load.
 
@@ -36,9 +36,9 @@ export function buildCommunityHtml(
   const description = card
     ? card.text.replace(/\n/g, ' ') || 'A community-made Celestial Decks card.'
     : 'A community-made Celestial Decks card.'
-  const pageUrl = `${origin}/cardmaker/community/?id=${encodeURIComponent(rawId)}`
+  const pageUrl = `${origin}/cards/community/?id=${encodeURIComponent(rawId)}`
   const imageMeta = card
-    ? `<meta property="og:image" content="${escapeHtml(`${origin}/cardmaker/api/cards/${card.id}/image.png`)}" />
+    ? `<meta property="og:image" content="${escapeHtml(`${origin}/cards/api/cards/${card.id}/image.png`)}" />
     <meta name="twitter:card" content="summary_large_image" />`
     : ''
   const heading = card ? escapeHtml(card.name) : 'Custom Card'
@@ -61,7 +61,7 @@ export function buildCommunityHtml(
     <header class="site-header">
       <h1 id="card-title">${heading}</h1>
       <nav class="page-nav">
-        <a href="../">Card Maker</a>
+        <a href="../maker/">Card Maker</a>
         <a href="../search/">Card Search</a>
         <a href="https://celestialdecks.gg">Play the Game</a>
       </nav>

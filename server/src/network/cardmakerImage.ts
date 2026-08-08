@@ -1,6 +1,6 @@
-// Server-side render of a community card, for the /cardmaker/community
+// Server-side render of a community card, for the /cards/community
 // og:image preview. Mirrors the layer stack and text layout in
-// sites/cardmaker/cardRenderer.js (client-only canvas renderer) so the two
+// sites/cards/cardRenderer.js (client-only canvas renderer) so the two
 // stay visually consistent; see that file if the client layout changes.
 
 import * as fs from 'fs'

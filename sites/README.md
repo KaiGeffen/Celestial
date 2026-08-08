@@ -10,15 +10,15 @@ Static auxilary sites, served at path prefixes on the main domain:
 | `/press/`    | [press/](press/)       | Press kit, has standard info, links, and assets.                                                           |
 | `/privacy/`  | [privacy/](privacy/)   | Basic privacy policy.                                                                                      |
 | `/streamer/` | [streamer/](streamer/) | Stream overlay. Must have a ref passed in to the url and be an approved ref in the database to show count. |
-| `/cardmaker/` | [cardmaker/](cardmaker/) | Custom card maker + community gallery. **Ships as its own image** (own Dockerfile/nginx.conf; see [SPEC](cardmaker/SPEC.md)), not part of the shared `sites` image. Its `/cardmaker/api` prefix routes to the game server. |
+| `/cards/`     | [cards/](cards/)         | Card maker, search, deck builder, and community gallery. **Ships as its own image** (own Dockerfile/nginx.conf; see [SPEC](cards/SPEC.md)), not part of the shared `sites` image. Its `/cards/api` prefix routes to the game server. |
 
 Each of these is a plain HTML/CSS/image (the card maker adds a JS canvas renderer).
 
-> **Card maker exception to the self-containment rule:** its `assets/` are
-> *generated* from `client/` and `shared/` by `cardmaker/generateAssets.ts`
+> **Card tools exception to the self-containment rule:** its `assets/` are
+> *generated* from `client/` and `shared/` by `cards/generateAssets.ts`
 > (gitignored, regenerated at image build) so its cards always match the game.
-> Build it from the **repo root**: `docker build -t cardmaker -f sites/cardmaker/Dockerfile .`
-> For local dev, run `npx -y tsx sites/cardmaker/generateAssets.ts` once
+> Build it from the **repo root**: `docker build -t cards -f sites/cards/Dockerfile .`
+> For local dev, run `npx -y tsx sites/cards/generateAssets.ts` once
 > (and again after card/asset changes).
 
 ## Shared assets
@@ -48,21 +48,21 @@ Then open [http://127.0.0.1:4950/about/](http://127.0.0.1:4950/about/) (also `/p
 > no reverse proxy stitching them onto one origin the way production does — that's  
 > expected.
 
-### Card maker (`/cardmaker/`) — full local setup
+### Card tools (`/cards/`) — full local setup
 
-The card maker needs an extra step or two the other sites don't, because (a) its
+The card tools need an extra step or two the other sites don't, because (a) its
 per-card pages and `assets/` are **generated**, and (b) its community
-gallery/publish/search hit `/cardmaker/api`, which only exists on the game
+gallery/publish/search hit `/cards/api`, which only exists on the game
 server.
 
 **1. Generate the assets + per-card game pages (required — they're gitignored):**
 
 ```bash
-npx -y tsx sites/cardmaker/generateAssets.ts
+npx -y tsx sites/cards/generateAssets.ts
 ```
 
-This refreshes `sites/cardmaker/assets/` and writes one static page per real
-game card at `sites/cardmaker/{slug}/` (e.g. `/cardmaker/boa/`). A fresh checkout
+This refreshes `sites/cards/assets/` and writes one static page per real
+game card at `sites/cards/{slug}/` (e.g. `/cards/boa/`). A fresh checkout
 has **none** of these, so those pages 404 until you run it. Re-run after any card
 or asset change in `client/`/`shared/`.
 
@@ -70,7 +70,7 @@ or asset change in `client/`/`shared/`.
 
 - **Static only** — the maker itself + the generated per-card game pages.
   Download/copy work; **Publish, the community gallery, and search do not**
-  (their `/cardmaker/api` calls 404 with no server). Use any static server
+  (their `/cards/api` calls 404 with no server). Use any static server
   pointed at `sites/`:
 
   ```bash
@@ -79,11 +79,11 @@ or asset change in `client/`/`shared/`.
   python3 -m http.server 4950 --directory sites  # http://127.0.0.1:4950
   ```
 
-  Then open http://127.0.0.1:4950/cardmaker/ .
+  Then open http://127.0.0.1:4950/cards/maker/ .
 
 - **Full test** — adds Publish, community gallery, and search. Run the **game
   server**: its `cardmakerServer` serves the static site *and* the
-  `/cardmaker/api` on a single origin (port **5561**), so the relative API calls
+  `/cards/api` on a single origin (port **5561**), so the relative API calls
   resolve without a proxy.
 
   ```bash
@@ -91,7 +91,7 @@ or asset change in `client/`/`shared/`.
   # one-shot alternative:  cd server && npm run build && npm start
   ```
 
-  Then open http://localhost:5561/cardmaker/ .
+  Then open http://localhost:5561/cards/maker/ .
 
   Requires `DATABASE_URL` in `server/.env` and the `customCards` table
   (`npm run migrate --prefix server` if it's missing). New publishes populate
@@ -99,7 +99,7 @@ or asset change in `client/`/`shared/`.
   DB/API down the maker still loads at 5561, but the gallery/publish return
   nothing.
 
-> **Which port?** Static servers (4950) can't answer `/cardmaker/api`, so use
+> **Which port?** Static servers (4950) can't answer `/cards/api`, so use
 > **5561** whenever you're testing publish/gallery/search. The per-card game
 > pages are plain static HTML and work on either port.
 

@@ -12,7 +12,7 @@ import { renderCardImage } from './cardmakerImage'
 import { buildCommunityHtml } from './cardmakerCommunityPage'
 
 // --- Field caps (must stay in sync with the DB varchar lengths in schema.ts
-//     and the UI caps in sites/cardmaker) ---
+//     and the UI caps in sites/cards) ---
 const NAME_MAX = 24
 const TEXT_MAX = 200
 const CREATOR_MAX = 20
@@ -37,7 +37,7 @@ const SUBJECT_MAX_FALLBACK = 512
 function loadSubjectCount(): number {
   const file = path.resolve(
     process.cwd(),
-    '../sites/cardmaker/assets/gameData.json',
+    '../sites/cards/assets/gameData.json',
   )
   try {
     const data = JSON.parse(fs.readFileSync(file, 'utf8'))
@@ -173,8 +173,8 @@ export default function createCardmakerServer() {
   // the real client IP rather than the proxy's.
   app.set('trust proxy', true)
 
-  // POST /cardmaker/api/cards — publish a card, returns { id }
-  app.post('/cardmaker/api/cards', async (req, res) => {
+  // POST /cards/api/cards — publish a card, returns { id }
+  app.post('/cards/api/cards', async (req, res) => {
     const ip = req.ip || 'unknown'
     const retryAfter = rateLimited(ip)
     if (retryAfter > 0) {
@@ -204,11 +204,11 @@ export default function createCardmakerServer() {
     }
   })
 
-  // GET /cardmaker/api/cards?before={id}&limit={n}&q={query}
+  // GET /cards/api/cards?before={id}&limit={n}&q={query}
   // Newest-first page of visible cards matching the query, plus the total match
   // count. `q` uses the same syntax as game-card search (see cardmakerSearch).
   // `before` is a keyset cursor (the last id of the previous page) for paging.
-  app.get('/cardmaker/api/cards', async (req, res) => {
+  app.get('/cards/api/cards', async (req, res) => {
     const limit = Math.min(
       Math.max(parseInt(String(req.query.limit ?? '20'), 10) || 20, 1),
       50,
@@ -244,8 +244,8 @@ export default function createCardmakerServer() {
     }
   })
 
-  // GET /cardmaker/api/cards/{id} — one card's fields
-  app.get('/cardmaker/api/cards/:id', async (req, res) => {
+  // GET /cards/api/cards/{id} — one card's fields
+  app.get('/cards/api/cards/:id', async (req, res) => {
     const id = parseInt(req.params.id, 10)
     if (!Number.isInteger(id)) {
       return res.status(400).json({ error: 'Invalid id' })
@@ -262,9 +262,9 @@ export default function createCardmakerServer() {
     }
   })
 
-  // GET /cardmaker/api/cards/{id}/image.png — server-rendered card art, used
+  // GET /cards/api/cards/{id}/image.png — server-rendered card art, used
   // as the og:image for the community page preview (see cardmakerImage.ts)
-  app.get('/cardmaker/api/cards/:id/image.png', async (req, res) => {
+  app.get('/cards/api/cards/:id/image.png', async (req, res) => {
     const id = parseInt(req.params.id, 10)
     if (!Number.isInteger(id)) {
       return res.status(400).end()
@@ -284,20 +284,20 @@ export default function createCardmakerServer() {
     }
   })
 
-  // GET /cardmaker/community — server-rendered HTML shell with per-card
+  // GET /cards/community — server-rendered HTML shell with per-card
   // og:title/og:description/og:image, so shared links preview the actual
   // card instead of one generic blurb (link-preview bots don't run JS, so
   // the static file's fixed meta tags can't vary by ?id=). Everything else
-  // under /cardmaker/ stays static; this route needs its own NPM custom
+  // under /cards/ stays static; this route needs its own NPM custom
   // location pointing at the backend — see sites/README.md.
-  app.get('/cardmaker/community', async (req, res) => {
+  app.get('/cards/community', async (req, res) => {
     // Relative asset paths in the rendered page (../viewCard.js, etc.)
     // only resolve correctly with a trailing slash — nginx did this
     // automatically for the old static file; this route has to do it itself.
-    if (req.path === '/cardmaker/community') {
+    if (req.path === '/cards/community') {
       return res.redirect(
         301,
-        req.originalUrl.replace('/cardmaker/community', '/cardmaker/community/'),
+        req.originalUrl.replace('/cards/community', '/cards/community/'),
       )
     }
     const rawId = typeof req.query.id === 'string' ? req.query.id : ''
@@ -308,13 +308,16 @@ export default function createCardmakerServer() {
     res.send(buildCommunityHtml(row, origin, rawId))
   })
 
-  // Local-dev convenience: also serve the static card maker site from this
-  // origin, so the same-origin `/cardmaker/api` calls resolve without a
+  // Local-dev convenience: also serve the static card tools site from this
+  // origin, so the same-origin `/cards/api` calls resolve without a
   // separate proxy. In production nginx serves these files instead; the
   // directory simply won't exist in the backend container, so this is skipped.
-  const siteDir = path.resolve(process.cwd(), '../sites/cardmaker')
+  // Bare /cards has no page of its own — mirrors the redirect in nginx.conf.
+  const siteDir = path.resolve(process.cwd(), '../sites/cards')
   if (fs.existsSync(siteDir)) {
-    app.use('/cardmaker', express.static(siteDir))
+    app.get('/cards', (req, res) => res.redirect(301, '/cards/maker/'))
+    app.get('/cards/', (req, res) => res.redirect(301, '/cards/maker/'))
+    app.use('/cards', express.static(siteDir))
   }
 
   app.listen(CARDMAKER_PORT, () => {

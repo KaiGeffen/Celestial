@@ -133,8 +133,8 @@ services:
     networks:
       - net
 
-  cardmaker:
-    image: cardmaker
+  cards:
+    image: cards
     restart: always
     environment:
       TZ: America/New_York

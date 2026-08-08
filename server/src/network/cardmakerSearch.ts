@@ -1,6 +1,6 @@
 // Server-side card search for the community gallery. Mirrors the game's deck
 // editor search (client/src/scene/deckEditor/cardSearchFilter.ts) and the card
-// maker's client port (sites/cardmaker/search/search.js) so community search
+// maker's client port (sites/cards/search/search.js) so community search
 // behaves identically to game-card search — but runs in SQL, so it scales to
 // tens of thousands of rows without shipping the whole set to the browser.
 //

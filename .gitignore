@@ -30,12 +30,13 @@ drizzle/
 
 docs/legal/
 
-# Cardmaker generated content (assets + per-card pages) — created from
-# client/ + shared/ by generateAssets.ts. Every directory under cardmaker/
+# Card tools generated content (assets + per-card pages) — created from
+# client/ + shared/ by generateAssets.ts. Every directory under cards/
 # is generated EXCEPT the negated source dirs; when adding a new source
 # directory there, negate it here too. #
-sites/cardmaker/assets/
-sites/cardmaker/*/
-!sites/cardmaker/search/
-!sites/cardmaker/community/
-!sites/cardmaker/deckbuilder/
+sites/cards/assets/
+sites/cards/*/
+!sites/cards/maker/
+!sites/cards/search/
+!sites/cards/community/
+!sites/cards/deckbuilder/
