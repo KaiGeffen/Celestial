@@ -323,6 +323,18 @@ export default function createCardmakerServer() {
     }
   })
 
+  // GET /cards/api/game-cards/{slug} — canonical fields for a real game
+  // card, keyed by the same slug the static pages/image route use. Lets
+  // callers that don't share generateAssets.ts's card list (e.g. the
+  // Discord bot) validate a slug and get the correct display name/case.
+  app.get('/cards/api/game-cards/:slug', (req, res) => {
+    const card = getGameCardsBySlug().get(req.params.slug)
+    if (!card) {
+      return res.status(404).end()
+    }
+    res.json(card)
+  })
+
   // GET /cards/community — server-rendered HTML shell with per-card
   // og:title/og:description/og:image, so shared links preview the actual
   // card instead of one generic blurb (link-preview bots don't run JS, so
