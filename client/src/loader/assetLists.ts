@@ -60,6 +60,7 @@ export const assetLists = {
       "City",
       "Default",
       "Hill",
+      "Leaf",
       "Lotus"
     ],
     "pixelArt": false
