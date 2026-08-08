@@ -39,15 +39,18 @@ const JOURNEY_CHOICES: JourneyChoiceData[] = [
   },
   // 2 — Mia
   {
-    intro: `I started my story with Simon because that was the last relationship where I tried to commit. It’s not like my life ended when we did. I continued on, found new friends, hobbies, and a lot more pets. I did a lot more than I thought I’d be capable of. To be honest there are things I know I haven’t gotten over… things I don’t want to relive and unpack, even if I managed to mention them in my story. Why should I? Why is it on me to resolve the things that I went through—the things that were done to me. You could give me a whole lifetime to heal, and I’d still rather punish and protect. `,
+    intro: `I never knew what to make of my work in therapy. Maybe it helped, I did a lot more in life than I thought I’d be capable of. To be honest there are things I know I haven’t gotten over… things I don’t want to relive and unpack, even if I managed to mention them in my story, or to Dr. Stacy. Why should I? Why is it on me to resolve the things that I went through—the things that were done to me. You could give me a whole lifetime to heal, and I’d still rather punish and protect.`,
     options: [
       {
-        text: `With your defenses constantly raised, you only limit yourself. Accepting risk is part of living bravely.`,
-        result: `Hmm. I don’t like the implication that I’m not brave. I’ve been brave every day of my life. I recognized risk everywhere and yet I persisted, made a life for myself. But yes, my vigilance had a cost. That’s why I always come back to Simon, isn’t it? I pushed positive possibilities away to protect myself from the bad ones. Okay, that doesn’t sound brave. I see what you mean now. I don’t think I ever considered accepting danger and risk. But it sounds more doable than healing and forgiving. Maybe I could make a little room for acceptance. I’m tired of these walls.`,
+        text: `You have a voice worth sharing and appreciating. Don’t let past wounds scare you into silence.`,
+        result: `Scared? I’m not scared. I’ve been brave every day of my life. I’ve been smart, not scared, to recognize risk everywhere and make a life for myself despite it. Yes, vigilance has a cost. There are some things I had to give up on. Some things I had to keep to myself. Or, who knows. Maybe I didn’t have to. 
+I think I see what you mean now. Then, if you’re here to listen, I’ll finally voice it all.
+My blog, I haven’t checked on it in years, but I hope it goes viral. I hope it gets published everywhere. I hope they find her name. I hope they find me, too: my pain, my drive, my effort. And I want to say that I’m sorry. I’m sorry to the people I’ve loved and pushed away. I’m sorry to myself, for getting hurt. For not pressing charges, for quitting too soon, and for hating myself over that. And I want to say… that I forgive you. I mean, myself. I forgive her.`,
       },
       {
-        text: `You can rest now, you’re safe.`,
-        result: `Safe? Well, that depends on  how you define “safe”. Plenty of times I’ve been told I’m safe when that couldn’t be further from the truth…Not that you would do that. I know this place is different. You’re different from anyone I’ve met on Earth, too. You’ve made me talk, for one. I guess I wouldn’t have gotten this far without feeling safe, somewhere deep down. I…I want to trust this feeling; your words. Is that okay? I think so. I think I’m ready to stop looking over my shoulder—It’s tiring. Will healing let me rest? If so, I’m willing to at least try.`,
+        text: `I hear and believe you. You can rest now, you’re safe.`,
+        result: `Safe? Well, that depends on  how you define “safe”. Plenty of times I’ve been told I’m safe when that couldn’t be further from the truth…Not that you would do that. I know this place is different. You’re different from anyone I’ve met on Earth, too. You’ve actually listened, for one. I guess I wouldn’t have gotten this far in telling my story without feeling safe, somewhere deep down. I…I want to trust this feeling; your words. Is that okay? I think so. I wish I realized I could relax much sooner, it feels so freeing—like the relief I’ve been waiting for my whole life. Maybe—now that I’m thinking about it—maybe I could’ve reached this feeling long before even entering this realm. 
+At least now I’m ready to stop looking over my shoulder, it's tiring. Will healing let me rest? If so, I’m willing to try. `,
       },
     ],
   },

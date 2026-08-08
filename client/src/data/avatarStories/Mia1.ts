@@ -1,24 +1,17 @@
-export default `I empty live crickets into Leo’s vivarium. He darts enthusiastically from under his log and to chase his prey. 
-“Isn’t it nice to eat at night,” I ask, “as a proper nocturnal critter should?” 
-Simon was squeamish at the sight of things like live insects, reptiles too. He could barely tolerate one little leopard gecko in our bedroom. What a wimp. It got so the only time I could feed Leo was in the morning after Simon left for work. Poor little guy was always sluggish during those hours, unable to fully enjoy his meals.
-My phone rings, it’s Chelsea.
-“Hi Chels,” I say. 
-I tap the speaker button and plop down on the queen-sized bed, spreading out my limbs to indulge in all the space that now belongs to only me.
-“Mia! How are you? I’ve been trying to reach you all day.”
-“Sorry. I was probably just napping, or busy. I’m doing well, though. Really well.”
-Chelsea’s voice sounds hesitant as she answers, “Okay… that’s good to hear,” Chelsea’s voice sounds hesitant. I wonder if she means it. “Did you figure out the work situation?”
-“I quit.”
-“Oh no, I’m sorry.”
-“Why? I needed to., iIt was a terrible environment for me.”
-“Yes, but the apartment…”
-“It’s fine, I’m looking at other places. Jobs, too.”
-“Okay…” 
-Again, she sounds reluctant, like she has more to say.
-Why did she even call? Was it just to silently judge me like this? This is not what I need from her right now.
-“Are you and Rob still in contact with him?” I ask.
-Chelsea offers a cowardly half-answer, “You and Simon are both good friends of ours.”
-“How could you still call him a friend, knowing what he did to me? Simon tried to bring me down, change me, make me into a doormat.”
-“Mia, I—”
-“He wanted to silence me, Chels. Don’t you know how much he hurt me? No, don’t you believe me?”
-“Look,” she says, soft but stern, “all I know is that you’re both hurt. The rest is between the two of you. Reach out when you’re ready. I can’t handle you like this.”
-The sudden sound of her hanging up pierces me somewhere deep inside. I draw my knees to my chest and my head sinks. My hair falls around me like curtains, enclosing me in a dark cocoon. I’m alright now. I’m free. Even if others don’t understand that yet.`
+export default `My third therapist, Dr. Stacy, seemed alright. If I had a complaint it would be the awkward, cramped layout of her waiting room. I practically bumped knees with other patients while pretending to be invisible. The popcorn ceiling and fluorescent overhead lights didn’t help. I put up with it since her office was pleasant and her white noise machine actually worked. Plus, she didn’t doubt me the way the last two did. 
+That day I had a lot to unload, namely the unexpected inheritance from my estranged father. Aside from new fencing, my tiny homestead didn’t demand much investment. Ideally I could put the money somewhere that needed it, like that shabby reptile sanctuary a few towns over. Sounded perfect in theory, except for the fact that the place was run by a group of college students: ecologic conservation-something-or-other majors.
+
+“So there’s passionate people already involved in the project, right? That’s great. You’ll need all the help you can get,” Dr. Stacy suggested. 
+“It makes things more complicated, though. Unpredictable.”
+“In what way?”
+“Well for one, I don’t know these people. Sure, they might care. But they might be in it for some bonus credits or an item on their resume. They’re airheaded 20-year olds actively racking up college debt. And I’m supposed to hand them a fat check and then leave them to their own devices?” I grumbled, half-jokingly.
+Dr. Stacy folded up her glasses and set them on the desk decisively. “You know what, Mia? I’ve noticed that when it comes to people you have a tendency to expect the worst.”
+“I’m sure you’ve heard enough tragic stories in your profession to know why one should expect the worst from others.”
+“What really matters right now is your story. Where do all these alarm bells in your mind come from?”
+“God,” I huffed, “where would I even start?”
+“When was the last time you felt betrayed? Let’s begin there.”
+“That’s barely scratching the surface”
+“I know, I find starting with the recent helps patients then reach further back.”
+“So… you want me to tell you about my life, backwards?”
+“Correct.”
+“I’ve never delivered a story that way, but sure. At this point, why not.”`

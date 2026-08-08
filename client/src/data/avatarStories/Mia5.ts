@@ -1,15 +1,12 @@
-export default `If there was one thing Mr.Hughes desired more than the undying love of his students, it was tenure. And so, it became my personal mission to make sure he never got it. I knew that I would never be able to prove what he tried to do to me, so instead I focused on what I could easily expose: the dinners, the pot, the liquor—everything he provided regularly to his 19-year-old students. Our class group chat had enough photos and videos to convince the board. 
-I was supposed to be anonymous; but the others weren’t stupid. I was the only one to stop calling him by name and attending his dinners. Eventually Zoe asked me directly, and I told her everything. She was my roommate, my closest friend. But as I talked, I saw expressions I didn’t recognize flash across her face. 
-“Scott invited you, and only you?” she asked.
-“Yeah, I didn’t know until I got there.”
-“How do you know he didn’t, though? Maybe the others he invited just couldn’t make it that evening.” 
-“Well, I straight up asked him and he said it was only me.” 
-I was confused. Why did this even matter? 
-“But you’re both adults, and nothing even happened. Why do you need to get him fired?”
-“Zoe, he grabbed me!” I said. It sounded like pleading. “I ran and didn’t look back!” I cried out. It sounded like pleading.
-She sighed. 
-“Hey, I’m sorry you went through something that felt… triggering, in that way. You’re a hurt person.”
+export default `My final years of college were nothing but a test of panopticon-Hell endurance. The group chat died. My former friends gave me dirty looks or retorts whenever I dared to speak in workshop, and I could never expect any good-faith critique for my own pieces. 
+I couldn’t stop feeling their eyes, hearing their whispers, and seeing their little smirks everywhere I went. Sometimes they would brush past me in the hall and sigh in exasperated, mocking tones: “Hurt people, hurt people.”
+I kept my head down, gritted my teeth knowing I couldn’t bite back—not yet. I survived on the fire of spite, using every oppressive experience as kindling. The flames continued to roar, long after I graduated and escaped to the city where I started out at my dream publication: Ink & Iron Press. 
+There, a steady stream of repetitive sensationalist headlines were funneled to my desk. I penned silent wars, popular controversies, consumer trends, acts of terror, technological breakthroughs, celebrity mistakes. Then one day I found a sticky note dangling from the stack of assignments sent my way, creased and crumpled with worn adhesive barely holding on. Unfolded, it read: “review of ‘Butterfly Woman’ case: inconsistencies, police error, missing witness”. Dashed out and discarded, it nevertheless called to me.
 
-The group chat was dead. My former friends gave me dirty looks whenever the new substitute professor stumbled over words or assigned tedious coursework. 
-Sometimes they would brush past me in the hall and whisper in exasperated, mocking tones: “Hurt people, hurt people.” 
-The worst part was not knowing what exactly Zoe had told them. She practically knew my whole life. I had poured my heart out to her, and now she wasn’t on my side.`
+“Mia, we love your work in news journalism. You’re direct, exacting, witty—and you’ve got a great pace going. Why shake things up?” said Martha, my editor-in-chief, when I proposed a pivot in my material.
+“All I do is summarize the same events as every other publication, and without breaking past the surface. I want to go deeper, and the Butterfly Woman case is worth exploring! I can conduct an investigation that is unique, thorough, and ongoing with updates our audience won’t want to miss.”
+“We don’t have the bandwidth to feature such an… obscure subject. There is so much else happening in the world that deserves your hard-hitting coverage,” she neatly wrapped up her rejection in empty flattery and excuses.
+“I could continue writing about countless passing subjects and achieve nothing, inspire no one; or I could give everything I’ve got to expose one overlooked injustice, and potentially uproot it.”
+“Oh Mia, you think too little of the work you’re already doing! I—”
+“Please, spare me the fluff. Will you let me pursue this case, or not?” 
+Martha flattened her concerned smile, “No, I won’t approve this project.”`
