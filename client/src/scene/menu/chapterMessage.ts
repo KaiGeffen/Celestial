@@ -119,10 +119,14 @@ export default class ChapterMessageMenu extends MessageMenu {
     const lines = txtTop.getWrappedText(params.s)
     txtTop.setText(lines.slice(0, 13).join('\n'))
 
-    // Get all the text after the lines from the top text
-    const lastTopLine = lines[12]
-    if (lastTopLine !== undefined) {
-      const splitIndex = params.s.indexOf(lastTopLine) + lastTopLine.length
+    // Get all the text after the lines shown in the top text. Search forward from
+    // the running offset (not from 0) — a blank paragraph-break line recurs often
+    // enough that indexOf could otherwise match an earlier occurrence
+    if (lines.length > 13) {
+      let splitIndex = 0
+      for (let i = 0; i < 13; i++) {
+        splitIndex = params.s.indexOf(lines[i], splitIndex) + lines[i].length
+      }
       const remainingString = params.s.slice(splitIndex).trimStart()
       txtBottom.setText(remainingString)
     }
