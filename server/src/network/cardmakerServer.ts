@@ -7,8 +7,9 @@ import { and, count, desc, eq, lt } from 'drizzle-orm'
 import { CARDMAKER_PORT } from '../../../shared/network/settings'
 import { db } from '../db/db'
 import { customCards } from '../db/schema'
+import Catalog from '../../../shared/state/catalog'
 import { buildSearchBlob, searchConditions } from './cardmakerSearch'
-import { renderCardImage } from './cardmakerImage'
+import { renderCardImage, renderGameCardImage } from './cardmakerImage'
 import { buildCommunityHtml } from './cardmakerCommunityPage'
 
 // --- Field caps (must stay in sync with the DB varchar lengths in schema.ts
@@ -50,6 +51,39 @@ function loadSubjectCount(): number {
   return SUBJECT_MAX_FALLBACK
 }
 const SUBJECT_COUNT = loadSubjectCount()
+
+// Must match slugify + the collectible+token card list in generateAssets.ts
+const slugify = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+
+const MAX_TOKEN_ID = 2000
+let gameCardsBySlug: Map<
+  string,
+  { name: string; cost: number; points: number; text: string; theme: number }
+> | null = null
+function getGameCardsBySlug() {
+  if (!gameCardsBySlug) {
+    const collectibleIds = new Set(
+      Catalog.collectibleCardsWithBetaCards.map((c) => c.id),
+    )
+    const all = [
+      ...Catalog.collectibleCards,
+      ...Catalog.allCards.filter(
+        (c) => !collectibleIds.has(c.id) && c.id <= MAX_TOKEN_ID,
+      ),
+    ]
+    gameCardsBySlug = new Map(
+      all.map((c) => [
+        slugify(c.name),
+        { name: c.name, cost: c.cost, points: c.points, text: c.text, theme: c.theme ?? 0 },
+      ]),
+    )
+  }
+  return gameCardsBySlug
+}
 
 type CardFields = {
   name: string
@@ -280,6 +314,25 @@ export default function createCardmakerServer() {
       res.send(png)
     } catch (e) {
       console.error('Error rendering custom card image:', e)
+      res.status(500).end()
+    }
+  })
+
+  // GET /cards/api/game-cards/{slug}/image.png — server-rendered art for a
+  // real game card's og:image. Static per-card pages can't render anything
+  // server-side themselves, so they point here — see generateAssets.ts.
+  app.get('/cards/api/game-cards/:slug/image.png', async (req, res) => {
+    const card = getGameCardsBySlug().get(req.params.slug)
+    if (!card) {
+      return res.status(404).end()
+    }
+    try {
+      const png = await renderGameCardImage(card)
+      res.set('Content-Type', 'image/png')
+      res.set('Cache-Control', 'public, max-age=86400, immutable')
+      res.send(png)
+    } catch (e) {
+      console.error('Error rendering game card image:', e)
       res.status(500).end()
     }
   })

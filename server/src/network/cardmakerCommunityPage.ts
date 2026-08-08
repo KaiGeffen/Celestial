@@ -22,6 +22,8 @@ function escapeHtml(s: string): string {
 interface CommunityCard {
   id: number
   name: string
+  cost: number
+  points: number
   text: string
 }
 
@@ -33,8 +35,9 @@ export function buildCommunityHtml(
   const title = card
     ? `${card.name} — Celestial Decks`
     : 'Custom Card — Celestial Decks'
+  // Same format as the real game cards' pages (see generateAssets.ts)
   const description = card
-    ? card.text.replace(/\n/g, ' ') || 'A community-made Celestial Decks card.'
+    ? `${card.name} — ${card.cost} cost, ${card.points} point${card.points === 1 ? '' : 's'}. ${card.text.replace(/\n/g, ' ')}`
     : 'A community-made Celestial Decks card.'
   const pageUrl = `${origin}/cards/community/?id=${encodeURIComponent(rawId)}`
   const imageMeta = card

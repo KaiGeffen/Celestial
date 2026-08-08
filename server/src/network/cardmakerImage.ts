@@ -258,6 +258,28 @@ function buildTextSvg(card: CardFields): string {
   </svg>`
 }
 
+// Real game cards don't carry a `subject` index (that's a custom-card concept —
+// see the maker's subject picker); their art is the curated subject whose file
+// name matches the card name exactly, falling back to Dove like the client's
+// subjectIndexByName in cardRenderer.js.
+function subjectIndexByName(name: string): number {
+  const names = getSubjectNames()
+  const i = names.indexOf(name)
+  if (i >= 0) return i
+  const dove = names.indexOf('Dove')
+  return dove >= 0 ? dove : 0
+}
+
+export async function renderGameCardImage(card: {
+  name: string
+  cost: number
+  points: number
+  text: string
+  theme: number
+}): Promise<Buffer> {
+  return renderCardImage({ ...card, subject: subjectIndexByName(card.name) })
+}
+
 export async function renderCardImage(card: CardFields): Promise<Buffer> {
   const [background, subject, arc, container] = await Promise.all([
     loadLayer('background', card.theme),

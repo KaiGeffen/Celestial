@@ -142,6 +142,9 @@ for (const card of cards) {
     `${card.name} — ${card.token ? 'token, ' : ''}${card.cost} cost, ${card.points} point${card.points === 1 ? '' : 's'}. ${card.text.replace(/\n/g, ' ')}`,
   )
 
+  const pageUrl = `https://celestialdecks.gg/cards/${slug}/`
+  const imageUrl = `https://celestialdecks.gg/cards/api/game-cards/${slug}/image.png`
+
   const html = `<!doctype html>
 ${GENERATED_MARKER}
 <html lang="en">
@@ -150,6 +153,11 @@ ${GENERATED_MARKER}
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>${escapeHtml(card.name)} - Celestial Decks</title>
     <meta name="description" content="${description}" />
+    <meta property="og:title" content="${escapeHtml(card.name)} — Celestial Decks" />
+    <meta property="og:description" content="${description}" />
+    <meta property="og:url" content="${pageUrl}" />
+    <meta property="og:image" content="${imageUrl}" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" type="image/svg+xml" href="../../about/assets/favicon.svg" />
     <link rel="stylesheet" href="../cardmaker.css" />
   </head>
