@@ -44,7 +44,7 @@ async function init() {
     card = await res.json()
   } catch (e) {
     main.hidden = true
-    status.innerHTML = 'Card not found. <a href="../">Make your own →</a>'
+    status.innerHTML = 'Card not found. <a href="../maker/">Make your own →</a>'
     return
   }
 

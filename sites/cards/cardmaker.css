@@ -113,7 +113,7 @@ legend {
 }
 
 /* The current page's own entry stays in the bar but isn't a link (plain cream,
-   not gold), so the three destinations are always visible and consistent. */
+   not gold), so all four destinations are always visible and consistent. */
 .page-nav [aria-current='page'] {
   color: var(--text);
 }
@@ -396,13 +396,6 @@ button:disabled {
   display: none;
 }
 
-/* Gallery */
-.gallery {
-  padding: 24px;
-  border-top: 2px solid var(--line);
-  text-align: center;
-}
-
 .gallery-grid {
   display: flex;
   flex-wrap: wrap;
@@ -485,12 +478,6 @@ button:disabled {
   align-items: center;
   gap: 18px;
   max-width: 354px;
-}
-
-.gallery-card canvas {
-  width: 100%;
-  height: auto;
-  display: block;
 }
 
 .gallery-item .credit {

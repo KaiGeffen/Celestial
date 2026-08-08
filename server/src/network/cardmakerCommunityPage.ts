@@ -66,6 +66,7 @@ export function buildCommunityHtml(
       <nav class="page-nav">
         <a href="../maker/">Card Maker</a>
         <a href="../search/">Card Search</a>
+        <a href="../deckbuilder/">Deck Builder</a>
         <a href="https://celestialdecks.gg">Play the Game</a>
       </nav>
     </header>

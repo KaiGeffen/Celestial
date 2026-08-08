@@ -33,7 +33,7 @@ interface CardFields {
 
 let subjectNames: string[] | null = null
 // Must match the sorted subject-name list generateAssets.ts builds for the client
-function getSubjectNames(): string[] {
+export function getSubjectNames(): string[] {
   if (!subjectNames) {
     subjectNames = fs
       .readdirSync(path.join(cardAssetsDir, 'subject'))

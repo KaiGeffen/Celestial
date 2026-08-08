@@ -9,7 +9,7 @@ import { db } from '../db/db'
 import { customCards } from '../db/schema'
 import Catalog from '../../../shared/state/catalog'
 import { buildSearchBlob, searchConditions } from './cardmakerSearch'
-import { renderCardImage, renderGameCardImage } from './cardmakerImage'
+import { renderCardImage, renderGameCardImage, getSubjectNames } from './cardmakerImage'
 import { buildCommunityHtml } from './cardmakerCommunityPage'
 
 // --- Field caps (must stay in sync with the DB varchar lengths in schema.ts
@@ -30,27 +30,13 @@ const THEME_MAX = 8
 const RATE_LIMIT = 10
 const RATE_WINDOW_MS = 60 * 60 * 1000 // 1 hour
 
-// The subject index is an offset into the append-only curated list in the card
-// maker's generated gameData.json. The backend doesn't ship that file, so we
-// read it when present (local dev) and otherwise fall back to a generous cap
-// that still rejects nonsense like `subject: 9999`.
-const SUBJECT_MAX_FALLBACK = 512
-function loadSubjectCount(): number {
-  const file = path.resolve(
-    process.cwd(),
-    '../sites/cards/assets/gameData.json',
-  )
-  try {
-    const data = JSON.parse(fs.readFileSync(file, 'utf8'))
-    if (Array.isArray(data.subjects) && data.subjects.length > 0) {
-      return data.subjects.length
-    }
-  } catch {
-    // Not available (e.g. prod backend) — fall through to the cap.
-  }
-  return SUBJECT_MAX_FALLBACK
-}
-const SUBJECT_COUNT = loadSubjectCount()
+// The subject index is an offset into the append-only curated list of subject
+// art. Read straight from the same client/ asset directory cardmakerImage.ts
+// renders from (shipped in the backend image — see DockerfileServer), so the
+// cap is always exact instead of a loose guess: a stale/oversized fallback here
+// would let a card publish with an index past the real art, permanently
+// rendering with no subject (published cards can't be edited afterward).
+const SUBJECT_COUNT = getSubjectNames().length
 
 // Must match slugify + the collectible+token card list in generateAssets.ts
 const slugify = (name: string) =>

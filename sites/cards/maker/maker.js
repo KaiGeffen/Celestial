@@ -190,12 +190,21 @@ function updateSubjectSelection() {
 const downloadCard = () => downloadCardPng(state, state.name)
 
 async function copyCard() {
-  const canvas = document.createElement('canvas')
-  canvas.width = CANVAS_W
-  canvas.height = CANVAS_H
-  await renderCard(canvas, state)
-  const blob = await new Promise((r) => canvas.toBlob(r, 'image/png'))
-  await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+  const btn = $('btn-copy')
+  try {
+    const canvas = document.createElement('canvas')
+    canvas.width = CANVAS_W
+    canvas.height = CANVAS_H
+    await renderCard(canvas, state)
+    const blob = await new Promise((r) => canvas.toBlob(r, 'image/png'))
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+    btn.textContent = 'Copied!'
+  } catch (e) {
+    btn.textContent = 'Copy failed'
+  }
+  setTimeout(() => {
+    btn.textContent = 'Copy'
+  }, 1500)
 }
 
 async function publishCard() {
