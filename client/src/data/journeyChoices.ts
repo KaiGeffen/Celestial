@@ -56,17 +56,19 @@ At least now I’m ready to stop looking over my shoulder, it’s tiring. Will h
   },
   // 3 — Kitz
   {
-    intro: `I only grasped half of what she said during that breakup. The grief struck me instantly, like she had already left and I was hearing her ghost. When she was gone for good, that very ghost attached itself to me, repeating throughout my life in whispers those words I still couldn’t quite understand. I’m always drawn back to that moment, to those words. What did I fail to learn? Whatever it was, it eluded me to the end. That’s why I’m here mulling over it one last time. Tell me, what did I do wrong? I only ever tried to love with all my heart and give all I could give.`,
+    intro: `I never endeavored to live a merely satisfactory life; to pursue contentment, achievement, or the greater good. No, I had an appetite that I lived to sate, and sate it I did. I’ve had my fill of all the pleasure and drama I could ask for. Call it selfish, if you must. I know that being true to myself makes me stick out amongst my friends, parents, and past lovers. Do they seem more fulfilled? I don’t believe so. More… purposeful, perhaps. At the very least, they’d be better equipped for the afterlife.
+Tasting the colors of life, plunging into thrill, making it overflow—I don’t mourn it. Yet, now I’m forced to wonder: am I complete? Have I missed out on something more important by prioritizing the wrong things?`,
     options: [
       {
-        text: `You should spare some of your focus and devotion for yourself.`,
-        result: `Myself? Do I need that kind of attention? Well, if it’s you saying so, my friend, I should give it some thought. I admit I’ve poured a lot into the external. I thought that naturally I would receive enough in return; but I suppose my level of investment is hard to match. I always think of myself in the context of others: do they like me? Do I like them? Once I find myself alone I’m at a loss. That’s partly why I’m always seeking the company and approval of others. Instead of focusing on how to keep someone else by my side, it’s about time I learn how to be a better companion to myself.`,
+        text: `I don’t think you’ve lived self-centeredly. If anything, you’re always looking outwards. Try looking inwards for once—what have you done and felt for the people you’re comparing yourself to?`,
+        result: `I thought I couldn’t find a lover, or even a cause to stay devoted to because I wasn’t needed enough. Eventually, my usefulness would run out and there’d be nothing left to keep a lover tethered to my side. But my friends, family, community — they stayed. Why? What did they see in me? Yes, I helped out here and there, but that could hardly compare to how much I nurtured the women I—Oh, I’m still looking outwards, aren’t I?
+The inward version is…what did I see in them, the ones who stayed? Companionship and care, both ways. Sometimes I felt pelted by the criticisms thrown my way; pressured by expectations and doubts. But I could always trust them to show up with security and support when I needed it the most. Needed. So that’s the answer. I needed them as much as they needed me. That’s true love.`,
       },
       {
-        text: `Your love was too smothering, you didn’t treat your partner as your equal.`,
-        result: `I know “partner” implies equals: a neat slice down the middle. But while I’ve always preferred to be relied on, I never considered that could place a burden on the reliant. I was careful not to use my power to exploit those I loved. I never tried to force anyone to stay or bend them to my will. Isn’t that enough?
-No, my past relationships prove it wasn’t. Love like that can’t endure indefinitely. Maybe trusting my partner—relying as much as I am relied on—isn’t the flaw I feared it to be.
-Maybe it could’ve been the opposite.`,
+        text: `Your connections and experiences were not futile. Even if your path looks different from others’, it was always meant to be your path.`,
+        result: `I know, now, I was wrong about Noor. Maybe at one point we shared a path, but she turned onto her own while I stayed behind. Stubbornly, I couldn’t see it, I refused to see it until I was forced to.
+For a period, I was prone to ruminating over what could have been if I’d adapted to her change. But seeing how her life ended up—steady and snug—I’ve accepted I wouldn’t belong, I wouldn’t appreciate it the way she did. 
+And despite the pain of parting ways, you’re right, I wouldn’t erase anything we experienced. I’d say the same for everyone after her, as well. Each romance that came and went felt like a gain, not a loss. Time savored is not time wasted. It might not be the typical picture of a happy ending with neatly checked boxes, but it is my ending, and I am happy.`,
       },
     ],
   },

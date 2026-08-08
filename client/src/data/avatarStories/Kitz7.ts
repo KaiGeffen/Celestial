@@ -1,13 +1,27 @@
-export default `From the moment I met her I knew she wasn’t at her best, but the full extent of her issues only revealed itself after we began living together. 
-Even in the comfort of our own home, she would lapse into states of paranoia and distress, or spend hours at a time listless and despondent. I learned quickly that it was best not to question her in these moments, or to bring them up after the fact. She responded better to indirect comfort and distraction, things that didn’t force her to confront or acknowledge her mood. Still, I paid quiet attention and noticed that these episodes often occurred after spending time out in public or after she had spent time on her phone or computer. 
-Eventually, when we had been together long enough, I made a passing offer to optimize her devices. 
-“Oh right,” she said, “I’d almost forgotten that’s what you do.”
-I explained as I worked, telling her about the VPN my company designed and the version I was setting up for her. She nodded along, gradually taking more and more interest in the tool.
-“So, in addition to those third party things and ad trackers,” she asked, “can you hide me—my information—from an individual?”  
-“Yes. I can block existing profiles, and set up a system to pre-emptively stop suspicious activity that exhibits certain patterns or comes from certain IPs.”
-Her eyes widened.
-“All I need is more information from you. You’d need to show me who this is and how they’ve targeted you.” 
-She agreed, and finally opened up about her ex turned stalker, someone who had continued to harass and threaten her for years, even showing up in person a few times. When she watched me dig through his activity and accounts, then set up a robust defense, her eyes wet with tears.
-“I went to the police and they wouldn’t do anything because I wasn’t in ‘enough danger’. The last guy I was seeing thought I was overreacting. Then he got suspicious of me, even though I’d tried everything, blocked every account I could.” 
-She choked up and embraced me. Grateful tears dampened my shoulder.
-I had never considered myself the kind of guy who identified with machismo. Even at that moment, I didn’t feel the satisfaction of chasing off competition and securing ‘my’ woman. But I did feel like a protector of sorts, and it was fulfilling to know that she was safe in my arms.`
+export default `I had enough of my parents’ nagging. While they didn’t mind my letting go of the restaurant—in fact they were grateful I managed it in their stead for as long as I did—they were censorious about my love life. Even more so after Noor and I split. No one I brought before their wise eyes was passable, and in conversation and background, none could prove herself deserving of my devotion.
+Tired of the detractors, I finally skipped the vetting process and debuted my partner Annette to my friends at the farewell party for Dan and Liv’s daughter. 
+
+After a brief introduction to my close circle, I unwove our hands and let Liv pull Annette into the swarm of people inside. The sliding door glided shut, swallowing up the two women and the burst of noise that broke free when it briefly opened.
+To my other side, leaning on the deck rail, Willem rolled his eyes.
+“Here we go again…” he sighed.
+“What? You don’t like her? Already?” I puzzled.
+“What happened with that other one, Fluer, or was it Fenna…she seemed more put together.”
+“She got that opportunity in America.”
+“The one you convinced her to apply for?” Dan jumped in.
+“Yes…Anyway, neither of us wanted to bother trying long-distance. It was a mutual parting.”
+“So you found a new sick puppy to patch up,” he ribbed. 
+I clapped my hands together. “You know what Dan, it’s been too long since I last heard you sing.”
+“Really?” 
+“Oh no…” Willem groaned. 
+“You have a guitar around here somewhere, right? I’ll pluck some strings for you, we’ll put on a show.”
+“Well, if you can find it I’ll perform.”
+
+My eyes found Annette’s anxious ones across the room as I waded through the crowd. I gave her an I’ll-come-over-in-a-minute look before I made it to the stairs.
+The second floor, like the deck, was a respite from the commotion downstairs. Instead of curated decor, an excessive amount of family photos hung in the hallway, as if I were travelling down the family’s memory lane. I entered the room that was at one point a nursery, recalling that it had been converted into miscellaneous storage at some point. I reached for the guitar that leaned in one corner of the cluttered room, and stilled, recognizing the same yellow I saw once, many years ago. Now chipped and faded in some places, the walls differed from my recollection. And most notably, the one I faced held traces of a mural: some kind of shrubbery with purple flowers.
+It pierced me instantly, like a needle to the temple: Noor painted this addition. 
+When? When had she changed? The shift that happened all at once and tore us apart—it had actually begun ages ago. The tantalizing question of “what-if”, like a stubborn syrup stuck in the grooves of my teeth since the breakup, reminded me of its presence with that sweet ache. What if I realized sooner? Would I have been able to make her stay?
+Two slender arms snaked around my chest from behind. Annette’s form pressed against my back, the sensation so clear I could see her when I closed my eyes. 
+“Let’s get out of here,” she murmured.
+“And go where?”
+“Anywhere! This place is stuffy.”
+“Sure, let’s slip out the back.”`

@@ -1,21 +1,18 @@
-export default `The young lawyer seated across from me recounted her road to success and future ambitions with a little too much enthusiasm. I took my final sip of coffee; her neglected cup was still nearly full. I leaned back and let my gaze wander over her shoulder and out the window behind her. It had an especially beautiful copper frame that transformed the rainy street into a live painting. 
-That was when I first laid eyes on her. She walked into the frame slowly, as if she wasn’t soaked to the bone. The rain made her dark hair even darker. The yellow dress that hung awkwardly on her thin frame made her complexion appear sickly.
-“Excuse me for a moment,” I said, stopping my date mid-monologue. 
-I grabbed the umbrella and jacket from the back of my chair and raced outside. The pale woman had only just made it past the next storefront, and I quickly caught up with her. 
-“Hello!,” I called out. 
-She turned around, her unfocused eyes suddenly sharpening with caution. 
-“What do you want?” she asked, and took a step back. There was an unexpected steadiness to her hostility that left me flustered.
-“Nothing! I mean, I don’t want anything… Not from you, I just—well I guess I wanted—to offer you an umbrella. You look like you could use one.”
-I was stammering like a fool. I watched the realization flicker across her stiff face, and decided I shouldn’t have said the last part aloud. She quickly crossed her arms over her chest and turned away, glancing around at other pedestrians nervously. I pulled off my jacket and draped it over her shoulders. She jumped and looked back at me, still wary.
-“You can keep it,” I said, “or throw it away once you get inside, up to you.” 
-She didn’t respond, just slipped her arms into the sleeves and zipped up the front. I held out the open umbrella, exposing myself to the rain. 
-“You don’t need to return this, either. Just take it.”
-When I returned to the cafe a bit wet, my date smiled.
-“That was kind of you, running out there to give someone an umbrella. I think I’d like to see you again sometime.”
-“I’m sorry,” I said. “I don’t think we’re a good fit.”
-“Really? I like you, though. You don’t… you don’t feel the same?” 
-She sounded genuinely hurt. My heart twinged.
-“Hey, it’s not that you’re unlikable. You’re just too good for me.”
-“That’s the least believable excuse a man can give,” she sighed.
-“I know it’s tossed around a lot, but I really mean it. You’re so… put-together, capable, confident. You don’t need me.”
-And I really did mean it.`
+export default `After the caulk gun glided along the window trim, my finger followed its path, smoothing the frosting-like trail. 
+“That should do it,” I told Dan.
+“Thanks, Kit,” he said, admiring my work. “I hadn’t even noticed the gaps there.”
+
+At Dan and Liv’s housemaking “party”, it was the nursery that wound up needing the most work. Willem and I were happy to help, even if it wasn’t our usual idea of fun. 
+Liv stepped back from the wall she and Willem had just finished painting. An even coat of pastel yellow now enveloped the small room in a warm embrace. 
+“It’s a shame Noor couldn’t make it,” she sighed. “When she’s back from her residency I’d love to start on a mural with her.” Liv began listing off potential subjects—hills of purple heather, blue tits perched on branches, or maybe flying kites…—and her voice faded into the background of my own thoughts. 
+Inwardly, I was rather glad that Noor’s passion kept her away from this scene. I couldn’t picture her painting a nursery wall in the middle of the day on the outskirts of the city. And I wouldn’t want her to see me like this, either; so meticulous and mundane. As much as my friends had warmed up to Noor, they couldn’t know her heart as well as I did. 
+Late to the party, but bearing gifts, Willem’s partner Coen finally arrived.
+“You all need a break from those paint fumes,” he called out from downstairs. “Let’s eat!”
+
+“So what do you think?” Coen asked as I kissed the crumbs of bitterballen coating off of my fingertips.
+“I keep telling you both,” I sighed, “I’m by no means an expert in these matters.”
+“And, your verdict?” Willem pushed.
+“This platter is the best, so far,” I admitted. The couple beamed at each other, as if I was their key to success.
+Willem and Coen were working on opening their own high-end club of sorts, and had taken to consulting me, since I technically “owned” a thriving restaurant. 
+Although I tried to act humble, I was always lured into lending whatever assistance I could offer. “But the drinks… hold on, I’ll write down some wineries you should get in touch with.”
+Once again, I was relieved Noor wasn’t there to witness my pseudo-professional persona.`

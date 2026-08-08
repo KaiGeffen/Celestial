@@ -1,9 +1,17 @@
-export default `In the colder months, she was drained of all vitality. At any time of the day I could find her curled up in some corner of our place, like a lazy cat attempting to hibernate. 
-I whisked her away to sunny beaches and island getaways, restoring the color to her cheeks and the light behind her eyes. She thrived on these vacations. And she was more beautiful to me than ever before.
-The image of her on our first trip, draped on a reclined chaise lounge and dyed orange by the setting sun on that beach in Aruba, carved itself into my memory. She wore the overpriced wrap-dress and beaded jewelry I’d bought for her from a local artisan. Something about this scene seemed to scratch the burning itch that lingered under my skin, an impossible remnant of my childhood illness. 
-I pictured her against different backdrops, future surprise destinations: a tropical forest, arid mountains, sprawling vineyards.... For each new environment I imagined the accompanying adornments I would decorate her with: handwoven sandals, thick knitwear, or chiffon blouses. She was like a perfect doll, smiling back at me, making full use of everything I provided.
-Then her smiling lips parted. 
-“Thank you, Kit,” she said, before returning her gaze to the sun setting over the sea. 
-For some reason those words stifled my fantasies. She wasn’t someone who constantly thanked me for things, and I liked that about her. It was as if she knew we had an equal exchange: that by fulfilling her role as my lover, my pet, I was already paid back in full.
-My unease turned out to be justified. 
-One day, a day like any other in our own home, I noticed the way she had begun carrying herself with a sense of peace I’d never imagined she could possess. I wondered how long she had been this way, and I made the mistake of asking her. It was a calm and surprisingly quick conversation. She thanked me for everything I’d done for her and for everything she’d learned throughout our relationship. And she apologized—for needing to move on and for not teaching me enough in return.`
+export default `Tess, a woman I met through mutual friends, invited me to a gallery opening she’d received free tickets to.
+It was a small venue, a side room in a semi-industrial building, featuring unknown but talented artists. The turnout was decent, and I could tell from the excited voices and frequent whispers of congratulations that the attendees consisted mostly of the artists’ friends and family.
+“I like these kinds of events,” Tess noted. “The calm and intimate kind.”
+I scanned the abstract color-block prints. “It’s a nice way to discover something new.”
+“Yes, a different pace of life, isn’t it? No tourists or pretension…” my date sighed. Her interpretation wasn’t what I intended, but I didn’t correct her. “Honestly, I was thinking of leaving this city, but now that my first ever grandchild is on the way I’ll put it off for now.”
+Though Tess was complaining, her smooth voice was sweet with undeniable affection and quite pleasant to the ear.
+“I’ll take you away.” 
+“Pardon?”
+“Give me a bit of your time and we can escape together.”
+The creases that fanned out like sunrays from the corners of her eyes deepened. “A weekend trip wouldn’t hurt.”
+
+We continued to exchange commentary and smalltalk, interspersed with crumbs of our backgrounds and preferences, as we made our way through the art show. Then Tess pointed to a section of small impressionistic paintings that made my breath catch for a moment.
+“Beautiful, isn’t it,” she said. As we approached the collection, the name on the plaque confirmed my hunch. Her surname had changed, but the style of brushstrokes remained distinctive. “Such ordinary subjects, yet you can tell there’s so much care in depicting them.”
+There were studies of a messy table after a shared meal, a worn bag, an unassuming armchair. And human subjects: children playing in the distance, a man with his face practically buried in a book, all captured in vague, yet vivid strokes.
+A jolt of energy ran through me—she could be here in the very same room. It wasn’t unthinkable, many of the displayed artists were present to celebrate the opening. My gaze darted around the gallery, searching for a trace of her in the crowd: brown curls… no, maybe grey by now. My excitement drained in an exhale. My insides settled. I returned to the cozy scenes of an everyday family. 
+I nodded, “It looks like a life well-lived.”
+“Mm,” Tess hummed in agreement. As we stood side by side, her arm slipped around mine. They fit together comfortably, naturally.`

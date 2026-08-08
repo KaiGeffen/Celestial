@@ -1,38 +1,14 @@
-export default `I recognized her silhouette in the restaurant parking lot immediately. I tried to get a little closer before calling out to her, but as soon as I was within a yard of her, she spun around. Her right hand dug around in her purse.
-“Woah, just wanted to say hi.”
-“You’re that guy…” 
-Her expression showed a hint of relief, then became even stonier. 
-“Have you been following me?”
-“What? No, never.”
-She lifted a spray bottle out of her bag.
-“I moved to the area recently,” I blurted out. “After my mom passed.” 
-“Oh, oh I’m so sorry—” she gasped.
-She fumbled with her belongings, making an attempt to shove the pepper spray away. Its top popped off and clattered onto the pavement. We both reached down to grab it when the spray tube slipped out and hit the ground, landing directly on the nozzle. The hiss of spray and whatever was in there sent us both running.
+export default `“You sold it?” Noor gaped at me. It was not the reaction I had eagerly anticipated.
+“That’s not the important part—” I quickly countered, slipping the VIP music festival tickets into her hand. “We’re going to camp in the Holy Land for a four-day hardcore marathon!”
+Her eyes shook back and forth over the tickets, her face still stiff with disbelief.
+“Are you upset? You haven’t been yourself lately, so I wanted to cheer you up with a surprise; something special…” 
+“It’s an amazing surprise, but I have to teach during the week, remember?” 
+“You only need two days off, I’ll call in and say you had an accident.”
+“I can’t risk my job, I just started.”
+“But, treasure, you can! These tickets are just the beginning of what’s in store for us. I don’t need to manage the restaurant, you don’t need a tedious day job, we’re set,” I explained.
+“You don’t get it!” Noor suddenly shouted. “I want to teach.” Reading the disbelief written on my face she continued, “Yes, I’m tired. It’s tiring to work. But I want a-a future! I want to be able to look a year ahead and actually see something.”
+Each word—each sensible, concise and honest word—drove me down into the hardwood floor. I was wedged in, stuck. Why did I think she would be as excited as me? She wasn’t overturning a past lie she told or putting up a new front to frustrate me. This was her truth. I missed it because I never asked.  
 
-“Come on, just put your eyes under a faucet… that one looks free.”
-“Are you sure?” I asked. “What about you?”
-My eyes were still squeezed shut as she guided me into the restaurant kitchen.
-“I’m fine, I’ve got a wet towel.”
-After a few seconds under the water, I pulled my head back and blinked.
-“Am I crazy or is pepper spray pretty mild?” 
-“Well, actually it’s just some cooking oil mixed with water,” she admitted. “I don’t trust myself with the real thing. But, still, I’m really sorry some got on you.”
-I started to dry my face off with the hem of my shirt.
-“You said you work here?”
-“For the time being…”
-I blinked until my eyes stayed open. 
-“Have you tried the bar’s tasting menu?” I asked. She shook her head. “Come split it with me. My friends are never game. Always saying they’re ‘too full’ after dinner.”
-“You mean like, the uh, wine and cheese thing? That’s a little…”
-“My treat.” 
-
-She swirled the wine glass and inhaled deeply through her nose, just as I taught her.
-“The aroma is… citrus-y?” she looked up at me for approval, her rosy cheek leaned lazily against the glass.
-“Good, what else?”
-She sighed, steadied again, and closed her eyes.
-“Something—what did you call it earlier? When there’s greens—Ah! Vegetal, and maybe herbaceous notes?”
-“Look at you! Cheers!” I applauded. 
-She took an eager sip. Even this far into the tasting menu, I hadn’t grown tired of watching her face light up, relax, contemplate, or even scrunch up in disgust, as she tried each delicacy for the first time. 
-“So, I don’t mean to pry, but as your victim I think I deserve to know... Why carry around the fake pepper spray?”
-What I really wanted to ask was how she can be so defensive yet vulnerable at the same time, so stubborn yet incompetent, in a way that made my heart pound all the way up into my head. 
-She avoided my gaze and smacked her lips as if still savoring the grape. 
-I lowered my voice and looked wistfully away. “We're in a pretty nice area.”
-“I’ve had some bad experiences in the past,” she explained with an awkward smile. “Some impulsive exes and pushy strangers. I’m new here, too. Still getting used to letting my guard down, I guess. I think you’ve already helped with that a bit.”`
+“Hey, let’s… let’s talk about this more later, okay? Maybe you can go on Thursday and I’ll come join you on Saturday,” Noor softened.
+Seeing me frozen in place, she reached out, slow and cautious, to caress my stiff arms. I felt nearly as fragile as her touch would suggest, but at the same time ready to melt away into her embrace.
+“We’ll figure it out,” her whisper brushed against my ear. It began to itch.`

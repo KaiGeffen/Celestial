@@ -1,16 +1,19 @@
-export default `When my parents picked me up, my rash had just faded. I made a plea to bring the stray home with us, which was immediately rejected. 
-“Who will watch her while you’re at school?” Mom asked.
-“Cats are independent,” I argued. “She can be alone for a bit during the day.”
-“Even so, we need you downstairs in the diner after school. Who will watch her then?”
-“Why do I have to stay downstairs? I don’t even do anything—just finish my homework and sit around while you and Dad are all busy… it’s so boring. But if she was with me—”
-“It’s a sanitation hazard, Kitz,” Mom said. “We can’t have a pet wandering around, let alone a stray with who-knows-what kinds of diseases and infestations.” 
-As the one managing the front of the house, Mom was always nagging about those kinds of things. She treated the diner like a newborn, even though it’d already been a year since the grand opening.
-“I’ll stay upstairs with her! Please! I don’t like staying in the diner anyway.” 
-I mumbled the last part. Dad heard it anyway.
-“Tell me, Sport,” Dad chimed in, “what’s the big sign at our place say, the one you picked out the colors and font for?” 
-It was something he brought up anytime I expressed discontent. 
-“What’s it say?” he repeated. 
-“Kitz’s Diner.” 
-“That’s right.”
-Those two words could slam shut any discussion. 
-I turned my head and looked out the window. The image of the sign with its red, cursive letters spelling out my name seemed to transpose itself onto the scenery blurring by. I couldn’t remember whose idea it was to name the diner after me, but it wasn’t something I’d asked for. Owning a restaurant was Mom’s lifelong dream, and Dad took pride in running the kitchen. I wasn’t sure where I fit in the picture. Maybe that was why they chose my name for the sign: to wedge me into their vision.`
+export default `I had never seen the kitchen so quiet and still, devoid of the barking orders or clattering dishes. It was the first time I stayed up past closing. 
+
+That characteristic twinkle, impossible to miss, flickered in Dad’s blue eyes and he lifted two crostinis.
+“Close your eyes, Mila.”
+Mom did so without even a blink of hesitation.
+“Tell me which quark we should go with,” Dad said.
+He cupped one hand under her chin as he fed her a bite of the first slice. Soft crunching filled the silence as Mom chewed delicately. She nodded and Dad fed her the next sample. 
+“Mmm,” she hummed. “Both cheeses are beautiful, but the rye…”
+Dad brushed a crumb from the corner of her mouth and brought it to his own lips, kissing it off his thumb. At his touch, Mom’s eyes fluttered open, her features softened and her focused expression melted away to bare tenderness. She appeared rapt in another manner.
+“I know, we’ll serve a fresh bake on Monday. Consider the spread itself,” Dad assured. 
+“Then, I’ll have to go with the first one.”
+“Really?” Dad asked. “No need for a second bite of either?”
+Mom nodded with conviction. “The acidity cut through, sharper, and without insulting the richness.”
+“Enough to earn us our star?”
+Mom rolled her eyes, a small smile on her lips, before she sighed with lighthearted exasperation. The subtle, sweet air that flowed between them like an invisible tether, bound by their eyes, dissolved when she turned to me.
+“We have our lucky star right here,” Mom declared.
+“But of course!” Dad chuckled and pushed the tray of samples towards me. “We need a verdict from our most trusted consultant.”
+My cheeks warmed and I kept my head down, studying the muddled gray-orange of the granite countertop as I took both pieces of rye. I was ashamed as if I had shattered something precious. The first bite was a convenient distraction. The quark, heavy on my tongue, was smooth and creamy, but a prickling tartness made my face tighten and scrunch. I tried to shake the revulsion off of me before my parents could notice, then steeled myself for a bite of the second sample. The same exact texture and taste invaded my mouth. This time I didn’t allow the confusion to reach my expression.
+“Mom’s right!”`
