@@ -10,8 +10,8 @@ Dr. Stacy folded up her glasses and set them on the desk decisively. “You know
 “What really matters right now is your story. Where do all these alarm bells in your mind come from?”
 “God,” I huffed, “where would I even start?”
 “When was the last time you felt betrayed? Let’s begin there.”
-“That’s barely scratching the surface”
-“I know, I find starting with the recent helps patients then reach further back.”
+“That’s barely scratching the surface.”
+“I know, I find starting with the recent helps patients to then reach further back.”
 “So… you want me to tell you about my life, backwards?”
 “Correct.”
 “I’ve never delivered a story that way, but sure. At this point, why not.”`

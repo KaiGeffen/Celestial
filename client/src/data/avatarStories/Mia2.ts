@@ -8,7 +8,7 @@ My phone rang, a call from Chelsea.
 I tapped the speaker button and sprawled onto the queen-sized bed, spreading my limbs across all the space that newly belonged to only me.
 “Mia! How are you? I’ve been trying to reach you all day.”
 “Sorry. I was probably just napping, or busy. I’m doing well, though. Really well.”
-“Okay… that’s good to hear,”Chelsea’s voice answered hesitantly. I wondered if she meant it. “Did you figure out the work situation?”
+“Okay… that’s good to hear,” Chelsea’s voice answered hesitantly. I wondered if she meant it. “Did you figure out the work situation?”
 “I quit.”
 “Oh no, again? I’m sorry.”
 “Why? I needed to, it was a terrible environment for me.”

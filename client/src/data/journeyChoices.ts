@@ -39,7 +39,7 @@ const JOURNEY_CHOICES: JourneyChoiceData[] = [
   },
   // 2 — Mia
   {
-    intro: `I never knew what to make of my work in therapy. Maybe it helped, I did a lot more in life than I thought I’d be capable of. To be honest there are things I know I haven’t gotten over… things I don’t want to relive and unpack, even if I managed to mention them in my story, or to Dr. Stacy. Why should I? Why is it on me to resolve the things that I went through—the things that were done to me. You could give me a whole lifetime to heal, and I’d still rather punish and protect.`,
+    intro: `I never knew what to make of my work in therapy. Maybe it helped, I did a lot more in life than I thought I’d be capable of. To be honest there are things I know I haven’t gotten over… things I don’t want to relive and unpack, even if I managed to mention them in my story, or to Dr. Stacy. Why should I? Why is it on me to resolve the things that I went through—the things that were done to me? You could give me a whole lifetime to heal, and I’d still rather punish and protect.`,
     options: [
       {
         text: `You have a voice worth sharing and appreciating. Don’t let past wounds scare you into silence.`,
@@ -49,8 +49,8 @@ My blog, I haven’t checked on it in years, but I hope it goes viral. I hope it
       },
       {
         text: `I hear and believe you. You can rest now, you’re safe.`,
-        result: `Safe? Well, that depends on  how you define “safe”. Plenty of times I’ve been told I’m safe when that couldn’t be further from the truth…Not that you would do that. I know this place is different. You’re different from anyone I’ve met on Earth, too. You’ve actually listened, for one. I guess I wouldn’t have gotten this far in telling my story without feeling safe, somewhere deep down. I…I want to trust this feeling; your words. Is that okay? I think so. I wish I realized I could relax much sooner, it feels so freeing—like the relief I’ve been waiting for my whole life. Maybe—now that I’m thinking about it—maybe I could’ve reached this feeling long before even entering this realm. 
-At least now I’m ready to stop looking over my shoulder, it's tiring. Will healing let me rest? If so, I’m willing to try. `,
+        result: `Safe? Well, that depends on how you define “safe.” Plenty of times I’ve been told I’m safe when that couldn’t be further from the truth…Not that you would do that. I know this place is different. You’re different from anyone I’ve met on Earth, too. You’ve actually listened, for one. I guess I wouldn’t have gotten this far in telling my story without feeling safe, somewhere deep down. I…I want to trust this feeling; your words. Is that okay? I think so. I wish I realized I could relax much sooner, it feels so freeing—like the relief I’ve been waiting for my whole life. Maybe—now that I’m thinking about it—maybe I could’ve reached this feeling long before even entering this realm.
+At least now I’m ready to stop looking over my shoulder, it’s tiring. Will healing let me rest? If so, I’m willing to try. `,
       },
     ],
   },
